@@ -1,0 +1,11 @@
+singleQuote: true
+semi: false
+printWidth: 100
+trailingComma: none
+endOfLine: lf
+arrowParens: always
+importOrder: ['<THIRD_PARTY_MODULES>', '^@renderer/(.*)$', '^[./]']
+importOrderSeparation: true
+importOrderSortSpecifiers: true
+importOrderParserPlugins: ['typescript', 'decorators']
+plugins: ['@trivago/prettier-plugin-sort-imports']

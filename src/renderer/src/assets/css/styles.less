@@ -1,0 +1,62 @@
+::selection {
+  background: #c0c0c0;
+  text-shadow: none;
+}
+
+:root {
+  color-scheme: dark;
+  --background-color-primary: rgb(36, 36, 36);
+  --app-min-height: 520px;
+  --app-min-width: 670px;
+  --app-title-bar-height: 30px;
+  --scroll-bar-height: 6px;
+  --scroll-bar-width: 6px;
+}
+
+::-webkit-scrollbar {
+  width: var(--scroll-bar-width);
+  height: var(--scroll-bar-height);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4c4c4c;
+  border-radius: 2px;
+
+  &:hover {
+    background-color: #626262;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+#app,
+html,
+body,
+#naive-ui-config-provider {
+  height: 100%;
+}
+
+#v-binder-view-measurer {
+  top: var(--app-title-bar-height) !important;
+}
+
+body {
+  // 防止一些使用绝对布局的元素溢出，产生多余的滚动条
+  overflow: hidden;
+}
+
+body {
+  user-select: none;
+  background-color: var(--background-color-primary);
+}
+
+a {
+  color: rgb(144, 198, 166);
+}
+
+a:visited {
+  color: rgb(144, 198, 166);
+}

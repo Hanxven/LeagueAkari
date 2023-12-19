@@ -1,0 +1,161 @@
+[lol-view] {
+  font-size: 12px;
+
+  attention {
+    color: rgb(255, 179, 0);
+    font-weight: 700;
+    margin: 0 2px;
+  }
+
+  stats {
+    display: block;
+  }
+
+  maintext {
+    display: block;
+  }
+
+  li {
+    list-style: none;
+  }
+
+  truedamage {
+    color: rgb(233, 255, 255);
+    font-weight: 700;
+    margin: 0 2px;
+  }
+
+  physicaldamage {
+    color: rgb(255, 212, 113);
+    font-weight: 700;
+    margin: 0 2px;
+  }
+
+  festeal {
+    color: rgb(255, 125, 113);
+    font-weight: 700;
+    margin: 0 2px;
+  }
+
+  buffedstat,
+  ornnbonus {
+    color: rgb(94, 255, 0);
+    font-weight: 700;
+    margin: 0 2px;
+
+    &::after {
+      content: '↑';
+      margin-left: 2px;
+    }
+  }
+
+  nerfedstat {
+    color: rgb(255, 87, 36);
+    font-weight: 700;
+    margin: 0 2px;
+
+    &::after {
+      content: '↓';
+      margin-left: 2px;
+    }
+  }
+
+  passive,
+  active {
+    color: white;
+    font-weight: 700;
+    font-style: italic;
+    margin: 0 2px;
+  }
+
+  status {
+    color: rgb(246, 138, 214);
+    font-weight: 700;
+    margin: 0 2px;
+  }
+
+  stats + br,
+  status + br,
+  maintext + br,
+  passive + br,
+  scalemr + br,
+  scalemana + br,
+  truedamage + br,
+  scaleap + br,
+  speed + br {
+    display: none;
+  }
+
+  raritymythic {
+    font-weight: 700;
+    color: yellow;
+  }
+
+  raritylegendary {
+    color: rgb(244, 246, 138);
+    font-weight: 700;
+    margin: 0 2px;
+  }
+
+  scalemr {
+    font-weight: 700;
+    color: rgb(47, 158, 255);
+    margin: 0 2px;
+  }
+
+  scalead {
+    font-weight: 700;
+    color: rgb(247, 247, 113);
+    margin: 0 2px;
+  }
+
+  scaleap,
+  magicdamage,
+  scalemana {
+    font-weight: 700;
+    color: rgb(47, 231, 255);
+    margin: 0 2px;
+  }
+
+  speed {
+    font-weight: 700;
+    color: rgb(161, 232, 74);
+    margin: 0 2px;
+  }
+
+  flavortext,
+  rules {
+    font-style: italic;
+  }
+
+  flavortext::before {
+    content: '“';
+  }
+
+  flavortext:after {
+    content: '”';
+  }
+
+  gold {
+    font-weight: 700;
+    color: rgb(255, 231, 47);
+    margin: 0 2px;
+  }
+
+  scalelevel {
+    font-weight: 700;
+    color: rgb(226, 226, 226);
+    margin: 0 2px;
+  }
+
+  lol-uikit-tooltipped-keyword {
+    display: inline;
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    margin: 8px 0;
+    background-color: rgb(96, 96, 96);
+  }
+}

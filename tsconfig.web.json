@@ -1,0 +1,21 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "include": [
+    "src/renderer/src/env.d.ts",
+    "src/renderer/src/**/*",
+    "src/renderer/src/**/*.vue",
+    "src/preload/*.d.ts",
+    "champ-select.ts"
+  ],
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@renderer/*": ["src/renderer/src/*"]
+    },
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  }
+}

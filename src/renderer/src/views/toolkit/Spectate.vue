@@ -1,0 +1,166 @@
+<template>
+  <NCard size="small">
+    <template #header
+      ><span class="card-header-title"
+        >观战{{ gameflow.phase === 'Lobby' ? ' (需要先退出当前房间)' : '' }}</span
+      ></template
+    >
+    <div class="control-line">
+      <span class="label">召唤师名称</span>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <NDropdown
+          trigger="click"
+          placement="top-start"
+          :disabled="gameflow.phase !== 'None'"
+          :options="watchableFriendOptions"
+          @select="(puuid) => handleSpectatePuuid(puuid)"
+          @update:show="handleLoadFriends"
+        >
+          <NInput
+            placeholder="召唤师名称 / PUUID"
+            style="width: 200px"
+            size="tiny"
+            :disabled="gameflow.phase !== 'None'"
+            @keyup.enter="handleSpectate"
+            v-model:value="spectator.summonerIdentity"
+          ></NInput>
+        </NDropdown>
+        <NButton
+          :loading="spectator.isProcessing"
+          :disabled="spectator.summonerIdentity.length === 0 || gameflow.phase !== 'None'"
+          @click="handleSpectate"
+          size="tiny"
+          >调起观战</NButton
+        >
+      </div>
+    </div>
+  </NCard>
+</template>
+
+<script setup lang="ts">
+import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
+import { computed, reactive, ref } from 'vue'
+
+import { notify } from '@renderer/events/notifications'
+import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
+import { getFriends } from '@renderer/http-api/chat'
+import { LcuHttpError } from '@renderer/http-api/common'
+import { launchSpectator } from '@renderer/http-api/spectator'
+import { getSummonerByName } from '@renderer/http-api/summoner'
+import { Friend } from '@renderer/types/chat'
+
+const id = 'view:toolkit:spectate'
+
+const gameflow = useGameflowStore()
+
+const spectator = reactive({
+  summonerIdentity: '',
+  isProcessing: false
+})
+
+const handleSpectate = async () => {
+  if (spectator.isProcessing || gameflow.phase !== 'None') {
+    return
+  }
+
+  spectator.isProcessing = true
+
+  let targetPuuid: string
+
+  if (spectator.summonerIdentity.includes('-')) {
+    targetPuuid = spectator.summonerIdentity
+  } else {
+    try {
+      const {
+        data: { puuid }
+      } = await getSummonerByName(spectator.summonerIdentity)
+      targetPuuid = puuid
+    } catch (err) {
+      notify.emit({
+        id,
+        type: 'warning',
+        content: `目标玩家 ${spectator.summonerIdentity} 不存在`
+      })
+
+      spectator.isProcessing = false
+      return
+    }
+  }
+
+  try {
+    await launchSpectator(targetPuuid)
+    notify.emit({
+      id,
+      type: 'success',
+      content: '已拉起观战'
+    })
+  } catch (err) {
+    if ((err as LcuHttpError).response?.status === 404) {
+      notify.emit({
+        id,
+        type: 'warning',
+        content: '尝试观战失败，玩家不存在',
+        extra: { error: err }
+      })
+    } else {
+      notify.emit({
+        id,
+        type: 'warning',
+        content: '尝试观战失败，该玩家可能不在对局中或目标模式不可观战',
+        extra: { error: err }
+      })
+    }
+  }
+
+  spectator.isProcessing = false
+}
+
+// 一个 PUUID 的版本
+const handleSpectatePuuid = async (puuid: string) => {
+  if (spectator.isProcessing || gameflow.phase !== 'None') {
+    return
+  }
+
+  spectator.isProcessing = true
+
+  try {
+    await launchSpectator(puuid)
+    notify.emit({
+      id,
+      type: 'success',
+      content: '已拉起观战'
+    })
+  } catch (err) {
+    notify.emit({
+      id,
+      type: 'warning',
+      content: '尝试观战失败，该玩家可能不在对局中或目标模式不可观战',
+      extra: { error: err }
+    })
+  } finally {
+    spectator.isProcessing = false
+  }
+}
+
+const friends = ref<Friend[]>([])
+const watchableFriendOptions = computed(() => {
+  return friends.value
+    .filter((f) => f.lol.gameStatus === 'inGame')
+    .map((v) => ({
+      key: v.puuid,
+      label: v.name
+    }))
+})
+
+const handleLoadFriends = async () => {
+  try {
+    friends.value = (await getFriends()).data
+  } catch (err) {
+    console.error('好友列表加载失败', err)
+  }
+}
+</script>
+
+<style lang="less" scoped>
+@import './style.less';
+</style>

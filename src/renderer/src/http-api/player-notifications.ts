@@ -1,0 +1,11 @@
+import { PlayerNotifications } from '@renderer/types/player-notifications'
+
+import { request } from './common'
+
+export function createNotification(data: Partial<PlayerNotifications>) {
+  return request({
+    method: 'POST',
+    url: '/player-notifications/v1/notifications',
+    data
+  })
+}
