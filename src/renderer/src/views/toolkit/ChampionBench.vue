@@ -29,6 +29,7 @@
           v-for="c of benchChampions"
           :key="c.championId"
           class="champion-image"
+          :class="{ 'champion-image-invalid': !champSelect.currentPickableChampions.has(c.championId) }"
           :src="championIcon(c.championId)"
           @click="() => handleBenchSwap(c.championId)"
         />
@@ -102,6 +103,10 @@ const handleBenchSwap = async (championId: number) => {
     return
   }
 
+  if (!champSelect.currentPickableChampions.has(championId)) {
+    return
+  }
+
   isSwapping.value = true
   try {
     await benchSwap(championId)
@@ -171,6 +176,11 @@ const handleReroll = async (grabBack = false) => {
   height: @size;
   border-radius: @border-radius;
   cursor: pointer;
+}
+
+.champion-image-invalid {
+  cursor: not-allowed;
+  filter: grayscale(1);
 }
 
 .champion-image-placeholder {
