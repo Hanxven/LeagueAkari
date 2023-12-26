@@ -13,7 +13,7 @@ asarUnpack:
   - resources/**
 afterSign: build/notarize.js
 win:
-  target: zip
+  target: 7z
   executableName: LeagueToolkit
   # icon: resources/lt-icon.ico
 nsis:
