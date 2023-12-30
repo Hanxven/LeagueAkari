@@ -1,7 +1,7 @@
 import cp from 'child_process'
 import { randomUUID } from 'crypto'
 import { app } from 'electron'
-import fs from 'fs'
+import fs, { rmSync } from 'fs'
 import path from 'path'
 
 /**
@@ -59,28 +59,27 @@ const clientName = 'LeagueClientUx.exe'
 export function queryLcuAuth(): Promise<LcuAuth> {
   return new Promise(function (resolve, reject) {
     try {
-      const savePath = path.join(app.getPath('temp'), randomUUID())
+      const savePath = path.join(app.getPath('temp'), 'temp-' + randomUUID())
       const cmd =
-        `
-      $_ = Start-Process powershell ` +
+        `$_ = Start-Process powershell ` +
         `-Argumentlist "\`$PSDefaultParameterValues['Out-File:Encoding']='utf8';` +
         `Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}''' | ` +
-        `Select-Object CommandLine | fl > ${savePath}" ` +
-        `-WindowStyle hidden -Verb runas -Wait -PassThru`
+        `Select-Object -ExpandProperty CommandLine | Out-File ${savePath} -Encoding UTF8" ` +
+        `-WindowStyle hidden -Verb runas -Wait -PassThru
+      `
       cp.exec(cmd, { shell: 'powershell' }, () => {
         try {
           if (!fs.existsSync(savePath)) {
-            throw new Error('file not exists')
+            throw new Error('File not exists')
           }
           const raw = fs.readFileSync(savePath, 'utf-8').replace(/\s/g, '')
           if (raw.trim().length === 0) {
-            throw new Error('empty file')
+            throw new Error('Empty file')
           }
 
-          const [, port] = raw.match(portRegex)!
-          const [, password] = raw.match(passwordRegex)!
-          const [, pid] = raw.match(pidRegex)!
-          fs.rmSync(savePath)
+          const [, port] = raw.match(portRegex) || []
+          const [, password] = raw.match(passwordRegex) || []
+          const [, pid] = raw.match(pidRegex) || []
           resolve({
             port: Number(port),
             pid: Number(pid),
@@ -89,7 +88,49 @@ export function queryLcuAuth(): Promise<LcuAuth> {
           })
         } catch (e) {
           reject(e)
+        } finally {
+          rmSync(savePath)
         }
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+export function queryLcuAuthOnAdmin(): Promise<LcuAuth> {
+  return new Promise(function (resolve, reject) {
+    try {
+      const cmd = `Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}''' | 
+      Select-Object -ExpandProperty CommandLine`
+
+      cp.exec(cmd, { shell: 'powershell' }, (error, stdout, stderr) => {
+        if (error) {
+          reject(new Error('Error executing PowerShell script: ' + stderr))
+          return
+        }
+
+        const raw = stdout.trim()
+        if (raw.length === 0) {
+          reject(new Error('No output from PowerShell script'))
+          return
+        }
+
+        const [, port] = raw.match(portRegex) || []
+        const [, password] = raw.match(passwordRegex) || []
+        const [, pid] = raw.match(pidRegex) || []
+
+        if (!port || !password || !pid) {
+          reject(new Error('Failed to parse output'))
+          return
+        }
+
+        resolve({
+          port: Number(port),
+          pid: Number(pid),
+          password,
+          certificate
+        })
       })
     } catch (e) {
       reject(e)

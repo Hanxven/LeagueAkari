@@ -3,8 +3,15 @@ import https from 'https'
 import { observable, reaction, runInAction, toJS } from 'mobx'
 import { WebSocket } from 'ws'
 
-import { LcuAuth, certificate, isLcuAuthObject, queryLcuAuth } from '../utils/lcu-auth'
+import {
+  LcuAuth,
+  certificate,
+  isLcuAuthObject,
+  queryLcuAuth,
+  queryLcuAuthOnAdmin
+} from '../utils/lcu-auth'
 import { getRandomAvailableLoopbackAddrWithPort } from '../utils/loopback'
+import { basicState } from './basic'
 import { onCall, sendUpdateToAll } from './common'
 
 let request: AxiosInstance | null = null
@@ -42,8 +49,7 @@ async function initHttpInstance(auth: LcuAuth) {
     },
     httpsAgent: new https.Agent({
       ca: auth.certificate,
-      localAddress: await getRandomAvailableLoopbackAddrWithPort(auth.port),
-      keepAlive: true
+      localAddress: await getRandomAvailableLoopbackAddrWithPort(auth.port)
     }),
     timeout: 10000,
     proxy: false
@@ -95,9 +101,7 @@ export function getWebSocket() {
   return ws
 }
 
-// 连接之后立即发送大量请求有一定概率会失败
-// 因此设置一点缓冲时间
-const INTERNAL_WAITING_TIME = 500
+const INTERVAL_TIMEOUT = 10000
 
 export async function initConnectionIpc() {
   onCall('connect', async (_, auth1?: LcuAuth) => {
@@ -114,35 +118,39 @@ export async function initConnectionIpc() {
         connectState.wsState = 'connecting'
       })
 
-      const auth = auth1 || (await queryLcuAuth())
+      const auth =
+        auth1 || (basicState.isAdmin ? await queryLcuAuthOnAdmin() : await queryLcuAuth())
 
       auth.certificate = auth.certificate || certificate
 
-      await initHttpInstance(auth)
       const ws = await initWebSocket(auth)
 
       let timeoutTimer: NodeJS.Timeout
-      let internalWaitingTimer: NodeJS.Timeout
       await new Promise<void>((resolve, reject) => {
         timeoutTimer = setTimeout(() => {
           ws.close()
           reject(new Error('连接超时'))
-        }, 10000)
+        }, INTERVAL_TIMEOUT)
 
-        ws.on('open', () => {
-          clearTimeout(timeoutTimer)
-          internalWaitingTimer = setTimeout(() => {
-            runInAction(() => {
-              connectState.wsState = 'connected'
-              connectState.auth = auth
-            })
-          }, INTERNAL_WAITING_TIME)
+        ws.on('open', async () => {
+          try {
+            await initHttpInstance(auth)
+            clearTimeout(timeoutTimer)
+          } catch (err) {
+            reject(err)
+          }
+
           ws.send(JSON.stringify([5, 'OnJsonApiEvent']))
+
+          runInAction(() => {
+            connectState.wsState = 'connected'
+            connectState.auth = auth
+          })
+
           resolve()
         })
 
         ws.on('error', () => {
-          clearTimeout(internalWaitingTimer)
           runInAction(() => {
             connectState.wsState = 'disconnected'
             connectState.auth = null
@@ -152,7 +160,6 @@ export async function initConnectionIpc() {
       })
 
       ws.on('close', () => {
-        clearTimeout(internalWaitingTimer)
         runInAction(() => {
           connectState.wsState = 'disconnected'
           connectState.auth = null

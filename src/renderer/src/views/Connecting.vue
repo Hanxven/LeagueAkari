@@ -15,7 +15,9 @@
         secondary
         v-if="!appState.isAdmin || (appState.isAdmin && isErr)"
         :type="isClientExists ? 'primary' : 'default'"
-        :loading="lcuState.state === 'connecting' || isAttemptingConnect"
+        :loading="
+          lcuState.state === 'connecting' || isAttemptingConnect || lcuState.state === 'connected'
+        "
         @click="() => handleConnect(1)"
         ><template v-if="isAttemptingConnect">尝试连接...</template>
         <template v-else
@@ -34,7 +36,7 @@
 
 <script setup lang="ts">
 import { useTimeoutPoll } from '@vueuse/core'
-import { NButton } from 'naive-ui'
+import { NButton, useNotification } from 'naive-ui'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -47,6 +49,7 @@ const isClientExists = ref(false)
 const isErr = ref(false)
 
 const router = useRouter()
+const notification = useNotification()
 
 const handleConnect = async (maxAttempts = 3) => {
   let attempts = 0 // 初始化尝试次数
@@ -63,6 +66,11 @@ const handleConnect = async (maxAttempts = 3) => {
       isAttemptingConnect.value = false
       return
     } catch (err) {
+      notification.warning({
+        duration: 5000,
+        content: (err as any).message ? (err as any).message : '发生错误'
+      })
+
       attempts++ // 增加尝试次数
       console.warn(`连接失败，正在尝试第 ${attempts} 次重连：`, err)
       if (attempts >= maxAttempts) {

@@ -11,7 +11,7 @@ export const basicState = observable({
 })
 
 // 基础通讯 API
-export function initBasicIpc() {
+export async function initBasicIpc() {
   reaction(
     () => basicState.isAdmin,
     (isAdmin) => {
@@ -19,16 +19,21 @@ export function initBasicIpc() {
     }
   )
 
-  cp.exec('net session', (err) => {
-    if (err) {
-      runInAction(() => {
-        basicState.isAdmin = false
-      })
-    } else {
-      runInAction(() => {
-        basicState.isAdmin = true
-      })
-    }
+  await new Promise<void>((resolve, reject) => {
+    resolve()
+    cp.exec('net session', (err) => {
+      if (err) {
+        runInAction(() => {
+          basicState.isAdmin = false
+        })
+        reject()
+      } else {
+        runInAction(() => {
+          basicState.isAdmin = true
+        })
+        resolve()
+      }
+    })
   })
 
   onCall('isAdmin', () => {

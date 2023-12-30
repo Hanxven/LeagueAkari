@@ -58,7 +58,7 @@ function createMainWindow(): void {
   }
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('sugar.cocoa.league-toolkit')
 
@@ -66,7 +66,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  initBasicIpc()
+  await initBasicIpc()
   initConnectionIpc()
   initWindowsPlatform()
   initDatabase()

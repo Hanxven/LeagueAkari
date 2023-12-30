@@ -73,6 +73,15 @@ function lcuState() {
   onUpdate('lcuAuth', (_, auth) => {
     lcuState.auth = auth
   })
+
+  watch(
+    () => lcuState.auth,
+    (auth) => {
+      if (auth) {
+        console.log('LCU Auth got', auth)
+      }
+    }
+  )
 }
 
 function gameflow() {
