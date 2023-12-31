@@ -13,6 +13,7 @@ export type PrintRules = Record<
 export const useSettingsStore = defineStore('settings', () => {
   const app = reactive({
     autoConnect: true,
+    autoCheckUpdates: true,
     fixWindowMethodAOptions: {
       baseWidth: 1600,
       baseHeight: 900

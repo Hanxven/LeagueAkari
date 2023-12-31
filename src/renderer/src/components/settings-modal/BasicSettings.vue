@@ -12,6 +12,16 @@
           />
         </div>
       </div>
+      <div class="control-line">
+        <div class="label" title="在应用启动时检查更新">自动检查更新</div>
+        <div class="control">
+          <NSwitch
+            size="small"
+            :value="settings.app.autoCheckUpdates"
+            @update:value="(val: boolean) => setAutoCheckUpdates(val)"
+          />
+        </div>
+      </div>
     </NCard>
   </NScrollbar>
 </template>
@@ -19,7 +29,7 @@
 <script setup lang="ts">
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
 
-import { setAutoConnect } from '@renderer/features/app'
+import { setAutoCheckUpdates, setAutoConnect } from '@renderer/features/app'
 import { useSettingsStore } from '@renderer/features/stores/settings'
 
 const settings = useSettingsStore()

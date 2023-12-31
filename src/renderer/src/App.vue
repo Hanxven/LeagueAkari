@@ -1,6 +1,7 @@
 <template>
   <div id="app-frame">
     <SettingsModal v-model:show="isShowingSettingModal" />
+    <UpdateModal v-model:show="isShowingNewUpdateModal" />
     <AppTitleBar @open-settings="isShowingSettingModal = true" />
     <div class="content"><RouterView /></div>
   </div>
@@ -11,8 +12,10 @@ import { ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AppTitleBar from './components/AppTitleBar.vue'
+import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import { setupNaiveUiNotificationEvents } from './events/notifications'
+import { useAppState } from './features/stores/app'
 import { useLcuStateStore } from './features/stores/lcu-connection'
 import { greeting } from './utils/greeting'
 
@@ -29,7 +32,20 @@ watchEffect(() => {
   }
 })
 
+const appState = useAppState()
+
 const isShowingSettingModal = ref(false)
+const isShowingNewUpdateModal = ref(false)
+
+watchEffect(() => {
+  if (appState.newUpdate) {
+    isShowingNewUpdateModal.value = true
+  } else {
+    isShowingNewUpdateModal.value = false
+  }
+})
+
+// check for updates
 </script>
 
 <style lang="less">

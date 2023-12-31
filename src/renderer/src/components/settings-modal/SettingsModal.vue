@@ -53,6 +53,13 @@
             >League Toolkit</a
           >
         </div>
+        <div class="about-para">
+          检查更新：<span
+            style="color: rgb(131, 193, 204); text-decoration: underline; cursor: pointer"
+            @click="() => checkUpdates()"
+            >{{ appState.isCheckingUpdates ? '正在检查' : '检查更新' }}</span
+          >
+        </div>
       </NTabPane>
     </NTabs>
   </NModal>
@@ -62,6 +69,7 @@
 import { NModal, NTabPane, NTabs } from 'naive-ui'
 import { useCssModule } from 'vue'
 
+import { checkUpdates } from '@renderer/features/app'
 import { useAppState } from '@renderer/features/stores/app'
 
 import BasicSettings from './BasicSettings.vue'
