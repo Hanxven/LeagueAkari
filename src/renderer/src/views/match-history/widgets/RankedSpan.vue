@@ -13,7 +13,7 @@
         {{ formatRankText(q) }}
       </div>
       <div v-if="!queueType" class="tip" style="margin-top: 4px">
-        展示优先级：单双排位 > 灵活排位 > 云顶之弈 > 北极星竞技场
+        展示优先级：单双排位 > 灵活排位 > 云顶之弈 > 竞技场
       </div>
       <div class="tip">仅展示本赛季段位信息</div>
     </NPopover>

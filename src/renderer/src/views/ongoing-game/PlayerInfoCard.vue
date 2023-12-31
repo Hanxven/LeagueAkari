@@ -145,7 +145,7 @@
           </template>
         </div>
         <div class="hint" v-if="queueType === 'CHERRY'">
-          统计自最近 {{ analysis.cherryGames }} 场北极星竞技场
+          统计自最近 {{ analysis.cherryGames }} 场竞技场
         </div>
         <div class="hint" v-else>统计自最近 {{ analysis.validGames }} 场有效对局</div>
       </div>
