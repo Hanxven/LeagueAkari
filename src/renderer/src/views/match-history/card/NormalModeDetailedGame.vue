@@ -186,8 +186,6 @@ const props = defineProps<{
   selfId?: number
 }>()
 
-const gameData = useGameDataStore()
-
 const match = computed(() => {
   const identities: Record<string, ParticipantIdentity> = {}
   props.game.participantIdentities.forEach((identity) => {

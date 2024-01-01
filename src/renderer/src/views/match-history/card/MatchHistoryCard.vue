@@ -3,21 +3,32 @@
     <NModal size="small" v-model:show="isModalShow">
       <MiscellaneousPanel :game="game" />
     </NModal>
+    <DefineSubTeam v-slot="{ participants }">
+      <div class="sub-team">
+        <div class="player" v-for="p of participants" :key="p.participantId">
+          <LcuImage class="image" :src="championIcon(p.championId)" />
+          <div
+            :title="p.identity.player.summonerName"
+            class="name"
+            :class="{ self: p.isSelf }"
+            @click="() => handleToSummoner(p.identity.player.summonerId)"
+          >
+            {{ p.identity.player.summonerName }}
+          </div>
+        </div>
+      </div>
+    </DefineSubTeam>
     <div v-if="self" class="match-history-card" :class="composedResultClass">
       <div class="game">
         <div class="mode">
           {{ formattedModeText }}
         </div>
-        <NTooltip placement="top-start" :delay="300">
-          <template #trigger>
-            <div class="begin-time">
-              {{ formattedGameCreationRelativeTime }}
-            </div>
-          </template>
-          <span class="small-text">{{
-            dayjs(game.gameCreation).locale('zh-cn').format('YYYY-MM-DD HH:mm:ss')
-          }}</span>
-        </NTooltip>
+        <div
+          class="begin-time"
+          :title="dayjs(game.gameCreation).locale('zh-cn').format('YYYY-MM-DD HH:mm:ss')"
+        >
+          {{ formattedGameCreationRelativeTime }}
+        </div>
         <div class="divider"></div>
         <div
           class="result"
@@ -92,7 +103,26 @@
           <ItemDisplay :size="24" is-trinket :item-id="self.participant.stats.item6" />
         </div>
       </div>
-      <div class="players"></div>
+      <div class="players">
+        <template v-if="game.gameMode === 'CHERRY'">
+          <div class="players-cherry" v-if="isDetailed">
+            <div>
+              <SubTeam :participants="teams.subTeam1" />
+              <SubTeam :participants="teams.subTeam2" style="margin-top: 8px" />
+            </div>
+            <div>
+              <SubTeam :participants="teams.subTeam3" />
+              <SubTeam :participants="teams.subTeam4" style="margin-top: 8px" />
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <div class="players-normal" v-if="isDetailed">
+            <SubTeam :participants="teams.team1" />
+            <SubTeam :participants="teams.team2" />
+          </div>
+        </template>
+      </div>
       <div class="show-more" @click="() => handleToggleShowDetailedGame()">
         <NIcon class="icon" @click.stop="() => handleShowMiscellaneous()" title="杂项"
           ><ListIcon
@@ -132,15 +162,16 @@ import {
   ChevronUp as ChevronUpIcon,
   List as ListIcon
 } from '@vicons/ionicons5'
-import { useTimeoutPoll } from '@vueuse/core'
+import { createReusableTemplate, useTimeoutPoll } from '@vueuse/core'
 import dayjs from 'dayjs'
-import { NIcon, NModal, NTooltip } from 'naive-ui'
+import { NIcon, NModal } from 'naive-ui'
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
 import { championIcon } from '@renderer/features/game-data'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
-import { Game } from '@renderer/types/match-history'
+import { Game, ParticipantIdentity } from '@renderer/types/match-history'
 
 import '../lol-view.less'
 import ItemDisplay from '../widgets/ItemDisplay.vue'
@@ -158,6 +189,10 @@ const props = defineProps<{
   isDetailed: boolean
   game: Game
 }>()
+
+const [DefineSubTeam, SubTeam] = createReusableTemplate<{
+  participants: (typeof teams.value)[keyof typeof teams.value]
+}>({ inheritAttrs: true })
 
 // 定期更新相对时间
 const formattedGameCreationRelativeTime = ref('')
@@ -241,6 +276,35 @@ const formattedModeText = computed(() => {
 
 const isModalShow = ref(false)
 
+const teams = computed(() => {
+  const identities: Record<string, ParticipantIdentity> = {}
+  props.game.participantIdentities.forEach((identity) => {
+    identities[identity.participantId] = identity
+  })
+
+  const all = props.game.participants.map((participant) => {
+    return {
+      ...participant,
+      isSelf: identities[participant.participantId].player.summonerId === props.selfId,
+      identity: identities[participant.participantId]
+    }
+  })
+
+  if (props.game.gameMode === 'CHERRY') {
+    return {
+      subTeam1: all.filter((p) => p.stats.playerSubteamId == 1),
+      subTeam2: all.filter((p) => p.stats.playerSubteamId == 2),
+      subTeam3: all.filter((p) => p.stats.playerSubteamId == 3),
+      subTeam4: all.filter((p) => p.stats.playerSubteamId == 4)
+    }
+  } else {
+    return {
+      team1: all.filter((p) => p.teamId === 100),
+      team2: all.filter((p) => p.teamId === 200)
+    }
+  }
+})
+
 const handleShowMiscellaneous = () => {
   emits('loadDetailedGame', props.game.gameId)
   isModalShow.value = true
@@ -259,6 +323,15 @@ const emits = defineEmits<{
   (e: 'setShowDetailedGame', gameId: number, expand: boolean)
   (e: 'loadDetailedGame', gameId: number)
 }>()
+
+const router = useRouter()
+const handleToSummoner = (summonerId: number) => {
+  // 人机不跳
+  if (summonerId === 0) {
+    return
+  }
+  router.replace(`/match-history/${summonerId}`)
+}
 </script>
 
 <style lang="less" scoped>
@@ -316,7 +389,7 @@ const emits = defineEmits<{
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  flex: 1;
+  width: 260px;
 
   .stats {
     display: flex;
@@ -413,6 +486,65 @@ const emits = defineEmits<{
     display: flex;
     gap: 4px;
     width: min-content;
+  }
+}
+
+.players {
+  flex: 1;
+
+  .players-normal {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .players-cherry {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    gap: 16px;
+  }
+}
+
+.sub-team {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  width: 128px;
+
+  .player {
+    display: flex;
+    line-height: 18px;
+
+    .image {
+      height: 16px;
+      width: 16px;
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+
+    .name {
+      flex: 1;
+      width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+      color: rgb(225, 225, 225);
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: rgb(167, 167, 255);
+      }
+    }
+
+    .name.self {
+      cursor: default;
+      font-weight: 700;
+      color: white;
+    }
   }
 }
 

@@ -22,6 +22,21 @@
           />
         </div>
       </div>
+      <div class="control-line">
+        <div
+          class="label"
+          title="在请求战绩列表的同时，也会立即拉取所有详细对局，短时间内的大量请求可能导致触发服务器限制"
+        >
+          拉取详细对局
+        </div>
+        <div class="control">
+          <NSwitch
+            size="small"
+            :value="settings.matchHistory.fetchDetailedGame"
+            @update:value="(val) => setFetchDetailedGame(val)"
+          />
+        </div>
+      </div>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">对局分析</span></template>
@@ -72,6 +87,7 @@ import { NCard, NInputNumber, NScrollbar, NSwitch } from 'naive-ui'
 import {
   setAfterGameFetch,
   setAutoRouteOnGameStart,
+  setFetchDetailedGame,
   setMatchHistoryLoadCount,
   setPreMadeThreshold,
   setTeamAnalysisPreloadCount

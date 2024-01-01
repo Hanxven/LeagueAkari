@@ -39,6 +39,9 @@ export const useSettingsStore = defineStore('settings', () => {
     // 为了判断预组队而进行的每名玩家提前加载的数量
     teamAnalysisPreloadCount: 4,
 
+    // 是否拉取页面的所有详细对局
+    fetchDetailedGame: false,
+
     matchHistoryLoadCount: 20,
     /**
      * 实验性特性，暂未实装。用于控制在拉取战绩时，的瞬时并发量

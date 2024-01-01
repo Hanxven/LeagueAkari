@@ -90,7 +90,7 @@
               placeholder=""
               v-model:value="inputtingText"
               @blur="handleInputBlur"
-              @keyup.enter="() => handleLoadPage(inputtingText)"
+              @keyup.enter="() => handleLoadPage(inputtingText || 1)"
               class="page"
               :min="1"
               :show-button="false"

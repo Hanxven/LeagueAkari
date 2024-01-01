@@ -701,6 +701,13 @@ export function setMatchHistoryLoadCount(count: number) {
   setSetting('matchHistory.matchHistoryLoadCount', count)
 }
 
+export function setFetchDetailedGame(enabled: boolean) {
+  const settings = useSettingsStore()
+
+  settings.matchHistory.fetchDetailedGame = enabled
+  setSetting('matchHistory.fetchDetailedGame', enabled)
+}
+
 export async function fetchTabRankedStats(summonerId: number) {
   const matchHistory = useMatchHistoryStore()
 
@@ -848,6 +855,7 @@ export async function fetchTabMatchHistory(
   pageSize: number = 20
 ) {
   const matchHistory = useMatchHistoryStore()
+  const settings = useSettingsStore()
   const tab = matchHistory.getTab(summonerId)
 
   if (tab && tab.data.summoner) {
@@ -882,9 +890,35 @@ export async function fetchTabMatchHistory(
         return acc
       }, {} as Record<number, MatchHistoryGameTabCard>)
 
+      // 异步加载页面战绩
+      if (settings.matchHistory.fetchDetailedGame) {
+        tab.data.matchHistory.games.forEach(async (g) => {
+          try {
+            if (g.isDetailed) {
+              return
+            }
+            g.isLoading = true
+            const game = await getGame(g.game.gameId)
+            g.game = game.data
+            g.isDetailed = true
+          } catch (err) {
+            g.hasError = true
+            notify.emit({
+              id,
+              content: `页面 ${tab.id} - 拉取详细对局 ${g.game.gameId} 失败`,
+              type: 'warning',
+              silent: true
+            })
+          } finally {
+            g.isLoading = false
+          }
+        })
+      }
+
       // 统计信息
       if (page === 1 && tab.data.matchHistory.games.length > 0) {
         // TODO SOME ANALYSIS
+        // 该功能作用不大，暂未实装，在版本后弃用
         const result = analyzeOnePageMatchHistory(tab.id, tab.data.matchHistory.games)
         tab.data.firstPageAnalysis = result
       }
@@ -986,6 +1020,7 @@ export async function fetchTabFullData(summonerId: number, silent = true) {
   })
 }
 
+// TODO 搁置功能
 export function setSendPlayerList(list: number[]) {
   const mh = useMatchHistoryStore()
 
