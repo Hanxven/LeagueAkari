@@ -9,11 +9,11 @@
           'not-pickable':
             gameflow.phase === 'ChampSelect' && !champSelect.currentPickableChampions.has(c)
         }"
-        v-for="c of value.slice(0, maxShow)"
+        v-for="c of arr.slice(0, maxShow)"
         :key="c"
       />
-      <div class="hint" v-if="value.length > maxShow">+{{ value.length - maxShow }}</div>
-      <div class="hint" v-if="value.length === 0">未选择</div>
+      <div class="hint" v-if="arr.length > maxShow">+{{ arr.length - maxShow }}</div>
+      <div class="hint" v-if="arr.length === 0">未选择</div>
     </div>
     <NPopover trigger="click" ref="popover">
       <template #trigger>
@@ -83,7 +83,7 @@
               <span>{{ gameData.champions[c]?.name }}</span>
             </div>
           </div>
-          <div class="placeholder" v-if="props.value.length === 0">未选择任何英雄</div>
+          <div class="placeholder" v-if="arr.length === 0">未选择任何英雄</div>
         </div>
       </div>
     </NPopover>
@@ -104,12 +104,12 @@ import LcuImage from './LcuImage.vue'
 const props = withDefaults(
   defineProps<{ value?: number[]; maxShow?: number; maxCount?: number }>(),
   {
-    value: () => [],
     maxShow: 5,
     maxCount: Infinity
   }
 )
-const emits = defineEmits<{ (e: 'update:value', value: number[]): void }>()
+
+const arr = defineModel<number[]>('value', { default: () => [] })
 
 const gameData = useGameDataStore()
 const popover = ref()
@@ -122,7 +122,7 @@ const listCurrent = ref<number | null>(null)
 
 const selectedChampions = computed(() => {
   const set = new Set<number>()
-  props.value.forEach((value) => set.add(value))
+  arr.value.forEach((value) => set.add(value))
   return set
 })
 
@@ -141,7 +141,7 @@ const championOptions = computed(() => {
 })
 
 watch(
-  () => props.value,
+  () => arr.value,
   (list) => {
     if (listCurrent.value === null && list.length !== 0) {
       listCurrent.value = list[0]
@@ -159,7 +159,7 @@ const movable = computed(() => {
     }
   }
 
-  const index = props.value.indexOf(listCurrent.value)
+  const index = arr.value.indexOf(listCurrent.value)
 
   if (index === -1) {
     return {
@@ -169,7 +169,7 @@ const movable = computed(() => {
   }
 
   return {
-    down: index !== props.value.length - 1,
+    down: index !== arr.value.length - 1,
     up: index !== 0
   }
 })
@@ -177,8 +177,8 @@ const movable = computed(() => {
 const addable = computed(() => {
   return (
     selectCurrent.value !== null &&
-    !props.value.includes(selectCurrent.value) &&
-    props.value.length < props.maxCount
+    !arr.value.includes(selectCurrent.value) &&
+    arr.value.length < props.maxCount
   )
 })
 
@@ -191,12 +191,12 @@ const handleMove = (direction: 'up' | 'down') => {
     return
   }
 
-  const index = props.value.indexOf(listCurrent.value)
+  const index = arr.value.indexOf(listCurrent.value)
   if (index === -1) {
     return
   }
 
-  const newArr = [...props.value]
+  const newArr = [...arr.value]
   if (direction === 'up') {
     if (index === 0) {
       return
@@ -204,22 +204,22 @@ const handleMove = (direction: 'up' | 'down') => {
 
     ;[newArr[index], newArr[index - 1]] = [newArr[index - 1], newArr[index]]
   } else if (direction === 'down') {
-    if (index === props.value.length - 1) {
+    if (index === arr.value.length - 1) {
       return
     }
 
     ;[newArr[index], newArr[index + 1]] = [newArr[index + 1], newArr[index]]
   }
 
-  emits('update:value', newArr)
+  arr.value = newArr
 }
 
 const handleAdd = () => {
-  if (selectCurrent.value === null || props.value.includes(selectCurrent.value)) {
+  if (selectCurrent.value === null || arr.value.includes(selectCurrent.value)) {
     return
   }
 
-  emits('update:value', [...props.value, selectCurrent.value])
+  arr.value = [...arr.value, selectCurrent.value]
 }
 
 const handleRemove = () => {
@@ -227,11 +227,11 @@ const handleRemove = () => {
     return
   }
 
-  const index = props.value.indexOf(listCurrent.value)
-  const isLastElement = index === props.value.length - 1
-  const newValue = props.value.filter((c) => c !== listCurrent.value)
+  const index = arr.value.indexOf(listCurrent.value)
+  const isLastElement = index === arr.value.length - 1
+  const newValue = arr.value.filter((c) => c !== listCurrent.value)
 
-  emits('update:value', newValue)
+  arr.value = newValue
 
   if (newValue.length > 0) {
     if (isLastElement) {

@@ -3,8 +3,7 @@
     transform-origin="center"
     size="small"
     preset="card"
-    @update:show="(val) => emits('update:show', val)"
-    :show="show"
+    v-model:show="show"
     :class="styles['settings-modal']"
   >
     <template #header><span class="card-header-title">发现更新</span></template>
@@ -29,7 +28,9 @@
         <div class="markdown-text" v-html="markdownText"></div>
       </NScrollbar>
       <div class="para" style="font-style: italic">可以在设置中关闭自动更新检查</div>
-      <div class="para" style="font-style: italic">仍可以在：[设置 -> 关于 -> 检查更新] 中手动检查更新</div>
+      <div class="para" style="font-style: italic">
+        仍可以在：[设置 -> 关于 -> 检查更新] 中手动检查更新
+      </div>
     </div>
   </NModal>
 </template>
@@ -41,10 +42,6 @@ import { computed, useCssModule } from 'vue'
 
 import { useAppState } from '@renderer/features/stores/app'
 
-defineProps<{
-  show: boolean
-}>()
-
 const appState = useAppState()
 
 const styles = useCssModule()
@@ -55,10 +52,7 @@ const markdownText = computed(() => {
   return md.render(appState.newUpdate?.description || '')
 })
 
-// 事件转交
-const emits = defineEmits<{
-  (e: 'update:show', val: boolean): void
-}>()
+const show = defineModel<boolean>('show', { default: false })
 </script>
 
 <style lang="less" scoped>

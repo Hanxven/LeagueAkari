@@ -1,5 +1,5 @@
 <template>
-  <NModal size="small" :show="show" @update:show="(s) => emits('update:show', s)">
+  <NModal size="small" v-model:show="show">
     <div class="wrapper" @click.self="handleHideModal">
       <MatchHistoryCard
         class="card"
@@ -44,12 +44,9 @@ const id = 'comp:standalone-match-history-card-modal'
 const props = defineProps<{
   gameId?: number
   selfId?: number
-  show?: boolean
 }>()
 
-const emits = defineEmits<{
-  (e: 'update:show', show: boolean): void
-}>()
+const show = defineModel<boolean>('show', { default: false })
 
 const game = shallowRef<Game | null>(null)
 const isExpanded = ref(true)
@@ -91,7 +88,7 @@ const fetchGame = async (gameId: number) => {
 // 为了 popover 能够更好地显示，Modal 占满屏幕
 // 但是点击空白处，应该能退出
 const handleHideModal = () => {
-  emits('update:show', false)
+  show.value = false
 }
 
 const handleReload = async () => {
@@ -110,8 +107,8 @@ watch(
       fetchGame(gameId)
       isExpanded.value = true
     } else {
-      if (props.show) {
-        emits('update:show', false)
+      if (show.value) {
+        show.value = false
       }
     }
   },

@@ -3,8 +3,7 @@
     transform-origin="center"
     size="small"
     preset="card"
-    @update:show="(val) => emits('update:show', val)"
-    :show="show"
+    v-model:show="show"
     :class="styles['settings-modal']"
   >
     <template #header><span class="card-header-title">设置</span></template>
@@ -85,10 +84,7 @@ const appState = useAppState()
 
 const styles = useCssModule()
 
-// 事件转交
-const emits = defineEmits<{
-  (e: 'update:show', val: boolean): void
-}>()
+const show = defineModel<boolean>('show', { default: false })
 </script>
 
 <style lang="less" scoped>
