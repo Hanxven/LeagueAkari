@@ -80,16 +80,19 @@ export function setupMatchHistory() {
   // 记录当前游戏中每个阵营有多少的成员
   // 用于记录的临时阵营会发生变化，所以提取逻辑
   const ongoingTeamPlayers = computed(() => {
-    return Object.entries(mh.ongoingPlayers).reduce((prev, [summonerId, info]) => {
-      if (info.team) {
-        if (prev[info.team]) {
-          prev[info.team].push(Number(summonerId))
-        } else {
-          prev[info.team] = [Number(summonerId)]
+    return Object.entries(mh.ongoingPlayers).reduce(
+      (prev, [summonerId, info]) => {
+        if (info.team) {
+          if (prev[info.team]) {
+            prev[info.team].push(Number(summonerId))
+          } else {
+            prev[info.team] = [Number(summonerId)]
+          }
         }
-      }
-      return prev
-    }, {} as Record<string, number[]>)
+        return prev
+      },
+      {} as Record<string, number[]>
+    )
   })
 
   // champ-select 阶段的动态状态变更
@@ -262,10 +265,13 @@ export function setupMatchHistory() {
         const mode = game.gameMode
 
         // participantId -> summonerId
-        const participantsMap = game.participantIdentities.reduce((prev, current) => {
-          prev[current.participantId] = current.player.summonerId
-          return prev
-        }, {} as Record<string, number>)
+        const participantsMap = game.participantIdentities.reduce(
+          (prev, current) => {
+            prev[current.participantId] = current.player.summonerId
+            return prev
+          },
+          {} as Record<string, number>
+        )
 
         let grouped: { teamId: number; summonerId: number }[]
         if (mode === 'CHERRY') {
@@ -282,14 +288,17 @@ export function setupMatchHistory() {
         }
 
         // teamId -> summonerId[]，这个记录的是这条战绩中的
-        const teamPlayersMap = grouped.reduce((prev, current) => {
-          if (prev[current.teamId]) {
-            prev[current.teamId].push(current.summonerId)
-          } else {
-            prev[current.teamId] = [current.summonerId]
-          }
-          return prev
-        }, {} as Record<string, number[]>)
+        const teamPlayersMap = grouped.reduce(
+          (prev, current) => {
+            if (prev[current.teamId]) {
+              prev[current.teamId].push(current.summonerId)
+            } else {
+              prev[current.teamId] = [current.summonerId]
+            }
+            return prev
+          },
+          {} as Record<string, number[]>
+        )
 
         // sideId -> summonerId[]，按照队伍区分。
         Object.entries(teamPlayersMap).forEach(([teamId, players]) => {
@@ -632,6 +641,7 @@ function loadSettingsFromStorage() {
   )
   settings.matchHistory.matchHistoryLoadCount = getSetting('matchHistory.matchHistoryLoadCount', 40)
   settings.matchHistory.autoRouteOnGameStart = getSetting('matchHistory.autoRouteOnGameStart', true)
+  settings.matchHistory.fetchDetailedGame = getSetting('matchHistory.fetchDetailedGame', false)
 }
 
 export function setAfterGameFetch(enabled: boolean) {
@@ -885,10 +895,13 @@ export async function fetchTabMatchHistory(
       } as SummonerTabMatchHistory
 
       // 用于快速查找
-      tab.data.matchHistory.gamesMap = tab.data.matchHistory.games.reduce((acc, cur) => {
-        acc[cur.game.gameId] = cur
-        return acc
-      }, {} as Record<number, MatchHistoryGameTabCard>)
+      tab.data.matchHistory.gamesMap = tab.data.matchHistory.games.reduce(
+        (acc, cur) => {
+          acc[cur.game.gameId] = cur
+          return acc
+        },
+        {} as Record<number, MatchHistoryGameTabCard>
+      )
 
       // 异步加载页面战绩
       if (settings.matchHistory.fetchDetailedGame) {

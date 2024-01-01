@@ -120,7 +120,7 @@
               </div>
               <div class="count">{{ c.cherryCount }} 场</div>
             </div>
-            <div class="favorite" v-if="analysis.champions.length === 0">
+            <div class="favorite" v-if="analysis.champions.filter((c) => c.cherryCount).length === 0">
               <LcuImage class="image" :src="championIcon(-1)"></LcuImage>
               <div class="label" title="无对局">无对局</div>
               <div class="label" title="无对局">无对局</div>
