@@ -641,7 +641,7 @@ function loadSettingsFromStorage() {
   )
   settings.matchHistory.matchHistoryLoadCount = getSetting('matchHistory.matchHistoryLoadCount', 40)
   settings.matchHistory.autoRouteOnGameStart = getSetting('matchHistory.autoRouteOnGameStart', true)
-  settings.matchHistory.fetchDetailedGame = getSetting('matchHistory.fetchDetailedGame', false)
+  settings.matchHistory.fetchDetailedGame = getSetting('matchHistory.fetchDetailedGame', true)
 }
 
 export function setAfterGameFetch(enabled: boolean) {
