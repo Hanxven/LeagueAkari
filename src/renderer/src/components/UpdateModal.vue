@@ -69,6 +69,7 @@ const show = defineModel<boolean>('show', { default: false })
   margin-top: 12px;
   margin-bottom: 12px;
   font-size: 13px;
+  user-select: text;
 
   h1,
   h2,
