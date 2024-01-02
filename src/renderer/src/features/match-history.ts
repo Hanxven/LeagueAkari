@@ -11,7 +11,7 @@ import { getRankedStats } from '@renderer/http-api/ranked'
 import { getSummoner } from '@renderer/http-api/summoner'
 import { call } from '@renderer/ipc'
 import { router } from '@renderer/routes'
-import { Participant, isPveQueue } from '@renderer/types/match-history'
+import { Game, Participant, isPveQueue } from '@renderer/types/match-history'
 import { SummonerInfo } from '@renderer/types/summoner'
 import { getSetting, setSetting } from '@renderer/utils/storage'
 import { calculateTogetherTimes } from '@renderer/utils/team-up'
@@ -882,8 +882,8 @@ export async function fetchTabMatchHistory(
 
       tab.data.matchHistory = {
         games: matchHistory.games.games.map((g) => ({
-          game: tab.data.detailedGames[g.gameId] || markRaw(g),
-          isDetailed: tab.data.detailedGames[g.gameId] !== undefined,
+          game: tab.data.detailedGamesCache.get(g.gameId) || markRaw(g),
+          isDetailed: tab.data.detailedGamesCache.get(g.gameId) !== undefined,
           isLoading: false,
           isExpanded: false
         })),
@@ -905,14 +905,21 @@ export async function fetchTabMatchHistory(
 
       // 异步加载页面战绩
       if (settings.matchHistory.fetchDetailedGame) {
-        tab.data.matchHistory.games.forEach(async (g) => {
+        const tasks = tab.data.matchHistory.games.map(async (g) => {
           try {
             if (g.isDetailed) {
               return
             }
-            g.isLoading = true
-            const game = await getGame(g.game.gameId)
-            g.game = game.data
+
+            if (tab.data.detailedGamesCache.has(g.game.gameId)) {
+              g.game = tab.data.detailedGamesCache.get(g.game.gameId)!
+            } else {
+              g.isLoading = true
+              const game = (await getGame(g.game.gameId)).data
+              g.game = markRaw(game)
+              tab.data.detailedGamesCache.set(g.game.gameId, game)
+            }
+
             g.isDetailed = true
           } catch (err) {
             g.hasError = true
@@ -926,6 +933,10 @@ export async function fetchTabMatchHistory(
             g.isLoading = false
           }
         })
+
+        Promise.allSettled(tasks)
+          .then(() => {})
+          .catch(() => {})
       }
 
       // 统计信息
@@ -963,10 +974,11 @@ export async function fetchTabDetailedGame(summonerId: number, gameId: number) {
         return
       }
 
-      if (tab.data.detailedGames[gameId]) {
-        match.game = tab.data.detailedGames[gameId]
+      if (tab.data.detailedGamesCache.has(gameId)) {
+        const game = tab.data.detailedGamesCache.get(gameId)!
+        match.game = game
         match.isDetailed = true
-        return tab.data.detailedGames[gameId]
+        return game
       }
 
       match.isLoading = true
@@ -974,9 +986,8 @@ export async function fetchTabDetailedGame(summonerId: number, gameId: number) {
       try {
         const game = (await getGame(gameId)).data
 
-        const rawGameObj = markRaw(game)
-        tab.data.detailedGames[gameId] = rawGameObj
-        match.game = rawGameObj
+        tab.data.detailedGamesCache.set(gameId, game)
+        match.game = markRaw(game)
         match.isDetailed = true
 
         return game

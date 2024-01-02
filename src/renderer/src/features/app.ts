@@ -129,6 +129,7 @@ export async function checkUpdates(background = false) {
       }
     } else {
       notify.emit({
+        id,
         type: 'success',
         content: '已经是最新版本',
         title: '检查更新',

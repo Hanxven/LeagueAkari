@@ -120,7 +120,10 @@
               </div>
               <div class="count">{{ c.cherryCount }} 场</div>
             </div>
-            <div class="favorite" v-if="analysis.champions.filter((c) => c.cherryCount).length === 0">
+            <div
+              class="favorite"
+              v-if="analysis.champions.filter((c) => c.cherryCount).length === 0"
+            >
               <LcuImage class="image" :src="championIcon(-1)"></LcuImage>
               <div class="label" title="无对局">无对局</div>
               <div class="label" title="无对局">无对局</div>
@@ -155,11 +158,15 @@
           <div
             class="match-history-item"
             :class="{
-              remake: m.data.selfParticipant.stats.gameEndedInEarlySurrender,
+              remake:
+                m.data.selfParticipant.stats.gameEndedInEarlySurrender ||
+                m.data.game.gameMode === 'PRACTICETOOL',
               win:
+                m.data.game.gameMode !== 'PRACTICETOOL' &&
                 !m.data.selfParticipant.stats.gameEndedInEarlySurrender &&
                 m.data.selfParticipant.stats.win,
               lose:
+                m.data.game.gameMode !== 'PRACTICETOOL' &&
                 !m.data.selfParticipant.stats.gameEndedInEarlySurrender &&
                 !m.data.selfParticipant.stats.win
             }"
@@ -192,7 +199,9 @@
                       )
                     : formatResultText(
                         m.data.selfParticipant.stats.win,
-                        m.data.selfParticipant.stats.gameEndedInEarlySurrender
+                        m.data.selfParticipant.stats.gameEndedInEarlySurrender,
+                        null,
+                        m.data.game.gameMode === 'PRACTICETOOL'
                       )
                 }}
               </div>
@@ -249,15 +258,21 @@ const chineseNumber = ['一', '二', '三', '四']
 const formatResultText = (
   win: boolean,
   gameEndedInEarlySurrender?: boolean | null,
-  subteamPlacement?: number
+  subteamPlacement?: number | null,
+  isPracticeTool?: boolean
 ) => {
-  if (subteamPlacement !== undefined) {
+  if (subteamPlacement) {
     // 服务器日常抽风导致的，服务器玩元梦之星导致的
     if (subteamPlacement === 0) {
       return '?'
     }
     return chineseNumber[Math.max(subteamPlacement - 1, 0)]
   }
+
+  if (isPracticeTool) {
+    return '-'
+  }
+
   if (gameEndedInEarlySurrender) {
     return '重'
   }

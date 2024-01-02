@@ -93,7 +93,7 @@
       <span class="text" v-else>不可用 (未连接)</span>
     </NCard>
     <NCard v-if="appState.isAdmin" size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">League Toolkitverse</span></template>
+      <template #header><span class="card-header-title">League Toolkiverse</span></template>
       <span class="text">当心！League Toolkit 现在运行在管理员权限😊</span>
     </NCard>
   </NScrollbar>

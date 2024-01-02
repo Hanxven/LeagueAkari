@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { markRaw, ref } from 'vue'
 
 import { useTabs } from '@renderer/compositions/useTabs'
 import { Game } from '@renderer/types/match-history'
 import { RankedStats } from '@renderer/types/ranked'
 import { SummonerInfo } from '@renderer/types/summoner'
+import { LruMap } from '@renderer/utils/collection'
 
 import { fetchTabFullData } from '../match-history'
 
@@ -119,11 +120,7 @@ export interface TabState {
     }[]
   }
 
-  /**
-   * 记录了详细战绩信息的全局图
-   * 因为游戏的对局信息永远不可变，所以在一次加载后可以直接缓存
-   */
-  detailedGames: Record<number | string, Game>
+  detailedGamesCache: LruMap<number, Game>
 
   /** 加载中状态 */
   loading: {
@@ -156,6 +153,8 @@ export interface SavedTaggedPlayer {
 
   summonerInfo: SummonerInfo
 }
+
+const DEFAULT_DETAILED_GAMES_CACHE_LIMIT = 200
 
 /** 和战绩相关的一切基础功能 store */
 export const useMatchHistoryStore = defineStore('match-history', () => {
@@ -211,7 +210,7 @@ export const useMatchHistoryStore = defineStore('match-history', () => {
         isEmpty: false,
         lastUpdate: Date.now()
       },
-      detailedGames: {},
+      detailedGamesCache: markRaw(new LruMap(DEFAULT_DETAILED_GAMES_CACHE_LIMIT)),
       loading: {
         isLoadingSummoner: false,
         isLoadingMatchHistory: false,
