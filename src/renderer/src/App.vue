@@ -38,7 +38,7 @@ const isShowingSettingModal = ref(false)
 const isShowingNewUpdateModal = ref(false)
 
 watchEffect(() => {
-  if (appState.newUpdate) {
+  if (appState.updates.newUpdates) {
     isShowingNewUpdateModal.value = true
   } else {
     isShowingNewUpdateModal.value = false

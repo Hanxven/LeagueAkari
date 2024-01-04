@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { markRaw } from 'vue'
 
 import { notify } from '@renderer/events/notifications'
 import { call, onUpdate } from '@renderer/ipc'
@@ -106,11 +107,12 @@ const CHECK_UPDATE_URL = 'https://api.github.com/repos/Hanxven/League-Toolkit/re
 export async function checkUpdates(background = false) {
   const appState = useAppState()
 
-  if (appState.isCheckingUpdates) {
+  if (appState.updates.isCheckingUpdates) {
     return
   }
 
-  appState.isCheckingUpdates = true
+  appState.updates.isCheckingUpdates = true
+  appState.updates.lastCheckAt = new Date()
   try {
     const { data } = await axios.get<GithubApiLatestRelease>(CHECK_UPDATE_URL)
 
@@ -120,18 +122,18 @@ export async function checkUpdates(background = false) {
         return a.content_type === 'application/x-compressed'
       })
 
-      appState.newUpdate = {
+      appState.updates.newUpdates = markRaw({
         currentVersion: appState.version,
         description: data.body,
         downloadUrl: archiveFile ? archiveFile.browser_download_url : '',
         version: versionString,
         pageUrl: data.html_url
-      }
+      })
     } else {
       notify.emit({
         id,
         type: 'success',
-        content: '已经是最新版本',
+        content: `已经是最新版本 ${versionString}`,
         title: '检查更新',
         silent: background
       })
@@ -144,7 +146,7 @@ export async function checkUpdates(background = false) {
       silent: background
     })
   } finally {
-    appState.isCheckingUpdates = false
+    appState.updates.isCheckingUpdates = false
   }
 }
 

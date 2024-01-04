@@ -7,49 +7,51 @@
     :class="styles['settings-modal']"
   >
     <template #header><span class="card-header-title">发现更新</span></template>
-    <div v-if="appState.newUpdate">
+    <div v-if="appState.updates.newUpdates">
       <div class="para">
-        新版本可用：{{ appState.newUpdate.version }} (当前版本：{{
-          appState.newUpdate.currentVersion
+        新版本可用：{{ appState.updates.newUpdates.version }} (当前版本：{{
+          appState.updates.newUpdates.currentVersion
         }})
       </div>
       <div>
-        <a class="small-link" target="_blank" :href="appState.newUpdate.pageUrl">查看发布页面</a>
+        <a class="small-link" target="_blank" :href="appState.updates.newUpdates.pageUrl"
+          >Github 发布页面</a
+        >
         <a
-          v-if="appState.newUpdate.downloadUrl"
+          v-if="appState.updates.newUpdates.downloadUrl"
           class="small-link"
           style="margin-left: 8px"
           target="_blank"
-          :href="appState.newUpdate.downloadUrl"
-          >下载</a
+          :href="appState.updates.newUpdates.downloadUrl"
+          >Github 下载</a
         >
       </div>
-      <NScrollbar style="max-height: 30vh">
-        <div class="markdown-text" v-html="markdownText"></div>
+      <NScrollbar style="max-height: 30vh" :class="styles['markdown-text-scroll-wrapper']">
+        <div class="markdown-text" v-html="markdownHtmlText"></div>
       </NScrollbar>
-      <div class="para" style="font-style: italic">可以在设置中关闭自动更新检查</div>
       <div class="para" style="font-style: italic">
-        仍可以在：[设置 -> 关于 -> 检查更新] 中手动检查更新
+        可以在：[设置 -> 应用 -> 基础 -> 自动检查更新] 关闭自动检查
+      </div>
+      <div class="para" style="font-style: italic">
+        可以在：[设置 -> 关于 -> 检查更新] 中手动检查更新
       </div>
     </div>
   </NModal>
 </template>
 
 <script setup lang="ts">
-import markdown from 'markdown-it'
 import { NModal, NScrollbar } from 'naive-ui'
 import { computed, useCssModule } from 'vue'
 
 import { useAppState } from '@renderer/features/stores/app'
+import { markdownIt } from '@renderer/utils/markdown'
 
 const appState = useAppState()
 
 const styles = useCssModule()
 
-const md = markdown()
-
-const markdownText = computed(() => {
-  return md.render(appState.newUpdate?.description || '')
+const markdownHtmlText = computed(() => {
+  return markdownIt.render(appState.updates.newUpdates?.description || '无内容')
 })
 
 const show = defineModel<boolean>('show', { default: false })
@@ -66,10 +68,9 @@ const show = defineModel<boolean>('show', { default: false })
 }
 
 :deep(.markdown-text) {
-  margin-top: 12px;
-  margin-bottom: 12px;
   font-size: 13px;
   user-select: text;
+  padding: 12px;
 
   h1,
   h2,
@@ -108,6 +109,36 @@ const show = defineModel<boolean>('show', { default: false })
   li p {
     display: inline;
   }
+
+  code {
+    font-family: inherit;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 2px;
+  }
+
+  table {
+    /* 设置表格边框 */
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 4px 0;
+    border-radius: 8px;
+  }
+
+  th,
+  td {
+    border: 1px solid #3b3b3b;
+    padding: 4px 8px;
+  }
+
+  blockquote {
+    border-radius: 2px;
+    padding: 4px 8px;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  blockquote + blockquote {
+    margin-top: 4px;
+  }
 }
 </style>
 
@@ -115,5 +146,12 @@ const show = defineModel<boolean>('show', { default: false })
 .settings-modal {
   width: 90%;
   max-width: 768px;
+}
+
+.markdown-text-scroll-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 </style>

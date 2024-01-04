@@ -56,7 +56,7 @@
           检查更新：<span
             style="color: rgb(131, 193, 204); text-decoration: underline; cursor: pointer"
             @click="() => checkUpdates()"
-            >{{ appState.isCheckingUpdates ? '正在检查' : '检查更新' }}</span
+            >{{ appState.updates.isCheckingUpdates ? '正在检查' : '检查更新' }}</span
           >
         </div>
       </NTabPane>
