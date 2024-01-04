@@ -51,29 +51,34 @@ const isErr = ref(false)
 const router = useRouter()
 const notification = useNotification()
 
+const NOTIFY_THRESHOLD = 2
+
+const attempts = ref(0)
 const handleConnect = async (maxAttempts = 3) => {
-  let attempts = 0 // 初始化尝试次数
+  attempts.value = 0 // 初始化尝试次数
 
   if (isAttemptingConnect.value) {
     return
   }
 
   isAttemptingConnect.value = true
-  while (attempts < maxAttempts && isAttemptingConnect.value) {
+  while (attempts.value < maxAttempts && isAttemptingConnect.value) {
     try {
       await call<void>('connect') // 尝试连接
       isErr.value = false
       isAttemptingConnect.value = false
       return
     } catch (err) {
-      notification.warning({
-        duration: 5000,
-        content: (err as any).message ? (err as any).message : '发生错误'
-      })
+      if (!appState.isAdmin || attempts.value > NOTIFY_THRESHOLD) {
+        notification.warning({
+          duration: 5000,
+          content: (err as any).message ? (err as any).message : '发生错误'
+        })
+      }
 
-      attempts++ // 增加尝试次数
+      attempts.value++ // 增加尝试次数
       console.warn(`连接失败，正在尝试第 ${attempts} 次重连：`, err)
-      if (attempts >= maxAttempts) {
+      if (attempts.value >= maxAttempts) {
         isErr.value = true
         isAttemptingConnect.value = false
         break
