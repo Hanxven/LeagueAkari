@@ -14,6 +14,7 @@
             v-for="p of participants.toSorted((a, b) => (a.order || -1) - (b.order || -1))"
             :key="p.id"
             :id="p.id"
+            :is-self="p.id === summoner.currentSummoner?.summonerId"
             :summoner-info="p.summoner"
             :ranked-stats="p.rankedStats"
             :match-history="p.matchHistory"
@@ -94,6 +95,7 @@ import { useKeepAliveScrollPositionMemo } from '@renderer/compositions/useKeepAl
 import { useTitle } from '@renderer/compositions/useTitle'
 import { championIcon } from '@renderer/features/game-data'
 import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
+import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
 import { OngoingTeamPlayer, useMatchHistoryStore } from '@renderer/features/stores/match-history'
 import { useSettingsStore } from '@renderer/features/stores/settings'
 import { removeSubsets } from '@renderer/utils/collection'
@@ -106,6 +108,7 @@ const title = useTitle()
 const mh = useMatchHistoryStore()
 const router = useRouter()
 const gameflow = useGameflowStore()
+const summoner = useSummonerStore()
 const settings = useSettingsStore()
 
 const handleToSummoner = (summonerId: number) => {
@@ -126,19 +129,22 @@ const isIdle = computed(() => {
 })
 
 const teams = computed(() => {
-  return Object.entries(mh.ongoingPlayers).reduce((o, [_id, info]) => {
-    if (!info.team) {
+  return Object.entries(mh.ongoingPlayers).reduce(
+    (o, [_id, info]) => {
+      if (!info.team) {
+        return o
+      }
+
+      if (o[info.team]) {
+        o[info.team].push(info)
+      } else {
+        o[info.team] = [info]
+      }
+
       return o
-    }
-
-    if (o[info.team]) {
-      o[info.team].push(info)
-    } else {
-      o[info.team] = [info]
-    }
-
-    return o
-  }, {} as Record<string, OngoingTeamPlayer[]>)
+    },
+    {} as Record<string, OngoingTeamPlayer[]>
+  )
 })
 
 const preMadeTeamsArray = computed(() => {

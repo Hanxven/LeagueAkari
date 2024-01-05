@@ -2,8 +2,8 @@
   <div
     class="player-info-card"
     :class="{
-      'privacy-private': summonerInfo?.privacy === 'PRIVATE',
-      'win-rate-team': analysis.maybeWinRateTeam
+      'privacy-private': summonerInfo?.privacy === 'PRIVATE' && !isSelf,
+      'win-rate-team': analysis.maybeWinRateTeam && !isSelf
     }"
   >
     <div class="header-line">
@@ -52,15 +52,15 @@
             </div>
           </NPopover>
           <span
-            title="该玩家妄图藏住一切，很遗憾这没有效果"
+            title="该玩家试图藏住一切，很遗憾这没有效果"
             class="tag privacy-private"
-            v-if="summonerInfo?.privacy === 'PRIVATE'"
+            v-if="summonerInfo?.privacy === 'PRIVATE' && !isSelf"
             >生涯隐藏</span
           >
           <span
             :title="winRateTeamText(id)"
             class="tag win-rate-team"
-            v-if="analysis.maybeWinRateTeam"
+            v-if="analysis.maybeWinRateTeam && !isSelf"
             >胜率队</span
           >
           <span
@@ -243,6 +243,7 @@ const emits = defineEmits<{
 
 const props = defineProps<{
   id: number
+  isSelf: boolean
   summonerInfo?: SummonerInfo
   rankedStats?: RankedStats
   matchHistory?: MatchHistoryGame[]

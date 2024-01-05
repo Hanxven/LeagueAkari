@@ -76,10 +76,14 @@
                 dayjs(tab.matchHistory.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
               }}</span
             >
+            <span style="margin-left: 16px" v-if="tab.loading.isLoadingMatchHistory"
+              >加载中...</span
+            >
           </div>
           <div class="pagination">
             <NButton
               size="small"
+              title="切换到上一页 (Ctrl+Left)"
               @click="handleLoadPage(tab.matchHistory.page - 1)"
               :disabled="tab.matchHistory.page <= 1"
               secondary
@@ -95,7 +99,11 @@
               :min="1"
               :show-button="false"
             />
-            <NButton size="small" @click="() => handleLoadPage(tab.matchHistory.page + 1)" secondary
+            <NButton
+              title="切换到下一页 (Ctrl+Right)"
+              size="small"
+              @click="() => handleLoadPage(tab.matchHistory.page + 1)"
+              secondary
               >下</NButton
             >
             <NSelect
@@ -136,6 +144,7 @@
 import { Tag as TagIcon } from '@vicons/carbon'
 import { Dice as DiceIcon } from '@vicons/ionicons5'
 import { useDebounce, useScroll } from '@vueuse/core'
+import { useMagicKeys, whenever } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NButton, NCard, NIcon, NInputNumber, NSelect, NSkeleton } from 'naive-ui'
 import { nextTick, onActivated, ref, watch } from 'vue'
@@ -198,6 +207,18 @@ const pageSizeOptions = [
     value: 100
   }
 ]
+
+const { Ctrl_Left, Ctrl_Right } = useMagicKeys()
+
+whenever(Ctrl_Left, () => {
+  if (props.tab.matchHistory.page > 1) {
+    handleLoadPage(props.tab.matchHistory.page - 1)
+  }
+})
+
+whenever(Ctrl_Right, () => {
+  handleLoadPage(props.tab.matchHistory.page + 1)
+})
 
 const handleChangePageSize = (pageSize: number) => {
   return fetchTabMatchHistory(props.tab.id, props.tab.matchHistory.page, pageSize)
