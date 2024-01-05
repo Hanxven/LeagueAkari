@@ -3,7 +3,7 @@
     <NModal size="small" v-model:show="isModalShow">
       <MiscellaneousPanel :game="game" />
     </NModal>
-    <DefineSubTeam v-slot="{ participants }">
+    <DefineSubTeam v-slot="{ participants, mode }">
       <div class="sub-team">
         <div class="player" v-for="p of participants" :key="p.participantId">
           <LcuImage class="image" :src="championIcon(p.championId)" />
@@ -15,6 +15,9 @@
           >
             {{ p.identity.player.summonerName }}
           </div>
+        </div>
+        <div class="placement" v-if="mode === 'CHERRY' && participants">
+          {{ participants[0].stats.subteamPlacement }}
         </div>
       </div>
     </DefineSubTeam>
@@ -103,23 +106,37 @@
           <ItemDisplay :size="24" is-trinket :item-id="self.participant.stats.item6" />
         </div>
       </div>
+      <div class="summary" v-if="self.summary">
+        <div class="kpr" title="在队伍中参与了击杀的程度">击杀参与率 {{ (self.summary.kpr * 100).toFixed(1) }} %</div>
+        <div class="ddr" title="在队伍中对英雄造成的伤害占比">伤害比率 {{ (self.summary.ddr * 100).toFixed(1) }} %</div>
+        <div class="dtr" title="在队伍中的承受所有伤害占比">承伤比率 {{ (self.summary.dtr * 100).toFixed(1) }} %</div>
+        <div class="gr" title="在队伍中的金币占比">经济比率 {{ (self.summary.gr * 100).toFixed(1) }} %</div>
+      </div>
       <div class="players">
         <template v-if="game.gameMode === 'CHERRY'">
           <div class="players-cherry" v-if="isDetailed">
             <div>
-              <SubTeam :participants="teams.subTeam1" />
-              <SubTeam :participants="teams.subTeam2" style="margin-top: 8px" />
+              <SubTeam :mode="game.gameMode" :participants="teams.subTeam1" />
+              <SubTeam
+                :mode="game.gameMode"
+                :participants="teams.subTeam2"
+                style="margin-top: 8px"
+              />
             </div>
             <div>
-              <SubTeam :participants="teams.subTeam3" />
-              <SubTeam :participants="teams.subTeam4" style="margin-top: 8px" />
+              <SubTeam :mode="game.gameMode" :participants="teams.subTeam3" />
+              <SubTeam
+                :mode="game.gameMode"
+                :participants="teams.subTeam4"
+                style="margin-top: 8px"
+              />
             </div>
           </div>
         </template>
         <template v-else>
           <div class="players-normal" v-if="isDetailed">
-            <SubTeam :participants="teams.team1" />
-            <SubTeam :participants="teams.team2" />
+            <SubTeam :mode="game.gameMode" :participants="teams.team1" />
+            <SubTeam :mode="game.gameMode" :participants="teams.team2" />
           </div>
         </template>
       </div>
@@ -192,6 +209,7 @@ const props = defineProps<{
 
 const [DefineSubTeam, SubTeam] = createReusableTemplate<{
   participants: (typeof teams.value)[keyof typeof teams.value]
+  mode: string
 }>({ inheritAttrs: true })
 
 // 定期更新相对时间
@@ -211,11 +229,47 @@ const self = computed(() => {
     return null
   }
 
+  // 查找对应的参与者 ID 和参与者信息
   const participantId = props.game.participantIdentities.find(
     (p) => p.player.summonerId === props.selfId
   )!.participantId
+
+  const participant = props.game.participants.find((p) => participantId === p.participantId)!
+
+  let summary: { kpr: number; ddr: number; dtr: number; gr: number } | null = null
+  if (props.isDetailed) {
+    const teamTotalStats = props.game.participants
+      .filter((p) => {
+        if (props.game.gameMode === 'CHERRY') {
+          return participant.stats.playerSubteamId === p.stats.playerSubteamId
+        } else {
+          return participant.teamId === p.teamId
+        }
+      })
+      .reduce(
+        (acc, p) => {
+          acc.kills += p.stats.kills
+          acc.totalDamageDealtToChampions += p.stats.totalDamageDealtToChampions
+          acc.totalDamageTaken += p.stats.totalDamageTaken
+          acc.goldEarned += p.stats.goldEarned
+          return acc
+        },
+        { kills: 0, totalDamageDealtToChampions: 0, totalDamageTaken: 0, goldEarned: 0 }
+      )
+
+    const kpr = (participant.stats.kills + participant.stats.assists) / (teamTotalStats.kills || 1)
+    const ddr =
+      participant.stats.totalDamageDealtToChampions /
+      (teamTotalStats.totalDamageDealtToChampions || 1)
+    const dtr = participant.stats.totalDamageTaken / (teamTotalStats.totalDamageTaken || 1)
+    const gr = participant.stats.goldEarned / (teamTotalStats.goldEarned || 1)
+
+    summary = { kpr, ddr, dtr, gr }
+  }
+
   return {
-    participant: props.game.participants.find((p) => participantId === p.participantId)!
+    participant,
+    summary
   }
 })
 
@@ -389,7 +443,7 @@ const handleToSummoner = (summonerId: number) => {
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  width: 260px;
+  width: 208px;
 
   .stats {
     display: flex;
@@ -489,6 +543,30 @@ const handleToSummoner = (summonerId: number) => {
   }
 }
 
+.summary {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 126px;
+  font-size: 12px;
+
+  .kpr {
+    color: rgb(223, 223, 223);
+  }
+
+  .ddr {
+    color: rgb(236, 152, 92);
+  }
+
+  .dtr {
+    color: rgb(98, 201, 94);
+  }
+
+  .gr {
+    color: rgb(227, 180, 119);
+  }
+}
+
 .players {
   flex: 1;
 
@@ -512,6 +590,20 @@ const handleToSummoner = (summonerId: number) => {
   flex-direction: column;
   flex-wrap: nowrap;
   width: 128px;
+  position: relative;
+
+  .placement {
+    position: absolute;
+    bottom: -4px;
+    left: -4px;
+    font-size: 10px;
+    background-color: rgba(0, 0, 0, 0.35);
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    text-align: center;
+  }
 
   .player {
     display: flex;

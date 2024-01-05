@@ -145,7 +145,7 @@ import { useRouter } from 'vue-router'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
 import { championIcon } from '@renderer/features/game-data'
-import { Game, ParticipantIdentity } from '@renderer/types/match-history'
+import { Game, Participant, ParticipantIdentity } from '@renderer/types/match-history'
 
 import AugmentDisplay from '../widgets/AugmentDisplay.vue'
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
@@ -170,91 +170,89 @@ const match = computed(() => {
     identities[identity.participantId] = identity
   })
 
-  const all = props.game.participants.map((participant) => {
-    return {
-      ...participant,
-      isSelf: identities[participant.participantId].player.summonerId === props.selfId,
-      identity: identities[participant.participantId]
+  type ParticipantWithIdentity = Participant & { isSelf: boolean; identity: ParticipantIdentity }
+
+  const all: ParticipantWithIdentity[] = props.game.participants.map((participant) => ({
+    ...participant,
+    isSelf: identities[participant.participantId].player.summonerId === props.selfId,
+    identity: identities[participant.participantId]
+  }))
+
+  const placements: Record<string, ParticipantWithIdentity[]> = {
+    placement0: [], // 只有在数据错误的时候，才会出现 placement0 的情况
+    placement1: [],
+    placement2: [],
+    placement3: [],
+    placement4: []
+  }
+
+  const aggregateStats = {
+    placement0: {
+      kills: 0,
+      deaths: 0,
+      assists: 0,
+      totalDamageDealtToChampions: 0,
+      totalDamageTaken: 0
+    },
+    placement1: {
+      kills: 0,
+      deaths: 0,
+      assists: 0,
+      totalDamageDealtToChampions: 0,
+      totalDamageTaken: 0
+    },
+    placement2: {
+      kills: 0,
+      deaths: 0,
+      assists: 0,
+      totalDamageDealtToChampions: 0,
+      totalDamageTaken: 0
+    },
+    placement3: {
+      kills: 0,
+      deaths: 0,
+      assists: 0,
+      totalDamageDealtToChampions: 0,
+      totalDamageTaken: 0
+    },
+    placement4: {
+      kills: 0,
+      deaths: 0,
+      assists: 0,
+      totalDamageDealtToChampions: 0,
+      totalDamageTaken: 0
     }
+  }
+
+  const recordStats = {
+    maxTotalDamageDealtToChampions: 0,
+    maxTotalDamageTaken: 0
+  }
+
+  all.forEach((p) => {
+    const placementKey = `placement${p.stats.subteamPlacement}`
+    placements[placementKey].push(p)
+
+    aggregateStats[placementKey].kills += p.stats.kills
+    aggregateStats[placementKey].deaths += p.stats.deaths
+    aggregateStats[placementKey].assists += p.stats.assists
+    aggregateStats[placementKey].totalDamageDealtToChampions += p.stats.totalDamageDealtToChampions
+    aggregateStats[placementKey].totalDamageTaken += p.stats.totalDamageTaken
+
+    recordStats.maxTotalDamageDealtToChampions = Math.max(
+      recordStats.maxTotalDamageDealtToChampions,
+      p.stats.totalDamageDealtToChampions
+    )
+    recordStats.maxTotalDamageTaken = Math.max(
+      recordStats.maxTotalDamageTaken,
+      p.stats.totalDamageTaken
+    )
   })
 
-  // 正常情况下是不会出现 0 位的。但 API 有时候返回的对局信息是错误的
-  // 在返回错误信息时，subteamPlacement 等于 0 且所有的 augment 全部为 0
-  const placement0 = all.filter((p) => p.stats.subteamPlacement === 0)
-
-  // 对应 1 ~ 4 名
-  const placement1 = all.filter((p) => p.stats.subteamPlacement === 1)
-  const placement2 = all.filter((p) => p.stats.subteamPlacement === 2)
-  const placement3 = all.filter((p) => p.stats.subteamPlacement === 3)
-  const placement4 = all.filter((p) => p.stats.subteamPlacement === 4)
-
   return {
-    teams: {
-      placement0,
-      placement1,
-      placement2,
-      placement3,
-      placement4
-    },
-    aggregateStats: {
-      placement0: {
-        kills: placement0.reduce((acc, p) => acc + p.stats.kills, 0),
-        deaths: placement0.reduce((acc, p) => acc + p.stats.deaths, 0),
-        assists: placement0.reduce((acc, p) => acc + p.stats.assists, 0),
-        totalDamageDealtToChampions: placement0.reduce(
-          (acc, p) => acc + p.stats.totalDamageDealtToChampions,
-          0
-        ),
-        totalDamageTaken: placement0.reduce((acc, p) => acc + p.stats.totalDamageTaken, 0)
-      },
-      placement1: {
-        kills: placement1.reduce((acc, p) => acc + p.stats.kills, 0),
-        deaths: placement1.reduce((acc, p) => acc + p.stats.deaths, 0),
-        assists: placement1.reduce((acc, p) => acc + p.stats.assists, 0),
-        totalDamageDealtToChampions: placement1.reduce(
-          (acc, p) => acc + p.stats.totalDamageDealtToChampions,
-          0
-        ),
-        totalDamageTaken: placement1.reduce((acc, p) => acc + p.stats.totalDamageTaken, 0)
-      },
-      placement2: {
-        kills: placement2.reduce((acc, p) => acc + p.stats.kills, 0),
-        deaths: placement2.reduce((acc, p) => acc + p.stats.deaths, 0),
-        assists: placement2.reduce((acc, p) => acc + p.stats.assists, 0),
-        totalDamageDealtToChampions: placement2.reduce(
-          (acc, p) => acc + p.stats.totalDamageDealtToChampions,
-          0
-        ),
-        totalDamageTaken: placement2.reduce((acc, p) => acc + p.stats.totalDamageTaken, 0)
-      },
-      placement3: {
-        kills: placement3.reduce((acc, p) => acc + p.stats.kills, 0),
-        deaths: placement3.reduce((acc, p) => acc + p.stats.deaths, 0),
-        assists: placement3.reduce((acc, p) => acc + p.stats.assists, 0),
-        totalDamageDealtToChampions: placement3.reduce(
-          (acc, p) => acc + p.stats.totalDamageDealtToChampions,
-          0
-        ),
-        totalDamageTaken: placement3.reduce((acc, p) => acc + p.stats.totalDamageTaken, 0)
-      },
-      placement4: {
-        kills: placement4.reduce((acc, p) => acc + p.stats.kills, 0),
-        deaths: placement4.reduce((acc, p) => acc + p.stats.deaths, 0),
-        assists: placement4.reduce((acc, p) => acc + p.stats.assists, 0),
-        totalDamageDealtToChampions: placement4.reduce(
-          (acc, p) => acc + p.stats.totalDamageDealtToChampions,
-          0
-        ),
-        totalDamageTaken: placement4.reduce((acc, p) => acc + p.stats.totalDamageTaken, 0)
-      }
-    },
-    recordStats: {
-      maxTotalDamageDealtToChampions: all.reduce(
-        (acc, p) => Math.max(acc, p.stats.totalDamageDealtToChampions),
-        0
-      ),
-      maxTotalDamageTaken: all.reduce((acc, p) => Math.max(acc, p.stats.totalDamageTaken), 0)
-    }
+    teams: placements,
+    aggregateStats,
+    recordStats
   }
 })
 

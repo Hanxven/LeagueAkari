@@ -166,7 +166,6 @@ import { useRouter } from 'vue-router'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
 import { championIcon } from '@renderer/features/game-data'
-import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { Game, ParticipantIdentity } from '@renderer/types/match-history'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
@@ -192,56 +191,63 @@ const match = computed(() => {
     identities[identity.participantId] = identity
   })
 
-  const all = props.game.participants.map((participant) => {
-    return {
-      ...participant,
-      isSelf: identities[participant.participantId].player.summonerId === props.selfId,
-      identity: identities[participant.participantId]
-    }
-  })
+  const all = props.game.participants.map((participant) => ({
+    ...participant,
+    isSelf: identities[participant.participantId].player.summonerId === props.selfId,
+    identity: identities[participant.participantId]
+  }))
 
-  const team1 = all.filter((p) => p.teamId === 100)
-  const team2 = all.filter((p) => p.teamId === 200)
+  const teamStats = {
+    team1: { kills: 0, deaths: 0, assists: 0, totalDamageDealtToChampions: 0, totalDamageTaken: 0 },
+    team2: { kills: 0, deaths: 0, assists: 0, totalDamageDealtToChampions: 0, totalDamageTaken: 0 }
+  }
+
+  const recordStats = {
+    maxTotalDamageDealtToChampions: 0,
+    maxTotalDamageTaken: 0,
+    maxGoldEarned: 0,
+    maxTotalMinionsKilled: 0
+  }
+
+  all.forEach((p) => {
+    let teamKey: string
+    if (p.teamId === 100) {
+      teamKey = 'team1'
+    } else if (p.teamId === 200) {
+      teamKey = 'team2'
+    } else {
+      return
+    }
+    teamStats[teamKey].kills += p.stats.kills
+    teamStats[teamKey].deaths += p.stats.deaths
+    teamStats[teamKey].assists += p.stats.assists
+    teamStats[teamKey].totalDamageDealtToChampions += p.stats.totalDamageDealtToChampions
+    teamStats[teamKey].totalDamageTaken += p.stats.totalDamageTaken
+
+    recordStats.maxTotalDamageDealtToChampions = Math.max(
+      recordStats.maxTotalDamageDealtToChampions,
+      p.stats.totalDamageDealtToChampions
+    )
+    recordStats.maxTotalDamageTaken = Math.max(
+      recordStats.maxTotalDamageTaken,
+      p.stats.totalDamageTaken
+    )
+    recordStats.maxGoldEarned = Math.max(recordStats.maxGoldEarned, p.stats.goldEarned)
+    recordStats.maxTotalMinionsKilled = Math.max(
+      recordStats.maxTotalMinionsKilled,
+      p.stats.totalMinionsKilled
+    )
+  })
 
   return {
     teams: {
-      team1,
-      team2
+      team1: all.filter((p) => p.teamId === 100),
+      team2: all.filter((p) => p.teamId === 200)
     },
-    aggregateStats: {
-      team1: {
-        kills: team1.reduce((acc, p) => acc + p.stats.kills, 0),
-        deaths: team1.reduce((acc, p) => acc + p.stats.deaths, 0),
-        assists: team1.reduce((acc, p) => acc + p.stats.assists, 0),
-        totalDamageDealtToChampions: team1.reduce(
-          (acc, p) => acc + p.stats.totalDamageDealtToChampions,
-          0
-        ),
-        totalDamageTaken: team1.reduce((acc, p) => acc + p.stats.totalDamageTaken, 0)
-      },
-      team2: {
-        kills: team2.reduce((acc, p) => acc + p.stats.kills, 0),
-        deaths: team2.reduce((acc, p) => acc + p.stats.deaths, 0),
-        assists: team2.reduce((acc, p) => acc + p.stats.assists, 0),
-        totalDamageDealtToChampions: team2.reduce(
-          (acc, p) => acc + p.stats.totalDamageDealtToChampions,
-          0
-        ),
-        totalDamageTaken: team2.reduce((acc, p) => acc + p.stats.totalDamageTaken, 0)
-      }
-    },
-    recordStats: {
-      maxTotalDamageDealtToChampions: all.reduce(
-        (acc, p) => Math.max(acc, p.stats.totalDamageDealtToChampions),
-        0
-      ),
-      maxTotalDamageTaken: all.reduce((acc, p) => Math.max(acc, p.stats.totalDamageTaken), 0),
-      maxGoldEarned: all.reduce((acc, p) => Math.max(acc, p.stats.goldEarned), 0),
-      maxTotalMinionsKilled: all.reduce((acc, p) => Math.max(acc, p.stats.totalMinionsKilled), 0)
-    }
+    aggregateStats: teamStats,
+    recordStats: recordStats
   }
 })
-
 const router = useRouter()
 
 const handleToSummoner = (summonerId: number) => {
