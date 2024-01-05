@@ -67,6 +67,26 @@
         @update:value="(list) => setBenchModeExpectedChampions(list)"
       />
     </div>
+    <div class="divider"></div>
+    <div class="control-line">
+      <span class="label">自动 ban 开启</span>
+      <NSwitch
+        @update:value="(v) => setAutoBanEnabled(v)"
+        :value="settings.autoSelect.banEnabled"
+        size="small"
+      ></NSwitch>
+    </div>
+    <div class="control-line">
+      <span class="label">意向 ban 英雄</span>
+      <NSelect
+        style="width: 140px"
+        size="tiny"
+        :value="settings.autoSelect.banChampionId"
+        @update:value="(v) => setAutoBanChampionId(v)"
+        filterable
+        :options="championsOptions"
+      ></NSelect>
+    </div>
   </NCard>
 </template>
 
@@ -76,6 +96,8 @@ import { computed, ref } from 'vue'
 
 import OrderedChampionList from '@renderer/components/OrderedChampionList.vue'
 import {
+  setAutoBanChampionId,
+  setAutoBanEnabled,
   setAutoSelectChampionId,
   setAutoSelectCompleted,
   setBenchModeAutoSelectEnabled,

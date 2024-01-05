@@ -21,9 +21,6 @@ let targetingChampion: number | null = null
 // 处理自动英雄选择相关逻辑
 export function setupAutoSelect() {
   const settings = useSettingsStore()
-  const gameflow = useGameflowStore()
-  const summoner = useSummonerStore()
-  const chat = useChatStore()
   const cs = useChampSelectStore()
 
   loadSettingsFromStorage()
@@ -36,12 +33,10 @@ export function setupAutoSelect() {
     return cs.session.hasSimultaneousPicks
   })
 
-  let isDoingAction = false
+  let isDoingPick = false
+  let isDoingBan = false
+  let t = 1
   onLcuEvent<ChampSelectSummoner>('/lol-champ-select/v1/summoners/*', async (event) => {
-    if (!settings.autoSelect.normalModeEnabled) {
-      return
-    }
-
     if (!cs.session) {
       return
     }
@@ -50,45 +45,54 @@ export function setupAutoSelect() {
       return
     }
 
-    if (
-      !event.data.isSelf ||
-      !event.data.isActingNow ||
-      event.data.championId /* 在用户手动选择其他的时候，不会自动改回去，championId 为 0 为未选 */
-    ) {
+    if (!event.data.isSelf || !event.data.isActingNow) {
       return
     }
-
-    if (settings.autoSelect.onlySimulMode && !isSimulPick.value) {
-      return
-    }
-
-    if (isDoingAction) {
-      return
-    }
-
-    // 客户端在英雄选择阶段，分为若干个 action 阶段
-    // session 中的 action 阶段可能会动态更新，会比这个事件 (/lol-champ-select/v1/summoners/:cellId) 更早发生
-    // 比如竞技场中，有三个 action 阶段:
-    // 分别是 ban 阶段 (10 名玩家各自有一个 ban 的 action)
-    // pick 1 阶段 (奇数位置的玩家各自有一个 pick 的 action)
-    // pick 2 阶段 (偶数位置的玩家各自有一个 pick 的 action)
-    // 这样的流程，表现为一个 actions[][] 的数组
-    const myInProgressActions = cs.session.actions.reduce((p, c) => {
-      const action = c.find((a) => a.actorCellId === event.data.cellId)
-      if (action && action.isInProgress) {
-        p.push(action)
-      }
-      return p
-    }, [] as Action[])
 
     switch (event.data.activeActionType) {
       case 'pick': {
+        if (!settings.autoSelect.normalModeEnabled) {
+          return
+        }
+
+        /* 在用户手动选择其他的时候，不会自动改回去，championId 为 0 为未选 */
+        if (event.data.championId) {
+          return
+        }
+
+        if (settings.autoSelect.onlySimulMode && !isSimulPick.value) {
+          return
+        }
+        
+        if (cs.session.isCustomGame) {
+          return
+        }
+
+        if (isDoingPick) {
+          return
+        }
+
+        // 客户端在英雄选择阶段，分为若干个 action 阶段
+        // session 中的 action 阶段可能会动态更新，会比这个事件 (/lol-champ-select/v1/summoners/:cellId) 更早发生
+        // 比如竞技场中，有三个 action 阶段:
+        // 分别是 ban 阶段 (10 名玩家各自有一个 ban 的 action)
+        // pick 1 阶段 (奇数位置的玩家各自有一个 pick 的 action)
+        // pick 2 阶段 (偶数位置的玩家各自有一个 pick 的 action)
+        // 这样的流程，表现为一个 actions[][] 的数组
+        const myInProgressActions = cs.session.actions.reduce((p, c) => {
+          const action = c.find((a) => a.actorCellId === event.data.cellId)
+          if (action && action.isInProgress) {
+            p.push(action)
+          }
+          return p
+        }, [] as Action[])
+
         const firstPickAction = myInProgressActions.find((a) => a.type === 'pick')
         if (firstPickAction) {
-          isDoingAction = true
+          isDoingPick = true
           try {
             await pickOrBan(
-              settings.autoSelect.championId,
+              settings.autoSelect.championId || 1,
               settings.autoSelect.completed,
               'pick',
               firstPickAction.id
@@ -101,14 +105,55 @@ export function setupAutoSelect() {
               extra: { error: err }
             })
           } finally {
-            isDoingAction = false
+            isDoingPick = false
           }
         }
         break
       }
 
-      case 'ban':
-      // 目前没有 ban 英雄的需求
+      case 'ban': {
+        if (!settings.autoSelect.banEnabled) {
+          return
+        }
+
+        if (cs.session.isCustomGame) {
+          return
+        }
+
+        if (isDoingBan) {
+          return
+        }
+
+        const myInProgressActions = cs.session.actions.reduce((p, c) => {
+          const action = c.find((a) => a.actorCellId === event.data.cellId)
+          if (action && action.isInProgress) {
+            p.push(action)
+          }
+          return p
+        }, [] as Action[])
+
+        const firstBanAction = myInProgressActions.find((a) => a.type === 'ban')
+        if (firstBanAction) {
+          isDoingBan = true
+          try {
+            await pickOrBan(
+              settings.autoSelect.banChampionId++ || 1,
+              true,
+              'ban',
+              firstBanAction.id
+            )
+          } catch (err) {
+            notify.emit({
+              id,
+              content: '尝试自动禁用英雄时失败',
+              type: 'warning',
+              extra: { error: err }
+            })
+          } finally {
+            isDoingBan = false
+          }
+        }
+      }
     }
   })
 
@@ -217,13 +262,15 @@ export function setupAutoSelect() {
 function loadSettingsFromStorage() {
   const settings = useSettingsStore()
 
-  settings.autoSelect.championId = getSetting('autoSelect.championId', 1)
+  settings.autoSelect.championId = getSetting('autoSelect.championId', 157)
   settings.autoSelect.completed = getSetting('autoSelect.completed', false)
   settings.autoSelect.normalModeEnabled = getSetting('autoSelect.normalModeEnabled', false)
   settings.autoSelect.onlySimulMode = getSetting('autoSelect.onlySimulMode', true)
   settings.autoSelect.benchModeEnabled = getSetting('autoSelect.benchModeEnabled', false)
   settings.autoSelect.benchExpectedChampions = getSetting('autoSelect.benchExpectedChampions', [])
   settings.autoSelect.grabDelay = getSetting('autoSelect.grabDelay', 1)
+  settings.autoSelect.banChampionId = getSetting('autoSelect.banChampionId', 157)
+  settings.autoSelect.banEnabled = getSetting('autoSelect.banEnabled', false)
 }
 
 export function setNormalModeAutoSelectEnabled(enabled: boolean) {
@@ -257,6 +304,20 @@ export function setAutoSelectChampionId(id: number) {
 
   setSetting('autoSelect.championId', id)
   settings.autoSelect.championId = id
+}
+
+export function setAutoBanChampionId(id: number) {
+  const settings = useSettingsStore()
+
+  setSetting('autoSelect.banChampionId', id)
+  settings.autoSelect.banChampionId = id
+}
+
+export function setAutoBanEnabled(enabled: boolean) {
+  const settings = useSettingsStore()
+
+  setSetting('autoSelect.banEnabled', enabled)
+  settings.autoSelect.banEnabled = enabled
 }
 
 export function setAutoSelectCompleted(completed: boolean) {

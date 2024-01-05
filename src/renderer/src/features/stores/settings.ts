@@ -82,7 +82,13 @@ export const useSettingsStore = defineStore('settings', () => {
 
     benchExpectedChampions: [] as number[],
 
-    grabDelay: 1
+    grabDelay: 1,
+
+    // 自动 ban
+    banEnabled: false,
+
+    // 自动 ban 的英雄 ID
+    banChampionId: 1
   })
 
   const lobby = reactive({

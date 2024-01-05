@@ -4,7 +4,7 @@
       <LcuImage
         :src="championIcon(c)"
         class="champion"
-        :title="gameData.champions[c].name"
+        :title="gameData.champions[c]?.name"
         :class="{
           'not-pickable':
             gameflow.phase === 'ChampSelect' && !champSelect.currentPickableChampions.has(c)
