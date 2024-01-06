@@ -137,7 +137,7 @@ export function setupAutoSelect() {
           isDoingBan = true
           try {
             await pickOrBan(
-              settings.autoSelect.banChampionId++ || 1,
+              settings.autoSelect.banChampionId || 1,
               true,
               'ban',
               firstBanAction.id
