@@ -117,7 +117,7 @@ watch(
   () => isClientExists.value,
   (b) => {
     if (b) {
-      if (!settings.app.autoConnect) {
+      if (!settings.app.autoConnect && !appState.isAdmin) {
         return
       }
 
