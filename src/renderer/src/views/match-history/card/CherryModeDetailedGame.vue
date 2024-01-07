@@ -5,7 +5,7 @@
         <thead class="team-header">
           <tr>
             <th class="header-info">
-              {{ `第${chineseNumber[participants[0].stats.subteamPlacement - 1] ?? ' ? '}名` }} ({{
+              {{ `第${chineseNumber[participants[0]?.stats.subteamPlacement - 1] ?? ' ? '}名` }} ({{
                 participants[0].stats.subteamPlacement <= 2 ? '胜利' : '失败'
               }})
             </th>

@@ -16,7 +16,15 @@
             {{ p.identity.player.summonerName }}
           </div>
         </div>
-        <div class="placement" v-if="mode === 'CHERRY' && participants">
+        <div
+          class="placement"
+          v-if="
+            mode === 'CHERRY' &&
+            participants &&
+            participants.length &&
+            participants[0].stats.subteamPlacement
+          "
+        >
           {{ participants[0].stats.subteamPlacement }}
         </div>
       </div>
@@ -107,37 +115,48 @@
         </div>
       </div>
       <div class="summary" v-if="self.summary">
-        <div class="kpr" title="在队伍中参与了击杀的程度">击杀参与率 {{ (self.summary.kpr * 100).toFixed(1) }} %</div>
-        <div class="ddr" title="在队伍中对英雄造成的伤害占比">伤害比率 {{ (self.summary.ddr * 100).toFixed(1) }} %</div>
-        <div class="dtr" title="在队伍中的承受所有伤害占比">承伤比率 {{ (self.summary.dtr * 100).toFixed(1) }} %</div>
-        <div class="gr" title="在队伍中的金币占比">经济比率 {{ (self.summary.gr * 100).toFixed(1) }} %</div>
+        <div class="kpr" title="在队伍中参与了击杀的程度">
+          击杀参与率 {{ (self.summary.kpr * 100).toFixed(1) }} %
+        </div>
+        <div class="ddr" title="在队伍中对英雄造成的伤害占比">
+          伤害比率 {{ (self.summary.ddr * 100).toFixed(1) }} %
+        </div>
+        <div class="dtr" title="在队伍中的承受所有伤害占比">
+          承伤比率 {{ (self.summary.dtr * 100).toFixed(1) }} %
+        </div>
+        <div class="gr" title="在队伍中的金币占比">
+          经济比率 {{ (self.summary.gr * 100).toFixed(1) }} %
+        </div>
       </div>
       <div class="players">
         <template v-if="game.gameMode === 'CHERRY'">
           <div class="players-cherry" v-if="isDetailed">
-            <div>
-              <SubTeam :mode="game.gameMode" :participants="teams.subTeam1" />
-              <SubTeam
-                :mode="game.gameMode"
-                :participants="teams.subTeam2"
-                style="margin-top: 8px"
-              />
-            </div>
-            <div>
-              <SubTeam :mode="game.gameMode" :participants="teams.subTeam3" />
-              <SubTeam
-                :mode="game.gameMode"
-                :participants="teams.subTeam4"
-                style="margin-top: 8px"
-              />
-            </div>
+            <template v-if="teams.subTeam0?.length">
+              <SubTeam :mode="game.gameMode" :participants="teams.subTeam0.slice(0, 4)" />
+              <SubTeam :mode="game.gameMode" :participants="teams.subTeam0.slice(4)" />
+            </template>
+            <template v-else>
+              <div>
+                <SubTeam :mode="game.gameMode" :participants="teams.subTeam1" />
+                <SubTeam
+                  :mode="game.gameMode"
+                  :participants="teams.subTeam2"
+                  style="margin-top: 8px"
+                />
+              </div>
+              <div>
+                <SubTeam :mode="game.gameMode" :participants="teams.subTeam3" />
+                <SubTeam
+                  :mode="game.gameMode"
+                  :participants="teams.subTeam4"
+                  style="margin-top: 8px"
+                />
+              </div>
+            </template>
           </div>
         </template>
         <template v-else>
-          <div class="players-normal" v-if="isDetailed">
-            <SubTeam :mode="game.gameMode" :participants="teams.team1" />
-            <SubTeam :mode="game.gameMode" :participants="teams.team2" />
-          </div>
+          <div class="players-normal" v-if="isDetailed"></div>
         </template>
       </div>
       <div class="show-more" @click="() => handleToggleShowDetailedGame()">
@@ -346,6 +365,7 @@ const teams = computed(() => {
 
   if (props.game.gameMode === 'CHERRY') {
     return {
+      subTeam0: all.filter((p) => p.stats.playerSubteamId == 0),
       subTeam1: all.filter((p) => p.stats.playerSubteamId == 1),
       subTeam2: all.filter((p) => p.stats.playerSubteamId == 2),
       subTeam3: all.filter((p) => p.stats.playerSubteamId == 3),
@@ -380,7 +400,6 @@ const emits = defineEmits<{
 
 const router = useRouter()
 const handleToSummoner = (summonerId: number) => {
-  // 人机不跳
   if (summonerId === 0) {
     return
   }
