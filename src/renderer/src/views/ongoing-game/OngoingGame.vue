@@ -22,7 +22,7 @@
             :team="team"
             :queue-type="mh.ongoingGame?.queueType"
             :saved-info="p.savedInfo"
-            @show-game="(id, selfId) => handleShowGame(id, selfId /* equals to p.id */)"
+            @show-game="(id, selfId) => handleShowGame(id, selfId)"
             @to-summoner="(id) => handleToSummoner(id)"
           />
         </div>

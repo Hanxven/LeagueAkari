@@ -10,9 +10,14 @@
       <LcuImage class="avatar" :src="championId ? championIcon(championId) : championIcon(-1)" />
       <div class="header-line-right-side">
         <div class="summoner-name-line">
-          <span :title="summonerInfo?.displayName" class="name" @click="emits('toSummoner', id)">{{
-            summonerInfo?.displayName ? summonerInfo.displayName : '<暂无名称>'
-          }}</span>
+          <span
+            :title="`${summonerInfo?.displayName}${
+              summonerInfo?.tagLine ? '#' + summonerInfo.tagLine : ''
+            }`"
+            class="name"
+            @click="emits('toSummoner', id)"
+            >{{ summonerInfo?.displayName ? summonerInfo.displayName : '<暂无名称>' }}</span
+          >
           <NPopover v-if="savedInfo" placement="bottom">
             <template #trigger>
               <span
