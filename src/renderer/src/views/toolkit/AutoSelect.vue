@@ -9,7 +9,7 @@
         size="small"
       ></NSwitch>
     </div>
-    <div class="control-line" title="仅限同步自选模式，排位队列等顺序自选的不在范围内">
+    <div class="control-line" title="仅限同步自选模式，排位队列等顺序自选队列不应用自动选择">
       <span class="label">仅限同步自选</span>
       <NSwitch
         @update:value="(v) => setOnlySimulMode(v)"
@@ -17,16 +17,12 @@
         size="small"
       ></NSwitch>
     </div>
-    <div class="control-line">
+    <div class="control-line" title="参照列表中的英雄选择，优先选择顺序靠前的英雄">
       <span class="label">意向英雄</span>
-      <NSelect
-        style="width: 140px"
-        size="tiny"
-        :value="settings.autoSelect.championId"
-        @update:value="(v) => setAutoSelectChampionId(v)"
-        filterable
-        :options="championsOptions"
-      ></NSelect>
+      <OrderedChampionList
+        :value="settings.autoSelect.expectedChampions"
+        @update:value="(list) => setNormalModeExpectedChampions(list)"
+      />
     </div>
     <div class="control-line">
       <span class="label">选择策略</span>
@@ -40,6 +36,14 @@
         <template #unchecked>亮出</template></NSwitch
       >
     </div>
+    <div class="control-line" title="不会回避队友预选的英雄">
+      <span class="label">无视队友预选</span>
+      <NSwitch
+        @update:value="(v) => setSelectTeammateIntendedChampion(v)"
+        :value="settings.autoSelect.selectTeammateIntendedChampion"
+        size="small"
+      />
+    </div>
     <div class="divider"></div>
     <div class="control-line" title="带有英雄选择台的队列，如极地大乱斗">
       <span class="label">随机模式开启</span>
@@ -49,7 +53,7 @@
         size="small"
       ></NSwitch>
     </div>
-    <div class="control-line" title="在目标英雄出现在英雄选择台上时，留给其他人的反应时间">
+    <div class="control-line" title="目标英雄出现在英雄选择台上需满足的累计时间">
       <span class="label">抢选延迟 (秒)</span>
       <NInputNumber
         style="width: 100px"
@@ -76,35 +80,41 @@
         size="small"
       ></NSwitch>
     </div>
-    <div class="control-line">
-      <span class="label">意向 ban 英雄</span>
-      <NSelect
-        style="width: 140px"
-        size="tiny"
-        :value="settings.autoSelect.banChampionId"
-        @update:value="(v) => setAutoBanChampionId(v)"
-        filterable
-        :options="championsOptions"
-      ></NSelect>
+    <div class="control-line" title="按照列表中的英雄顺序禁用，优先禁用顺序靠前的英雄">
+      <span class="label">意向禁用英雄</span>
+      <OrderedChampionList
+        :value="settings.autoSelect.bannedChampions"
+        @update:value="(list) => setNormalModeBannedChampions(list)"
+      />
+    </div>
+    <div class="control-line" title="禁用英雄时是否考虑队友预选位">
+      <span class="label">无视队友预选</span>
+      <NSwitch
+        @update:value="(v) => setBanTeammateIntendedChampion(v)"
+        :value="settings.autoSelect.banTeammateIntendedChampion"
+        size="small"
+      ></NSwitch>
     </div>
   </NCard>
 </template>
 
 <script setup lang="ts">
-import { NCard, NInputNumber, NSelect, NSwitch } from 'naive-ui'
+import { NCard, NInputNumber, NSwitch } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import OrderedChampionList from '@renderer/components/OrderedChampionList.vue'
 import {
-  setAutoBanChampionId,
   setAutoBanEnabled,
-  setAutoSelectChampionId,
   setAutoSelectCompleted,
+  setBanTeammateIntendedChampion,
   setBenchModeAutoSelectEnabled,
   setBenchModeExpectedChampions,
   setGrabDelay,
   setNormalModeAutoSelectEnabled,
-  setOnlySimulMode
+  setNormalModeBannedChampions,
+  setNormalModeExpectedChampions,
+  setOnlySimulMode,
+  setSelectTeammateIntendedChampion
 } from '@renderer/features/auto-select'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { useSettingsStore } from '@renderer/features/stores/settings'

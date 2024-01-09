@@ -77,7 +77,7 @@ const handleConnect = async (maxAttempts = 3) => {
       }
 
       attempts.value++ // 增加尝试次数
-      console.warn(`连接失败，正在尝试第 ${attempts} 次重连：`, err)
+      console.warn(`连接失败，正在尝试第 ${attempts.value} 次重连：`, err)
       if (attempts.value >= maxAttempts) {
         isErr.value = true
         isAttemptingConnect.value = false

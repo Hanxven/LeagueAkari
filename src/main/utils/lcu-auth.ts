@@ -67,19 +67,30 @@ export function queryLcuAuth(): Promise<LcuAuth> {
         `Select-Object -ExpandProperty CommandLine | Out-File ${savePath} -Encoding UTF8" ` +
         `-WindowStyle hidden -Verb runas -Wait -PassThru
       `
-      cp.exec(cmd, { shell: 'powershell' }, () => {
+      cp.exec(cmd, { shell: 'powershell' }, (error, _stdout, stderr) => {
+        if (error) {
+          reject(new Error('Error executing PowerShell script: ' + stderr))
+          return
+        }
+
         try {
           if (!fs.existsSync(savePath)) {
-            throw new Error('File not exists')
+            throw new Error('进程文件不存在')
           }
           const raw = fs.readFileSync(savePath, 'utf-8').replace(/\s/g, '')
           if (raw.trim().length === 0) {
-            throw new Error('Empty file')
+            throw new Error('空的文件内容，检查是否提供管理员权限')
           }
 
           const [, port] = raw.match(portRegex) || []
           const [, password] = raw.match(passwordRegex) || []
           const [, pid] = raw.match(pidRegex) || []
+
+          if (!port || !password || !pid) {
+            reject(new Error('无法解析进程命令行参数'))
+            return
+          }
+
           resolve({
             port: Number(port),
             pid: Number(pid),
@@ -89,7 +100,9 @@ export function queryLcuAuth(): Promise<LcuAuth> {
         } catch (e) {
           reject(e)
         } finally {
-          rmSync(savePath)
+          if (fs.existsSync(savePath)) {
+            rmSync(savePath)
+          }
         }
       })
     } catch (e) {
@@ -112,7 +125,7 @@ export function queryLcuAuthOnAdmin(): Promise<LcuAuth> {
 
         const raw = stdout.trim()
         if (raw.length === 0) {
-          reject(new Error('No output from PowerShell script'))
+          reject(new Error('空的文件内容'))
           return
         }
 
@@ -121,7 +134,7 @@ export function queryLcuAuthOnAdmin(): Promise<LcuAuth> {
         const [, pid] = raw.match(pidRegex) || []
 
         if (!port || !password || !pid) {
-          reject(new Error('Failed to parse output'))
+          reject(new Error('无法解析进程命令行参数'))
           return
         }
 

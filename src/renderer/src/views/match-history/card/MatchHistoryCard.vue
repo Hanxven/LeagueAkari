@@ -156,7 +156,10 @@
           </div>
         </template>
         <template v-else>
-          <div class="players-normal" v-if="isDetailed"></div>
+          <div class="players-normal" v-if="isDetailed">
+            <SubTeam :mode="game.gameMode" :participants="teams.team1" />
+            <SubTeam :mode="game.gameMode" :participants="teams.team2" />
+          </div>
         </template>
       </div>
       <div class="show-more" @click="() => handleToggleShowDetailedGame()">

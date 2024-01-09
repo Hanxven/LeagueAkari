@@ -127,9 +127,9 @@ export interface BenchChampion {
 }
 
 export interface Bans {
-  myTeamBans: any[]
+  myTeamBans: number[]
   numBans: number
-  theirTeamBans: any[]
+  theirTeamBans: number[]
 }
 
 export interface GridChamp {
@@ -188,12 +188,6 @@ export interface ChatDetails {
   chatRoomName: string
   chatRoomPassword: string
   multiUserChatJWT: string
-}
-
-export interface Bans {
-  myTeamBans: any[]
-  numBans: number
-  theirTeamBans: any[]
 }
 
 export interface Action {

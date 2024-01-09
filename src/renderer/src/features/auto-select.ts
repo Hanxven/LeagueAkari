@@ -1,15 +1,11 @@
-import { computed, watch } from 'vue'
+import { watch } from 'vue'
 
-import { useStableComputed } from '@renderer/compositions/useStableComputed'
 import { notify } from '@renderer/events/notifications'
-import { benchSwap, pickOrBan } from '@renderer/http-api/champ-select'
-import { Action, ChampSelectSession, ChampSelectSummoner } from '@renderer/types/champ-select'
-import { getSetting, setSetting } from '@renderer/utils/storage'
+import { benchSwap, getChampSelectSession, pickOrBan } from '@renderer/http-api/champ-select'
+import { Action, ChampSelectSummoner } from '@renderer/types/champ-select'
+import { getSetting, removeSetting, setSetting } from '@renderer/utils/storage'
 
 import { useChampSelectStore } from './stores/lcu/champ-select'
-import { useChatStore } from './stores/lcu/chat'
-import { useGameflowStore } from './stores/lcu/gameflow'
-import { useSummonerStore } from './stores/lcu/summoner'
 import { useSettingsStore } from './stores/settings'
 import { onLcuEvent } from './update/lcu-events'
 
@@ -25,27 +21,20 @@ export function setupAutoSelect() {
 
   loadSettingsFromStorage()
 
-  const isSimulPick = computed(() => {
-    if (!cs.session) {
-      return false
-    }
-
-    return cs.session.hasSimultaneousPicks
-  })
-
   let isDoingPick = false
   let isDoingBan = false
-  let t = 1
   onLcuEvent<ChampSelectSummoner>('/lol-champ-select/v1/summoners/*', async (event) => {
-    if (!cs.session) {
-      return
-    }
-
     if (event.eventType === 'Delete') {
       return
     }
 
     if (!event.data.isSelf || !event.data.isActingNow) {
+      return
+    }
+
+    const session = (await getChampSelectSession()).data
+
+    if (!session) {
       return
     }
 
@@ -60,11 +49,11 @@ export function setupAutoSelect() {
           return
         }
 
-        if (settings.autoSelect.onlySimulMode && !isSimulPick.value) {
+        if (settings.autoSelect.onlySimulMode && !session.hasSimultaneousPicks) {
           return
         }
-        
-        if (cs.session.isCustomGame) {
+
+        if (session.isCustomGame) {
           return
         }
 
@@ -73,13 +62,12 @@ export function setupAutoSelect() {
         }
 
         // 客户端在英雄选择阶段，分为若干个 action 阶段
-        // session 中的 action 阶段可能会动态更新，会比这个事件 (/lol-champ-select/v1/summoners/:cellId) 更早发生
         // 比如竞技场中，有三个 action 阶段:
         // 分别是 ban 阶段 (10 名玩家各自有一个 ban 的 action)
         // pick 1 阶段 (奇数位置的玩家各自有一个 pick 的 action)
         // pick 2 阶段 (偶数位置的玩家各自有一个 pick 的 action)
         // 这样的流程，表现为一个 actions[][] 的数组
-        const myInProgressActions = cs.session.actions.reduce((p, c) => {
+        const myInProgressActions = session.actions.reduce((p, c) => {
           const action = c.find((a) => a.actorCellId === event.data.cellId)
           if (action && action.isInProgress) {
             p.push(action)
@@ -89,23 +77,53 @@ export function setupAutoSelect() {
 
         const firstPickAction = myInProgressActions.find((a) => a.type === 'pick')
         if (firstPickAction) {
-          isDoingPick = true
-          try {
-            await pickOrBan(
-              settings.autoSelect.championId || 1,
-              settings.autoSelect.completed,
-              'pick',
-              firstPickAction.id
-            )
-          } catch (err) {
-            notify.emit({
-              id,
-              content: '尝试自动选择英雄时失败',
-              type: 'warning',
-              extra: { error: err }
+          // 场上出现的英雄，不能选
+          const unselectableChampions = [...session.myTeam, ...session.theirTeam].reduce(
+            (prev, cur) => {
+              if (cur.championId) {
+                prev.add(cur.championId)
+              }
+              return prev
+            },
+            new Set<number>()
+          )
+
+          if (!settings.autoSelect.selectTeammateIntendedChampion) {
+            session.myTeam.forEach((m) => {
+              if (m.championPickIntent) {
+                unselectableChampions.add(m.championPickIntent)
+              }
             })
-          } finally {
-            isDoingPick = false
+          }
+
+          // ban 位出现的英雄也不能选
+          ;[...session.bans.myTeamBans, ...session.bans.theirTeamBans].forEach((c) =>
+            unselectableChampions.add(c)
+          )
+
+          const pickableChampion = settings.autoSelect.expectedChampions.find(
+            (c) => !unselectableChampions.has(c) && cs.currentPickableChampions.has(c)
+          )
+
+          if (pickableChampion) {
+            isDoingPick = true
+            try {
+              await pickOrBan(
+                pickableChampion,
+                settings.autoSelect.completed,
+                'pick',
+                firstPickAction.id
+              )
+            } catch (err) {
+              notify.emit({
+                id,
+                content: '尝试自动选择英雄时失败',
+                type: 'warning',
+                extra: { error: err }
+              })
+            } finally {
+              isDoingPick = false
+            }
           }
         }
         break
@@ -116,7 +134,7 @@ export function setupAutoSelect() {
           return
         }
 
-        if (cs.session.isCustomGame) {
+        if (session.isCustomGame) {
           return
         }
 
@@ -124,7 +142,7 @@ export function setupAutoSelect() {
           return
         }
 
-        const myInProgressActions = cs.session.actions.reduce((p, c) => {
+        const myInProgressActions = session.actions.reduce((p, c) => {
           const action = c.find((a) => a.actorCellId === event.data.cellId)
           if (action && action.isInProgress) {
             p.push(action)
@@ -134,23 +152,42 @@ export function setupAutoSelect() {
 
         const firstBanAction = myInProgressActions.find((a) => a.type === 'ban')
         if (firstBanAction) {
-          isDoingBan = true
-          try {
-            await pickOrBan(
-              settings.autoSelect.banChampionId || 1,
-              true,
-              'ban',
-              firstBanAction.id
-            )
-          } catch (err) {
-            notify.emit({
-              id,
-              content: '尝试自动禁用英雄时失败',
-              type: 'warning',
-              extra: { error: err }
+          const unbannableChampions = [
+            ...session.bans.myTeamBans,
+            ...session.bans.theirTeamBans
+          ].reduce((prev, cur) => {
+            if (cur) {
+              prev.add(cur)
+            }
+            return prev
+          }, new Set<number>())
+
+          if (!settings.autoSelect.banTeammateIntendedChampion) {
+            session.myTeam.forEach((m) => {
+              if (m.championPickIntent) {
+                unbannableChampions.add(m.championPickIntent)
+              }
             })
-          } finally {
-            isDoingBan = false
+          }
+
+          const bannableChampion = settings.autoSelect.bannedChampions.find(
+            (c) => !unbannableChampions.has(c)
+          )
+
+          if (bannableChampion) {
+            isDoingBan = true
+            try {
+              await pickOrBan(bannableChampion, true, 'ban', firstBanAction.id)
+            } catch (err) {
+              notify.emit({
+                id,
+                content: '尝试自动禁用英雄时失败',
+                type: 'warning',
+                extra: { error: err }
+              })
+            } finally {
+              isDoingBan = false
+            }
           }
         }
       }
@@ -262,15 +299,40 @@ export function setupAutoSelect() {
 function loadSettingsFromStorage() {
   const settings = useSettingsStore()
 
-  settings.autoSelect.championId = getSetting('autoSelect.championId', 157)
   settings.autoSelect.completed = getSetting('autoSelect.completed', false)
   settings.autoSelect.normalModeEnabled = getSetting('autoSelect.normalModeEnabled', false)
   settings.autoSelect.onlySimulMode = getSetting('autoSelect.onlySimulMode', true)
   settings.autoSelect.benchModeEnabled = getSetting('autoSelect.benchModeEnabled', false)
   settings.autoSelect.benchExpectedChampions = getSetting('autoSelect.benchExpectedChampions', [])
   settings.autoSelect.grabDelay = getSetting('autoSelect.grabDelay', 1)
-  settings.autoSelect.banChampionId = getSetting('autoSelect.banChampionId', 157)
   settings.autoSelect.banEnabled = getSetting('autoSelect.banEnabled', false)
+  settings.autoSelect.banTeammateIntendedChampion = getSetting(
+    'autoSelect.banTeammateIntendedChampion',
+    false
+  )
+  settings.autoSelect.selectTeammateIntendedChampion = getSetting(
+    'autoSelect.selectTeammateIntendedChampion',
+    false
+  )
+
+  // migrate from previous version
+  const formerExpected = getSetting('autoSelect.championId')
+  if (formerExpected) {
+    settings.autoSelect.expectedChampions = getSetting('autoSelect.expectedChampions', [
+      formerExpected
+    ])
+    removeSetting('autoSelect.championId')
+  } else {
+    settings.autoSelect.expectedChampions = getSetting('autoSelect.expectedChampions', [])
+  }
+
+  const formerBanned = getSetting('autoSelect.banChampionId')
+  if (formerBanned) {
+    settings.autoSelect.bannedChampions = getSetting('autoSelect.bannedChampions', [formerBanned])
+    removeSetting('autoSelect.banChampionId')
+  } else {
+    settings.autoSelect.bannedChampions = getSetting('autoSelect.bannedChampions', [])
+  }
 }
 
 export function setNormalModeAutoSelectEnabled(enabled: boolean) {
@@ -299,18 +361,18 @@ export function setBenchModeExpectedChampions(list: number[]) {
   settings.autoSelect.benchExpectedChampions = list
 }
 
-export function setAutoSelectChampionId(id: number) {
+export function setNormalModeExpectedChampions(list: number[]) {
   const settings = useSettingsStore()
 
-  setSetting('autoSelect.championId', id)
-  settings.autoSelect.championId = id
+  setSetting('autoSelect.expectedChampions', list)
+  settings.autoSelect.expectedChampions = list
 }
 
-export function setAutoBanChampionId(id: number) {
+export function setNormalModeBannedChampions(list: number[]) {
   const settings = useSettingsStore()
 
-  setSetting('autoSelect.banChampionId', id)
-  settings.autoSelect.banChampionId = id
+  setSetting('autoSelect.bannedChampions', list)
+  settings.autoSelect.bannedChampions = list
 }
 
 export function setAutoBanEnabled(enabled: boolean) {
@@ -339,4 +401,18 @@ export function setGrabDelay(delay: number) {
 
   setSetting('autoSelect.grabDelay', delay)
   settings.autoSelect.grabDelay = delay
+}
+
+export function setBanTeammateIntendedChampion(enabled: boolean) {
+  const settings = useSettingsStore()
+
+  setSetting('autoSelect.banTeammateIntendedChampion', enabled)
+  settings.autoSelect.banTeammateIntendedChampion = enabled
+}
+
+export function setSelectTeammateIntendedChampion(enabled: boolean) {
+  const settings = useSettingsStore()
+
+  setSetting('autoSelect.selectTeammateIntendedChampion', enabled)
+  settings.autoSelect.selectTeammateIntendedChampion = enabled
 }

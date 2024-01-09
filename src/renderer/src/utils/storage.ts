@@ -21,3 +21,7 @@ export function getSetting<T = any>(key: string, defaultValue?: T) {
 export function setSetting<T = any>(key: string, value: T) {
   localStorage.setItem(key, JSON.stringify(value))
 }
+
+export function removeSetting(key: string) {
+  localStorage.removeItem(key)
+}

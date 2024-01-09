@@ -71,8 +71,10 @@ export const useSettingsStore = defineStore('settings', () => {
 
     onlySimulMode: true,
 
-    // 普遍自动选择时，英雄的 ID
-    championId: 1,
+    expectedChampions: [] as number[],
+
+    // 自动选择的时候是否避开队友预选
+    selectTeammateIntendedChampion: false,
 
     // 是否立即秒选
     completed: false,
@@ -82,13 +84,16 @@ export const useSettingsStore = defineStore('settings', () => {
 
     benchExpectedChampions: [] as number[],
 
+    // 选择的延迟，单位秒
     grabDelay: 1,
 
     // 自动 ban
     banEnabled: false,
 
-    // 自动 ban 的英雄 ID
-    banChampionId: 1
+    bannedChampions: [] as number[],
+
+    // ban 的时候是否考虑队友预选
+    banTeammateIntendedChampion: false
   })
 
   const lobby = reactive({
