@@ -9,7 +9,6 @@
           ref="inputEl"
           class="search-input"
           v-model:value="inputText"
-          placeholder="按照 召唤师名称 / 召唤师 ID / PUUID 精确查找"
           @keyup.enter="handleSearch"
           :disabled="isSearching"
         />
@@ -46,7 +45,14 @@
         v-if="!isNoSearchResult && !byNameResult && !bySummonerIdResult && !byPuuidResult"
         size="small"
       >
-        输入召唤师名称、ID 或 PUUID，开始精确搜索
+        {{
+          summoner.newIdSystemEnabled
+            ? '输入 ID 或 PUUID，开始精确搜索'
+            : '输入召唤师名称、ID 或 PUUID，开始精确搜索'
+        }}
+        <template v-if="summoner.newIdSystemEnabled"
+          ><br />由于该大区启用了新 ID 系统<br />因此无法通过 LCU API 通过召唤师名称查询</template
+        >
       </div>
     </div>
   </div>
@@ -56,11 +62,14 @@
 import { AutoCompleteOption, NAutoComplete, NButton } from 'naive-ui'
 import { onMounted, ref } from 'vue'
 
+import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
 import { getSummoner, getSummonerByName, getSummonerByPuuid } from '@renderer/http-api/summoner'
 import { SummonerInfo } from '@renderer/types/summoner'
 import { inferType } from '@renderer/utils/identity'
 
 import SummonerCard from './SummonerCard.vue'
+
+const summoner = useSummonerStore()
 
 const inputText = ref('')
 const searchText = ref('')
@@ -188,6 +197,7 @@ onMounted(() => {
   border: 1px solid rgb(46, 46, 46);
   font-size: 13px;
   color: rgb(142, 142, 142);
+  text-align: center;
 }
 
 .card:not(:last-child) {

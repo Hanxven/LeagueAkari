@@ -257,6 +257,7 @@ function summoner() {
         summoner.currentSummoner = data
         console.log('selfSummoner', data)
         retryCount = 0
+        summoner.newIdSystemEnabled = Boolean(data.tagLine)
       } catch (err) {
         error = err as Error
         retryCount++
