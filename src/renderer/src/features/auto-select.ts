@@ -6,6 +6,7 @@ import { Action, ChampSelectSummoner } from '@renderer/types/champ-select'
 import { getSetting, removeSetting, setSetting } from '@renderer/utils/storage'
 
 import { useChampSelectStore } from './stores/lcu/champ-select'
+import { useGameDataStore } from './stores/lcu/game-data'
 import { useSettingsStore } from './stores/settings'
 import { onLcuEvent } from './update/lcu-events'
 
@@ -18,6 +19,7 @@ let targetingChampion: number | null = null
 export function setupAutoSelect() {
   const settings = useSettingsStore()
   const cs = useChampSelectStore()
+  const gameData = useGameDataStore()
 
   loadSettingsFromStorage()
 
@@ -101,29 +103,32 @@ export function setupAutoSelect() {
             unselectableChampions.add(c)
           )
 
-          const pickableChampion = settings.autoSelect.expectedChampions.find(
+          const pickableChampions = settings.autoSelect.expectedChampions.filter(
             (c) => !unselectableChampions.has(c) && cs.currentPickableChampions.has(c)
           )
 
-          if (pickableChampion) {
-            isDoingPick = true
-            try {
-              await pickOrBan(
-                pickableChampion,
-                settings.autoSelect.completed,
-                'pick',
-                firstPickAction.id
-              )
-            } catch (err) {
-              notify.emit({
-                id,
-                content: '尝试自动选择英雄时失败',
-                type: 'warning',
-                extra: { error: err }
-              })
-            } finally {
-              isDoingPick = false
-            }
+          if (pickableChampions.length === 0) {
+            return
+          }
+
+          const candidate = settings.autoSelect.selectRandomly
+            ? pickableChampions[Math.floor(Math.random() * pickableChampions.length)]
+            : pickableChampions[0]
+
+          isDoingPick = true
+          try {
+            await pickOrBan(candidate, settings.autoSelect.completed, 'pick', firstPickAction.id)
+          } catch (err) {
+            notify.emit({
+              id,
+              content: `尝试自动选择英雄时失败，尝试选择 ${
+                gameData.champions[candidate]?.name || candidate
+              }`,
+              type: 'warning',
+              extra: { error: err }
+            })
+          } finally {
+            isDoingPick = false
           }
         }
         break
@@ -170,24 +175,32 @@ export function setupAutoSelect() {
             })
           }
 
-          const bannableChampion = settings.autoSelect.bannedChampions.find(
+          const bannableChampions = settings.autoSelect.bannedChampions.filter(
             (c) => !unbannableChampions.has(c)
           )
 
-          if (bannableChampion) {
-            isDoingBan = true
-            try {
-              await pickOrBan(bannableChampion, true, 'ban', firstBanAction.id)
-            } catch (err) {
-              notify.emit({
-                id,
-                content: '尝试自动禁用英雄时失败',
-                type: 'warning',
-                extra: { error: err }
-              })
-            } finally {
-              isDoingBan = false
-            }
+          if (bannableChampions.length === 0) {
+            return
+          }
+
+          const candidate = settings.autoSelect.banRandomly
+            ? bannableChampions[Math.floor(Math.random() * bannableChampions.length)]
+            : bannableChampions[0]
+
+          isDoingBan = true
+          try {
+            await pickOrBan(candidate, true, 'ban', firstBanAction.id)
+          } catch (err) {
+            notify.emit({
+              id,
+              content: `尝试自动禁用英雄时失败，尝试禁用 ${
+                gameData.champions[candidate]?.name || candidate
+              }`,
+              type: 'warning',
+              extra: { error: err }
+            })
+          } finally {
+            isDoingBan = false
           }
         }
       }
@@ -314,6 +327,8 @@ function loadSettingsFromStorage() {
     'autoSelect.selectTeammateIntendedChampion',
     false
   )
+  settings.autoSelect.selectRandomly = getSetting('autoSelect.selectRandomly', false)
+  settings.autoSelect.banRandomly = getSetting('autoSelect.banRandomly', false)
 
   // migrate from previous version
   const formerExpected = getSetting('autoSelect.championId')
@@ -415,4 +430,15 @@ export function setSelectTeammateIntendedChampion(enabled: boolean) {
 
   setSetting('autoSelect.selectTeammateIntendedChampion', enabled)
   settings.autoSelect.selectTeammateIntendedChampion = enabled
+}
+
+export function setSelectRandomly(enabled: boolean) {
+  const settings = useSettingsStore()
+  setSetting('autoSelect.selectRandomly', enabled)
+  settings.autoSelect.selectRandomly = enabled
+}
+export function setBanRandomly(enabled: boolean) {
+  const settings = useSettingsStore()
+  setSetting('autoSelect.banRandomly', enabled)
+  settings.autoSelect.banRandomly = enabled
 }

@@ -18,7 +18,8 @@
             @click="emits('toSummoner', id)"
             >{{ summonerInfo?.displayName ? summonerInfo.displayName : '<暂无名称>' }}</span
           >
-          <NPopover v-if="savedInfo" placement="bottom">
+          <span class="tag self" v-if="isSelf">我</span>
+          <NPopover v-if="savedInfo && !isSelf" placement="bottom">
             <template #trigger>
               <span
                 :title="`曾在 ${formattedRelativeTime} 遇见过，作为${
@@ -405,6 +406,10 @@ const analysis = computed(() => getAnalysis(matchHistoryList.value))
 
     .tag.encountered {
       background-color: rgb(67, 119, 116);
+    }
+
+    .tag.self {
+      background-color: rgb(67, 70, 119);
     }
 
     .tag.winning-streak {

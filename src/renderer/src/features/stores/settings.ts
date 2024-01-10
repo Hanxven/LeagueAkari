@@ -76,6 +76,8 @@ export const useSettingsStore = defineStore('settings', () => {
     // 自动选择的时候是否避开队友预选
     selectTeammateIntendedChampion: false,
 
+    selectRandomly: false,
+
     // 是否立即秒选
     completed: false,
 
@@ -91,6 +93,8 @@ export const useSettingsStore = defineStore('settings', () => {
     banEnabled: false,
 
     bannedChampions: [] as number[],
+
+    banRandomly: false,
 
     // ban 的时候是否考虑队友预选
     banTeammateIntendedChampion: false

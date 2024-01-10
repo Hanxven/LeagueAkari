@@ -24,6 +24,14 @@
         @update:value="(list) => setNormalModeExpectedChampions(list)"
       />
     </div>
+    <div class="control-line" title="随机选择一个意向列表中的英雄">
+      <span class="label">随机挑选</span>
+      <NSwitch
+        @update:value="(v) => setSelectRandomly(v)"
+        :value="settings.autoSelect.selectRandomly"
+        size="small"
+      ></NSwitch>
+    </div>
     <div class="control-line">
       <span class="label">选择策略</span>
       <NSwitch
@@ -87,6 +95,14 @@
         @update:value="(list) => setNormalModeBannedChampions(list)"
       />
     </div>
+    <div class="control-line" title="随机禁用一个意向列表中的英雄">
+      <span class="label">随机禁用</span>
+      <NSwitch
+        @update:value="(v) => setBanRandomly(v)"
+        :value="settings.autoSelect.banRandomly"
+        size="small"
+      ></NSwitch>
+    </div>
     <div class="control-line" title="禁用英雄时是否考虑队友预选位">
       <span class="label">无视队友预选</span>
       <NSwitch
@@ -106,6 +122,7 @@ import OrderedChampionList from '@renderer/components/OrderedChampionList.vue'
 import {
   setAutoBanEnabled,
   setAutoSelectCompleted,
+  setBanRandomly,
   setBanTeammateIntendedChampion,
   setBenchModeAutoSelectEnabled,
   setBenchModeExpectedChampions,
@@ -114,6 +131,7 @@ import {
   setNormalModeBannedChampions,
   setNormalModeExpectedChampions,
   setOnlySimulMode,
+  setSelectRandomly,
   setSelectTeammateIntendedChampion
 } from '@renderer/features/auto-select'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
