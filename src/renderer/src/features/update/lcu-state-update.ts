@@ -421,9 +421,12 @@ function champSelect() {
   )
 
   // 处理中场进入的情况，主动获取可用英雄列表
-  watch([() => lcuState.state, () => gameflow.phase], async ([state, phase], [prevState]) => {
-    if (prevState !== 'connected' && state === 'connected' && phase === 'ChampSelect') {
+  watch([() => lcuState.state, () => gameflow.phase], async ([state, phase]) => {
+    if (state === 'connected' && phase === 'ChampSelect') {
       try {
+        if (champSelect.currentPickableChampions.size) {
+          champSelect.currentPickableChampions.clear()
+        }
         const pickables = (await getPickableChampIds()).data
         pickables.forEach((id) => champSelect.currentPickableChampions.add(id))
       } catch (err) {
@@ -446,6 +449,9 @@ function champSelect() {
     if (event.eventType === 'Delete') {
       champSelect.currentPickableChampions.clear()
     } else {
+      if (champSelect.currentPickableChampions.size) {
+        champSelect.currentPickableChampions.clear()
+      }
       event.data.forEach((id) => champSelect.currentPickableChampions.add(id))
     }
   })
