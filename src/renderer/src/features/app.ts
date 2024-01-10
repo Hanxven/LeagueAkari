@@ -1,10 +1,10 @@
 import axios from 'axios'
+import { lt } from 'semver'
 import { markRaw } from 'vue'
 
 import { notify } from '@renderer/events/notifications'
 import { call, onUpdate } from '@renderer/ipc'
 import { getSetting, setSetting } from '@renderer/utils/storage'
-import { compareVersions } from '@renderer/utils/version'
 
 import { useAppState } from './stores/app'
 import { useSettingsStore } from './stores/settings'
@@ -117,7 +117,7 @@ export async function checkUpdates(background = false) {
     const { data } = await axios.get<GithubApiLatestRelease>(CHECK_UPDATE_URL)
 
     const versionString = data.tag_name
-    if (compareVersions(appState.version, versionString) < 0) {
+    if (lt(appState.version, versionString)) {
       const archiveFile = data.assets.find((a) => {
         return a.content_type === 'application/x-compressed'
       })

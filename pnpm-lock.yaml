@@ -52,6 +52,9 @@ devDependencies:
   '@types/node':
     specifier: ^18.19.4
     version: 18.19.4
+  '@types/semver':
+    specifier: ^7.5.6
+    version: 7.5.6
   '@types/ws':
     specifier: ^8.5.10
     version: 8.5.10
@@ -109,6 +112,9 @@ devDependencies:
   prettier:
     specifier: ^3.1.1
     version: 3.1.1
+  semver:
+    specifier: ^7.5.4
+    version: 7.5.4
   typescript:
     specifier: ^5.3.3
     version: 5.3.3
@@ -1198,6 +1204,10 @@ packages:
     resolution: {integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==}
     dependencies:
       '@types/node': 18.19.4
+
+  /@types/semver@7.5.6:
+    resolution: {integrity: sha512-dn1l8LaMea/IjDoHNd9J52uBbInB796CDffS6VdIxvqYCPSG0V0DzHp76GpaWnlhg88uYyPbXCDIowa86ybd5A==}
+    dev: true
 
   /@types/verror@1.10.9:
     resolution: {integrity: sha512-MLx9Z+9lGzwEuW16ubGeNkpBDE84RpB/NyGgg6z2BTpWzKkGU451cAY3UkUzZEp72RHF585oJ3V8JVNqIplcAQ==}
