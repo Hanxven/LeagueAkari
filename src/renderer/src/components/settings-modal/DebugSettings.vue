@@ -240,7 +240,9 @@ function isSubsequence(s: string, t: string) {
 }
 
 const options = computed(() => {
-  return lcuEndpoints.filter((v) => isSubsequence(editRuleText.value, v))
+  return lcuEndpoints
+    .filter((v) => isSubsequence(editRuleText.value, v))
+    .toSorted((a, b) => a.length - b.length)
 })
 
 const editRuleValid = computed(() => {
