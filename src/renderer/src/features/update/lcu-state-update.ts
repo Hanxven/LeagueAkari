@@ -2,7 +2,11 @@ import PQueue from 'p-queue'
 import { markRaw, watch } from 'vue'
 
 import { notify } from '@renderer/events/notifications'
-import { getChampSelectSession, getPickableChampIds } from '@renderer/http-api/champ-select'
+import {
+  getBannableChampIds,
+  getChampSelectSession,
+  getPickableChampIds
+} from '@renderer/http-api/champ-select'
 import { getMe } from '@renderer/http-api/chat'
 import {
   getAugments,
@@ -424,16 +428,28 @@ function champSelect() {
   watch([() => lcuState.state, () => gameflow.phase], async ([state, phase]) => {
     if (state === 'connected' && phase === 'ChampSelect') {
       try {
-        if (champSelect.currentPickableChampions.size) {
-          champSelect.currentPickableChampions.clear()
-        }
-        const pickables = (await getPickableChampIds()).data
-        pickables.forEach((id) => champSelect.currentPickableChampions.add(id))
+        const a = (async () => {
+          if (champSelect.currentPickableChampions.size) {
+            champSelect.currentPickableChampions.clear()
+          }
+          const pickables = (await getPickableChampIds()).data
+          pickables.forEach((id) => champSelect.currentPickableChampions.add(id))
+        })()
+
+        const b = (async () => {
+          if (champSelect.currentBannableChampions.size) {
+            champSelect.currentPickableChampions.clear()
+          }
+          const bannables = (await getBannableChampIds()).data
+          bannables.forEach((id) => champSelect.currentBannableChampions.add(id))
+        })()
+
+        await Promise.all([a, b])
       } catch (err) {
         notify.emit({
           id,
           type: 'warning',
-          content: '拉取当前英雄可选信息失败',
+          content: '拉取当前英雄可选/可禁信息失败',
           extra: { error: err }
         })
       }
@@ -453,6 +469,17 @@ function champSelect() {
         champSelect.currentPickableChampions.clear()
       }
       event.data.forEach((id) => champSelect.currentPickableChampions.add(id))
+    }
+  })
+
+  onLcuEvent<number[]>('/lol-champ-select/v1/bannable-champion-ids', (event) => {
+    if (event.eventType === 'Delete') {
+      champSelect.currentBannableChampions.clear()
+    } else {
+      if (champSelect.currentBannableChampions.size) {
+        champSelect.currentBannableChampions.clear()
+      }
+      event.data.forEach((id) => champSelect.currentBannableChampions.add(id))
     }
   })
 }

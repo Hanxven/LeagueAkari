@@ -67,6 +67,13 @@ export function getPickableChampIds() {
   })
 }
 
+export function getBannableChampIds() {
+  return request<number[]>({
+    url: '/lol-champ-select/v1/bannable-champion-ids',
+    method: 'GET'
+  })
+}
+
 export function reroll() {
   return request({
     url: '/lol-champ-select/v1/session/my-selection/reroll',

@@ -104,7 +104,7 @@ import LcuImage from './LcuImage.vue'
 const props = withDefaults(
   defineProps<{ value?: number[]; maxShow?: number; maxCount?: number }>(),
   {
-    maxShow: 5,
+    maxShow: 10,
     maxCount: Infinity
   }
 )

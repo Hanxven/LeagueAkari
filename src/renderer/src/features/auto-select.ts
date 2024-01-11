@@ -55,10 +55,6 @@ export function setupAutoSelect() {
           return
         }
 
-        if (session.isCustomGame) {
-          return
-        }
-
         if (isDoingPick) {
           return
         }
@@ -139,10 +135,6 @@ export function setupAutoSelect() {
           return
         }
 
-        if (session.isCustomGame) {
-          return
-        }
-
         if (isDoingBan) {
           return
         }
@@ -176,7 +168,7 @@ export function setupAutoSelect() {
           }
 
           const bannableChampions = settings.autoSelect.bannedChampions.filter(
-            (c) => !unbannableChampions.has(c)
+            (c) => !unbannableChampions.has(c) && cs.currentBannableChampions.has(c)
           )
 
           if (bannableChampions.length === 0) {

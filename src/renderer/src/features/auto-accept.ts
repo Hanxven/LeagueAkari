@@ -7,6 +7,7 @@ import { getSetting, setSetting } from '@renderer/utils/storage'
 import { useAutoAcceptStore } from './stores/auto-accept'
 import { useGameflowStore } from './stores/lcu/gameflow'
 import { useSettingsStore } from './stores/settings'
+import { onLcuEvent } from './update/lcu-events'
 
 export const id = 'feature:auto-accept'
 
@@ -57,6 +58,17 @@ export function setupAutoAccept() {
       }
     }
   )
+
+  // 如果用户取消了接受，那么自动接受则不会生效
+  onLcuEvent('/lol-matchmaking/v1/ready-check', (event) => {
+    if (event.data && event.data.playerResponse === 'Declined') {
+      if (autoAccept.willAutoAccept) {
+        window.clearTimeout(timerId)
+        autoAccept.willAutoAccept = false
+        autoAccept.willAutoAcceptAt = -1
+      }
+    }
+  })
 }
 
 function loadSettingsFromStorage() {

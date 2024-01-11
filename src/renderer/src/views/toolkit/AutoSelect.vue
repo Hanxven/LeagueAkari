@@ -17,14 +17,14 @@
         size="small"
       ></NSwitch>
     </div>
-    <div class="control-line" title="参照列表中的英雄选择，优先选择顺序靠前的英雄">
+    <div class="control-line" title="提供一个意向列表，选择操作将参考此列表">
       <span class="label">意向英雄</span>
       <OrderedChampionList
         :value="settings.autoSelect.expectedChampions"
         @update:value="(list) => setNormalModeExpectedChampions(list)"
       />
     </div>
-    <div class="control-line" title="随机选择一个意向列表中的英雄">
+    <div class="control-line" title="随机选择一个意向列表中的英雄，而不是按照列表顺序">
       <span class="label">随机挑选</span>
       <NSwitch
         @update:value="(v) => setSelectRandomly(v)"
@@ -72,7 +72,7 @@
         @update:value="(v) => setGrabDelay(v || 0)"
       />
     </div>
-    <div class="control-line" title="按照列表中的英雄选择，优先选择顺序靠前的英雄">
+    <div class="control-line" title="提供一个意向列表，选择操作将参考此列表">
       <span class="label">意向英雄</span>
       <OrderedChampionList
         :value="settings.autoSelect.benchExpectedChampions"
@@ -88,14 +88,14 @@
         size="small"
       ></NSwitch>
     </div>
-    <div class="control-line" title="按照列表中的英雄顺序禁用，优先禁用顺序靠前的英雄">
+    <div class="control-line" title="提供一个意向列表，禁用操作将参考此列表">
       <span class="label">意向禁用英雄</span>
       <OrderedChampionList
         :value="settings.autoSelect.bannedChampions"
         @update:value="(list) => setNormalModeBannedChampions(list)"
       />
     </div>
-    <div class="control-line" title="随机禁用一个意向列表中的英雄">
+    <div class="control-line" title="随机禁用一个意向列表中的英雄，而不是按照列表顺序">
       <span class="label">随机禁用</span>
       <NSwitch
         @update:value="(v) => setBanRandomly(v)"
