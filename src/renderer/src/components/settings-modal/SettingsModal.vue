@@ -59,6 +59,7 @@
             >{{ appState.updates.isCheckingUpdates ? '正在检查' : '检查更新' }}</span
           >
         </div>
+        <div class="about-para copyright">© 2024 Hanxven. 本软件是开源软件，遵循MIT许可证。</div>
       </NTabPane>
     </NTabs>
   </NModal>
@@ -91,6 +92,12 @@ const show = defineModel<boolean>('show', { default: false })
 .about-para {
   text-indent: 2em;
   font-size: 13px;
+}
+
+.copyright {
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgb(87, 87, 87);
 }
 
 .card-header-title {
