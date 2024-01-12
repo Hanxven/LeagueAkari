@@ -32,5 +32,5 @@ export function inferType(str: string) {
 }
 
 export function resolveSummonerName(nameWithTag: string) {
-  return nameWithTag.split('#', 1) as [string, string]
+  return nameWithTag.split('#', 2) as [string, string]
 }

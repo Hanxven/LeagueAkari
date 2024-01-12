@@ -8,6 +8,7 @@
           @focus="generateCompleteOptions"
           ref="inputEl"
           class="search-input"
+          :status="isTagNeeded ? 'warning' : 'success'"
           v-model:value="inputText"
           @keyup.enter="handleSearch"
           :disabled="isSearching"
@@ -45,14 +46,13 @@
         v-if="!isNoSearchResult && !byNameResult && !bySummonerIdResult && !byPuuidResult"
         size="small"
       >
-        {{
-          summoner.newIdSystemEnabled
-            ? '输入 ID 或 PUUID，开始精确搜索'
-            : '输入召唤师名称、ID 或 PUUID，开始精确搜索'
-        }}
-        <template v-if="summoner.newIdSystemEnabled"
-          ><br />由于该大区启用了新 ID 系统<br />因此无法通过 LCU API 通过召唤师名称查询</template
-        >
+        输入召唤师名称、ID 或 PUUID，开始精确搜索
+        <template v-if="summoner.newIdSystemEnabled">
+          <span>该大区启用了新 ID 系统</span>
+          <span :class="{ 'need-tag': isTagNeeded }" class="need-tag-hint"
+            >召唤师名称查询需满足格式 &lt;名称&gt;#&lt;TAG&gt;</span
+          >
+        </template>
       </div>
     </div>
   </div>
@@ -60,12 +60,17 @@
 
 <script setup lang="ts">
 import { AutoCompleteOption, NAutoComplete, NButton } from 'naive-ui'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
-import { getSummoner, getSummonerByName, getSummonerByPuuid } from '@renderer/http-api/summoner'
+import {
+  getSummoner,
+  getSummonerAlias,
+  getSummonerByName,
+  getSummonerByPuuid
+} from '@renderer/http-api/summoner'
 import { SummonerInfo } from '@renderer/types/summoner'
-import { inferType } from '@renderer/utils/identity'
+import { inferType, resolveSummonerName } from '@renderer/utils/identity'
 
 import SummonerCard from './SummonerCard.vue'
 
@@ -82,6 +87,33 @@ const bySummonerIdResult = ref<SummonerInfo>()
 const byNameResult = ref<SummonerInfo>()
 const byPuuidResult = ref<SummonerInfo>()
 
+function isNumeric(str: string): boolean {
+  return /^\d+$/.test(str)
+}
+
+const isTagNeeded = computed(() => {
+  if (!summoner.newIdSystemEnabled) {
+    return false
+  }
+
+  if (inputText.value.length === 0) {
+    return false
+  }
+
+  if (inputText.value.includes('-')) {
+    return false
+  }
+
+  if (!isNumeric(inputText.value)) {
+    const [name, tag] = resolveSummonerName(inputText.value)
+    if (!name || !tag) {
+      return true
+    }
+  }
+
+  return false
+})
+
 const isSearching = ref(false)
 const handleSearch = async () => {
   if (isSearching.value || !inputText.value) {
@@ -97,8 +129,16 @@ const handleSearch = async () => {
     if (type.type === 'name') {
       tasks.push(
         (async () => {
-          const summoner = await getSummonerByName(type.value)
-          byNameResult.value = summoner.data
+          if (type.isWithTagLine) {
+            const [name, tag] = resolveSummonerName(type.value)
+            const summoner2 = await getSummonerAlias(name, tag)
+            if (summoner2) {
+              byNameResult.value = summoner2
+            }
+          } else {
+            const summoner2 = await getSummonerByName(type.value)
+            byNameResult.value = summoner2.data
+          }
         })()
       )
     }
@@ -125,12 +165,6 @@ const handleSearch = async () => {
   byPuuidResult.value = undefined
 
   await Promise.allSettled(tasks)
-
-  // results.forEach((r) => {
-  //   if (r.status === 'rejected') {
-  //     console.log(r.reason)
-  //   }
-  // })
 
   if (byNameResult.value || bySummonerIdResult.value || byPuuidResult.value) {
     isNoSearchResult.value = false
@@ -192,6 +226,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   height: 160px;
   border-radius: 4px;
   border: 1px solid rgb(46, 46, 46);
@@ -210,5 +245,13 @@ onMounted(() => {
   .text {
     font-size: 13px;
   }
+}
+
+.need-tag {
+  color: rgb(215, 200, 85);
+}
+
+.need-tag-hint {
+  transition: all 0.3s ease;
 }
 </style>

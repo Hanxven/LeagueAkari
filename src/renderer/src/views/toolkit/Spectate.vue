@@ -43,15 +43,18 @@ import { computed, reactive, ref } from 'vue'
 
 import { notify } from '@renderer/events/notifications'
 import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
+import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
 import { getFriends } from '@renderer/http-api/chat'
 import { LcuHttpError } from '@renderer/http-api/common'
 import { launchSpectator } from '@renderer/http-api/spectator'
-import { getSummonerByName } from '@renderer/http-api/summoner'
+import { getSummonerAlias, getSummonerByName } from '@renderer/http-api/summoner'
 import { Friend } from '@renderer/types/chat'
+import { resolveSummonerName } from '@renderer/utils/identity'
 
 const id = 'view:toolkit:spectate'
 
 const gameflow = useGameflowStore()
+const summoner = useSummonerStore()
 
 const spectator = reactive({
   summonerIdentity: '',
@@ -71,10 +74,19 @@ const handleSpectate = async () => {
     targetPuuid = spectator.summonerIdentity
   } else {
     try {
-      const {
-        data: { puuid }
-      } = await getSummonerByName(spectator.summonerIdentity)
-      targetPuuid = puuid
+      if (summoner.newIdSystemEnabled) {
+        const s = await getSummonerAlias(...resolveSummonerName(spectator.summonerIdentity))
+        if (s) {
+          targetPuuid = s.puuid
+        } else {
+          throw new Error('玩家不存在')
+        }
+      } else {
+        const {
+          data: { puuid }
+        } = await getSummonerByName(spectator.summonerIdentity)
+        targetPuuid = puuid
+      }
     } catch (err) {
       notify.emit({
         id,

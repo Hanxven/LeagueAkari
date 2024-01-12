@@ -74,3 +74,20 @@ export function setSummonerBackgroundSkin(skinId: number) {
     value: skinId
   })
 }
+
+export function getSummonerAliases(nameTagList: { gameName: string; tagLine: string }[]) {
+  return request<SummonerInfo[]>({
+    url: '/lol-summoner/v1/summoners/aliases',
+    method: 'POST',
+    data: nameTagList
+  })
+}
+
+/**
+  同名函数
+ */
+export async function getSummonerAlias(name: string, tag: string) {
+  const response = await getSummonerAliases([{ gameName: name, tagLine: tag }])
+  const result = response.data[0]
+  return result || null
+}
