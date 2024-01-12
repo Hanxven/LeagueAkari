@@ -15,8 +15,8 @@
       <NTabPane name="about" tab="关于">
         <div style="display: flex; justify-content: center; vertical-align: bottom; margin: 24px 0">
           <img
-            style="border-radius: 50%; height: 108px; width: 108px"
-            src="@renderer/assets/temp-logo.png"
+            style="height: 108px; width: 108px"
+            src="@renderer/assets/logo.png"
             alt="Logo of League Toolkit"
           />
         </div>

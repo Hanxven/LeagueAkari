@@ -3,7 +3,7 @@ import { BrowserWindow, app, shell } from 'electron'
 import { join } from 'path'
 import 'reflect-metadata'
 
-import icon from '../../resources/icon.png?asset'
+import icon from '../../resources/LT_ICON.ico?asset'
 import { initBasicIpc } from './core/basic'
 import { initConnectionIpc } from './core/connection'
 import { initLcuClientFunctions } from './core/lcu-client'

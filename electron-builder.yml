@@ -21,7 +21,7 @@ afterSign: build/notarize.js
 win:
   target: 7z
   executableName: LeagueToolkit
-  # icon: resources/lt-icon.ico
+  icon: resources/LT_ICON.ico
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
