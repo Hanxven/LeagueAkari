@@ -7,6 +7,7 @@ import { getSetting, removeSetting, setSetting } from '@renderer/utils/storage'
 
 import { useChampSelectStore } from './stores/lcu/champ-select'
 import { useGameDataStore } from './stores/lcu/game-data'
+import { useSummonerStore } from './stores/lcu/summoner'
 import { useSettingsStore } from './stores/settings'
 import { onLcuEvent } from './update/lcu-events'
 
@@ -20,6 +21,7 @@ export function setupAutoSelect() {
   const settings = useSettingsStore()
   const cs = useChampSelectStore()
   const gameData = useGameDataStore()
+  const summoner = useSummonerStore()
 
   loadSettingsFromStorage()
 
@@ -31,6 +33,10 @@ export function setupAutoSelect() {
     }
 
     if (!event.data.isSelf || !event.data.isActingNow) {
+      return
+    }
+
+    if (!summoner.currentSummoner) {
       return
     }
 
@@ -78,7 +84,7 @@ export function setupAutoSelect() {
           // 场上出现的英雄，不能选
           const unselectableChampions = [...session.myTeam, ...session.theirTeam].reduce(
             (prev, cur) => {
-              if (cur.championId) {
+              if (cur.championId && cur.summonerId !== summoner.currentSummoner!.summonerId) {
                 prev.add(cur.championId)
               }
               return prev
@@ -88,7 +94,7 @@ export function setupAutoSelect() {
 
           if (!settings.autoSelect.selectTeammateIntendedChampion) {
             session.myTeam.forEach((m) => {
-              if (m.championPickIntent) {
+              if (m.championPickIntent && m.summonerId !== summoner.currentSummoner!.summonerId) {
                 unselectableChampions.add(m.championPickIntent)
               }
             })
@@ -161,7 +167,7 @@ export function setupAutoSelect() {
 
           if (!settings.autoSelect.banTeammateIntendedChampion) {
             session.myTeam.forEach((m) => {
-              if (m.championPickIntent) {
+              if (m.championPickIntent && m.summonerId !== summoner.currentSummoner!.summonerId) {
                 unbannableChampions.add(m.championPickIntent)
               }
             })
