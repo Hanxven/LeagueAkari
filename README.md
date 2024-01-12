@@ -1,3 +1,11 @@
+<div align="center">
+  <img
+    src="https://github.com/Hanxven/League-Toolkit/raw/HEAD/pictures/logo.png"
+    width="512"
+    height="512"
+  />
+</div>
+
 # League Toolkit
 
 利用合法的 League Client Update (LCU) API 实现的工具包。
