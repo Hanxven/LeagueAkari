@@ -19,20 +19,17 @@ export async function initBasicIpc() {
     }
   )
 
-  await new Promise<void>((resolve, reject) => {
-    resolve()
-    cp.exec('net session', (err) => {
-      if (err) {
-        runInAction(() => {
+  const testingCmd = `(New-Object System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)`
+  await new Promise<void>((resolve) => {
+    cp.exec(`powershell -Command "${testingCmd}"`, (err, stdout) => {
+      runInAction(() => {
+        if (err) {
           basicState.isAdmin = false
-        })
-        reject()
-      } else {
-        runInAction(() => {
-          basicState.isAdmin = true
-        })
-        resolve()
-      }
+        } else {
+          basicState.isAdmin = stdout.trim() === 'True'
+        }
+      })
+      resolve()
     })
   })
 
