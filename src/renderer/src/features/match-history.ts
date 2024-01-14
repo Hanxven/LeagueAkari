@@ -632,7 +632,6 @@ function loadSettingsFromStorage() {
   const settings = useSettingsStore()
 
   settings.matchHistory.fetchAfterGame = getSetting('matchHistory.fetchAfterGame', true)
-  settings.matchHistory.maxConcurrency = getSetting('matchHistory.maxConcurrency', 0)
   settings.matchHistory.preMadeTeamThreshold = getSetting('matchHistory.preMadeTeamThreshold', 3)
   settings.matchHistory.teamAnalysisPreloadCount = getSetting(
     'matchHistory.teamAnalysisPreloadCount',
@@ -655,17 +654,6 @@ export function setAutoRouteOnGameStart(enabled: boolean) {
 
   settings.matchHistory.autoRouteOnGameStart = enabled
   setSetting('matchHistory.autoRouteOnGameStart', enabled)
-}
-
-export function setMaxConcurrency(limit: number) {
-  if (limit < 0) {
-    return
-  }
-
-  const settings = useSettingsStore()
-
-  settings.matchHistory.maxConcurrency = limit
-  setSetting('matchHistory.maxConcurrency', limit)
 }
 
 export function setPreMadeThreshold(threshold: number) {

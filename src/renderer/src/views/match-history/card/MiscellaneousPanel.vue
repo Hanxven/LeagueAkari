@@ -24,15 +24,14 @@ import { computed, h } from 'vue'
 
 import CopyableText from '@renderer/components/CopyableText.vue'
 import LcuImage from '@renderer/components/LcuImage.vue'
+import AugmentDisplay from '@renderer/components/widgets/AugmentDisplay.vue'
+import ItemDisplay from '@renderer/components/widgets/ItemDisplay.vue'
+import PerkDisplay from '@renderer/components/widgets/PerkDisplay.vue'
+import PerkstyleDisplay from '@renderer/components/widgets/PerkstyleDisplay.vue'
+import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { Game, Player } from '@renderer/types/match-history'
-
-import AugmentDisplay from '../widgets/AugmentDisplay.vue'
-import ItemDisplay from '../widgets/ItemDisplay.vue'
-import PerkDisplay from '../widgets/PerkDisplay.vue'
-import PerkstyleDisplay from '../widgets/PerkstyleDisplay.vue'
-import SummonerSpellDisplay from '../widgets/SummonerSpellDisplay.vue'
 
 const props = defineProps<{
   game: Game
@@ -212,10 +211,13 @@ const statsConfigMap = {
 // }
 
 const participantsMap = computed(() => {
-  return props.game.participantIdentities.reduce((o, c) => {
-    o[c.participantId] = c.player
-    return o
-  }, {} as Record<string, Player>)
+  return props.game.participantIdentities.reduce(
+    (o, c) => {
+      o[c.participantId] = c.player
+      return o
+    },
+    {} as Record<string, Player>
+  )
 })
 
 const columns = computed(() => {

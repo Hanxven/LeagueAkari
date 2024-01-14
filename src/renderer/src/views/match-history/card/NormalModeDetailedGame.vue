@@ -165,18 +165,18 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
+import ItemDisplay from '@renderer/components/widgets/ItemDisplay.vue'
+import PerkDisplay from '@renderer/components/widgets/PerkDisplay.vue'
+import PerkstyleDisplay from '@renderer/components/widgets/PerkstyleDisplay.vue'
+import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
 import { Game, ParticipantIdentity } from '@renderer/types/match-history'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
-import ItemDisplay from '../widgets/ItemDisplay.vue'
-import PerkDisplay from '../widgets/PerkDisplay.vue'
-import PerkstyleDisplay from '../widgets/PerkstyleDisplay.vue'
-import SummonerSpellDisplay from '../widgets/SummonerSpellDisplay.vue'
 
 const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
-  participants: typeof match.value.teams.team1
-  aggregateTeamStats: typeof match.value.aggregateStats.team1
+  participants: (typeof match.value.teams)[keyof typeof match.value.teams]
+  aggregateTeamStats: (typeof match.value.aggregateStats)[keyof typeof match.value.aggregateStats]
   teamId: number
 }>({ inheritAttrs: false })
 

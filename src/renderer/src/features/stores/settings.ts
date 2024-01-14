@@ -28,8 +28,6 @@ export const useSettingsStore = defineStore('settings', () => {
 
   // 战绩加载功能
   const matchHistory = reactive({
-    fetchCount: 10,
-    fetchFullGame: false,
     fetchAfterGame: true,
     autoRouteOnGameStart: true,
 
@@ -42,17 +40,8 @@ export const useSettingsStore = defineStore('settings', () => {
     // 是否拉取页面的所有详细对局
     fetchDetailedGame: false,
 
-    matchHistoryLoadCount: 20,
-    /**
-     * 实验性特性，暂未实装。用于控制在拉取战绩时，的瞬时并发量
-     *
-     * 过高的并发可能导致失败
-     *
-     * 需要注意的是，需要考虑服务器的 QPS 限制。短时间内的大量请求会导致 503，因此直接查询所有玩家的游戏详情是困难的
-     *
-     * 举例，如果要查询五名玩家近 20 场的战绩详情，那么需要瞬间进行 115+ 次请求，很容易触发限制
-     */
-    maxConcurrency: 100
+    // 拉取分页大小
+    matchHistoryLoadCount: 40
   })
 
   const autoAccept = reactive({
@@ -105,11 +94,7 @@ export const useSettingsStore = defineStore('settings', () => {
     autoStartDelay: 0 // 自动开始匹配的延迟
   })
 
-  // TODO 未实装
-  const chat = reactive({
-    autoReplyWhenAway: false, // 在离开游戏时，是否自动回复
-    autoReplyMessage: '' // 如果开启自动回复，那么回复的内容是什么
-  })
+  const autoPerk = reactive({})
 
   return {
     app,
@@ -117,8 +102,8 @@ export const useSettingsStore = defineStore('settings', () => {
     matchHistory,
     autoAccept,
     lobby,
-    chat,
     autoReply,
-    autoSelect
+    autoSelect,
+    autoPerk
   }
 })

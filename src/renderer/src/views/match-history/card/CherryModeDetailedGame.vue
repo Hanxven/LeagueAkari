@@ -144,13 +144,13 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
+import AugmentDisplay from '@renderer/components/widgets/AugmentDisplay.vue'
+import ItemDisplay from '@renderer/components/widgets/ItemDisplay.vue'
+import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
 import { Game, Participant, ParticipantIdentity } from '@renderer/types/match-history'
 
-import AugmentDisplay from '../widgets/AugmentDisplay.vue'
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
-import ItemDisplay from '../widgets/ItemDisplay.vue'
-import SummonerSpellDisplay from '../widgets/SummonerSpellDisplay.vue'
 
 const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
   participants: typeof match.value.teams.placement1
