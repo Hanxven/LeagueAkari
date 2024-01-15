@@ -7,7 +7,7 @@ import { setupGameData } from './game-data'
 import { setupMatchHistory } from './match-history'
 import { setupStateUpdater } from './update/lcu-state-update'
 
-export function setupLeagueToolkitFeatures() {
+export async function setupLeagueToolkitFeatures() {
   // 应用本身的相关状态
   setupApp()
 

@@ -17,6 +17,10 @@ const app = createApp(NaiveUIProviderApp)
 app.use(router)
 app.use(createPinia())
 
-setupLeagueToolkitFeatures()
-
-app.mount('#app')
+try {
+  await setupLeagueToolkitFeatures()
+} catch (err) {
+  console.error('League Toolkit 无法正确加载：', err)
+} finally {
+  app.mount('#app')
+}
