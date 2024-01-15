@@ -23,8 +23,8 @@
     "@electron-toolkit/utils": "^3.0.0",
     "axios": "^1.6.5",
     "reflect-metadata": "^0.2.1",
-    "sqlite3": "^5.1.7",
-    "typeorm": "^0.3.19",
+    "sqlite3": "^5.1.6",
+    "typeorm": "^0.3.17",
     "ws": "^8.16.0"
   },
   "devDependencies": {
