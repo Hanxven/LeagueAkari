@@ -75,6 +75,9 @@ export const useSettingsStore = defineStore('settings', () => {
 
     benchExpectedChampions: [] as number[],
 
+    // 是否在聊天室进行提示
+    benchActionNotifyInChat: true,
+
     // 选择的延迟，单位秒
     grabDelay: 1,
 

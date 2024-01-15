@@ -2,10 +2,12 @@ import { watch } from 'vue'
 
 import { notify } from '@renderer/events/notifications'
 import { benchSwap, getChampSelectSession, pickOrBan } from '@renderer/http-api/champ-select'
+import { chatSend } from '@renderer/http-api/chat'
 import { Action, ChampSelectSummoner } from '@renderer/types/champ-select'
 import { getSetting, removeSetting, setSetting } from '@renderer/utils/storage'
 
 import { useChampSelectStore } from './stores/lcu/champ-select'
+import { useChatStore } from './stores/lcu/chat'
 import { useGameDataStore } from './stores/lcu/game-data'
 import { useSummonerStore } from './stores/lcu/summoner'
 import { useSettingsStore } from './stores/settings'
@@ -40,20 +42,21 @@ export function setupAutoSelect() {
       return
     }
 
-    const session = (await getChampSelectSession()).data
-
-    if (!session) {
-      return
-    }
-
     switch (event.data.activeActionType) {
       case 'pick': {
         if (!settings.autoSelect.normalModeEnabled) {
           return
         }
 
-        /* 在用户手动选择其他的时候，不会自动改回去，championId 为 0 为未选 */
-        if (event.data.championId) {
+        const session = (await getChampSelectSession()).data
+
+        if (!session) {
+          return
+        }
+
+        // 在用户手动选择其他的时候，不会自动改回去，championId 为 0 为未选。另外，样式会先于 championId 发生变化 
+        // 如 background-image: url('/lol-game-data/assets/v1/champion-icons/5.png')
+        if (event.data.championId || event.data.championIconStyle.includes('background-image')) {
           return
         }
 
@@ -142,6 +145,12 @@ export function setupAutoSelect() {
         }
 
         if (isDoingBan) {
+          return
+        }
+
+        const session = (await getChampSelectSession()).data
+
+        if (!session) {
           return
         }
 
@@ -271,6 +280,9 @@ export function setupAutoSelect() {
       if (e.includes(targetingChampion) && benchChampions.has(targetingChampion)) {
         return
       } else {
+        if (settings.autoSelect.benchActionNotifyInChat) {
+          notifyInChat('cancel', targetingChampion)
+        }
         window.clearTimeout(grabTimer)
         targetingChampion = null
       }
@@ -299,6 +311,9 @@ export function setupAutoSelect() {
         if (waitTime <= 15) {
           trySwap()
         } else {
+          if (settings.autoSelect.benchActionNotifyInChat) {
+            notifyInChat('select', targetingChampion, waitTime)
+          }
           grabTimer = window.setTimeout(trySwap, waitTime)
         }
         break
@@ -327,6 +342,10 @@ function loadSettingsFromStorage() {
   )
   settings.autoSelect.selectRandomly = getSetting('autoSelect.selectRandomly', false)
   settings.autoSelect.banRandomly = getSetting('autoSelect.banRandomly', false)
+  settings.autoSelect.benchActionNotifyInChat = getSetting(
+    'autoSelect.benchActionNotifyInChat',
+    true
+  )
 
   // migrate from previous version
   const formerExpected = getSetting('autoSelect.championId')
@@ -348,6 +367,25 @@ function loadSettingsFromStorage() {
   }
 }
 
+async function notifyInChat(type: 'cancel' | 'select', championId: number, time = 0) {
+  const chat = useChatStore()
+  const gameData = useGameDataStore()
+
+  if (!chat.conversations.championSelect) {
+    return
+  }
+
+  try {
+    await chatSend(
+      chat.conversations.championSelect.id,
+      type === 'select'
+        ? `[League Toolkit] - [自动选择]: 即将在 ${(time / 1000).toFixed(1)} 秒后选择 ${gameData.champions[championId]?.name || championId}`
+        : `[League Toolkit] - [自动选择]: 已取消选择 ${gameData.champions[championId]?.name || championId}`,
+      'celebration'
+    )
+  } catch {}
+}
+
 export function setNormalModeAutoSelectEnabled(enabled: boolean) {
   const settings = useSettingsStore()
 
@@ -358,7 +396,10 @@ export function setNormalModeAutoSelectEnabled(enabled: boolean) {
 export function setBenchModeAutoSelectEnabled(enabled: boolean) {
   const settings = useSettingsStore()
 
-  if (!enabled) {
+  if (!enabled && grabTimer) {
+    if (settings.autoSelect.benchActionNotifyInChat) {
+      notifyInChat('cancel', targetingChampion!)
+    }
     window.clearTimeout(grabTimer)
     targetingChampion = null
   }
@@ -439,4 +480,10 @@ export function setBanRandomly(enabled: boolean) {
   const settings = useSettingsStore()
   setSetting('autoSelect.banRandomly', enabled)
   settings.autoSelect.banRandomly = enabled
+}
+
+export function setBenchActionNotifyInChat(enabled: boolean) {
+  const settings = useSettingsStore()
+  setSetting('autoSelect.benchActionNotifyInChat', enabled)
+  settings.autoSelect.benchActionNotifyInChat = enabled
 }

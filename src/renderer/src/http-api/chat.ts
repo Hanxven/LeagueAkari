@@ -36,7 +36,7 @@ export function changeAvailability(availability: AvailabilityType) {
 export function chatSend(
   targetId: number | string,
   message: string,
-  type: 'chat' | 'system' | 'groupchat' = 'chat',
+  type: string = 'chat',
   isHistorical: boolean = false,
   summonerId?: number
 ) {

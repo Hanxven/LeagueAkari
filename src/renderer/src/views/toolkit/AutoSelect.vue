@@ -79,6 +79,14 @@
         @update:value="(list) => setBenchModeExpectedChampions(list)"
       />
     </div>
+    <div class="control-line" title="在当前聊天室中打印即将进行的选择或取消操作，仅自己可见">
+      <span class="label">反馈在聊天室</span>
+      <NSwitch
+        @update:value="(v) => setBenchActionNotifyInChat(v)"
+        :value="settings.autoSelect.benchActionNotifyInChat"
+        size="small"
+      ></NSwitch>
+    </div>
     <div class="divider"></div>
     <div class="control-line">
       <span class="label">自动 ban 开启</span>
@@ -116,7 +124,6 @@
 
 <script setup lang="ts">
 import { NCard, NInputNumber, NSwitch } from 'naive-ui'
-import { computed, ref } from 'vue'
 
 import OrderedChampionList from '@renderer/components/OrderedChampionList.vue'
 import {
@@ -124,6 +131,7 @@ import {
   setAutoSelectCompleted,
   setBanRandomly,
   setBanTeammateIntendedChampion,
+  setBenchActionNotifyInChat,
   setBenchModeAutoSelectEnabled,
   setBenchModeExpectedChampions,
   setGrabDelay,
@@ -149,21 +157,6 @@ const completeStrategy = ({ checked }: { checked: boolean }) => {
     return { 'background-color': 'rgb(42,148,125)', 'font-size': '12px' }
   }
 }
-
-const championsOptions = computed(() => {
-  const sorted = Object.values(gameData.champions).sort((a, b) =>
-    a.name.localeCompare(b.name, 'zh-Hans-CN')
-  )
-
-  return sorted
-    .filter((b) => b.id !== 0 && b.id !== -1)
-    .map((b) => ({
-      value: b.id,
-      label: b.name
-    }))
-})
-
-const champions = ref<number[]>([])
 </script>
 
 <style lang="less" scoped>
