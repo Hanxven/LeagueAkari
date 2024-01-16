@@ -54,7 +54,7 @@ const handleEarlyExit = async () => {
 
 const handleDodge = async () => {
   try {
-    const r = await dodge()
+    const _ = await dodge()
   } catch (err) {
     notify.emit({
       id,

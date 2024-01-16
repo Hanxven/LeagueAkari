@@ -24,6 +24,7 @@ export function setupAutoSelect() {
   const cs = useChampSelectStore()
   const gameData = useGameDataStore()
   const summoner = useSummonerStore()
+  // const chat = useChatStore()
 
   loadSettingsFromStorage()
 
@@ -54,7 +55,7 @@ export function setupAutoSelect() {
           return
         }
 
-        // 在用户手动选择其他的时候，不会自动改回去，championId 为 0 为未选。另外，样式会先于 championId 发生变化 
+        // 在用户手动选择其他的时候，不会自动改回去，championId 为 0 为未选。另外，样式会先于 championId 发生变化
         // 如 background-image: url('/lol-game-data/assets/v1/champion-icons/5.png')
         if (event.data.championId || event.data.championIconStyle.includes('background-image')) {
           return

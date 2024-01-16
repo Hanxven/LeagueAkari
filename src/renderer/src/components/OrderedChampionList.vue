@@ -7,7 +7,10 @@
         :title="gameData.champions[c]?.name"
         :class="{
           'not-pickable':
-            gameflow.phase === 'ChampSelect' && !champSelect.currentPickableChampions.has(c)
+            gameflow.phase === 'ChampSelect' &&
+            (type === 'pick'
+              ? !champSelect.currentPickableChampions.has(c)
+              : !champSelect.currentBannableChampions.has(c))
         }"
         v-for="c of arr.slice(0, maxShow)"
         :key="c"
@@ -76,7 +79,7 @@
                   gameflow.phase === 'ChampSelect' && !champSelect.currentPickableChampions.has(c),
                 current: listCurrent === c
               }"
-              :title="gameData.champions[c].name"
+              :title="gameData.champions[c]?.name"
             >
               <span class="order">#{{ i + 1 }}</span>
               <LcuImage class="list-item-image" :src="championIcon(c)" />
@@ -102,10 +105,11 @@ import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
 import LcuImage from './LcuImage.vue'
 
 const props = withDefaults(
-  defineProps<{ value?: number[]; maxShow?: number; maxCount?: number }>(),
+  defineProps<{ value?: number[]; maxShow?: number; maxCount?: number; type?: 'pick' | 'ban' }>(),
   {
     maxShow: 10,
-    maxCount: Infinity
+    maxCount: Infinity,
+    type: 'pick'
   }
 )
 

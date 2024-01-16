@@ -76,6 +76,9 @@ export interface SummonerTabMatchHistory {
 
   /** 请求的战绩是否为空，区分未加载和加载为空的情况 */
   isEmpty: boolean
+  
+  /** 是否请求出错 */
+  hasError: boolean
 
   /** 第几页，from 1 to Infinity */
   page: number
@@ -208,6 +211,7 @@ export const useMatchHistoryStore = defineStore('match-history', () => {
         page: 1,
         pageSize: 20,
         isEmpty: false,
+        hasError: false,
         lastUpdate: Date.now()
       },
       detailedGamesCache: markRaw(new LruMap(DEFAULT_DETAILED_GAMES_CACHE_LIMIT)),

@@ -27,7 +27,7 @@ const router = useRouter()
 
 const lcuState = useLcuStateStore()
 watchEffect(() => {
-  if (lcuState.state === 'disconnected') {
+  if (lcuState.state === 'disconnected' && !import.meta.env.DEV) {
     router.replace('/connecting')
   }
 })

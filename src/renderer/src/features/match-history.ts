@@ -4,6 +4,7 @@ import { computed, markRaw, watch } from 'vue'
 import { useStableComputed } from '@renderer/compositions/useStableComputed'
 import { notify } from '@renderer/events/notifications'
 import { getChampSelectSession } from '@renderer/http-api/champ-select'
+import { LcuHttpError } from '@renderer/http-api/common'
 import { getGameFlowSession } from '@renderer/http-api/gameflow'
 import { getGame, getMatchHistory } from '@renderer/http-api/match-history'
 import { getRankedStats } from '@renderer/http-api/ranked'
@@ -711,7 +712,7 @@ export async function fetchTabRankedStats(summonerId: number) {
   const tab = matchHistory.getTab(summonerId)
   if (tab && tab.data.summoner) {
     if (tab.data.loading.isLoadingRankedStats) {
-      return
+      return null
     }
 
     tab.data.loading.isLoadingRankedStats = true
@@ -857,7 +858,7 @@ export async function fetchTabMatchHistory(
 
   if (tab && tab.data.summoner) {
     if (tab.data.loading.isLoadingMatchHistory) {
-      return
+      return null
     }
 
     tab.data.loading.isLoadingMatchHistory = true
@@ -866,6 +867,8 @@ export async function fetchTabMatchHistory(
       const matchHistory = (
         await getMatchHistory(tab.data.summoner.puuid, (page - 1) * pageSize, page * pageSize - 1)
       ).data
+
+      tab.data.matchHistory.hasError = false
 
       tab.data.matchHistory = {
         games: matchHistory.games.games.map((g) => ({
@@ -921,9 +924,7 @@ export async function fetchTabMatchHistory(
           }
         })
 
-        Promise.allSettled(tasks)
-          .then(() => {})
-          .catch(() => {})
+        Promise.allSettled(tasks).catch()
       }
 
       // 统计信息
@@ -936,12 +937,25 @@ export async function fetchTabMatchHistory(
 
       return matchHistory
     } catch (err) {
-      notify.emit({
-        id,
-        type: 'warning',
-        content: '拉取战绩失败',
-        extra: { error: err }
-      })
+      tab.data.matchHistory.hasError = true
+      if (
+        (err as LcuHttpError)?.response?.status === 500 ||
+        (err as LcuHttpError)?.response?.status === 503
+      ) {
+        notify.emit({
+          id,
+          type: 'warning',
+          content: `拉取战绩失败，服务器异常。远程服务器返回内部错误 ${(err as LcuHttpError)?.response?.status}`,
+          extra: { error: err }
+        })
+      } else {
+        notify.emit({
+          id,
+          type: 'warning',
+          content: '拉取战绩失败',
+          extra: { error: err }
+        })
+      }
     } finally {
       tab.data.loading.isLoadingMatchHistory = false
     }
@@ -1001,23 +1015,21 @@ export async function fetchTabFullData(summonerId: number, silent = true) {
     return
   }
 
-  const results = await Promise.allSettled([
-    fetchTabMatchHistory(summonerId),
-    fetchTabRankedStats(summonerId)
-  ])
-
   let failed = false
-  results.forEach((r) => {
-    if (r.status === 'rejected') {
-      notify.emit({
-        id,
-        type: 'warning',
-        content: '拉取数据失败',
-        extra: { error: r.reason }
-      })
-      failed = true
-    }
-  })
+  await Promise.allSettled([
+    (async () => {
+      const r = await fetchTabMatchHistory(summonerId)
+      if (!r) {
+        failed = true
+      }
+    })(),
+    (async () => {
+      const r = await fetchTabRankedStats(summonerId)
+      if (!r) {
+        failed = true
+      }
+    })()
+  ])
 
   if (failed) {
     return

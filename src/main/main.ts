@@ -96,3 +96,7 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+
+process.on('uncaughtException', () => {
+  app.quit()
+})
