@@ -35,14 +35,17 @@ export function useGameDataBlobUrl(
       if (!unwrappedUrl.value) {
         return
       }
-      if (assetsCacheMap.has(unwrappedUrl.value)) {
-        url.value = assetsCacheMap.get(unwrappedUrl.value)
+
+      const targetUrl = unwrappedUrl.value
+
+      if (assetsCacheMap.has(targetUrl)) {
+        url.value = assetsCacheMap.get(targetUrl)
         return
       }
       try {
         const resp = await request(
           {
-            url: unwrappedUrl.value,
+            url: targetUrl,
             method: 'GET',
             responseType: 'arraybuffer'
           },
@@ -52,10 +55,13 @@ export function useGameDataBlobUrl(
           new Blob([resp.data], { type: resp.headers['content-type'] })
         )
         type.value = resp.headers['content-type']
-        if (cache) {
-          assetsCacheMap.set(unwrappedUrl.value!, objectURL)
+
+        if (unwrappedUrl.value === targetUrl) {
+          url.value = objectURL
+          if (cache) {
+            assetsCacheMap.set(targetUrl, objectURL)
+          }
         }
-        url.value = objectURL
       } catch (err) {
         console.error(err)
         url.value = undefined
