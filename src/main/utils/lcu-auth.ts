@@ -4,6 +4,8 @@ import { app } from 'electron'
 import fs, { rmSync } from 'fs'
 import path from 'path'
 
+import { basicState } from '../core/basic'
+
 /**
  * 来自 Riot 的证书文件
  * 可能会更新？但不是现在
@@ -55,6 +57,26 @@ const passwordRegex = /--remoting-auth-token=([\w-_]+)/
 const pidRegex = /--app-pid=([0-9]+)/
 const clientName = 'LeagueClientUx.exe'
 
+function buildPowershellScript(clientName: string, shell: string, tempSavePath?: string) {
+  let command: string
+  if (tempSavePath) {
+    command =
+      `$_ = Start-Process powershell ` +
+      `-Argumentlist "\`$PSDefaultParameterValues['Out-File:Encoding']='utf8';` +
+      `Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}''' | ` +
+      `Select-Object -ExpandProperty CommandLine | Out-File ${tempSavePath} -Encoding UTF8" ` +
+      `-WindowStyle hidden -Verb runas -Wait -PassThru`
+  } else {
+    command = `Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}''' | Select-Object -ExpandProperty CommandLine`
+  }
+
+  return `${shell} -Command "${command}"`
+}
+
+function buildCmdScript(clientName: string) {
+  return `wmic process where "name like '%${clientName}%'" get CommandLine`
+}
+
 // 仅限 Windows 平台，因为需要 Powershell
 export function queryLcuAuth(): Promise<LcuAuth> {
   return new Promise(function (resolve, reject) {
@@ -65,11 +87,11 @@ export function queryLcuAuth(): Promise<LcuAuth> {
         `-Argumentlist "\`$PSDefaultParameterValues['Out-File:Encoding']='utf8';` +
         `Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}''' | ` +
         `Select-Object -ExpandProperty CommandLine | Out-File ${savePath} -Encoding UTF8" ` +
-        `-WindowStyle hidden -Verb runas -Wait -PassThru
+        `-WindowStyle hidden -Verb runAs -Wait -PassThru
       `
       cp.exec(cmd, { shell: 'powershell' }, (error, _stdout, stderr) => {
         if (error) {
-          reject(new Error('Error executing PowerShell script: ' + stderr))
+          reject(new Error('尝试执行脚本时失败: ' + stderr + error.message))
           return
         }
 
@@ -111,15 +133,21 @@ export function queryLcuAuth(): Promise<LcuAuth> {
   })
 }
 
+// 管理员权限下会尝试更多的方法
 export function queryLcuAuthOnAdmin(): Promise<LcuAuth> {
   return new Promise(function (resolve, reject) {
     try {
-      const cmd = `Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}''' | 
-      Select-Object -ExpandProperty CommandLine`
+      let cmd: string
+      let shell = basicState.availableShells[0]
+      if (shell === 'cmd') {
+        cmd = buildCmdScript(clientName)
+      } else {
+        cmd = buildPowershellScript(clientName, shell)
+      }
 
-      cp.exec(cmd, { shell: 'powershell' }, (error, stdout, stderr) => {
+      cp.exec(cmd, (error, stdout, stderr) => {
         if (error) {
-          reject(new Error('Error executing PowerShell script: ' + stderr))
+          reject(new Error('执行脚本时发生错误：' + stderr + error.message))
           return
         }
 

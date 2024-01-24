@@ -100,3 +100,7 @@ app.on('window-all-closed', () => {
 process.on('uncaughtException', () => {
   app.quit()
 })
+
+process.on('unhandledRejection', (e) => {
+  console.log('unhandledRejection', e)
+})

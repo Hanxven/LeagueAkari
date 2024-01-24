@@ -1,13 +1,20 @@
-import cp from 'child_process'
-import { app } from 'electron'
+import { app, dialog } from 'electron'
 import { observable, reaction, runInAction } from 'mobx'
 
+import {
+  checkAdminPrivilegesCmd,
+  checkAdminPrivilegesPowershell,
+  checkAvailableShells,
+  isProcessExistsCmd,
+  isProcessExistsPowershell
+} from '../utils/shell'
 import { onCall, sendUpdateToAll } from './common'
 
 const clientName = 'LeagueClientUx.exe'
 
 export const basicState = observable({
-  isAdmin: false
+  isAdmin: false,
+  availableShells: [] as string[]
 })
 
 // 基础通讯 API
@@ -19,18 +26,32 @@ export async function initBasicIpc() {
     }
   )
 
-  const testingCmd = `(New-Object System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)`
+  const shells = await checkAvailableShells()
+
+  if (shells.length === 0) {
+    dialog.showErrorBox(
+      '终端不可用',
+      '未检测到 cmd、powershell 或 pwsh 终端存在于当前平台。本工具依赖于上述终端之一来收集必要信息。请确保至少安装其中一个终端后再尝试运行本工具。'
+    )
+    app.quit()
+  }
+
+  runInAction(() => {
+    basicState.availableShells = shells
+  })
+
   await new Promise<void>((resolve) => {
-    cp.exec(`powershell -Command "${testingCmd}"`, (err, stdout) => {
-      runInAction(() => {
-        if (err) {
-          basicState.isAdmin = false
-        } else {
-          basicState.isAdmin = stdout.trim() === 'True'
-        }
+    if (shells[0] === 'cmd') {
+      checkAdminPrivilegesCmd().then((isAdmin) => {
+        runInAction(() => (basicState.isAdmin = isAdmin))
+        resolve()
       })
-      resolve()
-    })
+    } else {
+      checkAdminPrivilegesPowershell(shells[0]).then((isAdmin) => {
+        runInAction(() => (basicState.isAdmin = isAdmin))
+        resolve()
+      })
+    }
   })
 
   onCall('isAdmin', () => {
@@ -43,21 +64,10 @@ export async function initBasicIpc() {
 
   // 检查英雄联盟渲染端是否存在
   onCall('isLeagueClientExists', async () => {
-    return new Promise((resolve) => {
-      cp.exec(
-        `powershell -WindowStyle Hidden "Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}'''"`,
-        (err, stdout) => {
-          if (err) {
-            resolve(false)
-            return
-          }
-          if (stdout.length === 0) {
-            resolve(false)
-          } else {
-            resolve(true)
-          }
-        }
-      )
-    })
+    if (shells[0] === 'cmd') {
+      return await isProcessExistsCmd(clientName)
+    } else {
+      return await isProcessExistsPowershell(clientName)
+    }
   })
 }
