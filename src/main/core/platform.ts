@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
 import { Notification } from 'electron'
 
-import { onCall, sendUpdate } from './common'
+import { onCall, sendUpdate } from '../utils/ipc'
 
 // 和平台相关的 API，目前仅限 Windows
 export function initWindowsPlatform() {

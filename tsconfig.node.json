@@ -1,6 +1,6 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
-  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/*", "src/main/core/ipc.ts"],
+  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/*", "src/main/utils/ipc.ts"],
   "compilerOptions": {
     // the browser is advanced enough to support ESNext, >= 110
     "target": "ESNext",

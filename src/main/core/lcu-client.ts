@@ -1,6 +1,6 @@
 import toolkit from '../native/ltToolkitWin32x64.node'
 import { basicState } from './basic'
-import { onCall } from './common'
+import { onCall } from '../utils/ipc'
 import { getHttpInstance } from './connection'
 
 export function initLcuClientFunctions() {

@@ -1,6 +1,6 @@
 import { Equal } from 'typeorm'
 
-import { onCall } from '../core/common'
+import { onCall } from '../utils/ipc'
 import { dataSource } from '../db'
 import { TaggedPlayer } from '../db/entities/TaggedPlayer'
 

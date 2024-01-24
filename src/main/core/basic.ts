@@ -8,7 +8,7 @@ import {
   isProcessExistsCmd,
   isProcessExistsPowershell
 } from '../utils/shell'
-import { onCall, sendUpdateToAll } from './common'
+import { onCall, sendUpdateToAll } from '../utils/ipc'
 
 const clientName = 'LeagueClientUx.exe'
 

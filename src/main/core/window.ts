@@ -2,7 +2,7 @@ import { BrowserWindow } from 'electron'
 import { observable, reaction, runInAction } from 'mobx'
 
 import { basicState } from './basic'
-import { onCall, sendUpdate } from './common'
+import { onCall, sendUpdate } from '../utils/ipc'
 
 export const windowState = observable({
   windowState: 'normal', // should be one of 'normal', 'maximized', 'minimized'

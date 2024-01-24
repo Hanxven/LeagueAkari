@@ -12,7 +12,7 @@ import {
 } from '../utils/lcu-auth'
 import { getRandomAvailableLoopbackAddrWithPort } from '../utils/loopback'
 import { basicState } from './basic'
-import { onCall, sendUpdateToAll } from './common'
+import { onCall, sendUpdateToAll } from '../utils/ipc'
 
 let request: AxiosInstance | null = null
 let ws: WebSocket | null = null
@@ -40,6 +40,7 @@ reaction(
 )
 
 const PING_URL = '/riotclient/auth-token'
+const REQUEST_TIMEOUT = 10000
 
 async function initHttpInstance(auth: LcuAuth) {
   request = axios.create({
@@ -51,7 +52,7 @@ async function initHttpInstance(auth: LcuAuth) {
       ca: auth.certificate,
       localAddress: await getRandomAvailableLoopbackAddrWithPort(auth.port)
     }),
-    timeout: 10000,
+    timeout: REQUEST_TIMEOUT,
     proxy: false
   })
 

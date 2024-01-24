@@ -1,5 +1,6 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { BrowserWindow, app, shell } from 'electron'
+import { configure } from 'mobx'
 import { join } from 'path'
 import 'reflect-metadata'
 
@@ -17,6 +18,8 @@ const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
   app.quit()
 }
+
+configure({ enforceActions: 'never' })
 
 let mainWindow: BrowserWindow
 
