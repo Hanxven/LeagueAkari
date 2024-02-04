@@ -44,8 +44,10 @@
       >
         <template #header
           ><span class="card-header-title"
-            >预组队推测 (统计样本
-            {{ Object.keys(mh.ongoingDetailedGamesCache).length }} 场游戏)</span
+            >预组队推测
+            <span style="font-size: 12px; color: rgb(184, 184, 184); font-weight: normal"
+              >(统计自 {{ Object.keys(mh.ongoingDetailedGamesCache).length }} 场游戏)</span
+            ></span
           ></template
         >
         <div class="pre-made-team">
@@ -78,7 +80,7 @@
       </NCard>
     </div>
     <div v-else class="no-ongoing-game">
-      <div>{{ title }}</div>
+      <div>League Toolkit</div>
       <div style="font-size: 14px; font-weight: normal">没有正在进行中的游戏</div>
     </div>
   </div>
@@ -92,7 +94,6 @@ import { useRouter } from 'vue-router'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
 import { useKeepAliveScrollPositionMemo } from '@renderer/compositions/useKeepAliveScrollPositionMemo'
-import { useTitle } from '@renderer/compositions/useTitle'
 import { championIcon } from '@renderer/features/game-data'
 import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
 import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
@@ -102,8 +103,6 @@ import { removeSubsets } from '@renderer/utils/collection'
 
 import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMatchHistoryCardModal.vue'
 import PlayerInfoCard from './PlayerInfoCard.vue'
-
-const title = useTitle()
 
 const mh = useMatchHistoryStore()
 const router = useRouter()
@@ -246,6 +245,7 @@ useKeepAliveScrollPositionMemo(el)
 
 .card-header-title {
   font-weight: bold;
+  font-size: 18px;
 }
 
 .pre-made-team {

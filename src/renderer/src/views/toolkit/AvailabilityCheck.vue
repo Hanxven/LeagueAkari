@@ -1,8 +1,11 @@
 <template>
   <NCard size="small">
     <template #header><span class="card-header-title">名称可用性</span></template>
-    <div class="control-line">
-      <span class="label">检查名称可用性</span>
+    <ControlItem
+      class="control-item-margin"
+      label="检查名称可用性"
+      label-description="查看当前名称是否可用"
+    >
       <div style="display: flex; align-items: center; gap: 8px">
         <NInput
           placeholder="召唤师名称"
@@ -27,9 +30,12 @@
           >
         </Transition>
       </div>
-    </div>
-    <div class="control-line">
-      <span class="label">创建新名称</span>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="创建新名称"
+      label-description="仅在大区召唤师创建时可用，通常用于为新号设置长名称"
+    >
       <div style="display: flex; align-items: center; gap: 8px">
         <NInput
           placeholder="召唤师名称"
@@ -53,7 +59,7 @@
           </div>
         </NPopconfirm>
       </div>
-    </div>
+    </ControlItem>
   </NCard>
 </template>
 
@@ -61,6 +67,7 @@
 import { NButton, NCard, NInput, NPopconfirm, useMessage } from 'naive-ui'
 import { h, reactive, ref, watch } from 'vue'
 
+import ControlItem from '@renderer/components/ControlItem.vue'
 import { notify } from '@renderer/events/notifications'
 import { quit } from '@renderer/http-api/process-control'
 import { checkAvailability, newSummonerName } from '@renderer/http-api/summoner'
@@ -141,8 +148,6 @@ const handleCreateNewSummonerWithName = async () => {
 </script>
 
 <style lang="less" scoped>
-@import './style.less';
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;
@@ -151,5 +156,16 @@ const handleCreateNewSummonerWithName = async () => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
+.card-header-title {
+  font-weight: bold;
+  font-size: 18px;
 }
 </style>

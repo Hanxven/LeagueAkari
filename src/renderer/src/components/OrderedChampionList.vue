@@ -107,7 +107,7 @@ import LcuImage from './LcuImage.vue'
 const props = withDefaults(
   defineProps<{ value?: number[]; maxShow?: number; maxCount?: number; type?: 'pick' | 'ban' }>(),
   {
-    maxShow: 10,
+    maxShow: 6,
     maxCount: Infinity,
     type: 'pick'
   }

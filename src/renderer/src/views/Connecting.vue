@@ -2,41 +2,18 @@
   <div class="waiting-screen">
     <div class="inner-content">
       <div v-if="isClientExists" class="text-line-1">
-        <template v-if="isAttemptingConnect">即将连接...</template
-        ><template v-else>客户端已启动，等待获取连接信息</template>
+        <template v-if="isAttemptingConnect">即将连接...</template>
+        <template v-else>客户端已启动，等待获取连接信息</template>
       </div>
       <div v-else class="text-line-1">游戏客户端未启动，等待客户端启动</div>
-      <div v-if="!appState.isAdmin" class="admin-hint">
-        <div>获取客户端连接信息需要<span class="em">管理员</span>权限</div>
-        <div>您可将程序设置为以管理员权限启动，以避免重复的授权过程</div>
-      </div>
-      <NButton
-        size="tiny"
-        secondary
-        v-if="!appState.isAdmin || (appState.isAdmin && isErr)"
-        :type="isClientExists ? 'primary' : 'default'"
-        :loading="
-          lcuState.state === 'connecting' || isAttemptingConnect || lcuState.state === 'connected'
-        "
-        @click="() => handleConnect(1)"
-        ><template v-if="isAttemptingConnect">尝试连接...</template>
-        <template v-else
-          ><template v-if="appState.isAdmin">手动连接</template
-          ><template v-else>连接到客户端</template></template
-        ></NButton
-      >
-      <div v-if="isErr" class="error-hint">
-        无法获取连接信息。请检查<template v-if="!appState.isAdmin"
-          >是否提供了管理员权限，或</template
-        >游戏客户端是否已经开启
-      </div>
+      <div v-if="isErr" class="error-hint">无法获取连接信息。请检查游戏客户端是否已经开启。</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useTimeoutPoll } from '@vueuse/core'
-import { NButton, useNotification } from 'naive-ui'
+import { useNotification } from 'naive-ui'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -122,7 +99,7 @@ watch(
       }
 
       if (appState.isAdmin) {
-        handleConnect(10000)
+        handleConnect(Infinity)
       } else {
         handleConnect(10)
       }

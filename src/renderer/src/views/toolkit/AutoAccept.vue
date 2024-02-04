@@ -1,8 +1,7 @@
 <template>
   <NCard size="small">
     <template #header><span class="card-header-title">自动接受对局</span></template>
-    <div class="control-line">
-      <span class="label">开启</span>
+    <ControlItem class="control-item-margin" label="开启">
       <div style="display: flex; align-items: center; gap: 8px">
         <NSwitch
           :value="settings.autoAccept.enabled"
@@ -13,9 +12,12 @@
           >取消本次自动接受 ({{ (remainingTime / 1e3).toFixed(2) }}s)</NButton
         >
       </div>
-    </div>
-    <div class="control-line">
-      <span class="label">延时 (秒)</span>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="延时 (s)"
+      label-description="在可接受时延迟执行接受操作的时间。单位为秒，可以设置非整数的值"
+    >
       <NInputNumber
         style="width: 80px"
         :value="settings.autoAccept.delaySeconds"
@@ -25,7 +27,7 @@
         :max="10"
         size="tiny"
       />
-    </div>
+    </ControlItem>
   </NCard>
 </template>
 
@@ -34,6 +36,7 @@ import { useIntervalFn } from '@vueuse/core'
 import { NButton, NCard, NInputNumber, NSwitch } from 'naive-ui'
 import { ref, watch } from 'vue'
 
+import ControlItem from '@renderer/components/ControlItem.vue'
 import {
   cancelAutoAccept,
   disableAutoAccept,
@@ -72,5 +75,14 @@ const handleSetAutoAccept = (v: boolean) => {
 </script>
 
 <style lang="less" scoped>
-@import './style.less';
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
+.card-header-title {
+  font-weight: bold;
+  font-size: 18px;
+}
 </style>

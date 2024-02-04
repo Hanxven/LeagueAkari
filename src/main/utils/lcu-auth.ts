@@ -1,14 +1,7 @@
-import cp from 'child_process'
-import { randomUUID } from 'crypto'
-import { app } from 'electron'
-import fs, { rmSync } from 'fs'
-import path from 'path'
-
-import { basicState } from '../core/basic'
+import { getCommandLine } from './shell'
 
 /**
  * 来自 Riot 的证书文件
- * 可能会更新？但不是现在
  */
 export const certificate = `-----BEGIN CERTIFICATE-----
 MIIEIDCCAwgCCQDJC+QAdVx4UDANBgkqhkiG9w0BAQUFADCB0TELMAkGA1UEBhMC
@@ -57,124 +50,25 @@ const passwordRegex = /--remoting-auth-token=([\w-_]+)/
 const pidRegex = /--app-pid=([0-9]+)/
 const clientName = 'LeagueClientUx.exe'
 
-function buildPowershellScript(clientName: string, shell: string, tempSavePath?: string) {
-  let command: string
-  if (tempSavePath) {
-    command =
-      `$_ = Start-Process powershell ` +
-      `-Argumentlist "\`$PSDefaultParameterValues['Out-File:Encoding']='utf8';` +
-      `Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}''' | ` +
-      `Select-Object -ExpandProperty CommandLine | Out-File ${tempSavePath} -Encoding UTF8" ` +
-      `-WindowStyle hidden -Verb runas -Wait -PassThru`
-  } else {
-    command = `Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}''' | Select-Object -ExpandProperty CommandLine`
+// 管理员权限下会尝试更多的方法
+export async function queryLcuAuthOnAdmin(shell: 'cmd' | 'powershell' | 'pwsh'): Promise<LcuAuth> {
+  const commandLine = await getCommandLine(shell, clientName)
+  if (commandLine.length === 0) {
+    throw new Error(`目标进程的命令行为空：${clientName}`)
   }
 
-  return `${shell} -Command "${command}"`
-}
+  const [, port] = commandLine.match(portRegex) || []
+  const [, password] = commandLine.match(passwordRegex) || []
+  const [, pid] = commandLine.match(pidRegex) || []
 
-function buildCmdScript(clientName: string) {
-  return `wmic process where "name like '%${clientName}%'" get CommandLine`
-}
+  if (!port || !password || !pid) {
+    throw new Error('无法解析英雄联盟客户端的命令行参数')
+  }
 
-// 仅限 Windows 平台，因为需要 Powershell
-export function queryLcuAuth(): Promise<LcuAuth> {
-  return new Promise(function (resolve, reject) {
-    try {
-      const savePath = path.join(app.getPath('temp'), 'temp-' + randomUUID())
-      const cmd =
-        `$_ = Start-Process powershell ` +
-        `-Argumentlist "\`$PSDefaultParameterValues['Out-File:Encoding']='utf8';` +
-        `Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}''' | ` +
-        `Select-Object -ExpandProperty CommandLine | Out-File ${savePath} -Encoding UTF8" ` +
-        `-WindowStyle hidden -Verb runAs -Wait -PassThru
-      `
-      cp.exec(cmd, { shell: 'powershell' }, (error, _stdout, stderr) => {
-        if (error) {
-          reject(new Error('尝试执行脚本时失败: ' + stderr + error.message))
-          return
-        }
-
-        try {
-          if (!fs.existsSync(savePath)) {
-            throw new Error('进程文件不存在')
-          }
-          const raw = fs.readFileSync(savePath, 'utf-8').replace(/\s/g, '')
-          if (raw.trim().length === 0) {
-            throw new Error('空的文件内容，检查是否提供管理员权限')
-          }
-
-          const [, port] = raw.match(portRegex) || []
-          const [, password] = raw.match(passwordRegex) || []
-          const [, pid] = raw.match(pidRegex) || []
-
-          if (!port || !password || !pid) {
-            reject(new Error('无法解析进程命令行参数'))
-            return
-          }
-
-          resolve({
-            port: Number(port),
-            pid: Number(pid),
-            password,
-            certificate
-          })
-        } catch (e) {
-          reject(e)
-        } finally {
-          if (fs.existsSync(savePath)) {
-            rmSync(savePath)
-          }
-        }
-      })
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
-
-// 管理员权限下会尝试更多的方法
-export function queryLcuAuthOnAdmin(): Promise<LcuAuth> {
-  return new Promise(function (resolve, reject) {
-    try {
-      let cmd: string
-      let shell = basicState.availableShells[0]
-      if (shell === 'cmd') {
-        cmd = buildCmdScript(clientName)
-      } else {
-        cmd = buildPowershellScript(clientName, shell)
-      }
-
-      cp.exec(cmd, (error, stdout, stderr) => {
-        if (error) {
-          reject(new Error('执行脚本时发生错误：' + stderr + error.message))
-          return
-        }
-
-        const raw = stdout.trim()
-        if (raw.length === 0) {
-          reject(new Error('空的文件内容'))
-          return
-        }
-
-        const [, port] = raw.match(portRegex) || []
-        const [, password] = raw.match(passwordRegex) || []
-        const [, pid] = raw.match(pidRegex) || []
-
-        if (!port || !password || !pid) {
-          reject(new Error('无法解析进程命令行参数'))
-          return
-        }
-
-        resolve({
-          port: Number(port),
-          pid: Number(pid),
-          password,
-          certificate
-        })
-      })
-    } catch (e) {
-      reject(e)
-    }
-  })
+  return {
+    port: Number(port),
+    pid: Number(pid),
+    password,
+    certificate
+  }
 }

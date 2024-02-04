@@ -1,30 +1,30 @@
 <template>
   <NCard size="small">
     <template #header><span class="card-header-title">聊天卡片段位修改</span></template>
-    <div class="control-line">
-      <span class="label">设置</span>
+    <ControlItem
+      class="control-item-margin"
+      label="立即使生效"
+      label-description="立即修改聊天卡片状态，在下一次客户端启动前有效"
+    >
       <NButton size="tiny" type="primary" @click="() => handleSet()">生效</NButton>
-    </div>
-    <div class="control-line">
-      <span class="label">队列</span>
+    </ControlItem>
+    <ControlItem class="control-item-margin" label="队列">
       <NSelect
         :options="queueOptions"
         style="max-width: 180px"
         v-model:value="state.queue"
         size="tiny"
       ></NSelect>
-    </div>
-    <div class="control-line">
-      <span class="label">段位</span>
+    </ControlItem>
+    <ControlItem class="control-item-margin" label="段位">
       <NSelect
         :options="tierOptions"
         style="max-width: 180px"
         v-model:value="state.tier"
         size="tiny"
       ></NSelect>
-    </div>
-    <div class="control-line">
-      <span class="label">分级</span>
+    </ControlItem>
+    <ControlItem class="control-item-margin" label="分级">
       <NSelect
         :options="divisionOptions"
         :disabled="
@@ -34,7 +34,7 @@
         v-model:value="state.division"
         size="tiny"
       ></NSelect>
-    </div>
+    </ControlItem>
   </NCard>
 </template>
 
@@ -42,6 +42,7 @@
 import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
 import { reactive } from 'vue'
 
+import ControlItem from '@renderer/components/ControlItem.vue'
 import { notify } from '@renderer/events/notifications'
 import { changeRanked } from '@renderer/http-api/chat'
 
@@ -165,8 +166,6 @@ const queueOptions = [
 </script>
 
 <style lang="less" scoped>
-@import './style.less';
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;
@@ -175,5 +174,16 @@ const queueOptions = [
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
+.card-header-title {
+  font-weight: bold;
+  font-size: 18px;
 }
 </style>

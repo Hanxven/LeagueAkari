@@ -35,6 +35,8 @@ export function onCall(
         }
       }
 
+      console.log('unknown error', err)
+
       // 如果不能确定 Error 的类型，那么返回一个占位符号
       // 这么做的考虑是，由于 Electron 的 IPC 机制，Error 必须是可序列化的
       return {

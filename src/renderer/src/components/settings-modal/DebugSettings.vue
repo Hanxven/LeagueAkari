@@ -93,8 +93,8 @@
       <span class="text" v-else>不可用 (未连接)</span>
     </NCard>
     <NCard v-if="appState.isAdmin" size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">League Toolkiverse</span></template>
-      <span class="text">当心！League Toolkit 现在运行在管理员权限😊</span>
+      <template #header><span class="card-header-title">League Toolkit</span></template>
+      <span class="text">League Toolkit 运行在管理员权限，仅用于实现命令行获取以及特定的客户端功能</span>
     </NCard>
   </NScrollbar>
 </template>
@@ -298,6 +298,7 @@ const handleReload = () => {
 
 .card-header-title {
   font-weight: bold;
+  font-size: 18px;
 }
 
 .check-box {

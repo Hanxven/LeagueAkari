@@ -2,33 +2,32 @@
   <NScrollbar style="max-height: 60vh" trigger="none">
     <NCard size="small">
       <template #header><span class="card-header-title">Riot Client</span></template>
-      <div class="control-line">
-        <div class="label" title="关闭游戏客户端进程">关闭游戏客户端进程</div>
-        <div class="control">
-          <NButton
-            :disabled="lcuState.state !== 'connected'"
-            size="tiny"
-            secondary
-            type="warning"
-            @click="handleQuitClient"
-            >关闭 Client 进程</NButton
-          >
-        </div>
-      </div>
+      <ControlItem
+        class="control-item-margin"
+        label="关闭游戏客户端进程"
+        label-description="这会导致游戏客户端立刻关闭"
+        :label-width="320"
+      >
+        <NButton
+          :disabled="lcuState.state !== 'connected'"
+          size="tiny"
+          secondary
+          type="warning"
+          @click="handleQuitClient"
+          >关闭 Client 进程</NButton
+        >
+      </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">League Client UX</span></template>
-      <div class="control-line" v-if="appState.isAdmin">
-        <div class="label" title="尝试修复客户端窗口">修复窗口大小</div>
-        <div class="control" style="display: flex; gap: 4px">
-          <NButton
-            :disabled="lcuState.state !== 'connected'"
-            size="tiny"
-            secondary
-            type="warning"
-            @click="handleFixWindowMethodA"
-            >修复</NButton
-          >
+      <ControlItem
+        class="control-item-margin"
+        v-if="appState.isAdmin"
+        label="调整窗口大小"
+        label-description="以 WinAPI 方式调整窗口的大小，请谨慎使用该功能。在客户端界面大小不正确时，可尝试此操作"
+        :label-width="320"
+      >
+        <div class="control" style="display: flex; gap: 4px; align-items: baseline">
           <NInputNumber
             style="width: 80px"
             size="tiny"
@@ -59,49 +58,61 @@
             @keyup.enter="() => handleFixWindowMethodA()"
             ><template #prefix>H</template>
           </NInputNumber>
-        </div>
-      </div>
-      <div class="control-line">
-        <div class="label" title="重启游戏 UX 进程，即游戏界面">重启 UX 进程</div>
-        <div class="control">
           <NButton
             :disabled="lcuState.state !== 'connected'"
             size="tiny"
             secondary
             type="warning"
-            @click="handleRestartUx"
-            >重启 UX 进程</NButton
+            @click="handleFixWindowMethodA"
+            >调整</NButton
           >
         </div>
-      </div>
-      <div class="control-line">
-        <div class="label" title="结束游戏 UX 进程，即游戏界面。不会影响到正在进行的流程">
-          结束 UX 进程
-        </div>
-        <div class="control">
-          <NButton
-            :disabled="lcuState.state !== 'connected'"
-            type="warning"
-            secondary
-            size="tiny"
-            @click="handleKillUx"
-            >结束 UX 进程</NButton
-          >
-        </div>
-      </div>
-      <div class="control-line">
-        <div class="label" title="启动 UX 进程">启动 UX 进程</div>
-        <div class="control">
-          <NButton
-            :disabled="lcuState.state !== 'connected'"
-            type="warning"
-            secondary
-            size="tiny"
-            @click="handleLaunchUx"
-            >启动 UX 进程</NButton
-          >
-        </div>
-      </div>
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="重启 UX 进程"
+        label-description="立即重启渲染进程。该操作不会影响正在进行中的活动，适用于修复客户端界面错误"
+        :label-width="320"
+      >
+        <NButton
+          :disabled="lcuState.state !== 'connected'"
+          size="tiny"
+          secondary
+          type="warning"
+          @click="handleRestartUx"
+          >重启 UX 进程</NButton
+        >
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="结束 UX 进程"
+        label-description="立即关闭渲染进程。该操作不会影响正在进行中的活动"
+        :label-width="320"
+      >
+        <NButton
+          :disabled="lcuState.state !== 'connected'"
+          type="warning"
+          secondary
+          size="tiny"
+          @click="handleKillUx"
+          >结束 UX 进程</NButton
+        >
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="启动 UX 进程"
+        label-description="如果渲染进程已经关闭，则立即启动渲染进程"
+        :label-width="320"
+      >
+        <NButton
+          :disabled="lcuState.state !== 'connected'"
+          type="warning"
+          secondary
+          size="tiny"
+          @click="handleLaunchUx"
+          >启动 UX 进程</NButton
+        >
+      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>
@@ -117,6 +128,8 @@ import { useSettingsStore } from '@renderer/features/stores/settings'
 import { quit } from '@renderer/http-api/process-control'
 import { killUx, launchUx, restartUx } from '@renderer/http-api/riotclient'
 import { call } from '@renderer/ipc'
+
+import ControlItem from '../ControlItem.vue'
 
 const lcuState = useLcuStateStore()
 const appState = useAppState()
@@ -216,6 +229,7 @@ const handleFixWindowMethodA = async () => {
 <style lang="less" scoped>
 .card-header-title {
   font-weight: bold;
+  font-size: 18px;
 }
 
 .control-line {
@@ -234,6 +248,12 @@ const handleFixWindowMethodA = async () => {
 
   .input-number {
     width: 120px;
+  }
+}
+
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
   }
 }
 </style>

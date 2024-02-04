@@ -117,7 +117,7 @@
         :tab="(mh.currentTab.data as TabState)"
         :is-self-tab="mh.currentTab.id === summoner.currentSummoner?.summonerId"
       />
-      <div v-else class="tabs-placeholder">{{ title }}</div>
+      <div v-else class="tabs-placeholder">League Toolkit</div>
     </div>
   </div>
 </template>
@@ -131,7 +131,6 @@ import { useRoute, useRouter } from 'vue-router'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
 import SearchSummoner from '@renderer/components/search-summoner/SearchSummoner.vue'
-import { useTitle } from '@renderer/compositions/useTitle'
 import { championIcon, profileIcon } from '@renderer/features/game-data'
 import { fetchTabFullData } from '@renderer/features/match-history'
 import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
@@ -139,7 +138,6 @@ import { TabState, useMatchHistoryStore } from '@renderer/features/stores/match-
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
 
-const title = useTitle()
 
 const route = useRoute()
 const router = useRouter()

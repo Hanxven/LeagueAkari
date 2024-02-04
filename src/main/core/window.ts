@@ -1,7 +1,6 @@
 import { BrowserWindow } from 'electron'
 import { observable, reaction, runInAction } from 'mobx'
 
-import { basicState } from './basic'
 import { onCall, sendUpdate } from '../utils/ipc'
 
 export const windowState = observable({
@@ -115,15 +114,6 @@ export function initWindowIpc(w: BrowserWindow) {
   onCall('setAlwaysOnTop', (_, flag, level, relativeLevel) => {
     w.setAlwaysOnTop(flag, level, relativeLevel)
   })
-
-  reaction(
-    () => basicState.isAdmin,
-    (isAdmin) => {
-      if (isAdmin) {
-        w.setTitle('League Toolkiverse')
-      }
-    }
-  )
 
   w.on('page-title-updated', (e) => e.preventDefault())
 }

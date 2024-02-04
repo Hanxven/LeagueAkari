@@ -1,75 +1,89 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">自动英雄选择</span></template>
-    <div class="line" style="display: flex; gap: 16px; margin-bottom: 8px">
-      <div>
-        <div class="control-line control-line-long" title="任何拥有主动英雄选择的队列，包括匹配队列、排位队列等">
-          <span class="label">普通模式开启</span>
-          <NSwitch
-            @update:value="(v) => setNormalModeAutoSelectEnabled(v)"
-            :value="settings.autoSelect.normalModeEnabled"
-            size="small"
-          ></NSwitch>
-        </div>
-        <div class="control-line control-line-long" title="仅限同步自选模式，如匹配模式。排位队列等顺序自选队列不应用自动选择">
-          <span class="label">仅限同步自选模式</span>
-          <NSwitch
-            @update:value="(v) => setOnlySimulMode(v)"
-            :value="settings.autoSelect.onlySimulMode"
-            size="small"
-          ></NSwitch>
-        </div>
-        <div class="control-line control-line-long" title="不会回避队友预选的英雄">
-          <span class="label">无视队友预选</span>
-          <NSwitch
-            @update:value="(v) => setSelectTeammateIntendedChampion(v)"
-            :value="settings.autoSelect.selectTeammateIntendedChampion"
-            size="small"
-          />
-        </div>
-      </div>
-      <div class="vertical-divider" title="朴实无华的竖向分割线"></div>
-      <div>
-        <div class="control-line control-line-short" title="随机选择一个意向列表中的英雄，而不是按照列表顺序">
-          <span class="label">随机挑选</span>
-          <NSwitch
-            @update:value="(v) => setSelectRandomly(v)"
-            :value="settings.autoSelect.selectRandomly"
-            size="small"
-          ></NSwitch>
-        </div>
-        <div class="control-line control-line-short">
-          <span class="label">选择策略</span>
-          <NSwitch
-            @update:value="(v) => setAutoSelectCompleted(v)"
-            :value="settings.autoSelect.completed"
-            size="small"
-            :rail-style="completeStrategy"
-          >
-            <template #checked>锁定</template>
-            <template #unchecked>亮出</template></NSwitch
-          >
-        </div>
-      </div>
-    </div>
-    <div class="control-line control-line-long" title="提供一个意向列表，选择操作将参考此列表">
-      <span class="label">意向英雄</span>
+    <template #header><span class="card-header-title">自动英雄选择 / 禁用</span></template>
+    <ControlItem
+      class="control-item-margin"
+      label="普通模式开启"
+      label-description="在常规的模式中启用。如匹配模式，排位模式等任何非随机英雄的模式"
+    >
+      <NSwitch
+        @update:value="(v) => setNormalModeAutoSelectEnabled(v)"
+        :value="settings.autoSelect.normalModeEnabled"
+        size="small"
+      ></NSwitch>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="仅限同步自选"
+      label-description="仅当模式是同步自选模式时生效。这些模式通常需要所有玩家同时选择英雄"
+    >
+      <NSwitch
+        @update:value="(v) => setOnlySimulMode(v)"
+        :value="settings.autoSelect.onlySimulMode"
+        size="small"
+      ></NSwitch>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="无视队友预选"
+      label-description="开启后将不会考虑队友的预选英雄"
+    >
+      <NSwitch
+        @update:value="(v) => setSelectTeammateIntendedChampion(v)"
+        :value="settings.autoSelect.selectTeammateIntendedChampion"
+        size="small"
+      />
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="随机挑选"
+      label-description="在期望列表中随机选择一个英雄，而不是按照列表靠前的顺序"
+    >
+      <NSwitch
+        @update:value="(v) => setSelectRandomly(v)"
+        :value="settings.autoSelect.selectRandomly"
+        size="small"
+      ></NSwitch>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="选择策略"
+      label-description="立即锁定或只是亮出"
+    >
+      <NSwitch
+        @update:value="(v) => setAutoSelectCompleted(v)"
+        :value="settings.autoSelect.completed"
+        size="small"
+        :rail-style="completeStrategy"
+      >
+        <template #checked>锁定</template>
+        <template #unchecked>亮出</template></NSwitch
+      >
+    </ControlItem>
+    <ControlItem class="control-item-margin" label="意向英雄">
       <OrderedChampionList
+        type="pick"
         :value="settings.autoSelect.expectedChampions"
         @update:value="(list) => setNormalModeExpectedChampions(list)"
       />
-    </div>
+    </ControlItem>
     <div class="divider"></div>
-    <div class="control-line" title="带有英雄选择台的队列，如极地大乱斗">
-      <span class="label">随机模式开启</span>
+    <ControlItem
+      class="control-item-margin"
+      label="随机模式开启"
+      label-description="随机分配英雄的模式，如极地大乱斗"
+    >
       <NSwitch
         @update:value="(v) => setBenchModeAutoSelectEnabled(v)"
         :value="settings.autoSelect.benchModeEnabled"
         size="small"
       ></NSwitch>
-    </div>
-    <div class="control-line" title="目标英雄出现在英雄选择台上需满足的累计时间">
-      <span class="label">抢选延迟 (秒)</span>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="选用延迟 (s)"
+      label-description="目标英雄出现在英雄选择台上的累计时间需达到此值才会执行交换操作，单位为秒"
+    >
       <NInputNumber
         style="width: 100px"
         placeholder="秒"
@@ -78,60 +92,75 @@
         :value="settings.autoSelect.grabDelay"
         @update:value="(v) => setGrabDelay(v || 0)"
       />
-    </div>
-    <div class="control-line" title="提供一个意向列表，选择操作将参考此列表">
-      <span class="label">意向英雄</span>
+    </ControlItem>
+    <ControlItem class="control-item-margin" label="期望英雄">
       <OrderedChampionList
+        type="pick"
         :value="settings.autoSelect.benchExpectedChampions"
         @update:value="(list) => setBenchModeExpectedChampions(list)"
       />
-    </div>
-    <div class="control-line" title="在当前聊天室中打印即将进行的选择或取消操作，仅自己可见">
-      <span class="label">反馈在聊天室</span>
+    </ControlItem>
+    <ControlItem class="control-item-margin" label="反馈在聊天室">
+      <template #labelDescription
+        >将即将进行的操作打印在当前聊天室。这些消息<span
+          style="font-weight: 700; font-style: italic"
+          >仅自己可见</span
+        ></template
+      >
       <NSwitch
         @update:value="(v) => setBenchActionNotifyInChat(v)"
         :value="settings.autoSelect.benchActionNotifyInChat"
         size="small"
       ></NSwitch>
-    </div>
+    </ControlItem>
     <div class="divider"></div>
-    <div class="control-line">
-      <span class="label">自动 ban 开启</span>
+    <ControlItem
+      class="control-item-margin"
+      label="自动禁用开启"
+      label-description="自动执行英雄的禁用操作"
+    >
       <NSwitch
         @update:value="(v) => setAutoBanEnabled(v)"
         :value="settings.autoSelect.banEnabled"
         size="small"
       ></NSwitch>
-    </div>
-    <div class="control-line" title="提供一个意向列表，禁用操作将参考此列表">
-      <span class="label">意向禁用英雄</span>
+    </ControlItem>
+    <ControlItem class="control-item-margin" label="意向英雄">
       <OrderedChampionList
         :value="settings.autoSelect.bannedChampions"
+        type="ban"
         @update:value="(list) => setNormalModeBannedChampions(list)"
       />
-    </div>
-    <div class="control-line" title="随机禁用一个意向列表中的英雄，而不是按照列表顺序">
-      <span class="label">随机禁用</span>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="随机禁用"
+      label-description="随机选择意向列表中的英雄并禁用，而不是按照列表靠前的顺序"
+    >
       <NSwitch
         @update:value="(v) => setBanRandomly(v)"
         :value="settings.autoSelect.banRandomly"
         size="small"
       ></NSwitch>
-    </div>
-    <div class="control-line" title="禁用英雄时是否考虑队友预选位">
-      <span class="label">无视队友预选</span>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="无视队友预选"
+      label-description="开启后将不会考虑队友的预选英雄"
+    >
       <NSwitch
         @update:value="(v) => setBanTeammateIntendedChampion(v)"
         :value="settings.autoSelect.banTeammateIntendedChampion"
         size="small"
       ></NSwitch>
-    </div>
+    </ControlItem>
   </NCard>
 </template>
 
 <script setup lang="ts">
-import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
+import { NCard, NInputNumber, NSwitch } from 'naive-ui'
 
+import ControlItem from '@renderer/components/ControlItem.vue'
 import OrderedChampionList from '@renderer/components/OrderedChampionList.vue'
 import {
   setAutoBanEnabled,
@@ -149,13 +178,11 @@ import {
   setSelectRandomly,
   setSelectTeammateIntendedChampion
 } from '@renderer/features/auto-select'
-import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { useSettingsStore } from '@renderer/features/stores/settings'
 
 // const id = 'view:toolkit:auto-select'
 
 const settings = useSettingsStore()
-const gameData = useGameDataStore()
 
 const completeStrategy = ({ checked }: { checked: boolean }) => {
   if (checked) {
@@ -167,8 +194,6 @@ const completeStrategy = ({ checked }: { checked: boolean }) => {
 </script>
 
 <style lang="less" scoped>
-@import './style.less';
-
 .divider {
   margin-top: 12px;
   margin-bottom: 12px;
@@ -176,20 +201,14 @@ const completeStrategy = ({ checked }: { checked: boolean }) => {
   background-color: rgba(255, 255, 255, 0.084);
 }
 
-.vertical-divider {
-  margin-left: 24px;
-  margin-right: 24px;
-  width: 1px;
-  height: 88px;
-  align-self: center;
-  background-color: rgba(255, 255, 255, 0.084);
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
 }
 
-.control-line-long {
-  --label-width: 120px;
-}
-
-.control-line-short {
-  --label-width: 68px;
+.card-header-title {
+  font-weight: bold;
+  font-size: 18px;
 }
 </style>

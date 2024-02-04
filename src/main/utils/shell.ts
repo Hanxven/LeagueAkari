@@ -1,94 +1,136 @@
-import { exec } from 'child_process'
+import { spawn } from 'node:child_process'
 
-function checkCommand(command: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    exec(command, (err) => {
-      resolve(!err)
+function runCommand(command: string, args: string[] = []): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args)
+    let stdout = ''
+    let stderr = ''
+
+    child.stdout.on('data', (data) => {
+      stdout += data.toString()
     })
+
+    child.stderr.on('data', (data) => {
+      stderr += data.toString()
+    })
+
+    child.on('close', (code) => {
+      if (code === 0) {
+        resolve(stdout)
+      } else {
+        reject(new Error(`Command failed with code ${code}: ${stderr}`))
+      }
+    })
+
+    child.on('error', (error) => reject(error))
   })
 }
 
-const precedence = {
-  cmd: 1,
-  pwsh: 2,
-  powershell: 3
+function testCommand(command: string, args: string[] = []): Promise<boolean> {
+  return new Promise((resolve) => {
+    runCommand(command, args)
+      .then(() => resolve(true))
+      .catch(() => resolve(false))
+  })
 }
 
-export async function checkAvailableShells(): Promise<string[]> {
-  const results = await Promise.allSettled([
-    checkCommand('powershell -Command "$PSVersionTable.PSVersion"').then((available) =>
-      available ? 'powershell' : null
-    ),
-    checkCommand('pwsh -Version').then((available) => (available ? 'pwsh' : null)),
-    checkCommand('cmd /c "echo"').then((available) => (available ? 'cmd' : null))
+export async function checkShellAvailability() {
+  const results = await Promise.all([
+    testCommand('cmd', ['/c', 'ver']),
+    testCommand('powershell', ['-Command', '$PSVersionTable.PSVersion.ToString()']),
+    testCommand('pwsh', ['-Version'])
   ])
 
-  return results
-    .filter((result) => result.status === 'fulfilled' && result.value !== null)
-    .map((result) => (result as PromiseFulfilledResult<string>).value)
-    .sort((a, b) => {
-      const ap = precedence[a] || 0
-      const bp = precedence[b] || 0
-      return bp - ap
-    })
+  return {
+    cmd: results[0],
+    powershell: results[1],
+    pwsh: results[2]
+  }
 }
 
-export function checkAdminPrivilegesCmd(): Promise<boolean> {
-  return new Promise((resolve) => {
-    exec('net session', (error, _stdout, _stderr) => {
-      if (error) {
-        resolve(false)
-      } else {
-        resolve(true)
-      }
-    })
-  })
-}
-
-export function checkAdminPrivilegesPowershell(shell: string): Promise<boolean> {
-  const command = `(New-Object System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)`
-  return new Promise<boolean>((resolve, reject) => {
-    exec(`${shell} -Command "${command}"`, (error, stdout) => {
-      if (error) {
-        reject(error)
-        return
-      }
-      resolve(stdout.trim() === 'True')
-    })
-  })
-}
-
-export async function isProcessExistsPowershell(clientName: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    exec(
-      `powershell -WindowStyle Hidden "Get-CimInstance -Query 'SELECT * from Win32_Process WHERE name LIKE ''${clientName}'''"`,
-      (err, stdout) => {
-        if (err || stdout.length === 0) {
-          resolve(false)
-        } else {
-          resolve(true)
-        }
-      }
+export async function checkAdminPrivileges(shell: 'powershell' | 'pwsh' | 'cmd'): Promise<boolean> {
+  if (shell === 'cmd') {
+    return new Promise((resolve) =>
+      runCommand('cmd', ['/c', 'net', 'session'])
+        .then(() => resolve(true))
+        .catch(() => resolve(false))
     )
+  }
+
+  const powershellCmd = `(New-Object System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)`
+  return (await runCommand(shell, ['-Command', powershellCmd])).trim() === 'True'
+}
+
+export async function isProcessExists(
+  shell: 'powershell' | 'pwsh' | 'cmd',
+  clientName: string
+): Promise<boolean> {
+  if (shell === 'cmd') {
+    return new Promise((resolve) => {
+      runCommand('cmd', [
+        '/c',
+        'wmic',
+        'process',
+        'where',
+        `name like '%${clientName}%'`,
+        'get',
+        'name'
+      ])
+        .then((out) => resolve(out.includes(clientName)))
+        .catch(() => resolve(false))
+    })
+  }
+
+  return new Promise((resolve) => {
+    runCommand(shell, [
+      '-Command',
+      'Get-CimInstance',
+      '-Query',
+      `'SELECT * from Win32_Process WHERE name LIKE ''${clientName}'''`
+    ])
+      .then((out) => {
+        if (out.trim().length === 0) {
+          resolve(false)
+          return
+        }
+        resolve(true)
+      })
+      .catch(() => resolve(false))
   })
 }
 
-export async function isProcessExistsCmd(clientName: string): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    const cmd = `wmic process where "name like '%${clientName}%'" get name`
-
-    exec(cmd, (err, stdout, stderr) => {
-      if (err) {
-        reject(err)
-        return
-      }
-
-      if (stderr) {
-        reject(stderr)
-        return
-      }
-
-      resolve(stdout.toLowerCase().includes(clientName.toLowerCase()))
+export async function getCommandLine(
+  shell: 'powershell' | 'pwsh' | 'cmd',
+  clientName: string
+): Promise<string> {
+  if (shell === 'cmd') {
+    return new Promise((resolve, reject) => {
+      runCommand('cmd', [
+        '/c',
+        'wmic',
+        'process',
+        'where',
+        `name like '%${clientName}%'`,
+        'get',
+        'CommandLine'
+      ])
+        .then((out) => resolve(out.trim()))
+        .catch((error) => reject(error))
     })
+  }
+
+  return new Promise((resolve, reject) => {
+    runCommand(shell, [
+      '-Command',
+      'Get-CimInstance',
+      '-Query',
+      `'SELECT * from Win32_Process WHERE name LIKE ''${clientName}'''`,
+      '|',
+      'Select-Object',
+      '-ExpandProperty',
+      'CommandLine'
+    ])
+      .then((out) => resolve(out.trim()))
+      .catch((error) => reject(error))
   })
 }

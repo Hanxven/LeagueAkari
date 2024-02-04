@@ -3,16 +3,10 @@ import https from 'https'
 import { observable, reaction, runInAction, toJS } from 'mobx'
 import { WebSocket } from 'ws'
 
-import {
-  LcuAuth,
-  certificate,
-  isLcuAuthObject,
-  queryLcuAuth,
-  queryLcuAuthOnAdmin
-} from '../utils/lcu-auth'
+import { onCall, sendUpdateToAll } from '../utils/ipc'
+import { LcuAuth, certificate, isLcuAuthObject, queryLcuAuthOnAdmin } from '../utils/lcu-auth'
 import { getRandomAvailableLoopbackAddrWithPort } from '../utils/loopback'
 import { basicState } from './basic'
-import { onCall, sendUpdateToAll } from '../utils/ipc'
 
 let request: AxiosInstance | null = null
 let ws: WebSocket | null = null
@@ -119,8 +113,13 @@ export async function initConnectionIpc() {
         connectState.wsState = 'connecting'
       })
 
-      const auth =
-        auth1 || (basicState.isAdmin ? await queryLcuAuthOnAdmin() : await queryLcuAuth())
+      const auth = await queryLcuAuthOnAdmin(
+        basicState.availableShells.cmd
+          ? 'cmd'
+          : basicState.availableShells.powershell
+            ? 'powershell'
+            : 'pwsh'
+      )
 
       auth.certificate = auth.certificate || certificate
 
@@ -130,7 +129,7 @@ export async function initConnectionIpc() {
       await new Promise<void>((resolve, reject) => {
         timeoutTimer = setTimeout(() => {
           ws.close()
-          reject(new Error('连接超时'))
+          reject(new Error('尝试连接到英雄联盟客户端超时'))
         }, INTERVAL_TIMEOUT)
 
         ws.on('open', async () => {

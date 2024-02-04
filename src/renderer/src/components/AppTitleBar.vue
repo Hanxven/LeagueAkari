@@ -6,9 +6,7 @@
         <span class="text">设置</span>
       </div>
     </div>
-    <div class="title">
-      {{ title }}
-    </div>
+    <div class="title">League Toolkit</div>
     <div class="traffic">
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
         <NIcon><MinimizeIcon /></NIcon>
@@ -39,12 +37,10 @@ import {
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 
-import { useTitle } from '@renderer/compositions/useTitle'
 import { useAppState } from '@renderer/features/stores/app'
 import { call } from '@renderer/ipc'
 
 const appState = useAppState()
-const title = useTitle()
 
 const handleMinimize = async () => {
   await call('minimize')
@@ -154,18 +150,21 @@ const emits = defineEmits<{
   .traffic-button.minimize {
     &:hover {
       background-color: rgba(255, 255, 255, 0.162);
+      color: #fff;
     }
   }
 
   .traffic-button.maximize {
     &:hover {
       background-color: rgba(255, 255, 255, 0.162);
+      color: #fff;
     }
   }
 
   .traffic-button.close {
     &:hover {
       background-color: rgb(194, 0, 0);
+      color: #fff;
     }
   }
 }

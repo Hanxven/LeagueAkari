@@ -29,7 +29,9 @@
           v-for="c of benchChampions"
           :key="c.championId"
           class="champion-image"
-          :class="{ 'champion-image-invalid': !champSelect.currentPickableChampions.has(c.championId) }"
+          :class="{
+            'champion-image-invalid': !champSelect.currentPickableChampions.has(c.championId)
+          }"
           :src="championIcon(c.championId)"
           @click="() => handleBenchSwap(c.championId)"
         />
@@ -155,7 +157,6 @@ const handleReroll = async (grabBack = false) => {
 </script>
 
 <style scoped lang="less">
-@import './style.less';
 .outer {
   display: flex;
   align-items: center;

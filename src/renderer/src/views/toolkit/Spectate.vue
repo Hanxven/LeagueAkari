@@ -5,8 +5,11 @@
         >观战{{ gameflow.phase === 'Lobby' ? ' (需要先退出当前房间)' : '' }}</span
       ></template
     >
-    <div class="control-line">
-      <span class="label">召唤师名称</span>
+    <ControlItem
+      class="control-item-margin"
+      label="目标召唤师"
+      label-description="通过 PUUID 或召唤师名称观战，前提是玩家正在可观战的对局中"
+    >
       <div style="display: flex; align-items: center; gap: 8px">
         <NDropdown
           trigger="click"
@@ -33,7 +36,7 @@
           >调起观战</NButton
         >
       </div>
-    </div>
+    </ControlItem>
   </NCard>
 </template>
 
@@ -41,6 +44,7 @@
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
 
+import ControlItem from '@renderer/components/ControlItem.vue'
 import { notify } from '@renderer/events/notifications'
 import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
 import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
@@ -174,5 +178,14 @@ const handleLoadFriends = async () => {
 </script>
 
 <style lang="less" scoped>
-@import './style.less';
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
+.card-header-title {
+  font-weight: bold;
+  font-size: 18px;
+}
 </style>

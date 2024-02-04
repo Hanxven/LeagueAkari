@@ -28,6 +28,7 @@ const settings = useSettingsStore()
 <style lang="less" scoped>
 .card-header-title {
   font-weight: bold;
+  font-size: 18px;
 }
 
 .control-line {

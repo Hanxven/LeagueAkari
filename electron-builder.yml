@@ -22,6 +22,7 @@ win:
   target: 7z
   executableName: LeagueToolkit
   icon: resources/LT_ICON.ico
+  requestedExecutionLevel: requireAdministrator
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

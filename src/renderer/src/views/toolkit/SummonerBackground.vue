@@ -33,10 +33,9 @@
         size="tiny"
       ></NSelect>
     </NModal>
-    <div class="control-line">
-      <span class="label">选择英雄皮肤</span>
+    <ControlItem class="control-item-margin" label="选择" label-description="查找目标英雄或皮肤">
       <NButton size="tiny" @click="isModalShow = true">选择</NButton>
-    </div>
+    </ControlItem>
   </NCard>
 </template>
 
@@ -44,6 +43,7 @@
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
 import { VNode, computed, h, ref, watch } from 'vue'
 
+import ControlItem from '@renderer/components/ControlItem.vue'
 import LcuImage from '@renderer/components/LcuImage.vue'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { getChampDetails } from '@renderer/http-api/game-data'
@@ -144,5 +144,14 @@ const handleApplyToProfile = async () => {
 </script>
 
 <style lang="less" scoped>
-@import './style.less';
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
+.card-header-title {
+  font-weight: bold;
+  font-size: 18px;
+}
 </style>

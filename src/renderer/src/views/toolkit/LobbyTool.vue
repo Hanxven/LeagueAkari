@@ -1,13 +1,12 @@
 <template>
   <NCard size="small">
     <template #header><span class="card-header-title">房间工具</span></template>
-    <div class="control-line">
-      <span class="label">5v5 训练房间</span>
-      <NButton @click="handleCreatePractice5v5" size="tiny">创建</NButton>
-    </div>
-    <div class="control-line">
-      <span class="label">添加人机</span>
-      <div style="display: flex; align-items: center; gap: 8px">
+    <ControlItem
+      class="control-item-margin"
+      label="添加人机"
+      label-description="在当前自定义或训练房间中添加人机"
+    >
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
         <NSelect
           style="width: 140px"
           size="tiny"
@@ -31,9 +30,12 @@
           >添加</NButton
         >
       </div>
-    </div>
-    <div class="control-line">
-      <span class="label">队列房间</span>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="创建队列房间"
+      label-description="创建一个指定队列 ID 的房间，受制于服务器是否开启目标队列"
+    >
       <div style="display: flex; align-items: center; gap: 8px">
         <NSelect
           placeholder="选择或指定 ID"
@@ -53,7 +55,10 @@
           >创建</NButton
         >
       </div>
-    </div>
+    </ControlItem>
+    <ControlItem class="control-item-margin" label="创建 5v5 训练房间">
+      <NButton @click="handleCreatePractice5v5" size="tiny">创建</NButton>
+    </ControlItem>
   </NCard>
 </template>
 
@@ -61,6 +66,7 @@
 import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
 import { computed, reactive, shallowRef } from 'vue'
 
+import ControlItem from '@renderer/components/ControlItem.vue'
 import { notify } from '@renderer/events/notifications'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
@@ -222,5 +228,14 @@ const handleLoadAvailableBots = async (show: boolean) => {
 </script>
 
 <style lang="less" scoped>
-@import './style.less';
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
+.card-header-title {
+  font-weight: bold;
+  font-size: 18px;
+}
 </style>

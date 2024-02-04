@@ -1,8 +1,11 @@
 <template>
   <NCard size="small">
     <template #header><span class="card-header-title">进行时</span></template>
-    <div class="control-line">
-      <span class="label">英雄选择秒退</span>
+    <ControlItem
+      class="control-item-margin"
+      label="英雄选择秒退"
+      label-description="立即退出当前英雄选择阶段，但不会关闭客户端"
+    >
       <NButton
         type="warning"
         :disabled="gameflow.phase !== 'ChampSelect'"
@@ -10,23 +13,16 @@
         size="tiny"
         >秒退</NButton
       >
-    </div>
-    <div class="control-line">
-      <span class="label">退出结算页面</span>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="退出结算页面"
+      label-description="立即退出结算界面。适用于由于客户端原因无法退出结算页面的情况"
+    >
       <NButton type="success" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="tiny"
         >回到房间</NButton
       >
-    </div>
-    <div v-if="false" class="control-line">
-      <span class="label">游戏内强退</span>
-      <NButton
-        type="warning"
-        :disabled="gameflow.phase !== 'Reconnect' && gameflow.phase !== 'InProgress'"
-        @click="handleEarlyExit"
-        size="tiny"
-        >强退</NButton
-      >
-    </div>
+    </ControlItem>
   </NCard>
 </template>
 
@@ -34,6 +30,7 @@
 import { NButton, NCard } from 'naive-ui'
 import { computed } from 'vue'
 
+import ControlItem from '@renderer/components/ControlItem.vue'
 import { notify } from '@renderer/events/notifications'
 import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
 import { earlyExit } from '@renderer/http-api/gameflow'
@@ -88,5 +85,14 @@ const handlePlayAgain = async () => {
 </script>
 
 <style lang="less" scoped>
-@import './style.less';
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
+.card-header-title {
+  font-weight: bold;
+  font-size: 18px;
+}
 </style>

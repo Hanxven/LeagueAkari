@@ -102,6 +102,7 @@ const show = defineModel<boolean>('show', { default: false })
 
 .card-header-title {
   font-weight: bold;
+  font-size: 18px;
 }
 </style>
 

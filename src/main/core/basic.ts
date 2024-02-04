@@ -1,20 +1,18 @@
 import { app, dialog } from 'electron'
 import { observable, reaction, runInAction } from 'mobx'
 
-import {
-  checkAdminPrivilegesCmd,
-  checkAdminPrivilegesPowershell,
-  checkAvailableShells,
-  isProcessExistsCmd,
-  isProcessExistsPowershell
-} from '../utils/shell'
 import { onCall, sendUpdateToAll } from '../utils/ipc'
+import { checkAdminPrivileges, checkShellAvailability, isProcessExists } from '../utils/shell'
 
 const clientName = 'LeagueClientUx.exe'
 
 export const basicState = observable({
   isAdmin: false,
-  availableShells: [] as string[]
+  availableShells: {
+    cmd: false,
+    powershell: false,
+    pwsh: false
+  }
 })
 
 // 基础通讯 API
@@ -26,9 +24,9 @@ export async function initBasicIpc() {
     }
   )
 
-  const shells = await checkAvailableShells()
+  const shells = await checkShellAvailability()
 
-  if (shells.length === 0) {
+  if (!shells.cmd && !shells.powershell && !shells.pwsh) {
     dialog.showErrorBox(
       '终端不可用',
       '未检测到 cmd、powershell 或 pwsh 终端存在于当前平台。本工具依赖于上述终端之一来收集必要信息。请确保至少安装其中一个终端后再尝试运行本工具。'
@@ -41,18 +39,26 @@ export async function initBasicIpc() {
   })
 
   await new Promise<void>((resolve) => {
-    if (shells[0] === 'cmd') {
-      checkAdminPrivilegesCmd().then((isAdmin) => {
+    if (shells.cmd) {
+      checkAdminPrivileges('cmd').then((isAdmin) => {
         runInAction(() => (basicState.isAdmin = isAdmin))
         resolve()
       })
     } else {
-      checkAdminPrivilegesPowershell(shells[0]).then((isAdmin) => {
+      checkAdminPrivileges(shells.powershell ? 'powershell' : 'pwsh').then((isAdmin) => {
         runInAction(() => (basicState.isAdmin = isAdmin))
         resolve()
       })
     }
   })
+
+  if (!basicState.isAdmin) {
+    dialog.showErrorBox(
+      '缺乏必要权限',
+      '本工具依赖管理员权限，以获取必要的命令行信息。'
+    )
+    app.quit()
+  }
 
   onCall('isAdmin', () => {
     return basicState.isAdmin
@@ -64,10 +70,10 @@ export async function initBasicIpc() {
 
   // 检查英雄联盟渲染端是否存在
   onCall('isLeagueClientExists', async () => {
-    if (shells[0] === 'cmd') {
-      return await isProcessExistsCmd(clientName)
+    if (shells.cmd) {
+      return await isProcessExists('cmd', clientName)
     } else {
-      return await isProcessExistsPowershell(clientName)
+      return await isProcessExists(shells.powershell ? 'powershell' : 'pwsh', clientName)
     }
   })
 }

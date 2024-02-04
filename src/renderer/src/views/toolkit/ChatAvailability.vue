@@ -1,8 +1,11 @@
 <template>
   <NCard size="small">
     <template #header><span class="card-header-title">聊天状态</span></template>
-    <div class="control-line">
-      <span class="label">状态</span>
+    <ControlItem
+      class="control-item-margin"
+      label="状态"
+      label-description="设置当前聊天状态。部分状态仅在特定情况下可用"
+    >
       <NRadioGroup
         size="small"
         :disabled="!chat.me"
@@ -20,13 +23,14 @@
           >
         </NSpace>
       </NRadioGroup>
-    </div>
+    </ControlItem>
   </NCard>
 </template>
 
 <script setup lang="ts">
 import { NCard, NRadio, NRadioGroup, NSpace } from 'naive-ui'
 
+import ControlItem from '@renderer/components/ControlItem.vue'
 import { notify } from '@renderer/events/notifications'
 import { useChatStore } from '@renderer/features/stores/lcu/chat'
 import { AvailabilityType, changeAvailability } from '@renderer/http-api/chat'
@@ -49,8 +53,6 @@ const handleChangeAvailability = async (availability: string) => {
 </script>
 
 <style lang="less" scoped>
-@import './style.less';
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;
@@ -59,5 +61,16 @@ const handleChangeAvailability = async (availability: string) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
+.card-header-title {
+  font-weight: bold;
+  font-size: 18px;
 }
 </style>
