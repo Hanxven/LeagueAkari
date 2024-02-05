@@ -69,29 +69,34 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  await initBasicIpc()
-  initConnectionIpc()
-  initWindowsPlatform()
-  initDatabase()
-  initStorageQuery()
-  initLcuClientFunctions()
+  try {
+    await initBasicIpc()
+    initConnectionIpc()
+    initWindowsPlatform()
+    initDatabase()
+    initStorageQuery()
+    initLcuClientFunctions()
 
-  createMainWindow()
+    createMainWindow()
 
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createMainWindow()
-    }
-  })
-
-  app.on('second-instance', (_event, _commandLine, _workingDirectory) => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore()
+    app.on('activate', function () {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createMainWindow()
       }
-      mainWindow.focus()
-    }
-  })
+    })
+
+    app.on('second-instance', (_event, _commandLine, _workingDirectory) => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) {
+          mainWindow.restore()
+        }
+        mainWindow.focus()
+      }
+    })
+  } catch (e) {
+    console.error('在初始化时出现错误', e)
+    app.quit()
+  }
 })
 
 app.on('window-all-closed', () => {

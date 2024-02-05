@@ -1,5 +1,6 @@
 #include <iostream>
 #include <napi.h>
+#include <shlobj.h>
 #include <windows.h>
 
 constexpr wchar_t APPLICATION_CLASS_NAME[] = L"RCLIENT";
@@ -47,8 +48,33 @@ Napi::Value FixWindowMethodA(const Napi::CallbackInfo& info) {
   return Napi::Boolean::New(env, true);
 }
 
+Napi::Value IsElevated(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  bool bIsElevated = false;
+
+  // Windows特定的权限检测
+  BOOL isMember = FALSE;
+  PSID administratorsGroup = nullptr;
+  SID_IDENTIFIER_AUTHORITY SIDAuthNT = SECURITY_NT_AUTHORITY;
+
+  if (AllocateAndInitializeSid(
+          &SIDAuthNT, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS,
+          0, 0, 0, 0, 0, 0, &administratorsGroup)) {
+    CheckTokenMembership(nullptr, administratorsGroup, &isMember);
+  }
+
+  if (administratorsGroup) {
+    FreeSid(administratorsGroup);
+  }
+
+  bIsElevated = isMember ? true : false;
+
+  return Napi::Boolean::New(env, bIsElevated);
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set("fixWindowMethodA", Napi::Function::New(env, FixWindowMethodA));
+  exports.Set("isElevated", Napi::Function::New(env, IsElevated));
   return exports;
 }
 

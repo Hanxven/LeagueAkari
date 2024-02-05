@@ -22,7 +22,10 @@ function runCommand(command: string, args: string[] = []): Promise<string> {
       }
     })
 
-    child.on('error', (error) => reject(error))
+    child.on('error', (error) => {
+      console.log('An error occurred on executing command: ', error, command, args)
+      reject(error)
+    })
   })
 }
 

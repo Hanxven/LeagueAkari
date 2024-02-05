@@ -1,8 +1,9 @@
 import { app, dialog } from 'electron'
 import { observable, reaction, runInAction } from 'mobx'
 
+import toolkit from '../native/ltToolkitWin32x64.node'
 import { onCall, sendUpdateToAll } from '../utils/ipc'
-import { checkAdminPrivileges, checkShellAvailability, isProcessExists } from '../utils/shell'
+import { checkShellAvailability, isProcessExists } from '../utils/shell'
 
 const clientName = 'LeagueClientUx.exe'
 
@@ -31,33 +32,17 @@ export async function initBasicIpc() {
       '终端不可用',
       '未检测到 cmd、powershell 或 pwsh 终端存在于当前平台。本工具依赖于上述终端之一来收集必要信息。请确保至少安装其中一个终端后再尝试运行本工具。'
     )
-    app.quit()
+    throw new Error('终端不可用')
   }
 
   runInAction(() => {
     basicState.availableShells = shells
-  })
-
-  await new Promise<void>((resolve) => {
-    if (shells.cmd) {
-      checkAdminPrivileges('cmd').then((isAdmin) => {
-        runInAction(() => (basicState.isAdmin = isAdmin))
-        resolve()
-      })
-    } else {
-      checkAdminPrivileges(shells.powershell ? 'powershell' : 'pwsh').then((isAdmin) => {
-        runInAction(() => (basicState.isAdmin = isAdmin))
-        resolve()
-      })
-    }
+    basicState.isAdmin = toolkit.isElevated()
   })
 
   if (!basicState.isAdmin) {
-    dialog.showErrorBox(
-      '缺乏必要权限',
-      '本工具依赖管理员权限，以获取必要的命令行信息。'
-    )
-    app.quit()
+    dialog.showErrorBox('缺乏必要权限', '本工具依赖管理员权限，以获取必要的命令行信息。')
+    throw new Error('缺乏必要权限')
   }
 
   onCall('isAdmin', () => {

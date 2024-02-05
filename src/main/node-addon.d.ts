@@ -59,6 +59,8 @@ declare module '*/ltToolkitWin32x64.node' {
      * @param config 具体设置
      */
     fixWindowMethodA(clientZoom: number, config?: { baseWidth: number; baseHeight: number }): void
+
+    isElevated(): boolean
   }
 
   const lt1: LeagueToolkit1Addon
