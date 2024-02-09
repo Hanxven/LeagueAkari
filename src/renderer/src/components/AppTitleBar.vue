@@ -79,7 +79,7 @@ const emits = defineEmits<{
   height: 16px;
 }
 
-.blurred {
+.blurred .title {
   color: rgb(107, 113, 125);
 }
 
