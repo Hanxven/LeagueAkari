@@ -76,7 +76,10 @@
               @click="handleSetCurrent(c)"
               :class="{
                 'not-pickable':
-                  gameflow.phase === 'ChampSelect' && !champSelect.currentPickableChampions.has(c),
+                  gameflow.phase === 'ChampSelect' &&
+                  (type === 'pick'
+                    ? !champSelect.currentPickableChampions.has(c)
+                    : !champSelect.currentBannableChampions.has(c)),
                 current: listCurrent === c
               }"
               :title="gameData.champions[c]?.name"
