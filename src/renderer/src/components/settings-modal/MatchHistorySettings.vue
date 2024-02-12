@@ -85,6 +85,48 @@
         />
       </ControlItem>
     </NCard>
+    <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">平均 KDA 简报</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="启用 KDA 发送"
+        :label-description="`在对局中或英雄选择中，使用 PageUp 发送己方队伍数据，使用 PageDown 发送敌方队伍 KDA 数据。英雄选择中发送通过聊天室实现。游戏内发送基于键盘输入模拟实现，因此在发送前，确保游戏内聊天框是关闭状态。统计对局的数量为 ${settings.matchHistory.matchHistoryLoadCount} 场，等同于对局战绩分析数量`"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="settings.matchHistory.sendKdaInGame"
+          @update:value="(val) => setSendKdaInGame(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="KDA 发送最低值"
+        label-description="仅当需发送对象的 KDA 值大于此值时，才会发送"
+        :label-width="320"
+      >
+        <NInputNumber
+          style="width: 100px"
+          size="tiny"
+          :min="0"
+          step="0.1"
+          :value="settings.matchHistory.sendKdaThreshold"
+          @update:value="(val) => setSendKdaThreshold(val || 0)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="KDA 发送附带免责声明"
+        label-description="在发送 KDA 数据时，在最后附带一条免责声明"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="settings.matchHistory.sendKdaInGameWithDisclaimer"
+          @update:value="(val) => sendKdaInGameWithDisclaimer(val)"
+        />
+      </ControlItem>
+    </NCard>
   </NScrollbar>
 </template>
 
@@ -92,11 +134,14 @@
 import { NCard, NInputNumber, NScrollbar, NSwitch } from 'naive-ui'
 
 import {
+  sendKdaInGameWithDisclaimer,
   setAfterGameFetch,
   setAutoRouteOnGameStart,
   setFetchDetailedGame,
   setMatchHistoryLoadCount,
   setPreMadeThreshold,
+  setSendKdaInGame,
+  setSendKdaThreshold,
   setTeamAnalysisPreloadCount
 } from '@renderer/features/match-history'
 import { useSettingsStore } from '@renderer/features/stores/settings'

@@ -17,6 +17,12 @@ declare module '*/ltInputWin32x64.node' {
     sendKeys(str: string): void
 
     /**
+     * Win32 API SendInput 封装 2，发送一串 Unicode 字符串，可输入到游戏内聊天框中。
+     * @param str
+     */
+    sendKeysX(str: string): void
+
+    /**
      * Win32 API SetWindowsHookEx 的封装，设置一个回调（仅一个回调，新设置会替换后设置的）
      * 监听所有正在按下的按键
      * @param callback

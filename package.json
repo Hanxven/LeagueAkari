@@ -22,6 +22,7 @@
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
     "axios": "^1.6.5",
+    "node-global-key-listener": "^0.1.1",
     "reflect-metadata": "^0.2.1",
     "sqlite3": "^5.1.6",
     "typeorm": "^0.3.17",

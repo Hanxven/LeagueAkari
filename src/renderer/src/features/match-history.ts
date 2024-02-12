@@ -4,21 +4,24 @@ import { computed, markRaw, watch } from 'vue'
 import { useStableComputed } from '@renderer/compositions/useStableComputed'
 import { notify } from '@renderer/events/notifications'
 import { getChampSelectSession } from '@renderer/http-api/champ-select'
+import { chatSend } from '@renderer/http-api/chat'
 import { LcuHttpError } from '@renderer/http-api/common'
 import { getGameFlowSession } from '@renderer/http-api/gameflow'
 import { getGame, getMatchHistory } from '@renderer/http-api/match-history'
 import { getRankedStats } from '@renderer/http-api/ranked'
 import { getSummoner } from '@renderer/http-api/summoner'
-import { call } from '@renderer/ipc'
+import { call, onUpdate } from '@renderer/ipc'
 import { router } from '@renderer/routes'
 import { Participant, isPveQueue } from '@renderer/types/match-history'
 import { SummonerInfo } from '@renderer/types/summoner'
+import { sleep } from '@renderer/utils/sleep'
 import { getSetting, setSetting } from '@renderer/utils/storage'
 import { calculateTogetherTimes } from '@renderer/utils/team-up'
 
 import { useLcuStateStore } from './stores/lcu-connection'
 import { useChampSelectStore } from './stores/lcu/champ-select'
 import { useChatStore } from './stores/lcu/chat'
+import { useGameDataStore } from './stores/lcu/game-data'
 import { useGameflowStore } from './stores/lcu/gameflow'
 import { useSummonerStore } from './stores/lcu/summoner'
 import {
@@ -532,6 +535,7 @@ export function setupMatchHistory() {
     }
   )
 
+  // 自动更换页面
   watch(
     () => ongoingState.value,
     (state) => {
@@ -627,6 +631,126 @@ export function setupMatchHistory() {
       }
     }
   )
+
+  const gameData = useGameDataStore()
+
+  let isSimulatingKeyboard = false
+  const sendStatsInGame = async (team: 'our-team' | 'their-team', threshold = 0) => {
+    if (
+      !settings.matchHistory.sendKdaInGame ||
+      (ongoingState.value !== 'in-game' && ongoingState.value !== 'champ-select')
+    ) {
+      return
+    }
+
+    console.log('here')
+
+    if (isSimulatingKeyboard) {
+      return
+    }
+
+    isSimulatingKeyboard = true
+
+    const tasks: (() => Promise<any>)[] = []
+
+    if (!summoner.currentSummoner) {
+      return
+    }
+
+    const selfTeam = mh.ongoingPlayers[summoner.currentSummoner.summonerId]?.team
+    if (!selfTeam) {
+      return
+    }
+
+    console.log('here 2')
+
+    const players = Object.values(mh.ongoingPlayers).filter((p) => {
+      if (!p.matchHistory || (!p.championId && !p.summoner)) {
+        return false
+      }
+
+      if (team === 'our-team') {
+        return p.team && p.team === selfTeam
+      } else {
+        return p.team && p.team !== selfTeam
+      }
+    })
+
+    if (!players.length) {
+      isSimulatingKeyboard = false
+      return
+    }
+
+    const texts = players
+      .map((p) => {
+        const analysis = analyzeOnePageMatchHistory(p.id, p.matchHistory!)
+        return {
+          player: p,
+          analysis
+        }
+      })
+      .filter(({ analysis }) => analysis.averageKda >= threshold)
+      .map(
+        ({ player, analysis }) =>
+          `${gameData.champions[player.championId || -1]?.name || player.summoner?.displayName} KDA平均${analysis.averageKda.toFixed(2)}`
+      )
+
+    texts.unshift(
+      `${team === 'our-team' ? '我方' : '敌方'}近${settings.matchHistory.matchHistoryLoadCount}场平均KDA：`
+    )
+
+    if (settings.matchHistory.sendKdaInGameWithDisclaimer) {
+      texts.push(
+        '注意，平均KDA只是参考，要综合考虑所玩位置和对局数据喵，真正的高光时刻在实战中寻找喵~'
+      )
+    }
+
+    if (ongoingState.value === 'champ-select') {
+      if (chat.conversations.championSelect) {
+        for (let i = 0; i < texts.length; i++) {
+          tasks.push(() => chatSend(chat.conversations.championSelect!.id, texts[i]))
+
+          if (i !== texts.length - 1) {
+            tasks.push(() => sleep(50))
+          }
+        }
+      }
+    } else if (ongoingState.value === 'in-game') {
+      for (let i = 0; i < texts.length; i++) {
+        tasks.push(async () => {
+          await call('sendKey', 13, true)
+          await call('sendKey', 13, false)
+          await sleep(50)
+          await call('sendKeys', texts[i])
+          await sleep(50)
+          await call('sendKey', 13, true)
+          await call('sendKey', 13, false)
+        })
+
+        if (i !== texts.length - 1) {
+          tasks.push(() => sleep(50))
+        }
+      }
+    }
+
+    for (const task of tasks) {
+      if (!isSimulatingKeyboard) {
+        return
+      }
+      await task()
+    }
+
+    isSimulatingKeyboard = false
+  }
+
+  // 游戏中模拟文字发送
+  onUpdate('globalKey:PageUp', () => {
+    sendStatsInGame('our-team')
+  })
+
+  onUpdate('globalKey:PageDown', () => {
+    sendStatsInGame('their-team')
+  })
 }
 
 function loadSettingsFromStorage() {
@@ -641,6 +765,12 @@ function loadSettingsFromStorage() {
   settings.matchHistory.matchHistoryLoadCount = getSetting('matchHistory.matchHistoryLoadCount', 40)
   settings.matchHistory.autoRouteOnGameStart = getSetting('matchHistory.autoRouteOnGameStart', true)
   settings.matchHistory.fetchDetailedGame = getSetting('matchHistory.fetchDetailedGame', true)
+  settings.matchHistory.sendKdaInGame = getSetting('matchHistory.sendKdaInGame', false)
+  settings.matchHistory.sendKdaThreshold = getSetting('matchHistory.sendKdaThreshold', 0)
+  settings.matchHistory.sendKdaInGameWithDisclaimer = getSetting(
+    'matchHistory.sendKdaInGameWithDisclaimer',
+    true
+  )
 }
 
 export function setAfterGameFetch(enabled: boolean) {
@@ -704,6 +834,31 @@ export function setFetchDetailedGame(enabled: boolean) {
 
   settings.matchHistory.fetchDetailedGame = enabled
   setSetting('matchHistory.fetchDetailedGame', enabled)
+}
+
+export function setSendKdaInGame(enabled: boolean) {
+  const settings = useSettingsStore()
+
+  settings.matchHistory.sendKdaInGame = enabled
+  setSetting('matchHistory.sendKdaInGame', enabled)
+}
+
+export function setSendKdaThreshold(kda: number) {
+  if (kda < 0) {
+    kda = 0
+  }
+
+  const settings = useSettingsStore()
+
+  settings.matchHistory.sendKdaThreshold = kda
+  setSetting('matchHistory.sendKdaThreshold', kda)
+}
+
+export function sendKdaInGameWithDisclaimer(enabled: boolean) {
+  const settings = useSettingsStore()
+
+  settings.matchHistory.sendKdaInGameWithDisclaimer = enabled
+  setSetting('matchHistory.sendKdaInGameWithDisclaimer', enabled)
 }
 
 export async function fetchTabRankedStats(summonerId: number) {
@@ -1248,6 +1403,7 @@ interface Player {
   kda: number
 }
 
+// 暂未实装
 export function findOutstandingPlayers(
   players: Player[],
   thresholdMultiplier: number = 1.5,

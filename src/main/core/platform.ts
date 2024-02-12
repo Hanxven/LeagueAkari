@@ -1,7 +1,11 @@
 import { randomUUID } from 'crypto'
 import { Notification } from 'electron'
+import { GlobalKeyboardListener } from 'node-global-key-listener'
 
-import { onCall, sendUpdate } from '../utils/ipc'
+import { onCall, sendUpdate, sendUpdateToAll } from '../utils/ipc'
+import sendInputWorker from '../workers/send-input?nodeWorker'
+
+const gkl = new GlobalKeyboardListener()
 
 // 和平台相关的 API，目前仅限 Windows
 export function initWindowsPlatform() {
@@ -24,13 +28,36 @@ export function initWindowsPlatform() {
     n.show()
   })
 
-  // 下等马相关功能，暂停开发
-  // import input from '../native/ltInputWin32x64.node'
-  // onCall('sendKey', (_, key, pressed) => {
-  //   input.sendKey(key, pressed)
-  // })
+  const siw = sendInputWorker({})
 
-  // onCall('sendKeys', (_, str) => {
-  //   input.sendKeys(str)
-  // })
+  onCall('sendKey', (_, key, pressed) => {
+    siw.postMessage({ type: 'key', key, press: pressed })
+  })
+
+  onCall('sendKeys', (_, str) => {
+    siw.postMessage({ type: 'string', data: str })
+  })
+
+  // CTRL+PAGE UP // CTRL+PAGE DOWN
+  let pageUpShortcut = false
+  let pageDownShortcut = false
+  gkl.addListener((event) => {
+    if (event.state === 'DOWN') {
+      if (event.name === 'PAGE UP') {
+        pageUpShortcut = true
+      } else if (event.name === 'PAGE DOWN') {
+        pageDownShortcut = true
+      }
+    }
+
+    if (event.state === 'UP') {
+      if (event.name === 'PAGE UP' && pageUpShortcut) {
+        sendUpdateToAll('globalKey:PageUp')
+        pageUpShortcut = false
+      } else if (event.name === 'PAGE DOWN' && pageDownShortcut) {
+        sendUpdateToAll('globalKey:PageDown')
+        pageDownShortcut = false
+      }
+    }
+  })
 }

@@ -14,6 +14,9 @@ dependencies:
   axios:
     specifier: ^1.6.5
     version: 1.6.5
+  node-global-key-listener:
+    specifier: ^0.1.1
+    version: 0.1.1
   reflect-metadata:
     specifier: ^0.2.1
     version: 0.2.1
@@ -3234,6 +3237,12 @@ packages:
       whatwg-url: 5.0.0
     dev: false
 
+  /node-global-key-listener@0.1.1:
+    resolution: {integrity: sha512-xPuMrjVDJSMWg1VchV4ynrE3I1nCtk84NRZWRr4WiPBAeauBEvmE7bMMmvLZbS7F5Z+xdK6YIhazhervyBINLw==}
+    dependencies:
+      sudo-prompt: 9.2.1
+    dev: false
+
   /node-gyp@8.4.1:
     resolution: {integrity: sha512-olTJRgUtAb/hOXG0E93wZDs5YiJlgbXxTwQAFHyNlRsXQnYzUaF2aGgujZbw+hR8aF4ZG/rST57bWMWD16jr9w==}
     engines: {node: '>= 10.12.0'}
@@ -3811,6 +3820,10 @@ packages:
     dependencies:
       ansi-regex: 6.0.1
     dev: true
+
+  /sudo-prompt@9.2.1:
+    resolution: {integrity: sha512-Mu7R0g4ig9TUuGSxJavny5Rv0egCEtpZRNMrZaYS1vxkiIxGiGUwoezU3LazIQ+KE04hTrTfNPgxU5gzi7F5Pw==}
+    dev: false
 
   /sumchecker@3.0.1:
     resolution: {integrity: sha512-MvjXzkz/BOfyVDkG0oFOtBxHX2u3gKbMHIF/dXblZsgD3BWOFLmHovIpZY7BykJdAjcqRCBi1WYBNdEC9yI7vg==}

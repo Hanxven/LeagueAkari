@@ -23,6 +23,31 @@ void SendUnicode(wchar_t data) {
   SendInput(2, input, sizeof(INPUT));
 }
 
+void SendUnicodeString(const std::u16string& msg) {
+  size_t inputCount = msg.length() * 2;
+  std::vector<INPUT> inputs(inputCount);
+
+  for (size_t i = 0, j = 0; i < msg.length(); ++i, j += 2) {
+    wchar_t ch = msg[i];
+
+    inputs[j].type = INPUT_KEYBOARD;
+    inputs[j].ki.wVk = 0;
+    inputs[j].ki.wScan = ch;
+    inputs[j].ki.dwFlags = KEYEVENTF_UNICODE;
+    inputs[j].ki.time = 0;
+    inputs[j].ki.dwExtraInfo = 0;
+
+    inputs[j + 1].type = INPUT_KEYBOARD;
+    inputs[j + 1].ki.wVk = 0;
+    inputs[j + 1].ki.wScan = ch;
+    inputs[j + 1].ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
+    inputs[j + 1].ki.time = 0;
+    inputs[j + 1].ki.dwExtraInfo = 0;
+  }
+
+  SendInput(static_cast<UINT>(inputs.size()), &inputs[0], sizeof(INPUT));
+}
+
 void SendAscii(wchar_t data, BOOL shift) {
   INPUT input[2];
   memset(input, 0, 2 * sizeof(INPUT));
@@ -70,31 +95,28 @@ Napi::Value SendKeys(const Napi::CallbackInfo& info) {
 
   for (size_t i = 0; i < msg.length(); i++) {
     wchar_t ch = msg[i];
-
-    if (ch >= 0 && ch < 256) {
-      vk = VkKeyScanW(ch);
-
-      if (vk == -1) {
-        SendUnicode(ch);
-      } else {
-        if (vk < 0) {
-          vk = ~vk + 0x1;
-        }
-
-        shift = (vk >> 8) & 0x1;
-
-        if (GetKeyState(VK_CAPITAL) & 0x1) {
-          if ((ch >= L'a' && ch <= L'z') || (ch >= L'A' && ch <= L'Z')) {
-            shift = !shift;
-          }
-        }
-
-        SendAscii(vk & 0xFF, shift);
-      }
-    } else {
-      SendUnicode(ch);
-    }
+    SendUnicode(ch);
   }
+
+  return env.Undefined();
+}
+
+Napi::Value SendKeysX(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  if (info.Length() < 1) {
+    Napi::TypeError::New(env, "League Toolkit - Wrong number of arguments: should be 1.").ThrowAsJavaScriptException();
+    return env.Undefined();
+  }
+
+  if (!info[0].IsString()) {
+    Napi::TypeError::New(env, "League Toolkit - Wrong type of argument 0: should be a string.").ThrowAsJavaScriptException();
+    return env.Undefined();
+  }
+
+  std::u16string msg = info[0].As<Napi::String>().Utf16Value();
+
+  SendUnicodeString(msg);
 
   return env.Undefined();
 }
@@ -231,6 +253,7 @@ Napi::Value UninstallHook(const Napi::CallbackInfo& info) {
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "sendKey"), Napi::Function::New(env, SendKey));
   exports.Set(Napi::String::New(env, "sendKeys"), Napi::Function::New(env, SendKeys));
+  exports.Set(Napi::String::New(env, "sendKeysX"), Napi::Function::New(env, SendKeysX));
   exports.Set(Napi::String::New(env, "setOnKeysPressed"), Napi::Function::New(env, OnKeysPressed));
   exports.Set(Napi::String::New(env, "setOnKeyUpDown"), Napi::Function::New(env, OnKeyUpDown));
   exports.Set(Napi::String::New(env, "install"), Napi::Function::New(env, RegisterHook));
