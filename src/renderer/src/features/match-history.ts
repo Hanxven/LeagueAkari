@@ -703,8 +703,14 @@ export function setupMatchHistory() {
       .filter(({ analysis }) => analysis.averageKda >= threshold)
       .map(
         ({ player, analysis }) =>
-          `${gameData.champions[player.championId || 0]?.name || player.summoner?.displayName} KDA平均${analysis.averageKda.toFixed(2)}`
+          `${gameData.champions[player.championId || 0]?.name || player.summoner?.displayName} 平均KDA${analysis.averageKda.toFixed(2)} 胜率${analysis.winningRate.toFixed(2)}`
       )
+
+    if (settings.matchHistory.sendKdaInGameWithDisclaimer) {
+      texts.unshift(
+        '注意，平均KDA只是参考，要综合考虑所玩位置和对局数据喵，真正的高光时刻应在实战中寻找喵~'
+      )
+    }
 
     texts.unshift(
       `${team === 'our-team' ? '我方' : '敌方'}近${settings.matchHistory.matchHistoryLoadCount}场平均KDA：`
@@ -718,6 +724,9 @@ export function setupMatchHistory() {
           return t.team && t.team !== selfTeam
         }
       })
+
+      const teamName = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+
       if (subTeams.length) {
         for (let i = 0; i < subTeams.length; i++) {
           const identities = subTeams[i].players.map((p) => {
@@ -728,7 +737,9 @@ export function setupMatchHistory() {
             )
           })
 
-          texts.push(`小队${i + 1} ${identities.join(' ')}`)
+          texts.push(
+            `开黑${subTeams.length === 1 ? '' : '小队'}${subTeams.length === 1 ? '' : teamName[i] || i} ${identities.join(' ')}`
+          )
         }
       }
     }
@@ -745,7 +756,7 @@ export function setupMatchHistory() {
           tasks.push(() => chatSend(chat.conversations.championSelect!.id, texts[i]))
 
           if (i !== texts.length - 1) {
-            tasks.push(() => sleep(50))
+            tasks.push(() => sleep(65))
           }
         }
       }
@@ -754,15 +765,15 @@ export function setupMatchHistory() {
         tasks.push(async () => {
           await call('sendKey', 13, true)
           await call('sendKey', 13, false)
-          await sleep(50)
+          await sleep(65)
           await call('sendKeys', texts[i])
-          await sleep(50)
+          await sleep(65)
           await call('sendKey', 13, true)
           await call('sendKey', 13, false)
         })
 
         if (i !== texts.length - 1) {
-          tasks.push(() => sleep(50))
+          tasks.push(() => sleep(65))
         }
       }
     }
