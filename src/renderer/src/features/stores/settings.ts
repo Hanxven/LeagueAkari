@@ -46,6 +46,9 @@ export const useSettingsStore = defineStore('settings', () => {
     // 允许在游戏内发送对局 KDA 信息
     sendKdaInGame: false,
 
+    // 预组队信息
+    sendKdaInGameWithPreMadeTeams: false,
+
     // 发送 KDA 信息需保证 KDA 大于此值
     sendKdaThreshold: 0,
 

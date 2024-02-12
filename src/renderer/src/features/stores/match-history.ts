@@ -76,7 +76,7 @@ export interface SummonerTabMatchHistory {
 
   /** 请求的战绩是否为空，区分未加载和加载为空的情况 */
   isEmpty: boolean
-  
+
   /** 是否请求出错 */
   hasError: boolean
 
@@ -292,6 +292,15 @@ export const useMatchHistoryStore = defineStore('match-history', () => {
     >
   >({})
 
+  const ongoingPreMadeTeamsSimplifiedArray = ref<
+    {
+      players: number[]
+      times: number
+      team: string
+      _id: number
+    }[]
+  >([])
+
   const sendPlayersList = ref<number[]>([])
 
   return {
@@ -319,6 +328,7 @@ export const useMatchHistoryStore = defineStore('match-history', () => {
     ongoingGame,
     ongoingDetailedGamesCache,
     ongoingPreMadeTeams,
+    ongoingPreMadeTeamsSimplifiedArray,
 
     /** 发送信息相关  */
     // 需要发送的对象列表

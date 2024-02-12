@@ -38,7 +38,7 @@
         <OngoingTeam :team="team" :participants="teamPlayers" />
       </NCard>
       <NCard
-        v-if="preMadeTeamsArray.simplified.length"
+        v-if="mh.ongoingPreMadeTeamsSimplifiedArray.length"
         style="background-color: transparent"
         size="small"
       >
@@ -53,7 +53,7 @@
         <div class="pre-made-team">
           <div
             class="group"
-            v-for="g of preMadeTeamsArray.simplified"
+            v-for="g of mh.ongoingPreMadeTeamsSimplifiedArray"
             :class="{
               blue: g.team === '100',
               red: g.team === '200',
@@ -68,11 +68,11 @@
             <div class="players">
               <div v-for="p of g.players" class="image-name-line">
                 <LcuImage
-                  :title="mh.ongoingPlayers[p].summoner?.displayName || p"
+                  :title="mh.ongoingPlayers[p]?.summoner?.displayName || p"
                   class="image"
-                  :src="championIcon(mh.ongoingPlayers[p].championId || -1)"
+                  :src="championIcon(mh.ongoingPlayers[p]?.championId || -1)"
                 />
-                <div class="name">{{ mh.ongoingPlayers[p].summoner?.displayName || p }}</div>
+                <div class="name">{{ mh.ongoingPlayers[p]?.summoner?.displayName || p }}</div>
               </div>
             </div>
           </div>
@@ -99,7 +99,6 @@ import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
 import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
 import { OngoingTeamPlayer, useMatchHistoryStore } from '@renderer/features/stores/match-history'
 import { useSettingsStore } from '@renderer/features/stores/settings'
-import { removeSubsets } from '@renderer/utils/collection'
 
 import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMatchHistoryCardModal.vue'
 import PlayerInfoCard from './PlayerInfoCard.vue'
@@ -144,26 +143,6 @@ const teams = computed(() => {
     },
     {} as Record<string, OngoingTeamPlayer[]>
   )
-})
-
-const preMadeTeamsArray = computed(() => {
-  const teams: { players: number[]; times: number; team: string; _id: number }[] = []
-
-  // 在这里，team 变成了字符串
-  Object.entries(mh.ongoingPreMadeTeams).forEach(([team, preMade]) => {
-    teams.push(...preMade.map((t, i) => ({ ...t, team, _id: i })))
-  })
-
-  // 去除一些不关心的子集，虽然这些子集可能具有更多的共同场次
-  const simplifiedSubsets = removeSubsets(teams, (team) => team.players)
-  const others = teams.filter((v) => {
-    return simplifiedSubsets.findIndex((r) => r._id === v._id) === -1
-  })
-
-  return {
-    simplified: simplifiedSubsets,
-    others
-  }
 })
 
 const [DefineOngoingTeam, OngoingTeam] = createReusableTemplate<{

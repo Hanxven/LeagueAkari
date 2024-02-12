@@ -61,7 +61,7 @@ export function setupAutoSelect() {
           return
         }
 
-        if (settings.autoSelect.onlySimulMode && !session.hasSimultaneousPicks) {
+        if (session.hasSimultaneousPicks && !settings.autoSelect.onlySimulMode) {
           return
         }
 

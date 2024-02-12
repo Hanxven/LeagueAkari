@@ -14,6 +14,7 @@ import { call, onUpdate } from '@renderer/ipc'
 import { router } from '@renderer/routes'
 import { Participant, isPveQueue } from '@renderer/types/match-history'
 import { SummonerInfo } from '@renderer/types/summoner'
+import { removeSubsets } from '@renderer/utils/collection'
 import { sleep } from '@renderer/utils/sleep'
 import { getSetting, setSetting } from '@renderer/utils/storage'
 import { calculateTogetherTimes } from '@renderer/utils/team-up'
@@ -329,6 +330,18 @@ export function setupMatchHistory() {
       )
 
       mh.ongoingPreMadeTeams = markRaw(result)
+
+      const teams: { players: number[]; times: number; team: string; _id: number }[] = []
+
+      // 在这里，team 变成了字符串
+      Object.entries(mh.ongoingPreMadeTeams).forEach(([team, preMade]) => {
+        teams.push(...preMade.map((t, i) => ({ ...t, team, _id: i })))
+      })
+
+      // 去除一些不关心的子集，虽然这些子集可能具有更多的共同场次
+      const simplifiedSubsets = removeSubsets(teams, (team) => team.players)
+
+      mh.ongoingPreMadeTeamsSimplifiedArray = simplifiedSubsets
     },
     500,
     { maxWait: 2000 }
@@ -662,8 +675,6 @@ export function setupMatchHistory() {
       return
     }
 
-    console.log('here 2')
-
     const players = Object.values(mh.ongoingPlayers).filter((p) => {
       if (!p.matchHistory || (!p.championId && !p.summoner)) {
         return false
@@ -692,16 +703,39 @@ export function setupMatchHistory() {
       .filter(({ analysis }) => analysis.averageKda >= threshold)
       .map(
         ({ player, analysis }) =>
-          `${gameData.champions[player.championId || -1]?.name || player.summoner?.displayName} KDA平均${analysis.averageKda.toFixed(2)}`
+          `${gameData.champions[player.championId || 0]?.name || player.summoner?.displayName} KDA平均${analysis.averageKda.toFixed(2)}`
       )
 
     texts.unshift(
       `${team === 'our-team' ? '我方' : '敌方'}近${settings.matchHistory.matchHistoryLoadCount}场平均KDA：`
     )
 
+    if (settings.matchHistory.sendKdaInGameWithPreMadeTeams) {
+      const subTeams = mh.ongoingPreMadeTeamsSimplifiedArray.filter((t) => {
+        if (team === 'our-team') {
+          return t.team && t.team === selfTeam
+        } else {
+          return t.team && t.team !== selfTeam
+        }
+      })
+      if (subTeams.length) {
+        for (let i = 0; i < subTeams.length; i++) {
+          const identities = subTeams[i].players.map((p) => {
+            return (
+              gameData.champions[mh.ongoingPlayers[p]?.championId || 0]?.name ||
+              mh.ongoingPlayers[p]?.summoner?.displayName ||
+              p.toString()
+            )
+          })
+
+          texts.push(`小队${i + 1} ${identities.join(' ')}`)
+        }
+      }
+    }
+
     if (settings.matchHistory.sendKdaInGameWithDisclaimer) {
       texts.push(
-        '注意，平均KDA只是参考，要综合考虑所玩位置和对局数据喵，真正的高光时刻在实战中寻找喵~'
+        '注意，平均KDA只是参考，要综合考虑所玩位置和对局数据喵，真正的高光时刻应在实战中寻找喵~'
       )
     }
 
@@ -770,6 +804,10 @@ function loadSettingsFromStorage() {
   settings.matchHistory.sendKdaInGameWithDisclaimer = getSetting(
     'matchHistory.sendKdaInGameWithDisclaimer',
     true
+  )
+  settings.matchHistory.sendKdaInGameWithPreMadeTeams = getSetting(
+    'matchHistory.sendKdaInGameWithPreMadeTeams',
+    false
   )
 }
 
@@ -854,11 +892,18 @@ export function setSendKdaThreshold(kda: number) {
   setSetting('matchHistory.sendKdaThreshold', kda)
 }
 
-export function sendKdaInGameWithDisclaimer(enabled: boolean) {
+export function setSendKdaInGameWithDisclaimer(enabled: boolean) {
   const settings = useSettingsStore()
 
   settings.matchHistory.sendKdaInGameWithDisclaimer = enabled
   setSetting('matchHistory.sendKdaInGameWithDisclaimer', enabled)
+}
+
+export function setSendKdaInGameWithPreMadeTeams(enabled: boolean) {
+  const settings = useSettingsStore()
+
+  settings.matchHistory.sendKdaInGameWithPreMadeTeams = enabled
+  setSetting('matchHistory.sendKdaInGameWithPreMadeTeams', enabled)
 }
 
 export async function fetchTabRankedStats(summonerId: number) {

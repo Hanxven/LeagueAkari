@@ -116,6 +116,18 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        label="KDA 发送时附带预组队信息"
+        label-description="在发送 KDA 数据时，将可能的预组队信息也一并发送"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="settings.matchHistory.sendKdaInGameWithPreMadeTeams"
+          @update:value="(val) => setSendKdaInGameWithPreMadeTeams(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         label="KDA 发送附带免责声明"
         label-description="在发送 KDA 数据时，在最后附带一条免责声明"
         :label-width="320"
@@ -123,7 +135,7 @@
         <NSwitch
           size="small"
           :value="settings.matchHistory.sendKdaInGameWithDisclaimer"
-          @update:value="(val) => sendKdaInGameWithDisclaimer(val)"
+          @update:value="(val) => setSendKdaInGameWithDisclaimer(val)"
         />
       </ControlItem>
     </NCard>
@@ -134,13 +146,14 @@
 import { NCard, NInputNumber, NScrollbar, NSwitch } from 'naive-ui'
 
 import {
-  sendKdaInGameWithDisclaimer,
   setAfterGameFetch,
   setAutoRouteOnGameStart,
   setFetchDetailedGame,
   setMatchHistoryLoadCount,
   setPreMadeThreshold,
   setSendKdaInGame,
+  setSendKdaInGameWithDisclaimer,
+  setSendKdaInGameWithPreMadeTeams,
   setSendKdaThreshold,
   setTeamAnalysisPreloadCount
 } from '@renderer/features/match-history'
