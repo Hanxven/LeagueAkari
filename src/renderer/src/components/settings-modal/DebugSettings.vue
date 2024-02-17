@@ -94,7 +94,9 @@
     </NCard>
     <NCard v-if="appState.isAdmin" size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">League Toolkit</span></template>
-      <span class="text">League Toolkit 运行在管理员权限，仅用于实现命令行获取以及特定的客户端功能</span>
+      <span class="text"
+        >League Toolkit 运行在管理员权限，仅用于实现命令行获取以及特定的客户端功能</span
+      >
     </NCard>
   </NScrollbar>
 </template>
@@ -108,9 +110,9 @@ import {
   NCheckbox,
   NCollapseTransition,
   NDataTable,
+  NFlex,
   NModal,
   NScrollbar,
-  NSpace,
   NTable
 } from 'naive-ui'
 import { computed, h, nextTick, ref, useCssModule, watch } from 'vue'
@@ -189,7 +191,7 @@ const columns: DataTableColumn<any>[] = [
     fixed: 'right',
     width: 50,
     render: (row) => {
-      return h(NSpace, { size: 4 }, () => [
+      return h(NFlex, { size: 4 }, () => [
         h(
           NButton,
           {

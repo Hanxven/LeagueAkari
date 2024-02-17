@@ -406,7 +406,7 @@ export function setupMatchHistory() {
 
     try {
       const { myTeam, theirTeam } = (await getChampSelectSession()).data
-      
+
       // 异步加载当前的游戏模式
       ;(async () => {
         const {
@@ -824,11 +824,11 @@ export function setupMatchHistory() {
 
   // 游戏中模拟文字发送
   onUpdate('globalKey:PageUp', () => {
-    sendStatsInGame('our-team')
+    sendStatsInGame('our-team', settings.matchHistory.sendKdaThreshold)
   })
 
   onUpdate('globalKey:PageDown', () => {
-    sendStatsInGame('their-team')
+    sendStatsInGame('their-team', settings.matchHistory.sendKdaThreshold)
   })
 }
 
