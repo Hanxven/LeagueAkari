@@ -13,7 +13,7 @@
         :value="chat.me?.availability"
         @update:value="(a) => handleChangeAvailability(a)"
       >
-        <NSpace :size="4">
+        <NFlex :size="4">
           <NRadio value="chat">聊天</NRadio>
           <NRadio value="mobile">在线分组</NRadio>
           <NRadio value="away">离开</NRadio>
@@ -21,14 +21,14 @@
           <NRadio value="dnd" title="不在游戏进程中时，通常情况下无法手动切换到此状态"
             >游戏中</NRadio
           >
-        </NSpace>
+        </NFlex>
       </NRadioGroup>
     </ControlItem>
   </NCard>
 </template>
 
 <script setup lang="ts">
-import { NCard, NRadio, NRadioGroup, NSpace } from 'naive-ui'
+import { NCard, NRadio, NRadioGroup, NFlex } from 'naive-ui'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
 import { notify } from '@renderer/events/notifications'
