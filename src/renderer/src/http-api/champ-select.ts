@@ -26,10 +26,6 @@ export function action(actionId: string | number, data: any) {
   })
 }
 
-// 额外的一层封装, 包含了选择英雄和ban英雄.
-// completed字段表示是否决定, 比如选英雄的时候, 为false的时候只是亮出来, true的时候才是真正的确认
-// 玩家可执行的操作（如 ban 或 pick）被称为 action，在游戏开始时系统会为每个玩家所在的格子分配一个 action ID，通过这个 ID 即可执行 action
-// 十名玩家占十个格子，一般来说只有五个格子是可见的（就是队友的），十个格子都可见，可能是当年的互选模式吧
 export function pickOrBan(
   championId: number,
   completed: boolean,
@@ -37,6 +33,10 @@ export function pickOrBan(
   actionId: number
 ) {
   return action(actionId, { championId, completed, type })
+}
+
+export function intentChampion(actionId: number, championId: number) {
+  return action(actionId, { championId })
 }
 
 export function getSession() {

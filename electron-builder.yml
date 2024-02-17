@@ -47,6 +47,6 @@ linux:
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-# publish:
+publish:
 #   provider: generic
 #   url: https://league-toolkit.cocoa.sugar/releases

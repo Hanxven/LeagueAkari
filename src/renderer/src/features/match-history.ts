@@ -1,4 +1,5 @@
 import { useDebounceFn } from '@vueuse/core'
+import { prefix } from 'naive-ui/es/_utils/cssr'
 import { computed, markRaw, watch } from 'vue'
 
 import { useStableComputed } from '@renderer/compositions/useStableComputed'
@@ -127,7 +128,8 @@ export function setupMatchHistory() {
     mh.ongoingPlayers = {}
     mh.ongoingDetailedGamesCache = {}
     mh.ongoingPreMadeTeams = {}
-    mh.sendPlayersList = []
+    mh.ongoingPreMadeTeamsSimplifiedArray = []
+    mh.sendPlayers = {}
   }
 
   // 加载对局中玩家的各种信息
@@ -404,7 +406,7 @@ export function setupMatchHistory() {
 
     try {
       const { myTeam, theirTeam } = (await getChampSelectSession()).data
-
+      
       // 异步加载当前的游戏模式
       ;(async () => {
         const {
@@ -436,6 +438,10 @@ export function setupMatchHistory() {
       const t = theirTeam
         .filter((p) => p.summonerId)
         .map((t, i) => ({ summonerId: t.summonerId, team: 200, order: i }))
+
+      ;[...m, ...t].forEach((t) => {
+        mh.sendPlayers[t.summonerId] = true
+      })
 
       await Promise.all([
         [...m, ...t].map(async (o) => loadPlayerStats(o.summonerId, o.team.toString(), o.order))
@@ -503,6 +509,13 @@ export function setupMatchHistory() {
             order: i,
             championId: t.championId
           }))
+
+        ;[...teamOne, ...teamTwo].forEach((t) => {
+          if (mh.sendPlayers[t.summonerId]) {
+            return
+          }
+          mh.sendPlayers[t.summonerId] = true
+        })
 
         await Promise.all([
           [...t1, ...t2].map(async (o) =>
@@ -656,8 +669,6 @@ export function setupMatchHistory() {
       return
     }
 
-    console.log('here')
-
     if (isSimulatingKeyboard) {
       return
     }
@@ -692,29 +703,53 @@ export function setupMatchHistory() {
       return
     }
 
-    const texts = players
-      .map((p) => {
-        const analysis = analyzeOnePageMatchHistory(p.id, p.matchHistory!)
-        return {
-          player: p,
-          analysis
-        }
-      })
-      .filter(({ analysis }) => analysis.averageKda >= threshold)
-      .map(
-        ({ player, analysis }) =>
-          `${gameData.champions[player.championId || 0]?.name || player.summoner?.displayName} 平均KDA${analysis.averageKda.toFixed(2)} 胜率${analysis.winningRate.toFixed(2)}`
-      )
+    const sendPlayers = players.filter((p) => mh.sendPlayers[p.id])
 
-    if (settings.matchHistory.sendKdaInGameWithDisclaimer) {
-      texts.unshift(
+    const texts: string[] = []
+
+    if (sendPlayers.length && settings.matchHistory.sendKdaInGameWithDisclaimer) {
+      texts.push(
         '注意，平均KDA只是参考，要综合考虑所玩位置和对局数据喵，真正的高光时刻应在实战中寻找喵~'
       )
     }
 
-    texts.unshift(
-      `${team === 'our-team' ? '我方' : '敌方'}近${settings.matchHistory.matchHistoryLoadCount}场平均KDA：`
-    )
+    if (sendPlayers.length) {
+      const prefixText =
+        sendPlayers.length === 1
+          ? sendPlayers[0].summoner?.displayName || ''
+          : team === 'our-team'
+            ? '我方'
+            : '敌方'
+      texts.push(`${prefixText}近${settings.matchHistory.matchHistoryLoadCount}场平均KDA：`)
+    }
+
+    sendPlayers
+      .map((p) => {
+        const analysis = getAnalysis(withSelfParticipantMatchHistory(p.matchHistory || [], p.id))
+        return {
+          player: p,
+          analysis,
+          isEmpty: !p.matchHistory || p.matchHistory.length === 0
+        }
+      })
+      .filter(({ analysis }) => analysis.averageKda >= threshold)
+      .map(({ player, analysis, isEmpty }) => {
+        const name =
+          gameData.champions[player.championId || 0]?.name || player.summoner?.displayName
+
+        if (isEmpty) {
+          return `${name} 近期无有效对局`
+        }
+
+        const field1 =
+          analysis.winningStreak > 3
+            ? ` ${analysis.winningStreak}连胜`
+            : analysis.losingStreak > 3
+              ? ` ${analysis.losingStreak}连败`
+              : ''
+        return `${name} 平均KDA ${analysis.averageKda.toFixed(2)} 胜率${analysis.winningRate.toFixed()}${field1}`
+      })
+      .forEach((t) => texts.push(t))
 
     if (settings.matchHistory.sendKdaInGameWithPreMadeTeams) {
       const subTeams = mh.ongoingPreMadeTeamsSimplifiedArray.filter((t) => {
@@ -744,10 +779,9 @@ export function setupMatchHistory() {
       }
     }
 
-    if (settings.matchHistory.sendKdaInGameWithDisclaimer) {
-      texts.push(
-        '注意，平均KDA只是参考，要综合考虑所玩位置和对局数据喵，真正的高光时刻应在实战中寻找喵~'
-      )
+    if (!texts.length) {
+      isSimulatingKeyboard = false
+      return
     }
 
     if (ongoingState.value === 'champ-select') {
@@ -818,7 +852,7 @@ function loadSettingsFromStorage() {
   )
   settings.matchHistory.sendKdaInGameWithPreMadeTeams = getSetting(
     'matchHistory.sendKdaInGameWithPreMadeTeams',
-    false
+    true
   )
 }
 
@@ -973,91 +1007,6 @@ export async function fetchTabSummoner(summonerId: number) {
   return null
 }
 
-function analyzeOnePageMatchHistory(summonerId: number, games: MatchHistoryGame[]) {
-  let winningStreak = 0
-  let wins = 0
-  let isOnAWinningStreak = true
-  let kdaSum = 0
-  let validGames = 0
-  const champMap = new Map<
-    number,
-    {
-      count: number
-      win: number
-      kda: number
-    }
-  >()
-
-  for (let i = 0; i < games.length; i++) {
-    let self: Participant
-
-    if (!games[i].isDetailed) {
-      self = games[i].game.participants[0]
-    } else {
-      const pId = games[i].game.participantIdentities.find(
-        (p) => p.player.summonerId === summonerId
-      )!.participantId
-      self = games[i].game.participants.find((p) => pId === p.participantId)!
-    }
-
-    // 匹配的对局 && 不是人机局 && 不是重开局
-    if (
-      games[i].game.gameType === 'MATCHED_GAME' &&
-      !isPveQueue(games[i].game.queueId) &&
-      !self.stats.gameEndedInEarlySurrender
-    ) {
-      validGames++
-    } else {
-      continue
-    }
-
-    if (!champMap.has(self.championId)) {
-      champMap.set(self.championId, {
-        count: 0,
-        win: 0,
-        kda: 0
-      })
-    }
-
-    const champ = champMap.get(self.championId)!
-    champ.count++
-    champ.kda += (self.stats.kills + self.stats.assists) / (self.stats.deaths || 1)
-
-    if (self.stats.win) {
-      if (isOnAWinningStreak) {
-        winningStreak++
-      }
-      wins++
-      champMap.get(self.championId)!.win++
-    } else {
-      isOnAWinningStreak = false
-    }
-
-    kdaSum += (self.stats.kills + self.stats.assists) / (self.stats.deaths || 1)
-  }
-
-  for (const [_, info] of champMap) {
-    info.kda /= info.count
-  }
-
-  const champions = Array.from(champMap)
-    .sort((a, b) => {
-      return b[1].count === a[1].count ? a[0] - b[0] : b[1].count - a[1].count
-    })
-    .map((v) => ({
-      championId: v[0],
-      ...v[1]
-    }))
-
-  return {
-    winningStreak,
-    averageKda: kdaSum / validGames,
-    validGames,
-    winningRate: (wins / (validGames || 1)) * 100,
-    champions
-  }
-}
-
 export async function fetchTabMatchHistory(
   summonerId: number,
   page: number = 1,
@@ -1136,14 +1085,6 @@ export async function fetchTabMatchHistory(
         })
 
         Promise.allSettled(tasks).catch()
-      }
-
-      // 统计信息
-      if (page === 1 && tab.data.matchHistory.games.length > 0) {
-        // TODO SOME ANALYSIS
-        // 该功能作用不大，暂未实装，在版本后弃用
-        const result = analyzeOnePageMatchHistory(tab.id, tab.data.matchHistory.games)
-        tab.data.firstPageAnalysis = result
       }
 
       return matchHistory
@@ -1254,11 +1195,12 @@ export async function fetchTabFullData(summonerId: number, silent = true) {
   })
 }
 
-// TODO 搁置功能
-export function setSendPlayerList(list: number[]) {
+export function setInGameKdaSendPlayer(summonerId: number, send: boolean) {
   const mh = useMatchHistoryStore()
 
-  mh.sendPlayersList = list
+  if (mh.sendPlayers[summonerId] !== undefined) {
+    mh.sendPlayers[summonerId] = send
+  }
 }
 
 export interface SelfParticipantGame extends MatchHistoryGame {

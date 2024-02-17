@@ -47,6 +47,18 @@
     </ControlItem>
     <ControlItem
       class="control-item-margin"
+      label="提前预选"
+      label-description="预选即将自动选用的英雄"
+    >
+      <NSwitch
+        type="pick"
+        size="small"
+        :value="settings.autoSelect.showIntent"
+        @update:value="(val) => setShowIntent(val)"
+      />
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
       label="选择策略"
       label-description="立即锁定或只是亮出"
     >
@@ -100,19 +112,6 @@
         @update:value="(list) => setBenchModeExpectedChampions(list)"
       />
     </ControlItem>
-    <ControlItem class="control-item-margin" label="反馈在聊天室">
-      <template #labelDescription
-        >将即将进行的操作打印在当前聊天室。这些消息<span
-          style="font-weight: 700; font-style: italic"
-          >仅自己可见</span
-        ></template
-      >
-      <NSwitch
-        @update:value="(v) => setBenchActionNotifyInChat(v)"
-        :value="settings.autoSelect.benchActionNotifyInChat"
-        size="small"
-      ></NSwitch>
-    </ControlItem>
     <div class="divider"></div>
     <ControlItem
       class="control-item-margin"
@@ -158,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { NCard, NInputNumber, NSwitch } from 'naive-ui'
+import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
 import OrderedChampionList from '@renderer/components/OrderedChampionList.vue'
@@ -167,7 +166,6 @@ import {
   setAutoSelectCompleted,
   setBanRandomly,
   setBanTeammateIntendedChampion,
-  setBenchActionNotifyInChat,
   setBenchModeAutoSelectEnabled,
   setBenchModeExpectedChampions,
   setGrabDelay,
@@ -176,7 +174,8 @@ import {
   setNormalModeExpectedChampions,
   setOnlySimulMode,
   setSelectRandomly,
-  setSelectTeammateIntendedChampion
+  setSelectTeammateIntendedChampion,
+  setShowIntent
 } from '@renderer/features/auto-select'
 import { useSettingsStore } from '@renderer/features/stores/settings'
 

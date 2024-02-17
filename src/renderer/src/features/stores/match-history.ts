@@ -100,29 +100,6 @@ export interface TabState {
   /** 战绩列表细节 */
   matchHistory: SummonerTabMatchHistory
 
-  /** 对最近的 %d 场战绩进行分析的结果，仅分析第一页 */
-  firstPageAnalysis?: {
-    /** 玩家的最大连胜局数 */
-    winningStreak: number
-
-    /** 当前胜率 */
-    winningRate: number
-
-    /** 计入统计的有效局数 */
-    validGames: number
-
-    /** 平均 KDA */
-    averageKda: number
-
-    /** 英雄的使用统计，包括平均 KDA，使用数量等 */
-    champions: {
-      championId: number
-      count: number
-      win: number
-      kda: number
-    }[]
-  }
-
   detailedGamesCache: LruMap<number, Game>
 
   /** 加载中状态 */
@@ -301,7 +278,7 @@ export const useMatchHistoryStore = defineStore('match-history', () => {
     }[]
   >([])
 
-  const sendPlayersList = ref<number[]>([])
+  const sendPlayers = ref<Record<string | number, boolean>>({})
 
   return {
     tabs,
@@ -330,8 +307,7 @@ export const useMatchHistoryStore = defineStore('match-history', () => {
     ongoingPreMadeTeams,
     ongoingPreMadeTeamsSimplifiedArray,
 
-    /** 发送信息相关  */
-    // 需要发送的对象列表
-    sendPlayersList
+    /** KDA 发送信息相关  */
+    sendPlayers
   }
 })

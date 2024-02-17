@@ -39,7 +39,7 @@
       </NCard>
       <NCard
         v-if="mh.ongoingPreMadeTeamsSimplifiedArray.length"
-        style="background-color: transparent"
+        style="background-color: transparent; margin-bottom: 12px"
         size="small"
       >
         <template #header
@@ -78,6 +78,32 @@
           </div>
         </div>
       </NCard>
+      <NCard
+        v-if="settings.matchHistory.sendKdaInGame"
+        style="background-color: transparent"
+        size="small"
+      >
+        <template #header><span class="card-header-title">KDA 简报</span></template>
+        <span style="font-size: 13px; margin-bottom: 12px; display: block"
+          >在英雄选择中或游戏内发送 KDA 简报已启用，在设置 -> 战绩 -> KDA 简报 中配置通用选项。
+        </span>
+        <ControlItem label="发送这些玩家的简报" label-description="只发送这些玩家的简报">
+          <div
+            v-for="(team, index) of teams"
+            :key="index"
+            style="display: flex; flex-wrap: wrap; margin-bottom: 4px"
+          >
+            <NCheckbox
+              size="small"
+              v-for="player of team"
+              :key="player.id"
+              :checked="mh.sendPlayers[player.id]"
+              @update:checked="(val) => setInGameKdaSendPlayer(player.id, val)"
+              >{{ player.summoner?.displayName || player.id }}</NCheckbox
+            >
+          </div>
+        </ControlItem>
+      </NCard>
     </div>
     <div v-else class="no-ongoing-game">
       <div>League Toolkit</div>
@@ -88,13 +114,15 @@
 
 <script setup lang="ts">
 import { createReusableTemplate } from '@vueuse/core'
-import { NCard } from 'naive-ui'
+import { NCard, NCheckbox } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import ControlItem from '@renderer/components/ControlItem.vue'
 import LcuImage from '@renderer/components/LcuImage.vue'
 import { useKeepAliveScrollPositionMemo } from '@renderer/compositions/useKeepAliveScrollPositionMemo'
 import { championIcon } from '@renderer/features/game-data'
+import { setInGameKdaSendPlayer } from '@renderer/features/match-history'
 import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
 import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
 import { OngoingTeamPlayer, useMatchHistoryStore } from '@renderer/features/stores/match-history'
@@ -285,22 +313,6 @@ useKeepAliveScrollPositionMemo(el)
     &.red .team-side {
       color: rgb(240, 120, 68);
     }
-  }
-}
-
-// Toolkit 页面的通用样式，但略微不同
-.control-line {
-  display: flex;
-  align-items: center;
-  height: 30px;
-
-  .label {
-    font-size: 13px;
-    width: 160px;
-  }
-
-  &:not(:last-child) {
-    margin-bottom: 8px;
   }
 }
 </style>

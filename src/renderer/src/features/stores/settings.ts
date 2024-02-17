@@ -47,13 +47,13 @@ export const useSettingsStore = defineStore('settings', () => {
     sendKdaInGame: false,
 
     // 预组队信息
-    sendKdaInGameWithPreMadeTeams: false,
+    sendKdaInGameWithPreMadeTeams: true,
 
     // 发送 KDA 信息需保证 KDA 大于此值
     sendKdaThreshold: 0,
 
     // 在后面附加免责声明
-    sendKdaInGameWithDisclaimer: true,
+    sendKdaInGameWithDisclaimer: true
   })
 
   const autoAccept = reactive({
@@ -79,6 +79,8 @@ export const useSettingsStore = defineStore('settings', () => {
 
     selectRandomly: false,
 
+    showIntent: false,
+
     // 是否立即秒选
     completed: false,
 
@@ -86,9 +88,6 @@ export const useSettingsStore = defineStore('settings', () => {
     benchModeEnabled: false,
 
     benchExpectedChampions: [] as number[],
-
-    // 是否在聊天室进行提示
-    benchActionNotifyInChat: true,
 
     // 选择的延迟，单位秒
     grabDelay: 1,

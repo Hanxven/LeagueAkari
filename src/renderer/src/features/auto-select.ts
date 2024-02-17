@@ -1,7 +1,8 @@
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 
+import { useStableRef } from '@renderer/compositions/useStableRef'
 import { notify } from '@renderer/events/notifications'
-import { benchSwap, getChampSelectSession, pickOrBan } from '@renderer/http-api/champ-select'
+import { action, benchSwap, pickOrBan } from '@renderer/http-api/champ-select'
 import { chatSend } from '@renderer/http-api/chat'
 import { Action, ChampSelectSummoner } from '@renderer/types/champ-select'
 import { getSetting, removeSetting, setSetting } from '@renderer/utils/storage'
@@ -9,6 +10,7 @@ import { getSetting, removeSetting, setSetting } from '@renderer/utils/storage'
 import { useChampSelectStore } from './stores/lcu/champ-select'
 import { useChatStore } from './stores/lcu/chat'
 import { useGameDataStore } from './stores/lcu/game-data'
+import { useGameflowStore } from './stores/lcu/gameflow'
 import { useSummonerStore } from './stores/lcu/summoner'
 import { useSettingsStore } from './stores/settings'
 import { onLcuEvent } from './update/lcu-events'
@@ -24,14 +26,192 @@ export function setupAutoSelect() {
   const cs = useChampSelectStore()
   const gameData = useGameDataStore()
   const summoner = useSummonerStore()
-  // const chat = useChatStore()
+  const gameflow = useGameflowStore()
+  const chat = useChatStore()
 
   loadSettingsFromStorage()
 
-  let isDoingPick = false
-  let isDoingBan = false
+  const getRandomValue = () => {
+    return Math.floor(Math.random() * 1.14514e12)
+  }
+
+  let randomlyPickSeed = 1.14e12
+  let randomlyBanSeed = 5.14e11
+  watch(
+    () => gameflow.phase,
+    (phase) => {
+      if (phase === 'ChampSelect') {
+        randomlyPickSeed = getRandomValue()
+        randomlyBanSeed = getRandomValue()
+      }
+    }
+  )
+
+  // 这个响应式变量指示了自动选择即将选择的英雄
+  const currentPickActionChampion = computed(() => {
+    if (!cs.session || !settings.autoSelect.expectedChampions || !summoner.currentSummoner) {
+      return null
+    }
+
+    if (!settings.autoSelect.normalModeEnabled) {
+      return null
+    }
+
+    if (!cs.session.hasSimultaneousPicks && settings.autoSelect.onlySimulMode) {
+      return null
+    }
+
+    let hasPickAction = false
+    for (const arr of cs.session.actions) {
+      if (arr.findIndex((a) => a.type === 'pick') !== -1) {
+        hasPickAction = true
+        break
+      }
+    }
+
+    if (!hasPickAction) {
+      return null
+    }
+
+    const self = cs.session.myTeam.find(
+      (t) => t.summonerId === summoner.currentSummoner?.summonerId
+    )
+
+    if (!self) {
+      return null
+    }
+
+    const unselectableChampions = [...cs.session.myTeam, ...cs.session.theirTeam].reduce(
+      (prev, cur) => {
+        if (cur.championId && cur.summonerId !== summoner.currentSummoner!.summonerId) {
+          prev.add(cur.championId)
+        }
+        return prev
+      },
+      new Set<number>()
+    )
+
+    cs.session.actions.forEach((ar) =>
+      ar.forEach((a) => {
+        if (a.type === 'ban' && a.completed) {
+          unselectableChampions.add(a.championId)
+        }
+      })
+    )
+
+    if (!settings.autoSelect.selectTeammateIntendedChampion) {
+      cs.session.myTeam.forEach((m) => {
+        if (m.championPickIntent && m.summonerId !== summoner.currentSummoner!.summonerId) {
+          unselectableChampions.add(m.championPickIntent)
+        }
+      })
+    }
+
+    ;[...cs.session.bans.myTeamBans, ...cs.session.bans.theirTeamBans].forEach((c) =>
+      unselectableChampions.add(c)
+    )
+
+    const expected = [...settings.autoSelect.expectedChampions]
+
+    const pickableChampions = expected.filter(
+      (c) => !unselectableChampions.has(c) && cs.currentPickableChampions.has(c)
+    )
+
+    if (pickableChampions.length === 0) {
+      return null
+    }
+
+    const candidate =
+      settings.autoSelect.selectRandomly && !self!.championPickIntent
+        ? pickableChampions[randomlyPickSeed % pickableChampions.length]
+        : pickableChampions[0]
+
+    // 已经选择的英雄将不再触发操作
+    if (!settings.autoSelect.completed && self!.championId === candidate) {
+      return null
+    }
+
+    return candidate
+  })
+
+  // 在选择之前实时更新预选
+  watch(
+    () => currentPickActionChampion.value,
+    (id) => {
+      if (!settings.autoSelect.showIntent) {
+        return
+      }
+
+      if (id && cs.session && summoner.currentSummoner) {
+        const cellId = cs.session.myTeam.find(
+          (c) => c.summonerId === summoner.currentSummoner!.summonerId
+        )!.cellId
+
+        for (const arr of cs.session.actions) {
+          const a = arr.find((c) => c.actorCellId === cellId && c.type === 'pick')
+
+          if (a) {
+            if (!a.isInProgress && !a.completed) {
+              action(a.id, { championId: id }).catch()
+            }
+            break
+          }
+        }
+      }
+    }
+  )
+
+  const activeSummonerState = useStableRef<{
+    actionType: string
+    actions: Pick<Action, 'id' | 'type'>[]
+    cellId: number
+  } | null>(null)
+
+  watch(
+    () => gameflow.phase,
+    (phase) => {
+      if (phase !== 'ChampSelect') {
+        activeSummonerState.value = null
+      }
+    }
+  )
+
+  watch(
+    () => chat.conversations.championSelect?.id,
+    (id) => {
+      if (id && gameflow.phase === 'ChampSelect') {
+        if (!cs.session) {
+          return
+        }
+        const texts: string[] = []
+        if (!cs.session.benchEnabled && settings.autoSelect.normalModeEnabled) {
+          texts.push('普通模式自动选择')
+        }
+        if (cs.session.benchEnabled && settings.autoSelect.benchModeEnabled) {
+          texts.push('随机模式自动选择')
+        }
+        if (!cs.session.benchEnabled && settings.autoSelect.banEnabled) {
+          let hasBanAction = false
+          for (const arr of cs.session.actions) {
+            if (arr.findIndex((a) => a.type === 'ban') !== -1) {
+              hasBanAction = true
+              break
+            }
+          }
+          if (hasBanAction) {
+            texts.push('自动禁用')
+          }
+        }
+        if (texts.length) {
+          chatSend(id, `[League Toolkit] ${texts.join('，')}已开启`, 'celebration').catch()
+        }
+      }
+    }
+  )
+
   onLcuEvent<ChampSelectSummoner>('/lol-champ-select/v1/summoners/*', async (event) => {
     if (event.eventType === 'Delete') {
+      activeSummonerState.value = null
       return
     }
 
@@ -39,181 +219,150 @@ export function setupAutoSelect() {
       return
     }
 
-    if (!summoner.currentSummoner) {
+    if (!cs.session) {
       return
     }
 
-    switch (event.data.activeActionType) {
-      case 'pick': {
-        if (!settings.autoSelect.normalModeEnabled) {
-          return
-        }
+    const myInProgressActions = cs.session.actions.reduce((p, c) => {
+      const action = c.find((a) => a.actorCellId === event.data.cellId)
+      if (action && action.isInProgress) {
+        p.push(action)
+      }
+      return p
+    }, [] as Action[])
 
-        const session = (await getChampSelectSession()).data
+    activeSummonerState.value = {
+      actionType: event.data.activeActionType,
+      cellId: event.data.cellId,
+      actions: myInProgressActions.map((a) => ({
+        id: a.id,
+        type: a.type
+      }))
+    }
+  })
 
-        if (!session) {
-          return
-        }
-
-        // 在用户手动选择其他的时候，不会自动改回去，championId 为 0 为未选。另外，样式会先于 championId 发生变化
-        // 如 background-image: url('/lol-game-data/assets/v1/champion-icons/5.png')
-        if (event.data.championId || event.data.championIconStyle.includes('background-image')) {
-          return
-        }
-
-        if (session.hasSimultaneousPicks && !settings.autoSelect.onlySimulMode) {
-          return
-        }
-
-        if (isDoingPick) {
-          return
-        }
-
-        // 客户端在英雄选择阶段，分为若干个 action 阶段
-        // 比如竞技场中，有三个 action 阶段:
-        // 分别是 ban 阶段 (10 名玩家各自有一个 ban 的 action)
-        // pick 1 阶段 (奇数位置的玩家各自有一个 pick 的 action)
-        // pick 2 阶段 (偶数位置的玩家各自有一个 pick 的 action)
-        // 这样的流程，表现为一个 actions[][] 的数组
-        const myInProgressActions = session.actions.reduce((p, c) => {
-          const action = c.find((a) => a.actorCellId === event.data.cellId)
-          if (action && action.isInProgress) {
-            p.push(action)
-          }
-          return p
-        }, [] as Action[])
-
-        const firstPickAction = myInProgressActions.find((a) => a.type === 'pick')
-        if (firstPickAction) {
-          // 场上出现的英雄，不能选
-          const unselectableChampions = [...session.myTeam, ...session.theirTeam].reduce(
-            (prev, cur) => {
-              if (cur.championId && cur.summonerId !== summoner.currentSummoner!.summonerId) {
-                prev.add(cur.championId)
-              }
-              return prev
-            },
-            new Set<number>()
-          )
-
-          if (!settings.autoSelect.selectTeammateIntendedChampion) {
-            session.myTeam.forEach((m) => {
-              if (m.championPickIntent && m.summonerId !== summoner.currentSummoner!.summonerId) {
-                unselectableChampions.add(m.championPickIntent)
-              }
-            })
-          }
-
-          // ban 位出现的英雄也不能选
-          ;[...session.bans.myTeamBans, ...session.bans.theirTeamBans].forEach((c) =>
-            unselectableChampions.add(c)
-          )
-
-          const pickableChampions = settings.autoSelect.expectedChampions.filter(
-            (c) => !unselectableChampions.has(c) && cs.currentPickableChampions.has(c)
-          )
-
-          if (pickableChampions.length === 0) {
-            return
-          }
-
-          const candidate = settings.autoSelect.selectRandomly
-            ? pickableChampions[Math.floor(Math.random() * pickableChampions.length)]
-            : pickableChampions[0]
-
-          isDoingPick = true
-          try {
-            await pickOrBan(candidate, settings.autoSelect.completed, 'pick', firstPickAction.id)
-          } catch (err) {
-            notify.emit({
-              id,
-              content: `尝试自动选择英雄时失败，尝试选择 ${
-                gameData.champions[candidate]?.name || candidate
-              }`,
-              type: 'warning',
-              extra: { error: err }
-            })
-          } finally {
-            isDoingPick = false
-          }
-        }
-        break
+  watch(
+    () => activeSummonerState.value,
+    async (s) => {
+      if (!s) {
+        return
       }
 
-      case 'ban': {
+      if (!summoner.currentSummoner) {
+        return
+      }
+
+      if (s.actionType === 'pick') {
+        if (!currentPickActionChampion.value) {
+          if (chat.conversations.championSelect && settings.autoSelect.normalModeEnabled) {
+            chatSend(
+              chat.conversations.championSelect.id,
+              '[League Toolkit] 无可用英雄供自动选择',
+              'celebration'
+            ).catch()
+          }
+          return
+        }
+
+        const firstPickAction = s.actions.find((a) => a.type === 'pick')
+
+        if (!firstPickAction) {
+          return
+        }
+
+        try {
+          await pickOrBan(
+            currentPickActionChampion.value,
+            settings.autoSelect.completed,
+            'pick',
+            firstPickAction.id
+          )
+        } catch (err) {
+          notify.emit({
+            id,
+            content: `尝试自动选择英雄时失败，尝试选择 ${
+              gameData.champions[currentPickActionChampion.value]?.name ||
+              currentPickActionChampion.value
+            }`,
+            type: 'warning',
+            extra: { error: err }
+          })
+        }
+      } else if (s.actionType === 'ban') {
         if (!settings.autoSelect.banEnabled) {
           return
         }
 
-        if (isDoingBan) {
+        if (!cs.session) {
           return
         }
 
-        const session = (await getChampSelectSession()).data
+        const firstBanAction = s.actions.find((a) => a.type === 'ban')
 
-        if (!session) {
+        if (!firstBanAction) {
           return
         }
 
-        const myInProgressActions = session.actions.reduce((p, c) => {
-          const action = c.find((a) => a.actorCellId === event.data.cellId)
-          if (action && action.isInProgress) {
-            p.push(action)
+        const unbannableChampions = [
+          ...cs.session.bans.myTeamBans,
+          ...cs.session.bans.theirTeamBans
+        ].reduce((prev, cur) => {
+          if (cur) {
+            prev.add(cur)
           }
-          return p
-        }, [] as Action[])
+          return prev
+        }, new Set<number>())
 
-        const firstBanAction = myInProgressActions.find((a) => a.type === 'ban')
-        if (firstBanAction) {
-          const unbannableChampions = [
-            ...session.bans.myTeamBans,
-            ...session.bans.theirTeamBans
-          ].reduce((prev, cur) => {
-            if (cur) {
-              prev.add(cur)
+        cs.session.actions.forEach((ar) =>
+          ar.forEach((a) => {
+            if (a.type === 'ban' && a.completed) {
+              unbannableChampions.add(a.championId)
             }
-            return prev
-          }, new Set<number>())
+          })
+        )
 
-          if (!settings.autoSelect.banTeammateIntendedChampion) {
-            session.myTeam.forEach((m) => {
-              if (m.championPickIntent && m.summonerId !== summoner.currentSummoner!.summonerId) {
-                unbannableChampions.add(m.championPickIntent)
-              }
-            })
+        if (!settings.autoSelect.banTeammateIntendedChampion) {
+          cs.session.myTeam.forEach((m) => {
+            if (m.championPickIntent && m.summonerId !== summoner.currentSummoner!.summonerId) {
+              unbannableChampions.add(m.championPickIntent)
+            }
+          })
+        }
+
+        const bannableChampions = settings.autoSelect.bannedChampions.filter(
+          (c) => !unbannableChampions.has(c) && cs.currentBannableChampions.has(c)
+        )
+
+        if (bannableChampions.length === 0) {
+          if (chat.conversations.championSelect) {
+            chatSend(
+              chat.conversations.championSelect.id,
+              '[League Toolkit] 无可用英雄供自动禁用',
+              'celebration'
+            ).catch()
           }
+          return
+        }
 
-          const bannableChampions = settings.autoSelect.bannedChampions.filter(
-            (c) => !unbannableChampions.has(c) && cs.currentBannableChampions.has(c)
-          )
+        const candidate = settings.autoSelect.banRandomly
+          ? bannableChampions[randomlyBanSeed % bannableChampions.length]
+          : bannableChampions[0]
 
-          if (bannableChampions.length === 0) {
-            return
-          }
-
-          const candidate = settings.autoSelect.banRandomly
-            ? bannableChampions[Math.floor(Math.random() * bannableChampions.length)]
-            : bannableChampions[0]
-
-          isDoingBan = true
-          try {
-            await pickOrBan(candidate, true, 'ban', firstBanAction.id)
-          } catch (err) {
-            notify.emit({
-              id,
-              content: `尝试自动禁用英雄时失败，尝试禁用 ${
-                gameData.champions[candidate]?.name || candidate
-              }`,
-              type: 'warning',
-              extra: { error: err }
-            })
-          } finally {
-            isDoingBan = false
-          }
+        try {
+          await pickOrBan(candidate, true, 'ban', firstBanAction.id)
+        } catch (err) {
+          notify.emit({
+            id,
+            content: `尝试自动禁用英雄时失败，尝试禁用 ${
+              gameData.champions[candidate]?.name || candidate
+            }`,
+            type: 'warning',
+            extra: { error: err }
+          })
         }
       }
     }
-  })
+  )
 
   interface BenchChampionInfo {
     // 最近一次在英雄选择台上的时间
@@ -281,9 +430,7 @@ export function setupAutoSelect() {
       if (e.includes(targetingChampion) && benchChampions.has(targetingChampion)) {
         return
       } else {
-        if (settings.autoSelect.benchActionNotifyInChat) {
-          notifyInChat('cancel', targetingChampion)
-        }
+        notifyInChat('cancel', targetingChampion)
         window.clearTimeout(grabTimer)
         targetingChampion = null
       }
@@ -312,9 +459,7 @@ export function setupAutoSelect() {
         if (waitTime <= 15) {
           trySwap()
         } else {
-          if (settings.autoSelect.benchActionNotifyInChat) {
-            notifyInChat('select', targetingChampion, waitTime)
-          }
+          notifyInChat('select', targetingChampion, waitTime)
           grabTimer = window.setTimeout(trySwap, waitTime)
         }
         break
@@ -343,10 +488,7 @@ function loadSettingsFromStorage() {
   )
   settings.autoSelect.selectRandomly = getSetting('autoSelect.selectRandomly', false)
   settings.autoSelect.banRandomly = getSetting('autoSelect.banRandomly', false)
-  settings.autoSelect.benchActionNotifyInChat = getSetting(
-    'autoSelect.benchActionNotifyInChat',
-    true
-  )
+  settings.autoSelect.showIntent = getSetting('autoSelect.showIntent', false)
 
   // migrate from previous version
   const formerExpected = getSetting('autoSelect.championId')
@@ -398,9 +540,7 @@ export function setBenchModeAutoSelectEnabled(enabled: boolean) {
   const settings = useSettingsStore()
 
   if (!enabled && grabTimer) {
-    if (settings.autoSelect.benchActionNotifyInChat) {
-      notifyInChat('cancel', targetingChampion!)
-    }
+    notifyInChat('cancel', targetingChampion!)
     window.clearTimeout(grabTimer)
     targetingChampion = null
   }
@@ -483,8 +623,8 @@ export function setBanRandomly(enabled: boolean) {
   settings.autoSelect.banRandomly = enabled
 }
 
-export function setBenchActionNotifyInChat(enabled: boolean) {
+export function setShowIntent(enabled: boolean) {
   const settings = useSettingsStore()
-  setSetting('autoSelect.benchActionNotifyInChat', enabled)
-  settings.autoSelect.benchActionNotifyInChat = enabled
+  setSetting('autoSelect.showIntent', enabled)
+  settings.autoSelect.showIntent = enabled
 }

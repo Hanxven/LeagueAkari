@@ -28,7 +28,7 @@ const isErr = ref(false)
 const router = useRouter()
 const notification = useNotification()
 
-const NOTIFY_THRESHOLD = 2
+const NOTIFY_THRESHOLD = 10
 
 const attempts = ref(0)
 const handleConnect = async (maxAttempts = 3) => {
