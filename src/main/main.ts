@@ -95,6 +95,7 @@ app.whenReady().then(async () => {
     })
   } catch (e) {
     console.error('在初始化时出现错误', e)
+    dialog.showErrorBox('在初始化时出现错误', e && (e as any).message)
     app.quit()
   }
 })
@@ -107,7 +108,7 @@ app.on('window-all-closed', () => {
 
 process.on('uncaughtException', (e) => {
   console.error(e)
-  dialog.showErrorBox('Uncaught Exception', e.message)
+  dialog.showErrorBox('未捕获的异常', e.message)
   app.quit()
 })
 
