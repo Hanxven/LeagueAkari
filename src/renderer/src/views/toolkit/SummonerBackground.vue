@@ -14,6 +14,7 @@
           :options="championOptions"
           v-model:value="currentChampionId"
           size="tiny"
+          :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
         ></NSelect>
         <NButton
           type="primary"
@@ -31,6 +32,7 @@
         :render-option="renderOption"
         v-model:value="currentSkinId"
         size="tiny"
+        :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
       ></NSelect>
     </NModal>
     <ControlItem class="control-item-margin" label="选择" label-description="查找目标英雄或皮肤">
@@ -49,6 +51,7 @@ import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { getChampDetails } from '@renderer/http-api/game-data'
 import { setSummonerBackgroundSkin } from '@renderer/http-api/summoner'
 import { ChampSkin } from '@renderer/types/game-data'
+import { isChampionNameMatch } from '@renderer/utils/string-match'
 
 const gameData = useGameDataStore()
 

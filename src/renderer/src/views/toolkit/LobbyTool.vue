@@ -77,6 +77,7 @@ import {
   getAvailableBots
 } from '@renderer/http-api/lobby'
 import { AvailableBot } from '@renderer/types/lobby'
+import { isChampionNameMatch } from '@renderer/utils/string-match'
 
 const id = 'view:toolkit:lobby-tool'
 

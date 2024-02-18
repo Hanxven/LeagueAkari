@@ -31,6 +31,7 @@
             v-model:value="selectCurrent"
             placeholder="英雄"
             filterable
+            :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
           ></NSelect>
           <NButton
             class="button"
@@ -104,6 +105,7 @@ import { championIcon } from '@renderer/features/game-data'
 import { useChampSelectStore } from '@renderer/features/stores/lcu/champ-select'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
+import { isChampionNameMatch } from '@renderer/utils/string-match'
 
 import LcuImage from './LcuImage.vue'
 

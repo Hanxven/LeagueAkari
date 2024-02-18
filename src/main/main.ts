@@ -1,5 +1,5 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { BrowserWindow, app, shell } from 'electron'
+import { BrowserWindow, app, dialog, shell } from 'electron'
 import { configure } from 'mobx'
 import { join } from 'path'
 import 'reflect-metadata'
@@ -105,7 +105,9 @@ app.on('window-all-closed', () => {
   }
 })
 
-process.on('uncaughtException', () => {
+process.on('uncaughtException', (e) => {
+  console.error(e)
+  dialog.showErrorBox('Uncaught Exception', e.message)
   app.quit()
 })
 
