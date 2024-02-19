@@ -39,7 +39,7 @@ function testCommand(command: string, args: string[] = []): Promise<boolean> {
 
 export async function checkShellAvailability() {
   const results = await Promise.all([
-    testCommand('cmd', ['/c', 'ver']),
+    testCommand('C:\\Windows\\System32\\cmd.exe', ['/c', 'ver']),
     testCommand('powershell', ['-Command', '$PSVersionTable.PSVersion.ToString()']),
     testCommand('pwsh', ['-Version'])
   ])
@@ -54,7 +54,7 @@ export async function checkShellAvailability() {
 export async function checkAdminPrivileges(shell: 'powershell' | 'pwsh' | 'cmd'): Promise<boolean> {
   if (shell === 'cmd') {
     return new Promise((resolve) =>
-      runCommand('cmd', ['/c', 'net', 'session'])
+      runCommand('C:\\Windows\\System32\\cmd.exe', ['/c', 'net', 'session'])
         .then(() => resolve(true))
         .catch(() => resolve(false))
     )
@@ -70,7 +70,7 @@ export async function isProcessExists(
 ): Promise<boolean> {
   if (shell === 'cmd') {
     return new Promise((resolve) => {
-      runCommand('cmd', [
+      runCommand('C:\\Windows\\System32\\cmd.exe', [
         '/c',
         'wmic',
         'process',
@@ -108,7 +108,7 @@ export async function getCommandLine(
 ): Promise<string> {
   if (shell === 'cmd') {
     return new Promise((resolve, reject) => {
-      runCommand('cmd', [
+      runCommand('C:\\Windows\\System32\\cmd.exe', [
         '/c',
         'wmic',
         'process',

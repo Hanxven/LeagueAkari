@@ -6,7 +6,7 @@
       label="立即使生效"
       label-description="立即修改聊天卡片状态，在下一次客户端启动前有效"
     >
-      <NButton size="tiny" type="primary" @click="() => handleSet()">生效</NButton>
+      <NButton size="tiny" type="primary" @click="() => handleSet()">修改</NButton>
     </ControlItem>
     <ControlItem class="control-item-margin" label="队列">
       <NSelect
