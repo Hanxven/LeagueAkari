@@ -720,7 +720,10 @@ export function setupMatchHistory() {
           : team === 'our-team'
             ? '我方'
             : '敌方'
-      texts.push(`${prefixText}近${settings.matchHistory.matchHistoryLoadCount}场平均KDA：`)
+      const thresholdText = threshold > 0 ? `（大于${threshold.toFixed(2)}）` : ''
+      texts.push(
+        `${prefixText}近${settings.matchHistory.matchHistoryLoadCount}场平均KDA${thresholdText}：`
+      )
     }
 
     sendPlayers
