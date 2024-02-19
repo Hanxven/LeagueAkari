@@ -1,5 +1,5 @@
 import deepEqual from 'deep-eql'
-import { ComputedRef, shallowRef } from 'vue'
+import { ComputedRef, shallowRef, watchEffect } from 'vue'
 import { computed } from 'vue'
 
 /**
@@ -9,15 +9,12 @@ import { computed } from 'vue'
 export function useStableComputed<T = any>(getter: () => T): ComputedRef<T> {
   const previousValue = shallowRef<T>(getter())
 
-  const computedValue = computed(() => {
+  watchEffect(() => {
     const currentValue = getter()
     if (!deepEqual(currentValue, previousValue.value)) {
       previousValue.value = currentValue
-      return currentValue
     }
-
-    return previousValue.value
   })
 
-  return computedValue
+  return computed(() => previousValue.value)
 }
