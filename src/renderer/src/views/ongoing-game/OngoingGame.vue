@@ -68,11 +68,21 @@
             <div class="players">
               <div v-for="p of g.players" class="image-name-line">
                 <LcuImage
-                  :title="mh.ongoingPlayers[p]?.summoner?.displayName || p"
+                  :title="
+                    mh.ongoingPlayers[p]?.summoner?.displayName ||
+                    mh.ongoingPlayers[p]?.summoner?.gameName ||
+                    p
+                  "
                   class="image"
                   :src="championIcon(mh.ongoingPlayers[p]?.championId || -1)"
                 />
-                <div class="name">{{ mh.ongoingPlayers[p]?.summoner?.displayName || p }}</div>
+                <div class="name">
+                  {{
+                    mh.ongoingPlayers[p]?.summoner?.displayName ||
+                    mh.ongoingPlayers[p]?.summoner?.gameName ||
+                    p
+                  }}
+                </div>
               </div>
             </div>
           </div>
@@ -99,7 +109,9 @@
               :key="player.id"
               :checked="mh.sendPlayers[player.id]"
               @update:checked="(val) => setInGameKdaSendPlayer(player.id, val)"
-              >{{ player.summoner?.displayName || player.id }}</NCheckbox
+              >{{
+                player.summoner?.displayName || player.summoner?.gameName || player.id
+              }}</NCheckbox
             >
           </div>
         </ControlItem>

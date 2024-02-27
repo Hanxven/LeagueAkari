@@ -14,12 +14,12 @@
             <CopyableText
               class="summoner-name"
               :text="
-                `${tab.summoner.displayName}${
+                `${tab.summoner.displayName || tab.summoner.gameName}${
                   tab.summoner.tagLine ? '#' + tab.summoner.tagLine : ''
                 }` || '<暂无名称>'
               "
             >
-              {{ tab.summoner.displayName || '<暂无名称>'
+              {{ tab.summoner.displayName || tab.summoner.gameName || '<暂无名称>'
               }}<span v-if="tab.summoner.tagLine" class="tag-line"
                 >#{{ tab.summoner.tagLine }}</span
               >

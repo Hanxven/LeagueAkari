@@ -4,7 +4,7 @@
     <ControlItem
       class="control-item-margin"
       label="状态"
-      label-description="设置当前聊天状态。部分状态仅在特定情况下可用"
+      label-description="展示或设置当前聊天状态。部分状态仅在特定情况下可用"
     >
       <NRadioGroup
         size="small"

@@ -13,13 +13,14 @@ import { initWindowIpc } from './core/window'
 import { initDatabase } from './db'
 import { initStorageQuery } from './storage'
 
+configure({ enforceActions: 'never' })
+
 const gotTheLock = app.requestSingleInstanceLock()
 
 if (!gotTheLock) {
+  dialog.showMessageBox({ title: '重复的实例', message: 'League Toolkit 正在运行中' })
   app.quit()
 }
-
-configure({ enforceActions: 'never' })
 
 let mainWindow: BrowserWindow
 

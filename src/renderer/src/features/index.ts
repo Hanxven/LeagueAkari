@@ -1,5 +1,6 @@
 import { setupApp } from './app'
 import { setupAutoAccept } from './auto-accept'
+import { setupAutoHonor } from './auto-honor'
 import { setupAutoReply } from './auto-reply'
 import { setupAutoSelect } from './auto-select'
 import { setupDebug } from './debug'
@@ -25,4 +26,6 @@ export async function setupLeagueToolkitFeatures() {
   setupAutoReply()
 
   setupAutoSelect()
+
+  setupAutoHonor()
 }

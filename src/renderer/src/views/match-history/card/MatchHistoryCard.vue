@@ -8,12 +8,12 @@
         <div class="player" v-for="p of participants" :key="p.participantId">
           <LcuImage class="image" :src="championIcon(p.championId)" />
           <div
-            :title="p.identity.player.summonerName"
+            :title="p.identity.player.summonerName || p.identity.player.gameName"
             class="name"
             :class="{ self: p.isSelf }"
             @click="() => handleToSummoner(p.identity.player.summonerId)"
           >
-            {{ p.identity.player.summonerName }}
+            {{ p.identity.player.summonerName || p.identity.player.gameName || '<无名>' }}
           </div>
         </div>
         <div

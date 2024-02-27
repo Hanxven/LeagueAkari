@@ -14,7 +14,7 @@
           v-for="tab of mh.tabs"
           @contextmenu="(event) => handleShowMenu(event, tab.id)"
           :key="tab.id"
-          :tab="tab.data.summoner?.displayName || tab.id"
+          :tab="tab.data.summoner?.displayName || tab.data.summoner?.gameName || tab.id"
           :name="tab.id"
           :closable="tab.id !== summoner.currentSummoner?.summonerId"
           :draggable="true"
@@ -39,7 +39,7 @@
               :src="tab.data.summoner ? profileIcon(tab.data.summoner.profileIconId) : undefined"
             />
             <span class="tab-title" :class="{ 'temporary-tab': tab.isTemporary }">{{
-              tab.data.summoner?.displayName || tab.id
+              tab.data.summoner?.displayName || tab.data.summoner?.gameName || tab.id
             }}</span>
             <NIcon
               v-if="

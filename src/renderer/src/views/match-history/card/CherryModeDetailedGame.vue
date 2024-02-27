@@ -39,7 +39,7 @@
                     class="name"
                     @click="handleToSummoner(p.identity.player.summonerId)"
                   >
-                    {{ p.identity.player.summonerName || '<无名>'
+                    {{ p.identity.player.summonerName || p.identity.player.gameName || '<无名>'
                     }}{{ p.identity.player.summonerId === 0 ? ' (人机)' : '' }}
                   </div>
                   <!-- <div class="rank">-</div> -->

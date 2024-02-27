@@ -8,6 +8,7 @@ import {
   getPickableChampIds
 } from '@renderer/http-api/champ-select'
 import { getMe } from '@renderer/http-api/chat'
+import { LcuHttpError } from '@renderer/http-api/common'
 import {
   getAugments,
   getChampionSummary,
@@ -18,6 +19,7 @@ import {
   getSummonerSpells
 } from '@renderer/http-api/game-data'
 import { getGameFlowPhase } from '@renderer/http-api/gameflow'
+import { getLobby } from '@renderer/http-api/lobby'
 import { getCurrentSummoner } from '@renderer/http-api/summoner'
 import { call, onUpdate } from '@renderer/ipc'
 
@@ -299,10 +301,34 @@ function summoner() {
 
 function lobby() {
   const lobby = useLobbyStore()
+  const lcuState = useLcuStateStore()
 
   onLcuEvent('/lol-lobby/v2/lobby', (event) => {
     lobby.lobby = event.data
   })
+
+  watch(
+    () => lcuState.state,
+    async (state) => {
+      if (state === 'connected') {
+        try {
+          const lb = await getLobby()
+          lobby.lobby = lb.data
+        } catch (err) {
+          if (err instanceof LcuHttpError && err.response?.status === 404) {
+            lobby.lobby = null
+            return
+          }
+          notify.emit({
+            id,
+            type: 'warning',
+            content: '尝试获取房间信息失败',
+            extra: { error: err }
+          })
+        }
+      }
+    }
+  )
 }
 
 function chat() {

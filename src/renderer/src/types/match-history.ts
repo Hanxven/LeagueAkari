@@ -208,6 +208,7 @@ export interface Player {
   platformId: string
   profileIcon: number
   summonerId: number
+  gameName: string
   summonerName: string
 }
 

@@ -1,6 +1,7 @@
 export interface SummonerInfo {
   accountId: number
   displayName: string
+  gameName: string // 旧 ID 系统，这个字段为空
   internalName: string
   nameChangeFlag: boolean
   percentCompleteForNextLevel: number

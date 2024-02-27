@@ -22,7 +22,7 @@
         class="image"
         :src="`/lol-game-data/assets/v1/profile-icons/${summoner.profileIconId}.jpg`"
       />
-      <CopyableText class="name" :text="summoner.displayName" />
+      <CopyableText class="name" :text="summoner.displayName || summoner.gameName" />
     </div>
   </NCard>
   <NCard size="small" hoverable class="card" v-else>
@@ -43,7 +43,7 @@
             : undefined
         "
       />
-      <CopyableText class="name" :text="selfData?.displayName" />
+      <CopyableText class="name" :text="selfData?.displayName || selfData?.gameName" />
     </div>
   </NCard>
 </template>

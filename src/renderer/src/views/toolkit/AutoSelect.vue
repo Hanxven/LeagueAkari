@@ -124,13 +124,6 @@
         size="small"
       ></NSwitch>
     </ControlItem>
-    <ControlItem class="control-item-margin" label="意向英雄">
-      <OrderedChampionList
-        :value="settings.autoSelect.bannedChampions"
-        type="ban"
-        @update:value="(list) => setNormalModeBannedChampions(list)"
-      />
-    </ControlItem>
     <ControlItem
       class="control-item-margin"
       label="随机禁用"
@@ -152,6 +145,13 @@
         :value="settings.autoSelect.banTeammateIntendedChampion"
         size="small"
       ></NSwitch>
+    </ControlItem>
+    <ControlItem class="control-item-margin" label="意向英雄">
+      <OrderedChampionList
+        :value="settings.autoSelect.bannedChampions"
+        type="ban"
+        @update:value="(list) => setNormalModeBannedChampions(list)"
+      />
     </ControlItem>
   </NCard>
 </template>

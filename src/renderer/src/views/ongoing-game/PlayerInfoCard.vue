@@ -11,12 +11,12 @@
       <div class="header-line-right-side">
         <div class="summoner-name-line">
           <span
-            :title="`${summonerInfo?.displayName}${
+            :title="`${summonerInfo?.displayName || summonerInfo?.gameName}${
               summonerInfo?.tagLine ? '#' + summonerInfo.tagLine : ''
             }`"
             class="name"
             @click="emits('toSummoner', id)"
-            >{{ summonerInfo?.displayName ? summonerInfo.displayName : '<暂无名称>' }}</span
+            >{{ summonerInfo?.displayName || summonerInfo?.gameName || '<暂无名称>' }}</span
           >
           <span class="tag self" v-if="isSelf">我</span>
           <NPopover v-if="savedInfo && !isSelf" placement="bottom">
@@ -34,13 +34,6 @@
                 最近一次遇见该玩家的时间是 {{ formattedRelativeTime }}，作为{{
                   savedInfo.side === 'teammate' ? '队友' : '对手'
                 }}。
-              </div>
-              <div
-                class="encountered-text"
-                v-if="savedInfo.summonerInfo.displayName !== summonerInfo?.displayName"
-              >
-                该召唤师曾用名为
-                <span style="font-weight: 700">{{ savedInfo.summonerInfo.displayName }}</span>
               </div>
               <div class="encountered-text" v-if="savedInfo.relatedGameIds.length > 1">
                 共遇见过 {{ savedInfo.relatedGameIds.length }} 次。

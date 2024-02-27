@@ -1,4 +1,4 @@
-import { AvailableBot, Lobby, LobbyMember } from '@renderer/types/lobby'
+import { AvailableBot, EogStatus, Lobby, LobbyMember } from '@renderer/types/lobby'
 
 import { request } from './common'
 
@@ -73,6 +73,13 @@ export function getMembers() {
   })
 }
 
+export function getLobby() {
+  return request<Lobby>({
+    url: '/lol-lobby/v2/lobby',
+    method: 'GET'
+  })
+}
+
 /**
  * 可以选择的人机种类
  */
@@ -123,5 +130,12 @@ export function playAgain() {
   return request({
     url: '/lol-lobby/v2/play-again',
     method: 'POST'
+  })
+}
+
+export function getEogStatus() {
+  return request<EogStatus>({
+    url: '/lol-lobby/v2/party/eog-status',
+    method: 'GET'
   })
 }

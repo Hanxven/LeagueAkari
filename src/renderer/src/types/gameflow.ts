@@ -105,6 +105,8 @@ export interface PlayerChampionSelection {
   selectedSkinIndex: number
   spell1Id: number
   spell2Id: number
+  summonerId: number // 旧 ID 系统中，无该字段
+  puuid: string // 旧 ID 系统中，无该字段
   summonerInternalName: string
 }
 

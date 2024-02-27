@@ -44,7 +44,7 @@
                       class="name-span"
                       @click="handleToSummoner(p.identity.player.summonerId)"
                       :title="p.identity.player.summonerName"
-                      >{{ p.identity.player.summonerName || '<无名>'
+                      >{{ p.identity.player.summonerName || p.identity.player.gameName || '<无名>'
                       }}{{ p.identity.player.summonerId === 0 ? ' (人机)' : '' }}</span
                     >
                   </div>

@@ -5,6 +5,7 @@
         <NTabPane tab="自动化" name="automation">
           <AutoAccept class="tool" />
           <AutoSelect class="tool" />
+          <AutoHonor class="tool" />
           <AutoReply class="tool" />
         </NTabPane>
         <NTabPane tab="过程中" name="in-process">
@@ -34,6 +35,7 @@ import { ref } from 'vue'
 import { useKeepAliveScrollPositionMemo } from '@renderer/compositions/useKeepAliveScrollPositionMemo'
 
 import AutoAccept from './AutoAccept.vue'
+import AutoHonor from './AutoHonor.vue'
 import AutoReply from './AutoReply.vue'
 import AutoSelect from './AutoSelect.vue'
 import AvailabilityCheck from './AvailabilityCheck.vue'
@@ -53,9 +55,16 @@ useKeepAliveScrollPositionMemo(el)
 
 <style lang="less" scoped>
 .toolkit-wrapper {
+  position: relative;
   height: 100%;
   max-width: 100%;
   overflow: auto;
+}
+
+.anchor {
+  position: absolute;
+  right: 8px;
+  top: 8px;
 }
 
 .toolkit-wrapper-inner {

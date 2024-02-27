@@ -154,3 +154,10 @@ export interface AvailableBot {
   id: number
   name: string
 }
+
+export interface EogStatus {
+  eogPlayers: string[]
+  leftPlayers: string[]
+  partySize: number
+  readyPlayers: string[]
+}

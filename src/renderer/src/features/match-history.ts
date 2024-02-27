@@ -25,6 +25,7 @@ import { useChampSelectStore } from './stores/lcu/champ-select'
 import { useChatStore } from './stores/lcu/chat'
 import { useGameDataStore } from './stores/lcu/game-data'
 import { useGameflowStore } from './stores/lcu/gameflow'
+import { useLobbyStore } from './stores/lcu/lobby'
 import { useSummonerStore } from './stores/lcu/summoner'
 import {
   MatchHistoryGame,
@@ -432,19 +433,19 @@ export function setupMatchHistory() {
       // 通常来说，summonerId 为 0 的时候，都是不可见的
       const m = myTeam
         .filter((p) => p.summonerId)
-        .map((t, i) => ({ summonerId: t.summonerId, team: 100, order: i }))
+        .map((t, i) => ({ summonerId: t.summonerId, team: '100', order: i }))
 
       // 在太阳从西边出来的情况下，可以看到对方的召唤师身份信息，万一能呢？
       const t = theirTeam
         .filter((p) => p.summonerId)
-        .map((t, i) => ({ summonerId: t.summonerId, team: 200, order: i }))
+        .map((t, i) => ({ summonerId: t.summonerId, team: '200', order: i }))
 
       ;[...m, ...t].forEach((t) => {
         mh.sendPlayers[t.summonerId] = true
       })
 
       await Promise.all([
-        [...m, ...t].map(async (o) => loadPlayerStats(o.summonerId, o.team.toString(), o.order))
+        [...m, ...t].map(async (o) => loadPlayerStats(o.summonerId, o.team, o.order))
       ])
     } catch (err) {
       notify.emit({ id, content: '英雄选择中 - 查询玩家信息失败', extra: { error: err } })
@@ -716,7 +717,7 @@ export function setupMatchHistory() {
     if (sendPlayers.length) {
       const prefixText =
         sendPlayers.length === 1
-          ? sendPlayers[0].summoner?.displayName || ''
+          ? sendPlayers[0].summoner?.displayName || sendPlayers[0].summoner?.gameName || ''
           : team === 'our-team'
             ? '我方'
             : '敌方'
@@ -738,7 +739,9 @@ export function setupMatchHistory() {
       .filter(({ analysis }) => analysis.averageKda >= threshold)
       .map(({ player, analysis, isEmpty }) => {
         const name =
-          gameData.champions[player.championId || 0]?.name || player.summoner?.displayName
+          gameData.champions[player.championId || 0]?.name ||
+          player.summoner?.displayName ||
+          player.summoner?.gameName
 
         if (isEmpty) {
           return `${name} 近期无有效对局`
@@ -771,6 +774,7 @@ export function setupMatchHistory() {
             return (
               gameData.champions[mh.ongoingPlayers[p]?.championId || 0]?.name ||
               mh.ongoingPlayers[p]?.summoner?.displayName ||
+              mh.ongoingPlayers[p]?.summoner?.gameName ||
               p.toString()
             )
           })
@@ -1194,7 +1198,7 @@ export async function fetchTabFullData(summonerId: number, silent = true) {
     id,
     type: 'success',
     silent,
-    content: `拉取召唤师 ${summoner.displayName} 的信息成功`
+    content: `拉取召唤师 ${summoner.displayName || summoner.gameName} 的信息成功`
   })
 }
 

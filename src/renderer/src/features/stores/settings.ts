@@ -110,6 +110,11 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const autoPerk = reactive({})
 
+  const autoHonor = reactive({
+    enabled: false,
+    strategy: 'random-all' as 'random-all' | 'random-lobby-member' | 'opt-out'
+  })
+
   return {
     app,
     debug,
@@ -118,6 +123,7 @@ export const useSettingsStore = defineStore('settings', () => {
     lobby,
     autoReply,
     autoSelect,
-    autoPerk
+    autoPerk,
+    autoHonor
   }
 })
