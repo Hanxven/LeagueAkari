@@ -112,7 +112,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const autoHonor = reactive({
     enabled: false,
-    strategy: 'random-all' as 'random-all' | 'random-lobby-member' | 'opt-out'
+    strategy: 'prefer-lobby-member'
   })
 
   return {

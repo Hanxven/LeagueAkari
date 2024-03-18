@@ -18,7 +18,7 @@
       <div class="hint" v-if="arr.length > maxShow">+{{ arr.length - maxShow }}</div>
       <div class="hint" v-if="arr.length === 0">未选择</div>
     </div>
-    <NPopover trigger="click" ref="popover">
+    <NPopover trigger="click" ref="popover" v-model:show="show">
       <template #trigger>
         <NButton size="tiny" type="primary" style="margin-left: 8px">编辑</NButton>
       </template>
@@ -31,6 +31,7 @@
             v-model:value="selectCurrent"
             placeholder="英雄"
             filterable
+            ref="select"
             :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
           ></NSelect>
           <NButton
@@ -115,6 +116,20 @@ const props = withDefaults(
     maxShow: 6,
     maxCount: Infinity,
     type: 'pick'
+  }
+)
+
+const select = ref()
+const show = defineModel<boolean>({ default: false })
+
+watch(
+  () => show.value,
+  (show) => {
+    if (show) {
+      nextTick(() => {
+        select.value?.focusInput()
+      })
+    }
   }
 )
 
@@ -228,7 +243,7 @@ const handleAdd = () => {
     return
   }
 
-  arr.value = [...arr.value, selectCurrent.value]
+  arr.value = [selectCurrent.value, ...arr.value]
 }
 
 const handleRemove = () => {

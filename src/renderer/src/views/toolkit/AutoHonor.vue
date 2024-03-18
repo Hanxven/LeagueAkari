@@ -4,7 +4,7 @@
     <ControlItem
       class="control-item-margin"
       label="开启"
-      label-description="在游戏结束时，自动点赞一位队友"
+      label-description="在游戏结束时，自动点赞一位队友。若不存在可点赞的玩家，将跳过点赞阶段"
     >
       <NSwitch
         :value="settings.autoHonor.enabled"
@@ -24,9 +24,10 @@
         @update:value="(val) => setAutoHonorStrategy(val)"
       >
         <NFlex :size="4">
-          <NRadio value="random-all">随机所有队友</NRadio>
-          <NRadio value="random-lobby-member">随机预组队成员</NRadio>
-          <NRadio value="opt-out">跳过</NRadio>
+          <NRadio value="prefer-lobby-member">优先预组队成员</NRadio>
+          <NRadio value="only-lobby-member">仅预组队成员</NRadio>
+          <NRadio value="all-member">所有成员</NRadio>
+          <NRadio value="opt-out">永远跳过</NRadio>
         </NFlex>
       </NRadioGroup>
     </ControlItem>
@@ -34,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { NCard, NRadio, NRadioGroup, NSwitch, NFlex } from 'naive-ui'
+import { NCard, NFlex, NRadio, NRadioGroup, NSwitch } from 'naive-ui'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
 import { setAutoHonorStrategy, setEnableAutoHonor } from '@renderer/features/auto-honor'
