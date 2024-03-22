@@ -1,4 +1,4 @@
-import { getCommandLine } from './shell'
+import {  getCommandLineStandalone } from './shell'
 
 /**
  * 来自 Riot 的证书文件
@@ -51,8 +51,8 @@ const pidRegex = /--app-pid=([0-9]+)/
 const clientName = 'LeagueClientUx.exe'
 
 // 管理员权限下会尝试更多的方法
-export async function queryLcuAuthOnAdmin(shell: 'cmd' | 'powershell' | 'pwsh'): Promise<LcuAuth> {
-  const commandLine = await getCommandLine(shell, clientName)
+export async function queryLcuAuthOnAdmin(): Promise<LcuAuth> {
+  const commandLine = await getCommandLineStandalone(clientName)
   if (commandLine.length === 0) {
     throw new Error(`目标进程的命令行为空：${clientName}`)
   }

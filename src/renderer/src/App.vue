@@ -2,6 +2,10 @@
   <div id="app-frame">
     <SettingsModal v-model:show="isShowingSettingModal" />
     <UpdateModal v-model:show="isShowingNewUpdateModal" />
+    <DeclarationModal
+      v-model:show="isShowingFreeSoftwareDeclaration"
+      @confirm="handleConfirmation"
+    />
     <AppTitleBar @open-settings="isShowingSettingModal = true" />
     <div class="content"><RouterView /></div>
   </div>
@@ -12,11 +16,14 @@ import { ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AppTitleBar from './components/AppTitleBar.vue'
+import DeclarationModal from './components/DeclarationModal.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import { setupNaiveUiNotificationEvents } from './events/notifications'
+import { setShowFreeSoftwareDeclaration } from './features/app'
 import { useAppState } from './features/stores/app'
 import { useLcuStateStore } from './features/stores/lcu-connection'
+import { useSettingsStore } from './features/stores/settings'
 import { greeting } from './utils/greeting'
 
 greeting()
@@ -33,9 +40,11 @@ watchEffect(() => {
 })
 
 const appState = useAppState()
+const settings = useSettingsStore()
 
 const isShowingSettingModal = ref(false)
 const isShowingNewUpdateModal = ref(false)
+const isShowingFreeSoftwareDeclaration = ref(settings.app.showFreeSoftwareDeclaration)
 
 watchEffect(() => {
   if (appState.updates.newUpdates) {
@@ -44,6 +53,11 @@ watchEffect(() => {
     isShowingNewUpdateModal.value = false
   }
 })
+
+const handleConfirmation = (notShowAgain: boolean) => {
+  setShowFreeSoftwareDeclaration(notShowAgain)
+  isShowingFreeSoftwareDeclaration.value = false
+}
 
 // check for updates
 </script>

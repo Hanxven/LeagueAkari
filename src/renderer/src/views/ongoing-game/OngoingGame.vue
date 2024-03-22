@@ -118,7 +118,7 @@
       </NCard>
     </div>
     <div v-else class="no-ongoing-game">
-      <div>League Toolkit</div>
+      <div>League Akari</div>
       <div style="font-size: 14px; font-weight: normal">没有正在进行中的游戏</div>
     </div>
   </div>

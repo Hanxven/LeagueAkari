@@ -203,7 +203,7 @@ export function setupAutoSelect() {
           }
         }
         if (texts.length) {
-          chatSend(id, `[League Toolkit] ${texts.join('，')}已开启`, 'celebration').catch()
+          chatSend(id, `[League Akari] ${texts.join('，')}已开启`, 'celebration').catch()
         }
       }
     }
@@ -257,7 +257,7 @@ export function setupAutoSelect() {
           if (chat.conversations.championSelect && settings.autoSelect.normalModeEnabled) {
             chatSend(
               chat.conversations.championSelect.id,
-              '[League Toolkit] 无可用英雄供自动选择',
+              '[League Akari] 无可用英雄供自动选择',
               'celebration'
             ).catch()
           }
@@ -337,7 +337,7 @@ export function setupAutoSelect() {
           if (chat.conversations.championSelect) {
             chatSend(
               chat.conversations.championSelect.id,
-              '[League Toolkit] 无可用英雄供自动禁用',
+              '[League Akari] 无可用英雄供自动禁用',
               'celebration'
             ).catch()
           }
@@ -522,8 +522,8 @@ async function notifyInChat(type: 'cancel' | 'select', championId: number, time 
     await chatSend(
       chat.conversations.championSelect.id,
       type === 'select'
-        ? `[League Toolkit] - [自动选择]: 即将在 ${(time / 1000).toFixed(1)} 秒后选择 ${gameData.champions[championId]?.name || championId}`
-        : `[League Toolkit] - [自动选择]: 已取消选择 ${gameData.champions[championId]?.name || championId}`,
+        ? `[League Akari] - [自动选择]: 即将在 ${(time / 1000).toFixed(1)} 秒后选择 ${gameData.champions[championId]?.name || championId}`
+        : `[League Akari] - [自动选择]: 已取消选择 ${gameData.champions[championId]?.name || championId}`,
       'celebration'
     )
   } catch {}

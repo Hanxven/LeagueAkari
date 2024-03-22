@@ -117,7 +117,7 @@
         :tab="(mh.currentTab.data as TabState)"
         :is-self-tab="mh.currentTab.id === summoner.currentSummoner?.summonerId"
       />
-      <div v-else class="tabs-placeholder">League Toolkit</div>
+      <div v-else class="tabs-placeholder">League Akari</div>
     </div>
   </div>
 </template>

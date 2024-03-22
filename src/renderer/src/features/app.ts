@@ -102,7 +102,7 @@ interface GithubApiLatestRelease {
   body: string
 }
 
-const CHECK_UPDATE_URL = 'https://api.github.com/repos/Hanxven/League-Toolkit/releases/latest'
+const CHECK_UPDATE_URL = 'https://api.github.com/repos/Hanxven/LeagueAkari/releases/latest'
 
 export async function checkUpdates(background = false) {
   const appState = useAppState()
@@ -155,6 +155,7 @@ function loadSettingsFromStorage() {
 
   settings.app.autoConnect = getSetting('app.autoConnect', true)
   settings.app.autoCheckUpdates = getSetting('app.autoCheckUpdates', true)
+  settings.app.showFreeSoftwareDeclaration = getSetting('app.showFreeSoftwareDeclaration', true)
 
   const options = getSetting('app.fixWindowMethodAOptions')
   if (options) {
@@ -184,4 +185,11 @@ export function setAutoCheckUpdates(enabled: boolean) {
 
   setSetting('app.autoCheckUpdates', enabled)
   settings.app.autoCheckUpdates = enabled
+}
+
+export function setShowFreeSoftwareDeclaration(enabled: boolean) {
+  const settings = useSettingsStore()
+
+  setSetting('app.showFreeSoftwareDeclaration', enabled)
+  settings.app.showFreeSoftwareDeclaration = enabled
 }

@@ -18,7 +18,7 @@ configure({ enforceActions: 'never' })
 const gotTheLock = app.requestSingleInstanceLock()
 
 if (!gotTheLock) {
-  dialog.showMessageBox({ title: '重复的实例', message: 'League Toolkit 正在运行中' })
+  dialog.showMessageBox({ title: '重复的实例', message: 'League Akari 正在运行中' })
   app.quit()
 }
 
@@ -32,7 +32,7 @@ function createMainWindow(): void {
     minHeight: 520,
     frame: false,
     show: false,
-    title: 'League Toolkit',
+    title: 'League Akari',
     autoHideMenuBar: false,
     icon,
     webPreferences: {
@@ -64,7 +64,7 @@ function createMainWindow(): void {
 
 app.whenReady().then(async () => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('sugar.cocoa.league-toolkit')
+  electronApp.setAppUserModelId('sugar.cocoa.league-akari')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

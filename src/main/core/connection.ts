@@ -113,13 +113,7 @@ export async function initConnectionIpc() {
         connectState.wsState = 'connecting'
       })
 
-      const auth = await queryLcuAuthOnAdmin(
-        basicState.availableShells.cmd
-          ? 'cmd'
-          : basicState.availableShells.powershell
-            ? 'powershell'
-            : 'pwsh'
-      )
+      const auth = await queryLcuAuthOnAdmin()
 
       auth.certificate = auth.certificate || certificate
 

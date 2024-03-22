@@ -2,7 +2,7 @@ import { useEventBus } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NotificationOptions, useNotification } from 'naive-ui'
 
-// League Toolkit 的基础消息通知机制
+// League Akari 的基础消息通知机制
 export const notify = useEventBus<NotificationEvent>(Symbol('notifications'))
 
 export interface NotificationEvent {

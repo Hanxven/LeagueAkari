@@ -93,9 +93,9 @@
       <span class="text" v-else>不可用 (未连接)</span>
     </NCard>
     <NCard v-if="appState.isAdmin" size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">League Toolkit</span></template>
+      <template #header><span class="card-header-title">League Akari</span></template>
       <span class="text"
-        >League Toolkit 运行在管理员权限，仅用于实现命令行获取以及特定的客户端功能</span
+        >League Akari 运行在管理员权限，仅用于实现命令行获取以及特定的客户端功能</span
       >
     </NCard>
   </NScrollbar>

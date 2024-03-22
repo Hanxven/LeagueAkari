@@ -7,7 +7,7 @@ import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'
 import './assets/css/styles.less'
-import { setupLeagueToolkitFeatures } from './features'
+import { setupLeagueAkariFeatures } from './features'
 import { router } from './routes'
 
 dayjs.extend(relativeTime)
@@ -18,9 +18,9 @@ app.use(router)
 app.use(createPinia())
 
 try {
-  await setupLeagueToolkitFeatures()
+  await setupLeagueAkariFeatures()
 } catch (err) {
-  console.error('League Toolkit 无法正确加载：', err)
+  console.error('League Akari 无法正确加载：', err)
 } finally {
   app.mount('#app')
 }

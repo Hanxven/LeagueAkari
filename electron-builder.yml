@@ -1,5 +1,5 @@
-appId: sugar.cocoa.league-toolkit
-productName: league-toolkit
+appId: sugar.cocoa.league-akari
+productName: league-akari
 directories:
   buildResources: build
 files:
@@ -20,7 +20,7 @@ asarUnpack:
 afterSign: build/notarize.js
 win:
   target: 7z
-  executableName: LeagueToolkit
+  executableName: LeagueAkari
   icon: resources/LT_ICON.ico
   requestedExecutionLevel: highestAvailable
 nsis:
@@ -49,4 +49,4 @@ appImage:
 npmRebuild: false
 publish:
 #   provider: generic
-#   url: https://league-toolkit.cocoa.sugar/releases
+#   url: https://league-akari.cocoa.sugar/releases

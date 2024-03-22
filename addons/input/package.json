@@ -1,7 +1,7 @@
 {
   "name": "addon-input",
   "version": "1.0.0",
-  "description": "League Toolkit Node Addon 1",
+  "description": "League Akari Node Addon 1",
   "private": true,
   "dependencies": {
     "bindings": "~1.2.1",

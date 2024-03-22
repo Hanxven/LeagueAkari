@@ -79,12 +79,12 @@ Napi::Value SendKeys(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
   if (info.Length() < 1) {
-    Napi::TypeError::New(env, "League Toolkit - Wrong number of arguments: should be 1.").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "League Akari - Wrong number of arguments: should be 1.").ThrowAsJavaScriptException();
     return env.Undefined();
   }
 
   if (!info[0].IsString()) {
-    Napi::TypeError::New(env, "League Toolkit - Wrong type of argument 0: should be a string.").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "League Akari - Wrong type of argument 0: should be a string.").ThrowAsJavaScriptException();
     return env.Undefined();
   }
 
@@ -105,12 +105,12 @@ Napi::Value SendKeysX(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
   if (info.Length() < 1) {
-    Napi::TypeError::New(env, "League Toolkit - Wrong number of arguments: should be 1.").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "League Akari - Wrong number of arguments: should be 1.").ThrowAsJavaScriptException();
     return env.Undefined();
   }
 
   if (!info[0].IsString()) {
-    Napi::TypeError::New(env, "League Toolkit - Wrong type of argument 0: should be a string.").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "League Akari - Wrong type of argument 0: should be a string.").ThrowAsJavaScriptException();
     return env.Undefined();
   }
 
@@ -142,12 +142,12 @@ Napi::Value SendKey(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
   if (info.Length() < 2) {
-    Napi::TypeError::New(env, "League Toolkit - Wrong number of arguments: should be 2.").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "League Akari - Wrong number of arguments: should be 2.").ThrowAsJavaScriptException();
     return env.Undefined();
   }
 
   if (!info[0].IsNumber() || !info[1].IsBoolean()) {
-    Napi::TypeError::New(env, "League Toolkit - Wrong type of argument: should be [uint32, bool]").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "League Akari - Wrong type of argument: should be [uint32, bool]").ThrowAsJavaScriptException();
     return env.Undefined();
   }
 
@@ -220,7 +220,7 @@ Napi::Value RegisterHook(const Napi::CallbackInfo& info) {
 Napi::Value OnKeysPressed(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   if (info.Length() < 1 || !info[0].IsFunction()) {
-    Napi::TypeError::New(env, "League Toolkit - Function expected").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "League Akari - Function expected").ThrowAsJavaScriptException();
   }
 
   keysPressedCallback = Napi::Persistent(info[0].As<Napi::Function>());
@@ -231,7 +231,7 @@ Napi::Value OnKeysPressed(const Napi::CallbackInfo& info) {
 Napi::Value OnKeyUpDown(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   if (info.Length() < 1 || !info[0].IsFunction()) {
-    Napi::TypeError::New(env, "League Toolkit - Function expected").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "League Akari - Function expected").ThrowAsJavaScriptException();
   }
 
   keyUpDownCallback = Napi::Persistent(info[0].As<Napi::Function>());

@@ -15,7 +15,7 @@ module.exports = async (context) => {
     return
   }
 
-  const appId = 'sugar.cocoa.league-toolkit'
+  const appId = 'sugar.cocoa.league-akari'
 
   const { appOutDir } = context
 

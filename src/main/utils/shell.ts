@@ -1,5 +1,8 @@
 import { spawn } from 'node:child_process'
 
+import wmicExecutable from '../../../resources/WMIC.exe?asset&asarUnpack'
+import { dialog } from 'electron'
+
 function runCommand(command: string, args: string[] = []): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args)
@@ -29,108 +32,24 @@ function runCommand(command: string, args: string[] = []): Promise<string> {
   })
 }
 
-function testCommand(command: string, args: string[] = []): Promise<boolean> {
+
+export async function isProcessExistsStandalone(clientName: string): Promise<boolean> {
   return new Promise((resolve) => {
-    runCommand(command, args)
-      .then(() => resolve(true))
-      .catch(() => resolve(false))
-  })
-}
-
-export async function checkShellAvailability() {
-  const results = await Promise.all([
-    testCommand('C:\\Windows\\System32\\cmd.exe', ['/c', 'ver']),
-    testCommand('powershell', ['-Command', '$PSVersionTable.PSVersion.ToString()']),
-    testCommand('pwsh', ['-Version'])
-  ])
-
-  return {
-    cmd: results[0],
-    powershell: results[1],
-    pwsh: results[2]
-  }
-}
-
-export async function checkAdminPrivileges(shell: 'powershell' | 'pwsh' | 'cmd'): Promise<boolean> {
-  if (shell === 'cmd') {
-    return new Promise((resolve) =>
-      runCommand('C:\\Windows\\System32\\cmd.exe', ['/c', 'net', 'session'])
-        .then(() => resolve(true))
-        .catch(() => resolve(false))
-    )
-  }
-
-  const powershellCmd = `(New-Object System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)`
-  return (await runCommand(shell, ['-Command', powershellCmd])).trim() === 'True'
-}
-
-export async function isProcessExists(
-  shell: 'powershell' | 'pwsh' | 'cmd',
-  clientName: string
-): Promise<boolean> {
-  if (shell === 'cmd') {
-    return new Promise((resolve) => {
-      runCommand('C:\\Windows\\System32\\cmd.exe', [
-        '/c',
-        'wmic',
-        'process',
-        'where',
-        `name like '%${clientName}%'`,
-        'get',
-        'name'
-      ])
-        .then((out) => resolve(out.includes(clientName)))
-        .catch(() => resolve(false))
-    })
-  }
-
-  return new Promise((resolve) => {
-    runCommand(shell, [
-      '-Command',
-      'Get-CimInstance',
-      '-Query',
-      `'SELECT * from Win32_Process WHERE name LIKE ''${clientName}'''`
-    ])
-      .then((out) => {
-        if (out.trim().length === 0) {
-          resolve(false)
-          return
-        }
-        resolve(true)
+    runCommand(wmicExecutable, ['process', 'where', `name like '%${clientName}%'`, 'get', 'name'])
+      .then((out) => resolve(out.includes(clientName)))
+      .catch((_e) => {
+        resolve(false)
       })
-      .catch(() => resolve(false))
   })
 }
 
-export async function getCommandLine(
-  shell: 'powershell' | 'pwsh' | 'cmd',
-  clientName: string
-): Promise<string> {
-  if (shell === 'cmd') {
-    return new Promise((resolve, reject) => {
-      runCommand('C:\\Windows\\System32\\cmd.exe', [
-        '/c',
-        'wmic',
-        'process',
-        'where',
-        `name like '%${clientName}%'`,
-        'get',
-        'CommandLine'
-      ])
-        .then((out) => resolve(out.trim()))
-        .catch((error) => reject(error))
-    })
-  }
-
+export async function getCommandLineStandalone(clientName: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    runCommand(shell, [
-      '-Command',
-      'Get-CimInstance',
-      '-Query',
-      `'SELECT * from Win32_Process WHERE name LIKE ''${clientName}'''`,
-      '|',
-      'Select-Object',
-      '-ExpandProperty',
+    runCommand(wmicExecutable, [
+      'process',
+      'where',
+      `name like '%${clientName}%'`,
+      'get',
       'CommandLine'
     ])
       .then((out) => resolve(out.trim()))

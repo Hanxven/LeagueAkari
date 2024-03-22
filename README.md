@@ -1,12 +1,12 @@
 <div align="center">
   <img
-    src="https://github.com/Hanxven/League-Toolkit/raw/HEAD/pictures/logo.png"
+    src="https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/logo.png"
     width="128"
     height="128"
   />
 </div>
 
-# League Toolkit
+# League Akari
 
 利用合法的 League Client Update (LCU) API 实现的工具包。
 
@@ -90,7 +90,7 @@
 
 - `/lol-gameflow/v1/*` (带有匿名占位符)
 
-注 2: 对于记录对局玩家，其使用 SQLite 作为数据库，存放在应用目录的 league-toolkit.db 中。
+注 2: 对于记录对局玩家，其使用 SQLite 作为数据库，存放在应用目录的 league-akari.db 中。
 
 # 样例
 
@@ -100,25 +100,25 @@
 
 查询任意一个召唤师。
 
-![查询召唤师](https://github.com/Hanxven/League-Toolkit/raw/HEAD/pictures/5.gif "查询召唤师")
+![查询召唤师](https://github.com/Hanxven/League-Akari/raw/HEAD/pictures/5.gif "查询召唤师")
 
 ## 秒选
 
 非常快速的选择操作。
 
-![立即选择](https://github.com/Hanxven/League-Toolkit/raw/HEAD/pictures/2.gif "立即选择")
+![立即选择](https://github.com/Hanxven/League-Akari/raw/HEAD/pictures/2.gif "立即选择")
 
 ## 自动化
 
 一切都在自动过程中。
 
-![完全自动化](https://github.com/Hanxven/League-Toolkit/raw/HEAD/pictures/3.gif "完全自动化")
+![完全自动化](https://github.com/Hanxven/League-Akari/raw/HEAD/pictures/3.gif "完全自动化")
 
 ## 大乱斗
 
 不止手速快。
 
-![无内置冷却](https://github.com/Hanxven/League-Toolkit/raw/HEAD/pictures/4.gif "无内置冷却")
+![无内置冷却](https://github.com/Hanxven/League-Akari/raw/HEAD/pictures/4.gif "无内置冷却")
 
 # 想要实现的功能
 

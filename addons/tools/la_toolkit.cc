@@ -12,7 +12,7 @@ Napi::Value FixWindowMethodA(const Napi::CallbackInfo& info) {
 
   // 检查参数数量和类型
   if (info.Length() < 2 || !info[0].IsNumber() || !info[1].IsObject()) {
-    Napi::TypeError::New(env, "League Toolkit - Expected zoom scale and configuration object").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "League Akari - Expected zoom scale and configuration object").ThrowAsJavaScriptException();
     return env.Null();
   }
 
@@ -20,7 +20,7 @@ Napi::Value FixWindowMethodA(const Napi::CallbackInfo& info) {
   Napi::Object config = info[1].As<Napi::Object>();
 
   if (clientZoomScale == -1) {
-    Napi::Error::New(env, "League Toolkit - Invalid original zoom of LeagueClientUx").ThrowAsJavaScriptException();
+    Napi::Error::New(env, "League Akari - Invalid original zoom of LeagueClientUx").ThrowAsJavaScriptException();
     return env.Null();
   }
 
@@ -32,7 +32,7 @@ Napi::Value FixWindowMethodA(const Napi::CallbackInfo& info) {
   HWND leagueClientWindowCefHWnd = FindWindowExW(leagueClientWindowHWnd, nullptr, CEF_WINDOW_NAME, nullptr);
 
   if (leagueClientWindowHWnd == nullptr || leagueClientWindowCefHWnd == nullptr) {
-    Napi::Error::New(env, "League Toolkit - Can't find LeagueClient window").ThrowAsJavaScriptException();
+    Napi::Error::New(env, "League Akari - Can't find LeagueClient window").ThrowAsJavaScriptException();
     return env.Null();
   }
 

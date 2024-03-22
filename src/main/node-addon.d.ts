@@ -1,8 +1,8 @@
 /**
  * 实验性 API，并未实装
  */
-declare module '*/ltInputWin32x64.node' {
-  interface LeagueToolkitInputAddon {
+declare module '*/laInputWin32x64.node' {
+  interface LeagueAkariInputAddon {
     /**
      * Win32 API SendInput 封装，发送一个按键的输入。可在游戏中模拟键盘输入。
      * @param key
@@ -47,15 +47,15 @@ declare module '*/ltInputWin32x64.node' {
     uninstall(): void
   }
 
-  const ltInput: LeagueToolkitInputAddon
+  const ltInput: LeagueAkariInputAddon
   export default ltInput
 }
 
 /**
  * 工具封装
  */
-declare module '*/ltToolkitWin32x64.node' {
-  interface LeagueToolkit1Addon {
+declare module '*/laToolkitWin32x64.node' {
+  interface LeagueAkari1Addon {
     /**
      * 感谢 Bilibili @Butter_Cookies 提供的思路
      * https://space.bilibili.com/248303677
@@ -69,6 +69,6 @@ declare module '*/ltToolkitWin32x64.node' {
     isElevated(): boolean
   }
 
-  const lt1: LeagueToolkit1Addon
+  const lt1: LeagueAkari1Addon
   export default lt1
 }

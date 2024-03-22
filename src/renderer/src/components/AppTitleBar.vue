@@ -6,7 +6,7 @@
         <span class="text">设置</span>
       </div>
     </div>
-    <div class="title">League Toolkit</div>
+    <div class="title">League Akari</div>
     <div class="traffic">
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
         <NIcon><MinimizeIcon /></NIcon>

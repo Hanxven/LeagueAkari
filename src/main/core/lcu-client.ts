@@ -1,4 +1,4 @@
-import toolkit from '../native/ltToolkitWin32x64.node'
+import toolkit from '../native/laToolkitWin32x64.node'
 import { onCall } from '../utils/ipc'
 import { basicState } from './basic'
 import { getHttpInstance } from './connection'

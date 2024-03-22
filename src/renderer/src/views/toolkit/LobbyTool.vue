@@ -77,7 +77,6 @@ import {
   getAvailableBots
 } from '@renderer/http-api/lobby'
 import { AvailableBot } from '@renderer/types/lobby'
-import { isChampionNameMatch } from '@renderer/utils/string-match'
 
 const id = 'view:toolkit:lobby-tool'
 
@@ -86,7 +85,7 @@ const gameData = useGameDataStore()
 
 const handleCreatePractice5v5 = async () => {
   try {
-    await createPractice5x5(`LEAGUETOOLKIT_${Date.now() % 1000000}`)
+    await createPractice5x5(`LEAGUEAKARI_${Date.now() % 1000000}`)
   } catch (err) {
     notify.emit({
       id,
