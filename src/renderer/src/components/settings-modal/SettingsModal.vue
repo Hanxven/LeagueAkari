@@ -21,7 +21,7 @@
           />
         </div>
         <div class="about-para">
-          League Akari (Version {{ appState.version }}) 是一个开源的、基于 Electron
+          League Akari (Version {{ appState.version }}) 是一个免费、开源的、基于 Electron
           的应用程序，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验。其所有实现都依赖
           <a target="_blank" href="https://riot-api-libraries.readthedocs.io/en/latest/lcu.html"
             >League Client Update (LCU)</a

@@ -8,7 +8,7 @@
 
 # League Akari
 
-利用合法的 League Client Update (LCU) API 实现的工具包。
+利用合法的 League Client Update (LCU) API 实现的工具集。
 
 主要功能包括：
 
