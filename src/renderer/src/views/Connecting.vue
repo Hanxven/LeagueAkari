@@ -83,7 +83,11 @@ const settings = useSettingsStore()
 // 重复等待客户端启动
 useTimeoutPoll(
   async () => {
-    isClientExists.value = await call<boolean>('isLeagueClientExists')
+    try {
+      isClientExists.value = await call<boolean>('isLeagueClientExists')
+    } catch (error) {
+      console.error('尝试检查进程存在时发生错误', error)
+    }
   },
   1000,
   { immediate: true }

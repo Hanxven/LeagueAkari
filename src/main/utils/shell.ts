@@ -1,11 +1,22 @@
-import { spawn } from 'node:child_process'
+import { SpawnOptionsWithoutStdio, spawn } from 'node:child_process'
+import fs from 'node:fs'
 
-import wmicExecutable from '../../../resources/WMIC.exe?asset&asarUnpack'
-import { dialog } from 'electron'
+const WMIC_PATH = 'C:\\Windows\\System32\\wbem\\WMIC.exe'
 
-function runCommand(command: string, args: string[] = []): Promise<string> {
+export function checkWmicAvailability() {
+  const isExists = fs.existsSync(WMIC_PATH)
+  if (!isExists) {
+    throw new Error('WMIC 不存在，League Akari 依赖此工具获取进程信息')
+  }
+}
+
+function runCommand(
+  command: string,
+  args: string[] = [],
+  options?: SpawnOptionsWithoutStdio
+): Promise<string> {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args)
+    const child = spawn(command, args, options)
     let stdout = ''
     let stderr = ''
 
@@ -32,26 +43,20 @@ function runCommand(command: string, args: string[] = []): Promise<string> {
   })
 }
 
-
 export async function isProcessExistsStandalone(clientName: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    runCommand(wmicExecutable, ['process', 'where', `name like '%${clientName}%'`, 'get', 'name'])
+  return new Promise((resolve, reject) => {
+    runCommand(WMIC_PATH, ['process', 'where', `name like '%${clientName}%'`, 'get', 'name'])
       .then((out) => resolve(out.includes(clientName)))
-      .catch((_e) => {
-        resolve(false)
+      .catch((error) => {
+        console.log(error)
+        reject(error)
       })
   })
 }
 
 export async function getCommandLineStandalone(clientName: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    runCommand(wmicExecutable, [
-      'process',
-      'where',
-      `name like '%${clientName}%'`,
-      'get',
-      'CommandLine'
-    ])
+    runCommand(WMIC_PATH, ['process', 'where', `name like '%${clientName}%'`, 'get', 'CommandLine'])
       .then((out) => resolve(out.trim()))
       .catch((error) => reject(error))
   })

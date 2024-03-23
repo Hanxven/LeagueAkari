@@ -12,6 +12,7 @@ import { initWindowsPlatform } from './core/platform'
 import { initWindowIpc } from './core/window'
 import { initDatabase } from './db'
 import { initStorageQuery } from './storage'
+import { checkWmicAvailability } from './utils/shell'
 
 configure({ enforceActions: 'never' })
 
@@ -71,6 +72,7 @@ app.whenReady().then(async () => {
   })
 
   try {
+    checkWmicAvailability()
     await initBasicIpc()
     initConnectionIpc()
     initWindowsPlatform()
