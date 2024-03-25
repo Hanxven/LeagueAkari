@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto'
-import { Notification } from 'electron'
+import { Notification, app } from 'electron'
 import { GlobalKeyboardListener } from 'node-global-key-listener'
 
 import { onCall, sendUpdate, sendUpdateToAll } from '../utils/ipc'
@@ -38,7 +38,6 @@ export function initWindowsPlatform() {
     siw.postMessage({ type: 'string', data: str })
   })
 
-  // CTRL+PAGE UP // CTRL+PAGE DOWN
   let pageUpShortcut = false
   let pageDownShortcut = false
   gkl.addListener((event) => {
@@ -59,5 +58,9 @@ export function initWindowsPlatform() {
         pageDownShortcut = false
       }
     }
+  })
+
+  app.on('before-quit', () => {
+    gkl.kill()
   })
 }

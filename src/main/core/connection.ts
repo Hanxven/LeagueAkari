@@ -6,7 +6,6 @@ import { WebSocket } from 'ws'
 import { onCall, sendUpdateToAll } from '../utils/ipc'
 import { LcuAuth, certificate, isLcuAuthObject, queryLcuAuthOnAdmin } from '../utils/lcu-auth'
 import { getRandomAvailableLoopbackAddrWithPort } from '../utils/loopback'
-import { basicState } from './basic'
 
 let request: AxiosInstance | null = null
 let ws: WebSocket | null = null
