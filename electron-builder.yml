@@ -21,7 +21,7 @@ afterSign: build/notarize.js
 win:
   target: 7z
   executableName: LeagueAkari
-  icon: resources/LT_ICON.ico
+  icon: resources/LA_ICON.ico
   requestedExecutionLevel: highestAvailable
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
