@@ -763,4 +763,3 @@ const handleToSummoner = (summonerId: number) => {
   font-size: 12px;
 }
 </style>
-@shared/types/lcu/match-history

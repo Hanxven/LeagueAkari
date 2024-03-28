@@ -239,4 +239,3 @@ const handleLoadAvailableBots = async (show: boolean) => {
   font-size: 18px;
 }
 </style>
-@shared/types/lcu/lobby

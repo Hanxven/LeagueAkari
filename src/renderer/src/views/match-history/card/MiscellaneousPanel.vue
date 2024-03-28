@@ -5,6 +5,18 @@
       <span>对局时间: {{ dayjs(game.gameCreation).format('YYYY-MM-DD HH:mm:ss') }}</span>
       <span>区服: {{ rsoPlatformText[game.platformId] || game.platformId }}</span>
     </div>
+    <div v-if="hasBan" class="bans">
+      <span style="margin-right: 12px; font-weight: 700; columns: #fff">禁用：</span>
+      <div v-for="t of game.teams.filter((a) => a.bans.length)" :key="t.teamId" class="team-bans">
+        <span>{{ formatTeam(t.teamId) }}</span>
+        <LcuImage
+          style="height: 20px; width: 20px"
+          v-for="b of t.bans"
+          :key="b.championId"
+          :src="championIcon(b.championId)"
+        />
+      </div>
+    </div>
     <NDataTable
       virtual-scroll
       max-height="60vh"
@@ -39,6 +51,10 @@ const props = defineProps<{
   game: Game
 }>()
 
+const hasBan = computed(() => {
+  return props.game.teams.some((t) => t.bans.length)
+})
+
 const gameData = useGameDataStore()
 
 const championDisplay = (championId: number) => {
@@ -67,16 +83,20 @@ const perkstyleDisplay = (perkstyleId: number) => h(PerkstyleDisplay, { size: 20
 
 const augmentDisplay = (augmentId: number) => h(AugmentDisplay, { size: 20, augmentId })
 
-const renderTeam = (teamId: number) => {
-  let team: string
-  if (teamId === 100) {
-    team = '蓝色方'
-  } else if (teamId === 200) {
-    team = '红色方'
+const platformDisplay = (platformId: string) => rsoPlatformText[platformId] || platformId
+
+const formatTeam = (id: number) => {
+  if (id === 100) {
+    return '蓝色方'
+  } else if (id === 200) {
+    return '红色方'
   } else {
-    team = '未知'
+    return id.toString()
   }
-  return h('span', team)
+}
+
+const renderTeam = (teamId: number) => {
+  return h('span', formatTeam(teamId))
 }
 
 const statsConfigMap = {
@@ -195,7 +215,9 @@ const statsConfigMap = {
   visionWardsBoughtInGame: { name: '控制守卫' },
   wardsKilled: { name: '破坏的守卫' },
   wardsPlaced: { name: '放置的守卫' },
-  win: { name: '胜利' }
+  win: { name: '胜利' },
+  currentPlatformId: { name: '当前区服', render: platformDisplay },
+  platformId: { name: '区服', render: platformDisplay }
 }
 
 // 暂未使用
@@ -244,7 +266,7 @@ const columns = computed(() => {
           h(
             'span',
             { style: { 'margin-left': '2px' } },
-            participantsMap.value[p.participantId].summonerName
+            `${participantsMap.value[p.participantId].summonerName || participantsMap.value[p.participantId].gameName}${participantsMap.value[p.participantId].tagLine ? '#' + participantsMap.value[p.participantId].tagLine : ''}`
           )
         ])
       },
@@ -290,13 +312,25 @@ const tableData = computed(() => {
     spells['propKey'] = 'spells'
   })
 
+  const cp: RowData = { propName: statsConfigMap['currentPlatformId']?.name }
+  props.game.participants.forEach((p) => {
+    cp[p.participantId] = participantsMap.value[p.participantId].currentPlatformId
+    cp['propKey'] = 'currentPlatformId'
+  })
+
+  const pi: RowData = { propName: statsConfigMap['platformId']?.name }
+  props.game.participants.forEach((p) => {
+    pi[p.participantId] = participantsMap.value[p.participantId].platformId
+    pi['propKey'] = 'platformId'
+  })
+
   const teams: RowData = { propName: statsConfigMap['teams']?.name }
   props.game.participants.forEach((p) => {
     teams[p.participantId] = p.teamId
     teams['propKey'] = 'teams'
   })
 
-  data.push(champions, spells, teams)
+  data.push(champions, spells, teams, cp, pi)
 
   const statsNames = Object.keys(props.game.participants[0].stats)
 
@@ -334,9 +368,23 @@ const tableData = computed(() => {
   font-size: 12px;
   font-weight: 700;
   margin-bottom: 4px;
-  display: inline;
   display: flex;
   gap: 8px;
 }
+
+.bans {
+  display: flex;
+  border-radius: 4px;
+  background-color: rgba(57, 57, 62, 1);
+  margin-bottom: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.team-bans {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: 12px;
+}
 </style>
-@shared/types/lcu/match-history

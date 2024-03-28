@@ -189,4 +189,3 @@ const handleLoadFriends = async () => {
   font-size: 18px;
 }
 </style>
-@shared/types/lcu/chat

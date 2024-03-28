@@ -582,4 +582,3 @@ const analysis = computed(() => getAnalysis(matchHistoryList.value))
   }
 }
 </style>
-@shared/types/lcu/ranked@shared/types/lcu/summoner

@@ -17,15 +17,17 @@
               }"
               @click="() => handleConnect(a)"
             >
-              <span class="rso" title="区服"
+              <span class="region" title="地区"
                 ><NSpin
                   v-if="currentConnectingClientPid === a.pid"
                   :size="12"
                   class="left-widget"
-                /><NIcon v-else class="left-widget"><CubeSharp /></NIcon>
+                /><NIcon v-else class="left-widget" style="vertical-align: text-bottom"
+                  ><CubeSharp
+                /></NIcon>
                 {{ regionText[a.region] || a.region }}</span
               >
-              <span class="region" title="地区">{{
+              <span class="rso" title="区服">{{
                 rsoPlatformText[a.rsoPlatformId] || a.rsoPlatformId
               }}</span>
               <span class="pid" title="Process ID">{{ a.pid }}</span>
@@ -40,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import { CubeSharp } from '@vicons/ionicons5'
 import { useTimeoutPoll } from '@vueuse/core'
 import { NIcon, NScrollbar, NSpin, useNotification } from 'naive-ui'
@@ -50,7 +53,6 @@ import { useAppState } from '@renderer/features/stores/app'
 import { useLcuStateStore } from '@renderer/features/stores/lcu-connection'
 import { useSettingsStore } from '@renderer/features/stores/settings'
 import { call } from '@renderer/ipc'
-import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import { sleep } from '@renderer/utils/sleep'
 
 const existingClients = shallowRef<any[]>([])
@@ -219,7 +221,6 @@ const handleConnect = (auth: any) => {
   }
 
   .region {
-    margin-left: 8px;
     font-size: 14px;
     color: #fff;
   }
@@ -227,6 +228,7 @@ const handleConnect = (auth: any) => {
   .rso {
     font-size: 14px;
     font-weight: 700;
+    margin-left: 8px;
   }
 
   .pid {
@@ -238,7 +240,6 @@ const handleConnect = (auth: any) => {
   .left-widget {
     margin-right: 8px;
     font-size: 16px;
-    vertical-align: text-bottom;
   }
 }
 

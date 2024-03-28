@@ -64,7 +64,6 @@ const fetchGame = async (gameId: number) => {
   isNotFound.value = false
   try {
     const g = (await getGame(gameId)).data
-    console.log(g)
     if (g.gameId === props.gameId) {
       game.value = g
     }
@@ -151,4 +150,3 @@ watch(
   margin: auto;
 }
 </style>
-@shared/types/lcu/match-history

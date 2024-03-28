@@ -463,4 +463,3 @@ table {
   margin: 12px 0px;
 }
 </style>
-@shared/types/lcu/match-history

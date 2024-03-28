@@ -186,4 +186,3 @@ const formatRankText = (rank: RankedEntry, simple = false) => {
   font-size: 16px;
 }
 </style>
-@shared/types/lcu/ranked

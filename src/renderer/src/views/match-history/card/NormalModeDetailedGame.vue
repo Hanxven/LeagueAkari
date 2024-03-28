@@ -443,4 +443,3 @@ table {
   color: rgb(167, 167, 255);
 }
 </style>
-@shared/types/lcu/match-history

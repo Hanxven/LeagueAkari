@@ -192,4 +192,3 @@ const handleReroll = async (grabBack = false) => {
   border-radius: @border-radius;
 }
 </style>
-@shared/types/lcu/champ-select
