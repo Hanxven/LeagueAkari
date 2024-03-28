@@ -3,7 +3,7 @@ import { observable, reaction, runInAction } from 'mobx'
 
 import toolkit from '../native/laToolkitWin32x64.node'
 import { onCall, sendUpdateToAll } from '../utils/ipc'
-import { isProcessExistsStandalone } from '../utils/shell'
+import { getProcessPidByName as getProcessPidsByName, isProcessExists, queryLcuAuth } from '../utils/shell'
 
 const clientName = 'LeagueClientUx.exe'
 
@@ -37,8 +37,8 @@ export async function initBasicIpc() {
     return app.getVersion()
   })
 
-  // 检查英雄联盟渲染端是否存在
-  onCall('isLeagueClientExists', async () => {
-    return await isProcessExistsStandalone(clientName)
+  // 检查英雄联盟渲染端是否存在，可能存在多个
+  onCall('queryLcuAuth', async () => {
+    return await queryLcuAuth(clientName)
   })
 }

@@ -4,7 +4,7 @@ import { observable, reaction, runInAction, toJS } from 'mobx'
 import { WebSocket } from 'ws'
 
 import { onCall, sendUpdateToAll } from '../utils/ipc'
-import { LcuAuth, certificate, isLcuAuthObject, queryLcuAuthOnAdmin } from '../utils/lcu-auth'
+import { LcuAuth, certificate, isLcuAuthObject } from '../utils/lcu-auth'
 import { getRandomAvailableLoopbackAddrWithPort } from '../utils/loopback'
 
 let request: AxiosInstance | null = null
@@ -98,25 +98,17 @@ export function getWebSocket() {
 const INTERVAL_TIMEOUT = 10000
 
 export async function initConnectionIpc() {
-  onCall('connect', async (_, auth1?: LcuAuth) => {
+  onCall('connect', async (_, auth1: LcuAuth) => {
     try {
       if (connectState.wsState === 'connecting') {
         throw new Error('连接正在进行中')
-      }
-
-      if (auth1 && !isLcuAuthObject(auth1)) {
-        throw new Error('错误的 LcuAuth 格式')
       }
 
       runInAction(() => {
         connectState.wsState = 'connecting'
       })
 
-      const auth = await queryLcuAuthOnAdmin()
-
-      auth.certificate = auth.certificate || certificate
-
-      const ws = await initWebSocket(auth)
+      const ws = await initWebSocket(auth1)
 
       let timeoutTimer: NodeJS.Timeout
       await new Promise<void>((resolve, reject) => {
@@ -127,7 +119,7 @@ export async function initConnectionIpc() {
 
         ws.on('open', async () => {
           try {
-            await initHttpInstance(auth)
+            await initHttpInstance(auth1)
             clearTimeout(timeoutTimer)
           } catch (err) {
             reject(err)
@@ -137,7 +129,7 @@ export async function initConnectionIpc() {
 
           runInAction(() => {
             connectState.wsState = 'connected'
-            connectState.auth = auth
+            connectState.auth = auth1
           })
 
           resolve()
@@ -175,6 +167,22 @@ export async function initConnectionIpc() {
       })
       throw err
     }
+  })
+
+  onCall('disconnect', async () => {
+    if (ws) {
+      ws.close()
+      ws = null
+    }
+
+    if (request) {
+      request = null
+    }
+
+    runInAction(() => {
+      connectState.wsState = 'disconnected'
+      connectState.auth = null
+    })
   })
 
   onCall('getLcuState', async () => {

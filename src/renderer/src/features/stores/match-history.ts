@@ -144,6 +144,7 @@ export const useMatchHistoryStore = defineStore('match-history', () => {
     canCloseCurrent,
     canCloseOther,
     closeAllTemporary,
+    closeAll,
     closeOther,
     current,
     del,
@@ -295,6 +296,7 @@ export const useMatchHistoryStore = defineStore('match-history', () => {
     canCloseCurrentTab: canCloseCurrent,
     closeOtherTabs: closeOther,
     closeAllTemporaryTabs: closeAllTemporary,
+    closeAllTabs: closeAll,
 
     isLoading: isLoadingTab,
     setMatchHistoryExpand,

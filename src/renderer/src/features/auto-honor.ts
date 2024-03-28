@@ -19,7 +19,6 @@ const HONOR_CATEGORY = ['COOL', 'SHOTCALLER', 'HEART'] as const
 export function setupAutoHonor() {
   const settings = useSettingsStore()
   const summoner = useSummonerStore()
-  const mh = useMatchHistoryStore()
 
   loadSettingsFromStorage()
 
@@ -81,7 +80,7 @@ function loadSettingsFromStorage() {
   const settings = useSettingsStore()
 
   settings.autoHonor.enabled = getSetting('autoHonor.enabled', false)
-  settings.autoHonor.strategy = getSetting('autoHonor.strategy', 'random-all')
+  settings.autoHonor.strategy = getSetting('autoHonor.strategy', 'prefer-lobby-member')
 }
 
 export function setEnableAutoHonor(enabled: boolean) {

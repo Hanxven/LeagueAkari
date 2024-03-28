@@ -1,7 +1,22 @@
 <template>
   <NScrollbar style="max-height: 60vh" trigger="none">
     <NCard size="small">
-      <template #header><span class="card-header-title">Riot Client</span></template>
+      <template #header><span class="card-header-title">League Client</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="断开连接"
+        label-description="断开 League Akari 与游戏客户端的连接"
+        :label-width="320"
+      >
+        <NButton
+          :disabled="lcuState.state !== 'connected'"
+          size="tiny"
+          secondary
+          type="warning"
+          @click="handleDisconnect"
+          >断开</NButton
+        >
+      </ControlItem>
       <ControlItem
         class="control-item-margin"
         label="关闭游戏客户端进程"
@@ -151,6 +166,10 @@ const handleQuitClient = async () => {
       }
     }
   })
+}
+
+const handleDisconnect = async () => {
+  await call('disconnect')
 }
 
 const handleRestartUx = async () => {

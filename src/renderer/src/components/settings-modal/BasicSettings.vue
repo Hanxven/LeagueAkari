@@ -14,6 +14,18 @@
           @update:value="(val: boolean) => setAutoCheckUpdates(val)"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="自动连接"
+        label-description="存在唯一的客户端时，则自动连接该客户端"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="settings.app.autoConnect"
+          @update:value="(val: boolean) => setAutoConnect(val)"
+        />
+      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>
@@ -21,7 +33,7 @@
 <script setup lang="ts">
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
 
-import { setAutoCheckUpdates } from '@renderer/features/app'
+import { setAutoCheckUpdates, setAutoConnect } from '@renderer/features/app'
 import { useSettingsStore } from '@renderer/features/stores/settings'
 
 import ControlItem from '../ControlItem.vue'

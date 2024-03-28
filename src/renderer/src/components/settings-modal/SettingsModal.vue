@@ -36,6 +36,13 @@
           >.
         </div>
         <div class="about-para">
+          第三方 LCU HTTP API 文档：<a
+            target="_blank"
+            href="https://github.com/KebsCS/lcu-and-riotclient-api"
+            >Github Repo</a
+          >.
+        </div>
+        <div class="about-para">
           第三方静态文件文档：<a
             target="_blank"
             href="https://www.communitydragon.org/documentation/assets"

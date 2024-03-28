@@ -26,6 +26,7 @@ export type UseTabsReturn<T> = {
   setTemporary: (id: number, temporary: boolean) => void
   move: (sourceId: number, targetId: number) => void
   closeAllTemporary: () => void
+  closeAll: () => void
   closeOther: (currentId: number) => void
   canCloseOther: (currentId: number) => boolean
   canCloseCurrent: (currentId: number) => boolean
@@ -228,6 +229,12 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     }
   }
 
+  const closeAll = () => {
+    tabs.value = []
+    tabsMap.clear()
+    currentTabId.value = null
+  }
+
   const closeOther = (currentId: number) => {
     let currentIndex = -1
     for (let i = tabs.value.length - 1; i >= 0; i--) {
@@ -277,6 +284,7 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     setTemporary,
     move,
     closeAllTemporary,
+    closeAll,
     closeOther,
     canCloseAllTemporary,
     canCloseCurrent,

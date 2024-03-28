@@ -1,4 +1,4 @@
-import {  getCommandLineStandalone } from './shell'
+import { queryLcuAuth } from './shell'
 
 /**
  * 来自 Riot 的证书文件
@@ -34,6 +34,8 @@ export interface LcuAuth {
   pid: number
   password: string
   certificate: string
+  region: string
+  rsoPlatformId: string
 }
 
 export function isLcuAuthObject(obj: any): obj is LcuAuth {
@@ -43,32 +45,4 @@ export function isLcuAuthObject(obj: any): obj is LcuAuth {
     typeof obj.pid === 'number' &&
     typeof obj.password === 'string'
   )
-}
-
-const portRegex = /--app-port=([0-9]+)/
-const passwordRegex = /--remoting-auth-token=([\w-_]+)/
-const pidRegex = /--app-pid=([0-9]+)/
-const clientName = 'LeagueClientUx.exe'
-
-// 管理员权限下会尝试更多的方法
-export async function queryLcuAuthOnAdmin(): Promise<LcuAuth> {
-  const commandLine = await getCommandLineStandalone(clientName)
-  if (commandLine.length === 0) {
-    throw new Error(`目标进程的命令行为空：${clientName}`)
-  }
-
-  const [, port] = commandLine.match(portRegex) || []
-  const [, password] = commandLine.match(passwordRegex) || []
-  const [, pid] = commandLine.match(pidRegex) || []
-
-  if (!port || !password || !pid) {
-    throw new Error('无法解析英雄联盟客户端的命令行参数')
-  }
-
-  return {
-    port: Number(port),
-    pid: Number(pid),
-    password,
-    certificate
-  }
 }

@@ -1,9 +1,37 @@
 <template>
   <div class="waiting-screen">
     <div class="inner-content">
-      <div v-if="isClientExists" class="text-line-1">
-        <template v-if="isAttemptingConnect">即将连接...</template>
-        <template v-else>客户端已启动，等待获取连接信息</template>
+      <div v-if="existingClients.length" class="text-line-1">
+        <template v-if="existingClients.length">
+          <div class="servers-available">已启动的客户端</div>
+          <NScrollbar style="max-height: 45vh" trigger="none">
+            <div
+              v-for="a of existingClients"
+              :key="a.pid"
+              class="client"
+              :style="{
+                cursor:
+                  currentConnectingClientPid && currentConnectingClientPid !== a.pid
+                    ? 'not-allowed'
+                    : 'cursor'
+              }"
+              @click="() => handleConnect(a)"
+            >
+              <span class="rso" title="区服"
+                ><NSpin
+                  v-if="currentConnectingClientPid === a.pid"
+                  :size="12"
+                  class="left-widget"
+                /><NIcon v-else class="left-widget"><CubeSharp /></NIcon>
+                {{ regionText[a.region] || a.region }}</span
+              >
+              <span class="region" title="地区">{{
+                rsoPlatformText[a.rsoPlatformId] || a.rsoPlatformId
+              }}</span>
+              <span class="pid" title="Process ID">{{ a.pid }}</span>
+            </div>
+          </NScrollbar>
+        </template>
       </div>
       <div v-else class="text-line-1">游戏客户端未启动，等待客户端启动</div>
       <div v-if="isErr" class="error-hint">无法获取连接信息。请检查游戏客户端是否已经开启。</div>
@@ -12,17 +40,20 @@
 </template>
 
 <script setup lang="ts">
+import { CubeSharp } from '@vicons/ionicons5'
 import { useTimeoutPoll } from '@vueuse/core'
-import { useNotification } from 'naive-ui'
-import { ref, watch } from 'vue'
+import { NIcon, NScrollbar, NSpin, useNotification } from 'naive-ui'
+import { ref, shallowRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAppState } from '@renderer/features/stores/app'
 import { useLcuStateStore } from '@renderer/features/stores/lcu-connection'
 import { useSettingsStore } from '@renderer/features/stores/settings'
 import { call } from '@renderer/ipc'
+import { regionText, rsoPlatformText } from '@renderer/utils/rso-platforms'
+import { sleep } from '@renderer/utils/sleep'
 
-const isClientExists = ref(false)
+const existingClients = shallowRef<any[]>([])
 const isErr = ref(false)
 
 const router = useRouter()
@@ -31,19 +62,26 @@ const notification = useNotification()
 const NOTIFY_THRESHOLD = 10
 
 const attempts = ref(0)
-const handleConnect = async (maxAttempts = 3) => {
-  attempts.value = 0 // 初始化尝试次数
+const currentConnectingClientPid = ref<number | null>(null)
 
-  if (isAttemptingConnect.value) {
+const tryConnect = async (maxAttempts = 3, auth: any) => {
+  if (currentConnectingClientPid.value) {
     return
   }
 
-  isAttemptingConnect.value = true
-  while (attempts.value < maxAttempts && isAttemptingConnect.value) {
+  attempts.value = 0
+
+  currentConnectingClientPid.value = auth.pid
+  while (attempts.value < maxAttempts) {
+    if (existingClients.value.findIndex((v) => v.pid === currentConnectingClientPid.value) === -1) {
+      currentConnectingClientPid.value = null
+      break
+    }
+
     try {
-      await call<void>('connect') // 尝试连接
+      await call<void>('connect', auth) // 尝试连接
       isErr.value = false
-      isAttemptingConnect.value = false
+      currentConnectingClientPid.value = null
       return
     } catch (err) {
       if (!appState.isAdmin || attempts.value > NOTIFY_THRESHOLD) {
@@ -57,10 +95,10 @@ const handleConnect = async (maxAttempts = 3) => {
       console.warn(`连接失败，正在尝试第 ${attempts.value} 次重连：`, err)
       if (attempts.value >= maxAttempts) {
         isErr.value = true
-        isAttemptingConnect.value = false
+        currentConnectingClientPid.value = null
         break
       }
-      await new Promise((resolve) => setTimeout(resolve, 2000)) // 等待2秒后重试
+      await sleep(2000)
     }
   }
 }
@@ -84,7 +122,7 @@ const settings = useSettingsStore()
 useTimeoutPoll(
   async () => {
     try {
-      isClientExists.value = await call<boolean>('isLeagueClientExists')
+      existingClients.value = await call('queryLcuAuth')
     } catch (error) {
       console.error('尝试检查进程存在时发生错误', error)
     }
@@ -93,25 +131,24 @@ useTimeoutPoll(
   { immediate: true }
 )
 
-const isAttemptingConnect = ref(false)
 watch(
-  () => isClientExists.value,
-  (b) => {
-    if (b) {
-      if (!settings.app.autoConnect && !appState.isAdmin) {
+  () => existingClients.value,
+  (a) => {
+    if (a) {
+      if (!existingClients.value.length) {
         return
       }
 
-      if (appState.isAdmin) {
-        handleConnect(Infinity)
-      } else {
-        handleConnect(10)
+      if (existingClients.value.length === 1 && settings.app.autoConnect) {
+        tryConnect(Infinity, existingClients.value[0])
       }
-    } else {
-      isAttemptingConnect.value = false
     }
   }
 )
+
+const handleConnect = (auth: any) => {
+  tryConnect(Infinity, auth)
+}
 </script>
 
 <style scoped lang="less">
@@ -156,5 +193,61 @@ watch(
   text-align: center;
   color: rgb(185, 135, 135);
   font-size: 12px;
+}
+
+.client {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 24px;
+  transition: 0.3s all ease;
+  cursor: pointer;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.03);
+  width: 240px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  &:active {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
+
+  .region {
+    margin-left: 8px;
+    font-size: 14px;
+    color: #fff;
+  }
+
+  .rso {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .pid {
+    font-size: 12px;
+    color: #5d5c5c;
+    margin-left: 8px;
+  }
+
+  .left-widget {
+    margin-right: 8px;
+    font-size: 16px;
+    vertical-align: text-bottom;
+  }
+}
+
+.servers-available {
+  font-size: 16px;
+  font-weight: 700;
+  padding: 0 24px;
+  margin-bottom: 12px;
+  color: #fff;
+  text-align: center;
 }
 </style>

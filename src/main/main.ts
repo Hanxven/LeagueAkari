@@ -19,7 +19,6 @@ configure({ enforceActions: 'never' })
 const gotTheLock = app.requestSingleInstanceLock()
 
 if (!gotTheLock) {
-  dialog.showMessageBox({ title: '重复的实例', message: 'League Akari 正在运行中' })
   app.quit()
 }
 

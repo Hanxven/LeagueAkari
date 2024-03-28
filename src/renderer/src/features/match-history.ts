@@ -1,5 +1,4 @@
 import { useDebounceFn } from '@vueuse/core'
-import { prefix } from 'naive-ui/es/_utils/cssr'
 import { computed, markRaw, watch } from 'vue'
 
 import { useStableComputed } from '@renderer/compositions/useStableComputed'
@@ -25,7 +24,6 @@ import { useChampSelectStore } from './stores/lcu/champ-select'
 import { useChatStore } from './stores/lcu/chat'
 import { useGameDataStore } from './stores/lcu/game-data'
 import { useGameflowStore } from './stores/lcu/gameflow'
-import { useLobbyStore } from './stores/lcu/lobby'
 import { useSummonerStore } from './stores/lcu/summoner'
 import {
   MatchHistoryGame,
@@ -591,6 +589,16 @@ export function setupMatchHistory() {
     { immediate: true }
   )
 
+  // 在断开连接后删除所有页面
+  watch(
+    () => lcuState.state,
+    (s) => {
+      if (s === 'disconnected') {
+        mh.closeAllTabs()
+      }
+    }
+  )
+
   // 进入英雄选择或游戏中，自动加载玩家对局信息
   watch(
     () => ongoingState.value,
@@ -658,6 +666,8 @@ export function setupMatchHistory() {
       }
     }
   )
+
+  mh
 
   const gameData = useGameDataStore()
 
