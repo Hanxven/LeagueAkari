@@ -116,6 +116,10 @@ export const useSettingsStore = defineStore('settings', () => {
     strategy: 'prefer-lobby-member'
   })
 
+  const respawnTimer = reactive({
+    enabled: false
+  })
+
   return {
     app,
     debug,
@@ -125,6 +129,7 @@ export const useSettingsStore = defineStore('settings', () => {
     autoReply,
     autoSelect,
     autoPerk,
-    autoHonor
+    autoHonor,
+    respawnTimer
   }
 })

@@ -16,7 +16,19 @@ export type SimpleAxiosRequestConfig<D = any> = Pick<
 >
 
 export class LcuHttpError extends Error {
-  constructor(message: string, public response: SimpleAxiosResponse | null) {
+  constructor(
+    message: string,
+    public response: SimpleAxiosResponse | null
+  ) {
+    super(message)
+  }
+}
+
+export class GameClientHttpError extends Error {
+  constructor(
+    message: string,
+    public response: SimpleAxiosResponse | null
+  ) {
     super(message)
   }
 }
@@ -80,3 +92,12 @@ export async function request<T = any, D = any>(config: SimpleAxiosRequestConfig
     }
 }
 */
+
+export async function gameClientRequest<T = any, D = any>(config: SimpleAxiosRequestConfig) {
+  const res = await call<SimpleAxiosResponse<T, D>>('httpRequest:gameClient', config)
+
+  if (res.status >= 400) {
+    throw new GameClientHttpError(res.statusText, res)
+  }
+  return res
+}

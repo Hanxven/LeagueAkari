@@ -38,6 +38,18 @@
           @update:value="(val) => setFetchDetailedGame(val)"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="重生倒计时"
+        label-description="在标题栏展示一个距离重生时间的指示器"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="settings.respawnTimer.enabled"
+          @update:value="(val) => setEnableRespawnTimer(val)"
+        />
+      </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">对局分析</span></template>
@@ -173,6 +185,8 @@ import {
   setTeamAnalysisPreloadCount
 } from '@renderer/features/match-history'
 import { useSettingsStore } from '@renderer/features/stores/settings'
+
+import { setEnableRespawnTimer } from '@renderer/features/respawn-timer'
 
 import ControlItem from '../ControlItem.vue'
 

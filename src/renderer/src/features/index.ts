@@ -6,6 +6,7 @@ import { setupAutoSelect } from './auto-select'
 import { setupDebug } from './debug'
 import { setupGameData } from './game-data'
 import { setupMatchHistory } from './match-history'
+import { setupRespawnTimer } from './respawn-timer'
 import { setupStateUpdater } from './update/lcu-state-update'
 
 export async function setupLeagueAkariFeatures() {
@@ -28,4 +29,6 @@ export async function setupLeagueAkariFeatures() {
   setupAutoSelect()
 
   setupAutoHonor()
+
+  setupRespawnTimer()
 }

@@ -4,11 +4,27 @@ import { observable, reaction, runInAction, toJS } from 'mobx'
 import { WebSocket } from 'ws'
 
 import { onCall, sendUpdateToAll } from '../utils/ipc'
-import { LcuAuth, certificate, isLcuAuthObject } from '../utils/lcu-auth'
+import { LcuAuth, certificate } from '../utils/lcu-auth'
 import { getRandomAvailableLoopbackAddrWithPort } from '../utils/loopback'
 
 let request: AxiosInstance | null = null
 let ws: WebSocket | null = null
+
+const gameClientRequest = axios.create({
+  baseURL: 'https://127.0.0.1:2999',
+  httpsAgent: new https.Agent({
+    ca: certificate
+  })
+})
+
+const normalizedAxiosInterceptor = (err: any) => {
+  if (isAxiosError(err) && (err.response || (!err.response && err.status && err.status < 500))) {
+    return Promise.resolve(err.response)
+  }
+  return Promise.reject(err)
+}
+
+gameClientRequest.interceptors.response.use(null, normalizedAxiosInterceptor)
 
 export const connectState = observable<{
   wsState: string
@@ -61,12 +77,7 @@ async function initHttpInstance(auth: LcuAuth) {
 
   // 在主进程和渲染进程通信途中，仅内部错误被视作错误
   // 4xx 和 5xx 错误在业务上被看作是正常响应，交由渲染进程处理
-  request.interceptors.response.use(null, (err) => {
-    if (isAxiosError(err) && (err.response || (!err.response && err.status && err.status < 500))) {
-      return Promise.resolve(err.response)
-    }
-    return Promise.reject(err)
-  })
+  request.interceptors.response.use(null, normalizedAxiosInterceptor)
 
   return request
 }
@@ -202,10 +213,16 @@ export async function initConnectionIpc() {
 
     return {
       ...rest,
-      config: {
-        data: c.data,
-        url: c.url
-      }
+      config: { data: c.data, url: c.url }
+    }
+  })
+
+  onCall('httpRequest:gameClient', async (_event, config) => {
+    const { config: c, request, ...rest } = await gameClientRequest.request(config)
+
+    return {
+      ...rest,
+      config: { data: c.data, url: c.url }
     }
   })
 }
