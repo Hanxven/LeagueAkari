@@ -1,5 +1,6 @@
+import { RadixMatcher } from '@shared/utils/radix-matcher'
+
 import { onUpdate } from '@renderer/ipc'
-import { RadixMatcher } from '@renderer/utils/radix-matcher'
 
 const matcher = new RadixMatcher()
 

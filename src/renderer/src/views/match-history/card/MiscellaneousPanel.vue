@@ -3,6 +3,7 @@
     <div class="meta">
       <CopyableText :text="game.gameId">对局 ID: {{ game.gameId }}</CopyableText>
       <span>对局时间: {{ dayjs(game.gameCreation).format('YYYY-MM-DD HH:mm:ss') }}</span>
+      <span>区服: {{ rsoPlatformText[game.platformId] || game.platformId }}</span>
     </div>
     <NDataTable
       virtual-scroll
@@ -17,6 +18,8 @@
 </template>
 
 <script setup lang="ts">
+import { Game, Player } from '@shared/types/lcu/match-history'
+import { rsoPlatformText } from '@shared/utils/rso-platforms'
 import dayjs from 'dayjs'
 import { DataTableColumns, NDataTable } from 'naive-ui'
 import { RowData } from 'naive-ui/es/data-table/src/interface'
@@ -31,7 +34,6 @@ import PerkstyleDisplay from '@renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
-import { Game, Player } from '@renderer/types/match-history'
 
 const props = defineProps<{
   game: Game
@@ -337,3 +339,4 @@ const tableData = computed(() => {
   gap: 8px;
 }
 </style>
+@shared/types/lcu/match-history

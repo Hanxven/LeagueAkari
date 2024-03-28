@@ -1,4 +1,4 @@
-import { GetSearch } from '@renderer/types/matchmaking'
+import { GetSearch } from '@shared/types/lcu/matchmaking'
 
 import { request } from './common'
 

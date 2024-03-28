@@ -214,7 +214,7 @@ import PerkstyleDisplay from '@renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
-import { Game, ParticipantIdentity } from '@renderer/types/match-history'
+import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 
 import '../lol-view.less'
 import CherryModeDetailedGame from './CherryModeDetailedGame.vue'
@@ -763,3 +763,4 @@ const handleToSummoner = (summonerId: number) => {
   font-size: 12px;
 }
 </style>
+@shared/types/lcu/match-history

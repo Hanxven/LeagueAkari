@@ -69,7 +69,7 @@ import {
   getSummonerByName,
   getSummonerByPuuid
 } from '@renderer/http-api/summoner'
-import { SummonerInfo } from '@renderer/types/summoner'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { inferType, resolveSummonerName } from '@renderer/utils/identity'
 
 import SummonerCard from './SummonerCard.vue'

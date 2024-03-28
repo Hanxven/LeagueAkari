@@ -50,7 +50,7 @@ import LcuImage from '@renderer/components/LcuImage.vue'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { getChampDetails } from '@renderer/http-api/game-data'
 import { setSummonerBackgroundSkin } from '@renderer/http-api/summoner'
-import { ChampSkin } from '@renderer/types/game-data'
+import { ChampSkin } from '@shared/types/lcu/game-data'
 import { isChampionNameMatch } from '@renderer/utils/string-match'
 
 const gameData = useGameDataStore()
@@ -158,3 +158,4 @@ const handleApplyToProfile = async () => {
   font-size: 18px;
 }
 </style>
+@shared/types/lcu/game-data

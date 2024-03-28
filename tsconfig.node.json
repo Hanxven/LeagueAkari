@@ -1,12 +1,16 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
-  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/*", "src/main/utils/ipc.ts"],
+  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/*", "src/shared/**/*"],
   "compilerOptions": {
     // the browser is advanced enough to support ESNext, >= 110
     "target": "ESNext",
     "lib": ["ESNext"],
     "composite": true,
     "types": ["electron-vite/node"],
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["src/shared/*"]
+    },
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "experimentalDecorators": true,

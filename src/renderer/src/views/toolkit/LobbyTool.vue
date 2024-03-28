@@ -76,7 +76,7 @@ import {
   createQueueLobby,
   getAvailableBots
 } from '@renderer/http-api/lobby'
-import { AvailableBot } from '@renderer/types/lobby'
+import { AvailableBot } from '@shared/types/lcu/lobby'
 
 const id = 'view:toolkit:lobby-tool'
 
@@ -239,3 +239,4 @@ const handleLoadAvailableBots = async (show: boolean) => {
   font-size: 18px;
 }
 </style>
+@shared/types/lcu/lobby

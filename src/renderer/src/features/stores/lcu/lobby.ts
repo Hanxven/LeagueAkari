@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 
-import { AvailableBot, Lobby } from '@renderer/types/lobby'
+import { AvailableBot, Lobby } from '@shared/types/lcu/lobby'
 
 export const id = 'store:lobby'
 

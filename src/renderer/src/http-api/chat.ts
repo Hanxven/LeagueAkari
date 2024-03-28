@@ -1,4 +1,4 @@
-import { ChatMessage, ChatPerson, ChatState, Friend } from '@renderer/types/chat'
+import { ChatMessage, ChatPerson, ChatState, Friend } from '@shared/types/lcu/chat'
 
 import { request } from './common'
 

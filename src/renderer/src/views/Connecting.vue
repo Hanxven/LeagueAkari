@@ -50,7 +50,7 @@ import { useAppState } from '@renderer/features/stores/app'
 import { useLcuStateStore } from '@renderer/features/stores/lcu-connection'
 import { useSettingsStore } from '@renderer/features/stores/settings'
 import { call } from '@renderer/ipc'
-import { regionText, rsoPlatformText } from '@renderer/utils/rso-platforms'
+import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import { sleep } from '@renderer/utils/sleep'
 
 const existingClients = shallowRef<any[]>([])

@@ -52,7 +52,7 @@ import { getFriends } from '@renderer/http-api/chat'
 import { LcuHttpError } from '@renderer/http-api/common'
 import { launchSpectator } from '@renderer/http-api/spectator'
 import { getSummonerAlias, getSummonerByName } from '@renderer/http-api/summoner'
-import { Friend } from '@renderer/types/chat'
+import { Friend } from '@shared/types/lcu/chat'
 import { resolveSummonerName } from '@renderer/utils/identity'
 
 const id = 'view:toolkit:spectate'
@@ -189,3 +189,4 @@ const handleLoadFriends = async () => {
   font-size: 18px;
 }
 </style>
+@shared/types/lcu/chat

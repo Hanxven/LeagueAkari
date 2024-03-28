@@ -1,4 +1,4 @@
-import { Game, MatchHistory } from '@renderer/types/match-history'
+import { Game, MatchHistory } from '@shared/types/lcu/match-history'
 
 import { request } from './common'
 

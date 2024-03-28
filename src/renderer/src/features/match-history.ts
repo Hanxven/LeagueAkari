@@ -1,3 +1,5 @@
+import { Participant, isPveQueue } from '@shared/types/lcu/match-history'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, markRaw, watch } from 'vue'
 
@@ -12,8 +14,6 @@ import { getRankedStats } from '@renderer/http-api/ranked'
 import { getSummoner } from '@renderer/http-api/summoner'
 import { call, onUpdate } from '@renderer/ipc'
 import { router } from '@renderer/routes'
-import { Participant, isPveQueue } from '@renderer/types/match-history'
-import { SummonerInfo } from '@renderer/types/summoner'
 import { removeSubsets } from '@renderer/utils/collection'
 import { sleep } from '@renderer/utils/sleep'
 import { getSetting, setSetting } from '@renderer/utils/storage'
@@ -714,6 +714,21 @@ export function setupMatchHistory() {
       return
     }
 
+    const countMap = players.reduce(
+      (prev, cur) => {
+        if (!cur.championId) {
+          return prev
+        }
+        if (prev[cur.championId]) {
+          prev[cur.championId]++
+        } else {
+          prev[cur.championId] = 1
+        }
+        return prev
+      },
+      {} as Record<number, number>
+    )
+
     const sendPlayers = players.filter((p) => mh.sendPlayers[p.id])
 
     const texts: string[] = []
@@ -748,10 +763,17 @@ export function setupMatchHistory() {
       })
       .filter(({ analysis }) => analysis.averageKda >= threshold)
       .map(({ player, analysis, isEmpty }) => {
-        const name =
-          gameData.champions[player.championId || 0]?.name ||
-          player.summoner?.displayName ||
-          player.summoner?.gameName
+        let name: string | undefined
+        if (player.championId && countMap[player.championId] > 1) {
+          name = player.summoner?.displayName || player.summoner?.gameName
+        } else {
+          name =
+            gameData.champions[player.championId || 0]?.name ||
+            player.summoner?.displayName ||
+            player.summoner?.gameName
+        }
+
+        name = name || id
 
         if (isEmpty) {
           return `${name} 近期无有效对局`

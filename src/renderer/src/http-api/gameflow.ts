@@ -1,4 +1,4 @@
-import { GameflowPhase, GameflowSession } from '@renderer/types/gameflow'
+import { GameflowPhase, GameflowSession } from '@shared/types/lcu/gameflow'
 
 import { request } from './common'
 

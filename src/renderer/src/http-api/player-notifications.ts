@@ -1,4 +1,4 @@
-import { PlayerNotifications } from '@renderer/types/player-notifications'
+import { PlayerNotifications } from '@shared/types/lcu/player-notifications'
 
 import { request } from './common'
 

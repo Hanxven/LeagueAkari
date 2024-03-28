@@ -1,4 +1,4 @@
-import { RankedStats } from '@renderer/types/ranked'
+import { RankedStats } from '@shared/types/lcu/ranked'
 
 import { request } from './common'
 

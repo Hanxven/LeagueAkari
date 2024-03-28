@@ -148,7 +148,7 @@ import AugmentDisplay from '@renderer/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@renderer/components/widgets/ItemDisplay.vue'
 import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
-import { Game, Participant, ParticipantIdentity } from '@renderer/types/match-history'
+import { Game, Participant, ParticipantIdentity } from '@shared/types/lcu/match-history'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 
@@ -463,3 +463,4 @@ table {
   margin: 12px 0px;
 }
 </style>
+@shared/types/lcu/match-history

@@ -1,4 +1,4 @@
-import { LootCraftResponse, LootMap } from '@renderer/types/loot'
+import { LootCraftResponse, LootMap } from '@shared/types/lcu/loot'
 
 import { request } from './common'
 

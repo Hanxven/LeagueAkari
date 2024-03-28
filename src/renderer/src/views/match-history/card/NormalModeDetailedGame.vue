@@ -170,7 +170,7 @@ import PerkDisplay from '@renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
-import { Game, ParticipantIdentity } from '@renderer/types/match-history'
+import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 
@@ -443,3 +443,4 @@ table {
   color: rgb(167, 167, 255);
 }
 </style>
+@shared/types/lcu/match-history

@@ -1,4 +1,4 @@
-import { AvailableBot, EogStatus, Lobby, LobbyMember } from '@renderer/types/lobby'
+import { AvailableBot, EogStatus, Lobby, LobbyMember } from '@shared/types/lcu/lobby'
 
 import { request } from './common'
 

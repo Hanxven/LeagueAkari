@@ -44,18 +44,29 @@ export default defineConfig({
     plugins: [swcPlugin(), externalizeDepsPlugin()],
     build: {
       minify
+    },
+    resolve: {
+      alias: {
+        '@shared': resolve('src/shared')
+      }
     }
   },
   preload: {
     plugins: [swcPlugin(), externalizeDepsPlugin()],
     build: {
       minify
+    },
+    resolve: {
+      alias: {
+        '@shared': resolve('src/shared')
+      }
     }
   },
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src')
+        '@renderer': resolve('src/renderer/src'),
+        '@shared': resolve('src/shared')
       }
     },
     plugins: [

@@ -9,7 +9,7 @@ import {
   Perkstyles,
   Queue,
   SummonerSpell
-} from '@renderer/types/game-data'
+} from '@shared/types/lcu/game-data'
 
 export const useGameDataStore = defineStore('game-data', () => {
   const summonerSpells = shallowRef<Record<number, SummonerSpell>>({})

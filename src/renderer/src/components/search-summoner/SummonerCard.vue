@@ -57,7 +57,7 @@ import CopyableText from '@renderer/components/CopyableText.vue'
 import LcuImage from '@renderer/components/LcuImage.vue'
 import { notify } from '@renderer/events/notifications'
 import { getSummoner } from '@renderer/http-api/summoner'
-import { SummonerInfo } from '@renderer/types/summoner'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 
 const id = 'comp:search-summoner'
 

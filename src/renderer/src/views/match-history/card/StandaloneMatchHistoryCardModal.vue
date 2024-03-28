@@ -29,13 +29,13 @@
 </template>
 
 <script setup lang="ts">
+import { Game } from '@shared/types/lcu/match-history'
 import { NButton, NModal } from 'naive-ui'
 import { ref, shallowRef, watch } from 'vue'
 
 import { notify } from '@renderer/events/notifications'
 import { LcuHttpError } from '@renderer/http-api/common'
 import { getGame } from '@renderer/http-api/match-history'
-import { Game } from '@renderer/types/match-history'
 
 import MatchHistoryCard from './MatchHistoryCard.vue'
 
@@ -64,6 +64,7 @@ const fetchGame = async (gameId: number) => {
   isNotFound.value = false
   try {
     const g = (await getGame(gameId)).data
+    console.log(g)
     if (g.gameId === props.gameId) {
       game.value = g
     }
@@ -150,3 +151,4 @@ watch(
   margin: auto;
 }
 </style>
+@shared/types/lcu/match-history

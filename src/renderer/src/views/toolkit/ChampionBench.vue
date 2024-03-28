@@ -57,7 +57,7 @@ import { championIcon } from '@renderer/features/game-data'
 import { useChampSelectStore } from '@renderer/features/stores/lcu/champ-select'
 import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
 import { benchSwap, reroll } from '@renderer/http-api/champ-select'
-import { isBenchEnabledSession } from '@renderer/types/champ-select'
+import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 
 // 可独立使用的组件，或许可以放到其他地方
 const id = 'comp:champions-bench'
@@ -192,3 +192,4 @@ const handleReroll = async (grabBack = false) => {
   border-radius: @border-radius;
 }
 </style>
+@shared/types/lcu/champ-select

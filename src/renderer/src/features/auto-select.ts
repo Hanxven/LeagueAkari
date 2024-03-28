@@ -4,7 +4,7 @@ import { useStableRef } from '@renderer/compositions/useStableRef'
 import { notify } from '@renderer/events/notifications'
 import { action, benchSwap, pickOrBan } from '@renderer/http-api/champ-select'
 import { chatSend } from '@renderer/http-api/chat'
-import { Action, ChampSelectSummoner } from '@renderer/types/champ-select'
+import { Action, ChampSelectSummoner } from '@shared/types/lcu/champ-select'
 import { getSetting, removeSetting, setSetting } from '@renderer/utils/storage'
 
 import { useChampSelectStore } from './stores/lcu/champ-select'

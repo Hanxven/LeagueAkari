@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive, shallowReactive, shallowRef } from 'vue'
 
-import { ChatPerson, Conversation } from '@renderer/types/chat'
+import { ChatPerson, Conversation } from '@shared/types/lcu/chat'
 
 export interface Conversations {
   championSelect: Conversation | null

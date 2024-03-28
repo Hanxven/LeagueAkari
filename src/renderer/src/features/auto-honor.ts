@@ -2,7 +2,7 @@ import { honor } from '@renderer/http-api/honor-v2'
 import { getEogStatus } from '@renderer/http-api/lobby'
 import { getGame } from '@renderer/http-api/match-history'
 import { getSummonerByPuuid } from '@renderer/http-api/summoner'
-import { Ballot } from '@renderer/types/honorV2'
+import { Ballot } from '@shared/types/lcu/honorV2'
 import { getSetting, setSetting } from '@renderer/utils/storage'
 
 import { useSummonerStore } from './stores/lcu/summoner'

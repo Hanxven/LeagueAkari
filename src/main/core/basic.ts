@@ -3,7 +3,7 @@ import { observable, reaction, runInAction } from 'mobx'
 
 import toolkit from '../native/laToolkitWin32x64.node'
 import { onCall, sendUpdateToAll } from '../utils/ipc'
-import { getProcessPidByName as getProcessPidsByName, isProcessExists, queryLcuAuth } from '../utils/shell'
+import { queryLcuAuth } from '../utils/shell'
 
 const clientName = 'LeagueClientUx.exe'
 

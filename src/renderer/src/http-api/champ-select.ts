@@ -1,4 +1,4 @@
-import { ChampSelectSession, GridChamp } from '@renderer/types/champ-select'
+import { ChampSelectSession, GridChamp } from '@shared/types/lcu/champ-select'
 
 import { request } from './common'
 

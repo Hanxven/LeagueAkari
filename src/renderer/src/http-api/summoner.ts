@@ -1,4 +1,4 @@
-import { SummonerInfo } from '@renderer/types/summoner'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 
 import { request } from './common'
 

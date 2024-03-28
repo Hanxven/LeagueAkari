@@ -82,6 +82,26 @@
             <td>密钥</td>
             <td><CopyableText :text="lcuState.auth?.password ?? '-'" /></td>
           </tr>
+          <tr>
+            <td>区服</td>
+            <td>
+              <CopyableText :text="lcuState.auth?.rsoPlatformId ?? '-'">{{
+                lcuState.auth?.rsoPlatformId
+                  ? rsoPlatformText[lcuState.auth.rsoPlatformId] || lcuState.auth.rsoPlatformId
+                  : lcuState.auth?.rsoPlatformId
+              }}</CopyableText>
+            </td>
+          </tr>
+          <tr>
+            <td>地域</td>
+            <td>
+              <CopyableText :text="lcuState.auth?.region ?? '-'">{{
+                lcuState.auth?.region
+                  ? regionText[lcuState.auth.region] || lcuState.auth.region
+                  : lcuState.auth?.region
+              }}</CopyableText>
+            </td>
+          </tr>
         </tbody>
       </NTable>
     </NCard>
@@ -102,6 +122,8 @@
 </template>
 
 <script setup lang="ts">
+import { RadixMatcher } from '@shared/utils/radix-matcher'
+import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import {
   DataTableColumn,
   NAutoComplete,
@@ -128,7 +150,6 @@ import { useLcuStateStore } from '@renderer/features/stores/lcu-connection'
 import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
 import { useSettingsStore } from '@renderer/features/stores/settings'
 import { call } from '@renderer/ipc'
-import { RadixMatcher } from '@renderer/utils/radix-matcher'
 
 import CopyableText from '../CopyableText.vue'
 import { lcuEndpoints } from './lcu-endpoints'

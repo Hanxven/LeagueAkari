@@ -229,8 +229,8 @@ import { championIcon } from '@renderer/features/game-data'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@renderer/features/match-history'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { MatchHistoryGame, SavedTaggedPlayer } from '@renderer/features/stores/match-history'
-import { RankedStats } from '@renderer/types/ranked'
-import { SummonerInfo } from '@renderer/types/summoner'
+import { RankedStats } from '@shared/types/lcu/ranked'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { winRateTeamText } from '@renderer/utils/sarcasms'
 
 import RankedSpan from '../match-history/widgets/RankedSpan.vue'
@@ -582,3 +582,4 @@ const analysis = computed(() => getAnalysis(matchHistoryList.value))
   }
 }
 </style>
+@shared/types/lcu/ranked@shared/types/lcu/summoner

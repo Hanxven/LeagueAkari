@@ -26,7 +26,7 @@ import { InformationCircleOutline as InformationIcon } from '@vicons/ionicons5'
 import { NIcon, NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-import { RankedEntry, RankedStats } from '@renderer/types/ranked'
+import { RankedEntry, RankedStats } from '@shared/types/lcu/ranked'
 
 const props = defineProps<{
   ranked: RankedStats
@@ -186,3 +186,4 @@ const formatRankText = (rank: RankedEntry, simple = false) => {
   font-size: 16px;
 }
 </style>
+@shared/types/lcu/ranked

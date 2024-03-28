@@ -8,6 +8,8 @@ export interface LcuAuth {
   pid: number
   password: string
   certificate: string
+  rsoPlatformId: string
+  region: string
 }
 
 export const useLcuStateStore = defineStore('lcu-state', () => {

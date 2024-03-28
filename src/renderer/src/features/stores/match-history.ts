@@ -2,9 +2,9 @@ import { defineStore } from 'pinia'
 import { markRaw, ref } from 'vue'
 
 import { useTabs } from '@renderer/compositions/useTabs'
-import { Game } from '@renderer/types/match-history'
-import { RankedStats } from '@renderer/types/ranked'
-import { SummonerInfo } from '@renderer/types/summoner'
+import { Game } from '@shared/types/lcu/match-history'
+import { RankedStats } from '@shared/types/lcu/ranked'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { LruMap } from '@renderer/utils/collection'
 
 import { fetchTabFullData } from '../match-history'
