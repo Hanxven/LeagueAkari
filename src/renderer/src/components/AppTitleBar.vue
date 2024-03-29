@@ -5,7 +5,11 @@
         <NIcon class="icon"><SettingsIcon /></NIcon>
         <span class="text">设置</span>
       </div>
-      <div v-if="respawnTimer.isDead" class="title-bar-item display" title="距离重生时间">
+      <div v-if="respawnTimer.isDead" class="title-bar-item display relative" title="距离重生时间">
+        <div
+          class="progress-mask"
+          :style="{ width: `${100 - (respawnTimer.timeLeft / respawnTimer.totalTime) * 100}%` }"
+        ></div>
         <NIcon class="icon"><HourglassIcon /></NIcon>
         <span class="text">距离重生 {{ respawnTimer.timeLeft.toFixed() }} s</span>
       </div>
@@ -119,16 +123,33 @@ const emits = defineEmits<{
 
   .display {
     padding: 0 8px;
-    background-color: rgb(20, 67, 74);
+    background-color: rgb(15, 71, 21);
+    z-index: 2;
+  }
+
+  .relative {
+    position: relative;
+  }
+
+  .progress-mask {
+    position: absolute;
+    height: 100%;
+    width: 0%;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 3;
+    transition: width 0.3s ease;
   }
 
   .title-bar-item .text {
     margin-left: 4px;
     font-size: 12px;
+    z-index: 5;
   }
 
   .title-bar-item .icon {
     font-size: 16px;
+    z-index: 5;
   }
 }
 

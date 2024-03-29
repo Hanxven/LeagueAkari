@@ -18,9 +18,6 @@ export async function call<R = any>(func: string, ...args: any[]): Promise<R> {
   const res = (await window.electron.ipcRenderer.invoke(`call:${func}`, ...args)) as IpcDataType
 
   if (!res.success) {
-    if (res.error.stack) {
-      console.error(res.error.stack)
-    }
     throw res.error
   }
 

@@ -51,6 +51,10 @@ export function setupRespawnTimer() {
       })
 
       if (self) {
+        if (!respawnTimer.isDead && self.isDead) {
+          respawnTimer.totalTime = self.respawnTimer
+        }
+
         respawnTimer.isDead = self.isDead
         respawnTimer.timeLeft = self.respawnTimer
       }
@@ -82,7 +86,6 @@ export function setupRespawnTimer() {
     () => gameflow.phase,
     (phase) => {
       if (phase === 'InProgress') {
-        console.log('dp')
         if (settings.respawnTimer.enabled) {
           startRespawnTimerPoll()
         }

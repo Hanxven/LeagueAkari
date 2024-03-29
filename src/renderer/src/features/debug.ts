@@ -1,4 +1,4 @@
-import { request } from '@renderer/http-api/common'
+import { gameClientRequest, request } from '@renderer/http-api/common'
 import { call } from '@renderer/ipc'
 import { router } from '@renderer/routes'
 
@@ -12,6 +12,8 @@ export function setupDebug() {
   // 全局功能
   // @ts-ignore
   window.lcuRequest = request
+  // @ts-ignore
+  window.gameClientRequest = gameClientRequest
   // @ts-ignore
   window.onLcuEvent = onLcuEvent
   // @ts-ignore

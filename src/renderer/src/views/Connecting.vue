@@ -1,42 +1,45 @@
 <template>
   <div class="waiting-screen">
     <div class="inner-content">
-      <div v-if="existingClients.length" class="text-line-1">
-        <template v-if="existingClients.length">
-          <div class="servers-available">已启动的客户端</div>
-          <NScrollbar style="max-height: 45vh" trigger="none">
-            <div
-              v-for="a of existingClients"
-              :key="a.pid"
-              class="client"
-              :style="{
-                cursor:
-                  currentConnectingClientPid && currentConnectingClientPid !== a.pid
-                    ? 'not-allowed'
-                    : 'cursor'
-              }"
-              @click="() => handleConnect(a)"
-            >
-              <span class="region" title="地区"
-                ><NSpin
-                  v-if="currentConnectingClientPid === a.pid"
-                  :size="12"
-                  class="left-widget"
-                /><NIcon v-else class="left-widget" style="vertical-align: text-bottom"
-                  ><CubeSharp
-                /></NIcon>
-                {{ regionText[a.region] || a.region }}</span
+      <template v-if="lcuState.state === 'disconnected' || lcuState.state === 'connecting'">
+        <div v-if="existingClients.length" class="text-line-1">
+          <template v-if="existingClients.length">
+            <div class="servers-available">已启动的客户端</div>
+            <NScrollbar style="max-height: 45vh" trigger="none">
+              <div
+                v-for="a of existingClients"
+                :key="a.pid"
+                class="client"
+                :style="{
+                  cursor:
+                    currentConnectingClientPid && currentConnectingClientPid !== a.pid
+                      ? 'not-allowed'
+                      : 'cursor'
+                }"
+                @click="() => handleConnect(a)"
               >
-              <span class="rso" title="区服">{{
-                rsoPlatformText[a.rsoPlatformId] || a.rsoPlatformId
-              }}</span>
-              <span class="pid" title="Process ID">{{ a.pid }}</span>
-            </div>
-          </NScrollbar>
-        </template>
-      </div>
-      <div v-else class="text-line-1">游戏客户端未启动，等待客户端启动</div>
-      <div v-if="isErr" class="error-hint">无法获取连接信息。请检查游戏客户端是否已经开启。</div>
+                <span class="region" title="地区"
+                  ><NSpin
+                    v-if="currentConnectingClientPid === a.pid"
+                    :size="12"
+                    class="left-widget"
+                  /><NIcon v-else class="left-widget" style="vertical-align: text-bottom"
+                    ><CubeSharp
+                  /></NIcon>
+                  {{ regionText[a.region] || a.region }}</span
+                >
+                <span class="rso" title="区服">{{
+                  rsoPlatformText[a.rsoPlatformId] || a.rsoPlatformId
+                }}</span>
+                <span class="pid" title="Process ID">{{ a.pid }}</span>
+              </div>
+            </NScrollbar>
+          </template>
+        </div>
+        <div v-else class="text-line-1">游戏客户端未启动，等待客户端启动</div>
+        <div v-if="isErr" class="error-hint">无法获取连接信息。请检查游戏客户端是否已经开启。</div>
+      </template>
+      <div v-else class="servers-available">已连接</div>
     </div>
   </div>
 </template>
