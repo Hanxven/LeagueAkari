@@ -4,6 +4,7 @@ import { basicState } from './basic'
 import { getHttpInstance } from './connection'
 
 export function initLcuClientFunctions() {
+  // call:/la/league-client-ux/fix-window-method-a
   onCall('fixWindowMethodA', async (_e, config) => {
     if (!basicState.isAdmin) {
       throw new Error('权限不足')

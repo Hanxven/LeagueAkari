@@ -36,7 +36,7 @@ export function setupRespawnTimer() {
     try {
       const playerList = (await getPlayerList()).data
       const self = playerList.find((p) => {
-        // 名称检查确认
+        // 名称检查确认，这个接口没有 tagLine
         const isNameEqualed =
           p.summonerName ===
           (summoner.currentSummoner!.displayName || summoner.currentSummoner!.gameName)
@@ -54,12 +54,8 @@ export function setupRespawnTimer() {
         respawnTimer.isDead = self.isDead
         respawnTimer.timeLeft = self.respawnTimer
       }
-    } catch (err) {}
+    } catch {}
   }
-
-  watch([() => respawnTimer.timeLeft, () => respawnTimer.isDead], (t, i) => {
-    console.log(t, i)
-  })
 
   startRespawnTimerPoll = async () => {
     if (isStarted) {

@@ -10,6 +10,7 @@ const gkl = new GlobalKeyboardListener()
 // 和平台相关的 API，目前仅限 Windows
 export function initWindowsPlatform() {
   // 系统级别的通知事件，暂未实装
+  // call:/la/notification
   onCall('notification', (event, options) => {
     options.id = options.id || randomUUID()
 
@@ -30,10 +31,12 @@ export function initWindowsPlatform() {
 
   const siw = sendInputWorker({})
 
+  // call:/la/send-key
   onCall('sendKey', (_, key, pressed) => {
     siw.postMessage({ type: 'key', key, press: pressed })
   })
 
+  // call:/la/send-keys
   onCall('sendKeys', (_, str) => {
     siw.postMessage({ type: 'string', data: str })
   })

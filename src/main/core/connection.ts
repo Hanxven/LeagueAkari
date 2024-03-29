@@ -111,6 +111,7 @@ export function getWebSocket() {
 const INTERVAL_TIMEOUT = 10000
 
 export async function initConnectionIpc() {
+  // call:/la/lcu/connect
   onCall('connect', async (_, auth1: LcuAuth) => {
     try {
       if (connectState.wsState === 'connecting') {
@@ -182,6 +183,7 @@ export async function initConnectionIpc() {
     }
   })
 
+  // call:/la/lcu/disconnect
   onCall('disconnect', async () => {
     if (ws) {
       ws.close()
@@ -198,14 +200,17 @@ export async function initConnectionIpc() {
     })
   })
 
+  // get:/la/lcu/state
   onCall('getLcuState', async () => {
     return connectState.wsState
   })
 
+  // get:/la/lcu/auth
   onCall('getLcuAuth', async () => {
     return toJS(connectState.auth)
   })
 
+  // call:/la/lcu/http-request
   onCall('httpRequest', async (_event, config) => {
     if (connectState.wsState !== 'connected') {
       throw new Error('LCU 未初始化')
@@ -219,6 +224,7 @@ export async function initConnectionIpc() {
     }
   })
 
+  // call:/la/game-client/http-request
   onCall('httpRequest:gameClient', async (_event, config) => {
     const { config: c, request, ...rest } = await gameClientRequest.request(config)
 

@@ -1,5 +1,5 @@
 /**
- * 实验性 API，并未实装
+ * 实现一些 JavaScript 办不到的操作
  */
 declare module '*/laInputWin32x64.node' {
   interface LeagueAkariInputAddon {
@@ -66,6 +66,9 @@ declare module '*/laToolkitWin32x64.node' {
      */
     fixWindowMethodA(clientZoom: number, config?: { baseWidth: number; baseHeight: number }): void
 
+    /**
+     * 检测是否在提升后的权限中运行
+     */
     isElevated(): boolean
   }
 

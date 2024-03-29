@@ -29,14 +29,17 @@ export async function initBasicIpc() {
     throw new Error('缺乏必要权限')
   }
 
+  // get:/la/is-admin
   onCall('isAdmin', () => {
     return basicState.isAdmin
   })
 
+  // get:/la/version
   onCall('getVersion', () => {
     return app.getVersion()
   })
 
+  // get:/la/lcu/auth
   // 检查英雄联盟渲染端是否存在，可能存在多个
   onCall('queryLcuAuth', async () => {
     return await queryLcuAuth(LEAGUE_CLIENT_UX_PROCESS_NAME)
