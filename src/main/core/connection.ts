@@ -4,16 +4,18 @@ import { observable, reaction, runInAction, toJS } from 'mobx'
 import { WebSocket } from 'ws'
 
 import { onCall, sendUpdateToAll } from '../utils/ipc'
-import { LcuAuth, certificate } from '../utils/lcu-auth'
+import { LcuAuth, RIOT_CERTIFICATE } from '../utils/lcu-auth'
 import { getRandomAvailableLoopbackAddrWithPort } from '../utils/loopback'
 
 let request: AxiosInstance | null = null
 let ws: WebSocket | null = null
 
+const GAME_CLIENT_BASE_URL = 'https://127.0.0.1:2999'
+
 const gameClientRequest = axios.create({
-  baseURL: 'https://127.0.0.1:2999',
+  baseURL: GAME_CLIENT_BASE_URL,
   httpsAgent: new https.Agent({
-    ca: certificate
+    ca: RIOT_CERTIFICATE
   })
 })
 

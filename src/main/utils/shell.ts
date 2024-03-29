@@ -1,7 +1,7 @@
 import { SpawnOptionsWithoutStdio, spawn } from 'node:child_process'
 import fs from 'node:fs'
 
-import { LcuAuth, certificate } from './lcu-auth'
+import { LcuAuth, RIOT_CERTIFICATE } from './lcu-auth'
 
 const WMIC_PATH = 'C:\\Windows\\System32\\wbem\\WMIC.exe'
 
@@ -93,7 +93,7 @@ function parseLcuAuth(s: string): LcuAuth | null {
     password,
     rsoPlatformId,
     region,
-    certificate
+    certificate: RIOT_CERTIFICATE
   }
 }
 

@@ -1,9 +1,7 @@
-import { queryLcuAuth } from './shell'
-
 /**
  * 来自 Riot 的证书文件
  */
-export const certificate = `-----BEGIN CERTIFICATE-----
+export const RIOT_CERTIFICATE = `-----BEGIN CERTIFICATE-----
 MIIEIDCCAwgCCQDJC+QAdVx4UDANBgkqhkiG9w0BAQUFADCB0TELMAkGA1UEBhMC
 VVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFTATBgNVBAcTDFNhbnRhIE1vbmljYTET
 MBEGA1UEChMKUmlvdCBHYW1lczEdMBsGA1UECxMUTG9MIEdhbWUgRW5naW5lZXJp

@@ -5,7 +5,7 @@ import toolkit from '../native/laToolkitWin32x64.node'
 import { onCall, sendUpdateToAll } from '../utils/ipc'
 import { queryLcuAuth } from '../utils/shell'
 
-const clientName = 'LeagueClientUx.exe'
+const LEAGUE_CLIENT_UX_PROCESS_NAME = 'LeagueClientUx.exe'
 
 export const basicState = observable({
   isAdmin: false
@@ -39,6 +39,6 @@ export async function initBasicIpc() {
 
   // 检查英雄联盟渲染端是否存在，可能存在多个
   onCall('queryLcuAuth', async () => {
-    return await queryLcuAuth(clientName)
+    return await queryLcuAuth(LEAGUE_CLIENT_UX_PROCESS_NAME)
   })
 }
