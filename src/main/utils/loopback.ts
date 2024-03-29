@@ -1,4 +1,4 @@
-import net from 'net'
+import net from 'node:net'
 
 export function checkPortInUse(host: string, port: number, timeout = 500): Promise<boolean> {
   return new Promise((resolve, _reject) => {

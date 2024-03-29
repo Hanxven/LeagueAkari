@@ -1,4 +1,4 @@
-import { parentPort } from 'worker_threads'
+import { parentPort } from 'node:worker_threads'
 
 import input from '../native/laInputWin32x64.node'
 

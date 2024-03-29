@@ -1,7 +1,7 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { BrowserWindow, app, dialog, shell } from 'electron'
 import { configure } from 'mobx'
-import { join } from 'path'
+import { join } from 'node:path'
 import 'reflect-metadata'
 
 import icon from '../../resources/LA_ICON.ico?asset'

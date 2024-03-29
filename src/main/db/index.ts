@@ -1,5 +1,5 @@
 import { app } from 'electron'
-import { join } from 'path'
+import { join } from 'node:path'
 import { DataSource } from 'typeorm'
 
 import { Metadata } from './entities/Metadata'

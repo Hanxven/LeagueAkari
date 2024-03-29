@@ -39,7 +39,7 @@
         <div v-else class="text-line-1">游戏客户端未启动，等待客户端启动</div>
         <div v-if="isErr" class="error-hint">无法获取连接信息。请检查游戏客户端是否已经开启。</div>
       </template>
-      <div v-else class="servers-available">已连接</div>
+      <div v-else class="servers-available">已连接，加载中</div>
     </div>
   </div>
 </template>
@@ -52,6 +52,7 @@ import { NIcon, NScrollbar, NSpin, useNotification } from 'naive-ui'
 import { ref, shallowRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { notify } from '@renderer/events/notifications'
 import { useAppState } from '@renderer/features/stores/app'
 import { useLcuStateStore } from '@renderer/features/stores/lcu-connection'
 import { useSettingsStore } from '@renderer/features/stores/settings'
@@ -129,6 +130,11 @@ useTimeoutPoll(
     try {
       existingClients.value = await call('queryLcuAuth')
     } catch (error) {
+      notify.emit({
+        type: 'error',
+        content: `尝试检查进程存在时发生错误：${(error as any)?.message}`,
+        extra: { error }
+      })
       console.error('尝试检查进程存在时发生错误', error)
     }
   },
