@@ -18,6 +18,10 @@
 
 - 自动点赞的默认值有误，现在会默认为随机预组队成员。
 
+## 优化
+
+- 优化的 Tab 页面切换性能。[Issue #15](https://github.com/Hanxven/LeagueAkari/issues/15) [@watchingfun](https://github.com/watchingfun)
+
 # 1.1.3 (2024-03-25)
 
 本版本仅涉及到 BUG 更正。

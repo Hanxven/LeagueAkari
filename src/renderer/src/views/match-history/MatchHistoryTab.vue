@@ -265,6 +265,7 @@ const scrollToTop = () => {
 }
 
 defineExpose({
+  id: props.tab.id,
   scrollToTop
 })
 </script>

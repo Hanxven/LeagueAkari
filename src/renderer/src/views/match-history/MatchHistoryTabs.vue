@@ -111,12 +111,16 @@
             ><NIcon><ArrowUpIcon /></NIcon></template
         ></NButton>
       </div>
-      <MatchHistoryTab
-        ref="innerComp"
-        v-if="mh.currentTab"
-        :tab="(mh.currentTab.data as TabState)"
-        :is-self-tab="mh.currentTab.id === summoner.currentSummoner?.summonerId"
-      />
+      <template v-if="mh.currentTab">
+        <MatchHistoryTab
+          v-for="t of mh.tabs"
+          :key="t.id"
+          v-show="t.id === mh.currentTab.id"
+          ref="innerComps"
+          :is-self-tab="mh.currentTab.id === summoner.currentSummoner?.summonerId"
+          :tab="t.data as TabState"
+        />
+      </template>
       <div v-else class="tabs-placeholder">League Akari</div>
     </div>
   </div>
@@ -137,7 +141,6 @@ import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
 import { TabState, useMatchHistoryStore } from '@renderer/features/stores/match-history'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
-
 
 const route = useRoute()
 const router = useRouter()
@@ -268,8 +271,13 @@ const handleShowMenu = (e: PointerEvent, id: number) => {
   menuProps.id = id
 }
 
-const innerComp = ref()
-const handleBackToTop = () => innerComp.value?.scrollToTop()
+const innerComps = ref<(typeof MatchHistoryTab)[]>([])
+const handleBackToTop = () => {
+  const tab = innerComps.value.find((t) => t.id === mh.currentTab?.id)
+  if (tab) {
+    tab.scrollToTop()
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -349,7 +357,9 @@ const handleBackToTop = () => innerComp.value?.scrollToTop()
     position: absolute;
     z-index: 1500;
     opacity: 0.6;
-    transition: opacity 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      opacity 0.2s ease,
+      box-shadow 0.2s ease;
     overflow: hidden;
     border-radius: 50%;
     box-shadow: 0 0 12px 0 rgba(84, 84, 84, 0.35);
