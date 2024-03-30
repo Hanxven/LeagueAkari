@@ -92,6 +92,10 @@
 
 注 2: 对于记录对局玩家，其使用 SQLite 作为数据库，存放在应用目录的 league-akari.db 中。
 
+# 更名
+
+该项目的前名称为 League-Toolkit。由于和现有项目重名，更名为 LeagueAkari。
+
 # 样例
 
 包含了一些使用样例。
