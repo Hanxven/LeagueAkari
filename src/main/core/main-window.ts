@@ -1,6 +1,6 @@
 import { is } from '@electron-toolkit/utils'
 import { BrowserWindow, shell } from 'electron'
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, reaction } from 'mobx'
 import { join } from 'node:path'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
@@ -32,6 +32,26 @@ export function getMainWindow() {
   return mainWindow
 }
 
+export function restoreAndFocus() {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+    }
+    mainWindow.focus()
+  }
+}
+
+export function toggleMinimizeAndFocus() {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+      mainWindow.focus()
+    } else {
+      mainWindow.minimize()
+    }
+  }
+}
+
 export function createMainWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1080,
@@ -43,6 +63,7 @@ export function createMainWindow(): void {
     title: 'League Akari',
     autoHideMenuBar: false,
     icon,
+    fullscreenable: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -95,6 +116,10 @@ export function initMainWindow(w: BrowserWindow) {
 
   w.on('minimize', () => {
     windowState.setState('minimized')
+  })
+
+  w.on('restore', () => {
+    windowState.setState('normal')
   })
 
   w.on('focus', () => {

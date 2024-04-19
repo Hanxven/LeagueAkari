@@ -36,11 +36,11 @@ app.whenReady().then(async () => {
 
   try {
     initLogger()
+    initWindowsPlatform()
     await initDatabase()
     checkWmicAvailability()
     await initApp()
     await initLcuConnection()
-    initWindowsPlatform()
     initStorageIpc()
     await initLeagueClientFunctions()
     await setupLeagueAkariFeatures()
