@@ -26,7 +26,28 @@
         :status="editRuleValid ? 'success' : 'error'"
       />
     </NModal>
+
     <NCard size="small">
+      <template #header><span class="card-header-title">Electron</span></template>
+      <div class="buttons">
+        <NButton size="tiny" secondary type="primary" @click="handleToggleDevtools"
+          >Toggle Devtools</NButton
+        >
+        <NButton size="tiny" secondary type="primary" @click="handleReload">重新加载界面</NButton>
+      </div>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">日志</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="日志目录"
+        label-description="打开 League Akari 日志文件所在目录"
+        :label-width="320"
+      >
+        <NButton size="tiny" @click="() => handleShowLogsDir()">日志目录</NButton>
+      </ControlItem>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">在控制台打印 LCU 事件</span></template>
       <div class="operations">
         <NCheckbox size="small" class="check-box" v-model:checked="debug.settings.printAllLcuEvents"
@@ -52,26 +73,6 @@
           <template #empty>无内容</template>
         </NDataTable>
       </NCollapseTransition>
-    </NCard>
-    <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">Electron</span></template>
-      <div class="buttons">
-        <NButton size="tiny" secondary type="primary" @click="handleToggleDevtools"
-          >Toggle Devtools</NButton
-        >
-        <NButton size="tiny" secondary type="primary" @click="handleReload">重新加载界面</NButton>
-      </div>
-    </NCard>
-    <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">日志</span></template>
-      <ControlItem
-        class="control-item-margin"
-        label="日志目录"
-        label-description="打开 League Akari 日志文件所在目录"
-        :label-width="320"
-      >
-        <NButton size="tiny" @click="() => handleShowLogsDir()">日志目录</NButton>
-      </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header

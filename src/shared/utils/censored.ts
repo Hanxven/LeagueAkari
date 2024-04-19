@@ -22,6 +22,6 @@ export function createSensitiveWordsReplacer(words: Word[]) {
 // 占位用途，暂未实装
 export const sensitiveWordsReplacer = createSensitiveWordsReplacer([
   { word: '萝莉', replaceBy: '罗利' },
-  { word: '泉此方', replaceBy: 'Konata' },
-  { word: '柊镜', replaceBy: 'Hiiragi' }
+  { word: '泉此方', replaceBy: 'Izumi Konata' },
+  { word: '柊镜', replaceBy: 'Hiiragi Kagami' }
 ])

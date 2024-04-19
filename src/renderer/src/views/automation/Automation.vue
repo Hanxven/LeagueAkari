@@ -2,9 +2,11 @@
   <div class="toolkit-wrapper" ref="el">
     <div class="toolkit-wrapper-inner">
       <NTabs type="line" animated>
-        <NTabPane tab="自动化" name="automation">
-          <AutoAccept class="tool" />
+        <NTabPane tab="对局中" name="in-progress">
           <AutoSelect class="tool" />
+        </NTabPane>
+        <NTabPane tab="流程" name="procedure">
+          <AutoAccept class="tool" />
           <AutoHonor class="tool" />
           <AutoReply class="tool" />
         </NTabPane>

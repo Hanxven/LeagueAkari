@@ -1,6 +1,6 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">结算自动点赞</span></template>
+    <template #header><span class="card-header-title">结算时点赞</span></template>
     <ControlItem
       class="control-item-margin"
       label="开启"

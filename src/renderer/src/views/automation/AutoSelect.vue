@@ -1,6 +1,6 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">自动英雄选择 / 禁用</span></template>
+    <template #header><span class="card-header-title">自动英雄选择 / 英雄禁用</span></template>
     <ControlItem
       class="control-item-margin"
       label="普通模式开启"
@@ -14,7 +14,7 @@
     </ControlItem>
     <ControlItem
       class="control-item-margin"
-      label="仅限同步自选"
+      label="仅限同步自选模式启用"
       label-description="仅当模式是同步自选模式时生效。这些模式通常需要所有玩家同时选择英雄"
     >
       <NSwitch
@@ -26,7 +26,7 @@
     <ControlItem
       class="control-item-margin"
       label="无视队友预选"
-      label-description="开启后将不会考虑队友的预选英雄"
+      label-description="开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突"
     >
       <NSwitch
         @update:value="(v) => setSelectTeammateIntendedChampion(v)"
@@ -37,7 +37,7 @@
     <ControlItem
       class="control-item-margin"
       label="随机挑选"
-      label-description="在期望列表中随机选择一个英雄，而不是按照列表靠前的顺序"
+      label-description="在期望列表中随机选择一个英雄，而不是默认的按照列表靠前的顺序"
     >
       <NSwitch
         @update:value="(v) => setSelectRandomly(v)"
@@ -91,11 +91,18 @@
         size="small"
       ></NSwitch>
     </ControlItem>
-    <ControlItem
-      class="control-item-margin"
-      label="选用延迟 (s)"
-      label-description="目标英雄出现在英雄选择台上的累计时间需达到此值才会执行交换操作，单位为秒"
-    >
+    <ControlItem class="control-item-margin" label="选用延迟 (s)">
+      <template #labelDescription>
+        目标英雄出现在英雄选择台上的累计时间需达到此值才会执行交换操作，单位为秒
+        <NTooltip>
+          <template #trigger
+            ><span style="text-decoration: underline; font-weight: 700">(?)</span></template
+          >
+          <div style="font-size: 12px; max-width: 300px">
+            当英雄出现在英雄选择台上时，会针对该英雄进行计时。只有其在英雄选择台上的累计时间满足设定值时，则执行自动选择，这可以避免“秒抢”的发生。
+          </div>
+        </NTooltip>
+      </template>
       <NInputNumber
         style="width: 100px"
         placeholder="秒"
@@ -157,7 +164,7 @@
 </template>
 
 <script setup lang="ts">
-import { NCard, NInputNumber, NSwitch } from 'naive-ui'
+import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
 import OrderedChampionList from '@renderer/components/OrderedChampionList.vue'

@@ -1,6 +1,6 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">自动接受对局</span></template>
+    <template #header><span class="card-header-title">接受对局</span></template>
     <ControlItem class="control-item-margin" label="开启">
       <div style="display: flex; align-items: center; gap: 8px">
         <NSwitch

@@ -1,5 +1,6 @@
 import { lcuEventEmitter } from '@main/core/lcu-connection'
 import { createLogger } from '@main/core/log'
+import { mwNotification } from '@main/core/main-window'
 import { accept } from '@main/http-api/matchmaking'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
@@ -8,7 +9,6 @@ import { reaction } from 'mobx'
 
 import { gameflow } from '../lcu-state-sync/gameflow'
 import { autoAcceptState } from './state'
-import { mwNotification } from '@main/core/main-window'
 
 let timerId: NodeJS.Timeout | null = null
 
@@ -57,7 +57,9 @@ export async function setupAutoAccept() {
         )
       } else {
         if (timerId) {
-          logger.info(`Auto accept canceled - not in ReadyCheck phase`)
+          if (autoAcceptState.willAutoAccept) {
+            logger.info(`Auto accept canceled - not in ReadyCheck phase`)
+          }
 
           clearTimeout(timerId)
           timerId = null
