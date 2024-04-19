@@ -42,14 +42,7 @@
         style="background-color: transparent; margin-bottom: 12px"
         size="small"
       >
-        <template #header
-          ><span class="card-header-title"
-            >预组队推测
-            <span style="font-size: 12px; color: rgb(184, 184, 184); font-weight: normal"
-              >(统计自 {{ Object.keys(cf.ongoingDetailedGamesCache).length }} 场游戏)</span
-            ></span
-          ></template
-        >
+        <template #header><span class="card-header-title">预组队推测</span></template>
         <div class="pre-made-team">
           <div
             class="group"

@@ -262,8 +262,6 @@ export const useCoreFunctionalityStore = defineStore('feature:core-functionality
     gameId: number
   } | null>(null)
 
-  const ongoingDetailedGamesCache = ref<Record<number | string, Game>>({})
-
   const ongoingPreMadeTeams = ref<
     {
       players: number[]
@@ -335,7 +333,6 @@ export const useCoreFunctionalityStore = defineStore('feature:core-functionality
     ongoingPlayers,
     ongoingGameInfo,
     ongoingTeams,
-    ongoingDetailedGamesCache,
     ongoingPreMadeTeams,
     ongoingState,
     isInEndgamePhase,

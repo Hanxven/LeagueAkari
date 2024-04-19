@@ -22,7 +22,8 @@
 import {
   AppSwitcher as AppSwitcherIcon,
   Layers as LayersIcon,
-  Template as TemplateIcon
+  Template as TemplateIcon,
+  AiStatus as AiStatusIcon
 } from '@vicons/carbon'
 import { MenuOption, NIcon, NMenu } from 'naive-ui'
 import { Component as ComponentC, h, ref, watchEffect } from 'vue'
@@ -43,11 +44,11 @@ const options = ref<MenuOption[]>([
     key: 'ongoing-game',
     icon: renderIcon(TemplateIcon)
   },
-  // {
-  //   label: '自动化',
-  //   key: 'automation',
-  //   icon: renderIcon(TemplateIcon)
-  // },
+  {
+    label: '自动化',
+    key: 'automation',
+    icon: renderIcon(AiStatusIcon)
+  },
   {
     label: '工具',
     key: 'toolkit',

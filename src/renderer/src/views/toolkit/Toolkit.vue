@@ -2,12 +2,6 @@
   <div class="toolkit-wrapper" ref="el">
     <div class="toolkit-wrapper-inner">
       <NTabs type="line" animated>
-        <NTabPane tab="自动化" name="automation">
-          <AutoAccept class="tool" />
-          <AutoSelect class="tool" />
-          <AutoHonor class="tool" />
-          <AutoReply class="tool" />
-        </NTabPane>
         <NTabPane tab="过程中" name="in-process">
           <ChampionBench class="tool" />
           <InProcess class="tool" />
@@ -34,10 +28,6 @@ import { ref } from 'vue'
 
 import { useKeepAliveScrollPositionMemo } from '@renderer/compositions/useKeepAliveScrollPositionMemo'
 
-import AutoAccept from './AutoAccept.vue'
-import AutoHonor from './AutoHonor.vue'
-import AutoReply from './AutoReply.vue'
-import AutoSelect from './AutoSelect.vue'
 import AvailabilityCheck from './AvailabilityCheck.vue'
 import ChampionBench from './ChampionBench.vue'
 import ChatAvailability from './ChatAvailability.vue'

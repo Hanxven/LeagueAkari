@@ -149,10 +149,7 @@ export async function setupCoreFunctionality() {
 
   mainStateSync('core-functionality/ongoing-pre-made-teams', (s) => (cf.ongoingPreMadeTeams = s))
 
-  mainStateSync('core-functionality/send-list', (s) => {
-    cf.sendList = s
-    console.log(s)
-  })
+  mainStateSync('core-functionality/send-list', (s) => (cf.sendList = s))
 
   // 对于自己页面的数据更新
   watch(

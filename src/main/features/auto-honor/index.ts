@@ -49,9 +49,6 @@ export async function setupAutoHonor() {
             )
           ).filter((p) => p.summonerId !== summoner.me?.summonerId)
 
-          // DEBUGGING
-          console.log('结算可用的房间玩家', lobbyMemberSummoners)
-
           const honorableLobbyMembers = lobbyMemberSummoners.filter((p) =>
             eligiblePlayerIds.has(p.summonerId)
           )

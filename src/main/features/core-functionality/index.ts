@@ -77,11 +77,11 @@ export async function setupCoreFunctionality() {
   const debouncedAnalyzeTeamUpFn = debounce(analyzeTeamUp, 500, { leading: true })
 
   reaction(
-    () => [Array.from(cf.tempDetailedGames.values()), cf.ongoingTeams] as const,
-    ([games, t]) => {
+    () => [Array.from(cf.tempDetailedGames.values()), cf.ongoingTeams, cf.ongoingState] as const,
+    ([games, t, s]) => {
       if (games.length && t) {
-        const result = debouncedAnalyzeTeamUpFn(games, t)
-        if (cf.ongoingState !== 'unavailable') {
+        if (s !== 'unavailable') {
+          const result = debouncedAnalyzeTeamUpFn(games, t)
           runInAction(() => {
             cf.ongoingPreMadeTeams = result
           })

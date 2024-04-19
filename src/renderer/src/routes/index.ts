@@ -27,6 +27,11 @@ const router = createRouter({
           name: 'toolkit',
           path: '/toolkit',
           component: () => import('@renderer/views/toolkit/Toolkit.vue')
+        },
+        {
+          name: 'automation',
+          path: '/automation',
+          component: () => import('@renderer/views/automation/Automation.vue')
         }
       ]
     },

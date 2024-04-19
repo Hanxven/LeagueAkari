@@ -67,6 +67,13 @@ export function setupNaiveUiNotificationEvents() {
       ...event.options
     })
 
-    console.log(dayjs().format('HH:mm:ss'), event.type, event.title, event.content, event.error)
+    console.log(
+      dayjs().format('HH:mm:ss'),
+      event.type,
+      event.title,
+      event.content,
+      event.error,
+      event.error?.response
+    )
   })
 }

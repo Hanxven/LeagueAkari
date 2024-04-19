@@ -1,0 +1,59 @@
+<template>
+  <div class="toolkit-wrapper" ref="el">
+    <div class="toolkit-wrapper-inner">
+      <NTabs type="line" animated>
+        <NTabPane tab="自动化" name="automation">
+          <AutoAccept class="tool" />
+          <AutoSelect class="tool" />
+          <AutoHonor class="tool" />
+          <AutoReply class="tool" />
+        </NTabPane>
+      </NTabs>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { NTabPane, NTabs } from 'naive-ui'
+import { ref } from 'vue'
+
+import { useKeepAliveScrollPositionMemo } from '@renderer/compositions/useKeepAliveScrollPositionMemo'
+
+import AutoAccept from './AutoAccept.vue'
+import AutoHonor from './AutoHonor.vue'
+import AutoReply from './AutoReply.vue'
+import AutoSelect from './AutoSelect.vue'
+
+// const id = 'view:toolkit'
+const el = ref()
+useKeepAliveScrollPositionMemo(el)
+</script>
+
+<style lang="less" scoped>
+.toolkit-wrapper {
+  position: relative;
+  height: 100%;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.anchor {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+
+.toolkit-wrapper-inner {
+  padding: 24px;
+  margin: 0 auto;
+  max-width: 800px;
+
+  :deep(.n-card) {
+    background-color: transparent;
+  }
+}
+
+.tool:not(:last-child) {
+  margin-bottom: 8px;
+}
+</style>
