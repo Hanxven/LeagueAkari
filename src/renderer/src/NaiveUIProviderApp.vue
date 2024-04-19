@@ -1,12 +1,11 @@
 <template>
   <NConfigProvider
-    :theme-overrides="{ Notification: { padding: '12px' } }"
+    :theme-overrides="themeOverrides"
     :theme="darkTheme"
     :locale="zhCN"
     :date-locale="dateZhCN"
     id="naive-ui-config-provider"
   >
-    <!-- 这嵌套看的我头大 -->
     <!-- 需要给一个相对于 Title Bar 的偏移量 -->
     <NMessageProvider :container-style="{ top: 'calc(var(--app-title-bar-height) + 12px)' }">
       <NNotificationProvider placement="bottom-right">
@@ -20,6 +19,7 @@
 
 <script setup lang="ts">
 import {
+  GlobalThemeOverrides,
   NConfigProvider,
   NDialogProvider,
   NMessageProvider,
@@ -30,4 +30,14 @@ import {
 } from 'naive-ui'
 
 import App from './App.vue'
+
+const themeOverrides: GlobalThemeOverrides = {
+  Notification: { padding: '12px' }
+}
 </script>
+
+<style>
+.bb {
+  color: #f2a6ac;
+}
+</style>
