@@ -75,7 +75,7 @@ export function createMainWindow(): void {
 // 和窗口相关的 API
 export function initMainWindow(w: BrowserWindow) {
   ipcStateSync('main-window/state', () => windowState.state)
-  ipcStateSync('main-window/focus', () => windowState.state)
+  ipcStateSync('main-window/focus', () => windowState.focus)
 
   if (w.isMaximized()) {
     windowState.setState('maximized')

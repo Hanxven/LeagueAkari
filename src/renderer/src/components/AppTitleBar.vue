@@ -157,7 +157,7 @@ const emits = defineEmits<{
   flex: 1;
   text-align: center;
   transition: all 0.3s;
-  color: rgb(157, 165, 180);
+  color: rgb(189, 195, 205);
 }
 
 .traffic {

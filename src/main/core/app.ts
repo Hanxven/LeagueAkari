@@ -300,7 +300,7 @@ async function migrateFromPreviousLocalStorageSettings(all: Record<string, strin
     })
 
     if (res.response === 0) {
-      logger.info('Old settings were migrated already. Now Relaunching the app...')
+      logger.info('Old settings were migrated already. Now request to relaunching the app...')
       app.relaunch()
       app.quit()
     } else if (res.response === 1) {

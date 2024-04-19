@@ -9,9 +9,9 @@ export async function setupApp() {
 
   await migrateFromPreviousLocalStorageSettings()
 
-  mainStateSync('main-window/state', (s) => {
-    app.windowState = s
-  })
+  mainStateSync('main-window/state', (s) => (app.windowState = s))
+
+  mainStateSync('main-window/focus', (s) => (app.focusState = s))
 
   mainStateSync('app/is-administrator', (s) => {
     app.isAdministrator = s
