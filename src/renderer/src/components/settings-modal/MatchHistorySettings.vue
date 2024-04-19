@@ -154,18 +154,6 @@
           @update:value="(val) => setSendKdaInGameWithPreMadeTeams(val)"
         />
       </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        label="KDA 发送附带免责声明"
-        label-description="在发送 KDA 数据时，附带一条免责声明"
-        :label-width="320"
-      >
-        <NSwitch
-          size="small"
-          :value="coreFunctionality.settings.sendKdaInGameWithDisclaimer"
-          @update:value="(val) => setSendKdaInGameWithDisclaimer(val)"
-        />
-      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>
@@ -180,7 +168,6 @@ import {
   setMatchHistoryLoadCount,
   setPreMadeThreshold,
   setSendKdaInGame,
-  setSendKdaInGameWithDisclaimer,
   setSendKdaInGameWithPreMadeTeams,
   setSendKdaThreshold,
   setTeamAnalysisPreloadCount

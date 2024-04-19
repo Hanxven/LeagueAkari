@@ -126,10 +126,6 @@ export async function setupCoreFunctionality() {
     (s) => (cf.settings.sendKdaInGame = s)
   )
   mainStateSync(
-    'core-functionality/settings/send-kda-in-game-with-disclaimer',
-    (s) => (cf.settings.sendKdaInGameWithDisclaimer = s)
-  )
-  mainStateSync(
     'core-functionality/settings/send-kda-in-game-with-pre-made-teams',
     (s) => (cf.settings.sendKdaInGameWithPreMadeTeams = s)
   )
@@ -249,10 +245,6 @@ export function setSendKdaInGame(enabled: boolean) {
 
 export function setSendKdaThreshold(kda: number) {
   return mainCall('core-functionality/settings/send-kda-threshold/set', kda)
-}
-
-export function setSendKdaInGameWithDisclaimer(enabled: boolean) {
-  return mainCall('core-functionality/settings/send-kda-in-game-with-disclaimer/set', enabled)
 }
 
 export function setSendKdaInGameWithPreMadeTeams(enabled: boolean) {

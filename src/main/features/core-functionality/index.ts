@@ -631,11 +631,6 @@ function stateSync() {
   ipcStateSync('core-functionality/settings/send-kda-in-game', () => cf.settings.sendKdaInGame)
 
   ipcStateSync(
-    'core-functionality/settings/send-kda-in-game-with-disclaimer',
-    () => cf.settings.sendKdaInGameWithDisclaimer
-  )
-
-  ipcStateSync(
     'core-functionality/settings/send-kda-in-game-with-pre-made-teams',
     () => cf.settings.sendKdaInGameWithPreMadeTeams
   )
@@ -726,14 +721,6 @@ function ipcCall() {
   )
 
   onRendererCall(
-    'core-functionality/settings/send-kda-in-game-with-disclaimer/set',
-    async (_, enabled) => {
-      cf.settings.setSendKdaInGameWithDisclaimer(enabled)
-      await setSetting('core-functionality/send-kda-in-game-with-disclaimer', enabled)
-    }
-  )
-
-  onRendererCall(
     'core-functionality/settings/send-kda-in-game-with-pre-made-teams/set',
     async (_, enabled) => {
       cf.settings.setSendKdaInGameWithPreMadeTeams(enabled)
@@ -776,13 +763,6 @@ async function loadSettings() {
 
   cf.settings.setSendKdaInGame(
     await getSetting('core-functionality/send-kda-in-game', cf.settings.sendKdaInGame)
-  )
-
-  cf.settings.setSendKdaInGameWithDisclaimer(
-    await getSetting(
-      'core-functionality/send-kda-in-game-with-disclaimer',
-      cf.settings.sendKdaInGameWithDisclaimer
-    )
   )
 
   cf.settings.setSendKdaInGameWithPreMadeTeams(

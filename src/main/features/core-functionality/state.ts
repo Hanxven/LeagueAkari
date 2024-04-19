@@ -18,7 +18,6 @@ class CoreFunctionalitySettings {
   sendKdaInGame: boolean = true
   sendKdaInGameWithPreMadeTeams: boolean = true
   sendKdaThreshold: number = 0
-  sendKdaInGameWithDisclaimer: boolean = true
 
   constructor() {
     makeAutoObservable(this)
@@ -58,10 +57,6 @@ class CoreFunctionalitySettings {
 
   setSendKdaThreshold(value: number) {
     this.sendKdaThreshold = value
-  }
-
-  setSendKdaInGameWithDisclaimer(value: boolean) {
-    this.sendKdaInGameWithDisclaimer = value
   }
 }
 
