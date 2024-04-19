@@ -224,12 +224,14 @@ async function loadSettings() {
  * @param all 所有设置项
  */
 async function migrateFromPreviousLocalStorageSettings(all: Record<string, string>) {
+  let migrated = false
   const toNewSettings = async (originKey: string, resName: string) => {
     const originValue = all[originKey]
     if (originValue !== undefined) {
       try {
         const jsonValue = JSON.parse(originValue)
         await setSetting(resName, jsonValue)
+        migrated = true
       } catch {}
     }
   }
@@ -288,4 +290,21 @@ async function migrateFromPreviousLocalStorageSettings(all: Record<string, strin
     'core-functionality/send-kda-in-game-with-pre-made-teams'
   )
   await toNewSettings('respawnTimer.enabled', 'respawn-timer/enabled')
+
+  if (migrated) {
+    const res = await dialog.showMessageBox({
+      title: '重新启动',
+      message: '新的设置项已从旧版本迁移，现在需要重新启动 League Akari 以应用新的设置项',
+      type: 'question',
+      buttons: ['重新启动', '暂不']
+    })
+
+    if (res.response === 0) {
+      logger.info('Old settings were migrated already. Now Relaunching the app...')
+      app.relaunch()
+      app.quit()
+    } else if (res.response === 1) {
+      // to do nothing
+    }
+  }
 }
