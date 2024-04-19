@@ -7,6 +7,8 @@ export const id = 'core:app'
 export async function setupApp() {
   const app = useAppStore()
 
+  await migrateFromPreviousLocalStorageSettings()
+
   mainStateSync('main-window/state', (s) => {
     app.windowState = s
   })
@@ -53,4 +55,29 @@ export function setShowFreeSoftwareDeclaration(enabled: boolean) {
 
 export function setFixWindowMethodAOptions(options: { baseWidth: number; baseHeight: number }) {
   return mainCall('league-client-ux/settings/fix-window-method-a-options/set', options)
+}
+
+/**
+ * 尝试迁移所有设置项到新版本中
+ */
+async function migrateFromPreviousLocalStorageSettings() {
+  const all: Record<string, string> = {}
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key) {
+      const item = localStorage.getItem(key)
+      if (item) {
+        all[key] = item
+      }
+    }
+  }
+
+  if (Object.keys(all).length === 0) {
+    return
+  }
+
+  try {
+    await mainCall('app/migrate-settings-from-previous-local-storage', all)
+    localStorage.clear()
+  } catch {}
 }

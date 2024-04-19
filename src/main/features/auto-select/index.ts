@@ -697,7 +697,7 @@ async function loadSettings() {
 
   autoSelectState.settings.setBanTeammateIntendedChampion(
     await getSetting(
-      'auto-select/ban-teammate-intended-champion/set',
+      'auto-select/ban-teammate-intended-champion',
       autoSelectState.settings.banTeammateIntendedChampion
     )
   )

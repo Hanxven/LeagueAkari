@@ -664,7 +664,7 @@ function ipcCall() {
 
   onRendererCall('core-functionality/settings/fetch-after-game/set', async (_, enabled) => {
     cf.settings.setFetchAfterGame(enabled)
-    await setSetting('core-functionality/settings/fetch-after-game', enabled)
+    await setSetting('core-functionality/fetch-after-game', enabled)
   })
 
   onRendererCall('core-functionality/settings/fetch-detailed-game/set', async (_, enabled) => {
@@ -781,5 +781,9 @@ async function loadSettings() {
       'core-functionality/team-analysis-preload-count',
       cf.settings.teamAnalysisPreloadCount
     )
+  )
+
+  cf.settings.setFetchAfterGame(
+    await getSetting('core-functionality/fetch-after-game', cf.settings.fetchAfterGame)
   )
 }

@@ -193,13 +193,16 @@ function ipcCall() {
   onRendererCall('app/updates/check', async (_) => {
     await checkUpdates()
   })
+
+  onRendererCall(
+    'app/migrate-settings-from-previous-local-storage',
+    async (_, all: Record<string, string>) => {
+      return await migrateFromPreviousLocalStorageSettings(all)
+    }
+  )
 }
 
 async function loadSettings() {
-  appState.settings.setAutoConnect(
-    await getSetting('app/auto-connect', appState.settings.autoConnect)
-  )
-
   appState.settings.setAutoConnect(
     await getSetting('app/auto-connect', appState.settings.autoConnect)
   )
@@ -214,4 +217,75 @@ async function loadSettings() {
       appState.settings.showFreeSoftwareDeclaration
     )
   )
+}
+
+/**
+ * 从前一个版本中尝试迁移所有的设置项到当前版本
+ * @param all 所有设置项
+ */
+async function migrateFromPreviousLocalStorageSettings(all: Record<string, string>) {
+  const toNewSettings = async (originKey: string, resName: string) => {
+    const originValue = all[originKey]
+    if (originValue !== undefined) {
+      try {
+        const jsonValue = JSON.parse(originValue)
+        await setSetting(resName, jsonValue)
+      } catch {}
+    }
+  }
+
+  await toNewSettings('app.autoConnect', 'app/auto-connect')
+  await toNewSettings('app.autoCheckUpdates', 'app/auto-check-updates')
+  await toNewSettings('app.showFreeSoftwareDeclaration', 'app/show-free-software-declaration')
+  await toNewSettings('autoAccept.enabled', 'auto-accept/enabled')
+  await toNewSettings('autoAccept.delaySeconds', 'auto-accept/delay-seconds')
+  await toNewSettings('autoHonor.enabled', 'auto-honor/enabled')
+  await toNewSettings('autoHonor.strategy', 'auto-honor/strategy')
+  await toNewSettings('autoReply.enabled', 'auto-reply/enabled')
+  await toNewSettings('autoReply.enableOnAway', 'auto-reply/enable-on-away')
+  await toNewSettings('autoReply.text', 'auto-reply/text')
+  await toNewSettings('autoSelect.normalModeEnabled', 'auto-select/normal-mode-enabled')
+  await toNewSettings('autoSelect.benchModeEnabled', 'auto-select/bench-mode-enabled')
+  await toNewSettings('autoSelect.benchExpectedChampions', 'auto-select/bench-expected-champions')
+  await toNewSettings('autoSelect.expectedChampions', 'auto-select/expected-champions')
+  await toNewSettings('autoSelect.bannedChampions', 'auto-select/banned-champions')
+  await toNewSettings('autoSelect.banEnabled', 'auto-select/ban-enabled')
+  await toNewSettings('autoSelect.completed', 'auto-select/completed')
+  await toNewSettings('autoSelect.onlySimulMode', 'auto-select/only-simul-mode')
+  await toNewSettings('autoSelect.grabDelay', 'auto-select/grab-delay-seconds')
+  await toNewSettings(
+    'autoSelect.banTeammateIntendedChampion',
+    'auto-select/ban-teammate-intended-champion'
+  )
+  await toNewSettings(
+    'autoSelect.selectTeammateIntendedChampion',
+    'auto-select/select-teammate-intended-champion'
+  )
+  await toNewSettings('autoSelect.selectRandomly', 'auto-select/select-randomly')
+  await toNewSettings('autoSelect.showIntent', 'auto-select/show-intent')
+  await toNewSettings('matchHistory.fetchAfterGame', 'core-functionality/fetch-after-game')
+  await toNewSettings(
+    'matchHistory.autoRouteOnGameStart',
+    'core-functionality/auto-route-on-game-start'
+  )
+  await toNewSettings(
+    'matchHistory.preMadeTeamThreshold',
+    'core-functionality/pre-made-team-threshold'
+  )
+  await toNewSettings(
+    'matchHistory.teamAnalysisPreloadCount',
+    'core-functionality/team-analysis-preload-count'
+  )
+  await toNewSettings(
+    'matchHistory.matchHistoryLoadCount',
+    'core-functionality/match-history-load-count'
+  )
+  await toNewSettings('matchHistory.fetchDetailedGame', 'core-functionality/fetch-detailed-game')
+  await toNewSettings('matchHistory.sendKdaInGame', 'core-functionality/send-kda-in-game')
+  await toNewSettings('matchHistory.sendKdaThreshold', 'core-functionality/send-kda-threshold')
+  await toNewSettings(
+    'matchHistory.sendKdaInGameWithPreMadeTeams',
+    'core-functionality/send-kda-in-game-with-pre-made-teams'
+  )
+  await toNewSettings('respawnTimer.enabled', 'respawn-timer/enabled')
 }
