@@ -68,9 +68,9 @@ import { NButton, NCard, NInput, NPopconfirm, useMessage } from 'naive-ui'
 import { h, reactive, ref, watch } from 'vue'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
-import { notify } from '@renderer/events/notifications'
 import { quit } from '@renderer/http-api/process-control'
 import { checkAvailability, newSummonerName } from '@renderer/http-api/summoner'
+import { laNotification } from '@renderer/notification'
 
 const id = 'view:toolkit:availability-check'
 
@@ -92,13 +92,8 @@ const handleCheckAvailability = async () => {
     } else {
       availability.availability = false
     }
-  } catch (err) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: '尝试检查召唤师可用性失败',
-      extra: { error: err }
-    })
+  } catch (error) {
+    laNotification.warn('可用性检查', '尝试检查召唤师可用性失败', error)
   } finally {
     availability.isCheckingSummonerName = false
   }
@@ -136,13 +131,12 @@ const handleCreateNewSummonerWithName = async () => {
         ]),
       { duration: 10000 }
     )
-  } catch (err) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: '尝试创建新的召唤师时失败，名称无法过长或过短，且无法重复创建角色',
-      extra: { error: err }
-    })
+  } catch (error) {
+    laNotification.warn(
+      '可用性检查',
+      '尝试创建新的召唤师时失败，名称无法过长或过短，且无法重复创建角色',
+      error
+    )
   }
 }
 </script>

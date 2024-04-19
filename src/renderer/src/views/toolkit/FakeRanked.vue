@@ -43,8 +43,8 @@ import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
 import { reactive } from 'vue'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
-import { notify } from '@renderer/events/notifications'
 import { changeRanked } from '@renderer/http-api/chat'
+import { laNotification } from '@renderer/notification'
 
 const id = 'view:toolkit:fake-ranked'
 
@@ -66,8 +66,8 @@ const handleSet = async () => {
         : state.division
     )
     message.success('成功', { duration: 1000 })
-  } catch (err) {
-    notify.emit({ id, type: 'warning', content: '尝试提交数据时失败', extra: { error: err } })
+  } catch (error) {
+    laNotification.warn('聊天状态伪造', '尝试提交数据时失败', error)
   }
 }
 

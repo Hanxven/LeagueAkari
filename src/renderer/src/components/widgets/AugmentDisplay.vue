@@ -41,7 +41,7 @@
 import { NPopover } from 'naive-ui'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
-import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
+import { useGameDataStore } from '@renderer/features/lcu-state-sync/game-data'
 
 withDefaults(
   defineProps<{
@@ -139,3 +139,4 @@ const formatRarity = (r: string) => {
   background-image: linear-gradient(135deg, #f6d7ff, #b453cf);
 }
 </style>
+@renderer/features/lcu-state-sync/game-data

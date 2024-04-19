@@ -22,11 +22,10 @@
 </template>
 
 <script setup lang="ts">
+import { RankedEntry, RankedStats } from '@shared/types/lcu/ranked'
 import { InformationCircleOutline as InformationIcon } from '@vicons/ionicons5'
 import { NIcon, NPopover } from 'naive-ui'
 import { computed } from 'vue'
-
-import { RankedEntry, RankedStats } from '@shared/types/lcu/ranked'
 
 const props = defineProps<{
   ranked: RankedStats

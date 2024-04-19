@@ -19,8 +19,8 @@ app.use(createPinia())
 
 try {
   await setupLeagueAkariFeatures()
-} catch (err) {
-  console.error('League Akari 无法正确加载：', err)
+} catch (error) {
+  console.error('League Akari 无法正确加载：', error)
 } finally {
   app.mount('#app')
 }

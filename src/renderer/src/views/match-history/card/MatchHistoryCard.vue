@@ -8,12 +8,22 @@
         <div class="player" v-for="p of participants" :key="p.participantId">
           <LcuImage class="image" :src="championIcon(p.championId)" />
           <div
-            :title="p.identity.player.summonerName || p.identity.player.gameName"
+            :title="
+              summonerName(
+                p.identity.player.gameName || p.identity.player.summonerName,
+                p.identity.player.tagLine
+              )
+            "
             class="name"
             :class="{ self: p.isSelf }"
             @click="() => handleToSummoner(p.identity.player.summonerId)"
           >
-            {{ p.identity.player.summonerName || p.identity.player.gameName || '<无名>' }}
+            {{
+              summonerName(
+                p.identity.player.gameName || p.identity.player.summonerName,
+                p.identity.player.tagLine
+              )
+            }}
           </div>
         </div>
         <div
@@ -196,6 +206,8 @@
 </template>
 
 <script setup lang="ts">
+import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
+import { summonerName } from '@shared/utils/name'
 import {
   ChevronDown as ChevronDownIcon,
   ChevronUp as ChevronUpIcon,
@@ -213,8 +225,7 @@ import PerkDisplay from '@renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
-import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
-import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
+import { useGameDataStore } from '@renderer/features/lcu-state-sync/game-data'
 
 import '../lol-view.less'
 import CherryModeDetailedGame from './CherryModeDetailedGame.vue'

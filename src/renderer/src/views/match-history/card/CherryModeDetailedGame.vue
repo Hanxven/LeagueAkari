@@ -35,11 +35,20 @@
                 </div>
                 <div class="name-and-rank">
                   <div
-                    :title="p.identity.player.summonerName"
+                    :title="
+                      summonerName(
+                        p.identity.player.gameName || p.identity.player.summonerName,
+                        p.identity.player.tagLine
+                      )
+                    "
                     class="name"
                     @click="handleToSummoner(p.identity.player.summonerId)"
                   >
-                    {{ p.identity.player.summonerName || p.identity.player.gameName || '<无名>'
+                    {{
+                      summonerName(
+                        p.identity.player.gameName || p.identity.player.summonerName,
+                        p.identity.player.tagLine
+                      )
                     }}{{ p.identity.player.summonerId === 0 ? ' (人机)' : '' }}
                   </div>
                   <!-- <div class="rank">-</div> -->
@@ -139,6 +148,8 @@
 </template>
 
 <script setup lang="ts">
+import { Game, Participant, ParticipantIdentity } from '@shared/types/lcu/match-history'
+import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -148,7 +159,6 @@ import AugmentDisplay from '@renderer/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@renderer/components/widgets/ItemDisplay.vue'
 import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
-import { Game, Participant, ParticipantIdentity } from '@shared/types/lcu/match-history'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 

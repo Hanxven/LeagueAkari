@@ -48,16 +48,16 @@
 </template>
 
 <script setup lang="ts">
+import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { NButton, NCard, NDivider } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
-import { notify } from '@renderer/events/notifications'
 import { championIcon } from '@renderer/features/game-data'
-import { useChampSelectStore } from '@renderer/features/stores/lcu/champ-select'
-import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
+import { useChampSelectStore } from '@renderer/features/lcu-state-sync/champ-select'
+import { useGameflowStore } from '@renderer/features/lcu-state-sync/gameflow'
 import { benchSwap, reroll } from '@renderer/http-api/champ-select'
-import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
+import { laNotification } from '@renderer/notification'
 
 // 可独立使用的组件，或许可以放到其他地方
 const id = 'comp:champions-bench'
@@ -112,13 +112,8 @@ const handleBenchSwap = async (championId: number) => {
   isSwapping.value = true
   try {
     await benchSwap(championId)
-  } catch (err) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: '交换失败，目标英雄可能已经不存在',
-      extra: { error: err }
-    })
+  } catch (error) {
+    laNotification.warn('英雄选择台', '交换失败，目标英雄可能已经不存在', error)
   } finally {
     isSwapping.value = false
   }
@@ -143,13 +138,8 @@ const handleReroll = async (grabBack = false) => {
         }
       }, 25)
     }
-  } catch (err) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: '重新随机失败',
-      extra: { error: err }
-    })
+  } catch (error) {
+    laNotification.warn('英雄选择台', '重新随机失败', error)
   } finally {
     isRerolling.value = false
   }

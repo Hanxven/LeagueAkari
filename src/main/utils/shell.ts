@@ -8,7 +8,9 @@ const WMIC_PATH = 'C:\\Windows\\System32\\wbem\\WMIC.exe'
 export function checkWmicAvailability() {
   const isExists = fs.existsSync(WMIC_PATH)
   if (!isExists) {
-    throw new Error('WMIC 不存在，League Akari 依赖此工具获取进程信息')
+    throw new Error(
+      'WMIC unavailable, League Akari relies on this tool to obtain process information'
+    )
   }
 }
 
@@ -34,12 +36,12 @@ function runCommand(
       if (code === 0) {
         resolve(stdout)
       } else {
-        reject(new Error(`Command failed with code ${code}: ${stderr}`))
+        reject(new Error(`command failed with code ${code}: ${stderr}`))
       }
     })
 
     child.on('error', (error) => {
-      console.log('An error occurred on executing command: ', error, command, args)
+      console.log('an error occurred on executing command: ', error, command, args)
       reject(error)
     })
   })

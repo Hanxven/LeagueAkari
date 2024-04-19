@@ -1,69 +1,33 @@
-import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { BrowserWindow, app, dialog, shell } from 'electron'
-import { configure } from 'mobx'
-import { join } from 'node:path'
 import 'reflect-metadata'
 
-import icon from '../../resources/LA_ICON.ico?asset'
-import { initBasicIpc } from './core/basic'
-import { initConnectionIpc } from './core/connection'
-import { initLcuClientFunctions } from './core/lcu-client'
+import { electronApp, optimizer } from '@electron-toolkit/utils'
+import { formatError } from '@shared/utils/errors'
+import { BrowserWindow, app, dialog } from 'electron'
+import { configure } from 'mobx'
+
+import { initApp } from './core/app'
+import { initLeagueClientFunctions } from './core/lcu-client'
+import { initLcuConnection } from './core/lcu-connection'
+import { createLogger, initLogger } from './core/log'
+import { createMainWindow, getMainWindow } from './core/main-window'
 import { initWindowsPlatform } from './core/platform'
-import { initWindowIpc } from './core/window'
 import { initDatabase } from './db'
-import { initStorageQuery } from './storage'
+import { setupLeagueAkariFeatures } from './features'
+import { initStorageIpc } from './storage'
+import { sendEventToAllRenderer } from './utils/ipc'
 import { checkWmicAvailability } from './utils/shell'
 
-configure({ enforceActions: 'never' })
+configure({ enforceActions: 'observed' })
 
 const gotTheLock = app.requestSingleInstanceLock()
+
+const logger = createLogger('initialization')
 
 if (!gotTheLock) {
   app.quit()
 }
 
-let mainWindow: BrowserWindow
-
-function createMainWindow(): void {
-  mainWindow = new BrowserWindow({
-    width: 1080,
-    height: 768,
-    minWidth: 670,
-    minHeight: 520,
-    frame: false,
-    show: false,
-    title: 'League Akari',
-    autoHideMenuBar: false,
-    icon,
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
-      spellcheck: false,
-      backgroundThrottling: false
-    }
-  })
-
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
-
-  initWindowIpc(mainWindow)
-
-  // HMR
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
-}
-
 app.whenReady().then(async () => {
-  // Set app user model id for windows
   electronApp.setAppUserModelId('sugar.cocoa.league-akari')
 
   app.on('browser-window-created', (_, window) => {
@@ -71,13 +35,17 @@ app.whenReady().then(async () => {
   })
 
   try {
+    initLogger()
+    await initDatabase()
     checkWmicAvailability()
-    await initBasicIpc()
-    initConnectionIpc()
+    await initApp()
+    await initLcuConnection()
     initWindowsPlatform()
-    initDatabase()
-    initStorageQuery()
-    initLcuClientFunctions()
+    initStorageIpc()
+    await initLeagueClientFunctions()
+    await setupLeagueAkariFeatures()
+
+    logger.info('LEAGUE AKARI - INITIALIZED')
 
     createMainWindow()
 
@@ -87,16 +55,24 @@ app.whenReady().then(async () => {
       }
     })
 
-    app.on('second-instance', (_event, _commandLine, _workingDirectory) => {
+    app.on('second-instance', (_event, commandLine, workingDirectory) => {
+      logger.info(`Trying to launch a second instance, cmd=${commandLine}, pwd=${workingDirectory}`)
+
+      const mainWindow = getMainWindow()
       if (mainWindow) {
         if (mainWindow.isMinimized()) {
           mainWindow.restore()
         }
         mainWindow.focus()
+      } else {
+        createMainWindow()
       }
+
+      sendEventToAllRenderer('app/second-instance', commandLine, workingDirectory)
     })
   } catch (e) {
-    console.error('在初始化时出现错误', e)
+    logger.error(`Failed to initialize League Akari, due to ${formatError(e)}`)
+
     dialog.showErrorBox('在初始化时出现错误', e && (e as any).message)
     app.quit()
   }
@@ -109,11 +85,11 @@ app.on('window-all-closed', () => {
 })
 
 process.on('uncaughtException', (e) => {
-  console.error(e)
+  logger.error(`uncaughtException: ${formatError(e)}`)
   dialog.showErrorBox('未捕获的异常', e.message)
   app.quit()
 })
 
 process.on('unhandledRejection', (e) => {
-  console.log('unhandledRejection', e)
+  logger.error(`unhandledRejection: ${formatError(e)}`)
 })

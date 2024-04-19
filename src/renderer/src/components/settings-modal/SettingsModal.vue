@@ -21,11 +21,11 @@
           />
         </div>
         <div class="about-para">
-          League Akari (Version {{ appState.version }}) 是一个免费、开源的、基于 Electron
-          的应用程序，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验。其所有实现都依赖
+          League Akari (Version {{ app.version }}) 是一个免费、开源的、基于 Electron
+          的应用程序，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其所有实现都依赖
           <a target="_blank" href="https://riot-api-libraries.readthedocs.io/en/latest/lcu.html"
             >League Client Update (LCU)</a
-          >
+          >。
         </div>
         <div class="about-para" style="font-weight: bold; margin: 12px 0">引用：</div>
         <div class="about-para">
@@ -55,18 +55,24 @@
           >.
         </div>
         <div class="about-para">
-          Github：<a target="_blank" href="https://github.com/Hanxven/LeagueAkari"
-            >League Akari</a
-          >
-        </div>
-        <div class="about-para">
           检查更新：<span
             style="color: rgb(131, 193, 204); text-decoration: underline; cursor: pointer"
             @click="() => checkUpdates()"
-            >{{ appState.updates.isCheckingUpdates ? '正在检查' : '检查更新' }}</span
+            >{{ app.updates.isCheckingUpdates ? '正在检查' : '检查更新' }}</span
           >
         </div>
-        <div class="about-para copyright">© 2024 Hanxven. 本软件是开源软件，遵循MIT许可证。</div>
+        <div class="about-para-2">
+          <span>Github：</span>
+          <a target="_blank" href="https://github.com/Hanxven/LeagueAkari" style="text-indent: 0; margin-right: 8px;"
+            >League Akari</a
+          >
+          <a target="_blank" href="https://github.com/Hanxven/LeagueAkari">
+            <img
+              alt="GitHub Repo stars"
+              src="https://img.shields.io/github/stars/Hanxven/LeagueAkari"
+          /></a>
+        </div>
+        <div class="about-para copyright">© 2024 Hanxven. 本软件是开源软件，遵循 MIT 许可证。</div>
       </NTabPane>
     </NTabs>
   </NModal>
@@ -76,29 +82,39 @@
 import { NModal, NTabPane, NTabs } from 'naive-ui'
 import { useCssModule } from 'vue'
 
-import { checkUpdates } from '@renderer/features/app'
-import { useAppState } from '@renderer/features/stores/app'
+import { useAppStore } from '@renderer/features/app/store'
+import { mainCall } from '@renderer/utils/ipc'
 
 import BasicSettings from './BasicSettings.vue'
 import DebugSettings from './DebugSettings.vue'
 import MatchHistorySettings from './MatchHistorySettings.vue'
 import ProcessSettings from './ProcessSettings.vue'
 
-defineProps<{
-  show: boolean
-}>()
-
-const appState = useAppState()
-
+const app = useAppStore()
 const styles = useCssModule()
-
 const show = defineModel<boolean>('show', { default: false })
+
+const checkUpdates = async () => {
+  mainCall('app/updates/check')
+}
 </script>
 
 <style lang="less" scoped>
 .about-para {
   text-indent: 2em;
   font-size: 13px;
+}
+
+.about-para-2 {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  text-indent: 2em;
+  font-size: 13px;
+
+  img {
+    display: block;
+  }
 }
 
 .copyright {

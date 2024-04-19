@@ -14,12 +14,13 @@
             <CopyableText
               class="summoner-name"
               :text="
-                `${tab.summoner.displayName || tab.summoner.gameName}${
-                  tab.summoner.tagLine ? '#' + tab.summoner.tagLine : ''
-                }` || '<暂无名称>'
+                summonerName(
+                  tab.summoner.gameName || tab.summoner.displayName,
+                  tab.summoner.tagLine
+                )
               "
             >
-              {{ tab.summoner.displayName || tab.summoner.gameName || '<暂无名称>'
+              {{ tab.summoner.gameName || tab.summoner.displayName
               }}<span v-if="tab.summoner.tagLine" class="tag-line"
                 >#{{ tab.summoner.tagLine }}</span
               >
@@ -141,6 +142,7 @@
 </template>
 
 <script setup lang="ts">
+import { summonerName } from '@shared/utils/name'
 import { Tag as TagIcon } from '@vicons/carbon'
 import { Dice as DiceIcon } from '@vicons/ionicons5'
 import { useDebounce, useScroll } from '@vueuse/core'
@@ -151,8 +153,8 @@ import { nextTick, onActivated, ref, watch } from 'vue'
 
 import CopyableText from '@renderer/components/CopyableText.vue'
 import LcuImage from '@renderer/components/LcuImage.vue'
-import { fetchTabDetailedGame, fetchTabMatchHistory } from '@renderer/features/match-history'
-import { TabState, useMatchHistoryStore } from '@renderer/features/stores/match-history'
+import { fetchTabDetailedGame, fetchTabMatchHistory } from '@renderer/features/core-functionality'
+import { TabState, useCoreFunctionalityStore } from '@renderer/features/core-functionality/store'
 import { hideMatchHistoryText } from '@renderer/utils/sarcasms'
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
@@ -170,7 +172,7 @@ const props = withDefaults(
     isSelfTab: false
   }
 )
-const mh = useMatchHistoryStore()
+const mh = useCoreFunctionalityStore()
 
 const handleLoadPage = (page: number) => {
   return fetchTabMatchHistory(props.tab.id, page, props.tab.matchHistory.pageSize)

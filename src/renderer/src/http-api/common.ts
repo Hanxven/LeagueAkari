@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 
-import { call } from '@renderer/ipc'
+import { ipcMainCallStandardized, mainCall } from '@renderer/utils/ipc'
 
 // 由于序列化和反序列化的要求，只能传递部分属性
 export type SimpleAxiosResponse<T = any, D = any> = Omit<
@@ -33,13 +33,16 @@ export class GameClientHttpError extends Error {
   }
 }
 
-export async function request<T = any, D = any>(config: SimpleAxiosRequestConfig, maxRetries = 3) {
+export async function request<T = any, D = any>(
+  config: SimpleAxiosRequestConfig,
+  maxRetries = 3
+): Promise<SimpleAxiosResponse<T, D>> {
   let retries = 0
   let lastError: any = null
 
   while (true) {
     try {
-      const res = await call<SimpleAxiosResponse<T, D>>('httpRequest', config)
+      const res = await mainCall('lcu-connection/http-request', config)
 
       if (res.status >= 500) {
         lastError = new LcuHttpError(res.statusText, res)
@@ -52,15 +55,15 @@ export async function request<T = any, D = any>(config: SimpleAxiosRequestConfig
 
         return res
       }
-    } catch (err) {
-      lastError = err
+    } catch (error) {
+      lastError = error
 
       // ECONNABORTED，一般是超时，直接无限重试
-      if ((err as any).code === 'ECONNABORTED') {
+      if ((error as any).code === 'ECONNABORTED') {
         retries++
       } else {
         // 其他所有连接异常，直接抛出
-        throw err
+        throw error
       }
     }
 
@@ -94,7 +97,10 @@ export async function request<T = any, D = any>(config: SimpleAxiosRequestConfig
 */
 
 export async function gameClientRequest<T = any, D = any>(config: SimpleAxiosRequestConfig) {
-  const res = await call<SimpleAxiosResponse<T, D>>('httpRequest:gameClient', config)
+  const res = await ipcMainCallStandardized<SimpleAxiosResponse<T, D>>(
+    'httpRequest:gameClient',
+    config
+  )
 
   if (res.status >= 400) {
     throw new GameClientHttpError(res.statusText, res)

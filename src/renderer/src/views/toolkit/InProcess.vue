@@ -31,34 +31,29 @@ import { NButton, NCard } from 'naive-ui'
 import { computed } from 'vue'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
-import { notify } from '@renderer/events/notifications'
-import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
+import { useGameflowStore } from '@renderer/features/lcu-state-sync/gameflow'
 import { earlyExit } from '@renderer/http-api/gameflow'
 import { playAgain } from '@renderer/http-api/lobby'
 import { dodge } from '@renderer/http-api/login'
+import { laNotification } from '@renderer/notification'
 
 const id = 'view:toolkit:ongoing'
 
 const gameflow = useGameflowStore()
 
-const handleEarlyExit = async () => {
+const _handleEarlyExit = async () => {
   try {
     await earlyExit()
-  } catch (err) {
-    notify.emit({ id, type: 'warning', content: '尝试强退失败', extra: { error: err } })
+  } catch (error) {
+    laNotification.warn('', '尝试强退失败', error)
   }
 }
 
 const handleDodge = async () => {
   try {
     const _ = await dodge()
-  } catch (err) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: '尝试秒退失败',
-      extra: { error: err }
-    })
+  } catch (error) {
+    laNotification.warn('过程中', '尝试秒退失败', error)
   }
 }
 
@@ -73,13 +68,8 @@ const isInEndgamePhase = computed(() => {
 const handlePlayAgain = async () => {
   try {
     await playAgain()
-  } catch (err) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: '尝试重新回到房间失败',
-      extra: { error: err }
-    })
+  } catch (error) {
+    laNotification.warn('过程中', '尝试重新回到房间失败', error)
   }
 }
 </script>

@@ -11,38 +11,42 @@
       <div class="header-line-right-side">
         <div class="summoner-name-line">
           <span
-            :title="`${summonerInfo?.displayName || summonerInfo?.gameName}${
-              summonerInfo?.tagLine ? '#' + summonerInfo.tagLine : ''
-            }`"
+            :title="
+              summonerName(
+                summonerInfo?.gameName || summonerInfo?.displayName,
+                summonerInfo?.tagLine
+              )
+            "
             class="name"
             @click="emits('toSummoner', id)"
-            >{{ summonerInfo?.displayName || summonerInfo?.gameName || '<暂无名称>' }}</span
+            >{{
+              summonerName(
+                summonerInfo?.gameName || summonerInfo?.displayName,
+                summonerInfo?.tagLine
+              )
+            }}</span
           >
           <span class="tag self" v-if="isSelf">我</span>
           <NPopover v-if="savedInfo && !isSelf" placement="bottom">
             <template #trigger>
               <span
-                :title="`曾在 ${formattedRelativeTime} 遇见过，作为${
-                  savedInfo.side === 'teammate' ? '队友' : '对手'
-                }，共遇见过 ${savedInfo.relatedGameIds.length} 次`"
+                :title="`曾在 ${formattedRelativeTime} 遇见过，共遇见过 ${savedInfo.encounteredGames.length} 次`"
                 class="tag encountered"
                 >遇见过</span
               >
             </template>
             <div style="max-width: 260px">
               <div class="encountered-text">
-                最近一次遇见该玩家的时间是 {{ formattedRelativeTime }}，作为{{
-                  savedInfo.side === 'teammate' ? '队友' : '对手'
-                }}。
+                最近一次遇见该玩家的时间是 {{ formattedRelativeTime }}。
               </div>
-              <div class="encountered-text" v-if="savedInfo.relatedGameIds.length > 1">
-                共遇见过 {{ savedInfo.relatedGameIds.length }} 次。
+              <div class="encountered-text" v-if="savedInfo.encounteredGames.length > 1">
+                共遇见过 {{ savedInfo.encounteredGames.length }} 次。
               </div>
               <div class="encountered-games">
                 <span class="encountered-text"
                   >相关对局：<span
                     class="encountered-game"
-                    v-for="g of savedInfo.relatedGameIds.slice(-10).toReversed()"
+                    v-for="g of savedInfo.encounteredGames.slice(-10).toReversed()"
                     @click="() => emits('showGame', g, id)"
                     >{{ g }}</span
                   ></span
@@ -219,18 +223,19 @@
 </template>
 
 <script setup lang="ts">
+import { RankedStats } from '@shared/types/lcu/ranked'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
+import { summonerName } from '@shared/utils/name'
 import { useTimeoutPoll, useVirtualList } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NDivider, NPopover } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
+import { MatchHistoryWithState, SavedPlayer } from '@renderer/features/core-functionality/store'
 import { championIcon } from '@renderer/features/game-data'
-import { getAnalysis, withSelfParticipantMatchHistory } from '@renderer/features/match-history'
-import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
-import { MatchHistoryGame, SavedTaggedPlayer } from '@renderer/features/stores/match-history'
-import { RankedStats } from '@shared/types/lcu/ranked'
-import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { useGameDataStore } from '@renderer/features/lcu-state-sync/game-data'
 import { winRateTeamText } from '@renderer/utils/sarcasms'
 
 import RankedSpan from '../match-history/widgets/RankedSpan.vue'
@@ -245,11 +250,11 @@ const props = defineProps<{
   isSelf: boolean
   summonerInfo?: SummonerInfo
   rankedStats?: RankedStats
-  matchHistory?: MatchHistoryGame[]
+  matchHistory?: MatchHistoryWithState[]
   championId?: number
   team?: string
   queueType?: string
-  savedInfo?: SavedTaggedPlayer
+  savedInfo?: SavedPlayer
 
   // 未实装的实验性特性
   isOutstandingPlayer?: boolean
@@ -295,7 +300,7 @@ const formattedRelativeTime = ref('')
 const { resume, pause } = useTimeoutPoll(
   () => {
     if (props.savedInfo) {
-      formattedRelativeTime.value = dayjs(props.savedInfo.lastMet).locale('zh-cn').fromNow()
+      formattedRelativeTime.value = dayjs(props.savedInfo.lastMetAt).locale('zh-cn').fromNow()
     }
   },
   60000,

@@ -43,6 +43,11 @@ const options = ref<MenuOption[]>([
     key: 'ongoing-game',
     icon: renderIcon(TemplateIcon)
   },
+  // {
+  //   label: '自动化',
+  //   key: 'automation',
+  //   icon: renderIcon(TemplateIcon)
+  // },
   {
     label: '工具',
     key: 'toolkit',
@@ -62,8 +67,8 @@ watchEffect(() => {
 const handleMenuChange = async (val: string) => {
   try {
     await router.replace({ name: val })
-  } catch (err) {
-    console.error('routing', err)
+  } catch (error) {
+    console.error('routing', error)
   }
 }
 </script>

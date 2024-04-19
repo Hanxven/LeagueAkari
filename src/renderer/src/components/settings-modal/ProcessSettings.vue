@@ -9,7 +9,7 @@
         :label-width="320"
       >
         <NButton
-          :disabled="lcuState.state !== 'connected'"
+          :disabled="app.lcuConnectionState !== 'connected'"
           size="tiny"
           secondary
           type="warning"
@@ -24,7 +24,7 @@
         :label-width="320"
       >
         <NButton
-          :disabled="lcuState.state !== 'connected'"
+          :disabled="app.lcuConnectionState !== 'connected'"
           size="tiny"
           secondary
           type="warning"
@@ -37,7 +37,7 @@
       <template #header><span class="card-header-title">League Client UX</span></template>
       <ControlItem
         class="control-item-margin"
-        v-if="appState.isAdmin"
+        v-if="app.isAdministrator"
         label="调整窗口大小"
         label-description="以 WinAPI 方式调整窗口的大小，请谨慎使用该功能。在客户端界面大小不正确时，可尝试此操作"
         :label-width="320"
@@ -46,14 +46,17 @@
           <NInputNumber
             style="width: 80px"
             size="tiny"
-            :disabled="lcuState.state !== 'connected'"
+            :disabled="app.lcuConnectionState !== 'connected'"
             :show-button="false"
             :min="1"
             @update:value="
               (v) =>
-                setFixWindowMethodAOptions(v || 1, settings.app.fixWindowMethodAOptions.baseHeight)
+                setFixWindowMethodAOptions({
+                  baseWidth: v || 1,
+                  baseHeight: app.settings.fixWindowMethodAOptions.baseHeight
+                })
             "
-            :value="settings.app.fixWindowMethodAOptions.baseWidth"
+            :value="app.settings.fixWindowMethodAOptions.baseWidth"
             @keyup.enter="() => fixWindowInputButton2?.focus()"
           >
             <template #prefix>W</template>
@@ -61,20 +64,23 @@
           <NInputNumber
             ref="fixWindowInputButton2"
             style="width: 80px"
-            :disabled="lcuState.state !== 'connected'"
+            :disabled="app.lcuConnectionState !== 'connected'"
             size="tiny"
             :show-button="false"
             :min="1"
             @update:value="
               (v) =>
-                setFixWindowMethodAOptions(settings.app.fixWindowMethodAOptions.baseWidth, v || 1)
+                setFixWindowMethodAOptions({
+                  baseWidth: app.settings.fixWindowMethodAOptions.baseWidth || 1,
+                  baseHeight: v || 1
+                })
             "
-            :value="settings.app.fixWindowMethodAOptions.baseHeight"
+            :value="app.settings.fixWindowMethodAOptions.baseHeight"
             @keyup.enter="() => handleFixWindowMethodA()"
             ><template #prefix>H</template>
           </NInputNumber>
           <NButton
-            :disabled="lcuState.state !== 'connected'"
+            :disabled="app.lcuConnectionState !== 'connected'"
             size="tiny"
             secondary
             type="warning"
@@ -90,7 +96,7 @@
         :label-width="320"
       >
         <NButton
-          :disabled="lcuState.state !== 'connected'"
+          :disabled="app.lcuConnectionState !== 'connected'"
           size="tiny"
           secondary
           type="warning"
@@ -105,7 +111,7 @@
         :label-width="320"
       >
         <NButton
-          :disabled="lcuState.state !== 'connected'"
+          :disabled="app.lcuConnectionState !== 'connected'"
           type="warning"
           secondary
           size="tiny"
@@ -120,7 +126,7 @@
         :label-width="320"
       >
         <NButton
-          :disabled="lcuState.state !== 'connected'"
+          :disabled="app.lcuConnectionState !== 'connected'"
           type="warning"
           secondary
           size="tiny"
@@ -137,18 +143,14 @@ import { NButton, NCard, NInputNumber, NScrollbar, useDialog } from 'naive-ui'
 import { reactive, ref } from 'vue'
 
 import { setFixWindowMethodAOptions } from '@renderer/features/app'
-import { useAppState } from '@renderer/features/stores/app'
-import { useLcuStateStore } from '@renderer/features/stores/lcu-connection'
-import { useSettingsStore } from '@renderer/features/stores/settings'
+import { useAppStore } from '@renderer/features/app/store'
 import { quit } from '@renderer/http-api/process-control'
 import { killUx, launchUx, restartUx } from '@renderer/http-api/riotclient'
-import { call } from '@renderer/ipc'
+import { mainCall } from '@renderer/utils/ipc'
 
 import ControlItem from '../ControlItem.vue'
 
-const lcuState = useLcuStateStore()
-const appState = useAppState()
-const settings = useSettingsStore()
+const app = useAppStore()
 
 const dialog = useDialog()
 
@@ -161,15 +163,15 @@ const handleQuitClient = async () => {
     onPositiveClick: async () => {
       try {
         await quit()
-      } catch (err) {
-        console.error(err)
+      } catch (error) {
+        console.error(error)
       }
     }
   })
 }
 
 const handleDisconnect = async () => {
-  await call('disconnect')
+  await mainCall('lcu-connection/disconnect')
 }
 
 const handleRestartUx = async () => {
@@ -181,8 +183,8 @@ const handleRestartUx = async () => {
     onPositiveClick: async () => {
       try {
         await restartUx()
-      } catch (err) {
-        console.error(err)
+      } catch (error) {
+        console.error(error)
       }
     }
   })
@@ -198,8 +200,8 @@ const handleKillUx = async () => {
     onPositiveClick: async () => {
       try {
         await killUx()
-      } catch (err) {
-        console.error(err)
+      } catch (error) {
+        console.error(error)
       }
     }
   })
@@ -214,8 +216,8 @@ const handleLaunchUx = async () => {
     onPositiveClick: async () => {
       try {
         await launchUx()
-      } catch (err) {
-        console.error(err)
+      } catch (error) {
+        console.error(error)
       }
     }
   })
@@ -236,9 +238,9 @@ const handleFixWindowMethodA = async () => {
     negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        await call('fixWindowMethodA', { ...fixWindowMethodAOptions })
-      } catch (err) {
-        console.error(err)
+        await mainCall('league-client-ux/fix-window-method-a', { ...fixWindowMethodAOptions })
+      } catch (error) {
+        console.error(error)
       }
     }
   })

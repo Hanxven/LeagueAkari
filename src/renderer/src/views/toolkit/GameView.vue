@@ -1,7 +1,7 @@
 <template>
   <NCard size="small">
     <template #header><span class="card-header-title">查看游戏</span></template>
-    <StandaloneMatchHistoryCardModal v-model:show="show" :game-id="gameId" />
+    <StandaloneMatchHistoryCardModal v-model:show="show" :game-id="viewingGameId" />
     <ControlItem
       class="control-item-margin"
       label="游戏 ID"
@@ -25,10 +25,12 @@ import StandaloneMatchHistoryCardModal from '@renderer/views/match-history/card/
 // const id = 'view:toolkit:game-view'
 
 const gameId = ref<number>()
+const viewingGameId = ref<number>()
 const show = ref(false)
 
 const handleInspect = () => {
   show.value = true
+  viewingGameId.value = gameId.value
 }
 </script>
 

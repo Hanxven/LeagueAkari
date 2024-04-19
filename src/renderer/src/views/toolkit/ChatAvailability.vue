@@ -28,12 +28,12 @@
 </template>
 
 <script setup lang="ts">
-import { NCard, NRadio, NRadioGroup, NFlex } from 'naive-ui'
+import { NCard, NFlex, NRadio, NRadioGroup } from 'naive-ui'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
-import { notify } from '@renderer/events/notifications'
-import { useChatStore } from '@renderer/features/stores/lcu/chat'
+import { useChatStore } from '@renderer/features/lcu-state-sync/chat'
 import { AvailabilityType, changeAvailability } from '@renderer/http-api/chat'
+import { laNotification } from '@renderer/notification'
 
 const id = 'view:toolkit:chat-availability'
 const chat = useChatStore()
@@ -41,13 +41,8 @@ const chat = useChatStore()
 const handleChangeAvailability = async (availability: string) => {
   try {
     await changeAvailability(availability as AvailabilityType)
-  } catch (err) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: `尝试修改状态失败`,
-      extra: { error: err }
-    })
+  } catch (error) {
+    laNotification.warn('聊天状态', `尝试修改状态失败`, error)
   }
 }
 </script>

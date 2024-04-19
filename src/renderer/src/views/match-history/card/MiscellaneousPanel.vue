@@ -31,6 +31,7 @@
 
 <script setup lang="ts">
 import { Game, Player } from '@shared/types/lcu/match-history'
+import { summonerName } from '@shared/utils/name'
 import { rsoPlatformText } from '@shared/utils/rso-platforms'
 import dayjs from 'dayjs'
 import { DataTableColumns, NDataTable } from 'naive-ui'
@@ -45,7 +46,7 @@ import PerkDisplay from '@renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
-import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
+import { useGameDataStore } from '@renderer/features/lcu-state-sync/game-data'
 
 const props = defineProps<{
   game: Game
@@ -266,7 +267,11 @@ const columns = computed(() => {
           h(
             'span',
             { style: { 'margin-left': '2px' } },
-            `${participantsMap.value[p.participantId].summonerName || participantsMap.value[p.participantId].gameName}${participantsMap.value[p.participantId].tagLine ? '#' + participantsMap.value[p.participantId].tagLine : ''}`
+            summonerName(
+              participantsMap.value[p.participantId].gameName ||
+                participantsMap.value[p.participantId].summonerName,
+              participantsMap.value[p.participantId].tagLine
+            )
           )
         ])
       },

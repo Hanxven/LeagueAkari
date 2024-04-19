@@ -4,7 +4,7 @@
     <ControlItem class="control-item-margin" label="开启">
       <div style="display: flex; align-items: center; gap: 8px">
         <NSwitch
-          :value="settings.autoAccept.enabled"
+          :value="autoAccept.settings.enabled"
           @update:value="handleSetAutoAccept"
           size="small"
         />
@@ -20,7 +20,7 @@
     >
       <NInputNumber
         style="width: 80px"
-        :value="settings.autoAccept.delaySeconds"
+        :value="autoAccept.settings.delaySeconds"
         @update:value="(value) => setDelaySeconds(value || 0)"
         placeholder="秒"
         :min="0"
@@ -39,15 +39,12 @@ import { ref, watch } from 'vue'
 import ControlItem from '@renderer/components/ControlItem.vue'
 import {
   cancelAutoAccept,
-  disableAutoAccept,
-  enableAutoAccept,
-  setDelaySeconds
+  setDelaySeconds,
+  setEnableAutoAccept
 } from '@renderer/features/auto-accept'
-import { useAutoAcceptStore } from '@renderer/features/stores/auto-accept'
-import { useSettingsStore } from '@renderer/features/stores/settings'
+import { useAutoAcceptStore } from '@renderer/features/auto-accept/store'
 
 const autoAccept = useAutoAcceptStore()
-const settings = useSettingsStore()
 
 const remainingTime = ref(0)
 const { pause, resume } = useIntervalFn(
@@ -66,11 +63,7 @@ watch(
 )
 
 const handleSetAutoAccept = (v: boolean) => {
-  if (v) {
-    enableAutoAccept()
-  } else {
-    disableAutoAccept()
-  }
+  setEnableAutoAccept(v)
 }
 </script>
 

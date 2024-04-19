@@ -10,7 +10,7 @@
       >
         <NSwitch
           size="small"
-          :value="settings.matchHistory.autoRouteOnGameStart"
+          :value="coreFunctionality.settings.autoRouteOnGameStart"
           @update:value="(val) => setAutoRouteOnGameStart(val)"
         />
       </ControlItem>
@@ -22,8 +22,8 @@
       >
         <NSwitch
           size="small"
-          :value="settings.matchHistory.fetchAfterGame"
-          @update:value="(val) => setAfterGameFetch(val)"
+          :value="coreFunctionality.settings.fetchAfterGame"
+          @update:value="(val) => setFetchAfterGame(val)"
         />
       </ControlItem>
       <ControlItem
@@ -34,7 +34,7 @@
       >
         <NSwitch
           size="small"
-          :value="settings.matchHistory.fetchDetailedGame"
+          :value="coreFunctionality.settings.fetchDetailedGame"
           @update:value="(val) => setFetchDetailedGame(val)"
         />
       </ControlItem>
@@ -46,7 +46,7 @@
       >
         <NSwitch
           size="small"
-          :value="settings.respawnTimer.enabled"
+          :value="respawnTimer.settings.enabled"
           @update:value="(val) => setEnableRespawnTimer(val)"
         />
       </ControlItem>
@@ -64,21 +64,21 @@
           size="tiny"
           :min="2"
           :max="200"
-          :value="settings.matchHistory.matchHistoryLoadCount"
+          :value="coreFunctionality.settings.matchHistoryLoadCount"
           @update:value="(val) => setMatchHistoryLoadCount(val || 20)"
         />
       </ControlItem>
       <ControlItem
         class="control-item-margin"
         label="预组队判定阈值"
-        :label-description="`目标玩家群体出现在同一阵营超过 ${settings.matchHistory.preMadeTeamThreshold} 次时，则判定为预组队。不能超过预组队分析样本局数`"
+        :label-description="`目标玩家群体出现在同一阵营超过 ${coreFunctionality.settings.preMadeTeamThreshold} 次时，则判定为预组队。不能超过预组队分析样本局数`"
         :label-width="320"
       >
         <NInputNumber
           style="width: 100px"
           size="tiny"
           :min="2"
-          :value="settings.matchHistory.preMadeTeamThreshold"
+          :value="coreFunctionality.settings.preMadeTeamThreshold"
           @update:value="(val) => setPreMadeThreshold(val || 3)"
         />
       </ControlItem>
@@ -92,7 +92,7 @@
           style="width: 100px"
           size="tiny"
           :min="2"
-          :value="settings.matchHistory.teamAnalysisPreloadCount"
+          :value="coreFunctionality.settings.teamAnalysisPreloadCount"
           @update:value="(val) => setTeamAnalysisPreloadCount(val || 4)"
         />
       </ControlItem>
@@ -102,7 +102,7 @@
       <ControlItem
         class="control-item-margin"
         label="启用 KDA 发送"
-        :label-description="`在对局中或英雄选择中，使用 PageUp 发送己方队伍数据，使用 PageDown 发送敌方队伍 KDA 数据。英雄选择中通过聊天室发送。游戏内发送基于模拟键盘实现，因此在发送前，确保游戏内聊天框是关闭状态。游戏内发送途中，按住 Shift 可将信息发送到全局。统计对局的数量为 ${settings.matchHistory.matchHistoryLoadCount} 场，等同于对局战绩分析数量`"
+        :label-description="`在对局中或英雄选择中，使用 PageUp 发送己方队伍数据，使用 PageDown 发送敌方队伍 KDA 数据。英雄选择中通过聊天室发送。游戏内发送基于模拟键盘实现，因此在发送前，确保游戏内聊天框是关闭状态。游戏内发送途中，按住 Shift 可将信息发送到全局。统计对局的数量为 ${coreFunctionality.settings.matchHistoryLoadCount} 场，等同于对局战绩分析数量`"
         :label-width="320"
       >
         <template #labelDescription>
@@ -116,13 +116,14 @@
           ><br />
           <span style="font-style: italic"
             >KDA 分析局数和 <span style="font-weight: 700">对局战绩分析数量</span> 一致。({{
-              settings.matchHistory.matchHistoryLoadCount
-            }} 场)</span
+              coreFunctionality.settings.matchHistoryLoadCount
+            }}
+            场)</span
           >
         </template>
         <NSwitch
           size="small"
-          :value="settings.matchHistory.sendKdaInGame"
+          :value="coreFunctionality.settings.sendKdaInGame"
           @update:value="(val) => setSendKdaInGame(val)"
         />
       </ControlItem>
@@ -137,7 +138,7 @@
           size="tiny"
           :min="0"
           step="0.1"
-          :value="settings.matchHistory.sendKdaThreshold"
+          :value="coreFunctionality.settings.sendKdaThreshold"
           @update:value="(val) => setSendKdaThreshold(val || 0)"
         />
       </ControlItem>
@@ -149,7 +150,7 @@
       >
         <NSwitch
           size="small"
-          :value="settings.matchHistory.sendKdaInGameWithPreMadeTeams"
+          :value="coreFunctionality.settings.sendKdaInGameWithPreMadeTeams"
           @update:value="(val) => setSendKdaInGameWithPreMadeTeams(val)"
         />
       </ControlItem>
@@ -161,7 +162,7 @@
       >
         <NSwitch
           size="small"
-          :value="settings.matchHistory.sendKdaInGameWithDisclaimer"
+          :value="coreFunctionality.settings.sendKdaInGameWithDisclaimer"
           @update:value="(val) => setSendKdaInGameWithDisclaimer(val)"
         />
       </ControlItem>
@@ -173,8 +174,8 @@
 import { NCard, NInputNumber, NScrollbar, NSwitch } from 'naive-ui'
 
 import {
-  setAfterGameFetch,
   setAutoRouteOnGameStart,
+  setFetchAfterGame,
   setFetchDetailedGame,
   setMatchHistoryLoadCount,
   setPreMadeThreshold,
@@ -183,14 +184,15 @@ import {
   setSendKdaInGameWithPreMadeTeams,
   setSendKdaThreshold,
   setTeamAnalysisPreloadCount
-} from '@renderer/features/match-history'
-import { useSettingsStore } from '@renderer/features/stores/settings'
-
+} from '@renderer/features/core-functionality'
+import { useCoreFunctionalityStore } from '@renderer/features/core-functionality/store'
 import { setEnableRespawnTimer } from '@renderer/features/respawn-timer'
+import { useRespawnTimerStore } from '@renderer/features/respawn-timer/store'
 
 import ControlItem from '../ControlItem.vue'
 
-const settings = useSettingsStore()
+const respawnTimer = useRespawnTimerStore()
+const coreFunctionality = useCoreFunctionalityStore()
 </script>
 
 <style lang="less" scoped>

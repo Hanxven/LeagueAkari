@@ -5,7 +5,7 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
   } catch (error) {
-    console.error(error)
+    console.error('preload', error)
   }
 } else {
   // @ts-ignore (define in dts)

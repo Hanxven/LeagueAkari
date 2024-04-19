@@ -41,19 +41,19 @@
 </template>
 
 <script setup lang="ts">
+import { Friend } from '@shared/types/lcu/chat'
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
-import { notify } from '@renderer/events/notifications'
-import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
-import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
+import { useGameflowStore } from '@renderer/features/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@renderer/features/lcu-state-sync/summoner'
 import { getFriends } from '@renderer/http-api/chat'
 import { LcuHttpError } from '@renderer/http-api/common'
 import { launchSpectator } from '@renderer/http-api/spectator'
 import { getSummonerAlias, getSummonerByName } from '@renderer/http-api/summoner'
-import { Friend } from '@shared/types/lcu/chat'
-import { resolveSummonerName } from '@renderer/utils/identity'
+import { laNotification } from '@renderer/notification'
+import { resolveSummonerName } from '@shared/utils/identity'
 
 const id = 'view:toolkit:spectate'
 
@@ -91,12 +91,8 @@ const handleSpectate = async () => {
         } = await getSummonerByName(spectator.summonerIdentity)
         targetPuuid = puuid
       }
-    } catch (err) {
-      notify.emit({
-        id,
-        type: 'warning',
-        content: `目标玩家 ${spectator.summonerIdentity} 不存在`
-      })
+    } catch (error) {
+      laNotification.warn('观战', `目标玩家 ${spectator.summonerIdentity} 不存在`, error)
 
       spectator.isProcessing = false
       return
@@ -105,26 +101,13 @@ const handleSpectate = async () => {
 
   try {
     await launchSpectator(targetPuuid)
-    notify.emit({
-      id,
-      type: 'success',
-      content: '已拉起观战'
-    })
-  } catch (err) {
-    if ((err as LcuHttpError).response?.status === 404) {
-      notify.emit({
-        id,
-        type: 'warning',
-        content: '尝试观战失败，玩家不存在',
-        extra: { error: err }
-      })
+
+    laNotification.success('观战', '已拉起观战')
+  } catch (error) {
+    if ((error as LcuHttpError).response?.status === 404) {
+      laNotification.warn('观战', '尝试观战失败，玩家不存在', error)
     } else {
-      notify.emit({
-        id,
-        type: 'warning',
-        content: '尝试观战失败，该玩家可能不在对局中或目标模式不可观战',
-        extra: { error: err }
-      })
+      laNotification.warn('观战', '尝试观战失败，该玩家可能不在对局中或目标模式不可观战', error)
     }
   }
 
@@ -141,18 +124,10 @@ const handleSpectatePuuid = async (puuid: string) => {
 
   try {
     await launchSpectator(puuid)
-    notify.emit({
-      id,
-      type: 'success',
-      content: '已拉起观战'
-    })
-  } catch (err) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: '尝试观战失败，该玩家可能不在对局中或目标模式不可观战',
-      extra: { error: err }
-    })
+
+    laNotification.success('观战', '已拉起观战')
+  } catch (error) {
+    laNotification.warn('观战', '尝试观战失败，该玩家可能不在对局中或目标模式不可观战', error)
   } finally {
     spectator.isProcessing = false
   }
@@ -171,8 +146,8 @@ const watchableFriendOptions = computed(() => {
 const handleLoadFriends = async () => {
   try {
     friends.value = (await getFriends()).data
-  } catch (err) {
-    console.error('好友列表加载失败', err)
+  } catch (error) {
+    console.error('好友列表加载失败', error)
   }
 }
 </script>

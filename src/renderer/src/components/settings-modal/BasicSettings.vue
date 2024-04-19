@@ -10,7 +10,7 @@
       >
         <NSwitch
           size="small"
-          :value="settings.app.autoCheckUpdates"
+          :value="app.settings.autoCheckUpdates"
           @update:value="(val: boolean) => setAutoCheckUpdates(val)"
         />
       </ControlItem>
@@ -22,7 +22,7 @@
       >
         <NSwitch
           size="small"
-          :value="settings.app.autoConnect"
+          :value="app.settings.autoConnect"
           @update:value="(val: boolean) => setAutoConnect(val)"
         />
       </ControlItem>
@@ -34,11 +34,11 @@
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
 
 import { setAutoCheckUpdates, setAutoConnect } from '@renderer/features/app'
-import { useSettingsStore } from '@renderer/features/stores/settings'
+import { useAppStore } from '@renderer/features/app/store'
 
 import ControlItem from '../ControlItem.vue'
 
-const settings = useSettingsStore()
+const app = useAppStore()
 </script>
 
 <style lang="less" scoped>

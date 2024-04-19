@@ -33,9 +33,9 @@ import { Game } from '@shared/types/lcu/match-history'
 import { NButton, NModal } from 'naive-ui'
 import { ref, shallowRef, watch } from 'vue'
 
-import { notify } from '@renderer/events/notifications'
 import { LcuHttpError } from '@renderer/http-api/common'
 import { getGame } from '@renderer/http-api/match-history'
+import { laNotification } from '@renderer/notification'
 
 import MatchHistoryCard from './MatchHistoryCard.vue'
 
@@ -67,19 +67,14 @@ const fetchGame = async (gameId: number) => {
     if (g.gameId === props.gameId) {
       game.value = g
     }
-  } catch (err) {
+  } catch (error) {
     isFailedToLoad.value = true
 
-    if (err instanceof LcuHttpError && err?.response?.status === 404) {
+    if (error instanceof LcuHttpError && error?.response?.status === 404) {
       isNotFound.value = true
     }
 
-    notify.emit({
-      id,
-      content: `对局 ${props.gameId} 加载失败`,
-      extra: { error: err },
-      silent: true
-    })
+    laNotification.warn('战绩卡片', `对局 ${props.gameId} 加载失败`, error)
   } finally {
     isLoading.value = false
   }

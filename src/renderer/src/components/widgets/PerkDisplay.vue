@@ -26,7 +26,7 @@
 import { NPopover } from 'naive-ui'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
-import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
+import { useGameDataStore } from '@renderer/features/lcu-state-sync/game-data'
 
 withDefaults(
   defineProps<{
@@ -67,3 +67,4 @@ const gameData = useGameDataStore()
   background-color: rgb(34, 34, 34);
 }
 </style>
+@renderer/features/lcu-state-sync/game-data

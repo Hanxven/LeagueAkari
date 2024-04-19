@@ -62,8 +62,8 @@ export function useGameDataBlobUrl(
             assetsCacheMap.set(targetUrl, objectURL)
           }
         }
-      } catch (err) {
-        console.error(err)
+      } catch (error) {
+        console.error(error)
         url.value = undefined
       }
     })

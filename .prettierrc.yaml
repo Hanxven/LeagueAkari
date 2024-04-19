@@ -4,7 +4,7 @@ printWidth: 100
 trailingComma: none
 endOfLine: lf
 arrowParens: always
-importOrder: ['<THIRD_PARTY_MODULES>', '^@renderer/(.*)$', '^[./]']
+importOrder: ['reflect-metadata', '<THIRD_PARTY_MODULES>', '^@renderer/(.*)$', '^[./]']
 importOrderSeparation: true
 importOrderSortSpecifiers: true
 importOrderParserPlugins: ['typescript', 'decorators']

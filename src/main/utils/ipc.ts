@@ -1,61 +1,138 @@
+import { createLogger } from '@main/core/log'
+import { IpcMainDataType } from '@shared/types/ipc'
+import { formatError } from '@shared/utils/errors'
 import { isAxiosError } from 'axios'
 import { BrowserWindow, IpcMainInvokeEvent, WebContents, ipcMain } from 'electron'
+import { reaction } from 'mobx'
 
-// IPC 包装层，保证统一的返回格式
-export function onCall(
-  func: string,
-  listener: (event: IpcMainInvokeEvent, ...args: any[]) => Promise<void> | any
+const logger = createLogger('utils:ipc')
+
+function handleError(error: any): IpcMainDataType {
+  if (isAxiosError(error)) {
+    return {
+      success: false,
+      error: {
+        code: error.code,
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      }
+    }
+  } else if (error instanceof Error) {
+    return {
+      success: false,
+      error: {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      }
+    }
+  }
+
+  logger.warn(`Unknown error: ${formatError(error)}`)
+
+  return {
+    success: false,
+    error: { message: 'An error occurred' }
+  }
+}
+
+/**
+ * 封装后的适合应用的通用 IPC 格式
+ * @param path
+ * @param listener
+ */
+
+export function ipcHandleRendererStandardized(
+  path: string,
+  listener: (event: IpcMainInvokeEvent, ...args: any[]) => any
 ) {
-  ipcMain.handle(`call:${func}`, async (event, ...args) => {
+  ipcMain.handle(path, (event, ...args) => {
     try {
-      const res = await listener(event, ...args)
-      return {
-        success: true,
-        data: res
-      }
-    } catch (err) {
-      if (isAxiosError(err)) {
+      const result = listener(event, ...args)
+      if (result instanceof Promise) {
+        return result
+          .then((res) => {
+            return {
+              success: true,
+              data: res
+            } as IpcMainDataType
+          })
+          .catch((error: any) => handleError(error))
+      } else {
         return {
-          success: false,
-          error: {
-            code: err.code,
-            message: err.message,
-            stack: err.stack,
-            name: err.name
-          }
-        }
-      } else if (err instanceof Error) {
-        return {
-          success: false,
-          error: {
-            message: err.message,
-            stack: err.stack,
-            name: err.name
-          }
-        }
+          success: true,
+          data: result
+        } as IpcMainDataType
       }
-
-      console.log('unknown error', err)
-
-      // 如果不能确定 Error 的类型，那么返回一个占位符号
-      // 这么做的考虑是，由于 Electron 的 IPC 机制，Error 必须是可序列化的
-      return {
-        success: false,
-        error: {
-          message: 'An error occurred'
-        }
-      }
+    } catch (error) {
+      return handleError(error)
     }
   })
 }
 
-// 将消息发送到所有渲染进程
-export function sendUpdateToAll(state: string, ...args: any[]) {
+/**
+ * 发送事件到全体窗口
+ * @param eventName
+ * @param args
+ */
+export function sendEventToAllRenderer(eventName: string, ...args: any[]) {
   for (const win of BrowserWindow.getAllWindows()) {
-    win.webContents.send(`update:${state}`, ...args)
+    win.webContents.send(`event:${eventName}`, ...args)
   }
 }
 
-export function sendUpdate(webContents: WebContents, state: string, ...args: any[]) {
-  webContents.send(`update:${state}`, ...args)
+/**
+ * 发送事件
+ * @param path
+ * @param args
+ */
+export function sendEventToRenderer(webContents: WebContents, eventName: string, ...args: any[]) {
+  webContents.send(`event:${eventName}`, ...args)
+}
+
+/**
+ * 封装的资源状态同步
+ * @param resName 资源名称，不包括 `get:` or `update:` 前缀
+ * @param stateGetter 获取 mobx 字段的 Getter
+ * @param webContents 需要发送的渲染进程，不指定时为发送全部
+ */
+export function ipcStateSync(
+  resName: string,
+  stateGetter: (...arg: any[]) => any,
+  webContents?: WebContents | WebContents[]
+) {
+  ipcMain.handle(`get:${resName}`, stateGetter)
+
+  if (webContents) {
+    if (Array.isArray(webContents)) {
+      reaction(stateGetter, (state, prev) => {
+        for (const w of webContents) {
+          w.send(`update:${resName}`, state, prev)
+        }
+      })
+    } else {
+      reaction(stateGetter, (state, prev) => {
+        webContents.send(`update:${resName}`, state, prev)
+      })
+    }
+  } else {
+    reaction(stateGetter, (state, prev) => {
+      for (const win of BrowserWindow.getAllWindows()) {
+        win.webContents.send(`update:${resName}`, state, prev)
+      }
+    })
+  }
+}
+
+/**
+ * 封装后的资源 call 操作
+ * @param resName
+ * @param listener
+ */
+export function onRendererCall(
+  resName: string,
+  listener: (event: IpcMainInvokeEvent, ...args: any[]) => Promise<any> | any
+) {
+  ipcHandleRendererStandardized(`call:${resName}`, listener)
 }

@@ -1,5 +1,6 @@
 <template>
   <NConfigProvider
+    :theme-overrides="{ Notification: { padding: '12px' } }"
     :theme="darkTheme"
     :locale="zhCN"
     :date-locale="dateZhCN"

@@ -27,7 +27,7 @@ export const rsoPlatformText = {
   WT6: '扭曲丛林',
   WT7: '巨龙之巢',
   EDU1: '教育网',
-  
+
   BGP2: '峡谷之巅',
   HN14_NEW: '均衡教派',
   HN16_NEW: '守望之海',
@@ -38,7 +38,6 @@ export const rsoPlatformText = {
   WT3_NEW: '弗雷尔卓德',
   WT2_NEW: '德玛西亚',
   WT4_NEW: '无畏先锋',
-
 
   BR1: '巴西',
   EUN1: '北欧 & 东欧',

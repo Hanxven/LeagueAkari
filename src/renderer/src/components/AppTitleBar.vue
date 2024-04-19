@@ -1,5 +1,5 @@
 <template>
-  <div class="app-title-bar" :class="{ blurred: appState.focusState === 'blurred' }">
+  <div class="app-title-bar" :class="{ blurred: app.focusState === 'blurred' }">
     <div class="title-bar-items">
       <div class="title-bar-item operation" @click="emits('openSettings')" title="通用设置">
         <NIcon class="icon"><SettingsIcon /></NIcon>
@@ -20,13 +20,11 @@
         <NIcon><MinimizeIcon /></NIcon>
       </div>
       <div
-        :title="appState.windowState === 'normal' ? '最大化' : '还原'"
+        :title="app.windowState === 'normal' ? '最大化' : '还原'"
         class="traffic-button maximize"
         @click="handleMaximize"
       >
-        <NIcon
-          ><MaximizeIcon v-if="appState.windowState === 'normal'" /><CarbonIcon v-else />
-        </NIcon>
+        <NIcon><MaximizeIcon v-if="app.windowState === 'normal'" /><CarbonIcon v-else /> </NIcon>
       </div>
       <div title="关闭" class="traffic-button close" @click="handleClose">
         <NIcon><CloseIcon /></NIcon>
@@ -46,27 +44,27 @@ import {
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 
-import { useAppState } from '@renderer/features/stores/app'
-import { useRespawnTimerStore } from '@renderer/features/stores/respawn-timer'
-import { call } from '@renderer/ipc'
+import { useAppStore } from '@renderer/features/app/store'
+import { useRespawnTimerStore } from '@renderer/features/respawn-timer/store'
+import { mainCall } from '@renderer/utils/ipc'
 
-const appState = useAppState()
+const app = useAppStore()
 const respawnTimer = useRespawnTimerStore()
 
 const handleMinimize = async () => {
-  await call('minimize')
+  await mainCall('main-window/minimize')
 }
 
 const handleMaximize = async () => {
-  if (appState.windowState === 'normal') {
-    await call('maximize')
+  if (app.windowState === 'normal') {
+    await mainCall('main-window/maximize')
   } else {
-    await call('unmaximize')
+    await mainCall('main-window/unmaximize')
   }
 }
 
 const handleClose = async () => {
-  await call('close')
+  await mainCall('main-window/close')
 }
 
 const emits = defineEmits<{

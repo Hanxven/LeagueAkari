@@ -59,18 +59,18 @@
 </template>
 
 <script setup lang="ts">
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { AutoCompleteOption, NAutoComplete, NButton } from 'naive-ui'
 import { computed, onMounted, ref } from 'vue'
 
-import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
+import { useSummonerStore } from '@renderer/features/lcu-state-sync/summoner'
 import {
   getSummoner,
   getSummonerAlias,
   getSummonerByName,
   getSummonerByPuuid
 } from '@renderer/http-api/summoner'
-import { SummonerInfo } from '@shared/types/lcu/summoner'
-import { inferType, resolveSummonerName } from '@renderer/utils/identity'
+import { inferType, resolveSummonerName } from '@shared/utils/identity'
 
 import SummonerCard from './SummonerCard.vue'
 

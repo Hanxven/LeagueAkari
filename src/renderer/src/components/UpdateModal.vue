@@ -7,22 +7,22 @@
     :class="styles['settings-modal']"
   >
     <template #header><span class="card-header-title">发现更新</span></template>
-    <div v-if="appState.updates.newUpdates">
+    <div v-if="app.updates.newUpdates">
       <div class="para">
-        新版本可用：{{ appState.updates.newUpdates.version }} (当前版本：{{
-          appState.updates.newUpdates.currentVersion
+        新版本可用：{{ app.updates.newUpdates.version }} (当前版本：{{
+          app.updates.newUpdates.currentVersion
         }})
       </div>
       <div>
-        <a class="small-link" target="_blank" :href="appState.updates.newUpdates.pageUrl"
+        <a class="small-link" target="_blank" :href="app.updates.newUpdates.pageUrl"
           >Github 发布页面</a
         >
         <a
-          v-if="appState.updates.newUpdates.downloadUrl"
+          v-if="app.updates.newUpdates.downloadUrl"
           class="small-link"
           style="margin-left: 8px"
           target="_blank"
-          :href="appState.updates.newUpdates.downloadUrl"
+          :href="app.updates.newUpdates.downloadUrl"
           >Github 下载</a
         >
       </div>
@@ -43,15 +43,15 @@
 import { NModal, NScrollbar } from 'naive-ui'
 import { computed, useCssModule } from 'vue'
 
-import { useAppState } from '@renderer/features/stores/app'
+import { useAppStore } from '@renderer/features/app/store'
 import { markdownIt } from '@renderer/utils/markdown'
 
-const appState = useAppState()
+const app = useAppStore()
 
 const styles = useCssModule()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(appState.updates.newUpdates?.description || '无内容')
+  return markdownIt.render(app.updates.newUpdates?.description || '无内容')
 })
 
 const show = defineModel<boolean>('show', { default: false })

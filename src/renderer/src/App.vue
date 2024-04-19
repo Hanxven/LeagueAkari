@@ -19,11 +19,9 @@ import AppTitleBar from './components/AppTitleBar.vue'
 import DeclarationModal from './components/DeclarationModal.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
-import { setupNaiveUiNotificationEvents } from './events/notifications'
 import { setShowFreeSoftwareDeclaration } from './features/app'
-import { useAppState } from './features/stores/app'
-import { useLcuStateStore } from './features/stores/lcu-connection'
-import { useSettingsStore } from './features/stores/settings'
+import { useAppStore } from './features/app/store'
+import { setupNaiveUiNotificationEvents } from './notification'
 import { greeting } from './utils/greeting'
 
 greeting()
@@ -32,22 +30,26 @@ setupNaiveUiNotificationEvents()
 
 const router = useRouter()
 
-const lcuState = useLcuStateStore()
+const app = useAppStore()
+
 watchEffect(() => {
-  if (lcuState.state === 'disconnected') {
+  if (app.lcuConnectionState === 'disconnected') {
     router.replace('/connecting')
   }
 })
 
-const appState = useAppState()
-const settings = useSettingsStore()
-
 const isShowingSettingModal = ref(false)
 const isShowingNewUpdateModal = ref(false)
-const isShowingFreeSoftwareDeclaration = ref(settings.app.showFreeSoftwareDeclaration)
+const isShowingFreeSoftwareDeclaration = ref(false)
 
 watchEffect(() => {
-  if (appState.updates.newUpdates) {
+  if (app.settings.showFreeSoftwareDeclaration) {
+    isShowingFreeSoftwareDeclaration.value = true
+  }
+})
+
+watchEffect(() => {
+  if (app.updates.newUpdates) {
     isShowingNewUpdateModal.value = true
   } else {
     isShowingNewUpdateModal.value = false

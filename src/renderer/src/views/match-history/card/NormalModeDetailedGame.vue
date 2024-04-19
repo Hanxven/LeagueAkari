@@ -43,8 +43,17 @@
                     <span
                       class="name-span"
                       @click="handleToSummoner(p.identity.player.summonerId)"
-                      :title="p.identity.player.summonerName"
-                      >{{ p.identity.player.summonerName || p.identity.player.gameName || '<无名>'
+                      :title="
+                        summonerName(
+                          p.identity.player.gameName || p.identity.player.summonerName,
+                          p.identity.player.tagLine
+                        )
+                      "
+                      >{{
+                        summonerName(
+                          p.identity.player.gameName || p.identity.player.summonerName,
+                          p.identity.player.tagLine
+                        )
                       }}{{ p.identity.player.summonerId === 0 ? ' (人机)' : '' }}</span
                     >
                   </div>
@@ -160,6 +169,8 @@
 </template>
 
 <script setup lang="ts">
+import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
+import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -170,7 +181,6 @@ import PerkDisplay from '@renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
-import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 

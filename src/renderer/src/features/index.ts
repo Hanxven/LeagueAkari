@@ -3,32 +3,32 @@ import { setupAutoAccept } from './auto-accept'
 import { setupAutoHonor } from './auto-honor'
 import { setupAutoReply } from './auto-reply'
 import { setupAutoSelect } from './auto-select'
+import { setupCoreFunctionality } from './core-functionality'
 import { setupDebug } from './debug'
 import { setupGameData } from './game-data'
-import { setupMatchHistory } from './match-history'
+import { setupStateUpdater } from './lcu-state-sync'
 import { setupRespawnTimer } from './respawn-timer'
-import { setupStateUpdater } from './update/lcu-state-update'
 
 export async function setupLeagueAkariFeatures() {
   // 应用本身的相关状态
-  setupApp()
+  await setupApp()
 
   // 所有涉及到 LCU 状态的更新
-  setupStateUpdater()
+  await setupStateUpdater()
 
-  setupDebug()
+  await setupDebug()
 
-  setupGameData()
+  await setupGameData()
 
-  setupMatchHistory()
-  
-  setupAutoAccept()
+  await setupCoreFunctionality()
 
-  setupAutoReply()
+  await setupAutoAccept()
 
-  setupAutoSelect()
+  await setupAutoReply()
 
-  setupAutoHonor()
+  await setupAutoSelect()
 
-  setupRespawnTimer()
+  await setupAutoHonor()
+
+  await setupRespawnTimer()
 }

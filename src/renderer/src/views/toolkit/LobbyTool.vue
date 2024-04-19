@@ -63,36 +63,29 @@
 </template>
 
 <script setup lang="ts">
+import { AvailableBot } from '@shared/types/lcu/lobby'
 import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
 import { computed, reactive, shallowRef } from 'vue'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
-import { notify } from '@renderer/events/notifications'
-import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
-import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
+import { useGameDataStore } from '@renderer/features/lcu-state-sync/game-data'
+import { useGameflowStore } from '@renderer/features/lcu-state-sync/gameflow'
 import {
   addBot,
   createPractice5x5,
   createQueueLobby,
   getAvailableBots
 } from '@renderer/http-api/lobby'
-import { AvailableBot } from '@shared/types/lcu/lobby'
-
-const id = 'view:toolkit:lobby-tool'
+import { laNotification } from '@renderer/notification'
 
 const gameflow = useGameflowStore()
 const gameData = useGameDataStore()
 
 const handleCreatePractice5v5 = async () => {
   try {
-    await createPractice5x5(`LEAGUEAKARI_${Date.now() % 1000000}`)
-  } catch (err) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: '尝试创建房间失败',
-      extra: { error: err }
-    })
+    await createPractice5x5(`LA_${(Date.now() % 10000000) + 10000000}`)
+  } catch (error) {
+    laNotification.warn('房间工具', '尝试创建房间失败', error)
   }
 }
 
@@ -102,12 +95,8 @@ const handleAddBot = async () => {
   }
   try {
     await addBot(botSettings.difficulty, botSettings.championId, botSettings.team)
-  } catch (e) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: '尝试添加人机失败'
-    })
+  } catch (error) {
+    laNotification.warn('房间工具', '尝试添加人机失败', error)
   }
 }
 
@@ -189,13 +178,8 @@ const handleCreateQueueLobby = async () => {
 
   try {
     await createQueueLobby(queueLobbySettings.queueId)
-  } catch (err) {
-    notify.emit({
-      id,
-      type: 'warning',
-      content: '尝试创建队列房间失败，队列可能未开放',
-      extra: { error: err }
-    })
+  } catch (error) {
+    laNotification.warn('房间工具', '尝试创建队列房间失败，队列可能未开放', error)
   }
 }
 
@@ -215,13 +199,8 @@ const handleLoadAvailableBots = async (show: boolean) => {
         })
         acknowledged = true
       }
-    } catch (err) {
-      notify.emit({
-        id,
-        type: 'warning',
-        content: '尝试加载可用人机列表失败',
-        extra: { error: err }
-      })
+    } catch (error) {
+      laNotification.warn('房间工具', '尝试加载可用人机列表失败', error)
     }
   }
 }

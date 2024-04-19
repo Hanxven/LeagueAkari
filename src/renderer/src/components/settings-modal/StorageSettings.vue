@@ -7,7 +7,7 @@
         <div class="control">
           <NSwitch
             size="small"
-            :value="settings.app.autoConnect"
+            :value="app.settings.autoConnect"
             @update:value="(val: boolean) => setAutoConnect(val)"
           />
         </div>
@@ -20,9 +20,9 @@
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
 
 import { setAutoConnect } from '@renderer/features/app'
-import { useSettingsStore } from '@renderer/features/stores/settings'
+import { useAppStore } from '@renderer/features/app/store'
 
-const settings = useSettingsStore()
+const app = useAppStore()
 </script>
 
 <style lang="less" scoped>

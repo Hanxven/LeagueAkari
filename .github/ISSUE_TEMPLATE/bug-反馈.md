@@ -1,10 +1,9 @@
 ---
 name: BUG 反馈
 about: 这些信息对定位 BUG 会有很大的帮助
-title: "[BUG]"
+title: '[BUG]'
 labels: ''
 assignees: Hanxven
-
 ---
 
 为了知道 BUG 的源头，请您尽可能描述：

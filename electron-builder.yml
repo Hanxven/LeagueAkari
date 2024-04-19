@@ -1,5 +1,5 @@
 appId: sugar.cocoa.league-akari
-productName: league-akari
+productName: League Akari
 directories:
   buildResources: build
 files:

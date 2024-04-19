@@ -103,10 +103,10 @@ import { NButton, NPopover, NSelect } from 'naive-ui'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { championIcon } from '@renderer/features/game-data'
-import { useChampSelectStore } from '@renderer/features/stores/lcu/champ-select'
-import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
-import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
-import { isChampionNameMatch } from '@renderer/utils/string-match'
+import { useChampSelectStore } from '@renderer/features/lcu-state-sync/champ-select'
+import { useGameDataStore } from '@renderer/features/lcu-state-sync/game-data'
+import { useGameflowStore } from '@renderer/features/lcu-state-sync/gameflow'
+import { isChampionNameMatch } from '@shared/utils/string-match'
 
 import LcuImage from './LcuImage.vue'
 

@@ -7,7 +7,7 @@
       label-description="在游戏结束时，自动点赞一位队友。若不存在可点赞的玩家，将跳过点赞阶段"
     >
       <NSwitch
-        :value="settings.autoHonor.enabled"
+        :value="autoHonor.settings.enabled"
         @update:value="(val) => setEnableAutoHonor(val)"
         size="small"
       />
@@ -20,7 +20,7 @@
       <NRadioGroup
         size="small"
         name="radio-group"
-        :value="settings.autoHonor.strategy"
+        :value="autoHonor.settings.strategy"
         @update:value="(val) => setAutoHonorStrategy(val)"
       >
         <NFlex :size="4">
@@ -39,9 +39,9 @@ import { NCard, NFlex, NRadio, NRadioGroup, NSwitch } from 'naive-ui'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
 import { setAutoHonorStrategy, setEnableAutoHonor } from '@renderer/features/auto-honor'
-import { useSettingsStore } from '@renderer/features/stores/settings'
+import { useAutoHonorStore } from '@renderer/features/auto-honor/store'
 
-const settings = useSettingsStore()
+const autoHonor = useAutoHonorStore()
 </script>
 
 <style lang="less" scoped>

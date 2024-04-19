@@ -43,21 +43,21 @@
             : undefined
         "
       />
-      <CopyableText class="name" :text="selfData?.displayName || selfData?.gameName" />
+      <CopyableText class="name" :text="selfData?.gameName || selfData?.displayName" />
     </div>
   </NCard>
 </template>
 
 <script setup lang="ts">
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { NCard } from 'naive-ui'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import CopyableText from '@renderer/components/CopyableText.vue'
 import LcuImage from '@renderer/components/LcuImage.vue'
-import { notify } from '@renderer/events/notifications'
 import { getSummoner } from '@renderer/http-api/summoner'
-import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { laNotification } from '@renderer/notification'
 
 const id = 'comp:search-summoner'
 
@@ -92,15 +92,8 @@ onMounted(async () => {
   if (typeof props.summoner === 'number') {
     try {
       selfData.value = (await getSummoner(props.summoner)).data
-    } catch (err) {
-      console.error(err)
-      notify.emit({
-        id,
-        type: 'warning',
-        content: '加载召唤师信息时失败',
-        silent: true,
-        extra: { error: err }
-      })
+    } catch (error) {
+      laNotification.warn('卡片组件', '加载召唤师信息时失败', error)
     }
   }
 })

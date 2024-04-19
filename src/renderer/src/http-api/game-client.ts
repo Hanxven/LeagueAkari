@@ -1,4 +1,5 @@
 import { PlayerList } from '@shared/types/game-client'
+
 import { gameClientRequest } from './common'
 
 export function getPlayerList() {

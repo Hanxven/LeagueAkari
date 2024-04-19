@@ -29,19 +29,19 @@
     <NCard size="small">
       <template #header><span class="card-header-title">在控制台打印 LCU 事件</span></template>
       <div class="operations">
-        <NCheckbox size="small" class="check-box" v-model:checked="settings.debug.printAllLcuEvents"
+        <NCheckbox size="small" class="check-box" v-model:checked="debug.settings.printAllLcuEvents"
           >打印全部事件</NCheckbox
         >
         <NButton
           size="tiny"
           @click="handleShowAddModal"
-          v-show="!settings.debug.printAllLcuEvents"
+          v-show="!debug.settings.printAllLcuEvents"
           secondary
           type="primary"
           >添加规则</NButton
         >
       </div>
-      <NCollapseTransition :show="!settings.debug.printAllLcuEvents">
+      <NCollapseTransition :show="!debug.settings.printAllLcuEvents">
         <NDataTable
           :class="styles.table"
           :columns="columns"
@@ -63,42 +63,53 @@
       </div>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">日志</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="日志目录"
+        label-description="打开 League Akari 日志文件所在目录"
+        :label-width="320"
+      >
+        <NButton size="tiny" @click="() => handleShowLogsDir()">日志目录</NButton>
+      </ControlItem>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
       <template #header
         ><span class="card-header-title"
-          >LCU{{ lcuState.state === 'connected' ? '' : ' (未连接)' }}</span
+          >LCU{{ app.lcuConnectionState === 'connected' ? '' : ' (未连接)' }}</span
         ></template
       >
       <NTable size="small" bordered>
         <tbody>
           <tr>
             <td style="width: 50px">端口</td>
-            <td><CopyableText :text="lcuState.auth?.port ?? '-'" /></td>
+            <td><CopyableText :text="app.lcuAuth?.port ?? '-'" /></td>
           </tr>
           <tr>
             <td>PID</td>
-            <td><CopyableText :text="lcuState.auth?.pid ?? '-'" /></td>
+            <td><CopyableText :text="app.lcuAuth?.pid ?? '-'" /></td>
           </tr>
           <tr>
             <td>密钥</td>
-            <td><CopyableText :text="lcuState.auth?.password ?? '-'" /></td>
+            <td><CopyableText :text="app.lcuAuth?.password ?? '-'" /></td>
           </tr>
           <tr>
             <td>区服</td>
             <td>
-              <CopyableText :text="lcuState.auth?.rsoPlatformId ?? '-'">{{
-                lcuState.auth?.rsoPlatformId
-                  ? rsoPlatformText[lcuState.auth.rsoPlatformId] || lcuState.auth.rsoPlatformId
-                  : lcuState.auth?.rsoPlatformId
+              <CopyableText :text="app.lcuAuth?.rsoPlatformId ?? '-'">{{
+                (app.lcuAuth?.rsoPlatformId
+                  ? rsoPlatformText[app.lcuAuth.rsoPlatformId] || app.lcuAuth.rsoPlatformId
+                  : app.lcuAuth?.rsoPlatformId) || '不可用'
               }}</CopyableText>
             </td>
           </tr>
           <tr>
             <td>地域</td>
             <td>
-              <CopyableText :text="lcuState.auth?.region ?? '-'">{{
-                lcuState.auth?.region
-                  ? regionText[lcuState.auth.region] || lcuState.auth.region
-                  : lcuState.auth?.region
+              <CopyableText :text="app.lcuAuth?.region ?? '-'">{{
+                app.lcuAuth?.region
+                  ? regionText[app.lcuAuth.region] || app.lcuAuth.region
+                  : app.lcuAuth?.region
               }}</CopyableText>
             </td>
           </tr>
@@ -107,12 +118,12 @@
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">游戏流</span></template>
-      <span class="text" v-if="lcuState.state === 'connected'"
+      <span class="text" v-if="app.lcuConnectionState === 'connected'"
         >{{ gameflowText[gameflow.phase || 'None'] }} ({{ gameflow.phase }})</span
       >
       <span class="text" v-else>不可用 (未连接)</span>
     </NCard>
-    <NCard v-if="appState.isAdmin" size="small" style="margin-top: 8px">
+    <NCard v-if="app.isAdministrator" size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">League Akari</span></template>
       <span class="text"
         >League Akari 运行在管理员权限，仅用于实现命令行获取以及特定的客户端功能</span
@@ -139,25 +150,24 @@ import {
 } from 'naive-ui'
 import { computed, h, nextTick, ref, useCssModule, watch } from 'vue'
 
+import { useAppStore } from '@renderer/features/app/store'
 import {
   addPrintRule,
   disablePrintRule,
   enablePrintRule,
   removePrintRule
 } from '@renderer/features/debug'
-import { useAppState } from '@renderer/features/stores/app'
-import { useLcuStateStore } from '@renderer/features/stores/lcu-connection'
-import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
-import { useSettingsStore } from '@renderer/features/stores/settings'
-import { call } from '@renderer/ipc'
+import { useDebugStore } from '@renderer/features/debug/store'
+import { useGameflowStore } from '@renderer/features/lcu-state-sync/gameflow'
+import { mainCall } from '@renderer/utils/ipc'
 
+import ControlItem from '../ControlItem.vue'
 import CopyableText from '../CopyableText.vue'
 import { lcuEndpoints } from './lcu-endpoints'
 
-const settings = useSettingsStore()
-const lcuState = useLcuStateStore()
 const gameflow = useGameflowStore()
-const appState = useAppState()
+const app = useAppStore()
+const debug = useDebugStore()
 
 const gameflowText = {
   Matchmaking: '正在匹配',
@@ -229,11 +239,11 @@ const columns: DataTableColumn<any>[] = [
 ]
 
 const printRulesArr = computed(() => {
-  return Object.keys(settings.debug.printRules)
+  return Object.keys(debug.settings.printRules)
     .sort((a, b) => a.localeCompare(b))
     .map((k) => ({
       rule: k,
-      data: settings.debug.printRules[k]
+      data: debug.settings.printRules[k]
     }))
 })
 
@@ -275,7 +285,7 @@ const editRuleValid = computed(() => {
 
   try {
     RadixMatcher.validateRoute(editRuleText.value)
-  } catch (err) {
+  } catch (error) {
     return false
   }
   return true
@@ -303,7 +313,11 @@ const handleRemoveEditRule = async (rule: string) => {
 const styles = useCssModule()
 
 const handleToggleDevtools = async () => {
-  await call('toggleDevtools')
+  await mainCall('main-window/devtools/toggle')
+}
+
+const handleShowLogsDir = async () => {
+  await mainCall('logs/dir/open')
 }
 
 const handleReload = () => {

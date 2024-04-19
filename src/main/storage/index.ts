@@ -1,5 +1,7 @@
-import { initTaggedPlayersStorage } from './tagged-players'
+import { initEncounteredGamesStorageIpc } from './encountered-games'
+import { initSavedPlayersStorageIpc } from './saved-player'
 
-export function initStorageQuery() {
-  initTaggedPlayersStorage()
+export function initStorageIpc() {
+  initSavedPlayersStorageIpc()
+  initEncounteredGamesStorageIpc()
 }

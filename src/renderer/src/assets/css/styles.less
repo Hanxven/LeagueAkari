@@ -62,6 +62,33 @@ a:visited {
   align-items: center;
 }
 
-.n-radio__label {
+.n-radio__label,
+.n-checkbox__label {
   font-size: 13px;
+}
+
+.n-notification-container .n-notification .n-notification-main .n-notification-main__header {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.n-notification-container .n-notification .n-notification-main .n-notification-main__content {
+  font-size: 13px;
+  margin: 4px 0 0 0;
+}
+
+.n-notification-container .n-notification .n-notification__avatar {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+
+.n-notification-container .n-notification.n-notification--show-avatar .n-notification-main {
+  margin-left: 30px;
+  width: calc(100% - 30px);
+}
+
+// adjust for app title bar height
+.n-notification-container > .n-scrollbar > .n-scrollbar-container {
+  max-height: calc(100vh - var(--app-title-bar-height)) !important;
 }

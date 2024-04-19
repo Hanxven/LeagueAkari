@@ -14,9 +14,15 @@
           v-for="tab of mh.tabs"
           @contextmenu="(event) => handleShowMenu(event, tab.id)"
           :key="tab.id"
-          :tab="tab.data.summoner?.displayName || tab.data.summoner?.gameName || tab.id"
+          :tab="
+            summonerName(
+              tab.data.summoner?.gameName || tab.data.summoner?.displayName,
+              tab.data.summoner?.tagLine,
+              tab.id.toString()
+            )
+          "
           :name="tab.id"
-          :closable="tab.id !== summoner.currentSummoner?.summonerId"
+          :closable="tab.id !== summoner.me?.summonerId"
           :draggable="true"
           @dragover.prevent
           @dragstart="() => handleDragStart(tab.id)"
@@ -29,9 +35,9 @@
           <div class="tab">
             <!-- 在进入游戏时，显示当前召唤师所选择的英雄的图标 -->
             <LcuImage
-              v-if="mh.ongoingPlayers[tab.id]?.championId"
+              v-if="mh.ongoingChampionSelections?.[tab.id]"
               class="tab-icon"
-              :src="championIcon(mh.ongoingPlayers[tab.id].championId!)"
+              :src="championIcon(mh.ongoingChampionSelections?.[tab.id])"
             />
             <LcuImage
               v-else-if="tab.data.summoner"
@@ -39,13 +45,14 @@
               :src="tab.data.summoner ? profileIcon(tab.data.summoner.profileIconId) : undefined"
             />
             <span class="tab-title" :class="{ 'temporary-tab': tab.isTemporary }">{{
-              tab.data.summoner?.displayName || tab.data.summoner?.gameName || tab.id
+              summonerName(
+                tab.data.summoner?.gameName || tab.data.summoner?.displayName,
+                tab.data.summoner?.tagLine,
+                tab.id.toString()
+              )
             }}</span>
             <NIcon
-              v-if="
-                tab.id !== summoner.currentSummoner?.summonerId &&
-                tab.data.summoner?.privacy === 'PRIVATE'
-              "
+              v-if="tab.id !== summoner.me?.summonerId && tab.data.summoner?.privacy === 'PRIVATE'"
               title="隐藏生涯"
               class="privacy-private-icon"
               ><WarningAltFilledIcon
@@ -98,7 +105,7 @@
             mh.currentTab.data.loading.isLoadingSummoner ||
             mh.currentTab.data.loading.isLoadingRankedStats
           "
-          @click="fetchTabFullData(mh.currentTab.id, false)"
+          @click="() => handleRefresh(mh.currentTab!.id)"
           circle
           type="primary"
           ><template #icon
@@ -117,7 +124,7 @@
           :key="t.id"
           v-show="t.id === mh.currentTab.id"
           ref="innerComps"
-          :is-self-tab="mh.currentTab.id === summoner.currentSummoner?.summonerId"
+          :is-self-tab="mh.currentTab.id === summoner.me?.summonerId"
           :tab="t.data as TabState"
         />
       </template>
@@ -127,6 +134,7 @@
 </template>
 
 <script setup lang="ts">
+import { summonerName } from '@shared/utils/name'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
 import { ArrowUp as ArrowUpIcon, Refresh as RefreshIcon } from '@vicons/ionicons5'
 import { NButton, NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
@@ -135,10 +143,11 @@ import { useRoute, useRouter } from 'vue-router'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
 import SearchSummoner from '@renderer/components/search-summoner/SearchSummoner.vue'
+import { fetchTabFullData } from '@renderer/features/core-functionality'
+import { TabState, useCoreFunctionalityStore } from '@renderer/features/core-functionality/store'
 import { championIcon, profileIcon } from '@renderer/features/game-data'
-import { fetchTabFullData } from '@renderer/features/match-history'
-import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
-import { TabState, useMatchHistoryStore } from '@renderer/features/stores/match-history'
+import { useSummonerStore } from '@renderer/features/lcu-state-sync/summoner'
+import { laNotification } from '@renderer/notification'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
 
@@ -148,7 +157,7 @@ const router = useRouter()
 // 当前登录的用户信息
 const summoner = useSummonerStore()
 
-const mh = useMatchHistoryStore()
+const mh = useCoreFunctionalityStore()
 
 const handleTabClose = (summonerId: number) => {
   mh.closeTab(summonerId)
@@ -156,6 +165,19 @@ const handleTabClose = (summonerId: number) => {
 
 const handleTabChange = async (summonerId: number) => {
   await router.replace(`/match-history/${summonerId}`)
+}
+
+const handleRefresh = async (summonerId: number) => {
+  const result = await fetchTabFullData(summonerId)
+
+  if (typeof result === 'number') {
+    laNotification.warn('召唤师信息', `无法拉取用户 ${summonerId} 的信息`)
+  } else {
+    laNotification.success(
+      '召唤师信息',
+      `拉取召唤师 ${summonerName(result.gameName || result.displayName, result.tagLine)} 的信息成功`
+    )
+  }
 }
 
 watch(
@@ -186,7 +208,7 @@ watch(
     } else {
       mh.createTab(id, {
         setCurrent: true,
-        pin: summoner.currentSummoner?.summonerId === id
+        pin: summoner.me?.summonerId === id
       })
     }
   },
@@ -251,7 +273,7 @@ const dropdownOptions = reactive([
 const handleMenuSelect = (action: string) => {
   switch (action) {
     case 'refresh':
-      fetchTabFullData(menuProps.id, false)
+      handleRefresh(menuProps.id)
       break
     case 'close':
       mh.closeTab(menuProps.id)

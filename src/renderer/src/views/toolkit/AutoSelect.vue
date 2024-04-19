@@ -8,7 +8,7 @@
     >
       <NSwitch
         @update:value="(v) => setNormalModeAutoSelectEnabled(v)"
-        :value="settings.autoSelect.normalModeEnabled"
+        :value="autoSelect.settings.normalModeEnabled"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -19,7 +19,7 @@
     >
       <NSwitch
         @update:value="(v) => setOnlySimulMode(v)"
-        :value="settings.autoSelect.onlySimulMode"
+        :value="autoSelect.settings.onlySimulMode"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -30,7 +30,7 @@
     >
       <NSwitch
         @update:value="(v) => setSelectTeammateIntendedChampion(v)"
-        :value="settings.autoSelect.selectTeammateIntendedChampion"
+        :value="autoSelect.settings.selectTeammateIntendedChampion"
         size="small"
       />
     </ControlItem>
@@ -41,7 +41,7 @@
     >
       <NSwitch
         @update:value="(v) => setSelectRandomly(v)"
-        :value="settings.autoSelect.selectRandomly"
+        :value="autoSelect.settings.selectRandomly"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -53,7 +53,7 @@
       <NSwitch
         type="pick"
         size="small"
-        :value="settings.autoSelect.showIntent"
+        :value="autoSelect.settings.showIntent"
         @update:value="(val) => setShowIntent(val)"
       />
     </ControlItem>
@@ -64,7 +64,7 @@
     >
       <NSwitch
         @update:value="(v) => setAutoSelectCompleted(v)"
-        :value="settings.autoSelect.completed"
+        :value="autoSelect.settings.completed"
         size="small"
         :rail-style="completeStrategy"
       >
@@ -75,7 +75,7 @@
     <ControlItem class="control-item-margin" label="意向英雄">
       <OrderedChampionList
         type="pick"
-        :value="settings.autoSelect.expectedChampions"
+        :value="autoSelect.settings.expectedChampions"
         @update:value="(list) => setNormalModeExpectedChampions(list)"
       />
     </ControlItem>
@@ -87,7 +87,7 @@
     >
       <NSwitch
         @update:value="(v) => setBenchModeAutoSelectEnabled(v)"
-        :value="settings.autoSelect.benchModeEnabled"
+        :value="autoSelect.settings.benchModeEnabled"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -101,14 +101,14 @@
         placeholder="秒"
         :min="0"
         size="tiny"
-        :value="settings.autoSelect.grabDelay"
-        @update:value="(v) => setGrabDelay(v || 0)"
+        :value="autoSelect.settings.grabDelaySeconds"
+        @update:value="(v) => setGrabDelaySeconds(v || 0)"
       />
     </ControlItem>
     <ControlItem class="control-item-margin" label="期望英雄">
       <OrderedChampionList
         type="pick"
-        :value="settings.autoSelect.benchExpectedChampions"
+        :value="autoSelect.settings.benchExpectedChampions"
         @update:value="(list) => setBenchModeExpectedChampions(list)"
       />
     </ControlItem>
@@ -120,7 +120,7 @@
     >
       <NSwitch
         @update:value="(v) => setAutoBanEnabled(v)"
-        :value="settings.autoSelect.banEnabled"
+        :value="autoSelect.settings.banEnabled"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -131,7 +131,7 @@
     >
       <NSwitch
         @update:value="(v) => setBanRandomly(v)"
-        :value="settings.autoSelect.banRandomly"
+        :value="autoSelect.settings.banRandomly"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -142,13 +142,13 @@
     >
       <NSwitch
         @update:value="(v) => setBanTeammateIntendedChampion(v)"
-        :value="settings.autoSelect.banTeammateIntendedChampion"
+        :value="autoSelect.settings.banTeammateIntendedChampion"
         size="small"
       ></NSwitch>
     </ControlItem>
     <ControlItem class="control-item-margin" label="意向英雄">
       <OrderedChampionList
-        :value="settings.autoSelect.bannedChampions"
+        :value="autoSelect.settings.bannedChampions"
         type="ban"
         @update:value="(list) => setNormalModeBannedChampions(list)"
       />
@@ -157,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
+import { NCard, NInputNumber, NSwitch } from 'naive-ui'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
 import OrderedChampionList from '@renderer/components/OrderedChampionList.vue'
@@ -168,7 +168,7 @@ import {
   setBanTeammateIntendedChampion,
   setBenchModeAutoSelectEnabled,
   setBenchModeExpectedChampions,
-  setGrabDelay,
+  setGrabDelaySeconds,
   setNormalModeAutoSelectEnabled,
   setNormalModeBannedChampions,
   setNormalModeExpectedChampions,
@@ -177,11 +177,11 @@ import {
   setSelectTeammateIntendedChampion,
   setShowIntent
 } from '@renderer/features/auto-select'
-import { useSettingsStore } from '@renderer/features/stores/settings'
+import { useAutoSelectStore } from '@renderer/features/auto-select/store'
 
 // const id = 'view:toolkit:auto-select'
 
-const settings = useSettingsStore()
+const autoSelect = useAutoSelectStore()
 
 const completeStrategy = ({ checked }: { checked: boolean }) => {
   if (checked) {

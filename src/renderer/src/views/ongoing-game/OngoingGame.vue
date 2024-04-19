@@ -11,17 +11,17 @@
       <DefineOngoingTeam v-slot="{ participants, team }">
         <div class="team">
           <PlayerInfoCard
-            v-for="p of participants.toSorted((a, b) => (a.order || -1) - (b.order || -1))"
-            :key="p.id"
-            :id="p.id"
-            :is-self="p.id === summoner.currentSummoner?.summonerId"
+            v-for="p of participants"
+            :key="p.summonerId"
+            :id="p.summonerId"
+            :is-self="p.summonerId === summoner.me?.summonerId"
             :summoner-info="p.summoner"
             :ranked-stats="p.rankedStats"
             :match-history="p.matchHistory"
-            :champion-id="p.championId"
+            :champion-id="cf.ongoingChampionSelections?.[p.summonerId]"
             :team="team"
-            :queue-type="mh.ongoingGame?.queueType"
-            :saved-info="p.savedInfo"
+            :queue-type="cf.ongoingGameInfo?.queueType"
+            :saved-info="undefined"
             @show-game="(id, selfId) => handleShowGame(id, selfId)"
             @to-summoner="(id) => handleToSummoner(id)"
           />
@@ -38,7 +38,7 @@
         <OngoingTeam :team="team" :participants="teamPlayers" />
       </NCard>
       <NCard
-        v-if="mh.ongoingPreMadeTeamsSimplifiedArray.length"
+        v-if="cf.ongoingPreMadeTeams.length"
         style="background-color: transparent; margin-bottom: 12px"
         size="small"
       >
@@ -46,14 +46,14 @@
           ><span class="card-header-title"
             >预组队推测
             <span style="font-size: 12px; color: rgb(184, 184, 184); font-weight: normal"
-              >(统计自 {{ Object.keys(mh.ongoingDetailedGamesCache).length }} 场游戏)</span
+              >(统计自 {{ Object.keys(cf.ongoingDetailedGamesCache).length }} 场游戏)</span
             ></span
           ></template
         >
         <div class="pre-made-team">
           <div
             class="group"
-            v-for="g of mh.ongoingPreMadeTeamsSimplifiedArray"
+            v-for="g of cf.ongoingPreMadeTeams"
             :class="{
               blue: g.team === '100',
               red: g.team === '200',
@@ -62,25 +62,31 @@
           >
             <div class="team-side">
               {{ formatTeamText(g.team) }} ({{ g.times
-              }}{{ g.times >= settings.matchHistory.teamAnalysisPreloadCount ? '+' : '' }}
+              }}{{ g.times >= cf.settings.teamAnalysisPreloadCount ? '+' : '' }}
               场对局)
             </div>
             <div class="players">
               <div v-for="p of g.players" class="image-name-line">
                 <LcuImage
                   :title="
-                    mh.ongoingPlayers[p]?.summoner?.displayName ||
-                    mh.ongoingPlayers[p]?.summoner?.gameName ||
-                    p
+                    summonerName(
+                      cf.ongoingPlayers[p]?.summoner?.gameName ||
+                        cf.ongoingPlayers[p]?.summoner?.displayName,
+                      cf.ongoingPlayers[p]?.summoner?.tagLine,
+                      p.toString()
+                    )
                   "
                   class="image"
-                  :src="championIcon(mh.ongoingPlayers[p]?.championId || -1)"
+                  :src="championIcon(cf.ongoingChampionSelections?.[p] || -1)"
                 />
                 <div class="name">
                   {{
-                    mh.ongoingPlayers[p]?.summoner?.displayName ||
-                    mh.ongoingPlayers[p]?.summoner?.gameName ||
-                    p
+                    summonerName(
+                      cf.ongoingPlayers[p]?.summoner?.gameName ||
+                        cf.ongoingPlayers[p]?.summoner?.displayName,
+                      cf.ongoingPlayers[p]?.summoner?.tagLine,
+                      p.toString()
+                    )
                   }}
                 </div>
               </div>
@@ -88,11 +94,7 @@
           </div>
         </div>
       </NCard>
-      <NCard
-        v-if="settings.matchHistory.sendKdaInGame"
-        style="background-color: transparent"
-        size="small"
-      >
+      <NCard v-if="cf.settings.sendKdaInGame" style="background-color: transparent" size="small">
         <template #header><span class="card-header-title">KDA 简报</span></template>
         <span style="font-size: 13px; margin-bottom: 12px; display: block"
           >在英雄选择中或游戏内发送 KDA 简报已启用，在设置 -> 战绩 -> KDA 简报 中配置通用选项。
@@ -106,11 +108,15 @@
             <NCheckbox
               size="small"
               v-for="player of team"
-              :key="player.id"
-              :checked="mh.sendPlayers[player.id]"
-              @update:checked="(val) => setInGameKdaSendPlayer(player.id, val)"
+              :key="player.summonerId"
+              :checked="cf.sendList[player.summonerId]"
+              @update:checked="(val) => setInGameKdaSendPlayer(player.summonerId, val)"
               >{{
-                player.summoner?.displayName || player.summoner?.gameName || player.id
+                summonerName(
+                  player.summoner?.gameName || player.summoner?.displayName,
+                  player.summoner?.tagLine,
+                  player.summonerId.toString()
+                )
               }}</NCheckbox
             >
           </div>
@@ -125,6 +131,7 @@
 </template>
 
 <script setup lang="ts">
+import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { NCard, NCheckbox } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
@@ -133,21 +140,22 @@ import { useRouter } from 'vue-router'
 import ControlItem from '@renderer/components/ControlItem.vue'
 import LcuImage from '@renderer/components/LcuImage.vue'
 import { useKeepAliveScrollPositionMemo } from '@renderer/compositions/useKeepAliveScrollPositionMemo'
+import { setInGameKdaSendPlayer } from '@renderer/features/core-functionality'
+import {
+  OngoingPlayer,
+  useCoreFunctionalityStore
+} from '@renderer/features/core-functionality/store'
 import { championIcon } from '@renderer/features/game-data'
-import { setInGameKdaSendPlayer } from '@renderer/features/match-history'
-import { useGameflowStore } from '@renderer/features/stores/lcu/gameflow'
-import { useSummonerStore } from '@renderer/features/stores/lcu/summoner'
-import { OngoingTeamPlayer, useMatchHistoryStore } from '@renderer/features/stores/match-history'
-import { useSettingsStore } from '@renderer/features/stores/settings'
+import { useGameflowStore } from '@renderer/features/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@renderer/features/lcu-state-sync/summoner'
 
 import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMatchHistoryCardModal.vue'
 import PlayerInfoCard from './PlayerInfoCard.vue'
 
-const mh = useMatchHistoryStore()
+const cf = useCoreFunctionalityStore()
 const router = useRouter()
 const gameflow = useGameflowStore()
 const summoner = useSummonerStore()
-const settings = useSettingsStore()
 
 const handleToSummoner = (summonerId: number) => {
   if (summonerId === 0) {
@@ -167,33 +175,34 @@ const isIdle = computed(() => {
 })
 
 const teams = computed(() => {
-  return Object.entries(mh.ongoingPlayers).reduce(
-    (o, [_id, info]) => {
-      if (!info.team) {
-        return o
-      }
+  if (!cf.ongoingTeams || !cf.ongoingPlayers) {
+    return {}
+  }
 
-      if (o[info.team]) {
-        o[info.team].push(info)
-      } else {
-        o[info.team] = [info]
-      }
+  const teamsWithPlayers: Record<string, OngoingPlayer[]> = {}
+  Object.entries(cf.ongoingTeams).forEach(([team, players]) => {
+    if (!players.length) {
+      return
+    }
 
-      return o
-    },
-    {} as Record<string, OngoingTeamPlayer[]>
-  )
+    const ps = players.filter((p) => cf.ongoingPlayers[p]).map((p) => cf.ongoingPlayers[p])
+    if (ps.length) {
+      teamsWithPlayers[team] = ps
+    }
+  })
+
+  return teamsWithPlayers
 })
 
 const [DefineOngoingTeam, OngoingTeam] = createReusableTemplate<{
-  participants: OngoingTeamPlayer[]
+  participants: OngoingPlayer[]
   team: string
 }>({ inheritAttrs: false })
 
 const formatTeamText = (team: string) => {
-  if (mh.ongoingGame?.queueType === 'CHERRY') {
+  if (cf.ongoingGameInfo?.queueType === 'CHERRY') {
     if (gameflow.phase === 'ChampSelect') {
-      return team === '100' ? '我方小队' : '敌方小队'
+      return team === 'our' ? '我方小队' : '敌方小队'
     } else {
       if (team === 'all') {
         return `所有`
@@ -203,7 +212,7 @@ const formatTeamText = (team: string) => {
     }
   } else {
     if (gameflow.phase === 'ChampSelect') {
-      return team === '100' ? '我方' : '敌方'
+      return team === 'our' ? '我方' : '敌方'
     } else {
       return team === '100' ? '蓝方' : '红方'
     }

@@ -60,8 +60,8 @@ const handleCopy = async () => {
     }
 
     emits('copy', text)
-  } catch (err) {
-    emits('error', err)
+  } catch (error) {
+    emits('error', error)
   }
 }
 </script>

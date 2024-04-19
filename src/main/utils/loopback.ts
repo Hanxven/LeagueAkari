@@ -1,6 +1,7 @@
+import { randomInt } from '@shared/utils/random'
 import net from 'node:net'
 
-export function checkPortInUse(host: string, port: number, timeout = 500): Promise<boolean> {
+export function checkIfPortInUse(host: string, port: number, timeout = 500): Promise<boolean> {
   return new Promise((resolve, _reject) => {
     const socket = new net.Socket()
 
@@ -28,10 +29,6 @@ export function checkPortInUse(host: string, port: number, timeout = 500): Promi
   })
 }
 
-export function randomInt(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
 const MAX_TRIES = 10
 
 /**
@@ -50,7 +47,7 @@ export async function getRandomAvailableLoopbackAddrWithPort(port: number) {
     const c = randomInt(2, 255)
     const host = `127.${a}.${b}.${c}`
 
-    if (await checkPortInUse(host, port)) {
+    if (await checkIfPortInUse(host, port)) {
       tryCount++
     } else {
       return host

@@ -1,7 +1,9 @@
 <template>
   <div class="waiting-screen">
     <div class="inner-content">
-      <template v-if="lcuState.state === 'disconnected' || lcuState.state === 'connecting'">
+      <template
+        v-if="app.lcuConnectionState === 'disconnected' || app.lcuConnectionState === 'connecting'"
+      >
         <div v-if="existingClients.length" class="text-line-1">
           <template v-if="existingClients.length">
             <div class="servers-available">已启动的客户端</div>
@@ -52,12 +54,10 @@ import { NIcon, NScrollbar, NSpin, useNotification } from 'naive-ui'
 import { ref, shallowRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { notify } from '@renderer/events/notifications'
-import { useAppState } from '@renderer/features/stores/app'
-import { useLcuStateStore } from '@renderer/features/stores/lcu-connection'
-import { useSettingsStore } from '@renderer/features/stores/settings'
-import { call } from '@renderer/ipc'
-import { sleep } from '@renderer/utils/sleep'
+import { useAppStore } from '@renderer/features/app/store'
+import { laNotification } from '@renderer/notification'
+import { mainCall } from '@renderer/utils/ipc'
+import { sleep } from '@shared/utils/sleep'
 
 const existingClients = shallowRef<any[]>([])
 const isErr = ref(false)
@@ -85,20 +85,20 @@ const tryConnect = async (maxAttempts = 3, auth: any) => {
     }
 
     try {
-      await call<void>('connect', auth) // 尝试连接
+      await mainCall('lcu-connection/connect', auth) // 尝试连接
       isErr.value = false
       currentConnectingClientPid.value = null
       return
-    } catch (err) {
-      if (!appState.isAdmin || attempts.value > NOTIFY_THRESHOLD) {
+    } catch (error) {
+      if (!app.isAdministrator || attempts.value > NOTIFY_THRESHOLD) {
         notification.warning({
           duration: 5000,
-          content: (err as any).message ? (err as any).message : '发生错误'
+          content: (error as any).message ? (error as any).message : '发生错误'
         })
       }
 
       attempts.value++ // 增加尝试次数
-      console.warn(`连接失败，正在尝试第 ${attempts.value} 次重连：`, err)
+      console.warn(`连接失败，正在尝试第 ${attempts.value} 次重连：`, error)
       if (attempts.value >= maxAttempts) {
         isErr.value = true
         currentConnectingClientPid.value = null
@@ -109,10 +109,10 @@ const tryConnect = async (maxAttempts = 3, auth: any) => {
   }
 }
 
-const lcuState = useLcuStateStore()
+const app = useAppStore()
 
 watch(
-  () => lcuState.state,
+  () => app.lcuConnectionState,
   (s) => {
     if (s === 'connected') {
       router.replace(`/match-history`)
@@ -121,21 +121,17 @@ watch(
   { immediate: true }
 )
 
-const appState = useAppState()
-const settings = useSettingsStore()
-
 // 重复等待客户端启动
 useTimeoutPoll(
   async () => {
     try {
-      existingClients.value = await call('queryLcuAuth')
+      existingClients.value = await mainCall('league-client-ux/lcu-auth/query')
     } catch (error) {
-      notify.emit({
-        type: 'error',
-        content: `尝试检查进程存在时发生错误：${(error as any)?.message}`,
-        extra: { error }
-      })
-      console.error('尝试检查进程存在时发生错误', error)
+      laNotification.warn(
+        '进程轮询',
+        `尝试检查进程存在时发生错误：${(error as any)?.message}`,
+        error
+      )
     }
   },
   1000,
@@ -150,7 +146,7 @@ watch(
         return
       }
 
-      if (existingClients.value.length === 1 && settings.app.autoConnect) {
+      if (existingClients.value.length === 1 && app.settings.autoConnect) {
         tryConnect(Infinity, existingClients.value[0])
       }
     }
