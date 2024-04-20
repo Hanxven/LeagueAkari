@@ -1,3 +1,9 @@
+import { autoAcceptState } from '@main/features/auto-accept/state'
+import { autoHonorState } from '@main/features/auto-honor/state'
+import { autoReplyState } from '@main/features/auto-reply/state'
+import { autoSelectState } from '@main/features/auto-select/state'
+import { coreFunctionalityState } from '@main/features/core-functionality/state'
+import { respawnTimerState } from '@main/features/respawn-timer/state'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants'
 import { GithubApiLatestRelease } from '@shared/types/github'
@@ -225,86 +231,185 @@ async function loadSettings() {
  */
 async function migrateFromPreviousLocalStorageSettings(all: Record<string, string>) {
   let migrated = false
-  const toNewSettings = async (originKey: string, resName: string) => {
+  const toNewSettings = async (originKey: string, resName: string, setter: (state: any) => any) => {
     const originValue = all[originKey]
     if (originValue !== undefined) {
       try {
         const jsonValue = JSON.parse(originValue)
         await setSetting(resName, jsonValue)
+        setter(jsonValue)
         migrated = true
       } catch {}
     }
   }
 
-  await toNewSettings('app.autoConnect', 'app/auto-connect')
-  await toNewSettings('app.autoCheckUpdates', 'app/auto-check-updates')
-  await toNewSettings('app.showFreeSoftwareDeclaration', 'app/show-free-software-declaration')
-  await toNewSettings('autoAccept.enabled', 'auto-accept/enabled')
-  await toNewSettings('autoAccept.delaySeconds', 'auto-accept/delay-seconds')
-  await toNewSettings('autoHonor.enabled', 'auto-honor/enabled')
-  await toNewSettings('autoHonor.strategy', 'auto-honor/strategy')
-  await toNewSettings('autoReply.enabled', 'auto-reply/enabled')
-  await toNewSettings('autoReply.enableOnAway', 'auto-reply/enable-on-away')
-  await toNewSettings('autoReply.text', 'auto-reply/text')
-  await toNewSettings('autoSelect.normalModeEnabled', 'auto-select/normal-mode-enabled')
-  await toNewSettings('autoSelect.benchModeEnabled', 'auto-select/bench-mode-enabled')
-  await toNewSettings('autoSelect.benchExpectedChampions', 'auto-select/bench-expected-champions')
-  await toNewSettings('autoSelect.expectedChampions', 'auto-select/expected-champions')
-  await toNewSettings('autoSelect.bannedChampions', 'auto-select/banned-champions')
-  await toNewSettings('autoSelect.banEnabled', 'auto-select/ban-enabled')
-  await toNewSettings('autoSelect.completed', 'auto-select/completed')
-  await toNewSettings('autoSelect.onlySimulMode', 'auto-select/only-simul-mode')
-  await toNewSettings('autoSelect.grabDelay', 'auto-select/grab-delay-seconds')
+  await toNewSettings(
+    'app.autoConnect',
+    'app/auto-connect',
+    (s) => (appState.settings.autoConnect = s)
+  )
+  await toNewSettings(
+    'app.autoCheckUpdates',
+    'app/auto-check-updates',
+    (s) => (appState.settings.autoCheckUpdates = s)
+  )
+  await toNewSettings(
+    'app.showFreeSoftwareDeclaration',
+    'app/show-free-software-declaration',
+    (s) => (appState.settings.showFreeSoftwareDeclaration = s)
+  )
+  await toNewSettings(
+    'autoAccept.enabled',
+    'auto-accept/enabled',
+    (s) => (autoAcceptState.settings.enabled = s)
+  )
+  await toNewSettings(
+    'autoAccept.delaySeconds',
+    'auto-accept/delay-seconds',
+    (s) => (autoAcceptState.settings.delaySeconds = s)
+  )
+  await toNewSettings(
+    'autoHonor.enabled',
+    'auto-honor/enabled',
+    (s) => (autoHonorState.settings.enabled = s)
+  )
+  await toNewSettings(
+    'autoHonor.strategy',
+    'auto-honor/strategy',
+    (s) => (autoHonorState.settings.strategy = s)
+  )
+  await toNewSettings(
+    'autoReply.enabled',
+    'auto-reply/enabled',
+    (s) => (autoReplyState.settings.enabled = s)
+  )
+  await toNewSettings(
+    'autoReply.enableOnAway',
+    'auto-reply/enable-on-away',
+    (s) => (autoReplyState.settings.enableOnAway = s)
+  )
+  await toNewSettings(
+    'autoReply.text',
+    'auto-reply/text',
+    (s) => (autoReplyState.settings.text = s)
+  )
+  await toNewSettings(
+    'autoSelect.normalModeEnabled',
+    'auto-select/normal-mode-enabled',
+    (s) => (autoSelectState.settings.normalModeEnabled = s)
+  )
+  await toNewSettings(
+    'autoSelect.benchModeEnabled',
+    'auto-select/bench-mode-enabled',
+    (s) => (autoSelectState.settings.benchModeEnabled = s)
+  )
+  await toNewSettings(
+    'autoSelect.benchExpectedChampions',
+    'auto-select/bench-expected-champions',
+    (s) => (autoSelectState.settings.benchExpectedChampions = s)
+  )
+  await toNewSettings(
+    'autoSelect.expectedChampions',
+    'auto-select/expected-champions',
+    (s) => (autoSelectState.settings.expectedChampions = s)
+  )
+  await toNewSettings(
+    'autoSelect.bannedChampions',
+    'auto-select/banned-champions',
+    (s) => (autoSelectState.settings.bannedChampions = s)
+  )
+  await toNewSettings(
+    'autoSelect.banEnabled',
+    'auto-select/ban-enabled',
+    (s) => (autoSelectState.settings.banEnabled = s)
+  )
+  await toNewSettings(
+    'autoSelect.completed',
+    'auto-select/completed',
+    (s) => (autoSelectState.settings.completed = s)
+  )
+  await toNewSettings(
+    'autoSelect.onlySimulMode',
+    'auto-select/only-simul-mode',
+    (s) => (autoSelectState.settings.onlySimulMode = s)
+  )
+  await toNewSettings(
+    'autoSelect.grabDelay',
+    'auto-select/grab-delay-seconds',
+    (s) => (autoSelectState.settings.grabDelaySeconds = s)
+  )
   await toNewSettings(
     'autoSelect.banTeammateIntendedChampion',
-    'auto-select/ban-teammate-intended-champion'
+    'auto-select/ban-teammate-intended-champion',
+    (s) => (autoSelectState.settings.banTeammateIntendedChampion = s)
   )
   await toNewSettings(
     'autoSelect.selectTeammateIntendedChampion',
-    'auto-select/select-teammate-intended-champion'
+    'auto-select/select-teammate-intended-champion',
+    (s) => (autoSelectState.settings.selectTeammateIntendedChampion = s)
   )
-  await toNewSettings('autoSelect.selectRandomly', 'auto-select/select-randomly')
-  await toNewSettings('autoSelect.showIntent', 'auto-select/show-intent')
-  await toNewSettings('matchHistory.fetchAfterGame', 'core-functionality/fetch-after-game')
+  await toNewSettings(
+    'autoSelect.selectRandomly',
+    'auto-select/select-randomly',
+    (s) => (autoSelectState.settings.selectRandomly = s)
+  )
+  await toNewSettings(
+    'autoSelect.showIntent',
+    'auto-select/show-intent',
+    (s) => (autoSelectState.settings.showIntent = s)
+  )
+  await toNewSettings(
+    'matchHistory.fetchAfterGame',
+    'core-functionality/fetch-after-game',
+    (s) => (coreFunctionalityState.settings.fetchAfterGame = s)
+  )
   await toNewSettings(
     'matchHistory.autoRouteOnGameStart',
-    'core-functionality/auto-route-on-game-start'
+    'core-functionality/auto-route-on-game-start',
+    (s) => (coreFunctionalityState.settings.autoRouteOnGameStart = s)
   )
   await toNewSettings(
     'matchHistory.preMadeTeamThreshold',
-    'core-functionality/pre-made-team-threshold'
+    'core-functionality/pre-made-team-threshold',
+    (s) => (coreFunctionalityState.settings.preMadeTeamThreshold = s)
   )
   await toNewSettings(
     'matchHistory.teamAnalysisPreloadCount',
-    'core-functionality/team-analysis-preload-count'
+    'core-functionality/team-analysis-preload-count',
+    (s) => (coreFunctionalityState.settings.teamAnalysisPreloadCount = s)
   )
   await toNewSettings(
     'matchHistory.matchHistoryLoadCount',
-    'core-functionality/match-history-load-count'
+    'core-functionality/match-history-load-count',
+    (s) => (coreFunctionalityState.settings.matchHistoryLoadCount = s)
   )
-  await toNewSettings('matchHistory.fetchDetailedGame', 'core-functionality/fetch-detailed-game')
-  await toNewSettings('matchHistory.sendKdaInGame', 'core-functionality/send-kda-in-game')
-  await toNewSettings('matchHistory.sendKdaThreshold', 'core-functionality/send-kda-threshold')
+  await toNewSettings(
+    'matchHistory.fetchDetailedGame',
+    'core-functionality/fetch-detailed-game',
+    (s) => (coreFunctionalityState.settings.fetchDetailedGame = s)
+  )
+  await toNewSettings(
+    'matchHistory.sendKdaInGame',
+    'core-functionality/send-kda-in-game',
+    (s) => (coreFunctionalityState.settings.sendKdaInGame = s)
+  )
+  await toNewSettings(
+    'matchHistory.sendKdaThreshold',
+    'core-functionality/send-kda-threshold',
+    (s) => (coreFunctionalityState.settings.sendKdaThreshold = s)
+  )
   await toNewSettings(
     'matchHistory.sendKdaInGameWithPreMadeTeams',
-    'core-functionality/send-kda-in-game-with-pre-made-teams'
+    'core-functionality/send-kda-in-game-with-pre-made-teams',
+    (s) => (coreFunctionalityState.settings.setSendKdaInGameWithPreMadeTeams = s)
   )
-  await toNewSettings('respawnTimer.enabled', 'respawn-timer/enabled')
+  await toNewSettings(
+    'respawnTimer.enabled',
+    'respawn-timer/enabled',
+    (s) => (respawnTimerState.settings.enabled = s)
+  )
 
   if (migrated) {
-    const res = await dialog.showMessageBox({
-      title: '重新启动',
-      message: '新的设置项已从旧版本迁移，现在需要重新启动 League Akari 以应用新的设置项',
-      type: 'question',
-      buttons: ['重新启动', '暂不']
-    })
-
-    if (res.response === 0) {
-      logger.info('Old settings were migrated already. Now request to relaunching the app...')
-      app.relaunch()
-      app.quit()
-    } else if (res.response === 1) {
-      // to do nothing
-    }
+    logger.info('Old settings were migrated already.')
   }
 }
