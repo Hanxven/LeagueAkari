@@ -47,9 +47,9 @@ export async function setupCoreFunctionality() {
 
   onMainEvent(
     'core-functionality/ongoing-player/saved-info',
-    (_, summonerId: number, saved: any) => {
+    (_, summonerId: number, savedInfo: any) => {
       if (cf.ongoingPlayers[summonerId]) {
-        cf.ongoingPlayers[summonerId].saved = saved
+        cf.ongoingPlayers[summonerId].savedInfo = savedInfo
       }
     }
   )

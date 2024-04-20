@@ -12,7 +12,7 @@ interface SavedPlayerQueryDto {
 }
 
 interface SavedPlayerSaveDto extends SavedPlayerQueryDto {
-  tag: string
+  tag?: string
   encountered: boolean // 在遇到时更新
 }
 
@@ -52,7 +52,7 @@ export function saveSavedPlayer(player: SavedPlayerSaveDto) {
   const savedPlayer = new SavedPlayer()
   const date = new Date()
   savedPlayer.summonerId = player.summonerId
-  savedPlayer.tag = player.tag
+  savedPlayer.tag = player.tag || null
   savedPlayer.selfSummonerId = player.selfSummonerId
   savedPlayer.rsoPlatformId = player.rsoPlatformId
   savedPlayer.region = player.region

@@ -19,7 +19,7 @@ export class SavedPlayer {
    * 标记的内容
    */
   @Column({ type: 'varchar', nullable: true })
-  tag: string
+  tag: string | null
 
   /**
    * 上次一更新的时间
@@ -29,11 +29,11 @@ export class SavedPlayer {
   updateAt: Date
 
   /**
-   * 上一次匹配到的时间
+   * 上一次匹配到的时间，可以为空
    */
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   @Index('saved_players_last_met_at_index')
-  lastMetAt: Date
+  lastMetAt: Date | null
 
   /**
    * 地区

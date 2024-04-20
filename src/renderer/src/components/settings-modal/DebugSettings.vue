@@ -41,7 +41,7 @@
       <ControlItem
         class="control-item-margin"
         label="日志目录"
-        label-description="打开 League Akari 日志文件所在目录"
+        label-description="打开 League Akari 日志文件所在目录。注意这些日志文件可能含有敏感个人信息，包括对局记录等"
         :label-width="320"
       >
         <NButton size="tiny" @click="() => handleShowLogsDir()">日志目录</NButton>

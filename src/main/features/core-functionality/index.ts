@@ -9,8 +9,8 @@ import { getGameflowSession } from '@main/http-api/gameflow'
 import { getGame, getMatchHistory } from '@main/http-api/match-history'
 import { getRankedStats } from '@main/http-api/ranked'
 import { getSummoner } from '@main/http-api/summoner'
-import { queryEncounteredGames } from '@main/storage/encountered-games'
-import { querySavedPlayer } from '@main/storage/saved-player'
+import { queryEncounteredGames, saveEncounteredGame } from '@main/storage/encountered-games'
+import { querySavedPlayer, saveSavedPlayer } from '@main/storage/saved-player'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall, sendEventToAllRenderer } from '@main/utils/ipc'
 import { Game } from '@shared/types/lcu/match-history'
@@ -23,6 +23,7 @@ import { observable, reaction, runInAction, toJS } from 'mobx'
 
 import { chat } from '../lcu-state-sync/chat'
 import { gameData } from '../lcu-state-sync/game-data'
+import { gameflow } from '../lcu-state-sync/gameflow'
 import { summoner } from '../lcu-state-sync/summoner'
 import { coreFunctionalityState as cf } from './state'
 
@@ -86,6 +87,51 @@ export async function setupCoreFunctionality() {
             cf.ongoingPreMadeTeams = result
           })
         }
+      }
+    }
+  )
+
+  // 在游戏结算时记录所有玩家到数据库
+  reaction(
+    () => gameflow.phase,
+    (phase) => {
+      if (phase === 'EndOfGame' && gameflow.session && summoner.me && lcuConnectionState.auth) {
+        const t1 = gameflow.session.gameData.teamOne
+        const t2 = gameflow.session.gameData.teamTwo
+
+        const all = [...t1, ...t2].filter((p) => p.summonerId)
+
+        const tasks = all.map(async (p) => {
+          const task1 = saveSavedPlayer({
+            encountered: true,
+            region: lcuConnectionState.auth!.region,
+            rsoPlatformId: lcuConnectionState.auth!.rsoPlatformId,
+            selfSummonerId: summoner.me!.summonerId,
+            summonerId: p.summonerId
+          })
+
+          const task2 = saveEncounteredGame({
+            region: lcuConnectionState.auth!.region,
+            rsoPlatformId: lcuConnectionState.auth!.rsoPlatformId,
+            selfSummonerId: summoner.me!.summonerId,
+            summonerId: p.summonerId,
+            gameId: gameflow.session!.gameData.gameId
+          })
+
+          const r = await Promise.allSettled([task1, task2])
+          if (r[0].status === 'fulfilled') {
+            logger.info(`Saved player: ${r[0].value.summonerId}`)
+          } else {
+            logger.info(`Failed to save player: ${formatError(r[0].reason)}`)
+          }
+          if (r[1].status === 'fulfilled') {
+            logger.info(`Saved gameId record: ${r[1].value.summonerId} ${r[1].value.gameId}`)
+          } else {
+            logger.info(`Failed to save gameId record: ${formatError(r[1].reason)}`)
+          }
+        })
+
+        Promise.allSettled(tasks)
       }
     }
   )

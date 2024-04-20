@@ -233,7 +233,7 @@ import { NDivider, NPopover } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
 import LcuImage from '@renderer/components/LcuImage.vue'
-import { MatchHistoryWithState, SavedPlayer } from '@renderer/features/core-functionality/store'
+import { MatchHistoryWithState, SavedPlayerInfo } from '@renderer/features/core-functionality/store'
 import { championIcon } from '@renderer/features/game-data'
 import { useGameDataStore } from '@renderer/features/lcu-state-sync/game-data'
 import { winRateTeamText } from '@renderer/utils/sarcasms'
@@ -254,7 +254,7 @@ const props = defineProps<{
   championId?: number
   team?: string
   queueType?: string
-  savedInfo?: SavedPlayer
+  savedInfo?: SavedPlayerInfo
 
   // 未实装的实验性特性
   isOutstandingPlayer?: boolean

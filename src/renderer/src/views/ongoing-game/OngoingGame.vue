@@ -21,7 +21,7 @@
             :champion-id="cf.ongoingChampionSelections?.[p.summonerId]"
             :team="team"
             :queue-type="cf.ongoingGameInfo?.queueType"
-            :saved-info="undefined"
+            :saved-info="p.savedInfo"
             @show-game="(id, selfId) => handleShowGame(id, selfId)"
             @to-summoner="(id) => handleToSummoner(id)"
           />

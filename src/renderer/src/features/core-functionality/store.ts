@@ -35,6 +35,27 @@ export interface MatchHistoryGameTabCard {
   isExpanded: boolean
 }
 
+/**
+ * 存储在本地的玩家信息
+ */
+export interface SavedPlayerInfo {
+  summonerId: number
+
+  selfSummonerId: number
+
+  tag: string
+
+  updateAt: Date
+
+  lastMetAt: Date
+
+  region: string
+
+  rsoPlatformId: string
+
+  encounteredGames: number[]
+}
+
 export interface OngoingPlayer {
   // 当前的召唤师 ID，和 key 值相同
   summonerId: number
@@ -57,7 +78,7 @@ export interface OngoingPlayer {
   /**
    * 记录的玩家信息
    */
-  saved?: any
+  savedInfo?: SavedPlayerInfo
 }
 
 export interface MatchHistoryWithState {
@@ -125,17 +146,6 @@ export interface TabState {
     x: number
     y: number
   }
-}
-
-export interface SavedPlayer {
-  summonerId: number
-  selfSummonerId: number
-  tag: string
-  updateAt: Date
-  lastMetAt: Date
-  region: string
-  rsoPlatformId: string
-  encounteredGames: number[]
 }
 
 const DEFAULT_DETAILED_GAMES_CACHE_LIMIT = 200
