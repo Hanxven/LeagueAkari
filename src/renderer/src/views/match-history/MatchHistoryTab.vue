@@ -1,6 +1,60 @@
 <template>
   <div class="match-history-wrapper" ref="wrapperEl">
     <div class="match-history-inner">
+      <DefinePageMeta v-slot="{ position }">
+        <div class="match-history-page-meta">
+          <div class="pagination-line">
+            <div class="text">
+              <span
+                >每页 {{ tab.matchHistory.pageSize }} 条，当前第
+                {{ tab.matchHistory.page }} 页</span
+              >
+              <span style="margin-left: 16px" v-if="tab.matchHistory.lastUpdate"
+                >更新时间：{{
+                  dayjs(tab.matchHistory.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+                }}</span
+              >
+              <span style="margin-left: 16px" v-if="tab.loading.isLoadingMatchHistory"
+                >加载中...</span
+              >
+            </div>
+            <div class="pagination">
+              <NButton
+                size="small"
+                title="切换到上一页 (Ctrl+Left)"
+                @click="handleLoadPage(tab.matchHistory.page - 1)"
+                :disabled="tab.matchHistory.page <= 1"
+                secondary
+                >上</NButton
+              >
+              <NInputNumber
+                size="small"
+                placeholder=""
+                v-model:value="inputtingText"
+                @blur="handleInputBlur"
+                @keyup.enter="() => handleLoadPage(inputtingText || 1)"
+                class="page"
+                :min="1"
+                :show-button="false"
+              />
+              <NButton
+                title="切换到下一页 (Ctrl+Right)"
+                size="small"
+                @click="() => handleLoadPage(tab.matchHistory.page + 1)"
+                secondary
+                >下</NButton
+              >
+              <NSelect
+                :value="tab.matchHistory.pageSize"
+                @update:value="handleChangePageSize"
+                class="select"
+                size="small"
+                :options="pageSizeOptions"
+              ></NSelect>
+            </div>
+          </div>
+        </div>
+      </DefinePageMeta>
       <div class="user-profile" v-if="tab.summoner && tab.rankedStats">
         <div class="avatar">
           <LcuImage
@@ -66,57 +120,7 @@
           </div>
         </div>
       </div>
-      <div class="match-history-page-meta">
-        <div class="pagination-line">
-          <div class="text">
-            <span
-              >每页 {{ tab.matchHistory.pageSize }} 条，当前第 {{ tab.matchHistory.page }} 页</span
-            >
-            <span style="margin-left: 16px" v-if="tab.matchHistory.lastUpdate"
-              >更新时间：{{
-                dayjs(tab.matchHistory.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
-              }}</span
-            >
-            <span style="margin-left: 16px" v-if="tab.loading.isLoadingMatchHistory"
-              >加载中...</span
-            >
-          </div>
-          <div class="pagination">
-            <NButton
-              size="small"
-              title="切换到上一页 (Ctrl+Left)"
-              @click="handleLoadPage(tab.matchHistory.page - 1)"
-              :disabled="tab.matchHistory.page <= 1"
-              secondary
-              >上</NButton
-            >
-            <NInputNumber
-              size="small"
-              placeholder=""
-              v-model:value="inputtingText"
-              @blur="handleInputBlur"
-              @keyup.enter="() => handleLoadPage(inputtingText || 1)"
-              class="page"
-              :min="1"
-              :show-button="false"
-            />
-            <NButton
-              title="切换到下一页 (Ctrl+Right)"
-              size="small"
-              @click="() => handleLoadPage(tab.matchHistory.page + 1)"
-              secondary
-              >下</NButton
-            >
-            <NSelect
-              :value="tab.matchHistory.pageSize"
-              @update:value="handleChangePageSize"
-              class="select"
-              size="small"
-              :options="pageSizeOptions"
-            ></NSelect>
-          </div>
-        </div>
-      </div>
+      <PageMeta position="top" />
       <div v-if="tab.matchHistory.games.length !== 0" class="match-history-list">
         <MatchHistoryCard
           class="match-history-card-item"
@@ -137,6 +141,7 @@
       <div v-else-if="tab.matchHistory.isEmpty" class="match-history-empty">
         <NCard size="small">暂无战绩</NCard>
       </div>
+      <PageMeta v-if="tab.matchHistory.games.length >= 5" position="bottom" />
     </div>
   </div>
 </template>
@@ -145,7 +150,7 @@
 import { summonerName } from '@shared/utils/name'
 import { Tag as TagIcon } from '@vicons/carbon'
 import { Dice as DiceIcon } from '@vicons/ionicons5'
-import { useDebounce, useScroll } from '@vueuse/core'
+import { createReusableTemplate, useDebounce, useScroll } from '@vueuse/core'
 import { useMagicKeys, whenever } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NButton, NCard, NIcon, NInputNumber, NSelect, NSkeleton } from 'naive-ui'
@@ -159,6 +164,10 @@ import { hideMatchHistoryText } from '@renderer/utils/sarcasms'
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import RankedSpan from './widgets/RankedSpan.vue'
+
+const [DefinePageMeta, PageMeta] = createReusableTemplate<{
+  position: 'bottom' | 'top'
+}>({ inheritAttrs: false })
 
 /*
  * 内部组件，用于 MatchHistoryTabs 的子组件
@@ -174,8 +183,10 @@ const props = withDefaults(
 )
 const cf = useCoreFunctionalityStore()
 
-const handleLoadPage = (page: number) => {
-  return fetchTabMatchHistory(props.tab.id, page, props.tab.matchHistory.pageSize)
+const handleLoadPage = async (page: number) => {
+  const r = await fetchTabMatchHistory(props.tab.id, page, props.tab.matchHistory.pageSize)
+  scrollToTop()
+  return r
 }
 
 const inputtingText = ref(props.tab.matchHistory.page)
@@ -222,8 +233,10 @@ whenever(Ctrl_Right, () => {
   handleLoadPage(props.tab.matchHistory.page + 1)
 })
 
-const handleChangePageSize = (pageSize: number) => {
-  return fetchTabMatchHistory(props.tab.id, props.tab.matchHistory.page, pageSize)
+const handleChangePageSize = async (pageSize: number) => {
+  const r = await fetchTabMatchHistory(props.tab.id, props.tab.matchHistory.page, pageSize)
+  scrollToTop()
+  return r
 }
 
 const handleTagPlayer = async () => {
