@@ -58,7 +58,7 @@ export function saveSavedPlayer(player: SavedPlayerSaveDto) {
   savedPlayer.region = player.region
   savedPlayer.updateAt = date
 
-  if (player.encountered || !isExists) {
+  if (player.encountered) {
     savedPlayer.lastMetAt = date
   }
 

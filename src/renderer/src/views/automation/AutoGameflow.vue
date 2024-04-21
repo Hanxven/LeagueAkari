@@ -61,7 +61,7 @@
     <div class="divider"></div>
     <ControlItem class="control-item-margin" label="自动回到房间开启">
       <template #labelDescription>
-        对局结束时，在短暂延迟后回到房间。可能需要先启用
+        对局结束时回到房间。可能需要先启用
         <span style="font-weight: 700">自动点赞</span> 以跳过点赞投票阶段
       </template>
       <NSwitch
