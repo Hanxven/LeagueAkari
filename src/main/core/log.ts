@@ -30,7 +30,7 @@ export function initLogger() {
     format: format.combine(
       format.timestamp(),
       format.printf(({ level, message, module, timestamp }) => {
-        return `[${timestamp}] [${module}] [${level}] ${JSON.stringify(message)}`
+        return `[${timestamp}] [${module}] [${level}] ${message}`
       })
     ),
     transports: [

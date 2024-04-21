@@ -8,8 +8,6 @@ import { useGameflowStore } from './gameflow'
 import { useLobbyStore } from './lobby'
 import { useSummonerStore } from './summoner'
 
-export const id = 'core:lcu-state-update'
-
 // 处理 App 和 LCU 的状态更新
 export async function setupStateUpdater() {
   lcuConnectionStateSync()

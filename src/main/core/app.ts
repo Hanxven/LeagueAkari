@@ -1,5 +1,4 @@
-import { autoAcceptState } from '@main/features/auto-accept/state'
-import { autoHonorState } from '@main/features/auto-honor/state'
+import { autoGameflowState } from '@main/features/auto-gameflow/state'
 import { autoReplyState } from '@main/features/auto-reply/state'
 import { autoSelectState } from '@main/features/auto-select/state'
 import { coreFunctionalityState } from '@main/features/core-functionality/state'
@@ -260,23 +259,23 @@ async function migrateFromPreviousLocalStorageSettings(all: Record<string, strin
   )
   await toNewSettings(
     'autoAccept.enabled',
-    'auto-accept/enabled',
-    (s) => (autoAcceptState.settings.enabled = s)
+    'auto-gameflow/auto-accept-enabled',
+    (s) => (autoGameflowState.settings.autoAcceptEnabled = s)
   )
   await toNewSettings(
     'autoAccept.delaySeconds',
-    'auto-accept/delay-seconds',
-    (s) => (autoAcceptState.settings.delaySeconds = s)
+    'auto-gameflow/auto-accept-delay-seconds',
+    (s) => (autoGameflowState.settings.autoAcceptDelaySeconds = s)
   )
   await toNewSettings(
     'autoHonor.enabled',
-    'auto-honor/enabled',
-    (s) => (autoHonorState.settings.enabled = s)
+    'auto-gameflow/auto-honor-enabled',
+    (s) => (autoGameflowState.settings.autoHonorEnabled = s)
   )
   await toNewSettings(
     'autoHonor.strategy',
-    'auto-honor/strategy',
-    (s) => (autoHonorState.settings.strategy = s)
+    'auto-gameflow/auto-honor-strategy',
+    (s) => (autoGameflowState.settings.autoHonorStrategy = s)
   )
   await toNewSettings(
     'autoReply.enabled',

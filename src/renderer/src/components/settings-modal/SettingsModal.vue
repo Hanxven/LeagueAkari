@@ -9,7 +9,7 @@
     <template #header><span class="card-header-title">设置</span></template>
     <NTabs type="line" animated size="small">
       <NTabPane name="basic" tab="应用"><BasicSettings /></NTabPane>
-      <NTabPane name="match-history" tab="战绩"><MatchHistorySettings /></NTabPane>
+      <NTabPane name="match-history" tab="核心"><CoreFunctionalitySettings /></NTabPane>
       <NTabPane name="process" tab="进程"><ProcessSettings /></NTabPane>
       <NTabPane name="debug" tab="调试"><DebugSettings /></NTabPane>
       <NTabPane name="about" tab="关于">
@@ -63,7 +63,10 @@
         </div>
         <div class="about-para-2">
           <span>Github：</span>
-          <a target="_blank" href="https://github.com/Hanxven/LeagueAkari" style="text-indent: 0; margin-right: 8px;"
+          <a
+            target="_blank"
+            href="https://github.com/Hanxven/LeagueAkari"
+            style="text-indent: 0; margin-right: 8px"
             >League Akari</a
           >
           <a target="_blank" href="https://github.com/Hanxven/LeagueAkari">
@@ -86,8 +89,8 @@ import { useAppStore } from '@renderer/features/app/store'
 import { mainCall } from '@renderer/utils/ipc'
 
 import BasicSettings from './BasicSettings.vue'
+import CoreFunctionalitySettings from './CoreFunctionalitySettings.vue'
 import DebugSettings from './DebugSettings.vue'
-import MatchHistorySettings from './MatchHistorySettings.vue'
 import ProcessSettings from './ProcessSettings.vue'
 
 const app = useAppStore()

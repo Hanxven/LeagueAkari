@@ -2,8 +2,6 @@ import { mainCall, mainStateSync } from '@renderer/utils/ipc'
 
 import { useRespawnTimerStore } from './store'
 
-export const id = 'feature:respawn-timer'
-
 export async function setupRespawnTimer() {
   const respawnTimer = useRespawnTimerStore()
 

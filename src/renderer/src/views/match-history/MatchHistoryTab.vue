@@ -172,7 +172,7 @@ const props = withDefaults(
     isSelfTab: false
   }
 )
-const mh = useCoreFunctionalityStore()
+const cf = useCoreFunctionalityStore()
 
 const handleLoadPage = (page: number) => {
   return fetchTabMatchHistory(props.tab.id, page, props.tab.matchHistory.pageSize)
@@ -236,7 +236,7 @@ const debouncedX = useDebounce(x, 300)
 const debouncedY = useDebounce(y, 300)
 
 watch([() => debouncedX.value, () => debouncedY.value], ([x, y]) => {
-  mh.setScrollPosition(props.tab.id, x, y)
+  cf.setScrollPosition(props.tab.id, x, y)
 })
 
 watch(
@@ -256,7 +256,7 @@ onActivated(() => {
 })
 
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
-  mh.setMatchHistoryExpand(props.tab.id, gameId, expand)
+  cf.setMatchHistoryExpand(props.tab.id, gameId, expand)
 }
 
 const scrollToTop = () => {

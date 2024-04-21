@@ -13,12 +13,10 @@ import { queryEncounteredGames, saveEncounteredGame } from '@main/storage/encoun
 import { querySavedPlayer, saveSavedPlayer } from '@main/storage/saved-player'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall, sendEventToAllRenderer } from '@main/utils/ipc'
-import { Game } from '@shared/types/lcu/match-history'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
 import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
 import { calculateTogetherTimes, removeSubsets } from '@shared/utils/team-up-calc'
-import { debounce } from 'lodash'
 import { observable, reaction, runInAction, toJS } from 'mobx'
 
 import { chat } from '../lcu-state-sync/chat'
@@ -75,20 +73,20 @@ export async function setupCoreFunctionality() {
     }
   )
 
-  const debouncedAnalyzeTeamUpFn = debounce(analyzeTeamUp, 500, { leading: true })
-
   reaction(
-    () => [Array.from(cf.tempDetailedGames.values()), cf.ongoingTeams, cf.ongoingState] as const,
-    ([games, t, s]) => {
-      if (games.length && t) {
-        if (s !== 'unavailable') {
-          const result = debouncedAnalyzeTeamUpFn(games, t)
-          runInAction(() => {
-            cf.ongoingPreMadeTeams = result
-          })
-        }
+    () =>
+      [
+        Array.from(cf.tempDetailedGames.values()),
+        Array.from(cf.ongoingPlayers.values()).map((p) => p.summoner),
+        cf.ongoingTeams
+      ] as const,
+    () => {
+      const result = analyzeTeamUp()
+      if (result && cf.ongoingState !== 'unavailable') {
+        runInAction(() => (cf.ongoingPreMadeTeams = result))
       }
-    }
+    },
+    { delay: 500 }
   )
 
   // 在游戏结算时记录所有玩家到数据库
@@ -99,7 +97,9 @@ export async function setupCoreFunctionality() {
         const t1 = gameflow.session.gameData.teamOne
         const t2 = gameflow.session.gameData.teamTwo
 
-        const all = [...t1, ...t2].filter((p) => p.summonerId)
+        const all = [...t1, ...t2].filter(
+          (p) => p.summonerId && p.summonerId !== summoner.me?.summonerId
+        )
 
         const tasks = all.map(async (p) => {
           const task1 = saveSavedPlayer({
@@ -341,7 +341,17 @@ async function loadPlayerStats(summonerId: number) {
  * @param ongoingTeams 当前队伍分类
  * @returns 结果
  */
-function analyzeTeamUp(games: Game[], ongoingTeams: Record<string, number[]>) {
+function analyzeTeamUp() {
+  if (!cf.ongoingTeams) {
+    return null
+  }
+
+  const games = Array.from(cf.tempDetailedGames.values())
+
+  if (!games.length) {
+    return null
+  }
+
   // 统计所有目前游戏中的每个队伍，并且将这些队伍分别视为一个独立的个体，使用 `${游戏ID}|${队伍ID}` 进行唯一区分
   const teamSides = new Map<string, number[]>()
   for (const game of games) {
@@ -396,7 +406,7 @@ function analyzeTeamUp(games: Game[], ongoingTeams: Record<string, number[]>) {
   const matches = Array.from(teamSides).map(([id /* sideId */, players]) => ({ id, players }))
 
   // result 即为最终计算的组队情况，之后使用 `removeSubsets` 进行进一步化简，移除一些可能不关心的结果
-  const result = Object.entries(ongoingTeams).reduce(
+  const result = Object.entries(cf.ongoingTeams).reduce(
     (obj, [team, teamPlayers]) => {
       obj[team] = calculateTogetherTimes(matches, teamPlayers, cf.settings.preMadeTeamThreshold)
 
@@ -582,7 +592,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
       for (let i = 0; i < subTeams.length; i++) {
         const identities = subTeams[i].players.map((p) => {
           return (
-            gameData.champions[cf.ongoingPlayers[p]?.championId || 0]?.name ||
+            gameData.champions[cf.ongoingChampionSelections![p]]?.name ||
             cf.ongoingPlayers[p]?.summoner?.gameName ||
             cf.ongoingPlayers[p]?.summoner?.displayName ||
             p.toString()

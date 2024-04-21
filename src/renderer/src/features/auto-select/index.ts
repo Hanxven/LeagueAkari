@@ -2,8 +2,6 @@ import { mainCall, mainStateSync } from '@renderer/utils/ipc'
 
 import { useAutoSelectStore } from './store'
 
-export const id = 'feature:auto-select'
-
 // 处理自动英雄选择相关逻辑
 export async function setupAutoSelect() {
   const autoSelectState = useAutoSelectStore()

@@ -79,12 +79,15 @@ export function initWindowsPlatform() {
 
   let pageUpShortcut = false
   let pageDownShortcut = false
+  let deleteShortcut = false
   gkl.addListener((event) => {
     if (event.state === 'DOWN') {
       if (event.name === 'PAGE UP') {
         pageUpShortcut = true
       } else if (event.name === 'PAGE DOWN') {
         pageDownShortcut = true
+      } else if (event.name === 'DELETE') {
+        deleteShortcut = true
       }
     }
 
@@ -97,6 +100,10 @@ export function initWindowsPlatform() {
         pageDownShortcut = false
         winPlatformEventBus.emit('windows/global-key/page-down')
         sendEventToAllRenderer('windows/global-key/page-down')
+      } else if (event.name === 'DELETE' && deleteShortcut) {
+        deleteShortcut = false
+        winPlatformEventBus.emit('windows/global-key/delete')
+        sendEventToAllRenderer('windows/global-key/delete')
       }
     }
   })

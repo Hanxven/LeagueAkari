@@ -147,6 +147,7 @@ async function connectToLcu(auth1: LcuAuth) {
       ws.on('error', (error) => {
         lcuConnectionState.setDisconnected()
         logger.warn(`An error occurred during connection to LCU Websocket: ${formatError(error)}`)
+        clearTimeout(timeoutTimer)
         reject(new Error('disconnected'))
       })
     })

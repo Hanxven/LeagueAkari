@@ -16,6 +16,7 @@
           <ChatAvailability class="tool" />
           <FakeRanked class="tool" />
           <GameView class="tool" />
+          <CustomKeyboardSequence class="tool" />
         </NTabPane>
       </NTabs>
     </div>
@@ -31,6 +32,7 @@ import { useKeepAliveScrollPositionMemo } from '@renderer/compositions/useKeepAl
 import AvailabilityCheck from './AvailabilityCheck.vue'
 import ChampionBench from './ChampionBench.vue'
 import ChatAvailability from './ChatAvailability.vue'
+import CustomKeyboardSequence from './CustomKeyboardSequence.vue'
 import FakeRanked from './FakeRanked.vue'
 import GameView from './GameView.vue'
 import InProcess from './InProcess.vue'
@@ -38,7 +40,6 @@ import LobbyTool from './LobbyTool.vue'
 import Spectate from './Spectate.vue'
 import SummonerBackground from './SummonerBackground.vue'
 
-// const id = 'view:toolkit'
 const el = ref()
 useKeepAliveScrollPositionMemo(el)
 </script>

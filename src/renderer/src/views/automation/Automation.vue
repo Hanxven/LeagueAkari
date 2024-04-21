@@ -2,12 +2,13 @@
   <div class="toolkit-wrapper" ref="el">
     <div class="toolkit-wrapper-inner">
       <NTabs type="line" animated>
+        <NTabPane tab="流程" name="gameflow">
+          <AutoGameflow class="tool" />
+        </NTabPane>
         <NTabPane tab="对局中" name="in-progress">
           <AutoSelect class="tool" />
         </NTabPane>
-        <NTabPane tab="流程" name="procedure">
-          <AutoAccept class="tool" />
-          <AutoHonor class="tool" />
+        <NTabPane tab="其他" name="miscellaneous">
           <AutoReply class="tool" />
         </NTabPane>
       </NTabs>
@@ -21,8 +22,7 @@ import { ref } from 'vue'
 
 import { useKeepAliveScrollPositionMemo } from '@renderer/compositions/useKeepAliveScrollPositionMemo'
 
-import AutoAccept from './AutoAccept.vue'
-import AutoHonor from './AutoHonor.vue'
+import AutoGameflow from './AutoGameflow.vue'
 import AutoReply from './AutoReply.vue'
 import AutoSelect from './AutoSelect.vue'
 

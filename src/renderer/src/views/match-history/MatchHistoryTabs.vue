@@ -4,14 +4,14 @@
       <NTabs
         class="tabs"
         @update:value="handleTabChange"
-        :value="mh.currentTab?.id"
+        :value="cf.currentTab?.id"
         type="card"
         :animated="false"
         @close="handleTabClose"
         size="small"
       >
         <NTab
-          v-for="tab of mh.tabs"
+          v-for="tab of cf.tabs"
           @contextmenu="(event) => handleShowMenu(event, tab.id)"
           :key="tab.id"
           :tab="
@@ -35,9 +35,9 @@
           <div class="tab">
             <!-- 在进入游戏时，显示当前召唤师所选择的英雄的图标 -->
             <LcuImage
-              v-if="mh.ongoingChampionSelections?.[tab.id]"
+              v-if="cf.ongoingChampionSelections?.[tab.id]"
               class="tab-icon"
-              :src="championIcon(mh.ongoingChampionSelections?.[tab.id])"
+              :src="championIcon(cf.ongoingChampionSelections?.[tab.id])"
             />
             <LcuImage
               v-else-if="tab.data.summoner"
@@ -97,34 +97,34 @@
       />
     </div>
     <div class="content">
-      <div class="fab reload" v-if="mh.currentTab">
+      <div class="fab reload" v-if="cf.currentTab">
         <NButton
           title="重新拉取数据"
           :loading="
-            mh.currentTab.data.loading.isLoadingMatchHistory ||
-            mh.currentTab.data.loading.isLoadingSummoner ||
-            mh.currentTab.data.loading.isLoadingRankedStats
+            cf.currentTab.data.loading.isLoadingMatchHistory ||
+            cf.currentTab.data.loading.isLoadingSummoner ||
+            cf.currentTab.data.loading.isLoadingRankedStats
           "
-          @click="() => handleRefresh(mh.currentTab!.id)"
+          @click="() => handleRefresh(cf.currentTab!.id)"
           circle
           type="primary"
           ><template #icon
             ><NIcon><RefreshIcon /></NIcon></template
         ></NButton>
       </div>
-      <div class="fab back-to-up" v-if="mh.currentTab">
+      <div class="fab back-to-up" v-if="cf.currentTab">
         <NButton title="回到顶部" circle type="primary" @click="handleBackToTop"
           ><template #icon
             ><NIcon><ArrowUpIcon /></NIcon></template
         ></NButton>
       </div>
-      <template v-if="mh.currentTab">
+      <template v-if="cf.currentTab">
         <MatchHistoryTab
-          v-for="t of mh.tabs"
+          v-for="t of cf.tabs"
           :key="t.id"
-          v-show="t.id === mh.currentTab.id"
+          v-show="t.id === cf.currentTab.id"
           ref="innerComps"
-          :is-self-tab="mh.currentTab.id === summoner.me?.summonerId"
+          :is-self-tab="cf.currentTab.id === summoner.me?.summonerId"
           :tab="t.data as TabState"
         />
       </template>
@@ -157,10 +157,10 @@ const router = useRouter()
 // 当前登录的用户信息
 const summoner = useSummonerStore()
 
-const mh = useCoreFunctionalityStore()
+const cf = useCoreFunctionalityStore()
 
 const handleTabClose = (summonerId: number) => {
-  mh.closeTab(summonerId)
+  cf.closeTab(summonerId)
 }
 
 const handleTabChange = async (summonerId: number) => {
@@ -181,7 +181,7 @@ const handleRefresh = async (summonerId: number) => {
 }
 
 watch(
-  () => mh.currentTab,
+  () => cf.currentTab,
   (c) => {
     if (c) {
       router.replace(`/match-history/${c.id}`)
@@ -202,11 +202,11 @@ watch(
       return
     }
 
-    const tab = mh.getTab(id)
+    const tab = cf.getTab(id)
     if (tab) {
-      mh.setCurrentTab(id)
+      cf.setCurrentTab(id)
     } else {
-      mh.createTab(id, {
+      cf.createTab(id, {
         setCurrent: true,
         pin: summoner.me?.summonerId === id
       })
@@ -241,10 +241,10 @@ const handleDrop = (id: number) => {
     return
   }
 
-  const tab = mh.getTab(id)
+  const tab = cf.getTab(id)
 
   if (tab) {
-    mh.moveTab(menuProps.dragging!, id)
+    cf.moveTab(menuProps.dragging!, id)
   }
 
   menuProps.dragging = null
@@ -254,19 +254,19 @@ const dropdownOptions = reactive([
   {
     label: '刷新',
     key: 'refresh',
-    disabled: computed(() => mh.isLoading(menuProps.id))
+    disabled: computed(() => cf.isLoading(menuProps.id))
   },
   {
     label: '关闭',
     key: 'close',
     disabled: computed(() => {
-      return mh.getTab(menuProps.id)?.isPinned
+      return cf.getTab(menuProps.id)?.isPinned
     })
   },
   {
     label: '关闭其他',
     key: 'close-others',
-    disabled: computed(() => !mh.canCloseOtherTabs(menuProps.id))
+    disabled: computed(() => !cf.canCloseOtherTabs(menuProps.id))
   }
 ])
 
@@ -276,10 +276,10 @@ const handleMenuSelect = (action: string) => {
       handleRefresh(menuProps.id)
       break
     case 'close':
-      mh.closeTab(menuProps.id)
+      cf.closeTab(menuProps.id)
       break
     case 'close-others':
-      mh.closeOtherTabs(menuProps.id)
+      cf.closeOtherTabs(menuProps.id)
       break
   }
   menuProps.show = false
@@ -295,7 +295,7 @@ const handleShowMenu = (e: PointerEvent, id: number) => {
 
 const innerComps = ref<(typeof MatchHistoryTab)[]>([])
 const handleBackToTop = () => {
-  const tab = innerComps.value.find((t) => t.id === mh.currentTab?.id)
+  const tab = innerComps.value.find((t) => t.id === cf.currentTab?.id)
   if (tab) {
     tab.scrollToTop()
   }

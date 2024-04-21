@@ -31,7 +31,7 @@ export class SavedPlayer {
   /**
    * 上一次匹配到的时间，可以为空
    */
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'datetime' })
   @Index('saved_players_last_met_at_index')
   lastMetAt: Date | null
 
