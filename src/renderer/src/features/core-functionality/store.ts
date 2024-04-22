@@ -127,6 +127,8 @@ export interface TabState {
   /** 召唤师段位信息 */
   rankedStats?: RankedStats
 
+  savedInfo?: SavedPlayerInfo
+
   /** 战绩列表细节 */
   matchHistory: SummonerTabMatchHistory
 

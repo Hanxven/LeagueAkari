@@ -1,4 +1,4 @@
-import { lcuConnectionState, lcuEventEmitter } from '@main/core/lcu-connection'
+import { lcuConnectionState, lcuEventBus } from '@main/core/lcu-connection'
 import { getGameflowPhase, getGameflowSession } from '@main/http-api/gameflow'
 import { ipcStateSync } from '@main/utils/ipc'
 import { GameflowPhase, GameflowSession } from '@shared/types/lcu/gameflow'
@@ -56,11 +56,11 @@ export function gameflowSync() {
     }
   )
 
-  lcuEventEmitter.on('/lol-gameflow/v1/gameflow-phase', (event) => {
+  lcuEventBus.on('/lol-gameflow/v1/gameflow-phase', (event) => {
     gameflow.setPhase(event.data)
   })
 
-  lcuEventEmitter.on('/lol-gameflow/v1/session', (event) => {
+  lcuEventBus.on('/lol-gameflow/v1/session', (event) => {
     gameflow.setSession(event.data)
   })
 

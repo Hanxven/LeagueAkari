@@ -1,4 +1,4 @@
-import { lcuConnectionState, lcuEventEmitter } from '@main/core/lcu-connection'
+import { lcuConnectionState, lcuEventBus } from '@main/core/lcu-connection'
 import { mwNotification } from '@main/core/main-window'
 import { getMe } from '@main/http-api/chat'
 import { ipcStateSync } from '@main/utils/ipc'
@@ -12,37 +12,42 @@ import { logger } from './common'
 export interface Conversations {
   championSelect: Conversation | null
   postGame: Conversation | null
+  lobby: Conversation | null
 }
 
 export interface Participants {
   championSelect: number[] | null
   postGame: number[] | null
+  lobby: number[] | null
 }
 
 class ChatState {
   conversations = observable<Conversations>(
     {
       championSelect: null,
-      postGame: null
+      postGame: null,
+      lobby: null
     },
     {
       championSelect: observable.struct,
-      postGame: observable.struct
-    }
+      postGame: observable.struct,
+      lobby: observable.struct
+    },
+    { deep: false }
   )
 
-  /**
-   * unused yet
-   */
   participants = observable<Participants>(
     {
       championSelect: null,
-      postGame: null
+      postGame: null,
+      lobby: null
     },
     {
       championSelect: observable.struct,
-      postGame: observable.struct
-    }
+      postGame: observable.struct,
+      lobby: observable.struct
+    },
+    { deep: false }
   )
 
   me: ChatPerson | null = null
@@ -67,6 +72,10 @@ class ChatState {
     this.conversations.postGame = c
   }
 
+  setConversationLobby(c: Conversation | null) {
+    this.conversations.lobby = c
+  }
+
   setParticipantsChampSelect(p: number[] | null) {
     this.participants.championSelect = p
   }
@@ -74,12 +83,16 @@ class ChatState {
   setParticipantsPostGame(p: number[] | null) {
     this.participants.postGame = p
   }
+
+  setParticipantsLobby(p: number[] | null) {
+    this.participants.lobby = p
+  }
 }
 
 export const chat = new ChatState()
 
 export function chatSync() {
-  lcuEventEmitter.on('/lol-chat/v1/conversations/:id', (event, { id }) => {
+  lcuEventBus.on('/lol-chat/v1/conversations/:id', (event, { id }) => {
     if (event.eventType === 'Delete') {
       if (chat.conversations.championSelect?.id === id) {
         runInAction(() => {
@@ -120,36 +133,44 @@ export function chatSync() {
   })
 
   // 监测用户进入房间
-  lcuEventEmitter.on(
+  lcuEventBus.on(
     '/lol-chat/v1/conversations/:conversationId/messages/:messageId',
     (event, param) => {
-      // 英雄选择期间聊天室
-      // 处理英雄选择时，用户加入的记录（只处理加入一次，因为要用来查战绩。用户退出聊天不管，因为会在聊天室销毁后统一清除）
-      if (
-        event.data &&
-        event.data.type === 'system' &&
-        event.data.body === 'joined_room' &&
-        chat.conversations.championSelect &&
-        chat.conversations.championSelect.id === param.conversationId
-      ) {
-        // 如果召唤师是混淆的，那么 ID = 0，这种情况需要考虑
+      if (event.data && event.data.type === 'system' && event.data.body === 'joined_room') {
         if (!event.data.fromSummonerId) {
           return
         }
 
-        // 去重的 id
-        const p = Array.from(
-          new Set([...(chat.participants.championSelect ?? []), event.data.fromSummonerId])
-        )
-        chat.setParticipantsChampSelect(p)
+        if (
+          chat.conversations.championSelect &&
+          chat.conversations.championSelect.id === param.conversationId
+        ) {
+          const p = Array.from(
+            new Set([...(chat.participants.championSelect ?? []), event.data.fromSummonerId])
+          )
+          chat.setParticipantsChampSelect(p)
+        } else if (
+          chat.conversations.postGame &&
+          chat.conversations.postGame.id === param.conversationId
+        ) {
+          const p = Array.from(
+            new Set([...(chat.participants.postGame ?? []), event.data.fromSummonerId])
+          )
+          chat.setParticipantsPostGame(p)
+        } else if (
+          chat.conversations.lobby &&
+          chat.conversations.lobby.id === param.conversationId
+        ) {
+          const p = Array.from(
+            new Set([...(chat.participants.lobby ?? []), event.data.fromSummonerId])
+          )
+          chat.setParticipantsLobby(p)
+        }
       }
-
-      // TODO 游戏结束后聊天室 - 目前还没有逻辑用到
-      // ...
     }
   )
 
-  lcuEventEmitter.on('/lol-chat/v1/me', (event) => {
+  lcuEventBus.on('/lol-chat/v1/me', (event) => {
     if (event.eventType === 'Update' || event.eventType === 'Create') {
       chat.setMe(event.data)
       return
@@ -175,4 +196,5 @@ export function chatSync() {
   ipcStateSync('lcu/chat/me', () => chat.me)
   ipcStateSync('lcu/chat/conversations/champ-select', () => chat.conversations.championSelect)
   ipcStateSync('lcu/chat/conversations/post-game', () => chat.conversations.postGame)
+  ipcStateSync('lcu/chat/conversations/lobby', () => chat.conversations.lobby)
 }

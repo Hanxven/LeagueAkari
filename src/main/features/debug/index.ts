@@ -1,4 +1,4 @@
-import { lcuEventEmitter } from '@main/core/lcu-connection'
+import { lcuEventBus } from '@main/core/lcu-connection'
 import { createLogger } from '@main/core/log'
 import { getMainWindow } from '@main/core/main-window'
 import { ipcStateSync, onRendererCall, sendEventToRenderer } from '@main/utils/ipc'
@@ -30,7 +30,7 @@ function ipcCall() {
     debugState.settings.setSendAllNativeLcuEvents(enabled)
   })
 
-  lcuEventEmitter.on('/**', (data) => {
+  lcuEventBus.on('/**', (data) => {
     if (debugState.settings.sendAllNativeLcuEvents) {
       const mw = getMainWindow()
 

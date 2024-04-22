@@ -1,7 +1,12 @@
 <template>
   <div class="match-history-wrapper" ref="wrapperEl">
     <div class="match-history-inner">
-      <DefinePageMeta v-slot="{ position }">
+      <PlayerTagEditModal
+        :summoner-id="tab.id"
+        v-model:show="isShowingTagEditModal"
+        @edited="(id) => handleTagEdited(id)"
+      />
+      <DefinePageMeta>
         <div class="match-history-page-meta">
           <div class="pagination-line">
             <div class="text">
@@ -92,8 +97,10 @@
               <span class="dice-count">{{ tab.summoner.rerollPoints.numberOfRolls }}</span>
             </div>
             <!-- UNDER DEVELOPMENT -->
-            <div title="标记玩家" class="tag" v-if="false && !isSelfTab" @click="handleTagPlayer">
+            <div title="标记玩家" class="tag" v-if="!isSelfTab" @click="handleTagPlayer">
               <NIcon><TagIcon /></NIcon>
+              <span class="tagged" v-if="tab.savedInfo?.tag">已标记</span>
+              <span class="untagged" v-else="tab.savedInfo?.tag">标记</span>
             </div>
           </div>
           <RankedSpan v-if="tab.rankedStats" :ranked="tab.rankedStats" />
@@ -158,7 +165,12 @@ import { nextTick, onActivated, ref, watch } from 'vue'
 
 import CopyableText from '@renderer/components/CopyableText.vue'
 import LcuImage from '@renderer/components/LcuImage.vue'
-import { fetchTabDetailedGame, fetchTabMatchHistory } from '@renderer/features/core-functionality'
+import PlayerTagEditModal from '@renderer/components/PlayerTagEditModal.vue'
+import {
+  fetchTabDetailedGame,
+  fetchTabMatchHistory,
+  querySavedInfo
+} from '@renderer/features/core-functionality'
 import { TabState, useCoreFunctionalityStore } from '@renderer/features/core-functionality/store'
 import { hideMatchHistoryText } from '@renderer/utils/sarcasms'
 
@@ -239,8 +251,10 @@ const handleChangePageSize = async (pageSize: number) => {
   return r
 }
 
+const isShowingTagEditModal = ref(false)
+
 const handleTagPlayer = async () => {
-  console.log('占位用途')
+  isShowingTagEditModal.value = true
 }
 
 const wrapperEl = ref<HTMLElement>()
@@ -270,6 +284,10 @@ onActivated(() => {
 
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
   cf.setMatchHistoryExpand(props.tab.id, gameId, expand)
+}
+
+const handleTagEdited = (summonerId: number) => {
+  querySavedInfo(summonerId)
 }
 
 const scrollToTop = () => {
@@ -335,13 +353,42 @@ defineExpose({
   }
 
   .tag {
-    margin-left: 8px;
-
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
     font-size: 16px;
+    line-height: 16px;
     color: rgb(196, 196, 196);
+    cursor: pointer;
 
     &:hover {
       color: rgb(222, 222, 222);
+    }
+
+    transition: all 0.3s ease;
+
+    &:hover .tagged {
+      color: rgb(255, 204, 0);
+    }
+
+    &:hover .untagged {
+      color: rgb(217, 217, 217);
+    }
+
+    .tagged {
+      margin-left: 2px;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgb(255, 157, 0);
+      transition: all 0.3s ease;
+    }
+
+    .untagged {
+      margin-left: 2px;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgb(196, 196, 196);
+      transition: all 0.3s ease;
     }
   }
 

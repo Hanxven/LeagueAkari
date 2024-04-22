@@ -89,6 +89,10 @@ export async function setupCoreFunctionality() {
     }
   )
 
+  onMainEvent('core-functionality/ongoing-player/clear', () => {
+    cf.ongoingPlayers = {}
+  })
+
   mainCall('core-functionality/ongoing-players/get').then((all: Map<number, OngoingPlayer>) => {
     all.forEach((value, key) => {
       cf.ongoingPlayers[key] = value
@@ -276,8 +280,8 @@ export async function fetchTabRankedStats(summonerId: number) {
 }
 
 export async function fetchTabSummoner(summonerId: number) {
-  const matchHistory = useCoreFunctionalityStore()
-  const tab = matchHistory.getTab(summonerId)
+  const cf = useCoreFunctionalityStore()
+  const tab = cf.getTab(summonerId)
 
   if (tab) {
     if (tab.data.loading.isLoadingSummoner) {
@@ -402,8 +406,8 @@ export async function fetchTabMatchHistory(
 }
 
 export async function fetchTabDetailedGame(summonerId: number, gameId: number) {
-  const matchHistory = useCoreFunctionalityStore()
-  const tab = matchHistory.getTab(summonerId)
+  const cf = useCoreFunctionalityStore()
+  const tab = cf.getTab(summonerId)
 
   if (tab) {
     const match = tab.data.matchHistory.gamesMap[gameId]
@@ -440,6 +444,36 @@ export async function fetchTabDetailedGame(summonerId: number, gameId: number) {
   return null
 }
 
+export async function querySavedInfo(summonerId: number) {
+  const app = useAppStore()
+  const summoner = useSummonerStore()
+  const cf = useCoreFunctionalityStore()
+
+  if (!app.lcuAuth || !summoner.me) {
+    return
+  }
+
+  const tab = cf.getTab(summonerId)
+
+  if (tab) {
+    try {
+      const savedInfo = await mainCall('storage/saved-player/query', {
+        selfSummonerId: summoner.me.summonerId,
+        summonerId: summonerId,
+        region: app.lcuAuth.region,
+        rsoPlatformId: app.lcuAuth.rsoPlatformId
+      })
+
+      tab.data.savedInfo = savedInfo
+      return savedInfo
+    } catch {
+      return null
+    }
+  }
+
+  return null
+}
+
 export async function fetchTabFullData(summonerId: number) {
   const summoner = await fetchTabSummoner(summonerId)
 
@@ -460,6 +494,9 @@ export async function fetchTabFullData(summonerId: number) {
       if (!r) {
         failed = true
       }
+    })(),
+    (async () => {
+      await querySavedInfo(summonerId)
     })()
   ])
 

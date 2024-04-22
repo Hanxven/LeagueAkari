@@ -1,4 +1,4 @@
-import { lcuEventEmitter } from '@main/core/lcu-connection'
+import { lcuEventBus } from '@main/core/lcu-connection'
 import { createLogger } from '@main/core/log'
 import { mwNotification } from '@main/core/main-window'
 import { honor } from '@main/http-api/honor-v2'
@@ -30,7 +30,7 @@ export async function setupAutoGameflow() {
   await loadSettings()
 
   // 结算点赞
-  lcuEventEmitter.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (message) => {
+  lcuEventBus.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (message) => {
     if (message.eventType === 'Create' && autoGameflowState.settings.autoHonorEnabled) {
       try {
         if (autoGameflowState.settings.autoHonorStrategy === 'opt-out') {
@@ -83,6 +83,7 @@ export async function setupAutoGameflow() {
           )
         } else {
           await honor(message.data.gameId, 'OPT_OUT', 0)
+          logger.info('Opt-outed honoring stage')
         }
       } catch (error) {
         mwNotification.warn('auto-gameflow', '自动点赞', '尝试自动点赞出现问题')
@@ -98,6 +99,7 @@ export async function setupAutoGameflow() {
       if (autoGameflowState.settings.playAgainEnabled && phase === 'EndOfGame') {
         try {
           await playAgain()
+          logger.info('Play again, returned to the lobby')
         } catch (error) {
           logger.warn(`Error when try to play again ${formatError(error)}`)
         }
@@ -140,7 +142,7 @@ export async function setupAutoGameflow() {
   )
 
   // 如果玩家手动取消了本次接受，则尝试取消即将进行的自动接受（如果有）
-  lcuEventEmitter.on('/lol-matchmaking/v1/ready-check', (event) => {
+  lcuEventBus.on('/lol-matchmaking/v1/ready-check', (event) => {
     if (event.data && event.data.playerResponse === 'Declined') {
       if (autoGameflowState.willAutoAccept) {
         if (autoAcceptTimerId) {
@@ -153,6 +155,14 @@ export async function setupAutoGameflow() {
       }
     }
   })
+
+  // 自动开始匹配
+  reaction(
+    () => lobby.lobby,
+    (lobby) => {
+      // console.log('lobby', lobby)
+    }
+  )
 
   logger.info('Initialized')
 }

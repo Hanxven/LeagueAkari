@@ -8,8 +8,8 @@ export class EncounteredGame {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ type: 'varchar', nullable: false })
-  @Index('encountered_games_rso_game_id_index')
+  @Column({ type: 'integer', nullable: false })
+  @Index('encountered_games_game_id_index')
   gameId: number
 
   @Column({ type: 'integer' })

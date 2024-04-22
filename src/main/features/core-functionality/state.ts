@@ -1,5 +1,6 @@
 import { lcuConnectionState } from '@main/core/lcu-connection'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
+import { sendEventToAllRenderer } from '@main/utils/ipc'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -82,7 +83,7 @@ export interface OngoingPlayer {
   /**
    * 记录的玩家信息
    */
-  saved?: SavedPlayer
+  savedInfo?: SavedPlayer & { encounteredGames: number[] }
 }
 
 export interface MatchHistoryWithState {

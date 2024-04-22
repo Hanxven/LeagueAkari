@@ -15,6 +15,8 @@ class AutoGameflowSettings {
   autoAcceptEnabled: boolean = false
   autoAcceptDelaySeconds: number = 0
 
+  autoSearchMatchEnabled: boolean
+
   setAutoHonorEnabled(enabled: boolean) {
     this.autoHonorEnabled = enabled
   }
@@ -52,6 +54,11 @@ class AutoGameflowState {
    * 即将进行的自动接受操作将在指定时间戳完成
    */
   willAutoAcceptAt = -1
+
+  /**
+   * 即将进行的匹配开始的时间
+   */
+  willSearchMatchAt = -1
 
   setAutoAcceptAt(at: number) {
     this.willAutoAccept = true

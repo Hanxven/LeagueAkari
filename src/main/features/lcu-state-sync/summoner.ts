@@ -1,4 +1,4 @@
-import { lcuConnectionState, lcuEventEmitter } from '@main/core/lcu-connection'
+import { lcuConnectionState, lcuEventBus } from '@main/core/lcu-connection'
 import { mwNotification } from '@main/core/main-window'
 import { getCurrentSummoner } from '@main/http-api/summoner'
 import { ipcStateSync } from '@main/utils/ipc'
@@ -85,7 +85,7 @@ export function summonerSync() {
     { fireImmediately: true }
   )
 
-  lcuEventEmitter.on('/lol-summoner/v1/current-summoner', (event) => {
+  lcuEventBus.on('/lol-summoner/v1/current-summoner', (event) => {
     summoner.setMe(event.data)
   })
 

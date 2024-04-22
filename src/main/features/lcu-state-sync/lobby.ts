@@ -1,4 +1,4 @@
-import { lcuConnectionState, lcuEventEmitter } from '@main/core/lcu-connection'
+import { lcuConnectionState, lcuEventBus } from '@main/core/lcu-connection'
 import { mwNotification } from '@main/core/main-window'
 import { getLobby } from '@main/http-api/lobby'
 import { ipcStateSync } from '@main/utils/ipc'
@@ -25,7 +25,7 @@ class LobbyState {
 export const lobby = new LobbyState()
 
 export function lobbySync() {
-  lcuEventEmitter.on('/lol-lobby/v2/lobby', (event) => {
+  lcuEventBus.on('/lol-lobby/v2/lobby', (event) => {
     lobby.setLobby(event.data)
   })
 

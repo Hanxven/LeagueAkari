@@ -3,6 +3,7 @@ import { Equal } from 'typeorm'
 
 import { dataSource } from '../db'
 import { onRendererCall } from '../utils/ipc'
+import { queryEncounteredGames } from './encountered-games'
 
 interface SavedPlayerQueryDto {
   summonerId: number
@@ -29,6 +30,32 @@ export function querySavedPlayer(query: SavedPlayerQueryDto) {
   })
 }
 
+export async function querySavedPlayerWithGames(query: SavedPlayerQueryDto) {
+  if (!query.summonerId || !query.selfSummonerId || !query.region || !query.rsoPlatformId) {
+    throw new Error('summonerId, selfSummonerId, region or rsoPlatformId cannot be empty')
+  }
+
+  const savedPlayer = await dataSource.manager.findOneBy(SavedPlayer, {
+    summonerId: Equal(query.summonerId),
+    selfSummonerId: Equal(query.selfSummonerId),
+    region: Equal(query.region),
+    rsoPlatformId: Equal(query.rsoPlatformId)
+  })
+
+  if (savedPlayer) {
+    const encounteredGames = await queryEncounteredGames({
+      summonerId: query.summonerId,
+      selfSummonerId: query.selfSummonerId,
+      region: query.region,
+      rsoPlatformId: query.rsoPlatformId
+    })
+
+    return { ...savedPlayer, encounteredGames: encounteredGames.map((g) => g.gameId) }
+  }
+
+  return null
+}
+
 export function deleteSavedPlayer(query: SavedPlayerQueryDto) {
   if (!query.summonerId || !query.selfSummonerId || !query.region || !query.rsoPlatformId) {
     throw new Error('summonerId, selfSummonerId, region or rsoPlatformId cannot be empty')
@@ -41,13 +68,6 @@ export function saveSavedPlayer(player: SavedPlayerSaveDto) {
   if (!player.summonerId || !player.selfSummonerId || !player.region || !player.rsoPlatformId) {
     throw new Error('summonerId, selfSummonerId, region or rsoPlatformId cannot be empty')
   }
-
-  const isExists = dataSource.manager.existsBy(SavedPlayer, {
-    summonerId: Equal(player.summonerId),
-    selfSummonerId: Equal(player.selfSummonerId),
-    rsoPlatformId: Equal(player.rsoPlatformId),
-    region: Equal(player.region)
-  })
 
   const savedPlayer = new SavedPlayer()
   const date = new Date()
@@ -76,5 +96,9 @@ export async function initSavedPlayersStorageIpc() {
 
   onRendererCall('storage/saved-player/query', (_, query: SavedPlayerQueryDto) => {
     return querySavedPlayer(query)
+  })
+
+  onRendererCall('storage/saved-player-with-games/query', (_, query: SavedPlayerQueryDto) => {
+    return querySavedPlayerWithGames(query)
   })
 }

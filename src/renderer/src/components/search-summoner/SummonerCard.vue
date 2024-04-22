@@ -22,7 +22,10 @@
         class="image"
         :src="`/lol-game-data/assets/v1/profile-icons/${summoner.profileIconId}.jpg`"
       />
-      <CopyableText class="name" :text="summoner.displayName || summoner.gameName" />
+      <CopyableText
+        class="name"
+        :text="summonerName(summoner.gameName || summoner.displayName, summoner.tagLine)"
+      />
     </div>
   </NCard>
   <NCard size="small" hoverable class="card" v-else>
@@ -43,13 +46,17 @@
             : undefined
         "
       />
-      <CopyableText class="name" :text="selfData?.gameName || selfData?.displayName" />
+      <CopyableText
+        class="name"
+        :text="summonerName(selfData?.gameName || selfData?.displayName, selfData?.tagLine)"
+      />
     </div>
   </NCard>
 </template>
 
 <script setup lang="ts">
 import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { summonerName } from '@shared/utils/name'
 import { NCard } from 'naive-ui'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

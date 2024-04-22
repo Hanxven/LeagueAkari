@@ -6,6 +6,10 @@
       :self-id="showingGame.summonerId"
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
+    <PlayerTagEditModal
+      v-model:show="isPlayerTagEditModalShow"
+      :summoner-id="tagEditingSummonerId"
+    />
     <div v-if="!isIdle" class="ongoing-game-inner">
       <!-- 蓝队 -->
       <DefineOngoingTeam v-slot="{ participants, team }">
@@ -13,7 +17,7 @@
           <PlayerInfoCard
             v-for="p of participants"
             :key="p.summonerId"
-            :id="p.summonerId"
+            :summoner-id="p.summonerId"
             :is-self="p.summonerId === summoner.me?.summonerId"
             :summoner-info="p.summoner"
             :ranked-stats="p.rankedStats"
@@ -24,6 +28,7 @@
             :saved-info="p.savedInfo"
             @show-game="(id, selfId) => handleShowGame(id, selfId)"
             @to-summoner="(id) => handleToSummoner(id)"
+            @show-saved-info="(id) => handleTagEditing(id)"
           />
         </div>
       </DefineOngoingTeam>
@@ -132,6 +137,7 @@ import { useRouter } from 'vue-router'
 
 import ControlItem from '@renderer/components/ControlItem.vue'
 import LcuImage from '@renderer/components/LcuImage.vue'
+import PlayerTagEditModal from '@renderer/components/PlayerTagEditModal.vue'
 import { useKeepAliveScrollPositionMemo } from '@renderer/compositions/useKeepAliveScrollPositionMemo'
 import { setInGameKdaSendPlayer } from '@renderer/features/core-functionality'
 import {
@@ -221,6 +227,13 @@ const handleShowGame = (gameId: number, summonerId: number) => {
   showingGame.id = gameId
   showingGame.summonerId = summonerId
   isStandaloneMatchHistoryCardShow.value = true
+}
+
+const isPlayerTagEditModalShow = ref(false)
+const tagEditingSummonerId = ref(0)
+const handleTagEditing = (summonerId: number) => {
+  isPlayerTagEditModalShow.value = true
+  tagEditingSummonerId.value = summonerId
 }
 
 const el = ref()

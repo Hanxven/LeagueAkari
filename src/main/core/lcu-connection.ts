@@ -42,7 +42,7 @@ class LcuConnectionState {
 
 export const lcuConnectionState = new LcuConnectionState()
 
-export const lcuEventEmitter = new RadixEventEmitter()
+export const lcuEventBus = new RadixEventEmitter()
 
 let lcuHttpRequest: AxiosInstance | null = null
 let ws: WebSocket | null = null
@@ -162,7 +162,7 @@ async function connectToLcu(auth1: LcuAuth) {
         const data = JSON.parse(msg.toString())[2]
 
         // self main process
-        lcuEventEmitter.emit(data.uri, data)
+        lcuEventBus.emit(data.uri, data)
       } catch {
         /* TODO NOTHING */
       }

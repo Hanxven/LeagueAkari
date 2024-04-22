@@ -1,4 +1,4 @@
-import { lcuEventEmitter } from '@main/core/lcu-connection'
+import { lcuEventBus } from '@main/core/lcu-connection'
 import { lcuConnectionState } from '@main/core/lcu-connection'
 import { mwNotification } from '@main/core/main-window'
 import {
@@ -117,12 +117,12 @@ export function champSelectSync() {
     }
   )
 
-  lcuEventEmitter.on('/lol-champ-select/v1/session', (event) => {
+  lcuEventBus.on('/lol-champ-select/v1/session', (event) => {
     // create, update, delete, 3 in 1
     champSelect.setSession(event.data)
   })
 
-  lcuEventEmitter.on<LcuEvent<number[]>>('/lol-champ-select/v1/pickable-champion-ids', (event) => {
+  lcuEventBus.on<LcuEvent<number[]>>('/lol-champ-select/v1/pickable-champion-ids', (event) => {
     if (event.eventType === 'Delete') {
       champSelect.setCurrentPickableChampionArray([])
     } else {
@@ -133,7 +133,7 @@ export function champSelectSync() {
     }
   })
 
-  lcuEventEmitter.on<LcuEvent<number[]>>('/lol-champ-select/v1/bannable-champion-ids', (event) => {
+  lcuEventBus.on<LcuEvent<number[]>>('/lol-champ-select/v1/bannable-champion-ids', (event) => {
     if (event.eventType === 'Delete') {
       champSelect.setCurrentBannableChampionArray([])
     } else {

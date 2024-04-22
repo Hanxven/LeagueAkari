@@ -2,15 +2,14 @@ import { lcuConnectionState } from '@main/core/lcu-connection'
 import { createLogger } from '@main/core/log'
 import { mwNotification } from '@main/core/main-window'
 import { pSendKey, pSendKeys, winPlatformEventBus } from '@main/core/platform'
-import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { getChampSelectSession } from '@main/http-api/champ-select'
 import { chatSend } from '@main/http-api/chat'
 import { getGameflowSession } from '@main/http-api/gameflow'
 import { getGame, getMatchHistory } from '@main/http-api/match-history'
 import { getRankedStats } from '@main/http-api/ranked'
 import { getSummoner } from '@main/http-api/summoner'
-import { queryEncounteredGames, saveEncounteredGame } from '@main/storage/encountered-games'
-import { querySavedPlayer, saveSavedPlayer } from '@main/storage/saved-player'
+import { saveEncounteredGame } from '@main/storage/encountered-games'
+import { querySavedPlayerWithGames, saveSavedPlayer } from '@main/storage/saved-player'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall, sendEventToAllRenderer } from '@main/utils/ipc'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
@@ -39,6 +38,7 @@ export async function setupCoreFunctionality() {
     () => cf.ongoingState,
     async (state) => {
       if (state === 'unavailable') {
+        sendEventToAllRenderer('core-functionality/ongoing-player/clear')
         cf.clearOngoingVars()
         return
       }
@@ -200,7 +200,9 @@ async function inGameQuery() {
  */
 async function loadPlayerStats(summonerId: number) {
   if (!cf.ongoingPlayers.has(summonerId)) {
-    runInAction(() => cf.ongoingPlayers.set(summonerId, observable({ summonerId })))
+    runInAction(() =>
+      cf.ongoingPlayers.set(summonerId, observable({ summonerId }, {}, { deep: false }))
+    )
     sendEventToAllRenderer('core-functionality/ongoing-player/new', summonerId)
   }
 
@@ -220,29 +222,19 @@ async function loadPlayerStats(summonerId: number) {
   }
 
   const _loadSavedInfo = async () => {
-    if (player.saved) {
+    if (player.savedInfo) {
       return
     }
 
-    const savedPlayer = await querySavedPlayer({
+    const savedInfo = await querySavedPlayerWithGames({
       region: auth.region,
       rsoPlatformId: auth.rsoPlatformId,
       selfSummonerId: me.summonerId,
       summonerId: summonerId
     })
 
-    let savedInfo: SavedPlayer & { encounteredGames: number[] }
-    if (savedPlayer) {
-      const encounteredGames = await queryEncounteredGames({
-        region: auth.region,
-        rsoPlatformId: auth.rsoPlatformId,
-        selfSummonerId: me.summonerId,
-        summonerId: summonerId
-      })
-
-      savedInfo = { encounteredGames: encounteredGames.map((v) => v.gameId), ...savedPlayer }
-
-      runInAction(() => (player.saved = savedInfo))
+    if (savedInfo) {
+      runInAction(() => (player.savedInfo = savedInfo))
 
       sendEventToAllRenderer('core-functionality/ongoing-player/saved-info', summonerId, savedInfo)
     }
@@ -274,15 +266,10 @@ async function loadPlayerStats(summonerId: number) {
     ).data
 
     runInAction(() => {
-      player.matchHistory = matchHistoryResult.games.games.map((g) =>
-        observable(
-          {
-            game: g,
-            isDetailed: false
-          },
-          { game: observable.ref }
-        )
-      )
+      player.matchHistory = matchHistoryResult.games.games.map((g) => ({
+        game: g,
+        isDetailed: false
+      }))
     })
 
     sendEventToAllRenderer(
@@ -791,6 +778,36 @@ function ipcCall() {
 
     cf.settings.setSendKdaThreshold(threshold)
     await setSetting('core-functionality/send-kda-threshold', threshold)
+  })
+
+  // 会额外更新现有内容
+  onRendererCall('core-functionality/saved-player/save', async (_, player) => {
+    const r = await saveSavedPlayer(player)
+
+    if (cf.ongoingPlayers) {
+      const p = cf.ongoingPlayers.get(player.summonerId)
+      if (p) {
+        const savedInfo = await querySavedPlayerWithGames({
+          region: player.region,
+          rsoPlatformId: player.rsoPlatformId,
+          selfSummonerId: player.selfSummonerId,
+          summonerId: player.summonerId
+        })
+
+        if (savedInfo) {
+          runInAction(() => (p.savedInfo = savedInfo))
+          sendEventToAllRenderer(
+            'core-functionality/ongoing-player/saved-info',
+            player.summonerId,
+            savedInfo
+          )
+
+          console.log('sent!', player, savedInfo)
+        }
+      }
+    }
+
+    return r
   })
 }
 

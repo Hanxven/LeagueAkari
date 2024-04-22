@@ -18,7 +18,7 @@
               )
             "
             class="name"
-            @click="emits('toSummoner', id)"
+            @click="emits('toSummoner', summonerId)"
             >{{
               summonerName(
                 summonerInfo?.gameName || summonerInfo?.displayName,
@@ -36,22 +36,30 @@
               >
             </template>
             <div style="max-width: 260px">
-              <div class="encountered-text">
-                最近一次遇见该玩家的时间是 {{ formattedRelativeTime }}。
-              </div>
-              <div class="encountered-text" v-if="savedInfo.encounteredGames.length > 1">
+              <div class="small-text">最近一次遇见该玩家的时间是 {{ formattedRelativeTime }}。</div>
+              <div class="small-text" v-if="savedInfo.encounteredGames.length > 1">
                 共遇见过 {{ savedInfo.encounteredGames.length }} 次。
               </div>
               <div class="encountered-games">
-                <span class="encountered-text"
+                <span class="small-text"
                   >相关对局：<span
                     class="encountered-game"
                     v-for="g of savedInfo.encounteredGames.slice(-10).toReversed()"
-                    @click="() => emits('showGame', g, id)"
+                    @click="() => emits('showGame', g, summonerId)"
                     >{{ g }}</span
                   ></span
                 >
               </div>
+            </div>
+          </NPopover>
+          <NPopover v-if="savedInfo && !isSelf && savedInfo.tag" placement="bottom">
+            <template #trigger>
+              <span @click="() => emits('showSavedInfo', summonerId)" class="tag tagged"
+                >已标记</span
+              >
+            </template>
+            <div class="small-text" style="max-width: 260px">
+              {{ savedInfo.tag }}
             </div>
           </NPopover>
           <span
@@ -61,7 +69,7 @@
             >生涯隐藏</span
           >
           <span
-            :title="winRateTeamText(id)"
+            :title="winRateTeamText(summonerId)"
             class="tag win-rate-team"
             v-if="analysis.maybeWinRateTeam && !isSelf"
             >胜率队</span
@@ -178,7 +186,7 @@
               marginBottom: `${matchHistoryItemMargin}px`
             }"
             v-for="m of list"
-            @click="() => emits('showGame', m.data.game.gameId, props.id)"
+            @click="() => emits('showGame', m.data.game.gameId, props.summonerId)"
             :key="m.data.game.gameId"
           >
             <LcuImage class="image" :src="championIcon(m.data.selfParticipant.championId)" />
@@ -241,12 +249,13 @@ import { winRateTeamText } from '@renderer/utils/sarcasms'
 import RankedSpan from '../match-history/widgets/RankedSpan.vue'
 
 const emits = defineEmits<{
-  (e: 'toSummoner', id: number): void
+  (e: 'toSummoner', summonerId: number): void
   (e: 'showGame', gameId: number, selfId: number): void
+  (e: 'showSavedInfo', summonerId: number): void
 }>()
 
 const props = defineProps<{
-  id: number
+  summonerId: number
   isSelf: boolean
   summonerInfo?: SummonerInfo
   rankedStats?: RankedStats
@@ -321,7 +330,7 @@ const matchHistoryList = computed(() => {
     return []
   }
 
-  return withSelfParticipantMatchHistory(props.matchHistory, props.id)
+  return withSelfParticipantMatchHistory(props.matchHistory, props.summonerId)
 })
 
 const { list, containerProps, wrapperProps } = useVirtualList(matchHistoryList, {
@@ -409,6 +418,11 @@ const analysis = computed(() => getAnalysis(matchHistoryList.value))
       background-color: rgb(67, 119, 116);
     }
 
+    .tag.tagged {
+      cursor: pointer;
+      background-color: rgb(100, 67, 119);
+    }
+
     .tag.self {
       background-color: rgb(67, 70, 119);
     }
@@ -427,7 +441,7 @@ const analysis = computed(() => getAnalysis(matchHistoryList.value))
   }
 }
 
-.encountered-text {
+.small-text {
   font-size: 12px;
 }
 

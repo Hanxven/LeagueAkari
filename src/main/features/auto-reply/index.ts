@@ -1,4 +1,4 @@
-import { lcuEventEmitter } from '@main/core/lcu-connection'
+import { lcuEventBus } from '@main/core/lcu-connection'
 import { createLogger } from '@main/core/log'
 import { mwNotification } from '@main/core/main-window'
 import { chatSend } from '@main/http-api/chat'
@@ -19,7 +19,7 @@ export async function setupAutoReply() {
   ipcCall()
   await loadSettings()
 
-  lcuEventEmitter.on<LcuEvent<ChatMessage>>(
+  lcuEventBus.on<LcuEvent<ChatMessage>>(
     '/lol-chat/v1/conversations/:fromId/messages/:messageId',
     async (event, { fromId }) => {
       if (

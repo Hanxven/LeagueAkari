@@ -1,4 +1,4 @@
-import { lcuEventEmitter } from '@main/core/lcu-connection'
+import { lcuEventBus } from '@main/core/lcu-connection'
 import { createLogger } from '@main/core/log'
 import { mwNotification } from '@main/core/main-window'
 import { action, benchSwap, pickOrBan } from '@main/http-api/champ-select'
@@ -212,7 +212,7 @@ export async function setupAutoSelect() {
     }
   )
 
-  lcuEventEmitter.on<LcuEvent<ChampSelectSummoner>>(
+  lcuEventBus.on<LcuEvent<ChampSelectSummoner>>(
     '/lol-champ-select/v1/summoners/*',
     async (event) => {
       if (event.eventType === 'Delete') {

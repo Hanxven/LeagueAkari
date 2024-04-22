@@ -23,7 +23,7 @@ export async function setupDebug() {
   // @ts-ignore
   window.mainCall = mainCall
 
-  watch([() => debug.settings.printAllLcuEvents, () => debug.settings.printRules], ([a, r]) => {
+  watch([() => debug.settings.printAllLcuEvents, debug.settings.printRules], ([a, r]) => {
     if (a || Object.values(r).some((r) => r.enabled)) {
       mainCall('debug/settings/send-all-native-lcu-events/set', true)
     } else {
@@ -31,7 +31,7 @@ export async function setupDebug() {
     }
   })
 
-  onMainEvent('event:debug/native-lcu-event', (_, data) => {
+  onMainEvent('debug/native-lcu-event', (_, data) => {
     matcher.emit(data.uri, data)
   })
 
