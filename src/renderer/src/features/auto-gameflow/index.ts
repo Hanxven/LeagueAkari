@@ -18,9 +18,9 @@ export async function setupAutoGameflow() {
     (s) => (autoGameflow.settings.playAgainEnabled = s)
   )
 
-  mainStateSync('auto-gameflow/will-auto-accept', (s) => (autoGameflow.willAutoAccept = s))
+  mainStateSync('auto-gameflow/will-accept', (s) => (autoGameflow.willAccept = s))
 
-  mainStateSync('auto-gameflow/will-auto-accept-at', (s) => (autoGameflow.willAutoAcceptAt = s))
+  mainStateSync('auto-gameflow/will-accept-at', (s) => (autoGameflow.willAcceptAt = s))
 
   mainStateSync(
     'auto-gameflow/settings/auto-accept-enabled',
@@ -31,9 +31,23 @@ export async function setupAutoGameflow() {
     'auto-gameflow/settings/auto-accept-delay-seconds',
     (s) => (autoGameflow.settings.autoAcceptDelaySeconds = s)
   )
+
+  mainStateSync('auto-gameflow/will-search-match', (s) => (autoGameflow.willSearchMatch = s))
+
+  mainStateSync('auto-gameflow/will-search-match-at', (s) => (autoGameflow.willSearchMatchAt = s))
+
+  mainStateSync(
+    'auto-gameflow/settings/auto-search-match-enabled',
+    (s) => (autoGameflow.settings.autoSearchMatchEnabled = s)
+  )
+
+  mainStateSync(
+    'auto-gameflow/settings/auto-search-match-delay-seconds',
+    (s) => (autoGameflow.settings.autoSearchMatchDelaySeconds = s)
+  )
 }
 
-export function setEnableAutoHonor(enabled: boolean) {
+export function setAutoHonorEnabled(enabled: boolean) {
   return mainCall('auto-gameflow/settings/auto-honor-enabled/set', enabled)
 }
 
@@ -45,7 +59,7 @@ export function setPlayAgainEnabled(enabled: boolean) {
   return mainCall('auto-gameflow/settings/play-again-enabled/set', enabled)
 }
 
-export function setEnableAutoAccept(enabled: boolean) {
+export function setAutoAcceptEnabled(enabled: boolean) {
   return mainCall('auto-gameflow/settings/auto-accept-enabled/set', enabled)
 }
 
@@ -55,4 +69,16 @@ export async function cancelAutoAccept() {
 
 export async function setAutoAcceptDelaySeconds(seconds: number) {
   return mainCall('auto-gameflow/settings/auto-accept-delay-seconds/set', seconds)
+}
+
+export async function setAutoSearchMatchEnabled(enabled: boolean) {
+  return mainCall('auto-gameflow/settings/auto-search-match-enabled/set', enabled)
+}
+
+export async function setAutoSearchMatchDelaySeconds(seconds: number) {
+  return mainCall('auto-gameflow/settings/auto-search-match-delay-seconds/set', seconds)
+}
+
+export async function cancelAutoSearchMatch() {
+  return mainCall('auto-gameflow/cancel-auto-search-match')
 }

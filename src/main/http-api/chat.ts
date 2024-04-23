@@ -1,4 +1,4 @@
-import { ChatMessage, ChatPerson, Friend } from '@shared/types/lcu/chat'
+import { ChatMessage, ChatPerson, Conversation, Friend } from '@shared/types/lcu/chat'
 
 import { request } from './common'
 
@@ -15,6 +15,20 @@ export function getMe() {
   return request<ChatPerson>({
     method: 'GET',
     url: '/lol-chat/v1/me'
+  })
+}
+
+export function getConversations() {
+  return request<Conversation[]>({
+    method: 'GET',
+    url: '/lol-chat/v1/conversations'
+  })
+}
+
+export function getParticipants(id: string) {
+  return request<ChatPerson[]>({
+    method: 'GET',
+    url: `/lol-chat/v1/conversations/${id}/participants`
   })
 }
 

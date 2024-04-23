@@ -11,7 +11,7 @@ import { ChampSelectSession } from '@shared/types/lcu/champ-select'
 import { LcuEvent } from '@shared/types/lcu/event'
 import { formatError } from '@shared/utils/errors'
 import { AxiosError } from 'axios'
-import { reaction } from 'mobx'
+import { comparer, reaction } from 'mobx'
 import { makeAutoObservable, observable } from 'mobx'
 
 import { logger } from './common'
@@ -114,7 +114,8 @@ export function champSelectSync() {
           }
         }
       }
-    }
+    },
+    { equals: comparer.shallow }
   )
 
   lcuEventBus.on('/lol-champ-select/v1/session', (event) => {

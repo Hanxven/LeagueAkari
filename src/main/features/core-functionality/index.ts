@@ -51,7 +51,7 @@ export async function setupCoreFunctionality() {
         }
       } catch (error) {
         mwNotification.warn('core-functionality', '对局中', '无法加载对局中信息')
-        logger.warn(`Ongoing failed to fetch information:  ${formatError(error)}, in ${state}`)
+        logger.warn(`加载对局中信息时发生错误:  ${formatError(error)}, in ${state}`)
       }
     }
   )
@@ -120,14 +120,14 @@ export async function setupCoreFunctionality() {
 
           const r = await Promise.allSettled([task1, task2])
           if (r[0].status === 'fulfilled') {
-            logger.info(`Saved player: ${r[0].value.summonerId}`)
+            logger.info(`保存玩家信息: ${r[0].value.summonerId}`)
           } else {
-            logger.info(`Failed to save player: ${formatError(r[0].reason)}`)
+            logger.info(`无法保存玩家信息: ${formatError(r[0].reason)}`)
           }
           if (r[1].status === 'fulfilled') {
-            logger.info(`Saved gameId record: ${r[1].value.summonerId} ${r[1].value.gameId}`)
+            logger.info(`保存游戏历史记录: ${r[1].value.summonerId} ${r[1].value.gameId}`)
           } else {
-            logger.info(`Failed to save gameId record: ${formatError(r[1].reason)}`)
+            logger.info(`无法保存游戏历史记录: ${formatError(r[1].reason)}`)
           }
         })
 
@@ -144,7 +144,7 @@ export async function setupCoreFunctionality() {
     sendPlayerStatsInGame('their')
   })
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }
 
 /**
@@ -307,7 +307,7 @@ async function loadPlayerStats(summonerId: number) {
           )
         } catch (error) {
           logger.warn(
-            `Ongoing error on loading game of gameId: ${game.game.gameId} ${formatError(error)}`
+            `无法加载对局, ID: ${game.game.gameId} ${formatError(error)}`
           )
           // throw error // it will not cause an error
         }
@@ -437,7 +437,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
 
   if (!summoner.me || !cf.ongoingTeams || !cf.ongoingChampionSelections) {
     logger.warn(
-      `Insufficient information: ${summoner.me} ${cf.ongoingTeams} ${cf.ongoingChampionSelections}`
+      `信息不足: ${summoner.me} ${cf.ongoingTeams} ${cf.ongoingChampionSelections}`
     )
     isSimulatingKeyboard = false
     return

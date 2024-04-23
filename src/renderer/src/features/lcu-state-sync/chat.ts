@@ -12,7 +12,7 @@ export interface Participants {
   postGame: number[] | null
 }
 
-export const useChatStore = defineStore('chat', () => {
+export const useChatStore = defineStore('lcu:chat', () => {
   const conversations = shallowReactive<Conversations>({
     championSelect: null,
     postGame: null

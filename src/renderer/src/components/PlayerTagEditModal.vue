@@ -78,8 +78,10 @@ watch([() => show.value, () => props.summonerId], async ([sh, id]) => {
         rsoPlatformId: app.lcuAuth.rsoPlatformId
       })
 
-      savedInfo.value = p
-      text.value = p.tag
+      if (p) {
+        savedInfo.value = p
+        text.value = p.tag
+      }
     } catch (error) {
       laNotification.warn('无法加载', `无法加载召唤师 ${id}`, error)
     }

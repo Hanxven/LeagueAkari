@@ -311,6 +311,7 @@ export async function fetchTabMatchHistory(
 ) {
   const cf = useCoreFunctionalityStore()
   const tab = cf.getTab(summonerId)
+  const app = useAppStore()
 
   if (tab && tab.data.summoner) {
     if (tab.data.loading.isLoadingMatchHistory) {
@@ -391,7 +392,7 @@ export async function fetchTabMatchHistory(
       ) {
         laNotification.warn(
           '加载失败',
-          `拉取战绩失败，服务器异常。远程服务器返回内部错误 ${(error as LcuHttpError)?.response?.status}`,
+          `拉取战绩失败，服务器异常。远程服务器返回内部错误 ${(error as LcuHttpError)?.response?.status}${app.lcuAuth?.rsoPlatformId === 'HN1' ? '，特别注意，艾欧尼亚服务器在晚间无法访问战绩接口' : ''}`,
           error
         )
       } else {

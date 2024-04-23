@@ -145,12 +145,12 @@ export async function setupAutoSelect() {
           if (a) {
             if (!a.isInProgress && !a.completed) {
               try {
-                logger.info('Trying to show champion picking intent')
+                logger.info('尝试预选')
 
                 await action(a.id, { championId: id })
               } catch (error) {
                 mwNotification.warn('auto-select', '自动选择', `无法执行 action (预选英雄 ${id})`)
-                logger.warn(`Something wrong when doing action ${formatError(error)}`)
+                logger.warn(`在执行 action 时出现问题 ${formatError(error)}`)
               }
             }
             break
@@ -256,17 +256,17 @@ export async function setupAutoSelect() {
         return
       }
 
-      logger.info(`Now active action: ${s.actionType} ${JSON.stringify(s.actions)} ${s.cellId}`)
+      logger.info(`当前的活跃 action: ${s.actionType} ${JSON.stringify(s.actions)} ${s.cellId}`)
 
       if (!summoner.me) {
-        logger.warn('Summoner information is not loaded')
+        logger.warn('召唤师信息没有正确加载')
         return
       }
 
       if (s.actionType === 'pick') {
         if (!currentPickActionChampion.get()) {
           if (chat.conversations.championSelect && autoSelectState.settings.normalModeEnabled) {
-            logger.info('No pickable champion now')
+            logger.info('没有可选的英雄')
 
             chatSend(
               chat.conversations.championSelect.id,
@@ -280,7 +280,7 @@ export async function setupAutoSelect() {
         const firstPickAction = s.actions.find((a) => a.type === 'pick')
 
         if (!firstPickAction) {
-          logger.info('No pick action now')
+          logger.info('没有可执行的 action')
           return
         }
 
@@ -298,7 +298,7 @@ export async function setupAutoSelect() {
             `无法执行 action (选择英雄 ${currentPickActionChampion.get()})`
           )
           logger.warn(
-            `Failed to do 'pick' a=${firstPickAction.id} c=${currentPickActionChampion.get()}`
+            `无法执行 'pick' action: a=${firstPickAction.id} c=${currentPickActionChampion.get()}`
           )
         }
       } else if (s.actionType === 'ban') {
@@ -307,12 +307,12 @@ export async function setupAutoSelect() {
         }
 
         if (!cs.session) {
-          logger.warn('No champ select session loaded')
+          logger.warn('没有 ChampSelect session')
 
           return
         }
 
-        logger.info(`Now active action: ${s.actionType} ${JSON.stringify(s.actions)} ${s.cellId}`)
+        logger.info(`当前的活跃 action: ${s.actionType} ${JSON.stringify(s.actions)} ${s.cellId}`)
 
         const firstBanAction = s.actions.find((a) => a.type === 'ban')
 
@@ -351,7 +351,7 @@ export async function setupAutoSelect() {
         )
 
         if (bannableChampions.length === 0) {
-          logger.info('No bannable champion now')
+          logger.info('没有可供禁用的英雄')
 
           if (chat.conversations.championSelect) {
             chatSend(
@@ -371,7 +371,7 @@ export async function setupAutoSelect() {
           await pickOrBan(candidate, true, 'ban', firstBanAction.id)
         } catch (error) {
           mwNotification.warn('auto-select', '自动选择', `无法执行 action (禁用英雄 ${candidate})`)
-          logger.warn(`Failed to do 'ban' a=${firstBanAction.id} c=${candidate}`)
+          logger.warn(`无法执行 'ban' action: a=${firstBanAction.id} c=${candidate}`)
         }
       }
     }
@@ -406,14 +406,24 @@ export async function setupAutoSelect() {
       await benchSwap(targetingChampion!)
     } catch (error) {
       mwNotification.warn('auto-select', '自动选择', `交换英雄失败`)
-      logger.warn('Something wrong on swapping champion')
+      logger.warn(`在尝试交换英雄是发生错误 ${formatError(error)}`)
     } finally {
       targetingChampion = null
     }
   }
 
+  const simplifiedCsSession = computed(() => {
+    if (!cs.session) {
+      return null
+    }
+
+    const { benchEnabled, localPlayerCellId, benchChampions, myTeam } = cs.session
+
+    return { benchEnabled, localPlayerCellId, benchChampions, myTeam }
+  })
+
   reaction(
-    () => [cs.session, autoSelectState.settings.benchExpectedChampions] as const,
+    () => [simplifiedCsSession.get(), autoSelectState.settings.benchExpectedChampions] as const,
     ([s, e], [ps]) => {
       if (!s) {
         if (ps) {
@@ -440,7 +450,7 @@ export async function setupAutoSelect() {
         if (e.includes(targetingChampion) && benchChampions.has(targetingChampion)) {
           return
         } else {
-          logger.info(`Canceling swap champion ${targetingChampion}`)
+          logger.info(`取消了即将进行的英雄交换, 目标: ${targetingChampion}`)
 
           notifyInChat('cancel', targetingChampion)
           if (grabTimer) {
@@ -472,7 +482,7 @@ export async function setupAutoSelect() {
             0
           )
 
-          logger.info(`Targeting champion ${c}`)
+          logger.info(`目标交换英雄: ${c}`)
 
           targetingChampion = c
           notifyInChat('select', targetingChampion, waitTime)
@@ -480,10 +490,11 @@ export async function setupAutoSelect() {
           break
         }
       }
-    }
+    },
+    { equals: comparer.structural }
   )
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }
 
 async function notifyInChat(type: 'cancel' | 'select', championId: number, time = 0) {

@@ -1,3 +1,5 @@
+import { LoginQueueState } from '@shared/types/lcu/login'
+
 import { request } from './common'
 
 export function dodge() {
@@ -10,5 +12,12 @@ export function dodge() {
       method: 'call',
       args: '["", "teambuilder-draft", "quitV2", ""]'
     }
+  })
+}
+
+export function getLoginQueueState() {
+  return request<LoginQueueState>({
+    url: '/lol-login/v1/login-queue-state',
+    method: 'GET'
   })
 }

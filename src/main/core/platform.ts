@@ -113,7 +113,7 @@ export function initWindowsPlatform() {
     gkl.kill()
   })
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }
 
 export function pSendKey(key: number, pressed: boolean) {

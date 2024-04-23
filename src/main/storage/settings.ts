@@ -7,7 +7,7 @@ export async function getSetting<T = any>(key: string, defaultValue: T) {
     if (defaultValue !== undefined) {
       return defaultValue
     }
-    throw new Error(`cannot find setting of value ${key}`)
+    throw new Error(`cannot find setting of key ${key}`)
   }
 
   return v.value as T

@@ -8,7 +8,7 @@
     >
       <NSwitch
         :value="autoGameflow.settings.autoAcceptEnabled"
-        @update:value="(val) => setEnableAutoAccept(val)"
+        @update:value="(val) => setAutoAcceptEnabled(val)"
         size="small"
       />
     </ControlItem>
@@ -35,7 +35,7 @@
     >
       <NSwitch
         :value="autoGameflow.settings.autoHonorEnabled"
-        @update:value="(val) => setEnableAutoHonor(val)"
+        @update:value="(val) => setAutoHonorEnabled(val)"
         size="small"
       />
     </ControlItem>
@@ -70,6 +70,33 @@
         size="small"
       />
     </ControlItem>
+    <div class="divider"></div>
+    <ControlItem
+      class="control-item-margin"
+      label="自动匹配对局"
+      label-description="在可匹配对局时，将自动开始匹配对局"
+    >
+      <NSwitch
+        :value="autoGameflow.settings.autoSearchMatchEnabled"
+        @update:value="(val) => setAutoSearchMatchEnabled(val)"
+        size="small"
+      />
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="匹配前等待时间 (s)"
+      label-description="在可匹配对局时，预留的等待时间，单位为秒"
+    >
+      <NInputNumber
+        style="width: 80px"
+        :value="autoGameflow.settings.autoSearchMatchDelaySeconds"
+        @update:value="(value) => setAutoSearchMatchDelaySeconds(value || 0)"
+        placeholder="秒"
+        :min="0"
+        :max="20"
+        size="tiny"
+      />
+    </ControlItem>
   </NCard>
 </template>
 
@@ -79,9 +106,11 @@ import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NSwitch } from 'naive-
 import ControlItem from '@renderer/components/ControlItem.vue'
 import {
   setAutoAcceptDelaySeconds,
+  setAutoAcceptEnabled,
+  setAutoHonorEnabled,
   setAutoHonorStrategy,
-  setEnableAutoAccept,
-  setEnableAutoHonor,
+  setAutoSearchMatchDelaySeconds,
+  setAutoSearchMatchEnabled,
   setPlayAgainEnabled
 } from '@renderer/features/auto-gameflow'
 import { useAutoGameflowStore } from '@renderer/features/auto-gameflow/store'

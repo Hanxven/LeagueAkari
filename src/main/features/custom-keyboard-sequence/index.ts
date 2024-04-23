@@ -26,7 +26,7 @@ export async function setupCustomKeyboardSequence() {
     }
   })
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }
 
 async function sendCustomSequence() {

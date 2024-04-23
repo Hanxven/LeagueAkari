@@ -1,6 +1,6 @@
 import { lcuConnectionState, lcuEventBus } from '@main/core/lcu-connection'
 import { mwNotification } from '@main/core/main-window'
-import { getMe } from '@main/http-api/chat'
+import { getConversations, getMe, getParticipants } from '@main/http-api/chat'
 import { ipcStateSync } from '@main/utils/ipc'
 import { ChatPerson, Conversation } from '@shared/types/lcu/chat'
 import { formatError } from '@shared/utils/errors'
@@ -188,6 +188,35 @@ export function chatSync() {
         } catch (error) {
           mwNotification.warn('lcu-state-sync', '状态同步', '获取聊天状态失败')
           logger.warn(`获取聊天状态失败 ${formatError(error)}`)
+        }
+      }
+    }
+  )
+
+  reaction(
+    () => lcuConnectionState.state,
+    async (state) => {
+      if (state === 'connected') {
+        try {
+          const cvs = (await getConversations()).data
+
+          for (const c of cvs) {
+            switch (c.type) {
+              case 'championSelect':
+                chat.setConversationChampSelect(c)
+                const ids1 = (await getParticipants(c.id)).data.map((cc) => cc.summonerId)
+                runInAction(() => chat.setParticipantsChampSelect(ids1))
+                break
+              case 'postGame':
+                chat.setConversationPostGame(c)
+                const ids2 = (await getParticipants(c.id)).data.map((cc) => cc.summonerId)
+                runInAction(() => chat.setParticipantsPostGame(ids2))
+                break
+            }
+          }
+        } catch (error) {
+          mwNotification.warn('lcu-state-sync', '状态同步', '获取现有对话失败')
+          logger.warn(`无法获取当前的对话 ${formatError(error)}`)
         }
       }
     }

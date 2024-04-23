@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { reactive, ref } from 'vue'
+import { VNode, reactive, ref } from 'vue'
 
 interface NewUpdates {
   currentVersion: string
@@ -18,6 +18,15 @@ export interface LcuAuth {
   certificate: string
   rsoPlatformId: string
   region: string
+}
+
+export interface TitleBarTask {
+  id: string // module id
+  progress?: number // from 0 ~ 1
+  foregroundColor?: string
+  backgroundColor?: string
+  text?: string | (() => VNode)
+  icon?: () => VNode
 }
 
 export const useAppStore = defineStore('core:app', () => {
@@ -44,6 +53,8 @@ export const useAppStore = defineStore('core:app', () => {
     }
   })
 
+  const titleBarTasks = ref<TitleBarTask[]>([])
+
   return {
     windowState,
     isAdministrator,
@@ -52,6 +63,7 @@ export const useAppStore = defineStore('core:app', () => {
     updates,
     settings,
     lcuAuth,
-    lcuConnectionState
+    lcuConnectionState,
+    titleBarTasks
   }
 })

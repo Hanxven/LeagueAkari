@@ -6,6 +6,7 @@ import { useChatStore } from './chat'
 import { useGameDataStore } from './game-data'
 import { useGameflowStore } from './gameflow'
 import { useLobbyStore } from './lobby'
+import { useLoginStore } from './login'
 import { useSummonerStore } from './summoner'
 
 // 处理 App 和 LCU 的状态更新
@@ -23,6 +24,8 @@ export async function setupStateUpdater() {
   champSelectSync()
 
   gameDataSync()
+
+  loginSync()
 }
 
 function lcuConnectionStateSync() {
@@ -89,4 +92,10 @@ function gameDataSync() {
   mainStateSync('lcu/game-data/perkstyles', (s) => (gameData.perkstyles = s))
   mainStateSync('lcu/game-data/queues', (s) => (gameData.queues = s))
   mainStateSync('lcu/game-data/summoner-spells', (s) => (gameData.summonerSpells = s))
+}
+
+function loginSync() {
+  const login = useLoginStore()
+
+  mainStateSync('lcu/login/login-queue-state', (s) => (login.loginQueueState = s))
 }

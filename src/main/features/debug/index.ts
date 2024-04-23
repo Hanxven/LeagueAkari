@@ -22,9 +22,9 @@ function stateSync() {
 function ipcCall() {
   onRendererCall('debug/settings/send-all-native-lcu-events/set', async (_, enabled) => {
     if (enabled) {
-      logger.info('Now all lcu events will be sent to the main window')
+      logger.info('发送所有 LCU 事件到 Main Window')
     } else {
-      logger.info('Lcu events sending is canceled')
+      logger.info('取消发送所有 LCU 事件到 Main Window')
     }
 
     debugState.settings.setSendAllNativeLcuEvents(enabled)
@@ -41,5 +41,5 @@ function ipcCall() {
     }
   })
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }

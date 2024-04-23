@@ -4,7 +4,7 @@ import { RadixEventEmitter } from '@shared/event-emitter'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosInstance, isAxiosError } from 'axios'
 import https from 'https'
-import { makeAutoObservable, observable, reaction } from 'mobx'
+import { comparer, makeAutoObservable, observable, reaction } from 'mobx'
 import { WebSocket } from 'ws'
 
 import { getRandomAvailableLoopbackAddrWithPort } from '../utils/loopback'
@@ -77,7 +77,7 @@ async function initHttpInstance(auth: LcuAuth) {
     await lcuHttpRequest.get(PING_URL)
   } catch (error) {
     if (isAxiosError(error) && (!error.response || (error.status && error.status >= 500))) {
-      logger.warn(`LCU client http PING: ${formatError(error)}`)
+      logger.warn(`无法执行 PING 操作: ${formatError(error)}`)
 
       throw new Error('http initialization PING failed')
     }
@@ -126,7 +126,7 @@ async function connectToLcu(auth1: LcuAuth) {
     await new Promise<void>((resolve, reject) => {
       timeoutTimer = setTimeout(() => {
         ws.close()
-        logger.warn(`LCU connecting TIMEOUT, exceeded ${INTERVAL_TIMEOUT} ms`)
+        logger.warn(`LCU 连接超时, 最大限时 ${INTERVAL_TIMEOUT} ms`)
         reject(new Error('timeout trying to connect to LCU Websocket'))
       }, INTERVAL_TIMEOUT)
 
@@ -146,7 +146,7 @@ async function connectToLcu(auth1: LcuAuth) {
 
       ws.on('error', (error) => {
         lcuConnectionState.setDisconnected()
-        logger.warn(`An error occurred during connection to LCU Websocket: ${formatError(error)}`)
+        logger.warn(`LCU WebSocket 发生错误: ${formatError(error)}`)
         clearTimeout(timeoutTimer)
         reject(new Error('disconnected'))
       })
@@ -168,7 +168,7 @@ async function connectToLcu(auth1: LcuAuth) {
       }
     })
   } catch (error) {
-    logger.warn(`LCU client connection: ${formatError(error)}`)
+    logger.warn(`LCU 连接错误: ${formatError(error)}`)
 
     lcuConnectionState.setDisconnected()
     throw error
@@ -182,8 +182,9 @@ export async function initLcuConnection() {
   reaction(
     () => [lcuConnectionState.auth, lcuConnectionState.state] as const,
     ([a, s]) => {
-      logger.info(`LCU state changed: ${s} ${JSON.stringify(a)}`)
-    }
+      logger.info(`LCU 状态发生变化: ${s} ${JSON.stringify(a)}`)
+    },
+    { equals: comparer.shallow }
   )
 
   onRendererCall('lcu-connection/connect', async (_, auth1: LcuAuth) => {
@@ -225,7 +226,7 @@ export async function initLcuConnection() {
         }
       }
 
-      logger.warn(`LCU client http: ${formatError(error)}`)
+      logger.warn(`LCU HTTP 客户端错误: ${formatError(error)}`)
 
       throw error
     }
@@ -248,11 +249,11 @@ export async function initLcuConnection() {
         }
       }
 
-      logger.warn(`Game client http: ${formatError(error)}`)
+      logger.warn(`游戏客户端错误 Game Client: ${formatError(error)}`)
 
       throw error
     }
   })
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }

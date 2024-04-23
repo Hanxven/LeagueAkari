@@ -5,13 +5,51 @@
         <NIcon class="icon"><SettingsIcon /></NIcon>
         <span class="text">设置</span>
       </div>
-      <div v-if="respawnTimer.isDead" class="title-bar-item display relative" title="距离重生时间">
+      <div
+        v-if="respawnTimer.isDead"
+        class="title-bar-item task-item respawn-timer relative"
+        title="距离重生时间"
+      >
         <div
           class="progress-mask"
           :style="{ width: `${100 - (respawnTimer.timeLeft / respawnTimer.totalTime) * 100}%` }"
         ></div>
         <NIcon class="icon"><HourglassIcon /></NIcon>
         <span class="text">距离重生 {{ respawnTimer.timeLeft.toFixed() }} s</span>
+      </div>
+      <div
+        v-if="autoGameflow.willAccept"
+        class="title-bar-item auto-gameflow-accept task-item relative"
+        title="即将开启自动接受对局"
+      >
+        <NIcon class="icon"><TimeIcon /></NIcon>
+        <span class="text">接受对局 {{ willAcceptIn.toFixed(1) }} s</span>
+      </div>
+      <div
+        v-if="autoGameflow.willSearchMatch"
+        class="title-bar-item auto-gameflow-search-match task-item relative"
+        title="即将开启自动匹配"
+      >
+        <NIcon class="icon"><TimeIcon /></NIcon>
+        <span class="text">开启匹配 {{ willSearchMatchIn.toFixed(1) }} s</span>
+      </div>
+      <div
+        v-if="login.loginQueueState"
+        class="title-bar-item in-login-queue task-item relative"
+        :title="`等待排队登录中 (${login.loginQueueState.approximateWaitTimeSeconds} / ${login.loginQueueState.maxDisplayedWaitTimeSeconds} s, ${login.loginQueueState.estimatedPositionInQueue} / ${login.loginQueueState.maxDisplayedPosition})`"
+      >
+        <NIcon class="icon"><QueuedIcon /></NIcon>
+        <span class="text" style="display: flex; gap: 6px; align-items: center"
+          >排队
+          <div>
+            <div style="font-size: 9px; line-height: 11px">
+              预计 {{ login.loginQueueState.approximateWaitTimeSeconds }} s
+            </div>
+            <div style="font-size: 9px; line-height: 11px">
+              位置 {{ login.loginQueueState.estimatedPositionInQueue }}
+            </div>
+          </div></span
+        >
       </div>
     </div>
     <div class="title">League Akari</div>
@@ -39,17 +77,69 @@ import {
   Hourglass as HourglassIcon,
   Maximize as MaximizeIcon,
   Minimize as MinimizeIcon,
-  Settings as SettingsIcon
+  Queued as QueuedIcon,
+  Settings as SettingsIcon,
+  Time as TimeIcon
 } from '@vicons/carbon'
 import { Close as CloseIcon } from '@vicons/ionicons5'
+import { useIntervalFn } from '@vueuse/core'
 import { NIcon } from 'naive-ui'
+import { ref, watch } from 'vue'
 
 import { useAppStore } from '@renderer/features/app/store'
+import { useAutoGameflowStore } from '@renderer/features/auto-gameflow/store'
+import { useLoginStore } from '@renderer/features/lcu-state-sync/login'
 import { useRespawnTimerStore } from '@renderer/features/respawn-timer/store'
 import { mainCall } from '@renderer/utils/ipc'
 
 const app = useAppStore()
 const respawnTimer = useRespawnTimerStore()
+const autoGameflow = useAutoGameflowStore()
+const login = useLoginStore()
+
+const willAcceptIn = ref(0)
+const { pause: pauseAC, resume: resumeAC } = useIntervalFn(
+  () => {
+    const s = (autoGameflow.willAcceptAt - Date.now()) / 1e3
+    willAcceptIn.value = Math.min(s, 0)
+  },
+  100,
+  { immediate: false, immediateCallback: true }
+)
+
+watch(
+  () => autoGameflow.willAccept,
+  (ok) => {
+    if (ok) {
+      resumeAC()
+    } else {
+      pauseAC()
+    }
+  },
+  { immediate: true }
+)
+
+const willSearchMatchIn = ref(0)
+const { pause: pauseSM, resume: resumeSM } = useIntervalFn(
+  () => {
+    const s = (autoGameflow.willSearchMatchAt - Date.now()) / 1e3
+    willSearchMatchIn.value = Math.min(s, 0)
+  },
+  100,
+  { immediate: false, immediateCallback: true }
+)
+
+watch(
+  () => autoGameflow.willSearchMatch,
+  (ok) => {
+    if (ok) {
+      resumeSM()
+    } else {
+      pauseSM()
+    }
+  },
+  { immediate: true }
+)
 
 const handleMinimize = async () => {
   await mainCall('main-window/minimize')
@@ -119,9 +209,24 @@ const emits = defineEmits<{
     }
   }
 
-  .display {
-    padding: 0 8px;
+  .respawn-timer {
     background-color: rgb(15, 71, 21);
+  }
+
+  .auto-gameflow-accept {
+    background-color: rgb(15, 52, 71);
+  }
+
+  .auto-gameflow-search-match {
+    background-color: rgb(67, 15, 71);
+  }
+
+  .in-login-queue {
+    background-color: rgb(31, 39, 69);
+  }
+
+  .task-item {
+    padding: 0 8px;
     z-index: 2;
   }
 

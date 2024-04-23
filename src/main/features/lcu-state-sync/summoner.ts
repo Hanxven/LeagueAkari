@@ -4,12 +4,13 @@ import { getCurrentSummoner } from '@main/http-api/summoner'
 import { ipcStateSync } from '@main/utils/ipc'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { formatError } from '@shared/utils/errors'
-import { reaction } from 'mobx'
+import { comparer, reaction } from 'mobx'
 import { makeAutoObservable, observable } from 'mobx'
 
 import { logger } from './common'
+import { login } from './login'
 
-const MAX_RETRIES = 10
+const MAX_RETRIES = 114514
 
 class SummonerState {
   /**
@@ -69,11 +70,11 @@ export function summonerSync() {
   }
 
   reaction(
-    () => lcuConnectionState.state,
-    (state) => {
-      if (state === 'connected') {
+    () => [lcuConnectionState.state, login.loginQueueState] as const,
+    ([state, queue]) => {
+      if (state === 'connected' && !queue) {
         retryFetching()
-      } else if (state === 'disconnected') {
+      } else if (state === 'disconnected' || queue) {
         if (timerId) {
           clearTimeout(timerId)
           timerId = null
@@ -82,7 +83,7 @@ export function summonerSync() {
         retryCount = 0
       }
     },
-    { fireImmediately: true }
+    { equals: comparer.structural, fireImmediately: true }
   )
 
   lcuEventBus.on('/lol-summoner/v1/current-summoner', (event) => {

@@ -15,7 +15,8 @@ class AutoGameflowSettings {
   autoAcceptEnabled: boolean = false
   autoAcceptDelaySeconds: number = 0
 
-  autoSearchMatchEnabled: boolean
+  autoSearchMatchEnabled: boolean = false
+  autoSearchMatchDelaySeconds: number = 5
 
   setAutoHonorEnabled(enabled: boolean) {
     this.autoHonorEnabled = enabled
@@ -37,6 +38,14 @@ class AutoGameflowSettings {
     this.autoAcceptDelaySeconds = seconds
   }
 
+  setAutoSearchMatchEnabled(enabled: boolean) {
+    this.autoSearchMatchEnabled = enabled
+  }
+
+  setAutoSearchMatchDelaySeconds(seconds: number) {
+    this.autoSearchMatchDelaySeconds = seconds
+  }
+
   constructor() {
     makeAutoObservable(this)
   }
@@ -48,26 +57,38 @@ class AutoGameflowState {
   /**
    * 即将进行自动接受操作
    */
-  willAutoAccept = false
+  willAccept: boolean = false
 
   /**
    * 即将进行的自动接受操作将在指定时间戳完成
    */
-  willAutoAcceptAt = -1
+  willAcceptAt: number = -1
+
+  willSearchMatch: boolean = false
 
   /**
    * 即将进行的匹配开始的时间
    */
-  willSearchMatchAt = -1
+  willSearchMatchAt: number = -1
 
-  setAutoAcceptAt(at: number) {
-    this.willAutoAccept = true
-    this.willAutoAcceptAt = at
+  setAcceptAt(at: number) {
+    this.willAccept = true
+    this.willAcceptAt = at
+  }
+
+  setSearchMatchAt(at: number) {
+    this.willSearchMatch = true
+    this.willSearchMatchAt = at
   }
 
   clearAutoAccept() {
-    this.willAutoAccept = false
-    this.willAutoAcceptAt = -1
+    this.willAccept = false
+    this.willAcceptAt = -1
+  }
+
+  clearAutoSearchMatch() {
+    this.willSearchMatch = false
+    this.willSearchMatchAt = -1
   }
 
   constructor() {

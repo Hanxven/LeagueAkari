@@ -470,6 +470,6 @@ table {
 .divider {
   background-color: rgb(76, 76, 76);
   height: 1px;
-  margin: 12px 0px;
+  margin: 4px 0px;
 }
 </style>

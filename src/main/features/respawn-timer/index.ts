@@ -24,7 +24,7 @@ export async function setupRespawnTimer() {
 
   const queryRespawnTime = async () => {
     if (!summoner.me) {
-      logger.warn('Summoner information is not set')
+      logger.warn('召唤师信息未正确加载')
       return
     }
 
@@ -61,7 +61,7 @@ export async function setupRespawnTimer() {
       return
     }
 
-    logger.info('Poll started')
+    logger.info('轮询开始')
 
     isStarted = true
     queryRespawnTime()
@@ -73,7 +73,7 @@ export async function setupRespawnTimer() {
       return
     }
 
-    logger.info('Poll stopped')
+    logger.info('轮询结束')
 
     isStarted = false
     clearInterval(timer)
@@ -101,7 +101,7 @@ export async function setupRespawnTimer() {
     }
   )
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }
 
 async function loadSettings() {

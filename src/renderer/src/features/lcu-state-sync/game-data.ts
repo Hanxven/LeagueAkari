@@ -10,7 +10,7 @@ import {
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 
-export const useGameDataStore = defineStore('game-data', () => {
+export const useGameDataStore = defineStore('lcu:game-data', () => {
   const summonerSpells = shallowRef<Record<number, SummonerSpell>>({})
   const items = shallowRef<Record<number | string, Item>>({})
   const queues = shallowRef<Record<number | string, Queue>>({})

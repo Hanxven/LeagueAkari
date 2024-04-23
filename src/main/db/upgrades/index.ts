@@ -20,10 +20,10 @@ export async function performUpgrades(r: QueryRunner, currentVersion: number) {
     .filter(([v]) => Number(v) > currentVersion)
     .toSorted(([v1], [v2]) => Number(v1) - Number(v2))
 
-  logger.info(`Pending upgrades count: ${pendingUpgrades.length}`)
+  logger.info(`即将进行的数据库升级数量: ${pendingUpgrades.length}`)
 
   for (const [v, fn] of pendingUpgrades) {
-    logger.info(`now performing version ${v} migration`)
+    logger.info(`正在执行版本 ${v} 的迁移`)
     await fn(r)
   }
 }
@@ -35,27 +35,27 @@ export async function checkAndInitializeDatabase(dataSource: DataSource) {
     return
   }
 
-  logger.info(`Database path is ${dbPath}`)
+  logger.info(`数据库位于 ${dbPath}`)
 
   const { needToRecreateDatabase, needToPerformUpgrade, currentVersion } =
     await checkDatabaseVersion(dataSource)
 
-  logger.info(`Current version ${currentVersion}`)
+  logger.info(`当前版本 ${currentVersion}`)
 
   let cv = currentVersion
 
   if (!needToPerformUpgrade && !needToPerformUpgrade) {
-    logger.info(`Already the latest version, no need to upgrade`)
+    logger.info(`当前已经是最新的数据库版本`)
   }
 
   if (needToRecreateDatabase) {
-    logger.warn(`Database needs recreation`)
+    logger.warn(`错误的数据库格式，需要重建数据库`)
     await recreateDatabase(dataSource, dbPath)
     cv = 0
   }
 
   if (needToPerformUpgrade) {
-    logger.info(`Database needs upgrading, from ${cv}`)
+    logger.info(`数据库需要从 ${cv} 版本升级`)
     const queryRunner = dataSource.createQueryRunner()
     await queryRunner.startTransaction()
 

@@ -45,7 +45,7 @@ app.whenReady().then(async () => {
     await initLeagueClientFunctions()
     await setupLeagueAkariFeatures()
 
-    logger.info('LEAGUE AKARI - INITIALIZED')
+    logger.info('LEAGUE AKARI 核心模块初始化完成')
 
     createMainWindow()
 
@@ -56,7 +56,7 @@ app.whenReady().then(async () => {
     })
 
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
-      logger.info(`Trying to launch a second instance, cmd=${commandLine}, pwd=${workingDirectory}`)
+      logger.info(`用户尝试启动第二个实例, cmd=${commandLine}, pwd=${workingDirectory}`)
 
       const mainWindow = getMainWindow()
       if (mainWindow) {

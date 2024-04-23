@@ -100,7 +100,7 @@
               <CopyableText :text="app.lcuAuth?.rsoPlatformId ?? '-'">{{
                 (app.lcuAuth?.rsoPlatformId
                   ? rsoPlatformText[app.lcuAuth.rsoPlatformId] || app.lcuAuth.rsoPlatformId
-                  : app.lcuAuth?.rsoPlatformId) || '不可用'
+                  : app.lcuAuth?.rsoPlatformId) || '-'
               }}</CopyableText>
             </td>
           </tr>

@@ -38,13 +38,13 @@ export async function setupAutoReply() {
           await chatSend(fromId, autoReplyState.settings.text)
         } catch (error) {
           mwNotification.warn('auto-reply', '自动回复', '无法发送信息')
-          logger.warn(`Failed to automatically reply ${formatError(error)}`)
+          logger.warn(`尝试自动回复时出现错误 ${formatError(error)}`)
         }
       }
     }
   )
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }
 
 function stateSync() {

@@ -5,6 +5,7 @@ import { chatSync } from './chat'
 import { gameDataSync } from './game-data'
 import { gameflowSync } from './gameflow'
 import { lobbySync } from './lobby'
+import { loginSync } from './login'
 import { summonerSync } from './summoner'
 
 const logger = createLogger('lcu-state-sync')
@@ -33,5 +34,7 @@ export async function setupLcuStateSync() {
   // 英雄选择
   champSelectSync()
 
-  logger.info('Initialized')
+  loginSync()
+
+  logger.info('初始化完成')
 }

@@ -105,11 +105,11 @@ export async function initApp() {
     try {
       await checkUpdates()
     } catch (error) {
-      logger.warn(`Failed to check updates ${formatError(error)}`)
+      logger.warn(`检查更新失败 ${formatError(error)}`)
     }
   }
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }
 
 export async function checkUpdates() {
@@ -409,6 +409,9 @@ async function migrateFromPreviousLocalStorageSettings(all: Record<string, strin
   )
 
   if (migrated) {
-    logger.info('Old settings were migrated already.')
+    logger.info('旧设置项已经成功迁移')
+    return true
   }
+
+  return false
 }

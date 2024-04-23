@@ -77,7 +77,7 @@ export async function initLeagueClientFunctions() {
     return queryLcuAuth(LEAGUE_CLIENT_UX_PROCESS_NAME)
   })
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }
 
 async function loadSettings() {

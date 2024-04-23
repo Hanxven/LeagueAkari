@@ -2,7 +2,7 @@ import { lcuEventBus } from '@main/core/lcu-connection'
 import { createLogger } from '@main/core/log'
 import { mwNotification } from '@main/core/main-window'
 import { honor } from '@main/http-api/honor-v2'
-import { getEogStatus, getLobby, playAgain } from '@main/http-api/lobby'
+import { getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
 import { accept } from '@main/http-api/matchmaking'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { getSetting, setSetting } from '@main/storage/settings'
@@ -10,8 +10,7 @@ import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { LcuEvent } from '@shared/types/lcu/event'
 import { Ballot } from '@shared/types/lcu/honorV2'
 import { formatError } from '@shared/utils/errors'
-import { sleep } from '@shared/utils/sleep'
-import { reaction } from 'mobx'
+import { comparer, computed, reaction } from 'mobx'
 
 import { gameflow } from '../lcu-state-sync/gameflow'
 import { lobby } from '../lcu-state-sync/lobby'
@@ -23,6 +22,7 @@ const HONOR_CATEGORY = ['COOL', 'SHOTCALLER', 'HEART'] as const
 const logger = createLogger('auto-gameflow')
 
 let autoAcceptTimerId: NodeJS.Timeout | null = null
+let autoSearchMatchTimerId: NodeJS.Timeout | null = null
 
 export async function setupAutoGameflow() {
   stateSync()
@@ -79,32 +79,33 @@ export async function setupAutoGameflow() {
           await honor(message.data.gameId, category, candidate)
 
           logger.info(
-            `Honored summoner ID: ${candidate} for ${category}, game ID: ${message.data.gameId}`
+            `给玩家: ${candidate} 点赞, for ${category}, game ID: ${message.data.gameId}`
           )
         } else {
           await honor(message.data.gameId, 'OPT_OUT', 0)
-          logger.info('Opt-outed honoring stage')
+          logger.info('跳过点赞阶段')
         }
       } catch (error) {
         mwNotification.warn('auto-gameflow', '自动点赞', '尝试自动点赞出现问题')
-        logger.warn(`Failed to honor a player ${formatError(error)}`)
+        logger.warn(`无法给玩家点赞 ${formatError(error)}`)
       }
     }
   })
 
   // 自动回到房间
   reaction(
-    () => gameflow.phase,
-    async (phase) => {
-      if (autoGameflowState.settings.playAgainEnabled && phase === 'EndOfGame') {
+    () => [gameflow.phase, autoGameflowState.settings.playAgainEnabled] as const,
+    async ([phase, enabled]) => {
+      if (enabled && phase === 'EndOfGame') {
         try {
           await playAgain()
-          logger.info('Play again, returned to the lobby')
+          logger.info('Play again, 返回房间')
         } catch (error) {
-          logger.warn(`Error when try to play again ${formatError(error)}`)
+          logger.warn(`尝试 Play again 时失败 ${formatError(error)}`)
         }
       }
-    }
+    },
+    { equals: comparer.shallow }
   )
 
   // 自动接受
@@ -116,7 +117,7 @@ export async function setupAutoGameflow() {
       }
 
       if (phase === 'ReadyCheck') {
-        autoGameflowState.setAutoAcceptAt(
+        autoGameflowState.setAcceptAt(
           Date.now() + autoGameflowState.settings.autoAcceptDelaySeconds * 1e3
         )
         autoAcceptTimerId = setTimeout(
@@ -125,12 +126,12 @@ export async function setupAutoGameflow() {
         )
 
         logger.info(
-          `ReadyCheck! Will accept the match in ${autoGameflowState.settings.autoAcceptDelaySeconds * 1e3} ms`
+          `ReadyCheck! 即将在 ${autoGameflowState.settings.autoAcceptDelaySeconds} 秒后接受对局`
         )
       } else {
         if (autoAcceptTimerId) {
-          if (autoGameflowState.willAutoAccept) {
-            logger.info(`Auto accept canceled - not in ReadyCheck phase`)
+          if (autoGameflowState.willAccept) {
+            logger.info(`取消了即将进行的接受操作 - 不在游戏 ReadyCheck 过程中`)
           }
 
           clearTimeout(autoAcceptTimerId)
@@ -141,30 +142,78 @@ export async function setupAutoGameflow() {
     }
   )
 
+  // 在设置项变更时解除即将进行的自动接受
+  reaction(
+    () => autoGameflowState.settings.autoAcceptEnabled,
+    (enabled) => {
+      if (!enabled) {
+        cancelAutoAccept()
+      }
+    }
+  )
+
   // 如果玩家手动取消了本次接受，则尝试取消即将进行的自动接受（如果有）
   lcuEventBus.on('/lol-matchmaking/v1/ready-check', (event) => {
     if (event.data && event.data.playerResponse === 'Declined') {
-      if (autoGameflowState.willAutoAccept) {
-        if (autoAcceptTimerId) {
-          logger.info(`Auto accept canceled - declined`)
+      cancelAutoAccept(true)
+    }
+  })
 
-          clearTimeout(autoAcceptTimerId)
-          autoAcceptTimerId = null
-        }
-        autoGameflowState.clearAutoAccept()
+  // 在设置项变更时解除即将进行的自动匹配
+  reaction(
+    () => autoGameflowState.settings.autoSearchMatchEnabled,
+    (enabled) => {
+      if (!enabled) {
+        cancelAutoSearchMatch()
       }
+    }
+  )
+
+  const canStartSearchMatch = computed(() => {
+    if (!lobby.lobby) {
+      return 'unavailable'
+    }
+
+    const pendingInvitation = lobby.lobby.invitations.some((i) => i.state === 'ongoing?')
+
+    if (pendingInvitation) {
+      return 'waiting-for-invitees'
+    }
+
+    if (lobby.lobby.canStartActivity) {
+      return 'can-start-activity'
+    } else {
+      return 'cannot-start-activity'
     }
   })
 
   // 自动开始匹配
   reaction(
-    () => lobby.lobby,
-    (lobby) => {
-      // console.log('lobby', lobby)
-    }
+    () => [canStartSearchMatch.get(), autoGameflowState.settings.autoSearchMatchEnabled] as const,
+    ([s, enabled]) => {
+      if (!enabled) {
+        return
+      }
+
+      if (s === 'can-start-activity') {
+        logger.info(
+          `现在将在 ${autoGameflowState.settings.autoSearchMatchDelaySeconds} 秒后开始匹配`
+        )
+        autoGameflowState.setSearchMatchAt(
+          Date.now() + autoGameflowState.settings.autoSearchMatchDelaySeconds * 1e3
+        )
+        autoSearchMatchTimerId = setTimeout(
+          startMatchmaking,
+          autoGameflowState.settings.autoSearchMatchDelaySeconds * 1e3
+        )
+      } else if (s === 'unavailable' || s === 'waiting-for-invitees') {
+        cancelAutoSearchMatch()
+      }
+    },
+    { equals: comparer.shallow }
   )
 
-  logger.info('Initialized')
+  logger.info('初始化完成')
 }
 
 function stateSync() {
@@ -183,9 +232,9 @@ function stateSync() {
     () => autoGameflowState.settings.playAgainEnabled
   )
 
-  ipcStateSync('auto-gameflow/will-auto-accept', () => autoGameflowState.willAutoAccept)
+  ipcStateSync('auto-gameflow/will-accept', () => autoGameflowState.willAccept)
 
-  ipcStateSync('auto-gameflow/will-auto-accept-at', () => autoGameflowState.willAutoAcceptAt)
+  ipcStateSync('auto-gameflow/will-accept-at', () => autoGameflowState.willAcceptAt)
 
   ipcStateSync(
     'auto-gameflow/settings/auto-accept-enabled',
@@ -196,6 +245,20 @@ function stateSync() {
     'auto-gameflow/settings/auto-accept-delay-seconds',
     () => autoGameflowState.settings.autoAcceptDelaySeconds
   )
+
+  ipcStateSync(
+    'auto-gameflow/settings/auto-search-match-enabled',
+    () => autoGameflowState.settings.autoSearchMatchEnabled
+  )
+
+  ipcStateSync(
+    'auto-gameflow/settings/auto-search-match-delay-seconds',
+    () => autoGameflowState.settings.autoSearchMatchDelaySeconds
+  )
+
+  ipcStateSync('auto-gameflow/will-search-match', () => autoGameflowState.willSearchMatch)
+
+  ipcStateSync('auto-gameflow/will-search-match-at', () => autoGameflowState.willSearchMatchAt)
 }
 
 function ipcCall() {
@@ -232,6 +295,26 @@ function ipcCall() {
     async (_, delaySeconds) => {
       autoGameflowState.settings.setAutoAcceptDelaySeconds(delaySeconds)
       await setSetting('auto-gameflow/auto-accept-delay-seconds', delaySeconds)
+    }
+  )
+
+  onRendererCall('auto-gameflow/cancel-auto-search-match', () => {
+    cancelAutoSearchMatch()
+  })
+
+  onRendererCall(
+    'auto-gameflow/settings/auto-search-match-enabled/set',
+    async (_, enabled: boolean) => {
+      autoGameflowState.settings.setAutoSearchMatchEnabled(enabled)
+      await setSetting('auto-gameflow/auto-search-match-enabled', enabled)
+    }
+  )
+
+  onRendererCall(
+    'auto-gameflow/settings/auto-search-match-delay-seconds/set',
+    async (_, seconds: number) => {
+      autoGameflowState.settings.setAutoSearchMatchDelaySeconds(seconds)
+      await setSetting('auto-gameflow/auto-search-match-delay-seconds', seconds)
     }
   )
 }
@@ -271,26 +354,71 @@ async function loadSettings() {
       autoGameflowState.settings.autoAcceptDelaySeconds
     )
   )
+
+  autoGameflowState.settings.setAutoAcceptDelaySeconds(
+    await getSetting(
+      'auto-gameflow/auto-accept-delay-seconds',
+      autoGameflowState.settings.autoAcceptDelaySeconds
+    )
+  )
+
+  autoGameflowState.settings.setAutoSearchMatchEnabled(
+    await getSetting(
+      'auto-gameflow/auto-search-match-enabled',
+      autoGameflowState.settings.autoSearchMatchEnabled
+    )
+  )
+
+  autoGameflowState.settings.setAutoSearchMatchDelaySeconds(
+    await getSetting(
+      'auto-gameflow/auto-search-match-delay-seconds',
+      autoGameflowState.settings.autoSearchMatchDelaySeconds
+    )
+  )
 }
 
 const acceptMatch = async () => {
   try {
     await accept()
   } catch (error) {
-    mwNotification.warn('auto-gameflow', '自动接受', '尝试自动接受时出现问题')
-    logger.warn(`Failed to accept match ${formatError(error)}`)
+    mwNotification.warn('auto-gameflow', '自动接受', '尝试接受对局时出现问题')
+    logger.warn(`无法接受对局 ${formatError(error)}`)
   }
   autoGameflowState.clearAutoAccept()
 }
 
-export function cancelAutoAccept() {
-  if (autoGameflowState.willAutoAccept) {
-    if (autoAcceptTimerId) {
-      logger.info(`Auto accept canceled - manually canceled`)
+const startMatchmaking = async () => {
+  try {
+    await searchMatch()
+  } catch (error) {
+    mwNotification.warn('auto-gameflow', '自动匹配', '尝试开始匹配时出现问题')
+    logger.warn(`无法开始匹配 ${formatError(error)}`)
+  }
+  autoGameflowState.clearAutoSearchMatch()
+}
 
+export function cancelAutoAccept(declined = false) {
+  if (autoGameflowState.willAccept) {
+    if (autoAcceptTimerId) {
       clearTimeout(autoAcceptTimerId)
       autoAcceptTimerId = null
     }
     autoGameflowState.clearAutoAccept()
+    if (declined) {
+      logger.info(`取消了即将进行的接受 - 已被玩家通过客户端操作取消`)
+    } else {
+      logger.info(`取消了即将进行的接受 - 已被玩家取消`)
+    }
+  }
+}
+
+export function cancelAutoSearchMatch() {
+  if (autoGameflowState.willSearchMatch) {
+    if (autoSearchMatchTimerId) {
+      clearTimeout(autoSearchMatchTimerId)
+      autoSearchMatchTimerId = null
+    }
+    autoGameflowState.clearAutoSearchMatch()
+    logger.info('即将进行的自动匹配对局已取消')
   }
 }

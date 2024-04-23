@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { Game, Player } from '@shared/types/lcu/match-history'
+import { Game, Participant, Player } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { rsoPlatformText } from '@shared/utils/rso-platforms'
 import dayjs from 'dayjs'
@@ -149,29 +149,29 @@ const statsConfigMap = {
   pentaKills: { name: '五杀' },
   // 天赋梦路!
   perk0: { name: '天赋0', render: perkDisplay },
-  perk0Var1: { name: '天赋0变量1', render: perkDisplay },
-  perk0Var2: { name: '天赋0变量2', render: perkDisplay },
-  perk0Var3: { name: '天赋0变量3', render: perkDisplay },
+  perk0Var1: { name: '天赋0变量1', render: (a, b) => console.log(a, b) },
+  perk0Var2: { name: '天赋0变量2' },
+  perk0Var3: { name: '天赋0变量3' },
   perk1: { name: '天赋1', render: perkDisplay },
-  perk1Var1: { name: '天赋1变量1', render: perkDisplay },
-  perk1Var2: { name: '天赋1变量2', render: perkDisplay },
-  perk1Var3: { name: '天赋1变量3', render: perkDisplay },
+  perk1Var1: { name: '天赋1变量1' },
+  perk1Var2: { name: '天赋1变量2' },
+  perk1Var3: { name: '天赋1变量3' },
   perk2: { name: '天赋2', render: perkDisplay },
-  perk2Var1: { name: '天赋2变量1', render: perkDisplay },
-  perk2Var2: { name: '天赋2变量2', render: perkDisplay },
-  perk2Var3: { name: '天赋2变量3', render: perkDisplay },
+  perk2Var1: { name: '天赋2变量1' },
+  perk2Var2: { name: '天赋2变量2' },
+  perk2Var3: { name: '天赋2变量3' },
   perk3: { name: '天赋3', render: perkDisplay },
-  perk3Var1: { name: '天赋3变量1', render: perkDisplay },
-  perk3Var2: { name: '天赋3变量2', render: perkDisplay },
-  perk3Var3: { name: '天赋3变量3', render: perkDisplay },
+  perk3Var1: { name: '天赋3变量1' },
+  perk3Var2: { name: '天赋3变量2' },
+  perk3Var3: { name: '天赋3变量3' },
   perk4: { name: '天赋4', render: perkDisplay },
-  perk4Var1: { name: '天赋4变量1', render: perkDisplay },
-  perk4Var2: { name: '天赋4变量2', render: perkDisplay },
-  perk4Var3: { name: '天赋4变量3', render: perkDisplay },
+  perk4Var1: { name: '天赋4变量1' },
+  perk4Var2: { name: '天赋4变量2' },
+  perk4Var3: { name: '天赋4变量3' },
   perk5: { name: '天赋5', render: perkDisplay },
-  perk5Var1: { name: '天赋5变量1', render: perkDisplay },
-  perk5Var2: { name: '天赋5变量2', render: perkDisplay },
-  perk5Var3: { name: '天赋5变量3', render: perkDisplay },
+  perk5Var1: { name: '天赋5变量1' },
+  perk5Var2: { name: '天赋5变量2' },
+  perk5Var3: { name: '天赋5变量3' },
   perkPrimaryStyle: { name: '主要天赋风格', render: perkstyleDisplay },
   perkSubStyle: { name: '次要天赋风格', render: perkstyleDisplay },
   physicalDamageDealt: { name: '造成的物理伤害' },
@@ -235,13 +235,23 @@ const statsConfigMap = {
 //   xpPerMinDeltas: '每分钟经验增量'
 // }
 
-const participantsMap = computed(() => {
+const participantInfoMap = computed(() => {
   return props.game.participantIdentities.reduce(
     (o, c) => {
       o[c.participantId] = c.player
       return o
     },
     {} as Record<string, Player>
+  )
+})
+
+const participantStatsMap = computed(() => {
+  return props.game.participants.reduce(
+    (o, c) => {
+      o[c.participantId] = c
+      return o
+    },
+    {} as Record<string, Participant>
   )
 })
 
@@ -268,9 +278,9 @@ const columns = computed(() => {
             'span',
             { style: { 'margin-left': '2px' } },
             summonerName(
-              participantsMap.value[p.participantId].gameName ||
-                participantsMap.value[p.participantId].summonerName,
-              participantsMap.value[p.participantId].tagLine
+              participantInfoMap.value[p.participantId].gameName ||
+                participantInfoMap.value[p.participantId].summonerName,
+              participantInfoMap.value[p.participantId].tagLine
             )
           )
         ])
@@ -287,7 +297,7 @@ const columns = computed(() => {
             }
             return content
           })
-        return renderer(data[p.participantId])
+        return renderer(data[p.participantId], participantStatsMap.value[p.participantId])
       }
     })
   })
@@ -319,13 +329,13 @@ const tableData = computed(() => {
 
   const cp: RowData = { propName: statsConfigMap['currentPlatformId']?.name }
   props.game.participants.forEach((p) => {
-    cp[p.participantId] = participantsMap.value[p.participantId].currentPlatformId
+    cp[p.participantId] = participantInfoMap.value[p.participantId].currentPlatformId
     cp['propKey'] = 'currentPlatformId'
   })
 
   const pi: RowData = { propName: statsConfigMap['platformId']?.name }
   props.game.participants.forEach((p) => {
-    pi[p.participantId] = participantsMap.value[p.participantId].platformId
+    pi[p.participantId] = participantInfoMap.value[p.participantId].platformId
     pi['propKey'] = 'platformId'
   })
 

@@ -1,6 +1,8 @@
+import { shallowRef } from 'vue'
+
 import { mainCall, mainStateSync } from '@renderer/utils/ipc'
 
-import { useAppStore } from './store'
+import { TitleBarTask, useAppStore } from './store'
 
 export const id = 'core:app'
 
@@ -77,7 +79,32 @@ async function migrateFromPreviousLocalStorageSettings() {
   }
 
   try {
-    await mainCall('app/migrate-settings-from-previous-local-storage', all)
-    localStorage.clear()
+    const ok = await mainCall('app/migrate-settings-from-previous-local-storage', all)
+    if (ok) {
+      localStorage.clear()
+    }
   } catch {}
+}
+
+// 暂时未使用，在复杂度提升后，将作为标题栏任务的展示方式
+export function createTitleBarTask(id: string) {
+  const app = useAppStore()
+
+  if (app.titleBarTasks.find((t) => t.id === id)) {
+    throw new Error(`Module ${id} already exists`)
+  }
+
+  const task = shallowRef<TitleBarTask>({ id })
+
+  app.titleBarTasks.push(task.value)
+
+  return {
+    task,
+    remove: () => {
+      const index = app.titleBarTasks.findIndex((t) => t.id === id)
+      if (index !== -1) {
+        app.titleBarTasks.splice(index, 1)
+      }
+    }
+  }
 }

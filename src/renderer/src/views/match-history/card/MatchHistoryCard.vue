@@ -126,16 +126,16 @@
       </div>
       <div class="summary" v-if="self.summary">
         <div class="kpr" title="在队伍中参与了击杀的程度">
-          击杀参与率 {{ (self.summary.kpr * 100).toFixed(1) }} %
+          {{ (self.summary.kpr * 100).toFixed(1) }} % 击杀
         </div>
         <div class="ddr" title="在队伍中对英雄造成的伤害占比">
-          伤害比率 {{ (self.summary.ddr * 100).toFixed(1) }} %
+          {{ (self.summary.ddr * 100).toFixed(1) }} % 伤害
         </div>
         <div class="dtr" title="在队伍中的承受所有伤害占比">
-          承伤比率 {{ (self.summary.dtr * 100).toFixed(1) }} %
+          {{ (self.summary.dtr * 100).toFixed(1) }} % 承受
         </div>
         <div class="gr" title="在队伍中的金币占比">
-          经济比率 {{ (self.summary.gr * 100).toFixed(1) }} %
+          {{ (self.summary.gr * 100).toFixed(1) }} % 金币
         </div>
       </div>
       <div class="players">
@@ -581,7 +581,7 @@ const handleToSummoner = (summonerId: number) => {
   flex-direction: column;
   justify-content: center;
   width: 126px;
-  font-size: 12px;
+  font-size: 11px;
 
   .kpr {
     color: rgb(223, 223, 223);
