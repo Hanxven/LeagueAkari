@@ -1,5 +1,6 @@
 import { onRendererCall, sendEventToAllRenderer, sendEventToRenderer } from '@main/utils/ipc'
-import { Menu, Notification, Tray, app } from 'electron'
+import { Menu, MenuItem, Notification, Tray, app } from 'electron'
+import { reaction } from 'mobx'
 import { GlobalKeyboardListener } from 'node-global-key-listener'
 import { randomUUID } from 'node:crypto'
 import EventEmitter from 'node:events'
@@ -7,6 +8,7 @@ import { Worker } from 'node:worker_threads'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
 import sendInputWorker from '../workers/send-input?nodeWorker'
+import { auxiliaryWindowState, showAuxiliaryWindow } from './auxiliary-window'
 import { createLogger } from './log'
 import { restoreAndFocus, toggleMinimizeAndFocus } from './main-window'
 
@@ -22,6 +24,14 @@ export const winPlatformEventBus = new EventEmitter()
 export function initWindowsPlatform() {
   const tray = new Tray(icon)
 
+  const showAuxiliaryWindowMenuItem = new MenuItem({
+    label: '展示小窗',
+    type: 'normal',
+    click: () => {
+      showAuxiliaryWindow()
+    }
+  })
+
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'League Akari',
@@ -33,6 +43,7 @@ export function initWindowsPlatform() {
     {
       type: 'separator'
     },
+    showAuxiliaryWindowMenuItem,
     {
       label: '退出',
       type: 'normal',

@@ -16,6 +16,7 @@ import { setupLeagueAkariFeatures } from './features'
 import { initStorageIpc } from './storage'
 import { sendEventToAllRenderer } from './utils/ipc'
 import { checkWmicAvailability } from './utils/shell'
+import { createAuxiliaryWindow } from './core/auxiliary-window'
 
 configure({ enforceActions: 'observed' })
 
@@ -48,6 +49,7 @@ app.whenReady().then(async () => {
     logger.info('LEAGUE AKARI 核心模块初始化完成')
 
     createMainWindow()
+    createAuxiliaryWindow()
 
     app.on('activate', function () {
       if (BrowserWindow.getAllWindows().length === 0) {

@@ -66,7 +66,8 @@ export default defineConfig({
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src'),
+        '@main-window': resolve('src/renderer/src-main-window'),
+        '@auxiliary-window': resolve('src/renderer/src-auxiliary-window'),
         '@shared': resolve('src/shared')
       }
     },
@@ -83,7 +84,13 @@ export default defineConfig({
       })
     ],
     build: {
-      minify
+      minify,
+      rollupOptions: {
+        input: {
+          mainWindow: resolve(__dirname, 'src/renderer/main-window.html'),
+          auxiliaryWindow: resolve(__dirname, 'src/renderer/auxiliary-window.html')
+        }
+      }
     }
   }
 })

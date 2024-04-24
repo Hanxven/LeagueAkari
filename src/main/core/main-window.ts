@@ -1,12 +1,13 @@
 import { is } from '@electron-toolkit/utils'
 import { BrowserWindow, shell } from 'electron'
-import { makeAutoObservable, reaction } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import { join } from 'node:path'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
 import { ipcStateSync, onRendererCall, sendEventToRenderer } from '../utils/ipc'
+import { getAuxiliaryWindow } from './auxiliary-window'
 
-class WindowState {
+class MainWindowState {
   state: 'normal' | 'maximized' | 'minimized' = 'normal'
 
   focus: 'focused' | 'blurred' = 'focused'
@@ -24,7 +25,7 @@ class WindowState {
   }
 }
 
-export const windowState = new WindowState()
+export const mainWindowState = new MainWindowState()
 
 let mainWindow: BrowserWindow | null = null
 
@@ -87,47 +88,47 @@ export function createMainWindow(): void {
 
   // HMR
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    mainWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/main-window.html`)
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(join(__dirname, '../renderer/main-window.html'))
   }
 }
 
 // 和窗口相关的 API
 export function initMainWindow(w: BrowserWindow) {
-  ipcStateSync('main-window/state', () => windowState.state)
-  ipcStateSync('main-window/focus', () => windowState.focus)
+  ipcStateSync('main-window/state', () => mainWindowState.state)
+  ipcStateSync('main-window/focus', () => mainWindowState.focus)
 
   if (w.isMaximized()) {
-    windowState.setState('maximized')
+    mainWindowState.setState('maximized')
   } else if (w.isMinimized()) {
-    windowState.setState('minimized')
+    mainWindowState.setState('minimized')
   } else {
-    windowState.setState('normal')
+    mainWindowState.setState('normal')
   }
 
   w.on('maximize', () => {
-    windowState.setState('maximized')
+    mainWindowState.setState('maximized')
   })
 
   w.on('unmaximize', () => {
-    windowState.setState('normal')
+    mainWindowState.setState('normal')
   })
 
   w.on('minimize', () => {
-    windowState.setState('minimized')
+    mainWindowState.setState('minimized')
   })
 
   w.on('restore', () => {
-    windowState.setState('normal')
+    mainWindowState.setState('normal')
   })
 
   w.on('focus', () => {
-    windowState.setFocus('focused')
+    mainWindowState.setFocus('focused')
   })
 
   w.on('blur', () => {
-    windowState.setFocus('blurred')
+    mainWindowState.setFocus('blurred')
   })
 
   onRendererCall('main-window/size/set', async (_e, width, height, animate) => {
@@ -155,6 +156,11 @@ export function initMainWindow(w: BrowserWindow) {
   })
 
   onRendererCall('main-window/close', async () => {
+    const auxWindow = getAuxiliaryWindow()
+    if (auxWindow) {
+      auxWindow.close()
+    }
+
     w.close()
   })
 

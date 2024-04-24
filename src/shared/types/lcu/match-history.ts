@@ -208,6 +208,7 @@ export interface Player {
   platformId: string
   profileIcon: number
   summonerId: number
+  puuid: string
   gameName: string
   tagLine: string
   summonerName: string

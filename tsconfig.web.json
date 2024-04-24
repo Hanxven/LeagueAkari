@@ -1,9 +1,11 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
   "include": [
-    "src/renderer/src/env.d.ts",
-    "src/renderer/src/**/*",
-    "src/renderer/src/**/*.vue",
+    "src/renderer/env.d.ts",
+    "src/renderer/src-main-window/**/*",
+    "src/renderer/src-main-window/**/*.vue",
+    "src/renderer/src-auxiliary-window/**/*",
+    "src/renderer/src-auxiliary-window/**/*.vue",
     "src/preload/*.d.ts",
     "src/shared/**/*"
   ],
@@ -13,7 +15,8 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@renderer/*": ["src/renderer/src/*"],
+      "@main-window/*": ["src/renderer/src-main-window/*"],
+      "@auxiliary-window/*": ["src/renderer/src-auxiliary-window/*"],
       "@shared/*": ["src/shared/*"]
     },
     "noUnusedLocals": false,

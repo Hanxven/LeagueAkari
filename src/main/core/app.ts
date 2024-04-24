@@ -80,7 +80,7 @@ class AppState {
     makeAutoObservable(this)
   }
 
-  setIsAdmin(b: boolean) {
+  setElevated(b: boolean) {
     this.isAdministrator = b
   }
 }
@@ -89,7 +89,7 @@ export const appState = new AppState()
 
 // 基础通讯 API
 export async function initApp() {
-  appState.setIsAdmin(toolkit.isElevated())
+  appState.setElevated(toolkit.isElevated())
 
   stateSync()
   ipcCall()

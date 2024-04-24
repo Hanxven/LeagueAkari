@@ -1,0 +1,94 @@
+@import './reset.less';
+
+::selection {
+  background: #c0c0c0;
+  text-shadow: none;
+}
+
+:root {
+  color-scheme: dark;
+  --background-color-primary: rgb(36, 36, 36);
+  --app-min-height: 600px;
+  --app-min-width: 340px;
+  --app-title-bar-height: 24px;
+  --scroll-bar-height: 6px;
+  --scroll-bar-width: 6px;
+}
+
+::-webkit-scrollbar {
+  width: var(--scroll-bar-width);
+  height: var(--scroll-bar-height);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4c4c4c;
+  border-radius: 2px;
+
+  &:hover {
+    background-color: #626262;
+  }
+}
+
+#app,
+html,
+body,
+#naive-ui-config-provider {
+  height: 100%;
+}
+
+#v-binder-view-measurer {
+  top: var(--app-title-bar-height) !important;
+}
+
+body {
+  // 防止一些使用绝对布局的元素溢出，产生多余的滚动条
+  overflow: hidden;
+}
+
+body {
+  user-select: none;
+  background-color: var(--background-color-primary);
+}
+
+a {
+  color: rgb(144, 198, 166);
+}
+
+a:visited {
+  color: rgb(144, 198, 166);
+}
+
+.n-radio {
+  align-items: center;
+}
+
+.n-radio__label,
+.n-checkbox__label {
+  font-size: 13px;
+}
+
+.n-notification-container .n-notification .n-notification-main .n-notification-main__header {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.n-notification-container .n-notification .n-notification-main .n-notification-main__content {
+  font-size: 13px;
+  margin: 4px 0 0 0;
+}
+
+.n-notification-container .n-notification .n-notification__avatar {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+
+.n-notification-container .n-notification.n-notification--show-avatar .n-notification-main {
+  margin-left: 30px;
+  width: calc(100% - 30px);
+}
+
+// adjust for app title bar height
+.n-notification-container > .n-scrollbar > .n-scrollbar-container {
+  max-height: calc(100vh - var(--app-title-bar-height)) !important;
+}
