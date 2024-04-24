@@ -6,6 +6,7 @@
         v-if="game"
         :game="game"
         :self-id="selfId"
+        :self-puuid="selfPuuid"
         :is-detailed="true"
         :is-loading="isLoading"
         :is-expanded="selfId ? isExpanded : true"
@@ -44,6 +45,7 @@ const id = 'comp:standalone-match-history-card-modal'
 const props = defineProps<{
   gameId?: number
   selfId?: number
+  selfPuuid?: string
 }>()
 
 const show = defineModel<boolean>('show', { default: false })

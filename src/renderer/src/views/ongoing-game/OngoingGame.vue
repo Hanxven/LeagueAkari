@@ -4,6 +4,7 @@
     <StandaloneMatchHistoryCardModal
       :game-id="showingGame.id"
       :self-id="showingGame.summonerId"
+      :self-puuid="showingGame.puuid"
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
     <div v-if="!isIdle" class="ongoing-game-inner">
@@ -212,12 +213,14 @@ const formatTeamText = (team: string) => {
 
 const showingGame = reactive({
   id: 0,
-  summonerId: 0
+  summonerId: 0,
+  puuid: '' as undefined | string
 })
 const isStandaloneMatchHistoryCardShow = ref(false)
-const handleShowGame = (gameId: number, summonerId: number) => {
+const handleShowGame = (gameId: number, summonerId: number, puuid?: string) => {
   showingGame.id = gameId
   showingGame.summonerId = summonerId
+  showingGame.puuid = puuid
   isStandaloneMatchHistoryCardShow.value = true
 }
 

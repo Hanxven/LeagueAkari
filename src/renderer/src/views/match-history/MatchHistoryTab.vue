@@ -122,6 +122,7 @@
           @set-show-detailed-game="handleToggleShowDetailedGame"
           @load-detailed-game="(gameId) => fetchTabDetailedGame(tab.id, gameId)"
           :self-id="tab.id"
+          :self-puuid="tab.summoner?.puuid"
           :is-detailed="g.isDetailed"
           :is-loading="g.isLoading"
           :is-expanded="g.isExpanded"

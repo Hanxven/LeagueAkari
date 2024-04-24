@@ -185,9 +185,16 @@
           class="detailed-game"
           :game="game"
           :self-id="selfId"
+          :self-puuid="selfPuuid"
           v-if="game.gameMode === 'CHERRY'"
         />
-        <NormalNodeDetailedGame class="detailed-game" v-else :game="game" :self-id="selfId" />
+        <NormalNodeDetailedGame
+          class="detailed-game"
+          v-else
+          :game="game"
+          :self-id="selfId"
+          :self-puuid="selfPuuid"
+        />
       </template>
       <div v-else-if="isLoading" class="loading">加载中...</div>
       <div v-else class="loading">无法加载</div>
@@ -196,6 +203,7 @@
 </template>
 
 <script setup lang="ts">
+import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import {
   ChevronDown as ChevronDownIcon,
   ChevronUp as ChevronUpIcon,
@@ -214,7 +222,6 @@ import PerkstyleDisplay from '@renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
-import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 
 import '../lol-view.less'
 import CherryModeDetailedGame from './CherryModeDetailedGame.vue'
@@ -223,6 +230,7 @@ import NormalNodeDetailedGame from './NormalModeDetailedGame.vue'
 
 const props = defineProps<{
   selfId?: number
+  selfPuuid?: string
   isLoading: boolean
   isExpanded: boolean
   isDetailed: boolean
@@ -252,9 +260,21 @@ const self = computed(() => {
   }
 
   // 查找对应的参与者 ID 和参与者信息
-  const participantId = props.game.participantIdentities.find(
+  let participantId: number | undefined
+
+  const pById = props.game.participantIdentities.find(
     (p) => p.player.summonerId === props.selfId
-  )!.participantId
+  )?.participantId
+
+  const pByPuuid = props.game.participantIdentities.find(
+    (p) => p.player.puuid === props.selfPuuid
+  )?.participantId
+
+  participantId = pById || pByPuuid
+
+  if (!participantId) {
+    return
+  }
 
   const participant = props.game.participants.find((p) => participantId === p.participantId)!
 
@@ -361,7 +381,9 @@ const teams = computed(() => {
   const all = props.game.participants.map((participant) => {
     return {
       ...participant,
-      isSelf: identities[participant.participantId].player.summonerId === props.selfId,
+      isSelf:
+        identities[participant.participantId].player.summonerId === props.selfId ||
+        identities[participant.participantId].player.puuid === props.selfPuuid,
       identity: identities[participant.participantId]
     }
   })

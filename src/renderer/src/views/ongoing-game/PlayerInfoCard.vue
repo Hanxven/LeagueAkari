@@ -43,7 +43,7 @@
                   >相关对局：<span
                     class="encountered-game"
                     v-for="g of savedInfo.relatedGameIds.slice(-10).toReversed()"
-                    @click="() => emits('showGame', g, id)"
+                    @click="() => emits('showGame', g, id, summonerInfo?.puuid)"
                     >{{ g }}</span
                   ></span
                 >
@@ -174,7 +174,7 @@
               marginBottom: `${matchHistoryItemMargin}px`
             }"
             v-for="m of list"
-            @click="() => emits('showGame', m.data.game.gameId, props.id)"
+            @click="() => emits('showGame', m.data.game.gameId, props.id, summonerInfo?.puuid)"
             :key="m.data.game.gameId"
           >
             <LcuImage class="image" :src="championIcon(m.data.selfParticipant.championId)" />
@@ -219,6 +219,8 @@
 </template>
 
 <script setup lang="ts">
+import { RankedStats } from '@shared/types/lcu/ranked'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { useTimeoutPoll, useVirtualList } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NDivider, NPopover } from 'naive-ui'
@@ -229,15 +231,13 @@ import { championIcon } from '@renderer/features/game-data'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@renderer/features/match-history'
 import { useGameDataStore } from '@renderer/features/stores/lcu/game-data'
 import { MatchHistoryGame, SavedTaggedPlayer } from '@renderer/features/stores/match-history'
-import { RankedStats } from '@shared/types/lcu/ranked'
-import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { winRateTeamText } from '@renderer/utils/sarcasms'
 
 import RankedSpan from '../match-history/widgets/RankedSpan.vue'
 
 const emits = defineEmits<{
   (e: 'toSummoner', id: number): void
-  (e: 'showGame', gameId: number, selfId: number): void
+  (e: 'showGame', gameId: number, selfId: number, puuid?: string): void
 }>()
 
 const props = defineProps<{

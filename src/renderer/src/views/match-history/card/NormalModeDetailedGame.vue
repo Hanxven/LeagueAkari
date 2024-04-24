@@ -160,6 +160,7 @@
 </template>
 
 <script setup lang="ts">
+import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import { createReusableTemplate } from '@vueuse/core'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -170,7 +171,6 @@ import PerkDisplay from '@renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@renderer/features/game-data'
-import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 
@@ -183,6 +183,7 @@ const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
 const props = defineProps<{
   game: Game
   selfId?: number
+  selfPuuid?: string
 }>()
 
 const match = computed(() => {
@@ -193,7 +194,9 @@ const match = computed(() => {
 
   const all = props.game.participants.map((participant) => ({
     ...participant,
-    isSelf: identities[participant.participantId].player.summonerId === props.selfId,
+    isSelf:
+      identities[participant.participantId].player.summonerId === props.selfId ||
+      identities[participant.participantId].player.puuid === props.selfPuuid,
     identity: identities[participant.participantId]
   }))
 
