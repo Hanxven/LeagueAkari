@@ -5,10 +5,10 @@
         class="card"
         v-if="game"
         :game="game"
-        :self-id="selfId"
+        :self-puuid="selfPuuid"
         :is-detailed="true"
         :is-loading="isLoading"
-        :is-expanded="selfId ? isExpanded : true"
+        :is-expanded="selfPuuid ? isExpanded : true"
         @set-show-detailed-game="(_, expand) => (isExpanded = expand)"
       />
       <div class="placeholder" v-else>
@@ -29,21 +29,19 @@
 </template>
 
 <script setup lang="ts">
+import { LcuHttpError } from '@shared/renderer-http-api/common'
+import { getGame } from '@shared/renderer-http-api/match-history'
 import { Game } from '@shared/types/lcu/match-history'
 import { NButton, NModal } from 'naive-ui'
 import { ref, shallowRef, watch } from 'vue'
 
-import { LcuHttpError } from '@shared/renderer-http-api/common'
-import { getGame } from '@shared/renderer-http-api/match-history'
 import { laNotification } from '@main-window/notification'
 
 import MatchHistoryCard from './MatchHistoryCard.vue'
 
-const id = 'comp:standalone-match-history-card-modal'
-
 const props = defineProps<{
   gameId?: number
-  selfId?: number
+  selfPuuid?: string
 }>()
 
 const show = defineModel<boolean>('show', { default: false })
@@ -94,7 +92,7 @@ const handleReload = async () => {
 }
 
 watch(
-  [() => props.gameId, () => props.selfId],
+  [() => props.gameId, () => props.selfPuuid],
   ([gameId, _selfId]) => {
     game.value = null
 

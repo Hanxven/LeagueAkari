@@ -1,15 +1,15 @@
+import { LcuHttpError } from '@shared/renderer-http-api/common'
+import { getGame, getMatchHistory } from '@shared/renderer-http-api/match-history'
+import { getRankedStats } from '@shared/renderer-http-api/ranked'
+import { getSummoner, getSummonerByPuuid } from '@shared/renderer-http-api/summoner'
+import { mainCall, mainStateSync, onMainEvent } from '@shared/renderer-utils/ipc'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { markRaw, watch } from 'vue'
 
-import { LcuHttpError } from '@shared/renderer-http-api/common'
-import { getGame, getMatchHistory } from '@shared/renderer-http-api/match-history'
-import { getRankedStats } from '@shared/renderer-http-api/ranked'
-import { getSummoner } from '@shared/renderer-http-api/summoner'
 import { laNotification } from '@main-window/notification'
 import { router } from '@main-window/routes'
-import { mainCall, mainStateSync, onMainEvent } from '@shared/renderer-utils/ipc'
 
 import { useAppStore } from '../app/store'
 import { useGameflowStore } from '../lcu-state-sync/gameflow'
@@ -28,44 +28,44 @@ export async function setupCoreFunctionality() {
   const summoner = useSummonerStore()
   const app = useAppStore()
 
-  onMainEvent('core-functionality/ongoing-player/new', (_, summonerId: number) => {
-    cf.ongoingPlayers[summonerId] = {
-      summonerId
+  onMainEvent('core-functionality/ongoing-player/new', (_, puuid: string) => {
+    cf.ongoingPlayers[puuid] = {
+      puuid
     }
   })
 
   onMainEvent(
     'core-functionality/ongoing-player/summoner',
-    (_, summonerId: number, info: SummonerInfo) => {
-      if (cf.ongoingPlayers[summonerId]) {
-        cf.ongoingPlayers[summonerId].summoner = info
+    (_, puuid: string, info: SummonerInfo) => {
+      if (cf.ongoingPlayers[puuid]) {
+        cf.ongoingPlayers[puuid].summoner = info
       }
     }
   )
 
   onMainEvent(
     'core-functionality/ongoing-player/saved-info',
-    (_, summonerId: number, savedInfo: any) => {
-      if (cf.ongoingPlayers[summonerId]) {
-        cf.ongoingPlayers[summonerId].savedInfo = savedInfo
+    (_, puuid: string, savedInfo: any) => {
+      if (cf.ongoingPlayers[puuid]) {
+        cf.ongoingPlayers[puuid].savedInfo = savedInfo
       }
     }
   )
 
   onMainEvent(
     'core-functionality/ongoing-player/ranked-stats',
-    (_, summonerId: number, rankedStats: RankedStats) => {
-      if (cf.ongoingPlayers[summonerId]) {
-        cf.ongoingPlayers[summonerId].rankedStats = rankedStats
+    (_, puuid: string, rankedStats: RankedStats) => {
+      if (cf.ongoingPlayers[puuid]) {
+        cf.ongoingPlayers[puuid].rankedStats = rankedStats
       }
     }
   )
 
   onMainEvent(
     'core-functionality/ongoing-player/match-history',
-    (_, summonerId: number, games: Game[]) => {
-      if (cf.ongoingPlayers[summonerId]) {
-        cf.ongoingPlayers[summonerId].matchHistory = games.map((g) => ({
+    (_, puuid: string, games: Game[]) => {
+      if (cf.ongoingPlayers[puuid]) {
+        cf.ongoingPlayers[puuid].matchHistory = games.map((g) => ({
           isDetailed: false,
           game: markRaw(g)
         }))
@@ -75,9 +75,9 @@ export async function setupCoreFunctionality() {
 
   onMainEvent(
     'core-functionality/ongoing-player/match-history-detailed-game',
-    (_, summonerId: number, game: Game) => {
-      if (cf.ongoingPlayers[summonerId]) {
-        const mh = cf.ongoingPlayers[summonerId].matchHistory
+    (_, puuid: string, game: Game) => {
+      if (cf.ongoingPlayers[puuid]) {
+        const mh = cf.ongoingPlayers[puuid].matchHistory
         if (mh) {
           const thatGame = mh.find((m) => m.game.gameId === game.gameId)
           if (thatGame) {
@@ -93,7 +93,7 @@ export async function setupCoreFunctionality() {
     cf.ongoingPlayers = {}
   })
 
-  mainCall('core-functionality/ongoing-players/get').then((all: Map<number, OngoingPlayer>) => {
+  mainCall('core-functionality/ongoing-players/get').then((all: Map<string, OngoingPlayer>) => {
     all.forEach((value, key) => {
       cf.ongoingPlayers[key] = value
     })
@@ -154,7 +154,7 @@ export async function setupCoreFunctionality() {
     () => summoner.me,
     (summoner) => {
       if (summoner) {
-        const tab = cf.getTab(summoner.summonerId)
+        const tab = cf.getTab(summoner.puuid)
         if (tab) {
           tab.data.summoner = summoner
         }
@@ -168,9 +168,8 @@ export async function setupCoreFunctionality() {
     (phase, _prevP) => {
       if (cf.settings.fetchAfterGame && phase === 'EndOfGame') {
         Object.keys(cf.ongoingPlayers).forEach((key) => {
-          const id = Number(key)
-          if (cf.getTab(id)) {
-            fetchTabFullData(id)
+          if (cf.getTab(key)) {
+            fetchTabFullData(key)
           }
         })
       }
@@ -196,10 +195,10 @@ export async function setupCoreFunctionality() {
       if (val) {
         cf.tabs.forEach((t) => cf.setTabPinned(t.id, false))
 
-        if (cf.getTab(val.summonerId)) {
-          cf.setTabPinned(val.summonerId, true)
+        if (cf.getTab(val.puuid)) {
+          cf.setTabPinned(val.puuid, true)
         } else {
-          cf.createTab(val.summonerId, { pin: true })
+          cf.createTab(val.puuid, { pin: true })
         }
       }
     },
@@ -253,10 +252,10 @@ export function setSendKdaInGameWithPreMadeTeams(enabled: boolean) {
   return mainCall('core-functionality/settings/send-kda-in-game-with-pre-made-teams/set', enabled)
 }
 
-export async function fetchTabRankedStats(summonerId: number) {
+export async function fetchTabRankedStats(puuid: string) {
   const matchHistory = useCoreFunctionalityStore()
 
-  const tab = matchHistory.getTab(summonerId)
+  const tab = matchHistory.getTab(puuid)
   if (tab && tab.data.summoner) {
     if (tab.data.loading.isLoadingRankedStats) {
       return null
@@ -279,19 +278,19 @@ export async function fetchTabRankedStats(summonerId: number) {
   return null
 }
 
-export async function fetchTabSummoner(summonerId: number) {
+export async function fetchTabSummoner(puuid: string) {
   const cf = useCoreFunctionalityStore()
-  const tab = cf.getTab(summonerId)
+  const tab = cf.getTab(puuid)
 
   if (tab) {
     if (tab.data.loading.isLoadingSummoner) {
-      return
+      return null
     }
 
     tab.data.loading.isLoadingSummoner = true
 
     try {
-      const summoner = (await getSummoner(summonerId)).data
+      const summoner = (await getSummonerByPuuid(puuid)).data
       tab.data.summoner = markRaw(summoner)
       return summoner
     } catch (error) {
@@ -304,13 +303,9 @@ export async function fetchTabSummoner(summonerId: number) {
   return null
 }
 
-export async function fetchTabMatchHistory(
-  summonerId: number,
-  page: number = 1,
-  pageSize: number = 20
-) {
+export async function fetchTabMatchHistory(puuid: string, page: number = 1, pageSize: number = 20) {
   const cf = useCoreFunctionalityStore()
-  const tab = cf.getTab(summonerId)
+  const tab = cf.getTab(puuid)
   const app = useAppStore()
 
   if (tab && tab.data.summoner) {
@@ -406,9 +401,9 @@ export async function fetchTabMatchHistory(
   return null
 }
 
-export async function fetchTabDetailedGame(summonerId: number, gameId: number) {
+export async function fetchTabDetailedGame(puuid: string, gameId: number) {
   const cf = useCoreFunctionalityStore()
-  const tab = cf.getTab(summonerId)
+  const tab = cf.getTab(puuid)
 
   if (tab) {
     const match = tab.data.matchHistory.gamesMap[gameId]
@@ -445,7 +440,7 @@ export async function fetchTabDetailedGame(summonerId: number, gameId: number) {
   return null
 }
 
-export async function querySavedInfo(summonerId: number) {
+export async function querySavedInfo(puuid: string) {
   const app = useAppStore()
   const summoner = useSummonerStore()
   const cf = useCoreFunctionalityStore()
@@ -454,13 +449,13 @@ export async function querySavedInfo(summonerId: number) {
     return
   }
 
-  const tab = cf.getTab(summonerId)
+  const tab = cf.getTab(puuid)
 
   if (tab) {
     try {
-      const savedInfo = await mainCall('storage/saved-player/query', {
-        selfSummonerId: summoner.me.summonerId,
-        summonerId: summonerId,
+      const savedInfo = await mainCall('storage/saved-player-with-games/query', {
+        selfPuuid: summoner.me.puuid,
+        puuid,
         region: app.lcuAuth.region,
         rsoPlatformId: app.lcuAuth.rsoPlatformId
       })
@@ -475,39 +470,39 @@ export async function querySavedInfo(summonerId: number) {
   return null
 }
 
-export async function fetchTabFullData(summonerId: number) {
-  const summoner = await fetchTabSummoner(summonerId)
+export async function fetchTabFullData(puuid: string) {
+  const summoner = await fetchTabSummoner(puuid)
 
   if (!summoner) {
-    return summonerId
+    return puuid
   }
 
   let failed = false
   await Promise.allSettled([
     (async () => {
-      const r = await fetchTabMatchHistory(summonerId)
+      const r = await fetchTabMatchHistory(puuid)
       if (!r) {
         failed = true
       }
     })(),
     (async () => {
-      const r = await fetchTabRankedStats(summonerId)
+      const r = await fetchTabRankedStats(puuid)
       if (!r) {
         failed = true
       }
     })(),
     (async () => {
-      await querySavedInfo(summonerId)
+      await querySavedInfo(puuid)
     })()
   ])
 
   if (failed) {
-    return summonerId
+    return puuid
   }
 
   return summoner
 }
 
-export function setInGameKdaSendPlayer(summonerId: number, send: boolean) {
-  return mainCall('core-functionality/send-list/update', summonerId, send)
+export function setInGameKdaSendPlayer(puuid: string, send: boolean) {
+  return mainCall('core-functionality/send-list/update', puuid, send)
 }

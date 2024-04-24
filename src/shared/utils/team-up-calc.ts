@@ -1,28 +1,28 @@
 type Edge = {
-  to: number
+  to: string
   weight: number
   ids: Set<string>
 }
 
-type ResultType = { players: number[]; times: number; ids: Set<string> }
+type ResultType = { players: string[]; times: number; ids: Set<string> }
 
 /**
  * 用于高效分析预组队情况的图结构
  */
 export class TeamUpGraph {
-  private adjacencyList: Map<number, Map<number, Edge>>
+  private adjacencyList: Map<string, Map<string, Edge>>
 
   constructor() {
     this.adjacencyList = new Map()
   }
 
-  addVertex(vertex: number): void {
+  addVertex(vertex: string): void {
     if (!this.adjacencyList.has(vertex)) {
       this.adjacencyList.set(vertex, new Map())
     }
   }
 
-  addEdge(vertex1: number, vertex2: number, id: string): void {
+  addEdge(vertex1: string, vertex2: string, id: string): void {
     this.addVertex(vertex1)
     this.addVertex(vertex2)
 
@@ -46,7 +46,7 @@ export class TeamUpGraph {
     }
   }
 
-  getTogetherTimes(playersGroups: number[][]): ResultType[] {
+  getTogetherTimes(playersGroups: string[][]): ResultType[] {
     const results: ResultType[] = []
 
     for (let players of playersGroups) {
@@ -82,13 +82,13 @@ export class TeamUpGraph {
   }
 }
 
-export function combinations(nums: number[]): number[][] {
-  const res: number[][] = []
+export function combinations(nums: string[]): string[][] {
+  const res: string[][] = []
   _backtrack(nums, [], 0, res)
   return res
 }
 
-function _backtrack(nums: number[], current: number[], start: number, res: number[][]): void {
+function _backtrack(nums: string[], current: string[], start: number, res: string[][]): void {
   res.push([...current])
 
   for (let i = start; i < nums.length; i++) {
@@ -107,12 +107,12 @@ function _backtrack(nums: number[], current: number[], start: number, res: numbe
  */
 export function calculateTogetherTimes(
   matches: {
-    players: number[]
+    players: string[]
     id: string
   }[],
-  players: number[],
+  players: string[],
   threshold = 3
-): Array<{ players: number[]; times: number; ids: string[] }> {
+): Array<{ players: string[]; times: number; ids: string[] }> {
   const graph = new TeamUpGraph()
   const set = new Set(players)
   matches
@@ -161,7 +161,7 @@ function toSetKey(set: Set<string>) {
   return Array.from(set.values()).sort().join('|')
 }
 
-function isSuperset(set: Set<number>, subset: Set<number>) {
+function isSuperset(set: Set<string>, subset: Set<string>) {
   if (subset.size > set.size) {
     return false
   }

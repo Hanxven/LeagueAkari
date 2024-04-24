@@ -7,11 +7,12 @@ import { chatSend } from '@main/http-api/chat'
 import { getGameflowSession } from '@main/http-api/gameflow'
 import { getGame, getMatchHistory } from '@main/http-api/match-history'
 import { getRankedStats } from '@main/http-api/ranked'
-import { getSummoner } from '@main/http-api/summoner'
+import { getSummoner, getSummonerByPuuid } from '@main/http-api/summoner'
 import { saveEncounteredGame } from '@main/storage/encountered-games'
 import { querySavedPlayerWithGames, saveSavedPlayer } from '@main/storage/saved-player'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall, sendEventToAllRenderer } from '@main/utils/ipc'
+import { EMPTY_PUUID } from '@shared/constants'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
 import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
@@ -97,35 +98,33 @@ export async function setupCoreFunctionality() {
         const t1 = gameflow.session.gameData.teamOne
         const t2 = gameflow.session.gameData.teamTwo
 
-        const all = [...t1, ...t2].filter(
-          (p) => p.summonerId && p.summonerId !== summoner.me?.summonerId
-        )
+        const all = [...t1, ...t2].filter((p) => p.puuid && p.puuid !== summoner.me?.puuid)
 
         const tasks = all.map(async (p) => {
           const task1 = saveSavedPlayer({
             encountered: true,
             region: lcuConnectionState.auth!.region,
             rsoPlatformId: lcuConnectionState.auth!.rsoPlatformId,
-            selfSummonerId: summoner.me!.summonerId,
-            summonerId: p.summonerId
+            selfPuuid: summoner.me!.puuid,
+            puuid: p.puuid
           })
 
           const task2 = saveEncounteredGame({
             region: lcuConnectionState.auth!.region,
             rsoPlatformId: lcuConnectionState.auth!.rsoPlatformId,
-            selfSummonerId: summoner.me!.summonerId,
-            summonerId: p.summonerId,
+            selfPuuid: summoner.me!.puuid,
+            puuid: p.puuid,
             gameId: gameflow.session!.gameData.gameId
           })
 
           const r = await Promise.allSettled([task1, task2])
           if (r[0].status === 'fulfilled') {
-            logger.info(`保存玩家信息: ${r[0].value.summonerId}`)
+            logger.info(`保存玩家信息: ${r[0].value.puuid}`)
           } else {
             logger.info(`无法保存玩家信息: ${formatError(r[0].reason)}`)
           }
           if (r[1].status === 'fulfilled') {
-            logger.info(`保存游戏历史记录: ${r[1].value.summonerId} ${r[1].value.gameId}`)
+            logger.info(`保存游戏历史记录: ${r[1].value.puuid} ${r[1].value.gameId}`)
           } else {
             logger.info(`无法保存游戏历史记录: ${formatError(r[1].reason)}`)
           }
@@ -154,17 +153,17 @@ async function champSelectQuery() {
   const session = (await getChampSelectSession()).data
 
   const m = session.myTeam
-    .filter((p) => p.summonerId)
-    .map((t, i) => ({ summonerId: t.summonerId, team: 'our', order: i }))
+    .filter((p) => p.puuid !== EMPTY_PUUID)
+    .map((t, i) => ({ puuid: t.puuid, team: 'our', order: i }))
 
   const t = session.theirTeam
-    .filter((p) => p.summonerId)
-    .map((t, i) => ({ summonerId: t.summonerId, team: 'their', order: i }))
+    .filter((p) => p.puuid !== EMPTY_PUUID)
+    .map((t, i) => ({ puuid: t.puuid, team: 'their', order: i }))
 
   const visiblePlayers = [...m, ...t]
 
   const playerTasks = visiblePlayers.map((p) => {
-    return loadPlayerStats(p.summonerId)
+    return loadPlayerStats(p.puuid)
   })
 
   await Promise.all(playerTasks)
@@ -174,17 +173,17 @@ async function inGameQuery() {
   const session = (await getGameflowSession()).data
 
   const m = session.gameData.teamOne
-    .filter((p) => p.summonerId)
-    .map((t, i) => ({ summonerId: t.summonerId, team: '100', order: i }))
+    .filter((p) => p.puuid !== EMPTY_PUUID)
+    .map((t, i) => ({ puuid: t.puuid, team: '100', order: i }))
 
   const t = session.gameData.teamTwo
-    .filter((p) => p.summonerId)
-    .map((t, i) => ({ summonerId: t.summonerId, team: '200', order: i }))
+    .filter((p) => p.puuid !== EMPTY_PUUID)
+    .map((t, i) => ({ puuid: t.puuid, team: '200', order: i }))
 
   const visiblePlayers = [...m, ...t]
 
   const playerTasks = visiblePlayers.map((p) => {
-    return loadPlayerStats(p.summonerId)
+    return loadPlayerStats(p.puuid)
   })
 
   await Promise.all(playerTasks)
@@ -198,21 +197,19 @@ async function inGameQuery() {
  * - 数据库中已记录的数据
  * - 战绩信息
  */
-async function loadPlayerStats(summonerId: number) {
-  if (!cf.ongoingPlayers.has(summonerId)) {
-    runInAction(() =>
-      cf.ongoingPlayers.set(summonerId, observable({ summonerId }, {}, { deep: false }))
-    )
-    sendEventToAllRenderer('core-functionality/ongoing-player/new', summonerId)
+async function loadPlayerStats(puuid: string) {
+  if (!cf.ongoingPlayers.has(puuid)) {
+    runInAction(() => cf.ongoingPlayers.set(puuid, observable({ puuid }, {}, { deep: false })))
+    sendEventToAllRenderer('core-functionality/ongoing-player/new', puuid)
   }
 
-  const player = cf.ongoingPlayers.get(summonerId)!
+  const player = cf.ongoingPlayers.get(puuid)!
 
   // 召唤师信息必须被提前加载完成
-  const summonerInfo = (await getSummoner(summonerId)).data
+  const summonerInfo = (await getSummonerByPuuid(puuid)).data
   runInAction(() => (player.summoner = summonerInfo))
 
-  sendEventToAllRenderer('core-functionality/ongoing-player/summoner', summonerId, summonerInfo)
+  sendEventToAllRenderer('core-functionality/ongoing-player/summoner', puuid, summonerInfo)
 
   const auth = lcuConnectionState.auth
   const me = summoner.me
@@ -229,14 +226,14 @@ async function loadPlayerStats(summonerId: number) {
     const savedInfo = await querySavedPlayerWithGames({
       region: auth.region,
       rsoPlatformId: auth.rsoPlatformId,
-      selfSummonerId: me.summonerId,
-      summonerId: summonerId
+      selfPuuid: me.puuid,
+      puuid: puuid
     })
 
     if (savedInfo) {
       runInAction(() => (player.savedInfo = savedInfo))
 
-      sendEventToAllRenderer('core-functionality/ongoing-player/saved-info', summonerId, savedInfo)
+      sendEventToAllRenderer('core-functionality/ongoing-player/saved-info', puuid, savedInfo)
     }
   }
 
@@ -245,15 +242,11 @@ async function loadPlayerStats(summonerId: number) {
       return
     }
 
-    const rankedStats = (await getRankedStats(summonerInfo.puuid)).data
+    const rankedStats = (await getRankedStats(puuid)).data
 
     runInAction(() => (player.rankedStats = rankedStats))
 
-    sendEventToAllRenderer(
-      'core-functionality/ongoing-player/ranked-stats',
-      summonerId,
-      rankedStats
-    )
+    sendEventToAllRenderer('core-functionality/ongoing-player/ranked-stats', puuid, rankedStats)
   }
 
   const _loadMatchHistory = async () => {
@@ -274,7 +267,7 @@ async function loadPlayerStats(summonerId: number) {
 
     sendEventToAllRenderer(
       'core-functionality/ongoing-player/match-history',
-      summonerId,
+      puuid,
       matchHistoryResult.games.games
     )
 
@@ -302,13 +295,11 @@ async function loadPlayerStats(summonerId: number) {
 
           sendEventToAllRenderer(
             'core-functionality/ongoing-player/match-history-detailed-game',
-            summonerId,
+            puuid,
             g
           )
         } catch (error) {
-          logger.warn(
-            `无法加载对局, ID: ${game.game.gameId} ${formatError(error)}`
-          )
+          logger.warn(`无法加载对局, ID: ${game.game.gameId} ${formatError(error)}`)
           // throw error // it will not cause an error
         }
       }
@@ -340,47 +331,47 @@ function analyzeTeamUp() {
   }
 
   // 统计所有目前游戏中的每个队伍，并且将这些队伍分别视为一个独立的个体，使用 `${游戏ID}|${队伍ID}` 进行唯一区分
-  const teamSides = new Map<string, number[]>()
+  const teamSides = new Map<string, string[]>()
   for (const game of games) {
     const mode = game.gameMode
 
-    // participantId -> summonerId
+    // participantId -> puuid
     const participantsMap = game.participantIdentities.reduce(
       (obj, current) => {
-        obj[current.participantId] = current.player.summonerId
+        obj[current.participantId] = current.player.puuid
         return obj
       },
-      {} as Record<string, number>
+      {} as Record<string, string>
     )
 
-    let grouped: { teamId: number; summonerId: number }[]
+    let grouped: { teamId: number; puuid: string }[]
     if (mode === 'CHERRY') {
       grouped = game.participants.map((p) => ({
         teamId: p.stats.subteamPlacement, // 取值范围是 1, 2, 3, 4, 这个实际上也是最终队伍排名
-        summonerId: participantsMap[p.participantId]
+        puuid: participantsMap[p.participantId]
       }))
     } else {
       // 对于其他模式，按照两队式计算
       grouped = game.participants.map((p) => ({
         teamId: p.teamId,
-        summonerId: participantsMap[p.participantId]
+        puuid: participantsMap[p.participantId]
       }))
     }
 
-    // teamId -> summonerId[]，这个记录的是这条战绩中的
+    // teamId -> puuid[]，这个记录的是这条战绩中的
     const teamPlayersMap = grouped.reduce(
       (obj, current) => {
         if (obj[current.teamId]) {
-          obj[current.teamId].push(current.summonerId)
+          obj[current.teamId].push(current.puuid)
         } else {
-          obj[current.teamId] = [current.summonerId]
+          obj[current.teamId] = [current.puuid]
         }
         return obj
       },
-      {} as Record<string, number[]>
+      {} as Record<string, string[]>
     )
 
-    // sideId -> summonerId[]，按照队伍区分。
+    // sideId -> puuid[]，按照队伍区分。
     Object.entries(teamPlayersMap).forEach(([teamId, players]) => {
       const sideId = `${game.gameId}|${teamId}`
       if (teamSides.has(sideId)) {
@@ -402,13 +393,13 @@ function analyzeTeamUp() {
     {} as Record<
       string,
       {
-        players: number[]
+        players: string[]
         times: number
       }[]
     >
   )
 
-  const teams: { players: number[]; times: number; team: string; _id: number }[] = []
+  const teams: { players: string[]; times: number; team: string; _id: number }[] = []
 
   Object.entries(result).forEach(([team, preMade]) => {
     teams.push(...preMade.map((t, i) => ({ ...t, team, _id: i })))
@@ -436,9 +427,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
   isSimulatingKeyboard = true
 
   if (!summoner.me || !cf.ongoingTeams || !cf.ongoingChampionSelections) {
-    logger.warn(
-      `信息不足: ${summoner.me} ${cf.ongoingTeams} ${cf.ongoingChampionSelections}`
-    )
+    logger.warn(`信息不足: ${summoner.me} ${cf.ongoingTeams} ${cf.ongoingChampionSelections}`)
     isSimulatingKeyboard = false
     return
   }
@@ -447,7 +436,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
 
   let selfTeam = ''
   for (const [t, players] of Object.entries(cf.ongoingTeams)) {
-    if (players.includes(summoner.me.summonerId)) {
+    if (players.includes(summoner.me.puuid)) {
       selfTeam = t
       break
     }
@@ -458,7 +447,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
     return
   }
 
-  const teamsSet: Record<'our' | 'their', Set<number>> = {
+  const teamsSet: Record<'our' | 'their', Set<string>> = {
     our: new Set(),
     their: new Set()
   }
@@ -472,14 +461,14 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
   }
 
   const players = Array.from(cf.ongoingPlayers.values()).filter((p) => {
-    if (!p.matchHistory || (!cf.ongoingChampionSelections?.[p.summonerId] && !p.summoner)) {
+    if (!p.matchHistory || (!cf.ongoingChampionSelections?.[p.puuid] && !p.summoner)) {
       return false
     }
 
     if (teamSide === 'our') {
-      return teamsSet.our.has(p.summonerId)
+      return teamsSet.our.has(p.puuid)
     } else {
-      return teamsSet.their.has(p.summonerId)
+      return teamsSet.their.has(p.puuid)
     }
   })
 
@@ -488,7 +477,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
     return
   }
 
-  const sendPlayers = players.filter((p) => cf.sendList[p.summonerId])
+  const sendPlayers = players.filter((p) => cf.sendList[p.puuid])
 
   if (!sendPlayers.length) {
     isSimulatingKeyboard = false
@@ -498,7 +487,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
   // 应对英雄重复的情况，一个典型是克隆模式
   const championCountMap = players.reduce(
     (obj, cur) => {
-      const playerSelected = cf.ongoingChampionSelections![cur.summonerId]
+      const playerSelected = cf.ongoingChampionSelections![cur.puuid]
 
       if (obj[playerSelected]) {
         obj[playerSelected]++
@@ -526,9 +515,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
 
   sendPlayers
     .map((p) => {
-      const analysis = getAnalysis(
-        withSelfParticipantMatchHistory(p.matchHistory || [], p.summonerId)
-      )
+      const analysis = getAnalysis(withSelfParticipantMatchHistory(p.matchHistory || [], p.puuid))
       return {
         player: p,
         analysis,
@@ -538,7 +525,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
     .filter(({ analysis }) => analysis.averageKda >= cf.settings.sendKdaThreshold)
     .map(({ player, analysis, isEmpty }) => {
       let name: string | undefined
-      let playerSelected = cf.ongoingChampionSelections![player.summonerId]
+      let playerSelected = cf.ongoingChampionSelections![player.puuid]
       if (playerSelected && championCountMap[playerSelected] > 1) {
         name = player.summoner?.gameName || player.summoner?.displayName
       } else {
@@ -548,7 +535,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
           player.summoner?.displayName
       }
 
-      name = name || player.summonerId.toString()
+      name = name || player.puuid.slice(0, 4)
 
       if (isEmpty) {
         return `${name} 近期无有效对局`
@@ -694,9 +681,9 @@ function ipcCall() {
     return toJS(cf.ongoingPlayers)
   })
 
-  onRendererCall('core-functionality/send-list/update', (_, summonerId, send) => {
-    if (cf.sendList[summonerId] !== undefined) {
-      runInAction(() => (cf.sendList[summonerId] = send))
+  onRendererCall('core-functionality/send-list/update', (_, puuid, send) => {
+    if (cf.sendList[puuid] !== undefined) {
+      runInAction(() => (cf.sendList[puuid] = send))
     }
   })
 
@@ -785,24 +772,22 @@ function ipcCall() {
     const r = await saveSavedPlayer(player)
 
     if (cf.ongoingPlayers) {
-      const p = cf.ongoingPlayers.get(player.summonerId)
+      const p = cf.ongoingPlayers.get(player.puuid)
       if (p) {
         const savedInfo = await querySavedPlayerWithGames({
           region: player.region,
           rsoPlatformId: player.rsoPlatformId,
-          selfSummonerId: player.selfSummonerId,
-          summonerId: player.summonerId
+          selfPuuid: player.selfPuuid,
+          puuid: player.puuid
         })
 
         if (savedInfo) {
           runInAction(() => (p.savedInfo = savedInfo))
           sendEventToAllRenderer(
             'core-functionality/ongoing-player/saved-info',
-            player.summonerId,
+            player.puuid,
             savedInfo
           )
-
-          console.log('sent!', player, savedInfo)
         }
       }
     }

@@ -31,6 +31,8 @@
 </template>
 
 <script setup lang="ts">
+import { getSummonerByPuuid } from '@shared/renderer-http-api/summoner'
+import { mainCall } from '@shared/renderer-utils/ipc'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NButton, NInput, NModal } from 'naive-ui'
@@ -39,9 +41,7 @@ import { nextTick, ref, shallowRef, watch } from 'vue'
 import { useAppStore } from '@main-window/features/app/store'
 import { SavedPlayerInfo } from '@main-window/features/core-functionality/store'
 import { useSummonerStore } from '@main-window/features/lcu-state-sync/summoner'
-import { getSummoner } from '@shared/renderer-http-api/summoner'
 import { laNotification } from '@main-window/notification'
-import { mainCall } from '@shared/renderer-utils/ipc'
 
 import LcuImage from './LcuImage.vue'
 
@@ -53,27 +53,27 @@ const savedInfo = shallowRef<SavedPlayerInfo | null>(null)
 const el = ref()
 
 const emits = defineEmits<{
-  (e: 'edited', summonerId: number): void
+  (e: 'edited', puuid: string): void
 }>()
 
 const props = defineProps<{
-  summonerId?: number
+  puuid?: string
 }>()
 
-watch([() => show.value, () => props.summonerId], async ([sh, id]) => {
-  if (!id || !app.lcuAuth || !summoner.me) {
+watch([() => show.value, () => props.puuid], async ([sh, puuid]) => {
+  if (!puuid || !app.lcuAuth || !summoner.me) {
     summonerInfo.value = null
     return
   }
 
   if (!summonerInfo.value && sh) {
     try {
-      const s = (await getSummoner(id)).data
+      const s = (await getSummonerByPuuid(puuid)).data
       summonerInfo.value = s
 
       const p = await mainCall('storage/saved-player-with-games/query', {
-        selfSummonerId: summoner.me.summonerId,
-        summonerId: props.summonerId,
+        selfPuuid: summoner.me.puuid,
+        puuid: props.puuid,
         region: app.lcuAuth.region,
         rsoPlatformId: app.lcuAuth.rsoPlatformId
       })
@@ -83,7 +83,7 @@ watch([() => show.value, () => props.summonerId], async ([sh, id]) => {
         text.value = p.tag
       }
     } catch (error) {
-      laNotification.warn('无法加载', `无法加载召唤师 ${id}`, error)
+      laNotification.warn('无法加载', `无法加载召唤师 ${puuid}`, error)
     }
   }
 })
@@ -101,14 +101,14 @@ const summoner = useSummonerStore()
 const text = ref('')
 
 const handleSaveTag = async () => {
-  if (!app.lcuAuth || !summoner.me || !props.summonerId) {
+  if (!app.lcuAuth || !summoner.me || !props.puuid) {
     return
   }
 
   try {
     await mainCall('core-functionality/saved-player/save', {
-      selfSummonerId: summoner.me.summonerId,
-      summonerId: props.summonerId,
+      selfPuuid: summoner.me.puuid,
+      puuid: props.puuid,
       region: app.lcuAuth.region,
       rsoPlatformId: app.lcuAuth.rsoPlatformId,
       tag: text.value || null
@@ -120,7 +120,7 @@ const handleSaveTag = async () => {
       laNotification.success('玩家标记', '已清除玩家标记')
     }
 
-    emits('edited', props.summonerId)
+    emits('edited', props.puuid)
     show.value = false
   } catch {
     laNotification.warn('玩家标记', '无法更新玩家标记')

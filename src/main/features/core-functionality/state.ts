@@ -1,9 +1,10 @@
 import { lcuConnectionState } from '@main/core/lcu-connection'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
-import { sendEventToAllRenderer } from '@main/utils/ipc'
+import { EMPTY_PUUID } from '@shared/constants'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { session } from 'electron'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { champSelect } from '../lcu-state-sync/champ-select'
@@ -63,7 +64,7 @@ class CoreFunctionalitySettings {
 
 export interface OngoingPlayer {
   // 当前的召唤师 ID，和 key 值相同
-  summonerId: number
+  puuid: string
 
   /**
    * 召唤师信息
@@ -99,13 +100,13 @@ class CoreFunctionalityState {
    *
    * 出于性能优化，手动同步该状态
    */
-  ongoingPlayers = observable(new Map<number, OngoingPlayer>(), { deep: false })
+  ongoingPlayers = observable(new Map<string, OngoingPlayer>(), { deep: false })
 
   // 用于临时对局分析的游戏详情图
   tempDetailedGames = observable(new Map<number, Game>(), { deep: false })
 
   ongoingPreMadeTeams: {
-    players: number[]
+    players: string[]
     times: number
     team: string
     _id: number
@@ -131,16 +132,16 @@ class CoreFunctionalityState {
         return null
       }
 
-      const selections: Record<number | string, number> = {}
+      const selections: Record<string, number> = {}
       champSelect.session.myTeam.forEach((p) => {
-        if (p.summonerId) {
-          selections[p.summonerId] = p.championId || p.championPickIntent
+        if (p.puuid) {
+          selections[p.puuid] = p.championId || p.championPickIntent
         }
       })
 
       champSelect.session.theirTeam.forEach((p) => {
-        if (p.summonerId) {
-          selections[p.summonerId] = p.championId || p.championPickIntent
+        if (p.puuid) {
+          selections[p.puuid] = p.championId || p.championPickIntent
         }
       })
 
@@ -150,17 +151,9 @@ class CoreFunctionalityState {
         return null
       }
 
-      const selections: Record<number | string, number> = {}
-      gameflow.session.gameData.teamOne.forEach((p) => {
-        if (p.summonerId) {
-          selections[p.summonerId] = p.championId
-        }
-      })
-
-      gameflow.session.gameData.teamTwo.forEach((p) => {
-        if (p.summonerId) {
-          selections[p.summonerId] = p.championId
-        }
+      const selections: Record<string, number> = {}
+      gameflow.session.gameData.playerChampionSelections.forEach((p) => {
+        selections[p.puuid] = p.championId
       })
 
       return selections
@@ -178,21 +171,21 @@ class CoreFunctionalityState {
         return null
       }
 
-      const teams: Record<string, number[]> = {
+      const teams: Record<string, string[]> = {
         our: [],
         their: []
       }
 
       champSelect.session.myTeam
-        .filter((p) => p.summonerId)
+        .filter((p) => p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
-          teams['our'].push(p.summonerId)
+          teams['our'].push(p.puuid)
         })
 
       champSelect.session.theirTeam
-        .filter((p) => p.summonerId)
+        .filter((p) => p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
-          teams['their'].push(p.summonerId)
+          teams['their'].push(p.puuid)
         })
 
       return teams
@@ -201,21 +194,21 @@ class CoreFunctionalityState {
         return null
       }
 
-      const teams: Record<string, number[]> = {
+      const teams: Record<string, string[]> = {
         100: [],
         200: []
       }
 
       gameflow.session.gameData.teamOne
-        .filter((p) => p.summonerId)
+        .filter((p) => p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
-          teams['100'].push(p.summonerId)
+          teams['100'].push(p.puuid)
         })
 
       gameflow.session.gameData.teamTwo
-        .filter((p) => p.summonerId)
+        .filter((p) => p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
-          teams['200'].push(p.summonerId)
+          teams['200'].push(p.puuid)
         })
 
       return teams

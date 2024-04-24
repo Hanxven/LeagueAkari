@@ -12,16 +12,16 @@ export class EncounteredGame {
   @Index('encountered_games_game_id_index')
   gameId: number
 
-  @Column({ type: 'integer' })
-  @Index('encountered_games_summoner_id_index')
-  summonerId: number
+  @Column({ type: 'varchar', nullable: false })
+  @Index('encountered_games_puuid_index')
+  puuid: string
 
   /**
    * 记录游戏时，使用 League Akari 的玩家是谁
    */
-  @Column({ type: 'integer', nullable: false })
-  @Index('encountered_games_self_summoner_id_index')
-  selfSummonerId: number
+  @Column({ type: 'varchar', nullable: false })
+  @Index('encountered_games_self_puuid_index')
+  selfPuuid: string
 
   /**
    * 地区

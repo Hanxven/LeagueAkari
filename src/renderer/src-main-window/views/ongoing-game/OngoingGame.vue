@@ -3,7 +3,7 @@
     <!-- 提供一个简单的历史对局查看工具 -->
     <StandaloneMatchHistoryCardModal
       :game-id="showingGame.id"
-      :self-id="showingGame.summonerId"
+      :self-puuid="showingGame.puuid"
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
     <PlayerTagEditModal
@@ -16,13 +16,13 @@
         <div class="team">
           <PlayerInfoCard
             v-for="p of participants"
-            :key="p.summonerId"
-            :summoner-id="p.summonerId"
-            :is-self="p.summonerId === summoner.me?.summonerId"
+            :key="p.puuid"
+            :puuid="p.puuid"
+            :is-self="p.puuid === summoner.me?.puuid"
             :summoner-info="p.summoner"
             :ranked-stats="p.rankedStats"
             :match-history="p.matchHistory"
-            :champion-id="cf.ongoingChampionSelections?.[p.summonerId]"
+            :champion-id="cf.ongoingChampionSelections?.[p.puuid]"
             :team="team"
             :queue-type="cf.ongoingGameInfo?.queueType"
             :saved-info="p.savedInfo"
@@ -106,14 +106,14 @@
             <NCheckbox
               size="small"
               v-for="player of team"
-              :key="player.summonerId"
-              :checked="cf.sendList[player.summonerId]"
-              @update:checked="(val) => setInGameKdaSendPlayer(player.summonerId, val)"
+              :key="player.puuid"
+              :checked="cf.sendList[player.puuid]"
+              @update:checked="(val) => setInGameKdaSendPlayer(player.puuid, val)"
               >{{
                 summonerName(
                   player.summoner?.gameName || player.summoner?.displayName,
                   player.summoner?.tagLine,
-                  player.summonerId.toString()
+                  player.puuid.slice(0, 6)
                 )
               }}</NCheckbox
             >
@@ -129,6 +129,7 @@
 </template>
 
 <script setup lang="ts">
+import { EMPTY_PUUID } from '@shared/constants'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { NCard, NCheckbox } from 'naive-ui'
@@ -156,11 +157,11 @@ const router = useRouter()
 const gameflow = useGameflowStore()
 const summoner = useSummonerStore()
 
-const handleToSummoner = (summonerId: number) => {
-  if (summonerId === 0) {
+const handleToSummoner = (puuid: string) => {
+  if (puuid === EMPTY_PUUID) {
     return
   }
-  return router.replace(`/match-history/${summonerId}`)
+  return router.replace(`/match-history/${puuid}`)
 }
 
 const isIdle = computed(() => {
@@ -220,20 +221,20 @@ const formatTeamText = (team: string) => {
 
 const showingGame = reactive({
   id: 0,
-  summonerId: 0
+  puuid: ''
 })
 const isStandaloneMatchHistoryCardShow = ref(false)
-const handleShowGame = (gameId: number, summonerId: number) => {
+const handleShowGame = (gameId: number, puuid: string) => {
   showingGame.id = gameId
-  showingGame.summonerId = summonerId
+  showingGame.puuid = puuid
   isStandaloneMatchHistoryCardShow.value = true
 }
 
 const isPlayerTagEditModalShow = ref(false)
-const tagEditingSummonerId = ref(0)
-const handleTagEditing = (summonerId: number) => {
+const tagEditingSummonerId = ref('')
+const handleTagEditing = (puuid: string) => {
   isPlayerTagEditModalShow.value = true
-  tagEditingSummonerId.value = summonerId
+  tagEditingSummonerId.value = puuid
 }
 
 const el = ref()

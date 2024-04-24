@@ -55,18 +55,18 @@
 </template>
 
 <script setup lang="ts">
+import { getSummonerByPuuid } from '@shared/renderer-http-api/summoner'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NCard } from 'naive-ui'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import CopyableText from '@main-window/components/CopyableText.vue'
 import LcuImage from '@main-window/components/LcuImage.vue'
-import { getSummoner } from '@shared/renderer-http-api/summoner'
 import { laNotification } from '@main-window/notification'
+import { EMPTY_PUUID } from '@shared/constants'
 
-const id = 'comp:search-summoner'
 
 // 内部组件
 const props = defineProps<{
@@ -75,7 +75,7 @@ const props = defineProps<{
 
   // 如果提供 ID，那么就加载
   // 或者直接提供现成的数据
-  summoner: SummonerInfo | number
+  summoner: SummonerInfo | string
 }>()
 
 const selfData = ref<SummonerInfo>()
@@ -83,22 +83,10 @@ const selfData = ref<SummonerInfo>()
 const route = useRoute()
 const router = useRouter()
 
-const isCurrentRoute = computed(() => {
-  if (route.name === 'match-history' && route.params.summonerId) {
-    const id = Number(route.params.summonerId)
-    return (
-      (typeof props.summoner === 'number' && props.summoner === id) ||
-      (typeof props.summoner === 'object' && props.summoner.summonerId === id)
-    )
-  }
-
-  return false
-})
-
 onMounted(async () => {
-  if (typeof props.summoner === 'number') {
+  if (typeof props.summoner === 'string') {
     try {
-      selfData.value = (await getSummoner(props.summoner)).data
+      selfData.value = (await getSummonerByPuuid(props.summoner)).data
     } catch (error) {
       laNotification.warn('卡片组件', '加载召唤师信息时失败', error)
     }
@@ -106,11 +94,11 @@ onMounted(async () => {
 })
 
 const handleToSummoner = () => {
-  // if (isCurrentRoute.value) {
-  //   return
-  // }
+  const id = typeof props.summoner === 'object' ? props.summoner.puuid : props.summoner
 
-  const id = typeof props.summoner === 'object' ? props.summoner.summonerId : props.summoner
+  if (id === EMPTY_PUUID) {
+    return
+  }
 
   router.replace(`/match-history/${id}`)
 }

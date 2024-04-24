@@ -44,6 +44,8 @@
 
 - 存储数据的数据库现在是 `LeagueAkari.db`，位于应用目录 `C:\Users\{Username}\AppData\Roaming\league-akari\LeagueAkari.db`。
 
+- 现在部分软件内部的用户 ID 从 Summoner ID 更改为 PUUID。
+
 ## 修复
 
 - 现在新的人机队列（如“新：一般级”）会被正确地识别为非 PVP 队列。（意味着它们不会被算作有效对局）
@@ -53,8 +55,6 @@
 - 现在数据库添加了额外的字段，以记录 League Akari 的使用者以及所属大区，避免潜在的混淆。
 
 - 重生倒计时会在游戏结束时正确地清理状态。
-
-- ID 系统更新后，原有 summonerId 发生变化。调整以保证原记录可被正常展示。
 
 # 1.1.4 (2024-3-30)
 

@@ -16,7 +16,7 @@
             "
             class="name"
             :class="{ self: p.isSelf }"
-            @click="() => handleToSummoner(p.identity.player.summonerId)"
+            @click="() => handleToSummoner(p.identity.player.puuid)"
           >
             {{
               summonerName(
@@ -194,17 +194,10 @@
         <CherryModeDetailedGame
           class="detailed-game"
           :game="game"
-          :self-id="selfId"
           :self-puuid="selfPuuid"
           v-if="game.gameMode === 'CHERRY'"
         />
-        <NormalNodeDetailedGame
-          class="detailed-game"
-          v-else
-          :game="game"
-          :self-id="selfId"
-          :self-puuid="selfPuuid"
-        />
+        <NormalNodeDetailedGame class="detailed-game" v-else :game="game" :self-puuid="selfPuuid" />
       </template>
       <div v-else-if="isLoading" class="loading">加载中...</div>
       <div v-else class="loading">无法加载</div>
@@ -213,6 +206,7 @@
 </template>
 
 <script setup lang="ts">
+import { EMPTY_PUUID } from '@shared/constants'
 import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import {
@@ -240,7 +234,6 @@ import MiscellaneousPanel from './MiscellaneousPanel.vue'
 import NormalNodeDetailedGame from './NormalModeDetailedGame.vue'
 
 const props = defineProps<{
-  selfId?: number
   selfPuuid?: string
   isLoading: boolean
   isExpanded: boolean
@@ -266,23 +259,14 @@ useTimeoutPoll(
 )
 
 const self = computed(() => {
-  if (!props.selfId && !props.selfPuuid) {
+  if (!props.selfPuuid) {
     return null
   }
 
-  let participantId: number | undefined
-
-  const pById = props.game.participantIdentities.find(
-    (p) => p.player.summonerId === props.selfId
-  )?.participantId
-
-  const pByPuuid = props.game.participantIdentities.find(
+  const participantId = props.game.participantIdentities.find(
     (p) => p.player.puuid === props.selfPuuid
   )?.participantId
 
-  participantId = pById || pByPuuid
-
-  // 新系统更新后，summonerId 无法对应
   if (!participantId) {
     return null
   }
@@ -392,7 +376,7 @@ const teams = computed(() => {
   const all = props.game.participants.map((participant) => {
     return {
       ...participant,
-      isSelf: identities[participant.participantId].player.summonerId === props.selfId,
+      isSelf: identities[participant.participantId].player.puuid === props.selfPuuid,
       identity: identities[participant.participantId]
     }
   })
@@ -433,11 +417,12 @@ const emits = defineEmits<{
 }>()
 
 const router = useRouter()
-const handleToSummoner = (summonerId: number) => {
-  if (summonerId === 0) {
+const handleToSummoner = (puuid: string) => {
+  if (puuid === EMPTY_PUUID) {
     return
   }
-  router.replace(`/match-history/${summonerId}`)
+
+  router.replace(`/match-history/${puuid}`)
 }
 </script>
 

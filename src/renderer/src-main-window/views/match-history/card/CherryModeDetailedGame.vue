@@ -21,7 +21,7 @@
             class="participant"
             :class="{ self: p.isSelf }"
             v-for="p of participants"
-            :key="p.identity.player.summonerId"
+            :key="p.identity.player.puuid"
           >
             <td style="min-width: 180px">
               <div class="info">
@@ -42,14 +42,18 @@
                       )
                     "
                     class="name"
-                    @click="handleToSummoner(p.identity.player.summonerId)"
+                    @click="handleToSummoner(p.identity.player.puuid)"
                   >
                     {{
                       summonerName(
                         p.identity.player.gameName || p.identity.player.summonerName,
                         p.identity.player.tagLine
                       )
-                    }}{{ p.identity.player.summonerId === 0 ? ' (人机)' : '' }}
+                    }}{{
+                      p.identity.player.puuid === '00000000-0000-0000-0000-000000000000'
+                        ? ' (人机)'
+                        : ''
+                    }}
                   </div>
                   <!-- <div class="rank">-</div> -->
                 </div>
@@ -148,6 +152,7 @@
 </template>
 
 <script setup lang="ts">
+import { EMPTY_PUUID } from '@shared/constants'
 import { Game, Participant, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
@@ -169,7 +174,6 @@ const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
 
 const props = defineProps<{
   game: Game
-  selfId?: number
   selfPuuid?: string
 }>()
 
@@ -185,9 +189,7 @@ const match = computed(() => {
 
   const all: ParticipantWithIdentity[] = props.game.participants.map((participant) => ({
     ...participant,
-    isSelf:
-      identities[participant.participantId].player.summonerId === props.selfId ||
-      identities[participant.participantId].player.puuid === props.selfPuuid,
+    isSelf: identities[participant.participantId].player.puuid === props.selfPuuid,
     identity: identities[participant.participantId]
   }))
 
@@ -271,12 +273,12 @@ const match = computed(() => {
 
 const router = useRouter()
 
-const handleToSummoner = (summonerId: number) => {
+const handleToSummoner = (puuid: string) => {
   // 人机不跳
-  if (summonerId === 0) {
+  if (puuid === EMPTY_PUUID) {
     return
   }
-  router.replace(`/match-history/${summonerId}`)
+  router.replace(`/match-history/${puuid}`)
 }
 </script>
 

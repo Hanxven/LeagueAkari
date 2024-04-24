@@ -1,14 +1,14 @@
 import { ComputedRef, Ref, UnwrapRef, computed, reactive, ref } from 'vue'
 
 export interface TabType<T = any> {
-  id: number
+  id: string
   isPinned: boolean
   isTemporary: boolean
   data: T
 }
 
 export interface UnwrappedTabType<T = any> {
-  id: number
+  id: string
   isPinned: boolean
   isTemporary: boolean
   data: UnwrapRef<T>
@@ -17,19 +17,19 @@ export interface UnwrappedTabType<T = any> {
 export type UseTabsReturn<T> = {
   tabs: Readonly<Ref<UnwrappedTabType<T>[]>>
   current: ComputedRef<UnwrappedTabType<T> | null>
-  setCurrent: (id: number) => void
-  add: (id: number, data: T, options?: { pin?: boolean; temporary?: boolean }) => void
-  get: (id: number) => UnwrappedTabType<T> | null
-  set: (id: number, data: T) => void
-  del: (id: number) => void
-  setPinned: (id: number, pin: boolean) => void
-  setTemporary: (id: number, temporary: boolean) => void
-  move: (sourceId: number, targetId: number) => void
+  setCurrent: (id: string) => void
+  add: (id: string, data: T, options?: { pin?: boolean; temporary?: boolean }) => void
+  get: (id: string) => UnwrappedTabType<T> | null
+  set: (id: string, data: T) => void
+  del: (id: string) => void
+  setPinned: (id: string, pin: boolean) => void
+  setTemporary: (id: string, temporary: boolean) => void
+  move: (sourceId: string, targetId: string) => void
   closeAllTemporary: () => void
   closeAll: () => void
-  closeOther: (currentId: number) => void
-  canCloseOther: (currentId: number) => boolean
-  canCloseCurrent: (currentId: number) => boolean
+  closeOther: (currentId: string) => void
+  canCloseOther: (currentId: string) => boolean
+  canCloseCurrent: (currentId: string) => boolean
   canCloseAllTemporary: () => boolean
 }
 
@@ -39,8 +39,8 @@ export type UseTabsReturn<T> = {
  */
 export function useTabs<T = any>(): UseTabsReturn<T> {
   const tabs = ref<TabType<T>[]>([])
-  const tabsMap = new Map<number, UnwrappedTabType<T>>()
-  const currentTabId = ref<number | null>(null)
+  const tabsMap = new Map<string, UnwrappedTabType<T>>()
+  const currentTabId = ref<string | null>(null)
 
   const current = computed(() => {
     if (currentTabId.value === null) {
@@ -49,7 +49,7 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     return tabsMap.get(currentTabId.value) || null
   })
 
-  const setCurrent = (id: number) => {
+  const setCurrent = (id: string) => {
     if (tabsMap.has(id)) {
       currentTabId.value = id
     } else {
@@ -68,7 +68,7 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     setCurrent(tabs.value[index - 1].id)
   }
 
-  const del = (id: number) => {
+  const del = (id: string) => {
     const index = tabs.value.findIndex((t) => t.id === id)
     if (index === -1) {
       console.warn(`Tab with ID ${id} not found.`)
@@ -88,7 +88,7 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     tabsMap.delete(id)
   }
 
-  const get = (id: number) => {
+  const get = (id: string) => {
     const tab = tabsMap.get(id)
     if (!tab) {
       return null
@@ -97,7 +97,7 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
   }
 
   const add = (
-    id: number,
+    id: string,
     data: T,
     options: {
       pin?: boolean
@@ -125,7 +125,7 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     }
   }
 
-  const set = (id: number, data: T) => {
+  const set = (id: string, data: T) => {
     const tab = tabsMap.get(id)
     if (!tab) {
       console.warn(`Tab with ID ${id} not found.`)
@@ -135,7 +135,7 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     tab.data = data as UnwrapRef<T>
   }
 
-  const setPinned = (id: number, pin: boolean) => {
+  const setPinned = (id: string, pin: boolean) => {
     const tab = tabsMap.get(id)
     if (!tab) {
       console.warn(`Tab with ID ${id} not found.`)
@@ -162,7 +162,7 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     }
   }
 
-  const setTemporary = (id: number, temporary: boolean) => {
+  const setTemporary = (id: string, temporary: boolean) => {
     const tab = tabsMap.get(id)
     if (!tab) {
       console.warn(`Tab with ID ${id} not found.`)
@@ -177,7 +177,7 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     tab.isTemporary = temporary
   }
 
-  const move = (sourceId: number, targetId: number) => {
+  const move = (sourceId: string, targetId: string) => {
     const sourceTab = tabsMap.get(sourceId)
     const targetTab = tabsMap.get(targetId)
 
@@ -235,7 +235,7 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     currentTabId.value = null
   }
 
-  const closeOther = (currentId: number) => {
+  const closeOther = (currentId: string) => {
     let currentIndex = -1
     for (let i = tabs.value.length - 1; i >= 0; i--) {
       const tab = tabs.value[i]
@@ -256,11 +256,11 @@ export function useTabs<T = any>(): UseTabsReturn<T> {
     }
   }
 
-  const canCloseOther = (currentId: number): boolean => {
+  const canCloseOther = (currentId: string): boolean => {
     return tabs.value.some((tab) => !tab.isPinned && tab.id !== currentId)
   }
 
-  const canCloseCurrent = (currentId: number): boolean => {
+  const canCloseCurrent = (currentId: string): boolean => {
     const currentTab = tabsMap.get(currentId)
     if (!currentTab) {
       return false

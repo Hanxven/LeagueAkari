@@ -5,14 +5,14 @@ import { Column, Entity, Index, PrimaryColumn } from 'typeorm'
  */
 @Entity('SavedPlayers')
 export class SavedPlayer {
-  @PrimaryColumn({ type: 'integer' })
-  summonerId: number
+  @PrimaryColumn({ type: 'varchar' })
+  puuid: string
 
   /**
    * 记录游戏时，使用 League Akari 的玩家是谁
    */
-  @PrimaryColumn({ type: 'integer' })
-  selfSummonerId: number
+  @PrimaryColumn({ type: 'varchar' })
+  selfPuuid: string
 
   /**
    * 地区

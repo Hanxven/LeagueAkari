@@ -41,6 +41,8 @@ export interface MatchHistoryGameTabCard {
 export interface SavedPlayerInfo {
   summonerId: number
 
+  puuid: string
+
   selfSummonerId: number
 
   tag: string
@@ -57,8 +59,7 @@ export interface SavedPlayerInfo {
 }
 
 export interface OngoingPlayer {
-  // 当前的召唤师 ID，和 key 值相同
-  summonerId: number
+  puuid: string
 
   /**
    * 召唤师信息
@@ -118,8 +119,8 @@ export interface SummonerTabMatchHistory {
 }
 
 export interface TabState {
-  /** 页面 ID，目前是召唤师 ID */
-  id: number
+  /** 页面的 puuid */
+  puuid: string
 
   /** 召唤师信息需要加载 */
   summoner?: SummonerInfo
@@ -172,8 +173,8 @@ export const useCoreFunctionalityStore = defineStore('feature:core-functionality
     tabs
   } = useTabs<TabState>()
 
-  const isLoadingTab = (id: number) => {
-    const tab = get(id)
+  const isLoadingTab = (puuid: string) => {
+    const tab = get(puuid)
     if (tab) {
       return (
         tab.data.loading.isLoadingMatchHistory ||
@@ -186,19 +187,19 @@ export const useCoreFunctionalityStore = defineStore('feature:core-functionality
 
   /** 创建一个新的 Tab 并自动进行初始化操作 */
   const createTab = (
-    id: number,
+    puuid: string,
     options: { setCurrent?: boolean; pin?: boolean; temporary?: boolean } = {}
   ) => {
-    const tab = get(id)
+    const tab = get(puuid)
     if (tab) {
       if (options.setCurrent) {
-        setCurrent(id)
+        setCurrent(puuid)
       }
       return
     }
 
     const newTab = {
-      id: id,
+      puuid,
       matchHistory: {
         games: [],
         gamesMap: {},
@@ -220,17 +221,17 @@ export const useCoreFunctionalityStore = defineStore('feature:core-functionality
       }
     } as TabState
 
-    add(id, newTab, options)
+    add(puuid, newTab, options)
 
     if (options.setCurrent) {
-      setCurrent(id)
+      setCurrent(puuid)
     }
 
-    fetchTabFullData(id)
+    fetchTabFullData(puuid)
   }
 
-  const setTabScrollPosition = (id: number, x: number, y: number) => {
-    const tab = get(id)
+  const setTabScrollPosition = (puuid: string, x: number, y: number) => {
+    const tab = get(puuid)
     if (tab) {
       tab.data.scrollPosition = {
         x,
@@ -241,8 +242,8 @@ export const useCoreFunctionalityStore = defineStore('feature:core-functionality
     return false
   }
 
-  const setMatchHistoryExpand = (summonerId: number, gameId: number, expand: boolean) => {
-    const tab = get(summonerId)
+  const setMatchHistoryExpand = (puuid: string, gameId: number, expand: boolean) => {
+    const tab = get(puuid)
 
     if (tab) {
       const match = tab.data.matchHistory.gamesMap[gameId]
@@ -264,7 +265,7 @@ export const useCoreFunctionalityStore = defineStore('feature:core-functionality
 
   const ongoingPlayers = ref<
     Record<
-      number | string, // summonerId
+      string, // puuid
       OngoingPlayer
     >
   >({})

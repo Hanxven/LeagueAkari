@@ -2,7 +2,7 @@
   <div class="match-history-wrapper" ref="wrapperEl">
     <div class="match-history-inner">
       <PlayerTagEditModal
-        :summoner-id="tab.id"
+        :puuid="tab.puuid"
         v-model:show="isShowingTagEditModal"
         @edited="(id) => handleTagEdited(id)"
       />
@@ -100,7 +100,7 @@
             <div title="标记玩家" class="tag" v-if="!isSelfTab" @click="handleTagPlayer">
               <NIcon><TagIcon /></NIcon>
               <span class="tagged" v-if="tab.savedInfo?.tag">已标记</span>
-              <span class="untagged" v-else="tab.savedInfo?.tag">标记</span>
+              <span class="untagged" v-else>标记</span>
             </div>
           </div>
           <RankedSpan v-if="tab.rankedStats" :ranked="tab.rankedStats" />
@@ -132,9 +132,8 @@
         <MatchHistoryCard
           class="match-history-card-item"
           @set-show-detailed-game="handleToggleShowDetailedGame"
-          @load-detailed-game="(gameId) => fetchTabDetailedGame(tab.id, gameId)"
-          :self-id="tab.id"
-          :self-puuid="tab.summoner?.puuid"
+          @load-detailed-game="(gameId) => fetchTabDetailedGame(tab.puuid, gameId)"
+          :self-puuid="tab.puuid"
           :is-detailed="g.isDetailed"
           :is-loading="g.isLoading"
           :is-expanded="g.isExpanded"
@@ -197,7 +196,7 @@ const props = withDefaults(
 const cf = useCoreFunctionalityStore()
 
 const handleLoadPage = async (page: number) => {
-  const r = await fetchTabMatchHistory(props.tab.id, page, props.tab.matchHistory.pageSize)
+  const r = await fetchTabMatchHistory(props.tab.puuid, page, props.tab.matchHistory.pageSize)
   scrollToTop()
   return r
 }
@@ -247,7 +246,7 @@ whenever(Ctrl_Right, () => {
 })
 
 const handleChangePageSize = async (pageSize: number) => {
-  const r = await fetchTabMatchHistory(props.tab.id, props.tab.matchHistory.page, pageSize)
+  const r = await fetchTabMatchHistory(props.tab.puuid, props.tab.matchHistory.page, pageSize)
   scrollToTop()
   return r
 }
@@ -264,11 +263,11 @@ const debouncedX = useDebounce(x, 300)
 const debouncedY = useDebounce(y, 300)
 
 watch([() => debouncedX.value, () => debouncedY.value], ([x, y]) => {
-  cf.setScrollPosition(props.tab.id, x, y)
+  cf.setScrollPosition(props.tab.puuid, x, y)
 })
 
 watch(
-  () => props.tab.id,
+  () => props.tab.puuid,
   () => {
     nextTick(() => {
       x.value = props.tab.scrollPosition.x
@@ -284,11 +283,11 @@ onActivated(() => {
 })
 
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
-  cf.setMatchHistoryExpand(props.tab.id, gameId, expand)
+  cf.setMatchHistoryExpand(props.tab.puuid, gameId, expand)
 }
 
-const handleTagEdited = (summonerId: number) => {
-  querySavedInfo(summonerId)
+const handleTagEdited = (puuid: string) => {
+  querySavedInfo(puuid)
 }
 
 const scrollToTop = () => {
@@ -299,7 +298,7 @@ const scrollToTop = () => {
 }
 
 defineExpose({
-  id: props.tab.id,
+  id: props.tab.puuid,
   scrollToTop
 })
 </script>

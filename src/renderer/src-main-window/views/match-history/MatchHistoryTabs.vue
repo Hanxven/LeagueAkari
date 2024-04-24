@@ -18,11 +18,11 @@
             summonerName(
               tab.data.summoner?.gameName || tab.data.summoner?.displayName,
               tab.data.summoner?.tagLine,
-              tab.id.toString()
+              tab.id
             )
           "
           :name="tab.id"
-          :closable="tab.id !== summoner.me?.summonerId"
+          :closable="tab.id !== summoner.me?.puuid"
           :draggable="true"
           @dragover.prevent
           @dragstart="() => handleDragStart(tab.id)"
@@ -48,11 +48,11 @@
               summonerName(
                 tab.data.summoner?.gameName || tab.data.summoner?.displayName,
                 tab.data.summoner?.tagLine,
-                tab.id.toString()
+                tab.id
               )
             }}</span>
             <NIcon
-              v-if="tab.id !== summoner.me?.summonerId && tab.data.summoner?.privacy === 'PRIVATE'"
+              v-if="tab.id !== summoner.me?.puuid && tab.data.summoner?.privacy === 'PRIVATE'"
               title="隐藏生涯"
               class="privacy-private-icon"
               ><WarningAltFilledIcon
@@ -124,7 +124,7 @@
           :key="t.id"
           v-show="t.id === cf.currentTab.id"
           ref="innerComps"
-          :is-self-tab="cf.currentTab.id === summoner.me?.summonerId"
+          :is-self-tab="cf.currentTab.id === summoner.me?.puuid"
           :tab="t.data as TabState"
         />
       </template>
@@ -159,19 +159,19 @@ const summoner = useSummonerStore()
 
 const cf = useCoreFunctionalityStore()
 
-const handleTabClose = (summonerId: number) => {
-  cf.closeTab(summonerId)
+const handleTabClose = (puuid: string) => {
+  cf.closeTab(puuid)
 }
 
-const handleTabChange = async (summonerId: number) => {
-  await router.replace(`/match-history/${summonerId}`)
+const handleTabChange = async (puuid: string) => {
+  await router.replace(`/match-history/${puuid}`)
 }
 
-const handleRefresh = async (summonerId: number) => {
-  const result = await fetchTabFullData(summonerId)
+const handleRefresh = async (puuid: string) => {
+  const result = await fetchTabFullData(puuid)
 
-  if (typeof result === 'number') {
-    laNotification.warn('召唤师信息', `无法拉取用户 ${summonerId} 的信息`)
+  if (typeof result === 'string') {
+    laNotification.warn('召唤师信息', `无法拉取用户 ${puuid} 的信息`)
   } else {
     laNotification.success(
       '召唤师信息',
@@ -191,24 +191,19 @@ watch(
 )
 
 watch(
-  () => route.params.summonerId,
-  (val) => {
-    if (val === '') {
+  () => route.params.puuid,
+  (puuid) => {
+    if (typeof puuid !== 'string' || !puuid) {
       return
     }
 
-    const id = Number(val)
-    if (Number.isNaN(id)) {
-      return
-    }
-
-    const tab = cf.getTab(id)
+    const tab = cf.getTab(puuid)
     if (tab) {
-      cf.setCurrentTab(id)
+      cf.setCurrentTab(puuid)
     } else {
-      cf.createTab(id, {
+      cf.createTab(puuid, {
         setCurrent: true,
-        pin: summoner.me?.summonerId === id
+        pin: summoner.me?.puuid === puuid
       })
     }
   },
@@ -219,24 +214,24 @@ const menuProps = reactive({
   x: 0,
   y: 0,
   show: false,
-  id: 0,
-  dragging: null as number | null,
-  hover: null as number | null
+  id: '',
+  dragging: null as string | null,
+  hover: null as string | null
 })
 
-const handleDragStart = (id: number) => {
+const handleDragStart = (id: string) => {
   menuProps.dragging = id
 }
 
-const handleDragEnter = (id: number) => {
+const handleDragEnter = (id: string) => {
   menuProps.hover = id
 }
 
-const handleDragLeaveOrEnd = (_id: number) => {
+const handleDragLeaveOrEnd = (_id: string) => {
   menuProps.hover = null
 }
 
-const handleDrop = (id: number) => {
+const handleDrop = (id: string) => {
   if (id === menuProps.dragging) {
     return
   }
@@ -285,12 +280,12 @@ const handleMenuSelect = (action: string) => {
   menuProps.show = false
 }
 
-const handleShowMenu = (e: PointerEvent, id: number) => {
+const handleShowMenu = (e: PointerEvent, puuid: string) => {
   e.preventDefault()
   menuProps.show = true
   menuProps.x = e.clientX
   menuProps.y = e.clientY - 30 /* 30 = title-bar-height */
-  menuProps.id = id
+  menuProps.id = puuid
 }
 
 const innerComps = ref<(typeof MatchHistoryTab)[]>([])

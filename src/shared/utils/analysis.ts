@@ -153,11 +153,11 @@ export function getAnalysis(
   }
 }
 
-export function withSelfParticipantMatchHistory(games: MatchHistoryWithState[], selfId: number) {
+export function withSelfParticipantMatchHistory(games: MatchHistoryWithState[], selfPuuid: string) {
   const r = games.map((m) => {
     if (m.isDetailed) {
       const participantId = m.game.participantIdentities.find(
-        (p) => p.player.summonerId === selfId
+        (p) => p.player.puuid === selfPuuid
       )!.participantId
 
       const selfParticipant = m.game.participants.find((p) => participantId === p.participantId)!

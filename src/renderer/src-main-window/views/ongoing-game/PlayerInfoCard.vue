@@ -18,7 +18,7 @@
               )
             "
             class="name"
-            @click="emits('toSummoner', summonerId)"
+            @click="emits('toSummoner', puuid)"
             >{{
               summonerName(
                 summonerInfo?.gameName || summonerInfo?.displayName,
@@ -45,7 +45,7 @@
                   >相关对局：<span
                     class="encountered-game"
                     v-for="g of savedInfo.encounteredGames.slice(-10).toReversed()"
-                    @click="() => emits('showGame', g, summonerId)"
+                    @click="() => emits('showGame', g, puuid)"
                     >{{ g }}</span
                   ></span
                 >
@@ -54,9 +54,7 @@
           </NPopover>
           <NPopover v-if="savedInfo && !isSelf && savedInfo.tag" placement="bottom">
             <template #trigger>
-              <span @click="() => emits('showSavedInfo', summonerId)" class="tag tagged"
-                >已标记</span
-              >
+              <span @click="() => emits('showSavedInfo', puuid)" class="tag tagged">已标记</span>
             </template>
             <div class="small-text" style="max-width: 260px">
               {{ savedInfo.tag }}
@@ -69,7 +67,7 @@
             >生涯隐藏</span
           >
           <span
-            :title="winRateTeamText(summonerId)"
+            :title="winRateTeamText(summonerInfo?.summonerId || 0)"
             class="tag win-rate-team"
             v-if="analysis.maybeWinRateTeam && !isSelf"
             >胜率队</span
@@ -186,7 +184,7 @@
               marginBottom: `${matchHistoryItemMargin}px`
             }"
             v-for="m of list"
-            @click="() => emits('showGame', m.data.game.gameId, props.summonerId)"
+            @click="() => emits('showGame', m.data.game.gameId, puuid)"
             :key="m.data.game.gameId"
           >
             <LcuImage class="image" :src="championIcon(m.data.selfParticipant.championId)" />
@@ -231,6 +229,7 @@
 </template>
 
 <script setup lang="ts">
+import { winRateTeamText } from '@shared/renderer-utils/sarcasms'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
@@ -241,21 +240,23 @@ import { NDivider, NPopover } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
 import LcuImage from '@main-window/components/LcuImage.vue'
-import { MatchHistoryWithState, SavedPlayerInfo } from '@main-window/features/core-functionality/store'
+import {
+  MatchHistoryWithState,
+  SavedPlayerInfo
+} from '@main-window/features/core-functionality/store'
 import { championIcon } from '@main-window/features/game-data'
 import { useGameDataStore } from '@main-window/features/lcu-state-sync/game-data'
-import { winRateTeamText } from '@shared/renderer-utils/sarcasms'
 
 import RankedSpan from '../match-history/widgets/RankedSpan.vue'
 
 const emits = defineEmits<{
-  (e: 'toSummoner', summonerId: number): void
-  (e: 'showGame', gameId: number, selfId: number): void
-  (e: 'showSavedInfo', summonerId: number): void
+  (e: 'toSummoner', puuid: string): void
+  (e: 'showGame', gameId: number, selfPuuid: string): void
+  (e: 'showSavedInfo', puuid: string): void
 }>()
 
 const props = defineProps<{
-  summonerId: number
+  puuid: string
   isSelf: boolean
   summonerInfo?: SummonerInfo
   rankedStats?: RankedStats
@@ -330,7 +331,7 @@ const matchHistoryList = computed(() => {
     return []
   }
 
-  return withSelfParticipantMatchHistory(props.matchHistory, props.summonerId)
+  return withSelfParticipantMatchHistory(props.matchHistory, props.puuid)
 })
 
 const { list, containerProps, wrapperProps } = useVirtualList(matchHistoryList, {

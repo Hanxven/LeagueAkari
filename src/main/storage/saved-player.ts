@@ -6,8 +6,8 @@ import { onRendererCall } from '../utils/ipc'
 import { queryEncounteredGames } from './encountered-games'
 
 interface SavedPlayerQueryDto {
-  summonerId: number
-  selfSummonerId: number
+  selfPuuid: string
+  puuid: string
   rsoPlatformId: string
   region: string
 }
@@ -18,34 +18,34 @@ interface SavedPlayerSaveDto extends SavedPlayerQueryDto {
 }
 
 export function querySavedPlayer(query: SavedPlayerQueryDto) {
-  if (!query.summonerId || !query.selfSummonerId || !query.region || !query.rsoPlatformId) {
-    throw new Error('summonerId, selfSummonerId, region or rsoPlatformId cannot be empty')
+  if (!query.puuid || !query.selfPuuid || !query.region || !query.rsoPlatformId) {
+    throw new Error('puuid, selfPuuid, region or rsoPlatformId cannot be empty')
   }
 
   return dataSource.manager.findOneBy(SavedPlayer, {
-    summonerId: Equal(query.summonerId),
-    selfSummonerId: Equal(query.selfSummonerId),
+    puuid: Equal(query.puuid),
+    selfPuuid: Equal(query.selfPuuid),
     region: Equal(query.region),
     rsoPlatformId: Equal(query.rsoPlatformId)
   })
 }
 
 export async function querySavedPlayerWithGames(query: SavedPlayerQueryDto) {
-  if (!query.summonerId || !query.selfSummonerId || !query.region || !query.rsoPlatformId) {
-    throw new Error('summonerId, selfSummonerId, region or rsoPlatformId cannot be empty')
+  if (!query.puuid || !query.selfPuuid || !query.region || !query.rsoPlatformId) {
+    throw new Error('puuid, selfPuuid, region or rsoPlatformId cannot be empty')
   }
 
   const savedPlayer = await dataSource.manager.findOneBy(SavedPlayer, {
-    summonerId: Equal(query.summonerId),
-    selfSummonerId: Equal(query.selfSummonerId),
+    puuid: Equal(query.puuid),
+    selfPuuid: Equal(query.selfPuuid),
     region: Equal(query.region),
     rsoPlatformId: Equal(query.rsoPlatformId)
   })
 
   if (savedPlayer) {
     const encounteredGames = await queryEncounteredGames({
-      summonerId: query.summonerId,
-      selfSummonerId: query.selfSummonerId,
+      puuid: query.puuid,
+      selfPuuid: query.puuid,
       region: query.region,
       rsoPlatformId: query.rsoPlatformId
     })
@@ -57,23 +57,23 @@ export async function querySavedPlayerWithGames(query: SavedPlayerQueryDto) {
 }
 
 export function deleteSavedPlayer(query: SavedPlayerQueryDto) {
-  if (!query.summonerId || !query.selfSummonerId || !query.region || !query.rsoPlatformId) {
-    throw new Error('summonerId, selfSummonerId, region or rsoPlatformId cannot be empty')
+  if (!query.puuid || !query.selfPuuid || !query.region || !query.rsoPlatformId) {
+    throw new Error('puuid, selfPuuid, region or rsoPlatformId cannot be empty')
   }
 
   return dataSource.manager.delete(SavedPlayer, query)
 }
 
 export function saveSavedPlayer(player: SavedPlayerSaveDto) {
-  if (!player.summonerId || !player.selfSummonerId || !player.region || !player.rsoPlatformId) {
-    throw new Error('summonerId, selfSummonerId, region or rsoPlatformId cannot be empty')
+  if (!player.puuid || !player.selfPuuid || !player.region || !player.rsoPlatformId) {
+    throw new Error('puuid, selfPuuid, region or rsoPlatformId cannot be empty')
   }
 
   const savedPlayer = new SavedPlayer()
   const date = new Date()
-  savedPlayer.summonerId = player.summonerId
+  savedPlayer.puuid = player.puuid
   savedPlayer.tag = player.tag || null
-  savedPlayer.selfSummonerId = player.selfSummonerId
+  savedPlayer.selfPuuid = player.selfPuuid
   savedPlayer.rsoPlatformId = player.rsoPlatformId
   savedPlayer.region = player.region
   savedPlayer.updateAt = date

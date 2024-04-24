@@ -3,7 +3,7 @@ import { request } from './common'
 export function honor(
   gameId: string | number,
   honorCategory: 'COOL' | 'SHOTCALLER' | 'HEART' | '' | 'OPT_OUT',
-  summonerId: string | number,
+  summonerId?: string | number,
   puuid?: string
 ) {
   return request({

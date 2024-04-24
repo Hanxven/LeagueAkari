@@ -8,3 +8,5 @@ export const LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL =
   'https://api.github.com/repos/Hanxven/LeagueAkari/releases/latest'
 
 export const LEAGUE_AKARI_DEFAULT_NOTIFICATION_DURATION = 4000
+
+export const EMPTY_PUUID = '00000000-0000-0000-0000-000000000000'

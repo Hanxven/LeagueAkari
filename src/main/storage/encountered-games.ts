@@ -4,8 +4,8 @@ import { onRendererCall } from '@main/utils/ipc'
 import { Equal } from 'typeorm'
 
 interface EncounteredGameQueryDto {
-  selfSummonerId: number
-  summonerId: number
+  selfPuuid: string
+  puuid: string
   region: string
   rsoPlatformId: string
   pageSize?: number
@@ -14,8 +14,8 @@ interface EncounteredGameQueryDto {
 }
 
 interface EncounteredGameSaveDto {
-  selfSummonerId: number
-  summonerId: number
+  selfPuuid: string
+  puuid: string
   region: string
   rsoPlatformId: string
   gameId: number
@@ -32,8 +32,8 @@ export async function queryEncounteredGames(query: EncounteredGameQueryDto) {
 
   const encounteredGames = await dataSource.manager.find(EncounteredGame, {
     where: {
-      selfSummonerId: Equal(query.selfSummonerId),
-      summonerId: Equal(query.summonerId),
+      selfPuuid: Equal(query.selfPuuid),
+      puuid: Equal(query.puuid),
       region: Equal(query.region),
       rsoPlatformId: Equal(query.rsoPlatformId)
     },
@@ -50,8 +50,8 @@ export async function saveEncounteredGame(dto: EncounteredGameSaveDto) {
   g.gameId = dto.gameId
   g.region = dto.region
   g.rsoPlatformId = dto.rsoPlatformId
-  g.selfSummonerId = dto.selfSummonerId
-  g.summonerId = dto.summonerId
+  g.selfPuuid = dto.selfPuuid
+  g.puuid = dto.puuid
   g.updateAt = new Date()
   return dataSource.manager.save(g)
 }

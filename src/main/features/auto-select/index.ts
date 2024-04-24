@@ -68,7 +68,7 @@ export async function setupAutoSelect() {
       return null
     }
 
-    const self = cs.session.myTeam.find((t) => t.summonerId === summoner.me?.summonerId)
+    const self = cs.session.myTeam.find((t) => t.puuid === summoner.me?.puuid)
 
     if (!self) {
       return null
@@ -76,7 +76,7 @@ export async function setupAutoSelect() {
 
     const unselectableChampions = [...cs.session.myTeam, ...cs.session.theirTeam].reduce(
       (prev, cur) => {
-        if (cur.championId && cur.summonerId !== summoner.me!.summonerId) {
+        if (cur.championId && cur.puuid !== summoner.me!.puuid) {
           prev.add(cur.championId)
         }
         return prev
@@ -94,7 +94,7 @@ export async function setupAutoSelect() {
 
     if (!autoSelectState.settings.selectTeammateIntendedChampion) {
       cs.session.myTeam.forEach((m) => {
-        if (m.championPickIntent && m.summonerId !== summoner.me!.summonerId) {
+        if (m.championPickIntent && m.puuid !== summoner.me!.puuid) {
           unselectableChampions.add(m.championPickIntent)
         }
       })
@@ -135,9 +135,7 @@ export async function setupAutoSelect() {
       }
 
       if (id && cs.session && summoner.me) {
-        const cellId = cs.session.myTeam.find(
-          (c) => c.summonerId === summoner.me!.summonerId
-        )!.cellId
+        const cellId = cs.session.myTeam.find((c) => c.puuid === summoner.me!.puuid)!.cellId
 
         for (const arr of cs.session.actions) {
           const a = arr.find((c) => c.actorCellId === cellId && c.type === 'pick')
@@ -340,7 +338,7 @@ export async function setupAutoSelect() {
 
         if (!autoSelectState.settings.banTeammateIntendedChampion) {
           cs.session.myTeam.forEach((m) => {
-            if (m.championPickIntent && m.summonerId !== summoner.me!.summonerId) {
+            if (m.championPickIntent && m.puuid !== summoner.me!.puuid) {
               unbannableChampions.add(m.championPickIntent)
             }
           })

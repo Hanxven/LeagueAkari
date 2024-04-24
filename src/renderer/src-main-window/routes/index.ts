@@ -15,7 +15,7 @@ const router = createRouter({
       children: [
         {
           name: 'match-history',
-          path: '/match-history/:summonerId?',
+          path: '/match-history/:puuid?',
           component: () => import('@main-window/views/match-history/MatchHistoryTabs.vue')
         },
         {
