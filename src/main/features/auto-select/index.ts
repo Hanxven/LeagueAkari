@@ -403,7 +403,7 @@ export async function setupAutoSelect() {
       await benchSwap(targetingChampion!)
     } catch (error) {
       mwNotification.warn('auto-select', '自动选择', `交换英雄失败`)
-      logger.warn(`在尝试交换英雄是发生错误 ${formatError(error)}`)
+      logger.warn(`在尝试交换英雄时发生错误 ${formatError(error)}`)
     } finally {
       targetingChampion = null
     }

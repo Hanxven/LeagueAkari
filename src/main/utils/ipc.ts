@@ -29,7 +29,7 @@ function handleError(error: any): IpcMainDataType {
     }
   }
 
-  logger.warn(`位置错误: ${formatError(error)}`)
+  logger.warn(`未知错误: ${formatError(error)}`)
 
   return {
     success: false,
