@@ -6,7 +6,6 @@
 
 <style lang="less">
 .champ-select-wrapper {
-  display: unset;
-  height: 100%;
+  padding: 8px 12px;
 }
 </style>
