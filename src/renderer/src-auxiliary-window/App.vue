@@ -1,12 +1,45 @@
 <template>
   <div id="aux-window-frame">
-    <AuxiliaryWindowTitleBar />
+    <AuxiliaryWindowTitleBar class="title-bar" />
     <div class="content"><RouterView /></div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
+import { watch } from 'vue'
+import { useRouter } from 'vue-router'
+
 import AuxiliaryWindowTitleBar from './components/AuxiliaryWindowTitleBar.vue'
+
+const gameflow = useGameflowStore()
+const router = useRouter()
+
+watch(
+  () => gameflow.phase,
+  (phase) => {
+    switch (phase) {
+      case 'None':
+      case 'Lobby':
+      case 'EndOfGame':
+      case 'PreEndOfGame':
+      case 'WatchInProgress':
+      case 'GameStart':
+      case 'InProgress':
+      case 'WaitingForStats':
+      case 'Reconnect':
+        router.replace({ name: 'root' })
+        break
+      case 'Matchmaking':
+      case 'ReadyCheck':
+        router.replace({ name: 'ready-check' })
+        break
+      case 'ChampSelect':
+        router.replace({ name: 'champ-select' })
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="less">

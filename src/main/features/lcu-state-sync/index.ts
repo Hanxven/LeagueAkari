@@ -6,6 +6,7 @@ import { gameDataSync } from './game-data'
 import { gameflowSync } from './gameflow'
 import { lobbySync } from './lobby'
 import { loginSync } from './login'
+import { matchmakingSync } from './matchmaking'
 import { summonerSync } from './summoner'
 
 const logger = createLogger('lcu-state-sync')
@@ -35,6 +36,8 @@ export async function setupLcuStateSync() {
   champSelectSync()
 
   loginSync()
+
+  matchmakingSync()
 
   logger.info('初始化完成')
 }

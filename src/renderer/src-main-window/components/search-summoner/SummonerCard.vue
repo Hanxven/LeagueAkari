@@ -55,18 +55,16 @@
 </template>
 
 <script setup lang="ts">
-import { getSummonerByPuuid } from '@shared/renderer-http-api/summoner'
+import { EMPTY_PUUID } from '@shared/constants'
+import CopyableText from '@shared/renderer/components/CopyableText.vue'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
+import { laNotification } from '@shared/renderer/notification'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NCard } from 'naive-ui'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
-import CopyableText from '@main-window/components/CopyableText.vue'
-import LcuImage from '@main-window/components/LcuImage.vue'
-import { laNotification } from '@main-window/notification'
-import { EMPTY_PUUID } from '@shared/constants'
-
 
 // 内部组件
 const props = defineProps<{
@@ -96,7 +94,7 @@ onMounted(async () => {
 const handleToSummoner = () => {
   const id = typeof props.summoner === 'object' ? props.summoner.puuid : props.summoner
 
-  if (id === EMPTY_PUUID) {
+  if (!id || id === EMPTY_PUUID) {
     return
   }
 

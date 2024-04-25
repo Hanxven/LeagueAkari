@@ -6,6 +6,7 @@ import { BrowserWindow, app, dialog } from 'electron'
 import { configure } from 'mobx'
 
 import { initApp } from './core/app'
+import { createAuxiliaryWindow } from './core/auxiliary-window'
 import { initLeagueClientFunctions } from './core/lcu-client'
 import { initLcuConnection } from './core/lcu-connection'
 import { createLogger, initLogger } from './core/log'
@@ -16,7 +17,6 @@ import { setupLeagueAkariFeatures } from './features'
 import { initStorageIpc } from './storage'
 import { sendEventToAllRenderer } from './utils/ipc'
 import { checkWmicAvailability } from './utils/shell'
-import { createAuxiliaryWindow } from './core/auxiliary-window'
 
 configure({ enforceActions: 'observed' })
 

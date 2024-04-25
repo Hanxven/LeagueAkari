@@ -16,13 +16,11 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { NButton, NCard, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'
 
-import ControlItem from '@main-window/components/ControlItem.vue'
 import StandaloneMatchHistoryCardModal from '@main-window/views/match-history/card/StandaloneMatchHistoryCardModal.vue'
-
-// const id = 'view:toolkit:game-view'
 
 const gameId = ref<number>()
 const viewingGameId = ref<number>()

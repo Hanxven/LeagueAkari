@@ -236,7 +236,7 @@ async function migrateFromPreviousLocalStorageSettings(all: Record<string, strin
       try {
         const jsonValue = JSON.parse(originValue)
         await setSetting(resName, jsonValue)
-        setter(jsonValue)
+        runInAction(() => setter(jsonValue))
         migrated = true
       } catch {}
     }

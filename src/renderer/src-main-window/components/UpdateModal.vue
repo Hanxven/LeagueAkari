@@ -40,11 +40,10 @@
 </template>
 
 <script setup lang="ts">
+import { useAppStore } from '@shared/renderer/features/app/store'
+import { markdownIt } from '@shared/renderer/utils/markdown'
 import { NModal, NScrollbar } from 'naive-ui'
 import { computed, useCssModule } from 'vue'
-
-import { useAppStore } from '@main-window/features/app/store'
-import { markdownIt } from '@shared/renderer-utils/markdown'
 
 const app = useAppStore()
 
@@ -156,4 +155,3 @@ const show = defineModel<boolean>('show', { default: false })
   margin-bottom: 12px;
 }
 </style>
-@shared/renderer-utils/markdown

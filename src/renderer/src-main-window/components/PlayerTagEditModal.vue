@@ -31,19 +31,17 @@
 </template>
 
 <script setup lang="ts">
-import { getSummonerByPuuid } from '@shared/renderer-http-api/summoner'
-import { mainCall } from '@shared/renderer-utils/ipc'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { useAppStore } from '@shared/renderer/features/app/store'
+import { SavedPlayerInfo } from '@shared/renderer/features/core-functionality/store'
+import { useSummonerStore } from '@shared/renderer/features/lcu-state-sync/summoner'
+import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
+import { laNotification } from '@shared/renderer/notification'
+import { mainCall } from '@shared/renderer/utils/ipc'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NButton, NInput, NModal } from 'naive-ui'
 import { nextTick, ref, shallowRef, watch } from 'vue'
-
-import { useAppStore } from '@main-window/features/app/store'
-import { SavedPlayerInfo } from '@main-window/features/core-functionality/store'
-import { useSummonerStore } from '@main-window/features/lcu-state-sync/summoner'
-import { laNotification } from '@main-window/notification'
-
-import LcuImage from './LcuImage.vue'
 
 const show = defineModel<boolean>('show', { default: false })
 
@@ -155,4 +153,3 @@ const handleSaveTag = async () => {
   }
 }
 </style>
-@shared/renderer-utils/ipc

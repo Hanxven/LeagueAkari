@@ -12,17 +12,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { setShowFreeSoftwareDeclaration } from '@shared/renderer/features/app'
+import { useAppStore } from '@shared/renderer/features/app/store'
+import { useCoreFunctionalityStore } from '@shared/renderer/features/core-functionality/store'
+import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
+import { greeting } from '@shared/renderer/utils/greeting'
+import { ref, watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AppTitleBar from './components/AppTitleBar.vue'
 import DeclarationModal from './components/DeclarationModal.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
-import { setShowFreeSoftwareDeclaration } from './features/app'
-import { useAppStore } from './features/app/store'
-import { setupNaiveUiNotificationEvents } from './notification'
-import { greeting } from '@shared/renderer-utils/greeting'
 
 greeting()
 
@@ -32,11 +33,24 @@ const router = useRouter()
 
 const app = useAppStore()
 
+const cf = useCoreFunctionalityStore()
+
 watchEffect(() => {
   if (app.lcuConnectionState === 'disconnected') {
     router.replace('/connecting')
   }
 })
+
+watch(
+  () => cf.ongoingState,
+  (state) => {
+    if (state === 'champ-select' || state === 'in-game') {
+      if (router.currentRoute.value.name !== 'ongoing-name') {
+        router.replace({ name: 'ongoing-game' })
+      }
+    }
+  }
+)
 
 const isShowingSettingModal = ref(false)
 const isShowingNewUpdateModal = ref(false)
@@ -79,4 +93,3 @@ const handleConfirmation = (notShowAgain: boolean) => {
   }
 }
 </style>
-../../shared/renderer-utils/greeting

@@ -4,14 +4,14 @@
       <NTabs
         class="tabs"
         @update:value="handleTabChange"
-        :value="cf.currentTab?.id"
+        :value="mh.currentTab?.id"
         type="card"
         :animated="false"
         @close="handleTabClose"
         size="small"
       >
         <NTab
-          v-for="tab of cf.tabs"
+          v-for="tab of mh.tabs"
           @contextmenu="(event) => handleShowMenu(event, tab.id)"
           :key="tab.id"
           :tab="
@@ -97,34 +97,34 @@
       />
     </div>
     <div class="content">
-      <div class="fab reload" v-if="cf.currentTab">
+      <div class="fab reload" v-if="mh.currentTab">
         <NButton
           title="重新拉取数据"
           :loading="
-            cf.currentTab.data.loading.isLoadingMatchHistory ||
-            cf.currentTab.data.loading.isLoadingSummoner ||
-            cf.currentTab.data.loading.isLoadingRankedStats
+            mh.currentTab.data.loading.isLoadingMatchHistory ||
+            mh.currentTab.data.loading.isLoadingSummoner ||
+            mh.currentTab.data.loading.isLoadingRankedStats
           "
-          @click="() => handleRefresh(cf.currentTab!.id)"
+          @click="() => handleRefresh(mh.currentTab!.id)"
           circle
           type="primary"
           ><template #icon
             ><NIcon><RefreshIcon /></NIcon></template
         ></NButton>
       </div>
-      <div class="fab back-to-up" v-if="cf.currentTab">
+      <div class="fab back-to-up" v-if="mh.currentTab">
         <NButton title="回到顶部" circle type="primary" @click="handleBackToTop"
           ><template #icon
             ><NIcon><ArrowUpIcon /></NIcon></template
         ></NButton>
       </div>
-      <template v-if="cf.currentTab">
+      <template v-if="mh.currentTab">
         <MatchHistoryTab
-          v-for="t of cf.tabs"
+          v-for="t of mh.tabs"
           :key="t.id"
-          v-show="t.id === cf.currentTab.id"
+          v-show="t.id === mh.currentTab.id"
           ref="innerComps"
-          :is-self-tab="cf.currentTab.id === summoner.me?.puuid"
+          :is-self-tab="mh.currentTab.id === summoner.me?.puuid"
           :tab="t.data as TabState"
         />
       </template>
@@ -134,6 +134,11 @@
 </template>
 
 <script setup lang="ts">
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { useCoreFunctionalityStore } from '@shared/renderer/features/core-functionality/store'
+import { championIcon, profileIcon } from '@shared/renderer/features/game-data'
+import { useSummonerStore } from '@shared/renderer/features/lcu-state-sync/summoner'
+import { laNotification } from '@shared/renderer/notification'
 import { summonerName } from '@shared/utils/name'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
 import { ArrowUp as ArrowUpIcon, Refresh as RefreshIcon } from '@vicons/ionicons5'
@@ -141,15 +146,13 @@ import { NButton, NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import LcuImage from '@main-window/components/LcuImage.vue'
 import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
-import { fetchTabFullData } from '@main-window/features/core-functionality'
-import { TabState, useCoreFunctionalityStore } from '@main-window/features/core-functionality/store'
-import { championIcon, profileIcon } from '@main-window/features/game-data'
-import { useSummonerStore } from '@main-window/features/lcu-state-sync/summoner'
-import { laNotification } from '@main-window/notification'
+import { fetchTabFullData } from '@main-window/features/match-history-tabs'
+import { TabState, useMatchHistoryTabsStore } from '@main-window/features/match-history-tabs/store'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
+
+const mh = useMatchHistoryTabsStore()
 
 const route = useRoute()
 const router = useRouter()
@@ -160,7 +163,7 @@ const summoner = useSummonerStore()
 const cf = useCoreFunctionalityStore()
 
 const handleTabClose = (puuid: string) => {
-  cf.closeTab(puuid)
+  mh.closeTab(puuid)
 }
 
 const handleTabChange = async (puuid: string) => {
@@ -181,7 +184,7 @@ const handleRefresh = async (puuid: string) => {
 }
 
 watch(
-  () => cf.currentTab,
+  () => mh.currentTab,
   (c) => {
     if (c) {
       router.replace(`/match-history/${c.id}`)
@@ -197,11 +200,11 @@ watch(
       return
     }
 
-    const tab = cf.getTab(puuid)
+    const tab = mh.getTab(puuid)
     if (tab) {
-      cf.setCurrentTab(puuid)
+      mh.setCurrentTab(puuid)
     } else {
-      cf.createTab(puuid, {
+      mh.createTab(puuid, {
         setCurrent: true,
         pin: summoner.me?.puuid === puuid
       })
@@ -236,10 +239,10 @@ const handleDrop = (id: string) => {
     return
   }
 
-  const tab = cf.getTab(id)
+  const tab = mh.getTab(id)
 
   if (tab) {
-    cf.moveTab(menuProps.dragging!, id)
+    mh.moveTab(menuProps.dragging!, id)
   }
 
   menuProps.dragging = null
@@ -249,19 +252,19 @@ const dropdownOptions = reactive([
   {
     label: '刷新',
     key: 'refresh',
-    disabled: computed(() => cf.isLoading(menuProps.id))
+    disabled: computed(() => mh.isLoading(menuProps.id))
   },
   {
     label: '关闭',
     key: 'close',
     disabled: computed(() => {
-      return cf.getTab(menuProps.id)?.isPinned
+      return mh.getTab(menuProps.id)?.isPinned
     })
   },
   {
     label: '关闭其他',
     key: 'close-others',
-    disabled: computed(() => !cf.canCloseOtherTabs(menuProps.id))
+    disabled: computed(() => !mh.canCloseOtherTabs(menuProps.id))
   }
 ])
 
@@ -271,10 +274,10 @@ const handleMenuSelect = (action: string) => {
       handleRefresh(menuProps.id)
       break
     case 'close':
-      cf.closeTab(menuProps.id)
+      mh.closeTab(menuProps.id)
       break
     case 'close-others':
-      cf.closeOtherTabs(menuProps.id)
+      mh.closeOtherTabs(menuProps.id)
       break
   }
   menuProps.show = false
@@ -290,7 +293,7 @@ const handleShowMenu = (e: PointerEvent, puuid: string) => {
 
 const innerComps = ref<(typeof MatchHistoryTab)[]>([])
 const handleBackToTop = () => {
-  const tab = innerComps.value.find((t) => t.id === cf.currentTab?.id)
+  const tab = innerComps.value.find((t) => t.id === mh.currentTab?.id)
   if (tab) {
     tab.scrollToTop()
   }
@@ -434,6 +437,8 @@ const handleBackToTop = () => {
 .tabs-placeholder {
   height: 100%;
   display: flex;
+  position: relative;
+  top: calc(var(--app-title-bar-height) * -1);
   justify-content: center;
   align-items: center;
   font-size: 22px;

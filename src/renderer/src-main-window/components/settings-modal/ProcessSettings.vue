@@ -139,16 +139,14 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import { setFixWindowMethodAOptions } from '@shared/renderer/features/app'
+import { useAppStore } from '@shared/renderer/features/app/store'
+import { quit } from '@shared/renderer/http-api/process-control'
+import { killUx, launchUx, restartUx } from '@shared/renderer/http-api/riotclient'
+import { mainCall } from '@shared/renderer/utils/ipc'
 import { NButton, NCard, NInputNumber, NScrollbar, useDialog } from 'naive-ui'
 import { reactive, ref } from 'vue'
-
-import { setFixWindowMethodAOptions } from '@main-window/features/app'
-import { useAppStore } from '@main-window/features/app/store'
-import { quit } from '@shared/renderer-http-api/process-control'
-import { killUx, launchUx, restartUx } from '@shared/renderer-http-api/riotclient'
-import { mainCall } from '@shared/renderer-utils/ipc'
-
-import ControlItem from '../ControlItem.vue'
 
 const app = useAppStore()
 
@@ -278,4 +276,3 @@ const handleFixWindowMethodA = async () => {
   }
 }
 </style>
-@shared/renderer-utils/ipc

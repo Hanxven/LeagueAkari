@@ -28,12 +28,11 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import { useChatStore } from '@shared/renderer/features/lcu-state-sync/chat'
+import { AvailabilityType, changeAvailability } from '@shared/renderer/http-api/chat'
+import { laNotification } from '@shared/renderer/notification'
 import { NCard, NFlex, NRadio, NRadioGroup } from 'naive-ui'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
-import { useChatStore } from '@main-window/features/lcu-state-sync/chat'
-import { AvailabilityType, changeAvailability } from '@shared/renderer-http-api/chat'
-import { laNotification } from '@main-window/notification'
 
 const id = 'view:toolkit:chat-availability'
 const chat = useChatStore()

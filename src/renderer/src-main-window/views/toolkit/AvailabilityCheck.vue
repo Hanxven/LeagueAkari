@@ -64,13 +64,12 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import { quit } from '@shared/renderer/http-api/process-control'
+import { checkAvailability, newSummonerName } from '@shared/renderer/http-api/summoner'
+import { laNotification } from '@shared/renderer/notification'
 import { NButton, NCard, NInput, NPopconfirm, useMessage } from 'naive-ui'
 import { h, reactive, ref, watch } from 'vue'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
-import { quit } from '@shared/renderer-http-api/process-control'
-import { checkAvailability, newSummonerName } from '@shared/renderer-http-api/summoner'
-import { laNotification } from '@main-window/notification'
 
 const id = 'view:toolkit:availability-check'
 

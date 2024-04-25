@@ -29,13 +29,12 @@
 </template>
 
 <script setup lang="ts">
-import { LcuHttpError } from '@shared/renderer-http-api/common'
-import { getGame } from '@shared/renderer-http-api/match-history'
+import { LcuHttpError } from '@shared/renderer/http-api/common'
+import { getGame } from '@shared/renderer/http-api/match-history'
+import { laNotification } from '@shared/renderer/notification'
 import { Game } from '@shared/types/lcu/match-history'
 import { NButton, NModal } from 'naive-ui'
 import { ref, shallowRef, watch } from 'vue'
-
-import { laNotification } from '@main-window/notification'
 
 import MatchHistoryCard from './MatchHistoryCard.vue'
 

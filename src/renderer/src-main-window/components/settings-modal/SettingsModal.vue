@@ -82,11 +82,10 @@
 </template>
 
 <script setup lang="ts">
+import { useAppStore } from '@shared/renderer/features/app/store'
+import { mainCall } from '@shared/renderer/utils/ipc'
 import { NModal, NTabPane, NTabs } from 'naive-ui'
 import { useCssModule } from 'vue'
-
-import { useAppStore } from '@main-window/features/app/store'
-import { mainCall } from '@shared/renderer-utils/ipc'
 
 import BasicSettings from './BasicSettings.vue'
 import CoreFunctionalitySettings from './CoreFunctionalitySettings.vue'
@@ -138,4 +137,3 @@ const checkUpdates = async () => {
   max-width: 768px;
 }
 </style>
-@shared/renderer-utils/ipc

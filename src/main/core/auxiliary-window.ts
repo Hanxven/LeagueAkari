@@ -49,11 +49,11 @@ export function createAuxiliaryWindow(): void {
     width: 340,
     height: 600,
     minWidth: 340,
-    maxWidth: 600,
+    maxWidth: 480,
     minHeight: 600,
     frame: false,
     show: false,
-    title: 'Akaza Akari', // 这个窗口有一点阿卡林特性
+    title: 'Akaza Akari',
     autoHideMenuBar: true,
     maximizable: false,
     minimizable: false,

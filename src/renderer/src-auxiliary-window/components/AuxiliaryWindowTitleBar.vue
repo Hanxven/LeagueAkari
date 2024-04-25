@@ -1,13 +1,13 @@
 <template>
-  <div class="title-bar" :class="{ blurred: app.focusState === 'blurred' }">
+  <div class="title-bar" :class="{ blurred: aw.focusState === 'blurred' }">
     <div style="flex: 1"></div>
     <div class="title">League Akari</div>
     <div class="traffic">
       <div
-        title="置顶"
+        :title="aw.isPinned ? `取消置顶` : `置顶`"
         class="traffic-button pin"
-        :class="{ pinned: app.isPinned }"
-        @click="() => handlePin(!app.isPinned)"
+        :class="{ pinned: aw.isPinned }"
+        @click="() => handlePin(!aw.isPinned)"
       >
         <NIcon><PinFilledIcon /></NIcon>
       </div>
@@ -19,20 +19,20 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from '@auxiliary-window/features/app/store'
-import { mainCall } from '@shared/renderer-utils/ipc'
+import { useAuxiliaryWindowStore } from '@auxiliary-window/features/auxiliary-window/store'
+import { mainCall } from '@shared/renderer/utils/ipc'
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 
-const app = useAppStore()
+const aw = useAuxiliaryWindowStore()
 
 const handleClose = () => {
-  mainCall('auxiliary-window/hide')
+  return mainCall('auxiliary-window/hide')
 }
 
 const handlePin = (b: boolean) => {
-  mainCall('auxiliary-window/set-always-on-top', b)
+  return mainCall('auxiliary-window/set-always-on-top', b)
 }
 </script>
 

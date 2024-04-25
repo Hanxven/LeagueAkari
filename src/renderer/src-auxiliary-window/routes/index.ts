@@ -6,7 +6,17 @@ const router = createRouter({
     {
       path: '/',
       name: 'root',
-      component: () => import('@auxiliary-window/views/SimpleView.vue')
+      component: () => import('@auxiliary-window/views/Placeholder.vue')
+    },
+    {
+      path: '/champ-select',
+      name: 'champ-select',
+      component: () => import('@auxiliary-window/views/ChampSelect.vue')
+    },
+    {
+      path: '/ready-check',
+      name: 'ready-check',
+      component: () => import('@auxiliary-window/views/ReadyCheck.vue')
     }
   ]
 })

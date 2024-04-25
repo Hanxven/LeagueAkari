@@ -215,8 +215,10 @@ export function chatSync() {
             }
           }
         } catch (error) {
-          mwNotification.warn('lcu-state-sync', '状态同步', '获取现有对话失败')
-          logger.warn(`无法获取当前的对话 ${formatError(error)}`)
+          if ((error as any)?.response?.data?.message !== 'not connected to RC chat yet') {
+            mwNotification.warn('lcu-state-sync', '状态同步', '获取现有对话失败')
+            logger.warn(`无法获取当前的对话 ${formatError(error)}`)
+          }
         }
       }
     }

@@ -17,16 +17,14 @@
 </template>
 
 <script setup lang="ts">
+import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { NTabPane, NTabs } from 'naive-ui'
 import { ref } from 'vue'
-
-import { useKeepAliveScrollPositionMemo } from '@main-window/compositions/useKeepAliveScrollPositionMemo'
 
 import AutoGameflow from './AutoGameflow.vue'
 import AutoReply from './AutoReply.vue'
 import AutoSelect from './AutoSelect.vue'
 
-// const id = 'view:toolkit'
 const el = ref()
 useKeepAliveScrollPositionMemo(el)
 </script>

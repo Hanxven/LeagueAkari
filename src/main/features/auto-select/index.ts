@@ -214,7 +214,6 @@ export async function setupAutoSelect() {
     '/lol-champ-select/v1/summoners/*',
     async (event) => {
       if (event.eventType === 'Delete') {
-        runInAction(() => activeSummonerState.set(null))
         return
       }
 

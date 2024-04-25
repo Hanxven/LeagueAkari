@@ -99,16 +99,14 @@
 </template>
 
 <script setup lang="ts">
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { championIcon } from '@shared/renderer/features/game-data'
+import { useChampSelectStore } from '@shared/renderer/features/lcu-state-sync/champ-select'
+import { useGameDataStore } from '@shared/renderer/features/lcu-state-sync/game-data'
+import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NPopover, NSelect } from 'naive-ui'
 import { computed, nextTick, ref, watch } from 'vue'
-
-import { championIcon } from '@main-window/features/game-data'
-import { useChampSelectStore } from '@main-window/features/lcu-state-sync/champ-select'
-import { useGameDataStore } from '@main-window/features/lcu-state-sync/game-data'
-import { useGameflowStore } from '@main-window/features/lcu-state-sync/gameflow'
-
-import LcuImage from './LcuImage.vue'
 
 const props = withDefaults(
   defineProps<{ value?: number[]; maxShow?: number; maxCount?: number; type?: 'pick' | 'ban' }>(),

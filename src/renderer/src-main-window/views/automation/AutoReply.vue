@@ -38,15 +38,14 @@
 </template>
 
 <script setup lang="ts">
-import { NCard, NInput, NSwitch } from 'naive-ui'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import {
   setAutoReplyEnabled,
   setAutoReplyText,
   setEnableOnAway
-} from '@main-window/features/auto-reply'
-import { useAutoReplyStore } from '@main-window/features/auto-reply/store'
+} from '@shared/renderer/features/auto-reply'
+import { useAutoReplyStore } from '@shared/renderer/features/auto-reply/store'
+import { NCard, NInput, NSwitch } from 'naive-ui'
 
 const autoReply = useAutoReplyStore()
 </script>

@@ -159,8 +159,7 @@
 </template>
 
 <script setup lang="ts">
-import { NCard, NInputNumber, NScrollbar, NSwitch } from 'naive-ui'
-
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import {
   setAutoRouteOnGameStart,
   setFetchAfterGame,
@@ -171,12 +170,11 @@ import {
   setSendKdaInGameWithPreMadeTeams,
   setSendKdaThreshold,
   setTeamAnalysisPreloadCount
-} from '@main-window/features/core-functionality'
-import { useCoreFunctionalityStore } from '@main-window/features/core-functionality/store'
-import { setEnableRespawnTimer } from '@main-window/features/respawn-timer'
-import { useRespawnTimerStore } from '@main-window/features/respawn-timer/store'
-
-import ControlItem from '../ControlItem.vue'
+} from '@shared/renderer/features/core-functionality'
+import { useCoreFunctionalityStore } from '@shared/renderer/features/core-functionality/store'
+import { setEnableRespawnTimer } from '@shared/renderer/features/respawn-timer'
+import { useRespawnTimerStore } from '@shared/renderer/features/respawn-timer/store'
+import { NCard, NInputNumber, NScrollbar, NSwitch } from 'naive-ui'
 
 const respawnTimer = useRespawnTimerStore()
 const coreFunctionality = useCoreFunctionalityStore()

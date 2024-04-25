@@ -31,12 +31,10 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import { setAutoCheckUpdates, setAutoConnect } from '@shared/renderer/features/app'
+import { useAppStore } from '@shared/renderer/features/app/store'
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
-
-import { setAutoCheckUpdates, setAutoConnect } from '@main-window/features/app'
-import { useAppStore } from '@main-window/features/app/store'
-
-import ControlItem from '../ControlItem.vue'
 
 const app = useAppStore()
 </script>

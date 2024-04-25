@@ -39,12 +39,11 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import { changeRanked } from '@shared/renderer/http-api/chat'
+import { laNotification } from '@shared/renderer/notification'
 import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
 import { reactive } from 'vue'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
-import { changeRanked } from '@shared/renderer-http-api/chat'
-import { laNotification } from '@main-window/notification'
 
 const id = 'view:toolkit:fake-ranked'
 

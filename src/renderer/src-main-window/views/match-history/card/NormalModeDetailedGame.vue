@@ -174,18 +174,17 @@
 
 <script setup lang="ts">
 import { EMPTY_PUUID } from '@shared/constants'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
+import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
+import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
+import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
+import { championIcon } from '@shared/renderer/features/game-data'
 import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-
-import LcuImage from '@main-window/components/LcuImage.vue'
-import ItemDisplay from '@main-window/components/widgets/ItemDisplay.vue'
-import PerkDisplay from '@main-window/components/widgets/PerkDisplay.vue'
-import PerkstyleDisplay from '@main-window/components/widgets/PerkstyleDisplay.vue'
-import SummonerSpellDisplay from '@main-window/components/widgets/SummonerSpellDisplay.vue'
-import { championIcon } from '@main-window/features/game-data'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 
@@ -267,7 +266,7 @@ const router = useRouter()
 
 const handleToSummoner = (puuid: string) => {
   // 人机不跳
-  if (puuid === EMPTY_PUUID) {
+  if (!puuid || puuid === EMPTY_PUUID) {
     return
   }
   router.replace(`/match-history/${puuid}`)

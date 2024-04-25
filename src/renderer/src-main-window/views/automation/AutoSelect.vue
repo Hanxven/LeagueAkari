@@ -164,10 +164,7 @@
 </template>
 
 <script setup lang="ts">
-import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
-import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import {
   setAutoBanEnabled,
   setAutoSelectCompleted,
@@ -183,8 +180,11 @@ import {
   setSelectRandomly,
   setSelectTeammateIntendedChampion,
   setShowIntent
-} from '@main-window/features/auto-select'
-import { useAutoSelectStore } from '@main-window/features/auto-select/store'
+} from '@shared/renderer/features/auto-select'
+import { useAutoSelectStore } from '@shared/renderer/features/auto-select/store'
+import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
+
+import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
 
 // const id = 'view:toolkit:auto-select'
 

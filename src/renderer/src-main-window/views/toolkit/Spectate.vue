@@ -41,19 +41,18 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@shared/renderer/features/lcu-state-sync/summoner'
+import { getFriends } from '@shared/renderer/http-api/chat'
+import { LcuHttpError } from '@shared/renderer/http-api/common'
+import { launchSpectator } from '@shared/renderer/http-api/spectator'
+import { getSummonerAlias, getSummonerByName } from '@shared/renderer/http-api/summoner'
+import { laNotification } from '@shared/renderer/notification'
 import { Friend } from '@shared/types/lcu/chat'
+import { resolveSummonerName } from '@shared/utils/identity'
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
-import { useGameflowStore } from '@main-window/features/lcu-state-sync/gameflow'
-import { useSummonerStore } from '@main-window/features/lcu-state-sync/summoner'
-import { getFriends } from '@shared/renderer-http-api/chat'
-import { LcuHttpError } from '@shared/renderer-http-api/common'
-import { launchSpectator } from '@shared/renderer-http-api/spectator'
-import { getSummonerAlias, getSummonerByName } from '@shared/renderer-http-api/summoner'
-import { laNotification } from '@main-window/notification'
-import { resolveSummonerName } from '@shared/utils/identity'
 
 const id = 'view:toolkit:spectate'
 

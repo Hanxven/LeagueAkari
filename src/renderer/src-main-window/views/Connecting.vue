@@ -47,17 +47,16 @@
 </template>
 
 <script setup lang="ts">
+import { useAppStore } from '@shared/renderer/features/app/store'
+import { laNotification } from '@shared/renderer/notification'
+import { mainCall } from '@shared/renderer/utils/ipc'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
+import { sleep } from '@shared/utils/sleep'
 import { CubeSharp } from '@vicons/ionicons5'
 import { useTimeoutPoll } from '@vueuse/core'
 import { NIcon, NScrollbar, NSpin, useNotification } from 'naive-ui'
 import { ref, shallowRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
-
-import { useAppStore } from '@main-window/features/app/store'
-import { laNotification } from '@main-window/notification'
-import { mainCall } from '@shared/renderer-utils/ipc'
-import { sleep } from '@shared/utils/sleep'
 
 const existingClients = shallowRef<any[]>([])
 const isErr = ref(false)
@@ -257,4 +256,3 @@ const handleConnect = (auth: any) => {
   text-align: center;
 }
 </style>
-@shared/renderer-utils/ipc

@@ -154,7 +154,9 @@
 </template>
 
 <script setup lang="ts">
-import { hideMatchHistoryText } from '@shared/renderer-utils/sarcasms'
+import CopyableText from '@shared/renderer/components/CopyableText.vue'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { hideMatchHistoryText } from '@shared/renderer/utils/sarcasms'
 import { summonerName } from '@shared/utils/name'
 import { Tag as TagIcon } from '@vicons/carbon'
 import { Dice as DiceIcon } from '@vicons/ionicons5'
@@ -164,15 +166,13 @@ import dayjs from 'dayjs'
 import { NButton, NCard, NIcon, NInputNumber, NSelect, NSkeleton } from 'naive-ui'
 import { nextTick, onActivated, ref, watch } from 'vue'
 
-import CopyableText from '@main-window/components/CopyableText.vue'
-import LcuImage from '@main-window/components/LcuImage.vue'
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import {
   fetchTabDetailedGame,
   fetchTabMatchHistory,
   querySavedInfo
-} from '@main-window/features/core-functionality'
-import { TabState, useCoreFunctionalityStore } from '@main-window/features/core-functionality/store'
+} from '@main-window/features/match-history-tabs'
+import { TabState, useMatchHistoryTabsStore } from '@main-window/features/match-history-tabs/store'
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import RankedSpan from './widgets/RankedSpan.vue'
@@ -193,7 +193,8 @@ const props = withDefaults(
     isSelfTab: false
   }
 )
-const cf = useCoreFunctionalityStore()
+
+const mh = useMatchHistoryTabsStore()
 
 const handleLoadPage = async (page: number) => {
   const r = await fetchTabMatchHistory(props.tab.puuid, page, props.tab.matchHistory.pageSize)
@@ -263,7 +264,7 @@ const debouncedX = useDebounce(x, 300)
 const debouncedY = useDebounce(y, 300)
 
 watch([() => debouncedX.value, () => debouncedY.value], ([x, y]) => {
-  cf.setScrollPosition(props.tab.puuid, x, y)
+  mh.setScrollPosition(props.tab.puuid, x, y)
 })
 
 watch(
@@ -283,7 +284,7 @@ onActivated(() => {
 })
 
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
-  cf.setMatchHistoryExpand(props.tab.puuid, gameId, expand)
+  mh.setMatchHistoryExpand(props.tab.puuid, gameId, expand)
 }
 
 const handleTagEdited = (puuid: string) => {
@@ -531,4 +532,3 @@ defineExpose({
   }
 }
 </style>
-@shared/renderer-utils/sarcasms

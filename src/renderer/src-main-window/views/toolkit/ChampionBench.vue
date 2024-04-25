@@ -48,16 +48,15 @@
 </template>
 
 <script setup lang="ts">
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { championIcon } from '@shared/renderer/features/game-data'
+import { useChampSelectStore } from '@shared/renderer/features/lcu-state-sync/champ-select'
+import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
+import { benchSwap, reroll } from '@shared/renderer/http-api/champ-select'
+import { laNotification } from '@shared/renderer/notification'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { NButton, NCard, NDivider } from 'naive-ui'
 import { computed, ref } from 'vue'
-
-import LcuImage from '@main-window/components/LcuImage.vue'
-import { championIcon } from '@main-window/features/game-data'
-import { useChampSelectStore } from '@main-window/features/lcu-state-sync/champ-select'
-import { useGameflowStore } from '@main-window/features/lcu-state-sync/gameflow'
-import { benchSwap, reroll } from '@shared/renderer-http-api/champ-select'
-import { laNotification } from '@main-window/notification'
 
 // 可独立使用的组件，或许可以放到其他地方
 const id = 'comp:champions-bench'

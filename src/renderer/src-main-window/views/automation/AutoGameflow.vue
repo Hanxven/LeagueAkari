@@ -74,7 +74,7 @@
     <ControlItem
       class="control-item-margin"
       label="自动匹配对局"
-      label-description="在可匹配对局时，将自动开始匹配对局"
+      label-description="在可匹配对局时，将自动开始匹配对局。如有正在邀请中的玩家，则等待"
     >
       <NSwitch
         :value="autoGameflow.settings.autoSearchMatchEnabled"
@@ -101,9 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NSwitch } from 'naive-ui'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import {
   setAutoAcceptDelaySeconds,
   setAutoAcceptEnabled,
@@ -112,8 +110,9 @@ import {
   setAutoSearchMatchDelaySeconds,
   setAutoSearchMatchEnabled,
   setPlayAgainEnabled
-} from '@main-window/features/auto-gameflow'
-import { useAutoGameflowStore } from '@main-window/features/auto-gameflow/store'
+} from '@shared/renderer/features/auto-gameflow'
+import { useAutoGameflowStore } from '@shared/renderer/features/auto-gameflow/store'
+import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NSwitch } from 'naive-ui'
 
 const autoGameflow = useAutoGameflowStore()
 </script>

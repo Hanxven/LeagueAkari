@@ -63,20 +63,19 @@
 </template>
 
 <script setup lang="ts">
-import { AvailableBot } from '@shared/types/lcu/lobby'
-import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
-import { computed, reactive, shallowRef } from 'vue'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
-import { useGameDataStore } from '@main-window/features/lcu-state-sync/game-data'
-import { useGameflowStore } from '@main-window/features/lcu-state-sync/gameflow'
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import { useGameDataStore } from '@shared/renderer/features/lcu-state-sync/game-data'
+import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
 import {
   addBot,
   createPractice5x5,
   createQueueLobby,
   getAvailableBots
-} from '@shared/renderer-http-api/lobby'
-import { laNotification } from '@main-window/notification'
+} from '@shared/renderer/http-api/lobby'
+import { laNotification } from '@shared/renderer/notification'
+import { AvailableBot } from '@shared/types/lcu/lobby'
+import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
+import { computed, reactive, shallowRef } from 'vue'
 
 const gameflow = useGameflowStore()
 const gameData = useGameDataStore()

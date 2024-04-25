@@ -207,6 +207,13 @@
 
 <script setup lang="ts">
 import { EMPTY_PUUID } from '@shared/constants'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
+import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
+import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
+import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
+import { championIcon } from '@shared/renderer/features/game-data'
+import { useGameDataStore } from '@shared/renderer/features/lcu-state-sync/game-data'
 import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import {
@@ -219,14 +226,6 @@ import dayjs from 'dayjs'
 import { NIcon, NModal } from 'naive-ui'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-
-import LcuImage from '@main-window/components/LcuImage.vue'
-import ItemDisplay from '@main-window/components/widgets/ItemDisplay.vue'
-import PerkDisplay from '@main-window/components/widgets/PerkDisplay.vue'
-import PerkstyleDisplay from '@main-window/components/widgets/PerkstyleDisplay.vue'
-import SummonerSpellDisplay from '@main-window/components/widgets/SummonerSpellDisplay.vue'
-import { championIcon } from '@main-window/features/game-data'
-import { useGameDataStore } from '@main-window/features/lcu-state-sync/game-data'
 
 import '../lol-view.less'
 import CherryModeDetailedGame from './CherryModeDetailedGame.vue'
@@ -418,7 +417,7 @@ const emits = defineEmits<{
 
 const router = useRouter()
 const handleToSummoner = (puuid: string) => {
-  if (puuid === EMPTY_PUUID) {
+  if (!puuid || puuid === EMPTY_PUUID) {
     return
   }
 

@@ -20,10 +20,10 @@
 
 <script setup lang="ts">
 import {
+  AiStatus as AiStatusIcon,
   AppSwitcher as AppSwitcherIcon,
   Layers as LayersIcon,
-  Template as TemplateIcon,
-  AiStatus as AiStatusIcon
+  Template as TemplateIcon
 } from '@vicons/carbon'
 import { MenuOption, NIcon, NMenu } from 'naive-ui'
 import { Component as ComponentC, h, ref, watchEffect } from 'vue'

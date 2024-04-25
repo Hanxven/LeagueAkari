@@ -153,7 +153,21 @@ class CoreFunctionalityState {
 
       const selections: Record<string, number> = {}
       gameflow.session.gameData.playerChampionSelections.forEach((p) => {
-        selections[p.puuid] = p.championId
+        if (p.puuid) {
+          selections[p.puuid] = p.championId
+        }
+      })
+
+      gameflow.session.gameData.teamOne.forEach((p) => {
+        if (p.championId) {
+          selections[p.puuid] = p.championId
+        }
+      })
+
+      gameflow.session.gameData.teamTwo.forEach((p) => {
+        if (p.championId) {
+          selections[p.puuid] = p.championId
+        }
       })
 
       return selections
@@ -177,13 +191,13 @@ class CoreFunctionalityState {
       }
 
       champSelect.session.myTeam
-        .filter((p) => p.puuid !== EMPTY_PUUID)
+        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
           teams['our'].push(p.puuid)
         })
 
       champSelect.session.theirTeam
-        .filter((p) => p.puuid !== EMPTY_PUUID)
+        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
           teams['their'].push(p.puuid)
         })
@@ -200,13 +214,13 @@ class CoreFunctionalityState {
       }
 
       gameflow.session.gameData.teamOne
-        .filter((p) => p.puuid !== EMPTY_PUUID)
+        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
           teams['100'].push(p.puuid)
         })
 
       gameflow.session.gameData.teamTwo
-        .filter((p) => p.puuid !== EMPTY_PUUID)
+        .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
           teams['200'].push(p.puuid)
         })

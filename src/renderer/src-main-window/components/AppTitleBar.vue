@@ -1,5 +1,5 @@
 <template>
-  <div class="app-title-bar" :class="{ blurred: app.focusState === 'blurred' }">
+  <div class="app-title-bar" :class="{ blurred: mw.focusState === 'blurred' }">
     <div class="title-bar-items">
       <div class="title-bar-item operation" @click="emits('openSettings')" title="通用设置">
         <NIcon class="icon"><SettingsIcon /></NIcon>
@@ -58,11 +58,11 @@
         <NIcon><MinimizeIcon /></NIcon>
       </div>
       <div
-        :title="app.windowState === 'normal' ? '最大化' : '还原'"
+        :title="mw.windowState === 'normal' ? '最大化' : '还原'"
         class="traffic-button maximize"
         @click="handleMaximize"
       >
-        <NIcon><MaximizeIcon v-if="app.windowState === 'normal'" /><CarbonIcon v-else /> </NIcon>
+        <NIcon><MaximizeIcon v-if="mw.windowState === 'normal'" /><CarbonIcon v-else /> </NIcon>
       </div>
       <div title="关闭" class="traffic-button close" @click="handleClose">
         <NIcon><CloseIcon /></NIcon>
@@ -72,7 +72,11 @@
 </template>
 
 <script setup lang="ts">
-import { mainCall } from '@shared/renderer-utils/ipc'
+import { useAppStore } from '@shared/renderer/features/app/store'
+import { useAutoGameflowStore } from '@shared/renderer/features/auto-gameflow/store'
+import { useLoginStore } from '@shared/renderer/features/lcu-state-sync/login'
+import { useRespawnTimerStore } from '@shared/renderer/features/respawn-timer/store'
+import { mainCall } from '@shared/renderer/utils/ipc'
 import {
   Carbon as CarbonIcon,
   Hourglass as HourglassIcon,
@@ -87,12 +91,10 @@ import { useIntervalFn } from '@vueuse/core'
 import { NIcon } from 'naive-ui'
 import { ref, watch } from 'vue'
 
-import { useAppStore } from '@main-window/features/app/store'
-import { useAutoGameflowStore } from '@main-window/features/auto-gameflow/store'
-import { useLoginStore } from '@main-window/features/lcu-state-sync/login'
-import { useRespawnTimerStore } from '@main-window/features/respawn-timer/store'
+import { useMainWindowStore } from '@main-window/features/main-window/store'
 
 const app = useAppStore()
+const mw = useMainWindowStore()
 const respawnTimer = useRespawnTimerStore()
 const autoGameflow = useAutoGameflowStore()
 const login = useLoginStore()
@@ -146,7 +148,7 @@ const handleMinimize = async () => {
 }
 
 const handleMaximize = async () => {
-  if (app.windowState === 'normal') {
+  if (mw.windowState === 'normal') {
     await mainCall('main-window/maximize')
   } else {
     await mainCall('main-window/unmaximize')
@@ -309,4 +311,3 @@ const emits = defineEmits<{
   }
 }
 </style>
-@shared/renderer-utils/ipc

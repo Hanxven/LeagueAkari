@@ -28,11 +28,10 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import { setCksEnabled, setCksText } from '@shared/renderer/features/custom-keyboard-sequence'
+import { useCustomKeyboardSequenceStore } from '@shared/renderer/features/custom-keyboard-sequence/store'
 import { NCard, NInput, NSwitch } from 'naive-ui'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
-import { setCksEnabled, setCksText } from '@main-window/features/custom-keyboard-sequence'
-import { useCustomKeyboardSequenceStore } from '@main-window/features/custom-keyboard-sequence/store'
 
 const cks = useCustomKeyboardSequenceStore()
 </script>

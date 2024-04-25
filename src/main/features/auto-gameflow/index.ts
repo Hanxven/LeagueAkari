@@ -78,9 +78,7 @@ export async function setupAutoGameflow() {
             honorablePlayerIds[Math.floor(Math.random() * honorablePlayerIds.length)]
           await honor(message.data.gameId, category, candidate)
 
-          logger.info(
-            `给玩家: ${candidate} 点赞, for ${category}, game ID: ${message.data.gameId}`
-          )
+          logger.info(`给玩家: ${candidate} 点赞, for ${category}, game ID: ${message.data.gameId}`)
         } else {
           await honor(message.data.gameId, 'OPT_OUT', 0)
           logger.info('跳过点赞阶段')
@@ -174,9 +172,9 @@ export async function setupAutoGameflow() {
       return 'unavailable'
     }
 
-    const pendingInvitation = lobby.lobby.invitations.some((i) => i.state === 'ongoing?')
+    const hasPendingInvitation = lobby.lobby.invitations.some((i) => i.state === 'Pending')
 
-    if (pendingInvitation) {
+    if (hasPendingInvitation) {
       return 'waiting-for-invitees'
     }
 

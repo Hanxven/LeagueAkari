@@ -30,6 +30,15 @@
 </template>
 
 <script setup lang="ts">
+import CopyableText from '@shared/renderer/components/CopyableText.vue'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import AugmentDisplay from '@shared/renderer/components/widgets/AugmentDisplay.vue'
+import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
+import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
+import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
+import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
+import { championIcon } from '@shared/renderer/features/game-data'
+import { useGameDataStore } from '@shared/renderer/features/lcu-state-sync/game-data'
 import { Game, Participant, Player } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { rsoPlatformText } from '@shared/utils/rso-platforms'
@@ -37,16 +46,6 @@ import dayjs from 'dayjs'
 import { DataTableColumns, NDataTable } from 'naive-ui'
 import { RowData } from 'naive-ui/es/data-table/src/interface'
 import { computed, h } from 'vue'
-
-import CopyableText from '@main-window/components/CopyableText.vue'
-import LcuImage from '@main-window/components/LcuImage.vue'
-import AugmentDisplay from '@main-window/components/widgets/AugmentDisplay.vue'
-import ItemDisplay from '@main-window/components/widgets/ItemDisplay.vue'
-import PerkDisplay from '@main-window/components/widgets/PerkDisplay.vue'
-import PerkstyleDisplay from '@main-window/components/widgets/PerkstyleDisplay.vue'
-import SummonerSpellDisplay from '@main-window/components/widgets/SummonerSpellDisplay.vue'
-import { championIcon } from '@main-window/features/game-data'
-import { useGameDataStore } from '@main-window/features/lcu-state-sync/game-data'
 
 const props = defineProps<{
   game: Game

@@ -130,24 +130,24 @@
 
 <script setup lang="ts">
 import { EMPTY_PUUID } from '@shared/constants'
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
+import { setInGameKdaSendPlayer } from '@shared/renderer/features/core-functionality'
+import {
+  OngoingPlayer,
+  useCoreFunctionalityStore
+} from '@shared/renderer/features/core-functionality/store'
+import { championIcon } from '@shared/renderer/features/game-data'
+import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@shared/renderer/features/lcu-state-sync/summoner'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { NCard, NCheckbox } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import ControlItem from '@main-window/components/ControlItem.vue'
-import LcuImage from '@main-window/components/LcuImage.vue'
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
-import { useKeepAliveScrollPositionMemo } from '@main-window/compositions/useKeepAliveScrollPositionMemo'
-import { setInGameKdaSendPlayer } from '@main-window/features/core-functionality'
-import {
-  OngoingPlayer,
-  useCoreFunctionalityStore
-} from '@main-window/features/core-functionality/store'
-import { championIcon } from '@main-window/features/game-data'
-import { useGameflowStore } from '@main-window/features/lcu-state-sync/gameflow'
-import { useSummonerStore } from '@main-window/features/lcu-state-sync/summoner'
 
 import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMatchHistoryCardModal.vue'
 import PlayerInfoCard from './PlayerInfoCard.vue'
@@ -158,7 +158,7 @@ const gameflow = useGameflowStore()
 const summoner = useSummonerStore()
 
 const handleToSummoner = (puuid: string) => {
-  if (puuid === EMPTY_PUUID) {
+  if (!puuid || puuid === EMPTY_PUUID) {
     return
   }
   return router.replace(`/match-history/${puuid}`)
@@ -264,6 +264,8 @@ useKeepAliveScrollPositionMemo(el)
 .no-ongoing-game {
   height: 100%;
   display: flex;
+  position: relative;
+  top: calc(var(--app-title-bar-height) * -1);
   flex-direction: column;
   justify-content: center;
   align-items: center;

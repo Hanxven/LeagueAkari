@@ -24,10 +24,9 @@
 </template>
 
 <script setup lang="ts">
+import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { NTabPane, NTabs } from 'naive-ui'
 import { ref } from 'vue'
-
-import { useKeepAliveScrollPositionMemo } from '@main-window/compositions/useKeepAliveScrollPositionMemo'
 
 import AvailabilityCheck from './AvailabilityCheck.vue'
 import ChampionBench from './ChampionBench.vue'

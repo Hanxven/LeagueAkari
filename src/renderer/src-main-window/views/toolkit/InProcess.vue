@@ -27,15 +27,14 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
+import { earlyExit } from '@shared/renderer/http-api/gameflow'
+import { playAgain } from '@shared/renderer/http-api/lobby'
+import { dodge } from '@shared/renderer/http-api/login'
+import { laNotification } from '@shared/renderer/notification'
 import { NButton, NCard } from 'naive-ui'
 import { computed } from 'vue'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
-import { useGameflowStore } from '@main-window/features/lcu-state-sync/gameflow'
-import { earlyExit } from '@shared/renderer-http-api/gameflow'
-import { playAgain } from '@shared/renderer-http-api/lobby'
-import { dodge } from '@shared/renderer-http-api/login'
-import { laNotification } from '@main-window/notification'
 
 const id = 'view:toolkit:ongoing'
 

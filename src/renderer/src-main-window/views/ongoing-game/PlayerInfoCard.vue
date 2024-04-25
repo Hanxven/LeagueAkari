@@ -229,7 +229,14 @@
 </template>
 
 <script setup lang="ts">
-import { winRateTeamText } from '@shared/renderer-utils/sarcasms'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import {
+  MatchHistoryWithState,
+  SavedPlayerInfo
+} from '@shared/renderer/features/core-functionality/store'
+import { championIcon } from '@shared/renderer/features/game-data'
+import { useGameDataStore } from '@shared/renderer/features/lcu-state-sync/game-data'
+import { winRateTeamText } from '@shared/renderer/utils/sarcasms'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
@@ -238,14 +245,6 @@ import { useTimeoutPoll, useVirtualList } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NDivider, NPopover } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
-
-import LcuImage from '@main-window/components/LcuImage.vue'
-import {
-  MatchHistoryWithState,
-  SavedPlayerInfo
-} from '@main-window/features/core-functionality/store'
-import { championIcon } from '@main-window/features/game-data'
-import { useGameDataStore } from '@main-window/features/lcu-state-sync/game-data'
 
 import RankedSpan from '../match-history/widgets/RankedSpan.vue'
 
@@ -602,4 +601,3 @@ const analysis = computed(() => getAnalysis(matchHistoryList.value))
   }
 }
 </style>
-@shared/renderer-utils/sarcasms

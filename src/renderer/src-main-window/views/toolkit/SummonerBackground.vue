@@ -42,16 +42,15 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { useGameDataStore } from '@shared/renderer/features/lcu-state-sync/game-data'
+import { getChampDetails } from '@shared/renderer/http-api/game-data'
+import { setSummonerBackgroundSkin } from '@shared/renderer/http-api/summoner'
 import { ChampSkin } from '@shared/types/lcu/game-data'
+import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
 import { VNode, computed, h, ref, watch } from 'vue'
-
-import ControlItem from '@main-window/components/ControlItem.vue'
-import LcuImage from '@main-window/components/LcuImage.vue'
-import { useGameDataStore } from '@main-window/features/lcu-state-sync/game-data'
-import { getChampDetails } from '@shared/renderer-http-api/game-data'
-import { setSummonerBackgroundSkin } from '@shared/renderer-http-api/summoner'
-import { isChampionNameMatch } from '@shared/utils/string-match'
 
 const gameData = useGameDataStore()
 

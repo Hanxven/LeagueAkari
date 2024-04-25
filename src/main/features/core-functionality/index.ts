@@ -7,7 +7,7 @@ import { chatSend } from '@main/http-api/chat'
 import { getGameflowSession } from '@main/http-api/gameflow'
 import { getGame, getMatchHistory } from '@main/http-api/match-history'
 import { getRankedStats } from '@main/http-api/ranked'
-import { getSummoner, getSummonerByPuuid } from '@main/http-api/summoner'
+import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { saveEncounteredGame } from '@main/storage/encountered-games'
 import { querySavedPlayerWithGames, saveSavedPlayer } from '@main/storage/saved-player'
 import { getSetting, setSetting } from '@main/storage/settings'
@@ -153,11 +153,11 @@ async function champSelectQuery() {
   const session = (await getChampSelectSession()).data
 
   const m = session.myTeam
-    .filter((p) => p.puuid !== EMPTY_PUUID)
+    .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
     .map((t, i) => ({ puuid: t.puuid, team: 'our', order: i }))
 
   const t = session.theirTeam
-    .filter((p) => p.puuid !== EMPTY_PUUID)
+    .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
     .map((t, i) => ({ puuid: t.puuid, team: 'their', order: i }))
 
   const visiblePlayers = [...m, ...t]
@@ -173,11 +173,11 @@ async function inGameQuery() {
   const session = (await getGameflowSession()).data
 
   const m = session.gameData.teamOne
-    .filter((p) => p.puuid !== EMPTY_PUUID)
+    .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
     .map((t, i) => ({ puuid: t.puuid, team: '100', order: i }))
 
   const t = session.gameData.teamTwo
-    .filter((p) => p.puuid !== EMPTY_PUUID)
+    .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
     .map((t, i) => ({ puuid: t.puuid, team: '200', order: i }))
 
   const visiblePlayers = [...m, ...t]

@@ -134,6 +134,11 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import CopyableText from '@shared/renderer/components/CopyableText.vue'
+import { useAppStore } from '@shared/renderer/features/app/store'
+import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
+import { mainCall } from '@shared/renderer/utils/ipc'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import {
@@ -151,7 +156,6 @@ import {
 } from 'naive-ui'
 import { computed, h, nextTick, ref, useCssModule, watch } from 'vue'
 
-import { useAppStore } from '@main-window/features/app/store'
 import {
   addPrintRule,
   disablePrintRule,
@@ -159,11 +163,7 @@ import {
   removePrintRule
 } from '@main-window/features/debug'
 import { useDebugStore } from '@main-window/features/debug/store'
-import { useGameflowStore } from '@main-window/features/lcu-state-sync/gameflow'
-import { mainCall } from '@shared/renderer-utils/ipc'
 
-import ControlItem from '../ControlItem.vue'
-import CopyableText from '../CopyableText.vue'
 import { lcuEndpoints } from './lcu-endpoints'
 
 const gameflow = useGameflowStore()
@@ -364,4 +364,3 @@ const handleReload = () => {
   --n-empty-padding: 12px;
 }
 </style>
-@shared/renderer-utils/ipc

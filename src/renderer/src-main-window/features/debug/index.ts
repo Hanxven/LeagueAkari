@@ -1,6 +1,6 @@
 import { RadixEventEmitter } from '@shared/event-emitter'
-import { gameClientRequest, request } from '@shared/renderer-http-api/common'
-import { mainCall, onMainEvent } from '@shared/renderer-utils/ipc'
+import { gameClientRequest, request } from '@shared/renderer/http-api/common'
+import { mainCall, onMainEvent } from '@shared/renderer/utils/ipc'
 import { watch } from 'vue'
 
 import { router } from '@main-window/routes'
