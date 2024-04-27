@@ -1,7 +1,8 @@
 import { is } from '@electron-toolkit/utils'
+import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
-import { BrowserWindow, shell } from 'electron'
-import { makeAutoObservable } from 'mobx'
+import { BrowserWindow, Rectangle, shell } from 'electron'
+import { comparer, makeAutoObservable, reaction } from 'mobx'
 import { join } from 'path'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
@@ -20,6 +21,8 @@ class AuxiliaryWindowState {
   isPinned: boolean = false
 
   isReady: boolean = false
+
+  bounds: Rectangle | null = null
 
   constructor() {
     makeAutoObservable(this)
@@ -43,6 +46,10 @@ class AuxiliaryWindowState {
 
   setReady(ready: boolean) {
     this.isReady = ready
+  }
+
+  setBounds(bounds: Rectangle | null) {
+    this.bounds = bounds
   }
 }
 
@@ -84,6 +91,13 @@ export function createAuxiliaryWindow(): void {
   })
 
   auxiliaryWindowState.setShow(false)
+  auxiliaryWindowState.setBounds(auxiliaryWindow.getBounds())
+
+  getLastWindowBounds().then((b) => {
+    if (b && auxiliaryWindow) {
+      auxiliaryWindow.setBounds(b)
+    }
+  })
 
   auxiliaryWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -136,6 +150,18 @@ export function createAuxiliaryWindow(): void {
 
   auxiliaryWindow.on('closed', () => {
     auxiliaryWindowState.setReady(false)
+  })
+
+  auxiliaryWindow.on('move', () => {
+    if (auxiliaryWindow) {
+      auxiliaryWindowState.setBounds(auxiliaryWindow.getBounds())
+    }
+  })
+
+  auxiliaryWindow.on('resize', () => {
+    if (auxiliaryWindow) {
+      auxiliaryWindowState.setBounds(auxiliaryWindow.getBounds())
+    }
   })
 
   auxiliaryWindow.on('page-title-updated', (e) => e.preventDefault())
@@ -217,17 +243,31 @@ export function setupAuxiliaryWindow() {
     hideAuxiliaryWindow(true)
   })
 
-  onRendererCall('auxiliary-window/show', (_, inactive) => {
-    if (inactive) {
-      auxiliaryWindow?.showInactive()
-    } else {
-      auxiliaryWindow?.show()
-    }
+  onRendererCall('auxiliary-window/show', (_) => {
+    showAuxiliaryWindow()
   })
 
   onRendererCall('auxiliary-window/set-always-on-top', (_, flag, level, relativeLevel) => {
     auxiliaryWindow?.setAlwaysOnTop(flag, level, relativeLevel)
   })
 
+  reaction(
+    () => auxiliaryWindowState.bounds,
+    (bounds) => {
+      if (bounds) {
+        saveWindowBounds(bounds)
+      }
+    },
+    { delay: 500, equals: comparer.shallow }
+  )
+
   logger.info('初始化完成')
+}
+
+function getLastWindowBounds() {
+  return getSetting<Rectangle | null>('auxiliary-window/bounds', null)
+}
+
+function saveWindowBounds(bounds: Rectangle) {
+  return setSetting('auxiliary-window/bounds', bounds)
 }

@@ -70,6 +70,17 @@ declare module '*/laToolkitWin32x64.node' {
      * 检测是否在提升后的权限中运行
      */
     isElevated(): boolean
+
+    /**
+     * 获取英雄联盟客户端窗口位置
+     */
+    GetLeagueClientWindowPlacementInfo(): {
+      left: number
+      top: number
+      right: number
+      bottom: number
+      shownState: numbre
+    } | null
   }
 
   const lt1: LeagueAkari1Addon

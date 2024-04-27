@@ -1,6 +1,5 @@
 import { onRendererCall, sendEventToAllRenderer, sendEventToRenderer } from '@main/utils/ipc'
 import { Menu, MenuItem, Notification, Tray, app } from 'electron'
-import { reaction } from 'mobx'
 import { GlobalKeyboardListener } from 'node-global-key-listener'
 import { randomUUID } from 'node:crypto'
 import EventEmitter from 'node:events'

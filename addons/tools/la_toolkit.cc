@@ -48,6 +48,34 @@ Napi::Value FixWindowMethodA(const Napi::CallbackInfo& info) {
   return Napi::Boolean::New(env, true);
 }
 
+Napi::Value GetLeagueClientWindowPlacementInfo(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  // 使用类名和窗口名查找窗口
+  HWND hwnd = FindWindowW(APPLICATION_CLASS_NAME, APPLICATION_NAME);
+  if (hwnd == NULL) {
+    // 如果窗口不存在，返回null
+    return env.Null();
+  }
+
+  WINDOWPLACEMENT wp;
+  wp.length = sizeof(WINDOWPLACEMENT);
+  if (GetWindowPlacement(hwnd, &wp)) {
+    // 创建一个返回对象
+    Napi::Object result = Napi::Object::New(env);
+    result.Set("left", Napi::Number::New(env, wp.rcNormalPosition.left));
+    result.Set("top", Napi::Number::New(env, wp.rcNormalPosition.top));
+    result.Set("right", Napi::Number::New(env, wp.rcNormalPosition.right));
+    result.Set("bottom", Napi::Number::New(env, wp.rcNormalPosition.bottom));
+    result.Set("shownState", Napi::Number::New(env, wp.showCmd));
+
+    return result;
+  } else {
+    // 如果无法获取窗口位置，返回null
+    return env.Null();
+  }
+}
+
 Napi::Value IsElevated(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   bool bIsElevated = false;
@@ -75,6 +103,7 @@ Napi::Value IsElevated(const Napi::CallbackInfo& info) {
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set("fixWindowMethodA", Napi::Function::New(env, FixWindowMethodA));
   exports.Set("isElevated", Napi::Function::New(env, IsElevated));
+  exports.Set("GetLeagueClientWindowPlacementInfo", Napi::Function::New(env, GetLeagueClientWindowPlacementInfo));
   return exports;
 }
 

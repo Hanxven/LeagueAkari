@@ -2,6 +2,7 @@ import { createLogger } from '@main/core/log'
 import { getPlayerList } from '@main/http-api/game-client'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
+import { summonerName } from '@shared/utils/name'
 import { reaction, runInAction } from 'mobx'
 
 import { gameData } from '../lcu-state-sync/game-data'
@@ -31,8 +32,15 @@ export async function setupRespawnTimer() {
     try {
       const playerList = (await getPlayerList()).data
       const self = playerList.find((p) => {
-        // 名称检查确认，这个接口没有 tagLine
-        const isNameEqualed = p.summonerName === (summoner.me!.gameName || summoner.me!.displayName)
+        // 2024-04-27 之后，有 Tag 了
+        if (p.summonerName.includes('#')) {
+          return (
+            p.summonerName ===
+            summonerName(summoner.me?.gameName || summoner.me?.displayName, summoner.me?.tagLine)
+          )
+        }
+
+        const isNameEqualed = p.summonerName === summoner.me?.gameName || summoner.me?.displayName
 
         // 额外保险步骤
         const championId = respawnTimerState.selfChampionInGameSelection
