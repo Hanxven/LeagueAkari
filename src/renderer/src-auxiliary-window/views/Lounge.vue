@@ -124,7 +124,7 @@ watch(
 .ready-check-wrapper {
   display: flex;
   position: relative;
-  top: calc(var(--app-title-bar-height) * -1);
+  top: calc(var(--title-bar-height) * -1);
   flex-direction: column;
   justify-content: center;
   align-items: center;

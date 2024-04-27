@@ -10,7 +10,7 @@
   --background-color-primary: rgb(36, 36, 36);
   --app-min-height: 200px;
   --app-min-width: 200px;
-  --app-title-bar-height: 24px;
+  --title-bar-height: 24px;
   --scroll-bar-height: 6px;
   --scroll-bar-width: 6px;
 }
@@ -37,7 +37,7 @@ body,
 }
 
 #v-binder-view-measurer {
-  top: var(--app-title-bar-height) !important;
+  top: var(--title-bar-height) !important;
 }
 
 body {
@@ -90,5 +90,5 @@ a:visited {
 
 // adjust for app title bar height
 .n-notification-container > .n-scrollbar > .n-scrollbar-container {
-  max-height: calc(100vh - var(--app-title-bar-height)) !important;
+  max-height: calc(100vh - var(--title-bar-height)) !important;
 }

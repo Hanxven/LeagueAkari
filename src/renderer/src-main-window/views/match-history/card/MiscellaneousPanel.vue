@@ -371,7 +371,7 @@ const tableData = computed(() => {
   max-width: 80vw;
   min-width: 640px;
   position: relative;
-  top: calc(var(--app-title-bar-height) / 2);
+  top: calc(var(--title-bar-height) / 2);
 
   :deep(.n-data-table) {
     font-size: 12px;

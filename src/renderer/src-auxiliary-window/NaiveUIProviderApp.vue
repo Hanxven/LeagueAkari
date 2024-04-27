@@ -6,8 +6,7 @@
     :date-locale="dateZhCN"
     id="naive-ui-config-provider"
   >
-    <!-- 需要给一个相对于 Title Bar 的偏移量 -->
-    <NMessageProvider :container-style="{ top: 'calc(var(--app-title-bar-height) + 12px)' }">
+    <NMessageProvider :container-style="{ top: 'calc(var(--title-bar-height) + 12px)' }">
       <NNotificationProvider placement="bottom-right">
         <NDialogProvider>
           <App />

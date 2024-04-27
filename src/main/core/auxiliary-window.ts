@@ -1,7 +1,7 @@
 import { is } from '@electron-toolkit/utils'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
-import { BrowserWindow, Rectangle, shell } from 'electron'
+import { BrowserWindow, Rectangle, screen, shell } from 'electron'
 import { comparer, makeAutoObservable, reaction } from 'mobx'
 import { join } from 'path'
 
@@ -251,6 +251,10 @@ export function setupAuxiliaryWindow() {
     auxiliaryWindow?.setAlwaysOnTop(flag, level, relativeLevel)
   })
 
+  onRendererCall('auxiliary-window/reset-window-position', () => {
+    resetWindowPosition()
+  })
+
   reaction(
     () => auxiliaryWindowState.bounds,
     (bounds) => {
@@ -270,4 +274,22 @@ function getLastWindowBounds() {
 
 function saveWindowBounds(bounds: Rectangle) {
   return setSetting('auxiliary-window/bounds', bounds)
+}
+
+function getCenteredRectangle(width: number, height: number) {
+  let { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize
+
+  let x = Math.round((screenWidth - width) / 2)
+  let y = Math.round((screenHeight - height) / 2)
+
+  return { x, y, width, height }
+}
+
+function resetWindowPosition() {
+  if (auxiliaryWindow) {
+    const b = auxiliaryWindow.getBounds()
+    const p = getCenteredRectangle(b.width, b.height)
+    auxiliaryWindow.setPosition(p.x, p.y)
+    logger.info('重置窗口位置到主显示器中心')
+  }
 }

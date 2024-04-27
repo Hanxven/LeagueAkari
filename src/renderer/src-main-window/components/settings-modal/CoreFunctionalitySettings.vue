@@ -167,12 +167,26 @@
         />
       </ControlItem>
     </NCard>
+    <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">高级</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="重设辅助窗口位置"
+        label-description="重新设置辅助窗口的位置，还原到默认主屏幕正中心"
+        :label-width="320"
+      >
+        <NButton size="tiny" type="warning" @click="() => resetAuxiliaryWindowPosition()"
+          >重设</NButton
+        >
+      </ControlItem>
+    </NCard>
   </NScrollbar>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import {
+  resetAuxiliaryWindowPosition,
   setAutoRouteOnGameStart,
   setFetchAfterGame,
   setFetchDetailedGame,
@@ -187,7 +201,7 @@ import {
 import { useCoreFunctionalityStore } from '@shared/renderer/features/core-functionality/store'
 import { setEnableRespawnTimer } from '@shared/renderer/features/respawn-timer'
 import { useRespawnTimerStore } from '@shared/renderer/features/respawn-timer/store'
-import { NCard, NInputNumber, NScrollbar, NSwitch } from 'naive-ui'
+import { NButton, NCard, NInputNumber, NScrollbar, NSwitch } from 'naive-ui'
 
 const respawnTimer = useRespawnTimerStore()
 const coreFunctionality = useCoreFunctionalityStore()

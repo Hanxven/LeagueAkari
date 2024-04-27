@@ -22,7 +22,7 @@ configure({ enforceActions: 'observed' })
 
 const gotTheLock = app.requestSingleInstanceLock()
 
-const logger = createLogger('initialization')
+const logger = createLogger('league-akari')
 
 if (!gotTheLock) {
   app.quit()

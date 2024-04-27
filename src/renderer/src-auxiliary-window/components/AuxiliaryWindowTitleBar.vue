@@ -40,7 +40,7 @@ const handlePin = (b: boolean) => {
 .title-bar {
   display: flex;
   position: relative;
-  height: var(--app-title-bar-height);
+  height: var(--title-bar-height);
   align-items: center;
   z-index: 1000000; // header must be on top
   -webkit-app-region: drag;
@@ -64,6 +64,7 @@ const handlePin = (b: boolean) => {
   display: flex;
   flex: 1;
   justify-content: flex-end;
+  transition: all 0.3s ease;
 
   .traffic-button {
     display: flex;

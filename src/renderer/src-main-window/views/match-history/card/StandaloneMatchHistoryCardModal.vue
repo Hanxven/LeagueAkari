@@ -113,7 +113,7 @@ watch(
   padding: 12px;
   position: relative;
   overflow: auto;
-  top: calc(var(--app-title-bar-height) / 2);
+  top: calc(var(--title-bar-height) / 2);
 
   :deep(.v-binder-follower-container) {
     position: fixed;

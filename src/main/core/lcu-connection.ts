@@ -182,7 +182,12 @@ export async function initLcuConnection() {
   reaction(
     () => [lcuConnectionState.auth, lcuConnectionState.state] as const,
     ([a, s]) => {
-      logger.info(`LCU 状态发生变化: ${s} ${JSON.stringify(a)}`)
+      if (a) {
+        const { certificate, ...rest } = a
+        logger.info(`LCU 状态发生变化: ${s} ${JSON.stringify(rest)}`)
+      } else {
+        logger.info(`LCU 状态发生变化: ${s} ${JSON.stringify(a)}`)
+      }
     },
     { equals: comparer.shallow }
   )

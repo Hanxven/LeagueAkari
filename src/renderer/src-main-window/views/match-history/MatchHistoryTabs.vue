@@ -128,13 +128,16 @@
           :tab="t.data as TabState"
         />
       </template>
-      <div v-else class="tabs-placeholder">League Akari</div>
+      <div v-else class="tabs-placeholder">
+        <LeagueAkariSpan bold class="placeholder-text" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useCoreFunctionalityStore } from '@shared/renderer/features/core-functionality/store'
 import { championIcon, profileIcon } from '@shared/renderer/features/game-data'
 import { useSummonerStore } from '@shared/renderer/features/lcu-state-sync/summoner'
@@ -422,7 +425,7 @@ const handleBackToTop = () => {
 
   .privacy-private-icon {
     position: relative;
-    top: 1px; // 看起来更舒服一点
+    top: 1px;
     font-size: 12px;
     margin-left: 4px;
     color: rgb(206, 52, 52);
@@ -438,11 +441,12 @@ const handleBackToTop = () => {
   height: 100%;
   display: flex;
   position: relative;
-  top: calc(var(--app-title-bar-height) * -1);
+  top: calc(var(--title-bar-height) * -1);
   justify-content: center;
   align-items: center;
-  font-size: 22px;
-  font-weight: 700;
-  color: rgb(92, 92, 92);
+
+  .placeholder-text {
+    font-size: 22px;
+  }
 }
 </style>

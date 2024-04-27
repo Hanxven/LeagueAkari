@@ -177,3 +177,7 @@ export function setInGameKdaSendPlayer(puuid: string, send: boolean) {
 export function setUseAuxiliaryWindow(enabled: boolean) {
   return mainCall('core-functionality/settings/use-auxiliary-window/set', enabled)
 }
+
+export function resetAuxiliaryWindowPosition() {
+  return mainCall('auxiliary-window/reset-window-position')
+}

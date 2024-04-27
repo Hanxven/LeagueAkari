@@ -52,7 +52,9 @@
         >
       </div>
     </div>
-    <div class="title">League Akari</div>
+    <div class="title-area">
+      <span class="title">League Akari</span>
+    </div>
     <div class="traffic">
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
         <NIcon><MinimizeIcon /></NIcon>
@@ -168,7 +170,7 @@ const emits = defineEmits<{
 .app-title-bar {
   display: flex;
   position: relative;
-  height: var(--app-title-bar-height);
+  height: var(--title-bar-height);
   align-items: center;
   background-color: rgb(24, 27, 31);
   z-index: 1000000; // header must be on top
@@ -258,13 +260,20 @@ const emits = defineEmits<{
   }
 }
 
+.title-area {
+  flex: 1;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
 .title {
   vertical-align: bottom;
   text-align: center;
   transition: all 0.3s;
-  color: rgb(189, 195, 205);
-  flex: 1;
   font-size: 12px;
+  color: rgb(189, 195, 205);
 }
 
 .traffic {

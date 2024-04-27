@@ -122,8 +122,8 @@
       </NCard>
     </div>
     <div v-else class="no-ongoing-game">
-      <div>League Akari</div>
-      <div style="font-size: 14px; font-weight: normal">没有正在进行中的游戏</div>
+      <LeagueAkariSpan bold class="akari-text" />
+      <div style="font-size: 14px; font-weight: normal; color: #666">没有正在进行中的游戏</div>
     </div>
   </div>
 </template>
@@ -132,6 +132,7 @@
 import { EMPTY_PUUID } from '@shared/constants'
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { setInGameKdaSendPlayer } from '@shared/renderer/features/core-functionality'
 import {
@@ -265,13 +266,14 @@ useKeepAliveScrollPositionMemo(el)
   height: 100%;
   display: flex;
   position: relative;
-  top: calc(var(--app-title-bar-height) * -1);
+  top: calc(var(--title-bar-height) * -1);
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 22px;
-  font-weight: 700;
-  color: rgb(92, 92, 92);
+
+  .akari-text {
+    font-size: 22px;
+  }
 }
 
 .team {

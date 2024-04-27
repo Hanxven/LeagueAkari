@@ -125,7 +125,7 @@
       <span class="text" v-else>不可用 (未连接)</span>
     </NCard>
     <NCard v-if="app.isAdministrator" size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">League Akari</span></template>
+      <template #header><LeagueAkariSpan class="card-header-title" /></template>
       <span class="text"
         >League Akari 运行在管理员权限，仅用于实现命令行获取以及特定的客户端功能</span
       >
@@ -136,6 +136,7 @@
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
+import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useAppStore } from '@shared/renderer/features/app/store'
 import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
 import { mainCall } from '@shared/renderer/utils/ipc'
