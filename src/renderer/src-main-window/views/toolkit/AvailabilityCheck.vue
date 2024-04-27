@@ -71,8 +71,6 @@ import { laNotification } from '@shared/renderer/notification'
 import { NButton, NCard, NInput, NPopconfirm, useMessage } from 'naive-ui'
 import { h, reactive, ref, watch } from 'vue'
 
-const id = 'view:toolkit:availability-check'
-
 const availability = reactive({
   summonerName: '',
   availability: null as boolean | null,

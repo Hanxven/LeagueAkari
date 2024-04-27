@@ -36,8 +36,6 @@ import { laNotification } from '@shared/renderer/notification'
 import { NButton, NCard } from 'naive-ui'
 import { computed } from 'vue'
 
-const id = 'view:toolkit:ongoing'
-
 const gameflow = useGameflowStore()
 
 const _handleEarlyExit = async () => {

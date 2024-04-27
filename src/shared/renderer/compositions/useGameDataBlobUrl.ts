@@ -64,6 +64,7 @@ export function useGameDataBlobUrl(
       } catch (error) {
         console.error(error)
         url.value = undefined
+        type.value = undefined
       }
     })
 

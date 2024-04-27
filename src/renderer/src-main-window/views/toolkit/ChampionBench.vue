@@ -58,9 +58,6 @@ import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { NButton, NCard, NDivider } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-// 可独立使用的组件，或许可以放到其他地方
-const id = 'comp:champions-bench'
-
 const champSelect = useChampSelectStore()
 const gameflow = useGameflowStore()
 

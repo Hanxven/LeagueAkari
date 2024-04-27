@@ -21,6 +21,8 @@ class CoreFunctionalitySettings {
   sendKdaInGameWithPreMadeTeams: boolean = false
   sendKdaThreshold: number = 0
 
+  useAuxiliaryWindow: boolean = true
+
   constructor() {
     makeAutoObservable(this)
   }
@@ -59,6 +61,10 @@ class CoreFunctionalitySettings {
 
   setSendKdaThreshold(value: number) {
     this.sendKdaThreshold = value
+  }
+
+  setUseAuxiliaryWindow(value: boolean) {
+    this.useAuxiliaryWindow = value
   }
 }
 

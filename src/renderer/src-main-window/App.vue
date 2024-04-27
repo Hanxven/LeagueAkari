@@ -6,7 +6,7 @@
       v-model:show="isShowingFreeSoftwareDeclaration"
       @confirm="handleConfirmation"
     />
-    <AppTitleBar @open-settings="isShowingSettingModal = true" />
+    <MainWindowTitleBar @open-settings="isShowingSettingModal = true" />
     <div class="content"><RouterView /></div>
   </div>
 </template>
@@ -20,8 +20,8 @@ import { greeting } from '@shared/renderer/utils/greeting'
 import { ref, watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
-import AppTitleBar from './components/AppTitleBar.vue'
 import DeclarationModal from './components/DeclarationModal.vue'
+import MainWindowTitleBar from './components/MainWindowTitleBar.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 

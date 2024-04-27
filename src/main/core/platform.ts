@@ -8,9 +8,11 @@ import { Worker } from 'node:worker_threads'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
 import sendInputWorker from '../workers/send-input?nodeWorker'
-import { auxiliaryWindowState, showAuxiliaryWindow } from './auxiliary-window'
+import { showAuxiliaryWindow } from './auxiliary-window'
 import { createLogger } from './log'
 import { restoreAndFocus, toggleMinimizeAndFocus } from './main-window'
+
+export const winPlatformEventBus = new EventEmitter()
 
 const gkl = new GlobalKeyboardListener()
 
@@ -18,11 +20,11 @@ const logger = createLogger('windows-platform')
 
 let siw: Worker | null = null
 
-export const winPlatformEventBus = new EventEmitter()
+let tray: Tray
 
 // 和平台相关的 API，目前仅限 Windows
 export function initWindowsPlatform() {
-  const tray = new Tray(icon)
+  tray = new Tray(icon)
 
   const showAuxiliaryWindowMenuItem = new MenuItem({
     label: '展示小窗',
@@ -136,5 +138,25 @@ export function pSendKey(key: number, pressed: boolean) {
 export function pSendKeys(str: string) {
   if (siw) {
     siw.postMessage({ type: 'string', data: str })
+  }
+}
+
+let auxiliaryWindowTipShowed = false
+
+export function displayAuxiliaryWindowTip() {
+  if (auxiliaryWindowTipShowed) {
+    return
+  }
+
+  if (tray) {
+    tray.displayBalloon({
+      title: 'League Akari',
+      content: '辅助小窗仍可在托盘区图标还原',
+      respectQuietTime: true,
+      noSound: true,
+      iconType: 'custom',
+      icon: icon
+    })
+    auxiliaryWindowTipShowed = true
   }
 }

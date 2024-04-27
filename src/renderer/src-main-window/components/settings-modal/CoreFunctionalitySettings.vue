@@ -4,6 +4,18 @@
       <template #header><span class="card-header-title">通用</span></template>
       <ControlItem
         class="control-item-margin"
+        label="使用辅助窗口"
+        label-description="在一些游戏流程中使用辅助窗口来展示状态"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="coreFunctionality.settings.useAuxiliaryWindow"
+          @update:value="(val) => setUseAuxiliaryWindow(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         label="自动切换到对局页面"
         label-description="在进入英雄选择或其他游戏状态时，自动切换到“对局”页面"
         :label-width="320"
@@ -169,7 +181,8 @@ import {
   setSendKdaInGame,
   setSendKdaInGameWithPreMadeTeams,
   setSendKdaThreshold,
-  setTeamAnalysisPreloadCount
+  setTeamAnalysisPreloadCount,
+  setUseAuxiliaryWindow
 } from '@shared/renderer/features/core-functionality'
 import { useCoreFunctionalityStore } from '@shared/renderer/features/core-functionality/store'
 import { setEnableRespawnTimer } from '@shared/renderer/features/respawn-timer'

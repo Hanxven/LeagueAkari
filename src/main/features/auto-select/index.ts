@@ -19,7 +19,7 @@ import { autoSelectState } from './state'
 
 const logger = createLogger('auto-select')
 
-let grabTimer: NodeJS.Timeout | null = null
+let grabTimerId: NodeJS.Timeout | null = null
 let targetingChampion: number | null = null
 
 function getRandomValue() {
@@ -405,6 +405,7 @@ export async function setupAutoSelect() {
       mwNotification.warn('auto-select', '自动选择', `交换英雄失败`)
       logger.warn(`在尝试交换英雄时发生错误 ${formatError(error)}`)
     } finally {
+      grabTimerId = null
       targetingChampion = null
     }
   }
@@ -450,9 +451,9 @@ export async function setupAutoSelect() {
           logger.info(`取消了即将进行的英雄交换, 目标: ${targetingChampion}`)
 
           notifyInChat('cancel', targetingChampion)
-          if (grabTimer) {
-            clearTimeout(grabTimer)
-            grabTimer = null
+          if (grabTimerId) {
+            clearTimeout(grabTimerId)
+            grabTimerId = null
           }
           targetingChampion = null
         }
@@ -483,7 +484,7 @@ export async function setupAutoSelect() {
 
           targetingChampion = c
           notifyInChat('select', targetingChampion, waitTime)
-          grabTimer = setTimeout(trySwap, waitTime)
+          grabTimerId = setTimeout(trySwap, waitTime)
           break
         }
       }
@@ -514,10 +515,10 @@ async function notifyInChat(type: 'cancel' | 'select', championId: number, time 
 }
 
 export async function setBenchModeEnabled(enabled: boolean) {
-  if (!enabled && grabTimer) {
+  if (!enabled && grabTimerId) {
     logger.info(`已取消即将进行的交换：ID：${targetingChampion}`)
     notifyInChat('cancel', targetingChampion!)
-    clearTimeout(grabTimer)
+    clearTimeout(grabTimerId)
     targetingChampion = null
   }
 

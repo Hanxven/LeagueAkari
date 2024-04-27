@@ -1,6 +1,7 @@
 import { lcuEventBus } from '@main/core/lcu-connection'
 import { createLogger } from '@main/core/log'
 import { mwNotification } from '@main/core/main-window'
+import { chatSend } from '@main/http-api/chat'
 import { honor } from '@main/http-api/honor-v2'
 import { getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
 import { accept } from '@main/http-api/matchmaking'
@@ -12,6 +13,7 @@ import { Ballot } from '@shared/types/lcu/honorV2'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed, reaction } from 'mobx'
 
+import { chat } from '../lcu-state-sync/chat'
 import { gameflow } from '../lcu-state-sync/gameflow'
 import { lobby } from '../lcu-state-sync/lobby'
 import { summoner } from '../lcu-state-sync/summoner'
@@ -23,6 +25,7 @@ const logger = createLogger('auto-gameflow')
 
 let autoAcceptTimerId: NodeJS.Timeout | null = null
 let autoSearchMatchTimerId: NodeJS.Timeout | null = null
+let autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
 
 export async function setupAutoGameflow() {
   stateSync()
@@ -162,13 +165,17 @@ export async function setupAutoGameflow() {
     () => autoGameflowState.settings.autoSearchMatchEnabled,
     (enabled) => {
       if (!enabled) {
-        cancelAutoSearchMatch()
+        cancelAutoSearchMatch('normal')
       }
     }
   )
 
   const canStartSearchMatch = computed(() => {
     if (!lobby.lobby) {
+      return 'unavailable'
+    }
+
+    if (gameflow.session?.gameData.isCustomGame) {
       return 'unavailable'
     }
 
@@ -185,11 +192,27 @@ export async function setupAutoGameflow() {
     }
   })
 
+  const isLeader = computed(() => {
+    if (!lobby.lobby) {
+      return false
+    }
+
+    const self = lobby.lobby.members.find((m) => m.puuid === summoner.me?.puuid)
+
+    return Boolean(self?.isLeader)
+  })
+
   // 自动开始匹配
   reaction(
-    () => [canStartSearchMatch.get(), autoGameflowState.settings.autoSearchMatchEnabled] as const,
-    ([s, enabled]) => {
-      if (!enabled) {
+    () =>
+      [
+        canStartSearchMatch.get(),
+        autoGameflowState.settings.autoSearchMatchEnabled,
+        isLeader.get()
+      ] as const,
+    ([s, enabled, is]) => {
+      if (!enabled || !is) {
+        cancelAutoSearchMatch('normal')
         return
       }
 
@@ -204,8 +227,13 @@ export async function setupAutoGameflow() {
           startMatchmaking,
           autoGameflowState.settings.autoSearchMatchDelaySeconds * 1e3
         )
-      } else if (s === 'unavailable' || s === 'waiting-for-invitees') {
-        cancelAutoSearchMatch()
+
+        printAutoSearchMatchInfo()
+        autoSearchMatchCountdownTimerId = setInterval(printAutoSearchMatchInfo, 1000)
+      } else if (s === 'unavailable') {
+        cancelAutoSearchMatch('normal')
+      } else if (s === 'waiting-for-invitees') {
+        cancelAutoSearchMatch('waiting-for-invitee')
       }
     },
     { equals: comparer.shallow }
@@ -297,7 +325,7 @@ function ipcCall() {
   )
 
   onRendererCall('auto-gameflow/cancel-auto-search-match', () => {
-    cancelAutoSearchMatch()
+    cancelAutoSearchMatch('normal')
   })
 
   onRendererCall(
@@ -383,6 +411,7 @@ const acceptMatch = async () => {
     logger.warn(`无法接受对局 ${formatError(error)}`)
   }
   autoGameflowState.clearAutoAccept()
+  autoSearchMatchTimerId = null
 }
 
 const startMatchmaking = async () => {
@@ -393,6 +422,29 @@ const startMatchmaking = async () => {
     logger.warn(`无法开始匹配 ${formatError(error)}`)
   }
   autoGameflowState.clearAutoSearchMatch()
+  autoSearchMatchTimerId = null
+  autoSearchMatchCountdownTimerId = null
+}
+
+const printAutoSearchMatchInfo = async (cancel?: 'normal' | 'waiting-for-invitee') => {
+  if (chat.conversations.customGame && autoGameflowState.willSearchMatch) {
+    if (cancel === 'normal') {
+      chatSend(chat.conversations.customGame.id, `[League Akari] 自动匹配已取消`).catch()
+      return
+    } else if (cancel === 'waiting-for-invitee') {
+      chatSend(
+        chat.conversations.customGame.id,
+        `[League Akari] 自动匹配已取消，等待被邀请者`
+      ).catch()
+      return
+    }
+
+    const time = (autoGameflowState.willSearchMatchAt - Date.now()) / 1e3
+    chatSend(
+      chat.conversations.customGame.id,
+      `[League Akari] 将在 ${Math.abs(time).toFixed()} 秒后自动匹配`
+    ).catch()
+  }
 }
 
 export function cancelAutoAccept(declined = false) {
@@ -410,13 +462,18 @@ export function cancelAutoAccept(declined = false) {
   }
 }
 
-export function cancelAutoSearchMatch() {
+export function cancelAutoSearchMatch(reason: 'normal' | 'waiting-for-invitee') {
   if (autoGameflowState.willSearchMatch) {
     if (autoSearchMatchTimerId) {
       clearTimeout(autoSearchMatchTimerId)
       autoSearchMatchTimerId = null
     }
+    if (autoSearchMatchCountdownTimerId) {
+      printAutoSearchMatchInfo(reason)
+      clearInterval(autoSearchMatchCountdownTimerId)
+      autoSearchMatchCountdownTimerId = null
+    }
     autoGameflowState.clearAutoSearchMatch()
-    logger.info('即将进行的自动匹配对局已取消')
+    logger.info(`即将进行的自动匹配对局已取消，${reason}`)
   }
 }

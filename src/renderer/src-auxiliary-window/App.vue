@@ -20,7 +20,6 @@ watch(
   (phase) => {
     switch (phase) {
       case 'None':
-      case 'Lobby':
       case 'EndOfGame':
       case 'PreEndOfGame':
       case 'WatchInProgress':
@@ -32,6 +31,7 @@ watch(
         break
       case 'Matchmaking':
       case 'ReadyCheck':
+      case 'Lobby':
         router.replace({ name: 'ready-check' })
         break
       case 'ChampSelect':

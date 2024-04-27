@@ -175,13 +175,13 @@ const emits = defineEmits<{
   -webkit-app-region: drag;
 }
 
+.blurred :is(.title-bar-item, .title, .traffic) {
+  filter: brightness(0.6);
+}
+
 .icon {
   width: 16px;
   height: 16px;
-}
-
-.blurred .title {
-  color: rgb(107, 113, 125);
 }
 
 .title-bar-items {
@@ -259,12 +259,12 @@ const emits = defineEmits<{
 }
 
 .title {
-  font-size: 12px;
   vertical-align: bottom;
-  flex: 1;
   text-align: center;
   transition: all 0.3s;
   color: rgb(189, 195, 205);
+  flex: 1;
+  font-size: 12px;
 }
 
 .traffic {
@@ -272,6 +272,7 @@ const emits = defineEmits<{
   display: flex;
   flex: 1;
   justify-content: flex-end;
+  transition: all 0.3s ease;
 
   .traffic-button {
     display: flex;

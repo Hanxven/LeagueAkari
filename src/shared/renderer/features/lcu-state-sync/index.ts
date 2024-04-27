@@ -32,6 +32,7 @@ function gameflowSync() {
   const gameflow = useGameflowStore()
 
   mainStateSync('lcu/gameflow/phase', (s) => (gameflow.phase = s))
+  mainStateSync('lcu/gameflow/session', (s) => (gameflow.session = s))
 }
 
 function summonerSync() {
@@ -57,6 +58,7 @@ function chatSync() {
   )
 
   mainStateSync('lcu/chat/conversations/post-game', (s) => (chat.conversations.postGame = s))
+  mainStateSync('lcu/chat/conversations/custom-game', (s) => (chat.conversations.customGame = s))
 }
 
 function champSelectSync() {

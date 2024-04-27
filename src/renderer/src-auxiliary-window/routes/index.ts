@@ -16,7 +16,7 @@ const router = createRouter({
     {
       path: '/ready-check',
       name: 'ready-check',
-      component: () => import('@auxiliary-window/views/ReadyCheck.vue')
+      component: () => import('@auxiliary-window/views/Lounge.vue')
     }
   ]
 })

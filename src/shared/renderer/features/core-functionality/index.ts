@@ -130,6 +130,7 @@ export async function setupCoreFunctionality() {
   mainStateSync('core-functionality/ongoing-pre-made-teams', (s) => (cf.ongoingPreMadeTeams = s))
 
   mainStateSync('core-functionality/send-list', (s) => (cf.sendList = s))
+  mainStateSync('core-functionality/settings/use-auxiliary-window', (s) => (cf.settings.useAuxiliaryWindow = s))
 }
 
 export function setFetchAfterGame(enabled: boolean) {
@@ -170,4 +171,9 @@ export function setSendKdaInGameWithPreMadeTeams(enabled: boolean) {
 
 export function setInGameKdaSendPlayer(puuid: string, send: boolean) {
   return mainCall('core-functionality/send-list/update', puuid, send)
+}
+
+
+export function setUseAuxiliaryWindow(enabled: boolean) {
+  return mainCall('core-functionality/settings/use-auxiliary-window/set', enabled)
 }

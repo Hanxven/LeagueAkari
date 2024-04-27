@@ -5,12 +5,12 @@ import { formatError } from '@shared/utils/errors'
 import { BrowserWindow, app, dialog } from 'electron'
 import { configure } from 'mobx'
 
-import { initApp } from './core/app'
-import { createAuxiliaryWindow } from './core/auxiliary-window'
+import { appState, initApp } from './core/app'
+import { createAuxiliaryWindow, setupAuxiliaryWindow } from './core/auxiliary-window'
 import { initLeagueClientFunctions } from './core/lcu-client'
 import { initLcuConnection } from './core/lcu-connection'
 import { createLogger, initLogger } from './core/log'
-import { createMainWindow, getMainWindow } from './core/main-window'
+import { createMainWindow, getMainWindow, setupMainWindow } from './core/main-window'
 import { initWindowsPlatform } from './core/platform'
 import { initDatabase } from './db'
 import { setupLeagueAkariFeatures } from './features'
@@ -29,6 +29,8 @@ if (!gotTheLock) {
 }
 
 app.whenReady().then(async () => {
+  appState.setReady(true)
+
   electronApp.setAppUserModelId('sugar.cocoa.league-akari')
 
   app.on('browser-window-created', (_, window) => {
@@ -45,11 +47,12 @@ app.whenReady().then(async () => {
     initStorageIpc()
     await initLeagueClientFunctions()
     await setupLeagueAkariFeatures()
+    setupMainWindow()
+    setupAuxiliaryWindow()
 
     logger.info('LEAGUE AKARI 核心模块初始化完成')
 
     createMainWindow()
-    createAuxiliaryWindow()
 
     app.on('activate', function () {
       if (BrowserWindow.getAllWindows().length === 0) {

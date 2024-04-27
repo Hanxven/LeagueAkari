@@ -1,7 +1,8 @@
 import { LEAGUE_AKARI_DEFAULT_NOTIFICATION_DURATION } from '@shared/constants'
-import { onMainEvent } from '@shared/renderer/utils/ipc'
+import { mainCall, onMainEvent } from '@shared/renderer/utils/ipc'
 import { useEventBus } from '@vueuse/core'
 import dayjs from 'dayjs'
+import { NotificationConstructorOptions } from 'electron/renderer'
 import { useNotification } from 'naive-ui'
 import { VNodeChild } from 'vue'
 
@@ -25,6 +26,10 @@ export const laNotification = {
     bus.emit({ type: 'error', title, content, error, options }),
   success: (title: string, content: string, error?: any, options?: object) =>
     bus.emit({ type: 'success', title, content, error, options })
+}
+
+export function nativeNotification(options: NotificationConstructorOptions) {
+  return mainCall('windows/notify', options)
 }
 
 // 用于 Naive UI 的通知事件展示

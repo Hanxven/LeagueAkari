@@ -45,8 +45,6 @@ import { laNotification } from '@shared/renderer/notification'
 import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
 import { reactive } from 'vue'
 
-const id = 'view:toolkit:fake-ranked'
-
 const state = reactive({
   queue: 'RANKED_SOLO_5x5',
   tier: 'CHALLENGER',

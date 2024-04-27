@@ -12,13 +12,13 @@ import { logger } from './common'
 export interface Conversations {
   championSelect: Conversation | null
   postGame: Conversation | null
-  lobby: Conversation | null
+  customGame: Conversation | null
 }
 
 export interface Participants {
   championSelect: number[] | null
   postGame: number[] | null
-  lobby: number[] | null
+  customGame: number[] | null
 }
 
 class ChatState {
@@ -26,12 +26,12 @@ class ChatState {
     {
       championSelect: null,
       postGame: null,
-      lobby: null
+      customGame: null
     },
     {
       championSelect: observable.struct,
       postGame: observable.struct,
-      lobby: observable.struct
+      customGame: observable.struct
     },
     { deep: false }
   )
@@ -40,12 +40,12 @@ class ChatState {
     {
       championSelect: null,
       postGame: null,
-      lobby: null
+      customGame: null
     },
     {
       championSelect: observable.struct,
       postGame: observable.struct,
-      lobby: observable.struct
+      customGame: observable.struct
     },
     { deep: false }
   )
@@ -72,8 +72,8 @@ class ChatState {
     this.conversations.postGame = c
   }
 
-  setConversationLobby(c: Conversation | null) {
-    this.conversations.lobby = c
+  setConversationCustomGame(c: Conversation | null) {
+    this.conversations.customGame = c
   }
 
   setParticipantsChampSelect(p: number[] | null) {
@@ -84,8 +84,8 @@ class ChatState {
     this.participants.postGame = p
   }
 
-  setParticipantsLobby(p: number[] | null) {
-    this.participants.lobby = p
+  setParticipantsCustomGame(p: number[] | null) {
+    this.participants.customGame = p
   }
 }
 
@@ -102,6 +102,11 @@ export function chatSync() {
       } else if (chat.conversations.postGame?.id === id) {
         runInAction(() => {
           chat.setConversationPostGame(null)
+          chat.setParticipantsPostGame(null)
+        })
+      } else if (chat.conversations.customGame?.id === id) {
+        runInAction(() => {
+          chat.setConversationCustomGame(null)
           chat.setParticipantsPostGame(null)
         })
       }
@@ -127,6 +132,17 @@ export function chatSync() {
           })
         } else if (event.eventType === 'Update') {
           chat.setConversationPostGame(event.data)
+        }
+        break
+
+      case 'customGame':
+        if (event.eventType === 'Create') {
+          runInAction(() => {
+            chat.setConversationCustomGame(event.data)
+            chat.setParticipantsCustomGame([])
+          })
+        } else if (event.eventType === 'Update') {
+          chat.setConversationCustomGame(event.data)
         }
         break
     }
@@ -158,13 +174,13 @@ export function chatSync() {
           )
           chat.setParticipantsPostGame(p)
         } else if (
-          chat.conversations.lobby &&
-          chat.conversations.lobby.id === param.conversationId
+          chat.conversations.customGame &&
+          chat.conversations.customGame.id === param.conversationId
         ) {
           const p = Array.from(
-            new Set([...(chat.participants.lobby ?? []), event.data.fromSummonerId])
+            new Set([...(chat.participants.customGame ?? []), event.data.fromSummonerId])
           )
-          chat.setParticipantsLobby(p)
+          chat.setParticipantsCustomGame(p)
         }
       }
     }
@@ -212,6 +228,10 @@ export function chatSync() {
                 const ids2 = (await getParticipants(c.id)).data.map((cc) => cc.summonerId)
                 runInAction(() => chat.setParticipantsPostGame(ids2))
                 break
+              case 'customGame':
+                chat.setConversationCustomGame(c)
+                const ids3 = (await getParticipants(c.id)).data.map((cc) => cc.summonerId)
+                runInAction(() => chat.setParticipantsCustomGame(ids3))
             }
           }
         } catch (error) {
@@ -227,5 +247,5 @@ export function chatSync() {
   ipcStateSync('lcu/chat/me', () => chat.me)
   ipcStateSync('lcu/chat/conversations/champ-select', () => chat.conversations.championSelect)
   ipcStateSync('lcu/chat/conversations/post-game', () => chat.conversations.postGame)
-  ipcStateSync('lcu/chat/conversations/lobby', () => chat.conversations.lobby)
+  ipcStateSync('lcu/chat/conversations/custom-game', () => chat.conversations.customGame)
 }

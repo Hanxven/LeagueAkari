@@ -5,12 +5,18 @@ import { join } from 'node:path'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
 import { ipcStateSync, onRendererCall, sendEventToRenderer } from '../utils/ipc'
+import { appState } from './app'
 import { getAuxiliaryWindow } from './auxiliary-window'
+import { createLogger } from './log'
+
+const logger = createLogger('main-window')
 
 class MainWindowState {
   state: 'normal' | 'maximized' | 'minimized' = 'normal'
 
   focus: 'focused' | 'blurred' = 'focused'
+
+  ready: boolean = false
 
   constructor() {
     makeAutoObservable(this)
@@ -22,6 +28,10 @@ class MainWindowState {
 
   setFocus(f: 'focused' | 'blurred' = 'focused') {
     this.focus = f
+  }
+
+  setReady(ready: boolean) {
+    this.ready = ready
   }
 }
 
@@ -74,17 +84,55 @@ export function createMainWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
+    mainWindowState.setReady(true)
+
     if (mainWindow) {
       mainWindow.show()
     }
   })
 
+  mainWindow.on('closed', () => {
+    mainWindowState.setReady(false)
+  })
+
+  if (mainWindow.isMaximized()) {
+    mainWindowState.setState('maximized')
+  } else if (mainWindow.isMinimized()) {
+    mainWindowState.setState('minimized')
+  } else {
+    mainWindowState.setState('normal')
+  }
+
+  mainWindow.on('maximize', () => {
+    mainWindowState.setState('maximized')
+  })
+
+  mainWindow.on('unmaximize', () => {
+    mainWindowState.setState('normal')
+  })
+
+  mainWindow.on('minimize', () => {
+    mainWindowState.setState('minimized')
+  })
+
+  mainWindow.on('restore', () => {
+    mainWindowState.setState('normal')
+  })
+
+  mainWindow.on('focus', () => {
+    mainWindowState.setFocus('focused')
+  })
+
+  mainWindow.on('blur', () => {
+    mainWindowState.setFocus('blurred')
+  })
+
+  mainWindow.on('page-title-updated', (e) => e.preventDefault())
+
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
-
-  initMainWindow(mainWindow)
 
   // HMR
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -92,67 +140,36 @@ export function createMainWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/main-window.html'))
   }
+
+  logger.info('Main Window 已创建')
 }
 
-// 和窗口相关的 API
-export function initMainWindow(w: BrowserWindow) {
+export function setupMainWindow() {
   ipcStateSync('main-window/state', () => mainWindowState.state)
   ipcStateSync('main-window/focus', () => mainWindowState.focus)
 
-  if (w.isMaximized()) {
-    mainWindowState.setState('maximized')
-  } else if (w.isMinimized()) {
-    mainWindowState.setState('minimized')
-  } else {
-    mainWindowState.setState('normal')
-  }
-
-  w.on('maximize', () => {
-    mainWindowState.setState('maximized')
-  })
-
-  w.on('unmaximize', () => {
-    mainWindowState.setState('normal')
-  })
-
-  w.on('minimize', () => {
-    mainWindowState.setState('minimized')
-  })
-
-  w.on('restore', () => {
-    mainWindowState.setState('normal')
-  })
-
-  w.on('focus', () => {
-    mainWindowState.setFocus('focused')
-  })
-
-  w.on('blur', () => {
-    mainWindowState.setFocus('blurred')
-  })
-
   onRendererCall('main-window/size/set', async (_e, width, height, animate) => {
-    w.setSize(width, height, animate)
+    mainWindow?.setSize(width, height, animate)
   })
 
   onRendererCall('main-window/size/get', async () => {
-    return w.getSize()
+    return mainWindow?.getSize()
   })
 
   onRendererCall('main-window/maximize', async () => {
-    w.maximize()
+    mainWindow?.maximize()
   })
 
   onRendererCall('main-window/minimize', async () => {
-    w.minimize()
+    mainWindow?.minimize()
   })
 
   onRendererCall('main-window/unmaximize', async () => {
-    w.unmaximize()
+    mainWindow?.unmaximize()
   })
 
   onRendererCall('main-window/restore', async () => {
-    w.restore()
+    mainWindow?.restore()
   })
 
   onRendererCall('main-window/close', async () => {
@@ -161,34 +178,34 @@ export function initMainWindow(w: BrowserWindow) {
       auxWindow.close()
     }
 
-    w.close()
+    mainWindow?.close()
   })
 
   onRendererCall('main-window/devtools/toggle', async () => {
-    w.webContents.toggleDevTools()
+    mainWindow?.webContents.toggleDevTools()
   })
 
   onRendererCall('main-window/title/set', (_, title) => {
-    w.setTitle(title)
+    mainWindow?.setTitle(title)
   })
 
   onRendererCall('main-window/hide', () => {
-    w.hide()
+    mainWindow?.hide()
   })
 
   onRendererCall('main-window/show', (_, inactive) => {
     if (inactive) {
-      w.showInactive()
+      mainWindow?.showInactive()
     } else {
-      w.show()
+      mainWindow?.show()
     }
   })
 
   onRendererCall('main-window/set-always-on-top', (_, flag, level, relativeLevel) => {
-    w.setAlwaysOnTop(flag, level, relativeLevel)
+    mainWindow?.setAlwaysOnTop(flag, level, relativeLevel)
   })
 
-  w.on('page-title-updated', (e) => e.preventDefault())
+  logger.info('初始化完成')
 }
 
 /**

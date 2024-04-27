@@ -54,8 +54,6 @@ import { resolveSummonerName } from '@shared/utils/identity'
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
 
-const id = 'view:toolkit:spectate'
-
 const gameflow = useGameflowStore()
 const summoner = useSummonerStore()
 

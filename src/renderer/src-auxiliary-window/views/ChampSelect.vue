@@ -1,8 +1,12 @@
 <template>
-  <div class="champ-select-wrapper">占位</div>
+  <div class="champ-select-wrapper">
+    <BenchChampionsMini />
+  </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import BenchChampionsMini from '@auxiliary-window/components/BenchChampionsMini.vue'
+</script>
 
 <style lang="less">
 .champ-select-wrapper {

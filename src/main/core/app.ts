@@ -63,6 +63,8 @@ interface NewUpdates {
 class AppState {
   isAdministrator: boolean = false
 
+  ready: boolean = false
+
   updates = observable(
     {
       isCheckingUpdates: false,
@@ -82,6 +84,10 @@ class AppState {
 
   setElevated(b: boolean) {
     this.isAdministrator = b
+  }
+
+  setReady(b: boolean) {
+    this.ready = b
   }
 }
 

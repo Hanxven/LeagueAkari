@@ -1,5 +1,10 @@
 <template>
   <div class="ready-check-wrapper">
+    <LcuVideo
+      class="mode-image"
+      v-if="gameflow.session?.map?.assets['game-select-icon-active-video']"
+      :src="gameflow.session?.map?.assets['game-select-icon-active-video']"
+    />
     <template v-if="gameflow.phase === 'ReadyCheck'">
       <template v-if="autoGameflow.willAccept">
         <span class="main-text">将自动接受对局</span>
@@ -33,15 +38,23 @@
         {{ matchmaking.search.estimatedQueueTime.toFixed(1) }} s</span
       >
     </template>
+    <template v-else-if="autoGameflow.willSearchMatch">
+      <span class="main-text">将自动开始匹配对局</span>
+      <span class="sub-text">{{ willSearchMatchIn }} s</span>
+      <NButton type="primary" size="tiny" @click="() => handleCancelAutoSearchMatch()"
+        >取消本次自动匹配</NButton
+      >
+    </template>
     <template v-else>
-      <span class="main-text">无状态</span>
-      <span class="sub-text">这似乎不是一个可以达到的状态</span>
+      <span class="main-text">{{ gameflow.session?.map.gameModeName || '模式中' }}</span>
+      <span class="sub-text">{{ gameflow.session?.map.name || '地图' }}</span>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { cancelAutoAccept } from '@shared/renderer/features/auto-gameflow'
+import LcuVideo from '@shared/renderer/components/LcuVideo.vue'
+import { cancelAutoAccept, cancelAutoSearchMatch } from '@shared/renderer/features/auto-gameflow'
 import { useAutoGameflowStore } from '@shared/renderer/features/auto-gameflow/store'
 import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
 import { useMatchmakingStore } from '@shared/renderer/features/lcu-state-sync/matchmaking'
@@ -64,11 +77,23 @@ const { pause: pauseAC, resume: resumeAC } = useIntervalFn(
   { immediate: false, immediateCallback: true }
 )
 
+const willSearchMatchIn = ref(0)
+const { pause: pauseAS, resume: resumeAS } = useIntervalFn(
+  () => {
+    const s = (autoGameflow.willSearchMatchAt - Date.now()) / 1e3
+    willSearchMatchIn.value = Math.abs(Math.max(s, 0))
+  },
+  100,
+  { immediate: false, immediateCallback: true }
+)
+
 const handleAccept = () => accept()
 
 const handleDecline = () => decline()
 
 const handleCancelAutoAccept = () => cancelAutoAccept()
+
+const handleCancelAutoSearchMatch = () => cancelAutoSearchMatch()
 
 watch(
   () => autoGameflow.willAccept,
@@ -77,6 +102,18 @@ watch(
       resumeAC()
     } else {
       pauseAC()
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => autoGameflow.willSearchMatch,
+  (ok) => {
+    if (ok) {
+      resumeAS()
+    } else {
+      pauseAS()
     }
   },
   { immediate: true }
@@ -93,6 +130,12 @@ watch(
   align-items: center;
   height: 100%;
   padding: 8px 12px;
+}
+
+.mode-image {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 16px;
 }
 
 .main-text {

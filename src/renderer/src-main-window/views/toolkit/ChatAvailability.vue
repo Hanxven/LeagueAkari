@@ -34,7 +34,6 @@ import { AvailabilityType, changeAvailability } from '@shared/renderer/http-api/
 import { laNotification } from '@shared/renderer/notification'
 import { NCard, NFlex, NRadio, NRadioGroup } from 'naive-ui'
 
-const id = 'view:toolkit:chat-availability'
 const chat = useChatStore()
 
 const handleChangeAvailability = async (availability: string) => {

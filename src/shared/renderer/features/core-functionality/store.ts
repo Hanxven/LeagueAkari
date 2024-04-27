@@ -110,7 +110,9 @@ export const useCoreFunctionalityStore = defineStore('feature:core-functionality
     sendKdaInGameWithPreMadeTeams: true,
 
     // 发送 KDA 信息需保证 KDA 大于此值
-    sendKdaThreshold: 0
+    sendKdaThreshold: 0,
+
+    useAuxiliaryWindow: true
   })
 
   return {

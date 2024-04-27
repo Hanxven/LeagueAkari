@@ -46,8 +46,8 @@ const handlePin = (b: boolean) => {
   -webkit-app-region: drag;
 }
 
-.blurred .title {
-  color: rgb(107, 113, 125);
+.blurred :is(.title, .traffic) {
+  filter: brightness(0.6);
 }
 
 .title {

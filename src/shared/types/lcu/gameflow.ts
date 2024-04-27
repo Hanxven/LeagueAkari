@@ -1,5 +1,4 @@
 export type GameflowPhase =
-  | null
   | 'Matchmaking' // 正在匹配
   | 'ChampSelect' // 英雄选择中
   | 'ReadyCheck' // 等待接受状态中

@@ -1,3 +1,11 @@
+import { appState } from '@main/core/app'
+import {
+  auxiliaryWindowState,
+  closeAuxiliaryWindow,
+  createAuxiliaryWindow,
+  hideAuxiliaryWindow,
+  showAuxiliaryWindow
+} from '@main/core/auxiliary-window'
 import { lcuConnectionState } from '@main/core/lcu-connection'
 import { createLogger } from '@main/core/log'
 import { mwNotification } from '@main/core/main-window'
@@ -17,7 +25,7 @@ import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/anal
 import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
 import { calculateTogetherTimes, removeSubsets } from '@shared/utils/team-up-calc'
-import { observable, reaction, runInAction, toJS } from 'mobx'
+import { comparer, observable, reaction, runInAction, toJS } from 'mobx'
 
 import { chat } from '../lcu-state-sync/chat'
 import { gameData } from '../lcu-state-sync/game-data'
@@ -34,6 +42,52 @@ export async function setupCoreFunctionality() {
   stateSync()
   ipcCall()
   await loadSettings()
+
+  reaction(
+    () => [gameflow.phase, auxiliaryWindowState.isReady] as const,
+    ([phase, b]) => {
+      if (!b) {
+        return
+      }
+
+      switch (phase) {
+        case 'Matchmaking':
+        case 'ReadyCheck':
+        case 'ChampSelect':
+        case 'Lobby':
+          showAuxiliaryWindow()
+          return
+      }
+
+      hideAuxiliaryWindow()
+    },
+    { equals: comparer.shallow }
+  )
+
+  reaction(
+    () => [cf.settings.useAuxiliaryWindow, appState.ready] as const,
+    ([enabled, ready]) => {
+      if (!ready) {
+        return
+      }
+
+      if (enabled) {
+        createAuxiliaryWindow()
+      } else {
+        closeAuxiliaryWindow()
+      }
+    },
+    { fireImmediately: true, delay: 500, equals: comparer.shallow }
+  )
+
+  reaction(
+    () => lcuConnectionState.state,
+    (state) => {
+      if (state !== 'connected') {
+        hideAuxiliaryWindow()
+      }
+    }
+  )
 
   reaction(
     () => cf.ongoingState,
@@ -668,6 +722,11 @@ function stateSync() {
   ipcStateSync('core-functionality/settings/send-kda-threshold', () => cf.settings.sendKdaThreshold)
 
   ipcStateSync(
+    'core-functionality/settings/use-auxiliary-window',
+    () => cf.settings.useAuxiliaryWindow
+  )
+
+  ipcStateSync(
     'core-functionality/settings/team-analysis-preload-count',
     () => cf.settings.teamAnalysisPreloadCount
   )
@@ -758,6 +817,11 @@ function ipcCall() {
     }
   )
 
+  onRendererCall('core-functionality/settings/use-auxiliary-window/set', async (_, enabled) => {
+    cf.settings.setUseAuxiliaryWindow(enabled)
+    await setSetting('core-functionality/use-auxiliary-window', enabled)
+  })
+
   onRendererCall('core-functionality/settings/send-kda-threshold/set', async (_, threshold) => {
     if (threshold < 0) {
       threshold = 0
@@ -843,5 +907,9 @@ async function loadSettings() {
 
   cf.settings.setFetchAfterGame(
     await getSetting('core-functionality/fetch-after-game', cf.settings.fetchAfterGame)
+  )
+
+  cf.settings.setFetchAfterGame(
+    await getSetting('core-functionality/use-auxiliary-window', cf.settings.useAuxiliaryWindow)
   )
 }

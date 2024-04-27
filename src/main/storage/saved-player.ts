@@ -45,7 +45,7 @@ export async function querySavedPlayerWithGames(query: SavedPlayerQueryDto) {
   if (savedPlayer) {
     const encounteredGames = await queryEncounteredGames({
       puuid: query.puuid,
-      selfPuuid: query.puuid,
+      selfPuuid: query.selfPuuid,
       region: query.region,
       rsoPlatformId: query.rsoPlatformId
     })
