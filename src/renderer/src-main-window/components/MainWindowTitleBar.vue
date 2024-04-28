@@ -1,6 +1,6 @@
 <template>
   <div class="app-title-bar" :class="{ blurred: mw.focusState === 'blurred' }">
-    <div class="title-bar-items">
+    <div class="title-bar-items" ref="titleBarItemsContainer">
       <div class="title-bar-item operation" @click="emits('openSettings')" title="通用设置">
         <NIcon class="icon"><SettingsIcon /></NIcon>
         <span class="text">设置</span>
@@ -8,7 +8,9 @@
       <div
         v-if="respawnTimer.isDead"
         class="title-bar-item task-item respawn-timer relative"
+        :class="{ hide: !respawnTimerTaskShow }"
         title="距离重生时间"
+        ref="respawnTimerTaskEl"
       >
         <div
           class="progress-mask"
@@ -20,7 +22,9 @@
       <div
         v-if="autoGameflow.willAccept"
         class="title-bar-item auto-gameflow-accept task-item relative"
+        :class="{ hide: !autoAcceptTaskShow }"
         title="即将开启自动接受对局"
+        ref="autoAcceptTaskEl"
       >
         <NIcon class="icon"><TimeIcon /></NIcon>
         <span class="text">接受对局 {{ willAcceptIn.toFixed(1) }} s</span>
@@ -28,7 +32,9 @@
       <div
         v-if="autoGameflow.willSearchMatch"
         class="title-bar-item auto-gameflow-search-match task-item relative"
+        :class="{ hide: !autoSearchMatchTaskShow }"
         title="即将开启自动匹配"
+        ref="autoSearchMatchTaskEl"
       >
         <NIcon class="icon"><TimeIcon /></NIcon>
         <span class="text">开启匹配 {{ willSearchMatchIn.toFixed(1) }} s</span>
@@ -36,7 +42,9 @@
       <div
         v-if="login.loginQueueState"
         class="title-bar-item in-login-queue task-item relative"
+        :class="{ hide: !queueTaskShow }"
         :title="`等待排队登录中 (${login.loginQueueState.approximateWaitTimeSeconds} / ${login.loginQueueState.maxDisplayedWaitTimeSeconds} s, ${login.loginQueueState.estimatedPositionInQueue} / ${login.loginQueueState.maxDisplayedPosition})`"
+        ref="queueTaskEl"
       >
         <NIcon class="icon"><QueuedIcon /></NIcon>
         <span class="text" style="display: flex; gap: 6px; align-items: center"
@@ -74,6 +82,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCompleteVisibility } from '@shared/renderer/compositions/useOverflowDetection'
 import { useAppStore } from '@shared/renderer/features/app/store'
 import { useAutoGameflowStore } from '@shared/renderer/features/auto-gameflow/store'
 import { useLoginStore } from '@shared/renderer/features/lcu-state-sync/login'
@@ -161,6 +170,17 @@ const handleClose = async () => {
   await mainCall('main-window/close')
 }
 
+const titleBarItemsContainer = ref<HTMLElement>()
+const respawnTimerTaskEl = ref<HTMLElement>()
+const autoAcceptTaskEl = ref<HTMLElement>()
+const autoSearchMatchTaskEl = ref<HTMLElement>()
+const queueTaskEl = ref<HTMLElement>()
+
+const respawnTimerTaskShow = useCompleteVisibility(respawnTimerTaskEl, titleBarItemsContainer)
+const autoAcceptTaskShow = useCompleteVisibility(autoAcceptTaskEl, titleBarItemsContainer)
+const autoSearchMatchTaskShow = useCompleteVisibility(autoSearchMatchTaskEl, titleBarItemsContainer)
+const queueTaskShow = useCompleteVisibility(queueTaskEl, titleBarItemsContainer)
+
 const emits = defineEmits<{
   (e: 'openSettings'): void
 }>()
@@ -181,6 +201,10 @@ const emits = defineEmits<{
   filter: brightness(0.6);
 }
 
+.hide {
+  visibility: hidden;
+}
+
 .icon {
   width: 16px;
   height: 16px;
@@ -190,12 +214,15 @@ const emits = defineEmits<{
   height: 100%;
   display: flex;
   flex: 1;
+  overflow: hidden;
 
   .title-bar-item {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
     -webkit-app-region: no-drag;
   }
 
@@ -261,7 +288,6 @@ const emits = defineEmits<{
 }
 
 .title-area {
-  flex: 1;
   display: flex;
   height: 100%;
   justify-content: center;
