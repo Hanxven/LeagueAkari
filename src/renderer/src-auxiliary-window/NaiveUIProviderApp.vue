@@ -31,7 +31,10 @@ import {
 import App from './App.vue'
 
 const themeOverrides: GlobalThemeOverrides = {
-  Notification: { padding: '12px' }
+  Notification: { padding: '12px' },
+  Card: {
+    color: '#0000',
+  }
 }
 </script>
 

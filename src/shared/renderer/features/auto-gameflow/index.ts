@@ -45,6 +45,11 @@ export async function setupAutoGameflow() {
     'auto-gameflow/settings/auto-search-match-delay-seconds',
     (s) => (autoGameflow.settings.autoSearchMatchDelaySeconds = s)
   )
+
+  mainStateSync(
+    'auto-gameflow/activity-start-status',
+    (s) => (autoGameflow.activityStartStatus = s)
+  )
 }
 
 export function setAutoHonorEnabled(enabled: boolean) {

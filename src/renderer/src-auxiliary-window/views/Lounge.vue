@@ -8,7 +8,7 @@
     <template v-if="gameflow.phase === 'ReadyCheck'">
       <template v-if="autoGameflow.willAccept">
         <span class="main-text">将自动接受对局</span>
-        <span class="sub-text">{{ willAcceptIn }} s</span>
+        <span class="sub-text">{{ willAcceptIn.toFixed(1) }} s</span>
         <NButton type="primary" size="tiny" @click="() => handleCancelAutoAccept()"
           >取消本次自动接受</NButton
         >
@@ -46,8 +46,18 @@
       >
     </template>
     <template v-else>
-      <span class="main-text">{{ gameflow.session?.map.gameModeName || '模式中' }}</span>
-      <span class="sub-text">{{ gameflow.session?.map.name || '地图' }}</span>
+      <span class="main-text-2"
+        >{{ gameflow.session?.map.gameModeName || '模式中' }} ·
+        {{ gameflow.session?.map.name || '地图' }}</span
+      >
+      <span
+        class="sub-text"
+        v-if="
+          autoGameflow.settings.autoSearchMatchEnabled &&
+          autoGameflow.activityStartStatus === 'waiting-for-invitees'
+        "
+        >正在等待受邀请的玩家</span
+      >
     </template>
   </div>
 </template>
@@ -140,6 +150,12 @@ watch(
 
 .main-text {
   font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.main-text-2 {
+  font-size: 18px;
   font-weight: 700;
   margin-bottom: 8px;
 }

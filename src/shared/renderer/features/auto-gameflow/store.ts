@@ -21,11 +21,14 @@ export const useAutoGameflowStore = defineStore('feature:auto-gameflow', () => {
 
   const willSearchMatchAt = ref(-1)
 
+  const activityStartStatus = ref('unavailable')
+
   return {
     settings,
     willAccept,
     willAcceptAt,
     willSearchMatch,
-    willSearchMatchAt
+    willSearchMatchAt,
+    activityStartStatus
   }
 })

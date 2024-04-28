@@ -6,29 +6,40 @@
   />
 </div>
 
-# League Akari
+<div
+  style="
+    background-clip: text;
+    background-image: linear-gradient(90deg, #91dcff, #91dcff 10%, #ff59cb 55%, #ffc1eb 100%);
+    color: transparent;
+    font-size: 6.5vw;
+    text-align: center;
+    font-weight: 700;
+  "
+>
+  League Akari
+</div>
 
-利用 League Client Update (LCU) API 实现的工具集。
+利用 League Client Update (LCU) API 实现的工具集，功能很多。
 
-## 模块：核心功能
+## 战绩页面
 
-负责加载战绩以及给出对局中分析等若干核心功能。
+以标签页的形式展现不同玩家的战绩。
 
-## 模块：自动选择
+## 自动游戏流程
 
-负责英雄选择期间的**选择**和**禁用**功能，它会按照预设的列表自动化选择英雄，并考虑到队友预选、禁用等各种情况。
+这包括了自动开始匹配、自动接受对局、自动点赞和自动开始下一局四个部分。
 
-英雄选择在大乱斗模式中同样生效，并提供了一个选项：只有目标英雄出现在选择台上且满足预设的**累计时间**时才会自动化执行，避免秒抢。
+## 核心功能
 
-## 模块：自动接受
+对局中队友或对手的分析。
 
-在指定时间内自动接受对局。
+## 自动选择和禁用
 
-## 其他模块
+普通模式、排位模式或大乱斗模式的英雄自动选择和禁用。
 
-还包括自动回复、自动点赞以及若干杂项工具如创建特殊房间、重生倒计时（切屏必备）等功能。
+## 其他功能
 
-尽在探索中。
+不多赘述，尽在探索中。
 
 # 使用样例
 
@@ -36,33 +47,33 @@
 
 一图胜千言。
 
-## 战绩总是真实的
+## 这里是战绩
 
 查询任意一个召唤师，并进入到战绩主页。
 
 ![查询召唤师](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/5.gif '查询召唤师')
 
-## 为什么不玩亚索
+## 快人一步
 
 超\~级\~快速的英雄选择。
 
 ![立即选择](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/2.gif '立即选择')
 
-## 自动选择
+## 完美的流程
 
 一切都在自动过程中。
 
 ![完全自动化](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/3.gif '完全自动化')
 
-## 大乱斗的必备
+## 大乱斗标配
 
-不止手速快。
+还在等内置 CD？我已经换了三次英雄了。
 
 ![无内置冷却](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/4.gif '无内置冷却')
 
-# 软件更名
+# 更名通知
 
-该项目的前名称为 League-Toolkit。由于和 Github 现有项目重名，现更名为 LeagueAkari。
+该项目的前名称为 `League-Toolkit`。由于和 Github 现有项目重名，现更名为 `LeagueAkari`。
 
 > "Akari" 来自于《摇曳百合》的主角（?）赤座灯里（Akaza **Akari**）。
 
@@ -70,25 +81,35 @@
 
 League Akari 是开源软件，所有已发行的主要版本（不包括特殊测试版本）都可由 Github 源码编译而来。
 
-**League Akari 不会在任何平台标价出售。**
+**League Akari 不会在任何平台标价出售，且作者没有在任何平台开放捐赠渠道。**
 
 League Akari 不会上传任何玩家数据，所有的数据记录皆在本地进行。
 
 League Akari 通过 Github 公开仓库检查版本更新。
 
+# 关于自动符文功能
+
+本功能即使容易实现，但由于没有稳定的公开外部数据源，开发进度会较为缓慢。
+
 # 加入到开发过程中！
+
+企鹅群组：301157623。
 
 百密一疏，各种问题总是难以避免，作为使用者，您可以：
 
 ## 提个 issue！
 
-Github Issues 是最重要的反馈渠道，请精准描述您的需求、遇到问题或任何想法。
+Github Issues 是最重要的反馈渠道，请精准描述您的需求、遇到的问题或任何可行的想法。
 
 除了 Github，另一个反馈渠道是 Bilibili 的[作者私信](https://space.bilibili.com/34532360)和[专栏评论区](https://www.bilibili.com/read/cv28654091/)。
 
 ## 加入开发！
 
-如果您对此项目感兴趣，欢迎加入到开发之中，为其添加更多功能。
+如果您对此项目感兴趣，欢迎加入到开发之中，提交 PR，为其添加更多功能。
+
+## 帮助推广！
+
+对于开源作者来说，自己写的软件能被很多人使用是一件很开心的事情。
 
 # 编译 & 构建 & 运行
 
@@ -100,7 +121,7 @@ Github Issues 是最重要的反馈渠道，请精准描述您的需求、遇到
 
 dev：`yarn dev`
 
-build（Windows）: `yarn build:win`
+build（for Windows）: `yarn build:win`
 
 ## Node Addon
 

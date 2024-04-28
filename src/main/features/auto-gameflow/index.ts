@@ -170,48 +170,15 @@ export async function setupAutoGameflow() {
     }
   )
 
-  const canStartSearchMatch = computed(() => {
-    if (!lobby.lobby) {
-      return 'unavailable'
-    }
-
-    if (gameflow.session?.gameData.isCustomGame) {
-      return 'unavailable'
-    }
-
-    const hasPendingInvitation = lobby.lobby.invitations.some((i) => i.state === 'Pending')
-
-    if (hasPendingInvitation) {
-      return 'waiting-for-invitees'
-    }
-
-    if (lobby.lobby.canStartActivity) {
-      return 'can-start-activity'
-    } else {
-      return 'cannot-start-activity'
-    }
-  })
-
-  const isLeader = computed(() => {
-    if (!lobby.lobby) {
-      return false
-    }
-
-    const self = lobby.lobby.members.find((m) => m.puuid === summoner.me?.puuid)
-
-    return Boolean(self?.isLeader)
-  })
-
   // 自动开始匹配
   reaction(
     () =>
       [
-        canStartSearchMatch.get(),
-        autoGameflowState.settings.autoSearchMatchEnabled,
-        isLeader.get()
+        autoGameflowState.activityStartStatus,
+        autoGameflowState.settings.autoSearchMatchEnabled
       ] as const,
-    ([s, enabled, is]) => {
-      if (!enabled || !is) {
+    ([s, enabled]) => {
+      if (!enabled) {
         cancelAutoSearchMatch('normal')
         return
       }
@@ -230,9 +197,11 @@ export async function setupAutoGameflow() {
 
         printAutoSearchMatchInfo()
         autoSearchMatchCountdownTimerId = setInterval(printAutoSearchMatchInfo, 1000)
-      } else if (s === 'unavailable') {
+      } else if (s === 'unavailable' || s === 'cannot-start-activity') {
         cancelAutoSearchMatch('normal')
       } else if (s === 'waiting-for-invitees') {
+        cancelAutoSearchMatch('waiting-for-invitee')
+      } else if (s === 'not-the-leader') {
         cancelAutoSearchMatch('waiting-for-invitee')
       }
     },
@@ -285,6 +254,8 @@ function stateSync() {
   ipcStateSync('auto-gameflow/will-search-match', () => autoGameflowState.willSearchMatch)
 
   ipcStateSync('auto-gameflow/will-search-match-at', () => autoGameflowState.willSearchMatchAt)
+
+  ipcStateSync('auto-gameflow/activity-start-status', () => autoGameflowState.activityStartStatus)
 }
 
 function ipcCall() {
@@ -426,7 +397,9 @@ const startMatchmaking = async () => {
   autoSearchMatchCountdownTimerId = null
 }
 
-const printAutoSearchMatchInfo = async (cancel?: 'normal' | 'waiting-for-invitee') => {
+const printAutoSearchMatchInfo = async (
+  cancel?: 'normal' | 'waiting-for-invitee' | 'not-the-leader'
+) => {
   if (chat.conversations.customGame && autoGameflowState.willSearchMatch) {
     if (cancel === 'normal') {
       chatSend(chat.conversations.customGame.id, `[League Akari] 自动匹配已取消`).catch()
@@ -435,6 +408,12 @@ const printAutoSearchMatchInfo = async (cancel?: 'normal' | 'waiting-for-invitee
       chatSend(
         chat.conversations.customGame.id,
         `[League Akari] 自动匹配已取消，等待被邀请者`
+      ).catch()
+      return
+    } else if (cancel === 'not-the-leader') {
+      chatSend(
+        chat.conversations.customGame.id,
+        `[League Akari] 自动匹配已取消，当前不是房间房主`
       ).catch()
       return
     }
@@ -462,7 +441,7 @@ export function cancelAutoAccept(declined = false) {
   }
 }
 
-export function cancelAutoSearchMatch(reason: 'normal' | 'waiting-for-invitee') {
+export function cancelAutoSearchMatch(reason: 'normal' | 'waiting-for-invitee' | 'not-the-leader') {
   if (autoGameflowState.willSearchMatch) {
     if (autoSearchMatchTimerId) {
       clearTimeout(autoSearchMatchTimerId)
