@@ -1,6 +1,8 @@
 <template>
   <div class="waiting-screen">
+    <div class="border"></div>
     <div class="inner-content">
+      <LeagueAkariSpan class="akari-text" bold />
       <template
         v-if="app.lcuConnectionState === 'disconnected' || app.lcuConnectionState === 'connecting'"
       >
@@ -38,15 +40,16 @@
             </NScrollbar>
           </template>
         </div>
-        <div v-else class="text-line-1">游戏客户端未启动，等待客户端启动</div>
-        <div v-if="isErr" class="error-hint">无法获取连接信息。请检查游戏客户端是否已经开启。</div>
+        <div v-else class="text-line-1">等待游戏客户端启动</div>
+        <div v-if="isErr" class="error-hint">无法获取连接信息。请检查游戏客户端是否已经开启</div>
       </template>
-      <div v-else class="servers-available">已连接，加载中</div>
+      <div v-else class="connected-text">已连接，加载中</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useAppStore } from '@shared/renderer/features/app/store'
 import { laNotification } from '@shared/renderer/notification'
 import { mainCall } from '@shared/renderer/utils/ipc'
@@ -159,27 +162,43 @@ const handleConnect = (auth: any) => {
 
 <style scoped lang="less">
 .waiting-screen {
+  position: relative;
   height: 100%;
   background-color: var(--background-color-primary);
-  padding: 24px;
   box-sizing: border-box;
+}
+
+.border {
+  position: absolute;
+  inset: 0;
+  border: 1px rgb(73, 73, 73) solid;
+  border-radius: 4px;
+  margin: 18px;
+}
+
+.akari-text {
+  font-size: 28px;
+  margin-bottom: 12px;
 }
 
 .inner-content {
   display: flex;
+  position: relative;
+  top: calc(var(--title-bar-height) * -1);
   justify-content: center;
   align-items: center;
   flex-direction: column;
   height: 100%;
-  border-radius: 4px;
-  border: 1px rgb(73, 73, 73) solid;
 }
 
 .text-line-1 {
   color: rgb(174, 174, 174);
-  margin-bottom: 12px;
   font-size: 14px;
   font-weight: 700;
+}
+
+.text-line-1:not(:last-child) {
+  margin-bottom: 12px;
 }
 
 .admin-hint {
@@ -195,7 +214,6 @@ const handleConnect = (auth: any) => {
 }
 
 .error-hint {
-  margin-top: 4px;
   text-align: center;
   color: rgb(185, 135, 135);
   font-size: 12px;
@@ -252,6 +270,14 @@ const handleConnect = (auth: any) => {
   font-weight: 700;
   padding: 0 24px;
   margin-bottom: 12px;
+  color: #fff;
+  text-align: center;
+}
+
+.connected-text {
+  font-size: 16px;
+  font-weight: 700;
+  padding: 0 24px;
   color: #fff;
   text-align: center;
 }
