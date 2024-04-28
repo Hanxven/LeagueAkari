@@ -8,7 +8,7 @@ import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
 import axios from 'axios'
-import { app, dialog } from 'electron'
+import { app, dialog, shell } from 'electron'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
 import { lt } from 'semver'
 
@@ -148,14 +148,20 @@ export async function checkUpdates() {
           pageUrl: data.html_url
         }
       })
+
+      logger.info(
+        `检查到更新版本, 当前 ${currentVersion}, Github ${versionString}, 归档包 ${JSON.stringify(archiveFile)}`
+      )
     } else {
       runInAction(() => {
         appState.updates.newUpdates = null
       })
       mwNotification.success('app', '检查更新', `目前是最新版本 (${currentVersion})`)
+      logger.info(`目前是最新版本, 当前 ${currentVersion}, Github ${versionString}`)
     }
   } catch (error) {
     mwNotification.warn('app', '检查更新', `当前检查更新失败 ${(error as Error).message}`)
+    logger.warn(`尝试检查更新失败 ${formatError(error)}`)
   } finally {
     runInAction(() => {
       appState.updates.isCheckingUpdates = false
@@ -211,6 +217,10 @@ function ipcCall() {
       return await migrateFromPreviousLocalStorageSettings(all)
     }
   )
+
+  onRendererCall('app/user-data/open', () => {
+    return shell.openPath(app.getPath('userData'))
+  })
 }
 
 async function loadSettings() {

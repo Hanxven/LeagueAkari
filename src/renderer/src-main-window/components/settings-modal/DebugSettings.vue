@@ -37,14 +37,26 @@
       </div>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">日志</span></template>
+      <template #header><span class="card-header-title">存储</span></template>
       <ControlItem
         class="control-item-margin"
         label="日志目录"
-        label-description="打开 League Akari 日志文件所在目录。注意这些日志文件可能含有敏感个人信息，包括对局记录等"
+        label-description="打开 League Akari 日志文件所在目录"
         :label-width="320"
       >
-        <NButton size="tiny" @click="() => handleShowLogsDir()">日志目录</NButton>
+        <NButton size="tiny" secondary type="primary" @click="() => handleShowLogsDir()"
+          >日志目录</NButton
+        >
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="应用数据目录"
+        label-description="打开 League Akari 应用文件存储目录"
+        :label-width="320"
+      >
+        <NButton size="tiny" secondary type="primary" @click="() => handleShowUserDataDir()"
+          >应用目录</NButton
+        >
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
@@ -320,6 +332,10 @@ const handleToggleDevtools = async () => {
 
 const handleShowLogsDir = async () => {
   await mainCall('logs/dir/open')
+}
+
+const handleShowUserDataDir = async () => {
+  await mainCall('app/user-data/open')
 }
 
 const handleReload = () => {
