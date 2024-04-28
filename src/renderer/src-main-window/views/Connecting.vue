@@ -177,7 +177,7 @@ const handleConnect = (auth: any) => {
 }
 
 .akari-text {
-  font-size: 28px;
+  font-size: 22px;
   margin-bottom: 12px;
 }
 

@@ -112,7 +112,11 @@ export const useCoreFunctionalityStore = defineStore('feature:core-functionality
     // 发送 KDA 信息需保证 KDA 大于此值
     sendKdaThreshold: 0,
 
-    useAuxiliaryWindow: true
+    // 使用辅助小窗
+    useAuxiliaryWindow: true,
+
+    // 对局中战绩获取的最大并发限制
+    fetchMatchHistoryConcurrency: 10
   })
 
   return {

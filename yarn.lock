@@ -3934,7 +3934,7 @@ __metadata:
     markdown-it: "npm:^14.1.0"
     mobx: "npm:^6.12.3"
     naive-ui: "npm:^2.38.1"
-    node-global-key-listener: "npm:^0.2.0"
+    node-global-key-listener: "npm:0.1.1"
     p-queue: "npm:^8.0.1"
     pinia: "npm:^2.1.7"
     pinyin-pro: "npm:^3.20.2"
@@ -4505,12 +4505,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-global-key-listener@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "node-global-key-listener@npm:0.2.0"
+"node-global-key-listener@npm:0.1.1":
+  version: 0.1.1
+  resolution: "node-global-key-listener@npm:0.1.1"
   dependencies:
     sudo-prompt: "npm:^9.2.1"
-  checksum: 10c0/8d7112b7ca290d5a7eaff7340d09750b0e027a4d19ff329beba7ef46c5fd60063c6b4ef0133b9cc3977ba9820feb824dc4a24bc411d68a2e33d66b9cd6a631ff
+  checksum: 10c0/8b997973bad620855d32e229d980ef1b554be86d42296e49993c823ff9aba22ec999046542a872bf6228c14ee04f8cc3e788e5d6d73b1d0a28e08f7a40f2994d
   languageName: node
   linkType: hard
 

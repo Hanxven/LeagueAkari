@@ -26,12 +26,17 @@ import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
 import { calculateTogetherTimes, removeSubsets } from '@shared/utils/team-up-calc'
 import { comparer, observable, reaction, runInAction, toJS } from 'mobx'
+import PQueue from 'p-queue'
 
 import { chat } from '../lcu-state-sync/chat'
 import { gameData } from '../lcu-state-sync/game-data'
 import { gameflow } from '../lcu-state-sync/gameflow'
 import { summoner } from '../lcu-state-sync/summoner'
 import { coreFunctionalityState as cf } from './state'
+
+const fetchMatchHistoryLimiter = new PQueue({
+  concurrency: 10
+})
 
 const logger = createLogger('core-functionality')
 
@@ -308,12 +313,16 @@ async function loadPlayerStats(puuid: string) {
       return
     }
 
-    const matchHistoryResult = (
-      await getMatchHistory(summonerInfo.puuid, 0, cf.settings.matchHistoryLoadCount - 1)
-    ).data
+    const matchHistoryResult = await fetchMatchHistoryLimiter.add(() =>
+      getMatchHistory(summonerInfo.puuid, 0, cf.settings.matchHistoryLoadCount - 1)
+    )
+
+    if (!matchHistoryResult) {
+      return
+    }
 
     runInAction(() => {
-      player.matchHistory = matchHistoryResult.games.games.map((g) => ({
+      player.matchHistory = matchHistoryResult.data.games.games.map((g) => ({
         game: g,
         isDetailed: false
       }))
@@ -322,7 +331,7 @@ async function loadPlayerStats(puuid: string) {
     sendEventToAllRenderer(
       'core-functionality/ongoing-player/match-history',
       puuid,
-      matchHistoryResult.games.games
+      matchHistoryResult.data.games.games
     )
 
     const loadGameTasks: Promise<void>[] = []
@@ -340,17 +349,22 @@ async function loadPlayerStats(puuid: string) {
         }
 
         try {
-          const g = (await getGame(game.game.gameId)).data
+          const g = await fetchMatchHistoryLimiter.add(() => getGame(game.game.gameId))
+
+          if (!g) {
+            return
+          }
+
           runInAction(() => {
             game.isDetailed = true
-            game.game = g
-            cf.tempDetailedGames.set(g.gameId, g)
+            game.game = g.data
+            cf.tempDetailedGames.set(g.data.gameId, g.data)
           })
 
           sendEventToAllRenderer(
             'core-functionality/ongoing-player/match-history-detailed-game',
             puuid,
-            g
+            g.data
           )
         } catch (error) {
           logger.warn(`无法加载对局, ID: ${game.game.gameId} ${formatError(error)}`)
@@ -722,6 +736,11 @@ function stateSync() {
   ipcStateSync('core-functionality/settings/send-kda-threshold', () => cf.settings.sendKdaThreshold)
 
   ipcStateSync(
+    'core-functionality/settings/fetch-match-history-concurrency',
+    () => cf.settings.fetchMatchHistoryConcurrency
+  )
+
+  ipcStateSync(
     'core-functionality/settings/use-auxiliary-window',
     () => cf.settings.useAuxiliaryWindow
   )
@@ -831,6 +850,20 @@ function ipcCall() {
     await setSetting('core-functionality/send-kda-threshold', threshold)
   })
 
+  onRendererCall(
+    'core-functionality/settings/fetch-match-history-concurrency/set',
+    async (_, limit) => {
+      if (limit < 0) {
+        limit = 1
+      }
+
+      fetchMatchHistoryLimiter.concurrency = limit
+
+      cf.settings.setFetchMatchHistoryConcurrency(limit)
+      await setSetting('core-functionality/fetch-match-history-concurrency', limit)
+    }
+  )
+
   // 会额外更新现有内容
   onRendererCall('core-functionality/saved-player/save', async (_, player) => {
     const r = await saveSavedPlayer(player)
@@ -911,5 +944,12 @@ async function loadSettings() {
 
   cf.settings.setFetchAfterGame(
     await getSetting('core-functionality/use-auxiliary-window', cf.settings.useAuxiliaryWindow)
+  )
+
+  cf.settings.setFetchMatchHistoryConcurrency(
+    await getSetting(
+      'core-functionality/fetch-match-history-concurrency',
+      cf.settings.fetchMatchHistoryConcurrency
+    )
   )
 }

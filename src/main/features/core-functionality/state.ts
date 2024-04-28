@@ -23,6 +23,8 @@ class CoreFunctionalitySettings {
 
   useAuxiliaryWindow: boolean = true
 
+  fetchMatchHistoryConcurrency: number = 10
+
   constructor() {
     makeAutoObservable(this)
   }
@@ -65,6 +67,10 @@ class CoreFunctionalitySettings {
 
   setUseAuxiliaryWindow(value: boolean) {
     this.useAuxiliaryWindow = value
+  }
+
+  setFetchMatchHistoryConcurrency(limit) {
+    this.fetchMatchHistoryConcurrency = limit
   }
 }
 

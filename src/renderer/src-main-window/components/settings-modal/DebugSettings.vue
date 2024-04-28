@@ -18,7 +18,6 @@
       </template>
       <NAutoComplete
         ref="editRuleInputEl"
-        @keyup.enter="handleAddRule"
         placeholder="输入匹配规则，如 /path/:name/to"
         v-model:value="editRuleText"
         :options="options"
@@ -51,7 +50,7 @@
       <ControlItem
         class="control-item-margin"
         label="应用数据目录"
-        label-description="打开 League Akari 应用文件存储目录"
+        label-description="打开 League Akari 应用文件存储目录。删除该目录不会影响正常运行，但会丢失所有已储存的信息"
         :label-width="320"
       >
         <NButton size="tiny" secondary type="primary" @click="() => handleShowUserDataDir()"

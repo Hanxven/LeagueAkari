@@ -40,7 +40,7 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="拉取详细对局"
+        label="战绩页面拉取详细对局"
         label-description="在请求页面战绩列表时，也同时加载所有对局的详细信息"
         :label-width="320"
       >
@@ -106,6 +106,20 @@
           :min="2"
           :value="coreFunctionality.settings.teamAnalysisPreloadCount"
           @update:value="(val) => setTeamAnalysisPreloadCount(val || 4)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="战绩拉取并发数"
+        label-description="在对局分析中，每秒所进行网络请求的最大数量。较低的值可避免客户端异常退出以及网络请求失败"
+        :label-width="320"
+      >
+        <NInputNumber
+          style="width: 100px"
+          size="tiny"
+          :min="1"
+          :value="coreFunctionality.settings.fetchMatchHistoryConcurrency"
+          @update:value="(val) => setFetchMatchHistoryConcurrency(val || 10)"
         />
       </ControlItem>
     </NCard>
@@ -190,6 +204,7 @@ import {
   setAutoRouteOnGameStart,
   setFetchAfterGame,
   setFetchDetailedGame,
+  setFetchMatchHistoryConcurrency,
   setMatchHistoryLoadCount,
   setPreMadeThreshold,
   setSendKdaInGame,

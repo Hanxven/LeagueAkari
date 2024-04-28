@@ -46,7 +46,9 @@
       >
     </template>
     <template v-else>
-      <span class="main-text-2"
+      <span
+        class="main-text-2"
+        :title="`${gameflow.session?.map.gameModeName || '模式中'} · ${gameflow.session?.map.name || '地图'}`"
         >{{ gameflow.session?.map.gameModeName || '模式中' }} ·
         {{ gameflow.session?.map.name || '地图' }}</span
       >
@@ -155,9 +157,14 @@ watch(
 }
 
 .main-text-2 {
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 8px;
+  max-width: 300px;
 }
 
 .sub-text {

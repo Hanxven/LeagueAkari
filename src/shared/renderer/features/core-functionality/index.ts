@@ -89,37 +89,50 @@ export async function setupCoreFunctionality() {
     'core-functionality/settings/auto-route-on-game-start',
     (s) => (cf.settings.autoRouteOnGameStart = s)
   )
+
   mainStateSync(
     'core-functionality/settings/fetch-after-game',
     (s) => (cf.settings.fetchAfterGame = s)
   )
+
   mainStateSync(
     'core-functionality/settings/fetch-detailed-game',
     (s) => (cf.settings.fetchDetailedGame = s)
   )
+
   mainStateSync(
     'core-functionality/settings/match-history-load-count',
     (s) => (cf.settings.matchHistoryLoadCount = s)
   )
+
   mainStateSync(
     'core-functionality/settings/pre-made-team-threshold',
     (s) => (cf.settings.preMadeTeamThreshold = s)
   )
+
   mainStateSync(
     'core-functionality/settings/send-kda-in-game',
     (s) => (cf.settings.sendKdaInGame = s)
   )
+
   mainStateSync(
     'core-functionality/settings/send-kda-in-game-with-pre-made-teams',
     (s) => (cf.settings.sendKdaInGameWithPreMadeTeams = s)
   )
+
   mainStateSync(
     'core-functionality/settings/send-kda-threshold',
     (s) => (cf.settings.sendKdaThreshold = s)
   )
+
   mainStateSync(
     'core-functionality/settings/team-analysis-preload-count',
     (s) => (cf.settings.teamAnalysisPreloadCount = s)
+  )
+
+  mainStateSync(
+    'core-functionality/settings/fetch-match-history-concurrency',
+    (s) => (cf.settings.fetchMatchHistoryConcurrency = s)
   )
 
   mainStateSync(
@@ -130,7 +143,10 @@ export async function setupCoreFunctionality() {
   mainStateSync('core-functionality/ongoing-pre-made-teams', (s) => (cf.ongoingPreMadeTeams = s))
 
   mainStateSync('core-functionality/send-list', (s) => (cf.sendList = s))
-  mainStateSync('core-functionality/settings/use-auxiliary-window', (s) => (cf.settings.useAuxiliaryWindow = s))
+  mainStateSync(
+    'core-functionality/settings/use-auxiliary-window',
+    (s) => (cf.settings.useAuxiliaryWindow = s)
+  )
 }
 
 export function setFetchAfterGame(enabled: boolean) {
@@ -173,11 +189,14 @@ export function setInGameKdaSendPlayer(puuid: string, send: boolean) {
   return mainCall('core-functionality/send-list/update', puuid, send)
 }
 
-
 export function setUseAuxiliaryWindow(enabled: boolean) {
   return mainCall('core-functionality/settings/use-auxiliary-window/set', enabled)
 }
 
 export function resetAuxiliaryWindowPosition() {
   return mainCall('auxiliary-window/reset-window-position')
+}
+
+export function setFetchMatchHistoryConcurrency(limit: number) {
+  return mainCall('core-functionality/settings/fetch-match-history-concurrency/set', limit)
 }

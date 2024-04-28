@@ -11,11 +11,10 @@ import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { LcuEvent } from '@shared/types/lcu/event'
 import { Ballot } from '@shared/types/lcu/honorV2'
 import { formatError } from '@shared/utils/errors'
-import { comparer, computed, reaction } from 'mobx'
+import { comparer, reaction } from 'mobx'
 
 import { chat } from '../lcu-state-sync/chat'
 import { gameflow } from '../lcu-state-sync/gameflow'
-import { lobby } from '../lcu-state-sync/lobby'
 import { summoner } from '../lcu-state-sync/summoner'
 import { autoGameflowState } from './state'
 
@@ -387,6 +386,10 @@ const acceptMatch = async () => {
 
 const startMatchmaking = async () => {
   try {
+    if (autoSearchMatchCountdownTimerId) {
+      clearInterval(autoSearchMatchCountdownTimerId)
+      autoSearchMatchCountdownTimerId = null
+    }
     await searchMatch()
   } catch (error) {
     mwNotification.warn('auto-gameflow', '自动匹配', '尝试开始匹配时出现问题')
@@ -394,7 +397,6 @@ const startMatchmaking = async () => {
   }
   autoGameflowState.clearAutoSearchMatch()
   autoSearchMatchTimerId = null
-  autoSearchMatchCountdownTimerId = null
 }
 
 const printAutoSearchMatchInfo = async (

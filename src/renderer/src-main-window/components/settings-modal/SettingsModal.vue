@@ -8,8 +8,8 @@
   >
     <template #header><span class="card-header-title">设置</span></template>
     <NTabs type="line" animated size="small">
-      <NTabPane name="basic" tab="应用"><BasicSettings /></NTabPane>
-      <NTabPane name="match-history" tab="核心"><CoreFunctionalitySettings /></NTabPane>
+      <NTabPane name="basic" tab="应用"><AppSettings /></NTabPane>
+      <NTabPane name="match-history" tab="通用"><GeneralSettings /></NTabPane>
       <NTabPane name="process" tab="进程"><ProcessSettings /></NTabPane>
       <NTabPane name="debug" tab="调试"><DebugSettings /></NTabPane>
       <NTabPane name="about" tab="关于">
@@ -88,9 +88,9 @@ import { mainCall } from '@shared/renderer/utils/ipc'
 import { NModal, NTabPane, NTabs } from 'naive-ui'
 import { useCssModule } from 'vue'
 
-import BasicSettings from './BasicSettings.vue'
-import CoreFunctionalitySettings from './CoreFunctionalitySettings.vue'
+import AppSettings from './AppSettings.vue'
 import DebugSettings from './DebugSettings.vue'
+import GeneralSettings from './GeneralSettings.vue'
 import ProcessSettings from './ProcessSettings.vue'
 
 const app = useAppStore()
