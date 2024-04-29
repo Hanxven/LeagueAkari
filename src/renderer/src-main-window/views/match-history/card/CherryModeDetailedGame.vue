@@ -6,7 +6,7 @@
           <tr>
             <th class="header-info">
               {{ `第${chineseNumber[participants[0]?.stats.subteamPlacement - 1] ?? ' ? '}名` }} ({{
-                participants[0].stats.subteamPlacement <= 2 ? '胜利' : '失败'
+                participants[0].stats.subteamPlacement <= (match.maxPlacement / 2) ? '胜利' : '失败'
               }})
             </th>
             <th class="header-augments">增益</th>

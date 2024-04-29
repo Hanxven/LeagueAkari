@@ -147,18 +147,18 @@
             </template>
             <template v-else>
               <div>
-                <SubTeam :mode="game.gameMode" :participants="teams.subTeam1" />
+                <SubTeam :mode="game.gameMode" :participants="teams.placement1" />
                 <SubTeam
                   :mode="game.gameMode"
-                  :participants="teams.subTeam2"
+                  :participants="teams.placement2"
                   style="margin-top: 8px"
                 />
               </div>
               <div>
-                <SubTeam :mode="game.gameMode" :participants="teams.subTeam3" />
+                <SubTeam :mode="game.gameMode" :participants="teams.placement3" />
                 <SubTeam
                   :mode="game.gameMode"
-                  :participants="teams.subTeam4"
+                  :participants="teams.placement4"
                   style="margin-top: 8px"
                 />
               </div>
@@ -383,10 +383,10 @@ const teams = computed(() => {
   if (props.game.gameMode === 'CHERRY') {
     return {
       subTeam0: all.filter((p) => p.stats.playerSubteamId == 0),
-      subTeam1: all.filter((p) => p.stats.playerSubteamId == 1),
-      subTeam2: all.filter((p) => p.stats.playerSubteamId == 2),
-      subTeam3: all.filter((p) => p.stats.playerSubteamId == 3),
-      subTeam4: all.filter((p) => p.stats.playerSubteamId == 4)
+      placement1: all.filter((p) => p.stats.subteamPlacement == 1),
+      placement2: all.filter((p) => p.stats.subteamPlacement == 2),
+      placement3: all.filter((p) => p.stats.subteamPlacement == 3),
+      placement4: all.filter((p) => p.stats.subteamPlacement == 4)
     }
   } else {
     return {
