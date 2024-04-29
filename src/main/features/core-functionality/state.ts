@@ -22,7 +22,7 @@ class CoreFunctionalitySettings {
 
   useAuxiliaryWindow: boolean = true
 
-  fetchMatchHistoryConcurrency: number = 10
+  playerAnalysisFetchConcurrency: number = 10
 
   constructor() {
     makeAutoObservable(this)
@@ -68,8 +68,8 @@ class CoreFunctionalitySettings {
     this.useAuxiliaryWindow = value
   }
 
-  setFetchMatchHistoryConcurrency(limit) {
-    this.fetchMatchHistoryConcurrency = limit
+  setPlayerAnalysisFetchConcurrency(limit: number) {
+    this.playerAnalysisFetchConcurrency = limit
   }
 }
 

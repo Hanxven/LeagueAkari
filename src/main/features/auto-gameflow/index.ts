@@ -11,7 +11,7 @@ import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { LcuEvent } from '@shared/types/lcu/event'
 import { Ballot } from '@shared/types/lcu/honorV2'
 import { formatError } from '@shared/utils/errors'
-import { comparer, reaction } from 'mobx'
+import { comparer, computed, reaction } from 'mobx'
 
 import { chat } from '../lcu-state-sync/chat'
 import { gameflow } from '../lcu-state-sync/gameflow'
@@ -92,11 +92,15 @@ export async function setupAutoGameflow() {
     }
   })
 
+  const isEndGame = computed(
+    () => gameflow.phase === 'EndOfGame' || gameflow.phase === 'PreEndOfGame'
+  )
+
   // 自动回到房间
   reaction(
-    () => [gameflow.phase, autoGameflowState.settings.playAgainEnabled] as const,
-    async ([phase, enabled]) => {
-      if (enabled && phase === 'EndOfGame') {
+    () => [isEndGame.get(), autoGameflowState.settings.playAgainEnabled] as const,
+    async ([isEnd, enabled]) => {
+      if (enabled && isEnd) {
         try {
           await playAgain()
           logger.info('Play again, 返回房间')

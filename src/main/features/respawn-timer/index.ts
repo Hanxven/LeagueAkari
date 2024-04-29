@@ -34,10 +34,7 @@ export async function setupRespawnTimer() {
       const self = playerList.find((p) => {
         // 2024-04-27 之后，有 Tag 了
         if (!p.summonerName.includes('#')) {
-          return (
-            p.summonerName ===
-            summonerName(summoner.me?.gameName || summoner.me?.displayName, summoner.me?.tagLine)
-          )
+          return p.summonerName === summoner.me?.gameName || summoner.me?.displayName
         }
 
         const isNameEqualed = p.summonerName === summoner.me?.gameName || summoner.me?.displayName

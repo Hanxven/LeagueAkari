@@ -116,7 +116,7 @@ export const useCoreFunctionalityStore = defineStore('feature:core-functionality
     useAuxiliaryWindow: true,
 
     // 对局中战绩获取的最大并发限制
-    fetchMatchHistoryConcurrency: 10
+    playerAnalysisFetchConcurrency: 10
   })
 
   return {

@@ -110,16 +110,16 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="战绩拉取并发数"
-        label-description="在对局分析中，每秒所进行网络请求的最大数量。较低的值可避免客户端异常退出以及网络请求失败"
+        label="对局中请求并发数"
+        label-description="在对局分析中，所进行的所有网络请求总并发数限制。它并不会限制其他模块的请求并发数"
         :label-width="320"
       >
         <NInputNumber
           style="width: 100px"
           size="tiny"
           :min="1"
-          :value="coreFunctionality.settings.fetchMatchHistoryConcurrency"
-          @update:value="(val) => setFetchMatchHistoryConcurrency(val || 10)"
+          :value="coreFunctionality.settings.playerAnalysisFetchConcurrency"
+          @update:value="(val) => setPlayerAnalysisFetchConcurrency(val || 10)"
         />
       </ControlItem>
     </NCard>
@@ -204,7 +204,7 @@ import {
   setAutoRouteOnGameStart,
   setFetchAfterGame,
   setFetchDetailedGame,
-  setFetchMatchHistoryConcurrency,
+  setPlayerAnalysisFetchConcurrency,
   setMatchHistoryLoadCount,
   setPreMadeThreshold,
   setSendKdaInGame,

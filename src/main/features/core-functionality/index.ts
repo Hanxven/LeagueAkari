@@ -34,9 +34,7 @@ import { gameflow } from '../lcu-state-sync/gameflow'
 import { summoner } from '../lcu-state-sync/summoner'
 import { coreFunctionalityState as cf } from './state'
 
-const fetchMatchHistoryLimiter = new PQueue({
-  concurrency: 10
-})
+const fetchMatchHistoryLimiter = new PQueue()
 
 const logger = createLogger('core-functionality')
 
@@ -47,6 +45,8 @@ export async function setupCoreFunctionality() {
   stateSync()
   ipcCall()
   await loadSettings()
+
+  fetchMatchHistoryLimiter.concurrency = cf.settings.playerAnalysisFetchConcurrency
 
   reaction(
     () => [gameflow.phase, auxiliaryWindowState.isReady] as const,
@@ -94,20 +94,27 @@ export async function setupCoreFunctionality() {
     }
   )
 
+  let controller: AbortController | null = null
+
   reaction(
     () => cf.ongoingState,
     async (state) => {
       if (state === 'unavailable') {
         sendEventToAllRenderer('core-functionality/ongoing-player/clear')
         cf.clearOngoingVars()
+        controller?.abort(new Error('Aborted'))
         return
+      }
+
+      if (!controller) {
+        controller = new AbortController()
       }
 
       try {
         if (state === 'champ-select') {
-          await champSelectQuery()
+          await champSelectQuery(controller.signal)
         } else if (state === 'in-game') {
-          await inGameQuery()
+          await inGameQuery(controller.signal)
         }
       } catch (error) {
         mwNotification.warn('core-functionality', '对局中', '无法加载对局中信息')
@@ -205,10 +212,17 @@ export async function setupCoreFunctionality() {
   logger.info('初始化完成')
 }
 
+function handleAbortError(e: any) {
+  if (e instanceof Error && e.name === 'AbortError') {
+    return
+  }
+  throw e
+}
+
 /**
  * team: 'our': 临时的己方队伍; 'their': 临时的对方队伍
  */
-async function champSelectQuery() {
+async function champSelectQuery(signal: AbortSignal) {
   const session = (await getChampSelectSession()).data
 
   const m = session.myTeam
@@ -222,13 +236,13 @@ async function champSelectQuery() {
   const visiblePlayers = [...m, ...t]
 
   const playerTasks = visiblePlayers.map((p) => {
-    return loadPlayerStats(p.puuid)
+    return loadPlayerStats(signal, p.puuid)
   })
 
-  await Promise.all(playerTasks)
+  await Promise.allSettled(playerTasks)
 }
 
-async function inGameQuery() {
+async function inGameQuery(signal: AbortSignal) {
   const session = (await getGameflowSession()).data
 
   const m = session.gameData.teamOne
@@ -242,10 +256,10 @@ async function inGameQuery() {
   const visiblePlayers = [...m, ...t]
 
   const playerTasks = visiblePlayers.map((p) => {
-    return loadPlayerStats(p.puuid)
+    return loadPlayerStats(signal, p.puuid)
   })
 
-  await Promise.all(playerTasks)
+  await Promise.allSettled(playerTasks)
 }
 
 /**
@@ -256,7 +270,7 @@ async function inGameQuery() {
  * - 数据库中已记录的数据
  * - 战绩信息
  */
-async function loadPlayerStats(puuid: string) {
+async function loadPlayerStats(signal: AbortSignal, puuid: string) {
   if (!cf.ongoingPlayers.has(puuid)) {
     runInAction(() => cf.ongoingPlayers.set(puuid, observable({ puuid }, {}, { deep: false })))
     sendEventToAllRenderer('core-functionality/ongoing-player/new', puuid)
@@ -265,10 +279,19 @@ async function loadPlayerStats(puuid: string) {
   const player = cf.ongoingPlayers.get(puuid)!
 
   // 召唤师信息必须被提前加载完成
-  const summonerInfo = (await getSummonerByPuuid(puuid)).data
-  runInAction(() => (player.summoner = summonerInfo))
+  const summonerInfo = await fetchMatchHistoryLimiter
+    .add(() => getSummonerByPuuid(puuid), {
+      signal
+    })
+    .catch(handleAbortError)
 
-  sendEventToAllRenderer('core-functionality/ongoing-player/summoner', puuid, summonerInfo)
+  if (!summonerInfo) {
+    return
+  }
+
+  runInAction(() => (player.summoner = summonerInfo.data))
+
+  sendEventToAllRenderer('core-functionality/ongoing-player/summoner', puuid, summonerInfo.data)
 
   const auth = lcuConnectionState.auth
   const me = summoner.me
@@ -301,11 +324,21 @@ async function loadPlayerStats(puuid: string) {
       return
     }
 
-    const rankedStats = (await getRankedStats(puuid)).data
+    const rankedStats = await fetchMatchHistoryLimiter
+      .add(() => getRankedStats(puuid), {
+        signal
+      })
+      .catch(handleAbortError)
 
-    runInAction(() => (player.rankedStats = rankedStats))
+    if (rankedStats) {
+      runInAction(() => (player.rankedStats = rankedStats.data))
 
-    sendEventToAllRenderer('core-functionality/ongoing-player/ranked-stats', puuid, rankedStats)
+      sendEventToAllRenderer(
+        'core-functionality/ongoing-player/ranked-stats',
+        puuid,
+        rankedStats.data
+      )
+    }
   }
 
   const _loadMatchHistory = async () => {
@@ -313,16 +346,19 @@ async function loadPlayerStats(puuid: string) {
       return
     }
 
-    const matchHistoryResult = await fetchMatchHistoryLimiter.add(() =>
-      getMatchHistory(summonerInfo.puuid, 0, cf.settings.matchHistoryLoadCount - 1)
-    )
+    const matchHistory = await fetchMatchHistoryLimiter
+      .add(
+        () => getMatchHistory(summonerInfo.data.puuid, 0, cf.settings.matchHistoryLoadCount - 1),
+        { signal }
+      )
+      .catch(handleAbortError)
 
-    if (!matchHistoryResult) {
+    if (!matchHistory) {
       return
     }
 
     runInAction(() => {
-      player.matchHistory = matchHistoryResult.data.games.games.map((g) => ({
+      player.matchHistory = matchHistory.data.games.games.map((g) => ({
         game: g,
         isDetailed: false
       }))
@@ -331,7 +367,7 @@ async function loadPlayerStats(puuid: string) {
     sendEventToAllRenderer(
       'core-functionality/ongoing-player/match-history',
       puuid,
-      matchHistoryResult.data.games.games
+      matchHistory.data.games.games
     )
 
     const loadGameTasks: Promise<void>[] = []
@@ -349,7 +385,11 @@ async function loadPlayerStats(puuid: string) {
         }
 
         try {
-          const g = await fetchMatchHistoryLimiter.add(() => getGame(game.game.gameId))
+          const g = await fetchMatchHistoryLimiter
+            .add(() => getGame(game.game.gameId), {
+              signal
+            })
+            .catch(handleAbortError)
 
           if (!g) {
             return
@@ -732,8 +772,8 @@ function stateSync() {
   ipcStateSync('core-functionality/settings/send-kda-threshold', () => cf.settings.sendKdaThreshold)
 
   ipcStateSync(
-    'core-functionality/settings/fetch-match-history-concurrency',
-    () => cf.settings.fetchMatchHistoryConcurrency
+    'core-functionality/settings/player-analysis-fetch-concurrency',
+    () => cf.settings.playerAnalysisFetchConcurrency
   )
 
   ipcStateSync(
@@ -847,7 +887,7 @@ function ipcCall() {
   })
 
   onRendererCall(
-    'core-functionality/settings/fetch-match-history-concurrency/set',
+    'core-functionality/settings/player-analysis-fetch-concurrency/set',
     async (_, limit) => {
       if (limit < 0) {
         limit = 1
@@ -855,8 +895,8 @@ function ipcCall() {
 
       fetchMatchHistoryLimiter.concurrency = limit
 
-      cf.settings.setFetchMatchHistoryConcurrency(limit)
-      await setSetting('core-functionality/fetch-match-history-concurrency', limit)
+      cf.settings.setPlayerAnalysisFetchConcurrency(limit)
+      await setSetting('core-functionality/player-analysis-fetch-concurrency', limit)
     }
   )
 
@@ -942,10 +982,10 @@ async function loadSettings() {
     await getSetting('core-functionality/use-auxiliary-window', cf.settings.useAuxiliaryWindow)
   )
 
-  cf.settings.setFetchMatchHistoryConcurrency(
+  cf.settings.setPlayerAnalysisFetchConcurrency(
     await getSetting(
-      'core-functionality/fetch-match-history-concurrency',
-      cf.settings.fetchMatchHistoryConcurrency
+      'core-functionality/player-analysis-fetch-concurrency',
+      cf.settings.playerAnalysisFetchConcurrency
     )
   )
 }

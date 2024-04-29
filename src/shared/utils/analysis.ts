@@ -24,7 +24,7 @@ export function getAnalysis(
   let losingStreak = 0
   let isOnWinningStreak = true
   let isOnLosingStreak = true
-  let cherryTop2s = 0
+  let cherryTop4s = 0
   let cherryTop1s = 0
   let cherryGames = 0
 
@@ -39,7 +39,7 @@ export function getAnalysis(
       count: number
       cherryCount: number
       top1: number
-      top2: number
+      top4: number
       win: number
       kda: number
     }
@@ -68,7 +68,7 @@ export function getAnalysis(
         win: 0,
         kda: 0,
         top1: 0,
-        top2: 0
+        top4: 0
       })
     }
 
@@ -89,9 +89,9 @@ export function getAnalysis(
 
       if (game.game.gameMode === 'CHERRY') {
         const r = game.selfParticipant.stats.subteamPlacement
-        if (r && r <= 2) {
-          cherryTop2s++
-          champ.top2++
+        if (r && r <= 4) {
+          cherryTop4s++
+          champ.top4++
           if (r === 1) {
             cherryTop1s++
             champ.top1++
@@ -127,7 +127,7 @@ export function getAnalysis(
     .sort((a, b) => {
       // 按照场数排列，相同则按照 KDA 排列
       if (sortBy === 'cherry') {
-        return b[1].count === a[1].count ? b[1].top2 - a[1].top2 : b[1].count - a[1].count
+        return b[1].count === a[1].count ? b[1].top4 - a[1].top4 : b[1].count - a[1].count
       }
       return b[1].count === a[1].count ? b[1].kda - a[1].kda : b[1].count - a[1].count
     })
@@ -141,7 +141,7 @@ export function getAnalysis(
     validGames,
     winningRate: (wins / (validGames || 1)) * 100,
     cherryGames,
-    cherryTop2s,
+    cherryTop4s,
     cherryTop1s,
     winningStreak,
     losingStreak,
@@ -181,7 +181,7 @@ export interface AnalysisResult {
   validGames: number
   winningRate: number
   cherryGames: number
-  cherryTop2s: number
+  cherryTop4s: number
   cherryTop1s: number
   winningStreak: number
   losingStreak: number
@@ -195,7 +195,7 @@ export interface AnalysisResult {
     win: number
     kda: number
     top1: number
-    top2: number
+    top4: number
   }>
   maybeWinRateTeam: boolean
 }

@@ -131,8 +131,8 @@ export async function setupCoreFunctionality() {
   )
 
   mainStateSync(
-    'core-functionality/settings/fetch-match-history-concurrency',
-    (s) => (cf.settings.fetchMatchHistoryConcurrency = s)
+    'core-functionality/settings/player-analysis-fetch-concurrency',
+    (s) => (cf.settings.playerAnalysisFetchConcurrency = s)
   )
 
   mainStateSync(
@@ -197,6 +197,6 @@ export function resetAuxiliaryWindowPosition() {
   return mainCall('auxiliary-window/reset-window-position')
 }
 
-export function setFetchMatchHistoryConcurrency(limit: number) {
-  return mainCall('core-functionality/settings/fetch-match-history-concurrency/set', limit)
+export function setPlayerAnalysisFetchConcurrency(limit: number) {
+  return mainCall('core-functionality/settings/player-analysis-fetch-concurrency/set', limit)
 }

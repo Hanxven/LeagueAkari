@@ -111,9 +111,9 @@
           </div>
           <div class="overall-item" v-if="queueType === 'CHERRY'">
             <span class="value"
-              >{{ Math.round((analysis.cherryTop2s / (analysis.cherryGames || 1)) * 100) }} %</span
+              >{{ Math.round((analysis.cherryTop4s / (analysis.cherryGames || 1)) * 100) }} %</span
             >
-            <span class="label">前二</span>
+            <span class="label">前四</span>
           </div>
         </div>
         <div class="player-favorites">
@@ -123,9 +123,9 @@
               v-for="c of analysis.champions.filter((c) => c.cherryCount).slice(0, 3)"
             >
               <LcuImage class="image" :src="championIcon(c.championId)"></LcuImage>
-              <div class="label" title="前二率">前二率</div>
-              <div class="label" title="前二率">
-                {{ Math.round((c.top2 / (c.cherryCount || 1)) * 100) }} %
+              <div class="label" title="前四率">前四率</div>
+              <div class="label" title="前四率">
+                {{ Math.round((c.top4 / (c.cherryCount || 1)) * 100) }} %
               </div>
               <div class="count">{{ c.cherryCount }} 场</div>
             </div>

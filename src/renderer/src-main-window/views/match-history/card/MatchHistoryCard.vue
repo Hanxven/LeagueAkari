@@ -141,9 +141,9 @@
       <div class="players">
         <template v-if="game.gameMode === 'CHERRY'">
           <div class="players-cherry" v-if="isDetailed">
-            <template v-if="teams.subTeam0?.length">
-              <SubTeam :mode="game.gameMode" :participants="teams.subTeam0.slice(0, 4)" />
-              <SubTeam :mode="game.gameMode" :participants="teams.subTeam0.slice(4)" />
+            <template v-if="teams.placement0?.length">
+              <SubTeam :mode="game.gameMode" :participants="teams.placement0.slice(0, 4)" />
+              <SubTeam :mode="game.gameMode" :participants="teams.placement0.slice(4)" />
             </template>
             <template v-else>
               <div>
@@ -382,7 +382,7 @@ const teams = computed(() => {
 
   if (props.game.gameMode === 'CHERRY') {
     return {
-      subTeam0: all.filter((p) => p.stats.playerSubteamId == 0),
+      placement0: all.filter((p) => p.stats.playerSubteamId == 0),
       placement1: all.filter((p) => p.stats.subteamPlacement == 1),
       placement2: all.filter((p) => p.stats.subteamPlacement == 2),
       placement3: all.filter((p) => p.stats.subteamPlacement == 3),
