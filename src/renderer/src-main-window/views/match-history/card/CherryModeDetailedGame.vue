@@ -122,25 +122,13 @@
       </table>
     </DefineDetailedTable>
     <template v-if="match.teams.placement0.length === 0">
-      <DetailedTable
-        :participants="match.teams.placement1"
-        :aggregate-team-stats="match.aggregateStats.placement1"
-      />
-      <div class="divider"></div>
-      <DetailedTable
-        :participants="match.teams.placement2"
-        :aggregate-team-stats="match.aggregateStats.placement2"
-      />
-      <div class="divider"></div>
-      <DetailedTable
-        :participants="match.teams.placement3"
-        :aggregate-team-stats="match.aggregateStats.placement3"
-      />
-      <div class="divider"></div>
-      <DetailedTable
-        :participants="match.teams.placement4"
-        :aggregate-team-stats="match.aggregateStats.placement4"
-      />
+      <template v-for="i of match.maxPlacement">
+        <DetailedTable
+          :participants="match.teams[`placement${i}`]"
+          :aggregate-team-stats="match.aggregateStats[`placement${i}`]"
+        />
+        <div class="divider" v-if="i !== match.maxPlacement"></div>
+      </template>
     </template>
     <template v-else>
       <DetailedTable
@@ -192,44 +180,29 @@ const match = computed(() => {
     identity: identities[participant.participantId]
   }))
 
-  const placements: Record<string, ParticipantWithIdentity[]> = {
-    placement0: [], // 只有在数据错误的时候，才会出现 placement0 的情况
-    placement1: [],
-    placement2: [],
-    placement3: [],
-    placement4: []
+  const maxPlacement = all.reduce((p, c) => {
+    return Math.max(c.stats.subteamPlacement, p)
+  }, 0)
+
+  const placements: Record<string, ParticipantWithIdentity[]> = {}
+
+  for (let i = 0; i <= maxPlacement; i++) {
+    placements[`placement${i}`] = []
   }
 
-  const aggregateStats = {
-    placement0: {
-      kills: 0,
-      deaths: 0,
-      assists: 0,
-      totalDamageDealtToChampions: 0,
-      totalDamageTaken: 0
-    },
-    placement1: {
-      kills: 0,
-      deaths: 0,
-      assists: 0,
-      totalDamageDealtToChampions: 0,
-      totalDamageTaken: 0
-    },
-    placement2: {
-      kills: 0,
-      deaths: 0,
-      assists: 0,
-      totalDamageDealtToChampions: 0,
-      totalDamageTaken: 0
-    },
-    placement3: {
-      kills: 0,
-      deaths: 0,
-      assists: 0,
-      totalDamageDealtToChampions: 0,
-      totalDamageTaken: 0
-    },
-    placement4: {
+  const aggregateStats: Record<
+    string,
+    {
+      kills: number
+      deaths: number
+      assists: number
+      totalDamageDealtToChampions: number
+      totalDamageTaken: number
+    }
+  > = {}
+
+  for (let i = 0; i <= maxPlacement; i++) {
+    aggregateStats[`placement${i}`] = {
       kills: 0,
       deaths: 0,
       assists: 0,
@@ -266,7 +239,8 @@ const match = computed(() => {
   return {
     teams: placements,
     aggregateStats,
-    recordStats
+    recordStats,
+    maxPlacement
   }
 })
 

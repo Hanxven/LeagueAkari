@@ -478,6 +478,7 @@ function analyzeTeamUp() {
 }
 
 let isSimulatingKeyboard = false
+const SEND_INTERVAL = 65
 
 /**
  * 在游戏中或英雄选择中发送这些玩家的数据
@@ -546,11 +547,6 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
   }
 
   const sendPlayers = players.filter((p) => cf.sendList[p.puuid])
-
-  if (!sendPlayers.length) {
-    isSimulatingKeyboard = false
-    return
-  }
 
   // 应对英雄重复的情况，一个典型是克隆模式
   const championCountMap = players.reduce(
@@ -659,7 +655,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
         tasks.push(() => chatSend(chat.conversations.championSelect!.id, texts[i]))
 
         if (i !== texts.length - 1) {
-          tasks.push(() => sleep(65))
+          tasks.push(() => sleep(SEND_INTERVAL))
         }
       }
     }
@@ -668,15 +664,15 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
       tasks.push(async () => {
         pSendKey(13, true)
         pSendKey(13, false)
-        await sleep(65)
+        await sleep(SEND_INTERVAL)
         pSendKeys(texts[i])
-        await sleep(65)
+        await sleep(SEND_INTERVAL)
         pSendKey(13, true)
         pSendKey(13, false)
       })
 
       if (i !== texts.length - 1) {
-        tasks.push(() => sleep(65))
+        tasks.push(() => sleep(SEND_INTERVAL))
       }
     }
   }

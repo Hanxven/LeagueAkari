@@ -203,7 +203,7 @@ const [DefineOngoingTeam, OngoingTeam] = createReusableTemplate<{
 const formatTeamText = (team: string) => {
   if (cf.ongoingGameInfo?.queueType === 'CHERRY') {
     if (gameflow.phase === 'ChampSelect') {
-      return team === 'our' ? '我方小队' : '敌方小队'
+      return team.startsWith('our') ? '我方小队' : '敌方小队'
     } else {
       if (team === 'all') {
         return `所有`
@@ -213,7 +213,23 @@ const formatTeamText = (team: string) => {
     }
   } else {
     if (gameflow.phase === 'ChampSelect') {
-      return team === 'our' ? '我方' : '敌方'
+      switch (team) {
+        case 'our':
+          return '我方'
+        case 'our-1':
+          return '我方 (蓝方)'
+        case 'our-2':
+          return '我方 (红方)'
+        case 'their':
+          return '敌方'
+        case 'their-1':
+          return '敌方 (蓝方)'
+        case 'their-2':
+          return '敌方 (红方)'
+
+        default:
+          return '队伍'
+      }
     } else {
       return team === '100' ? '蓝方' : '红方'
     }

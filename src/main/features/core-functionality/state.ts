@@ -4,7 +4,6 @@ import { EMPTY_PUUID } from '@shared/constants'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
-import { session } from 'electron'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { champSelect } from '../lcu-state-sync/champ-select'
@@ -197,21 +196,26 @@ class CoreFunctionalityState {
         return null
       }
 
-      const teams: Record<string, string[]> = {
-        our: [],
-        their: []
-      }
+      const teams: Record<string, string[]> = {}
 
       champSelect.session.myTeam
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
-          teams['our'].push(p.puuid)
+          const key = p.team ? `our-${p.team}` : 'our'
+          if (!teams[key]) {
+            teams[key] = []
+          }
+          teams[key].push(p.puuid)
         })
 
       champSelect.session.theirTeam
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
-          teams['their'].push(p.puuid)
+          const key = p.team ? `their-${p.team}` : 'their'
+          if (!teams[key]) {
+            teams[key] = []
+          }
+          teams[key].push(p.puuid)
         })
 
       return teams

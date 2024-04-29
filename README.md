@@ -6,18 +6,7 @@
   />
 </div>
 
-<div
-  style="
-    background-clip: text;
-    background-image: linear-gradient(90deg, #91dcff, #91dcff 10%, #ff59cb 55%, #ffc1eb 100%);
-    color: transparent;
-    font-size: 6.5vw;
-    text-align: center;
-    font-weight: 700;
-  "
->
-  League Akari
-</div>
+# League Akari
 
 利用 League Client Update (LCU) API 实现的工具集，功能很多。
 
