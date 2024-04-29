@@ -147,15 +147,18 @@ export async function setupAutoGameflow() {
     () => autoGameflowState.settings.autoAcceptEnabled,
     (enabled) => {
       if (!enabled) {
-        cancelAutoAccept()
+        cancelAutoAccept('normal')
       }
     }
   )
 
   // 如果玩家手动取消了本次接受，则尝试取消即将进行的自动接受（如果有）
   lcuEventBus.on('/lol-matchmaking/v1/ready-check', (event) => {
-    if (event.data && event.data.playerResponse === 'Declined') {
-      cancelAutoAccept(true)
+    if (
+      event.data &&
+      (event.data.playerResponse === 'Declined' || event.data.playerResponse === 'Accepted')
+    ) {
+      cancelAutoAccept('declined')
     }
   })
 
@@ -274,12 +277,12 @@ function ipcCall() {
   })
 
   onRendererCall('auto-gameflow/cancel-auto-accept', async (_) => {
-    cancelAutoAccept()
+    cancelAutoAccept('normal')
   })
 
   onRendererCall('auto-gameflow/settings/auto-accept-enabled/set', async (_, enabled) => {
     if (!enabled) {
-      cancelAutoAccept()
+      cancelAutoAccept('normal')
     }
 
     autoGameflowState.settings.setAutoAcceptEnabled(enabled)
@@ -428,16 +431,19 @@ const printAutoSearchMatchInfo = async (
   }
 }
 
-export function cancelAutoAccept(declined = false) {
+export function cancelAutoAccept(reason: 'accepted' | 'declined' | 'normal') {
   if (autoGameflowState.willAccept) {
     if (autoAcceptTimerId) {
       clearTimeout(autoAcceptTimerId)
       autoAcceptTimerId = null
     }
     autoGameflowState.clearAutoAccept()
-    if (declined) {
+    if (reason === 'accepted') {
       logger.info(`取消了即将进行的接受 - 已被玩家通过客户端操作取消`)
-    } else {
+    } else if (reason === 'declined') {
+      logger.info(`取消了即将进行的接受 - 已被玩家通过客户端操作接受`)
+    }
+    {
       logger.info(`取消了即将进行的接受 - 已被玩家取消`)
     }
   }
