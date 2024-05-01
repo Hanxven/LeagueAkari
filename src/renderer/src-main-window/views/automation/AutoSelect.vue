@@ -36,17 +36,6 @@
     </ControlItem>
     <ControlItem
       class="control-item-margin"
-      label="随机挑选"
-      label-description="在期望列表中随机选择一个英雄，而不是默认的按照列表靠前的顺序"
-    >
-      <NSwitch
-        @update:value="(v) => setSelectRandomly(v)"
-        :value="autoSelect.settings.selectRandomly"
-        size="small"
-      ></NSwitch>
-    </ControlItem>
-    <ControlItem
-      class="control-item-margin"
       label="提前预选"
       label-description="预选即将自动选用的英雄"
     >
@@ -131,17 +120,7 @@
         size="small"
       ></NSwitch>
     </ControlItem>
-    <ControlItem
-      class="control-item-margin"
-      label="随机禁用"
-      label-description="随机选择意向列表中的英雄并禁用，而不是按照列表靠前的顺序"
-    >
-      <NSwitch
-        @update:value="(v) => setBanRandomly(v)"
-        :value="autoSelect.settings.banRandomly"
-        size="small"
-      ></NSwitch>
-    </ControlItem>
+
     <ControlItem
       class="control-item-margin"
       label="无视队友预选"
@@ -168,7 +147,6 @@ import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import {
   setAutoBanEnabled,
   setAutoSelectCompleted,
-  setBanRandomly,
   setBanTeammateIntendedChampion,
   setBenchModeAutoSelectEnabled,
   setBenchModeExpectedChampions,
@@ -177,7 +155,6 @@ import {
   setNormalModeBannedChampions,
   setNormalModeExpectedChampions,
   setOnlySimulMode,
-  setSelectRandomly,
   setSelectTeammateIntendedChampion,
   setShowIntent
 } from '@shared/renderer/features/auto-select'

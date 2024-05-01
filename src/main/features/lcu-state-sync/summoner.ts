@@ -43,6 +43,8 @@ export function summonerSync() {
   let retryCount = 0
   let timerId: NodeJS.Timeout | null = null
 
+  ipcStateSync('lcu/summoner/me', () => summoner.me)
+
   /**
    * 个人信息获取十分关键，因此必须优先获取，以实现后续功能
    */
@@ -89,6 +91,4 @@ export function summonerSync() {
   lcuEventBus.on('/lol-summoner/v1/current-summoner', (event) => {
     summoner.setMe(event.data)
   })
-
-  ipcStateSync('lcu/summoner/me', () => summoner.me)
 }

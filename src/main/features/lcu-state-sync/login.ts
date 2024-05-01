@@ -25,6 +25,8 @@ class LoginState {
 export const login = new LoginState()
 
 export function loginSync() {
+  ipcStateSync('lcu/login/login-queue-state', () => login.loginQueueState)
+
   lcuEventBus.on('/lol-login/v1/login-queue-state', (event) => {
     login.setLoginQueueState(event.data)
   })
@@ -57,6 +59,4 @@ export function loginSync() {
       }
     }
   )
-
-  ipcStateSync('lcu/login/login-queue-state', () => login.loginQueueState)
 }

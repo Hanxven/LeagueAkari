@@ -183,6 +183,14 @@ async function loadChampions() {
 }
 
 export function gameDataSync() {
+  ipcStateSync('lcu/game-data/augments', () => gameData.augments)
+  ipcStateSync('lcu/game-data/champions', () => gameData.champions)
+  ipcStateSync('lcu/game-data/items', () => gameData.items)
+  ipcStateSync('lcu/game-data/perks', () => gameData.perks)
+  ipcStateSync('lcu/game-data/perkstyles', () => gameData.perkstyles)
+  ipcStateSync('lcu/game-data/queues', () => gameData.queues)
+  ipcStateSync('lcu/game-data/summoner-spells', () => gameData.summonerSpells)
+
   reaction(
     () => lcuConnectionState.state,
     (state) => {
@@ -200,12 +208,4 @@ export function gameDataSync() {
     },
     { fireImmediately: true }
   )
-
-  ipcStateSync('lcu/game-data/augments', () => gameData.augments)
-  ipcStateSync('lcu/game-data/champions', () => gameData.champions)
-  ipcStateSync('lcu/game-data/items', () => gameData.items)
-  ipcStateSync('lcu/game-data/perks', () => gameData.perks)
-  ipcStateSync('lcu/game-data/perkstyles', () => gameData.perkstyles)
-  ipcStateSync('lcu/game-data/queues', () => gameData.queues)
-  ipcStateSync('lcu/game-data/summoner-spells', () => gameData.summonerSpells)
 }

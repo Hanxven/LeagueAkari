@@ -26,10 +26,7 @@ export async function setupAutoSelect() {
     (s) => (autoSelectState.settings.selectTeammateIntendedChampion = s)
   )
 
-  mainStateSync(
-    'auto-select/settings/select-randomly',
-    (s) => (autoSelectState.settings.selectRandomly = s)
-  )
+
 
   mainStateSync(
     'auto-select/settings/show-intent',
@@ -63,10 +60,6 @@ export async function setupAutoSelect() {
     (s) => (autoSelectState.settings.bannedChampions = s)
   )
 
-  mainStateSync(
-    'auto-select/settings/ban-randomly',
-    (s) => (autoSelectState.settings.banRandomly = s)
-  )
 
   mainStateSync(
     'auto-select/settings/ban-teammate-intended-champion',
@@ -116,14 +109,6 @@ export function setBanTeammateIntendedChampion(enabled: boolean) {
 
 export function setSelectTeammateIntendedChampion(enabled: boolean) {
   return mainCall('auto-select/settings/select-teammate-intended-champion/set', enabled)
-}
-
-export function setSelectRandomly(enabled: boolean) {
-  return mainCall('auto-select/settings/select-randomly/set', enabled)
-}
-
-export function setBanRandomly(enabled: boolean) {
-  return mainCall('auto-select/settings/ban-randomly/set', enabled)
 }
 
 export function setShowIntent(enabled: boolean) {

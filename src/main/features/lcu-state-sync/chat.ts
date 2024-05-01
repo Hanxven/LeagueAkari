@@ -92,6 +92,11 @@ class ChatState {
 export const chat = new ChatState()
 
 export function chatSync() {
+  ipcStateSync('lcu/chat/me', () => chat.me)
+  ipcStateSync('lcu/chat/conversations/champ-select', () => chat.conversations.championSelect)
+  ipcStateSync('lcu/chat/conversations/post-game', () => chat.conversations.postGame)
+  ipcStateSync('lcu/chat/conversations/custom-game', () => chat.conversations.customGame)
+
   lcuEventBus.on('/lol-chat/v1/conversations/:id', (event, { id }) => {
     if (event.eventType === 'Delete') {
       if (chat.conversations.championSelect?.id === id) {
@@ -243,9 +248,4 @@ export function chatSync() {
       }
     }
   )
-
-  ipcStateSync('lcu/chat/me', () => chat.me)
-  ipcStateSync('lcu/chat/conversations/champ-select', () => chat.conversations.championSelect)
-  ipcStateSync('lcu/chat/conversations/post-game', () => chat.conversations.postGame)
-  ipcStateSync('lcu/chat/conversations/custom-game', () => chat.conversations.customGame)
 }

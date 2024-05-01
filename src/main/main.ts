@@ -4,9 +4,10 @@ import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { formatError } from '@shared/utils/errors'
 import { BrowserWindow, app, dialog } from 'electron'
 import { configure } from 'mobx'
+import EventEmitter from 'node:events'
 
 import { appState, initApp } from './core/app'
-import { createAuxiliaryWindow, setupAuxiliaryWindow } from './core/auxiliary-window'
+import { setupAuxiliaryWindow } from './core/auxiliary-window'
 import { initLeagueClientFunctions } from './core/lcu-client'
 import { initLcuConnection } from './core/lcu-connection'
 import { createLogger, initLogger } from './core/log'
@@ -17,6 +18,8 @@ import { setupLeagueAkariFeatures } from './features'
 import { initStorageIpc } from './storage'
 import { sendEventToAllRenderer } from './utils/ipc'
 import { checkWmicAvailability } from './utils/shell'
+
+EventEmitter.defaultMaxListeners = 1000
 
 configure({ enforceActions: 'observed' })
 

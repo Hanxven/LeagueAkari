@@ -364,11 +364,6 @@ async function migrateFromPreviousLocalStorageSettings(all: Record<string, strin
     (s) => (autoSelectState.settings.selectTeammateIntendedChampion = s)
   )
   await toNewSettings(
-    'autoSelect.selectRandomly',
-    'auto-select/select-randomly',
-    (s) => (autoSelectState.settings.selectRandomly = s)
-  )
-  await toNewSettings(
     'autoSelect.showIntent',
     'auto-select/show-intent',
     (s) => (autoSelectState.settings.showIntent = s)

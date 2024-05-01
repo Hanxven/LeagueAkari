@@ -2,7 +2,7 @@ import vue from '@vitejs/plugin-vue'
 import { defineConfig, externalizeDepsPlugin, swcPlugin } from 'electron-vite'
 import { resolve } from 'path'
 
-const minify = false
+const minify = process.env.NODE_ENV === 'production'
 
 // 在解析 League Client 的标签时，需要考虑到这些自创的元素
 // 作为参考，列在下面，同时供模板使用

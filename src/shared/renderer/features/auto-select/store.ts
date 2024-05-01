@@ -12,8 +12,6 @@ export const useAutoSelectStore = defineStore('feature:auto-select', () => {
     // 自动选择的时候是否避开队友预选
     selectTeammateIntendedChampion: false,
 
-    selectRandomly: false,
-
     showIntent: false,
 
     // 是否立即秒选
@@ -31,8 +29,6 @@ export const useAutoSelectStore = defineStore('feature:auto-select', () => {
     banEnabled: false,
 
     bannedChampions: [] as number[],
-
-    banRandomly: false,
 
     // ban 的时候是否考虑队友预选
     banTeammateIntendedChampion: false

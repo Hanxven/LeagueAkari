@@ -8,6 +8,7 @@
           @focus="generateCompleteOptions"
           ref="inputEl"
           class="search-input"
+          placeholder="精确搜索"
           :status="isTagNeeded ? 'warning' : 'success'"
           v-model:value="inputText"
           @keyup.enter="handleSearch"
@@ -48,9 +49,8 @@
       >
         输入召唤师名称、ID 或 PUUID，开始精确搜索
         <template v-if="summoner.newIdSystemEnabled">
-          <span>该大区启用了新 ID 系统</span>
           <span :class="{ 'need-tag': isTagNeeded }" class="need-tag-hint"
-            >召唤师名称查询需满足格式 &lt;名称&gt;#&lt;TAG&gt;</span
+            >召唤师名称查询需满足格式 [名称]#[TAG]</span
           >
         </template>
       </div>

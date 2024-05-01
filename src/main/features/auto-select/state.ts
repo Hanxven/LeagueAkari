@@ -1,11 +1,13 @@
 import { makeAutoObservable, observable } from 'mobx'
 
+import { champSelect as cs } from '../lcu-state-sync/champ-select'
+import { summoner } from '../lcu-state-sync/summoner'
+
 class AutoSelectSettings {
   normalModeEnabled: boolean = false
   onlySimulMode: boolean = true
   expectedChampions: number[] = []
   selectTeammateIntendedChampion: boolean = false
-  selectRandomly: boolean = false
   showIntent: boolean = false
   completed: boolean = false
   benchModeEnabled: boolean = false
@@ -13,7 +15,6 @@ class AutoSelectSettings {
   grabDelaySeconds: number = 1
   banEnabled: boolean = false
   bannedChampions: number[] = []
-  banRandomly: boolean = false
   banTeammateIntendedChampion: boolean = false
 
   setNormalModeEnabled(value: boolean) {
@@ -30,10 +31,6 @@ class AutoSelectSettings {
 
   setSelectTeammateIntendedChampion(value: boolean) {
     this.selectTeammateIntendedChampion = value
-  }
-
-  setSelectRandomly(value: boolean) {
-    this.selectRandomly = value
   }
 
   setShowIntent(value: boolean) {
@@ -64,10 +61,6 @@ class AutoSelectSettings {
     this.bannedChampions = value
   }
 
-  setBanRandomly(value: boolean) {
-    this.banRandomly = value
-  }
-
   setBanTeammateIntendedChampion(value: boolean) {
     this.banTeammateIntendedChampion = value
   }
@@ -83,6 +76,29 @@ class AutoSelectSettings {
 
 class AutoSelectState {
   settings = new AutoSelectSettings()
+
+  // get sessionInfo() {
+  //   if (!cs.session) {
+  //     return null
+  //   }
+
+  //   const memberMe = cs.session.myTeam.find((p) => p.puuid === summoner.me?.puuid)
+
+  //   if (!memberMe) {
+  //     return null
+  //   }
+
+  //   const myActions = cs.session.actions
+  //     .map((arr) => {
+  //       return arr.filter((a) => a.actorCellId === memberMe.cellId)
+  //     })
+  //     .filter((arr) => arr.length)
+
+  //   return {
+  //     myActions,
+  //     hasSimultaneousPicks: cs.session.hasSimultaneousBans
+  //   }
+  // }
 
   constructor() {
     makeAutoObservable(this)

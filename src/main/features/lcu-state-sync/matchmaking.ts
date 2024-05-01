@@ -23,6 +23,9 @@ class MatchmakingState {
 export const matchmaking = new MatchmakingState()
 
 export function matchmakingSync() {
+  ipcStateSync('lcu/matchmaking/ready-check', () => matchmaking.readyCheck)
+  ipcStateSync('lcu/matchmaking/search', () => matchmaking.search)
+
   lcuEventBus.on('/lol-matchmaking/v1/ready-check', (event) => {
     matchmaking.setReadyCheck(event.data)
   })
@@ -30,7 +33,4 @@ export function matchmakingSync() {
   lcuEventBus.on('/lol-matchmaking/v1/search', (event) => {
     matchmaking.setSearch(event.data)
   })
-
-  ipcStateSync('lcu/matchmaking/ready-check', () => matchmaking.readyCheck)
-  ipcStateSync('lcu/matchmaking/search', () => matchmaking.search)
 }

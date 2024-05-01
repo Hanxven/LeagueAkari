@@ -29,6 +29,9 @@ class GameflowState {
 export const gameflow = new GameflowState()
 
 export function gameflowSync() {
+  ipcStateSync('lcu/gameflow/phase', () => gameflow.phase)
+  ipcStateSync('lcu/gameflow/session', () => gameflow.session)
+
   // 立即初始化
   reaction(
     () => lcuConnectionState.state,
@@ -63,7 +66,4 @@ export function gameflowSync() {
   lcuEventBus.on('/lol-gameflow/v1/session', (event) => {
     gameflow.setSession(event.data)
   })
-
-  ipcStateSync('lcu/gameflow/phase', () => gameflow.phase)
-  ipcStateSync('lcu/gameflow/session', () => gameflow.session)
 }

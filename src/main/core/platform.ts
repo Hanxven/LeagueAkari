@@ -92,6 +92,7 @@ export function initWindowsPlatform() {
   let pageUpShortcut = false
   let pageDownShortcut = false
   let deleteShortcut = false
+
   gkl.addListener((event) => {
     if (event.state === 'DOWN') {
       if (event.name === 'PAGE UP') {

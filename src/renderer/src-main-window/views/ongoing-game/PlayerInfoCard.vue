@@ -271,7 +271,7 @@ const props = defineProps<{
 
 const gameData = useGameDataStore()
 
-const chineseNumber = ['一', '二', '三', '四']
+const chineseNumber = ['一', '二', '三', '四', '五', '六', '七', '八']
 const formatResultText = (
   win: boolean,
   gameEndedInEarlySurrender?: boolean | null,

@@ -25,6 +25,8 @@ class LobbyState {
 export const lobby = new LobbyState()
 
 export function lobbySync() {
+  ipcStateSync('lcu/lobby/lobby', () => lobby.lobby)
+
   lcuEventBus.on('/lol-lobby/v2/lobby', (event) => {
     lobby.setLobby(event.data)
   })
@@ -48,6 +50,4 @@ export function lobbySync() {
       }
     }
   )
-
-  ipcStateSync('lcu/lobby/lobby', () => lobby.lobby)
 }

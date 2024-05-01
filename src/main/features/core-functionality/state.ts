@@ -15,7 +15,7 @@ class CoreFunctionalitySettings {
   preMadeTeamThreshold: number = 3
   teamAnalysisPreloadCount: number = 4
   fetchDetailedGame: boolean = true
-  matchHistoryLoadCount: number = 40
+  matchHistoryLoadCount: number = 20
   sendKdaInGame: boolean = false
   sendKdaInGameWithPreMadeTeams: boolean = false
   sendKdaThreshold: number = 0

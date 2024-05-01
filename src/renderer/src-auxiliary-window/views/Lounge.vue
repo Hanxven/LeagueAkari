@@ -40,7 +40,7 @@
     </template>
     <template v-else-if="autoGameflow.willSearchMatch">
       <span class="main-text">将自动开始匹配对局</span>
-      <span class="sub-text">{{ willSearchMatchIn }} s</span>
+      <span class="sub-text">{{ willSearchMatchIn.toFixed(1) }} s</span>
       <NButton type="primary" size="tiny" @click="() => handleCancelAutoSearchMatch()"
         >取消本次自动匹配</NButton
       >

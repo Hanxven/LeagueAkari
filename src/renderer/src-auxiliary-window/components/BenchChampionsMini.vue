@@ -1,6 +1,6 @@
 <template>
-  <NCard size="small">
-    <div class="outer" v-if="benchChampions !== null">
+  <NCard size="small" v-if="benchChampions">
+    <div class="outer">
       <div class="operations">
         <LcuImage
           class="champion-image"
