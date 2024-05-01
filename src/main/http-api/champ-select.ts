@@ -1,4 +1,4 @@
-import { ChampSelectSession, GridChamp } from '@shared/types/lcu/champ-select'
+import { ChampSelectSession, ChampSelectSummoner, GridChamp } from '@shared/types/lcu/champ-select'
 
 import { request } from './common'
 
@@ -84,6 +84,13 @@ export function reroll() {
 export function getCurrentChamp() {
   return request<number>({
     url: '/lol-champ-select/v1/current-champion',
+    method: 'GET'
+  })
+}
+
+export function getChampSelectSummoner(cellId: number) {
+  return request<ChampSelectSummoner>({
+    url: `/lol-champ-select/v1/summoners/${cellId}`,
     method: 'GET'
   })
 }

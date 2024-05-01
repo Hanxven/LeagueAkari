@@ -4,10 +4,11 @@ import { mwNotification } from '@main/core/main-window'
 import {
   getBannableChampIds,
   getChampSelectSession,
+  getChampSelectSummoner,
   getPickableChampIds
 } from '@main/http-api/champ-select'
 import { ipcStateSync } from '@main/utils/ipc'
-import { ChampSelectSession } from '@shared/types/lcu/champ-select'
+import { ChampSelectSession, ChampSelectSummoner } from '@shared/types/lcu/champ-select'
 import { LcuEvent } from '@shared/types/lcu/event'
 import { formatError } from '@shared/utils/errors'
 import { isAxiosError } from 'axios'
@@ -15,6 +16,7 @@ import { reaction } from 'mobx'
 import { makeAutoObservable, observable } from 'mobx'
 
 import { logger } from './common'
+import { summoner } from './summoner'
 
 class ChampSelectState {
   session: ChampSelectSession | null = null
@@ -23,11 +25,14 @@ class ChampSelectState {
 
   currentBannableChampionArray: number[] = []
 
+  selfSummoner: ChampSelectSummoner | null = null
+
   constructor() {
     makeAutoObservable(this, {
       session: observable.struct,
       currentPickableChampionArray: observable.struct,
-      currentBannableChampionArray: observable.struct
+      currentBannableChampionArray: observable.struct,
+      selfSummoner: observable.struct
     })
   }
 
@@ -54,6 +59,10 @@ class ChampSelectState {
   setCurrentBannableChampionArray(array: number[]) {
     this.currentBannableChampionArray = array
   }
+
+  setSelfSummoner(s: ChampSelectSummoner | null) {
+    this.selfSummoner = s
+  }
 }
 
 export const champSelect = new ChampSelectState()
@@ -79,6 +88,8 @@ export function champSelectSync() {
           champSelect.setSession((await getChampSelectSession()).data)
         } catch (error) {
           if (isAxiosError(error) && error.response?.status === 404) {
+            champSelect.setSession(null)
+            champSelect.setSelfSummoner(null)
             return
           }
 
@@ -101,6 +112,7 @@ export function champSelectSync() {
               champSelect.setCurrentPickableChampionArray(pickables)
             } catch (error) {
               if (isAxiosError(error) && error.response?.status === 404) {
+                champSelect.setCurrentPickableChampionArray([])
                 return
               }
 
@@ -114,6 +126,7 @@ export function champSelectSync() {
               champSelect.setCurrentBannableChampionArray(bannables)
             } catch (error) {
               if (isAxiosError(error) && error.response?.status === 404) {
+                champSelect.setCurrentBannableChampionArray([])
                 return
               }
 
@@ -130,9 +143,44 @@ export function champSelectSync() {
     }
   )
 
+  let isCellSummonerUpdated = false
+  reaction(
+    () => [champSelect.session?.myTeam, summoner.me?.puuid] as const,
+    async ([myTeam, puuid]) => {
+      if (!isCellSummonerUpdated && myTeam && puuid) {
+        const self = myTeam.find((t) => t.puuid === puuid)
+        if (self) {
+          try {
+            const s = await getChampSelectSummoner(self.cellId)
+
+            // 如果没有被更新，用于区分首次加载的情况
+            if (champSelect.selfSummoner === null) {
+              champSelect.setSelfSummoner(s.data)
+            }
+          } catch (error) {
+            mwNotification.warn('lcu-state-sync', '状态同步', '获取当前英雄选择召唤师状态失败')
+            logger.warn(`获取当前英雄选择召唤师状态失败 ${formatError(error)}`)
+          }
+        }
+
+        isCellSummonerUpdated = true
+      }
+    }
+  )
+
+  reaction(
+    () => lcuConnectionState.state,
+    (state) => {
+      if (state !== 'connected') {
+        isCellSummonerUpdated = false
+      }
+    }
+  )
+
   lcuEventBus.on('/lol-champ-select/v1/session', (event) => {
     if (event.eventType === 'Delete') {
       champSelect.setSession(null)
+      champSelect.setSelfSummoner(null)
     } else {
       champSelect.setSession(event.data)
     }
@@ -151,6 +199,12 @@ export function champSelectSync() {
       champSelect.setCurrentBannableChampionArray([])
     } else {
       champSelect.setCurrentBannableChampionArray(event.data)
+    }
+  })
+
+  lcuEventBus.on<LcuEvent<ChampSelectSummoner>>('/lol-champ-select/v1/summoners/*', (event) => {
+    if (event.data && event.data.isSelf) {
+      champSelect.setSelfSummoner(event.data)
     }
   })
 }

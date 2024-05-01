@@ -1,16 +1,15 @@
 <template>
   <NCard size="small" v-if="selfActions">
     <NTimeline>
-      <NTimelineItem
-        v-for="a of selfActions"
-        :type="getTimelineTypeByAction(a[0])"
-        :line-type="a[0].completed ? 'default' : 'dashed'"
-      >
-        <span
-          class="action"
-          :class="{ completed: a[0].completed, 'in-progress': a[0].isInProgress }"
-          >{{ formatActionTypeText(a[0]) }}</span
-        >
+      <NTimelineItem v-for="a of selfActions" :type="getTimelineTypeByAction(a[0])">
+        <template #header>
+          <span
+            class="action"
+            :class="{ completed: a[0].completed, 'in-progress': a[0].isInProgress }"
+            >{{ formatActionTypeText(a[0]) }}</span
+          >
+        </template>
+        测试内容
       </NTimelineItem>
     </NTimeline>
   </NCard>
@@ -59,7 +58,7 @@ const formatActionTypeText = (action: Action) => {
       actionName = '投票'
       break
     case 'ten_bans_reveal':
-      actionName = '[系统] 禁用展示'
+      actionName = '系统 · 禁用展示'
       break
 
     default:

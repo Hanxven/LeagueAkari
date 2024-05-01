@@ -1,12 +1,14 @@
+import { lcuEventBus } from '@main/core/lcu-connection'
 import { createLogger } from '@main/core/log'
 import { mwNotification } from '@main/core/main-window'
 import { action, benchSwap, pickOrBan } from '@main/http-api/champ-select'
 import { chatSend } from '@main/http-api/chat'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
-import { Action } from '@shared/types/lcu/champ-select'
+import { Action, ChampSelectSummoner } from '@shared/types/lcu/champ-select'
+import { LcuEvent } from '@shared/types/lcu/event'
 import { formatError } from '@shared/utils/errors'
-import { comparer, computed, reaction } from 'mobx'
+import { comparer, computed, observable, reaction, runInAction } from 'mobx'
 
 import { champSelect as cs } from '../lcu-state-sync/champ-select'
 import { chat } from '../lcu-state-sync/chat'
@@ -25,8 +27,31 @@ export async function setupAutoSelect() {
   ipcCall()
   await loadSettings()
 
+  const selfSummoner = observable.box<ChampSelectSummoner | null>(null, {
+    equals: comparer.structural
+  })
+
+  reaction(
+    () => [cs.session, summoner.me] as const,
+    ([session, me]) => {
+      if (session) {
+        if (!selfSummoner.get()) {
+          session.myTeam.find((t) => t.puuid === me?.puuid)
+        }
+      } else {
+        runInAction(() => selfSummoner.set(null))
+      }
+    }
+  )
+
+  lcuEventBus.on<LcuEvent<ChampSelectSummoner>>('/lol-champ-select/v1/summoners/*', (event) => {
+    if (event.data && event.data.isSelf) {
+      runInAction(() => selfSummoner.set(event.data))
+    }
+  })
+
   const champSelectActionInfo = computed(() => {
-    if (!cs.session) {
+    if (!cs.session || !cs.selfSummoner) {
       return null
     }
 
@@ -65,6 +90,7 @@ export async function setupAutoSelect() {
       ban: banArr,
       session: cs.session,
       memberMe,
+      isActingNow: cs.selfSummoner.isActingNow,
       currentPickables: cs.currentPickableChampions,
       currentBannables: cs.currentBannableChampions
     }
@@ -140,7 +166,7 @@ export async function setupAutoSelect() {
 
     return {
       championId: pickables[0],
-      // selfChampionId: a.memberMe.championId,
+      isActingNow: a.isActingNow,
       action: {
         id: first.id,
         isInProgress: first.isInProgress,
@@ -201,6 +227,7 @@ export async function setupAutoSelect() {
 
     return {
       championId: bannables[0],
+      isActingNow: a.isActingNow,
       action: {
         id: first.id,
         isInProgress: first.isInProgress,
@@ -216,7 +243,40 @@ export async function setupAutoSelect() {
         return
       }
 
-      if (!pick.action.isInProgress) {
+      if (pick.isActingNow && pick.action.isInProgress) {
+        if (
+          !autoSelectState.settings.completed &&
+          champSelectActionInfo.get()?.memberMe.championId === pick.championId
+        ) {
+          return
+        }
+
+        try {
+          logger.info(
+            `现在选择：${pick.championId}, ${autoSelectState.settings.completed}, actionId=${pick.action.id}`
+          )
+
+          await pickOrBan(
+            pick.championId,
+            autoSelectState.settings.completed,
+            'pick',
+            pick.action.id
+          )
+        } catch (error) {
+          mwNotification.warn(
+            'auto-select',
+            '自动选择',
+            `无法执行 action (选择英雄 ${pick.championId})`
+          )
+          logger.warn(
+            `尝试自动执行 pick 时失败, 目标英雄: ${pick.championId} ${formatError(error)}`
+          )
+        }
+
+        return
+      }
+
+      if (!pick.isActingNow) {
         if (!autoSelectState.settings.showIntent) {
           return
         }
@@ -235,29 +295,6 @@ export async function setupAutoSelect() {
         }
         return
       }
-
-      // 已在手中！
-      if (
-        !autoSelectState.settings.completed &&
-        champSelectActionInfo.get()?.memberMe.championId === pick.championId
-      ) {
-        return
-      }
-
-      try {
-        logger.info(
-          `现在选择：${pick.championId}, ${autoSelectState.settings.completed}, actionId=${pick.action.id}`
-        )
-
-        await pickOrBan(pick.championId, autoSelectState.settings.completed, 'pick', pick.action.id)
-      } catch (error) {
-        mwNotification.warn(
-          'auto-select',
-          '自动选择',
-          `无法执行 action (选择英雄 ${pick.championId})`
-        )
-        logger.warn(`尝试自动执行 pick 时失败, 目标英雄: ${pick.championId} ${formatError(error)}`)
-      }
     },
     { equals: comparer.structural }
   )
@@ -269,7 +306,7 @@ export async function setupAutoSelect() {
         return
       }
 
-      if (ban.action.isInProgress) {
+      if (ban.action.isInProgress && ban.isActingNow) {
         try {
           await pickOrBan(ban.championId, true, 'ban', ban.action.id)
         } catch (error) {

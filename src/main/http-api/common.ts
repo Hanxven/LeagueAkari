@@ -1,3 +1,5 @@
+import { logger } from '@main/features/lcu-state-sync/common'
+import { formatError } from '@shared/utils/errors'
 import { AxiosRequestConfig, isAxiosError } from 'axios'
 
 import { getHttpInstance } from '../core/lcu-connection'
@@ -22,7 +24,10 @@ export async function request<T = any, D = any>(config: AxiosRequestConfig<D>, m
       lastError = error
 
       if (isAxiosError(error)) {
-        if (error.code === 'ECONNABORTED' || (error.status && error.status >= 500)) {
+        if (
+          error.code === 'ECONNABORTED' ||
+          (error.response?.status && error.response.status >= 500)
+        ) {
           retries++
         } else {
           throw error
@@ -33,7 +38,7 @@ export async function request<T = any, D = any>(config: AxiosRequestConfig<D>, m
     }
 
     if (retries >= maxRetries) {
-      console.warn('LCU max retires exceeded', retries)
+      logger.warn(`LCU max retires exceeded ${formatError(lastError)}`)
       throw lastError || new Error('max retries exceeded')
     }
   }

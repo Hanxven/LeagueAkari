@@ -1,9 +1,9 @@
 <template>
   <div class="ready-check-wrapper">
-    <LcuVideo
+    <LcuImage
       class="mode-image"
-      v-if="gameflow.session?.map?.assets['game-select-icon-active-video']"
-      :src="gameflow.session?.map?.assets['game-select-icon-active-video']"
+      v-if="gameflow.session?.map?.assets['game-select-icon-hover']"
+      :src="gameflow.session?.map?.assets['game-select-icon-hover']"
     />
     <template v-if="gameflow.phase === 'ReadyCheck'">
       <template v-if="autoGameflow.willAccept">
@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import LcuVideo from '@shared/renderer/components/LcuVideo.vue'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { cancelAutoAccept, cancelAutoSearchMatch } from '@shared/renderer/features/auto-gameflow'
 import { useAutoGameflowStore } from '@shared/renderer/features/auto-gameflow/store'
 import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'

@@ -1,8 +1,5 @@
 import { makeAutoObservable, observable } from 'mobx'
 
-import { champSelect as cs } from '../lcu-state-sync/champ-select'
-import { summoner } from '../lcu-state-sync/summoner'
-
 class AutoSelectSettings {
   normalModeEnabled: boolean = false
   onlySimulMode: boolean = true
