@@ -157,8 +157,8 @@ import {
   setOnlySimulMode,
   setSelectTeammateIntendedChampion,
   setShowIntent
-} from '@shared/renderer/features/auto-select'
-import { useAutoSelectStore } from '@shared/renderer/features/auto-select/store'
+} from '@shared/renderer/modules/auto-select'
+import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
 import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
 
 import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'

@@ -66,10 +66,10 @@
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { cancelAutoAccept, cancelAutoSearchMatch } from '@shared/renderer/features/auto-gameflow'
-import { useAutoGameflowStore } from '@shared/renderer/features/auto-gameflow/store'
-import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
-import { useMatchmakingStore } from '@shared/renderer/features/lcu-state-sync/matchmaking'
+import { cancelAutoAccept, cancelAutoSearchMatch } from '@shared/renderer/modules/auto-gameflow'
+import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useMatchmakingStore } from '@shared/renderer/modules/lcu-state-sync/matchmaking'
 import { accept, decline } from '@shared/renderer/http-api/matchmaking'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton } from 'naive-ui'

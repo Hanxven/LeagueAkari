@@ -10,8 +10,8 @@
       >
         <NSwitch
           size="small"
-          :value="coreFunctionality.settings.useAuxiliaryWindow"
-          @update:value="(val) => setUseAuxiliaryWindow(val)"
+          :value="aux.settings.enabled"
+          @update:value="(val) => setEnableAuxiliaryWindow(val)"
         />
       </ControlItem>
       <ControlItem
@@ -201,25 +201,29 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import {
   resetAuxiliaryWindowPosition,
+  setEnableAuxiliaryWindow
+} from '@shared/renderer/modules/auxiliary-window'
+import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
+import {
   setAutoRouteOnGameStart,
   setFetchAfterGame,
   setFetchDetailedGame,
-  setPlayerAnalysisFetchConcurrency,
   setMatchHistoryLoadCount,
+  setPlayerAnalysisFetchConcurrency,
   setPreMadeThreshold,
   setSendKdaInGame,
   setSendKdaInGameWithPreMadeTeams,
   setSendKdaThreshold,
-  setTeamAnalysisPreloadCount,
-  setUseAuxiliaryWindow
-} from '@shared/renderer/features/core-functionality'
-import { useCoreFunctionalityStore } from '@shared/renderer/features/core-functionality/store'
-import { setEnableRespawnTimer } from '@shared/renderer/features/respawn-timer'
-import { useRespawnTimerStore } from '@shared/renderer/features/respawn-timer/store'
+  setTeamAnalysisPreloadCount
+} from '@shared/renderer/modules/core-functionality'
+import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { setEnableRespawnTimer } from '@shared/renderer/modules/respawn-timer'
+import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
 import { NButton, NCard, NInputNumber, NScrollbar, NSwitch } from 'naive-ui'
 
 const respawnTimer = useRespawnTimerStore()
 const coreFunctionality = useCoreFunctionalityStore()
+const aux = useAuxiliaryWindowStore()
 </script>
 
 <style lang="less" scoped>

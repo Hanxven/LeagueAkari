@@ -29,8 +29,8 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { setCksEnabled, setCksText } from '@shared/renderer/features/custom-keyboard-sequence'
-import { useCustomKeyboardSequenceStore } from '@shared/renderer/features/custom-keyboard-sequence/store'
+import { setCksEnabled, setCksText } from '@shared/renderer/modules/custom-keyboard-sequence'
+import { useCustomKeyboardSequenceStore } from '@shared/renderer/modules/custom-keyboard-sequence/store'
 import { NCard, NInput, NSwitch } from 'naive-ui'
 
 const cks = useCustomKeyboardSequenceStore()

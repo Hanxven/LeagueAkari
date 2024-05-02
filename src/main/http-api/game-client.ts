@@ -1,6 +1,6 @@
 import { PlayerList } from '@shared/types/game-client'
 
-import { gameClientHttpRequest } from '../core/lcu-connection'
+import { gameClientHttpRequest } from '../core-modules/lcu-connection'
 
 export function getPlayerList() {
   return gameClientHttpRequest<PlayerList[]>({

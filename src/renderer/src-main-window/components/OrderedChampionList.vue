@@ -100,10 +100,10 @@
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { championIcon } from '@shared/renderer/features/game-data'
-import { useChampSelectStore } from '@shared/renderer/features/lcu-state-sync/champ-select'
-import { useGameDataStore } from '@shared/renderer/features/lcu-state-sync/game-data'
-import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
+import { championIcon } from '@shared/renderer/modules/game-data'
+import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NPopover, NSelect } from 'naive-ui'
 import { computed, nextTick, ref, watch } from 'vue'

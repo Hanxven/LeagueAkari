@@ -138,9 +138,9 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useCoreFunctionalityStore } from '@shared/renderer/features/core-functionality/store'
-import { championIcon, profileIcon } from '@shared/renderer/features/game-data'
-import { useSummonerStore } from '@shared/renderer/features/lcu-state-sync/summoner'
+import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { championIcon, profileIcon } from '@shared/renderer/modules/game-data'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { laNotification } from '@shared/renderer/notification'
 import { summonerName } from '@shared/utils/name'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
@@ -150,8 +150,8 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
-import { fetchTabFullData } from '@main-window/features/match-history-tabs'
-import { TabState, useMatchHistoryTabsStore } from '@main-window/features/match-history-tabs/store'
+import { fetchTabFullData } from '@main-window/modules/match-history-tabs'
+import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
 

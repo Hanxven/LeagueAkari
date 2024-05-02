@@ -1,4 +1,4 @@
-import { createLogger } from '@main/core/log'
+import { createLogger } from '@main/core-modules/log'
 import { LEAGUE_AKARI_DB_CURRENT_VERSION } from '@shared/constants'
 import { unlinkSync } from 'node:fs'
 import { DataSource, QueryRunner } from 'typeorm'

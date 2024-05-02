@@ -171,8 +171,8 @@ import {
   fetchTabDetailedGame,
   fetchTabMatchHistory,
   querySavedInfo
-} from '@main-window/features/match-history-tabs'
-import { TabState, useMatchHistoryTabsStore } from '@main-window/features/match-history-tabs/store'
+} from '@main-window/modules/match-history-tabs'
+import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import RankedSpan from './widgets/RankedSpan.vue'

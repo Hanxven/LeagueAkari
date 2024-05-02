@@ -6,15 +6,15 @@ import { BrowserWindow, app, dialog } from 'electron'
 import { configure } from 'mobx'
 import EventEmitter from 'node:events'
 
-import { appState, initApp } from './core/app'
-import { setupAuxiliaryWindow } from './core/auxiliary-window'
-import { initLeagueClientFunctions } from './core/lcu-client'
-import { initLcuConnection } from './core/lcu-connection'
-import { createLogger, initLogger } from './core/log'
-import { createMainWindow, getMainWindow, setupMainWindow } from './core/main-window'
-import { initWindowsPlatform } from './core/platform'
+import { appState, initApp } from './core-modules/app'
+import { setupAuxiliaryWindow } from './core-modules/auxiliary-window'
+import { initLeagueClientFunctions } from './core-modules/lcu-client'
+import { initLcuConnection } from './core-modules/lcu-connection'
+import { createLogger, initLogger } from './core-modules/log'
+import { createMainWindow, getMainWindow, setupMainWindow } from './core-modules/main-window'
+import { initWindowsPlatform } from './core-modules/platform'
 import { initDatabase } from './db'
-import { setupLeagueAkariFeatures } from './features'
+import { setupLeagueAkariFeatures } from './modules'
 import { initStorageIpc } from './storage'
 import { sendEventToAllRenderer } from './utils/ipc'
 import { checkWmicAvailability } from './utils/shell'
@@ -51,7 +51,7 @@ app.whenReady().then(async () => {
     await initLeagueClientFunctions()
     await setupLeagueAkariFeatures()
     setupMainWindow()
-    setupAuxiliaryWindow()
+    await setupAuxiliaryWindow()
 
     logger.info('LEAGUE AKARI 核心模块初始化完成')
 

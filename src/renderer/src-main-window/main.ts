@@ -7,7 +7,7 @@ import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'
 import './assets/css/styles.less'
-import { setupLeagueAkariFeatures } from './features'
+import { setupLeagueAkariFeatures } from './modules'
 import { router } from './routes'
 
 dayjs.extend(relativeTime)

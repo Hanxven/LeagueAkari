@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { useGameDataStore } from '@shared/renderer/features/lcu-state-sync/game-data'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { getChampDetails } from '@shared/renderer/http-api/game-data'
 import { setSummonerBackgroundSkin } from '@shared/renderer/http-api/summoner'
 import { ChampSkin } from '@shared/types/lcu/game-data'

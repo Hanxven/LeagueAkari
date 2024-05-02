@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from '@shared/renderer/features/app/store'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import { markdownIt } from '@shared/renderer/utils/markdown'
 import { NModal, NScrollbar } from 'naive-ui'
 import { computed, useCssModule } from 'vue'

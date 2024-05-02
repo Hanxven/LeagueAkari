@@ -6,7 +6,11 @@
   />
 </div>
 
-# League Akari
+# 不完全
+
+该提交版本内容尚未发布。
+
+# League Akari 
 
 利用 League Client Update (LCU) API 实现的工具集，功能很多。
 

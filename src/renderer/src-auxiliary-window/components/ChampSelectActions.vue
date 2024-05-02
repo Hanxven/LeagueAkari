@@ -9,21 +9,44 @@
             >{{ formatActionTypeText(a[0]) }}</span
           >
         </template>
-        测试内容
+        <template v-if="a[0].completed">
+          <div class="solution completed" v-if="a[0].type === 'pick'">
+            <span class="label">已选择</span>
+            <LcuImage class="image" :src="championIcon(a[0].championId)" />
+          </div>
+          <div class="solution completed" v-if="a[0].type === 'ban'">
+            <span class="label">已禁用</span>
+            <LcuImage class="image" :src="championIcon(a[0].championId)" />
+          </div>
+        </template>
+        <template v-else>
+          <div class="solution" v-if="as.upcomingPick && as.upcomingPick.action.id === a[0].id">
+            <span class="label">自动选择</span>
+            <LcuImage class="image" :src="championIcon(as.upcomingPick.championId)" />
+          </div>
+          <div class="solution" v-if="as.upcomingBan && as.upcomingBan.action.id === a[0].id">
+            <span class="label">自动禁用</span>
+            <LcuImage class="image" :src="championIcon(as.upcomingBan.championId)" />
+          </div>
+        </template>
       </NTimelineItem>
     </NTimeline>
   </NCard>
 </template>
 
 <script setup lang="ts">
-import { useChampSelectStore } from '@shared/renderer/features/lcu-state-sync/champ-select'
-import { useSummonerStore } from '@shared/renderer/features/lcu-state-sync/summoner'
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
+import { championIcon } from '@shared/renderer/modules/game-data'
+import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { Action } from '@shared/types/lcu/champ-select'
 import { NCard, NTimeline, NTimelineItem } from 'naive-ui'
 import { computed } from 'vue'
 
 const cs = useChampSelectStore()
 const summoner = useSummonerStore()
+const as = useAutoSelectStore()
 
 const selfActions = computed(() => {
   if (!cs.session) {
@@ -94,11 +117,29 @@ const getTimelineTypeByAction = (action: Action) => {
   color: rgb(146, 146, 146);
 }
 
-.action.completed {
+.action.completed,
+.solution.completed {
   filter: brightness(0.8);
 }
 
 .action.in-progress {
   color: #ffffff;
+}
+
+.solution {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .label {
+    font-size: 12px;
+    color: #ffffff;
+  }
+
+  .image {
+    width: 24px;
+    height: 24px;
+    border-radius: 2px;
+  }
 }
 </style>

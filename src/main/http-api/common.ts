@@ -1,8 +1,8 @@
-import { logger } from '@main/features/lcu-state-sync/common'
+import { logger } from '@main/modules/lcu-state-sync/common'
 import { formatError } from '@shared/utils/errors'
 import { AxiosRequestConfig, isAxiosError } from 'axios'
 
-import { getHttpInstance } from '../core/lcu-connection'
+import { getHttpInstance } from '../core-modules/lcu-connection'
 
 /*
  * request with retries

@@ -43,8 +43,8 @@ import {
   setAutoReplyEnabled,
   setAutoReplyText,
   setEnableOnAway
-} from '@shared/renderer/features/auto-reply'
-import { useAutoReplyStore } from '@shared/renderer/features/auto-reply/store'
+} from '@shared/renderer/modules/auto-reply'
+import { useAutoReplyStore } from '@shared/renderer/modules/uto-reply/store'
 import { NCard, NInput, NSwitch } from 'naive-ui'
 
 const autoReply = useAutoReplyStore()

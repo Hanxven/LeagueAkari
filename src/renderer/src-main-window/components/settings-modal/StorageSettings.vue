@@ -17,8 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { setAutoConnect } from '@shared/renderer/features/app'
-import { useAppStore } from '@shared/renderer/features/app/store'
+import { setAutoConnect } from '@shared/renderer/modules/app'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
 
 const app = useAppStore()

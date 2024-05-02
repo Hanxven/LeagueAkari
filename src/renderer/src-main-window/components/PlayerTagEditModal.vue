@@ -32,9 +32,9 @@
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { useAppStore } from '@shared/renderer/features/app/store'
-import { SavedPlayerInfo } from '@shared/renderer/features/core-functionality/store'
-import { useSummonerStore } from '@shared/renderer/features/lcu-state-sync/summoner'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { SavedPlayerInfo } from '@shared/renderer/modules/core-functionality/store'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
 import { laNotification } from '@shared/renderer/notification'
 import { mainCall } from '@shared/renderer/utils/ipc'

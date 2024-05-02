@@ -148,8 +148,8 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useAppStore } from '@shared/renderer/features/app/store'
-import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
@@ -173,8 +173,8 @@ import {
   disablePrintRule,
   enablePrintRule,
   removePrintRule
-} from '@main-window/features/debug'
-import { useDebugStore } from '@main-window/features/debug/store'
+} from '@main-window/modules/debug'
+import { useDebugStore } from '@main-window/modules/debug/store'
 
 import { lcuEndpoints } from './lcu-endpoints'
 

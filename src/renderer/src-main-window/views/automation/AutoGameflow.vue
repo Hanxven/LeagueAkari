@@ -110,8 +110,8 @@ import {
   setAutoSearchMatchDelaySeconds,
   setAutoSearchMatchEnabled,
   setPlayAgainEnabled
-} from '@shared/renderer/features/auto-gameflow'
-import { useAutoGameflowStore } from '@shared/renderer/features/auto-gameflow/store'
+} from '@shared/renderer/modules/auto-gameflow'
+import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NSwitch } from 'naive-ui'
 
 const autoGameflow = useAutoGameflowStore()

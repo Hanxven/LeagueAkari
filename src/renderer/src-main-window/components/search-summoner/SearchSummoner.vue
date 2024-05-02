@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSummonerStore } from '@shared/renderer/features/lcu-state-sync/summoner'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import {
   getSummoner,
   getSummonerAlias,

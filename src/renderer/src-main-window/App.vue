@@ -12,9 +12,9 @@
 </template>
 
 <script setup lang="ts">
-import { setShowFreeSoftwareDeclaration } from '@shared/renderer/features/app'
-import { useAppStore } from '@shared/renderer/features/app/store'
-import { useCoreFunctionalityStore } from '@shared/renderer/features/core-functionality/store'
+import { setShowFreeSoftwareDeclaration } from '@shared/renderer/modules/app'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
 import { greeting } from '@shared/renderer/utils/greeting'
 import { ref, watch, watchEffect } from 'vue'

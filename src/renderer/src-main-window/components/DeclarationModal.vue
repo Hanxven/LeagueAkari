@@ -12,11 +12,11 @@
     <template #header><span class="card-header-title">应用声明</span></template>
     <template #footer>
       <NFlex justify="flex-end" align="center">
-        <NButton @click="() => emits('confirm', !notShowAgainChecked)" size="tiny" type="primary"
+        <NButton @click="() => emits('confirm', showAgainChecked)" size="tiny" type="primary"
           >我已知晓</NButton
         >
-        <NCheckbox v-model:checked="notShowAgainChecked" size="small" style="font-size: 12px"
-          >不再提醒</NCheckbox
+        <NCheckbox v-model:checked="showAgainChecked" size="small" style="font-size: 12px"
+          >再次提醒</NCheckbox
         >
       </NFlex>
     </template>
@@ -45,7 +45,7 @@ const emits = defineEmits<{
 }>()
 
 const styles = useCssModule()
-const notShowAgainChecked = ref(false)
+const showAgainChecked = ref(true)
 
 const show = defineModel<boolean>('show', { default: false })
 </script>

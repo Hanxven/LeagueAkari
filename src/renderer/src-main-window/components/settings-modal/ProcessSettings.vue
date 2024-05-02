@@ -140,8 +140,8 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { setFixWindowMethodAOptions } from '@shared/renderer/features/app'
-import { useAppStore } from '@shared/renderer/features/app/store'
+import { setFixWindowMethodAOptions } from '@shared/renderer/modules/app'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import { quit } from '@shared/renderer/http-api/process-control'
 import { killUx, launchUx, restartUx } from '@shared/renderer/http-api/riotclient'
 import { mainCall } from '@shared/renderer/utils/ipc'

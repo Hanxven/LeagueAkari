@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAuxiliaryWindowStore } from '@auxiliary-window/features/auxiliary-window/store'
+import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
 import { Close as CloseIcon } from '@vicons/ionicons5'

@@ -83,10 +83,10 @@
 
 <script setup lang="ts">
 import { useCompleteVisibility } from '@shared/renderer/compositions/useOverflowDetection'
-import { useAppStore } from '@shared/renderer/features/app/store'
-import { useAutoGameflowStore } from '@shared/renderer/features/auto-gameflow/store'
-import { useLoginStore } from '@shared/renderer/features/lcu-state-sync/login'
-import { useRespawnTimerStore } from '@shared/renderer/features/respawn-timer/store'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
+import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync/login'
+import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import {
   Carbon as CarbonIcon,
@@ -102,7 +102,7 @@ import { useIntervalFn } from '@vueuse/core'
 import { NIcon } from 'naive-ui'
 import { ref, watch } from 'vue'
 
-import { useMainWindowStore } from '@main-window/features/main-window/store'
+import { useMainWindowStore } from '@shared/renderer/modules/main-window/store'
 
 const app = useAppStore()
 const mw = useMainWindowStore()

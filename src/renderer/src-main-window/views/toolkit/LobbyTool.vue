@@ -64,8 +64,8 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useGameDataStore } from '@shared/renderer/features/lcu-state-sync/game-data'
-import { useGameflowStore } from '@shared/renderer/features/lcu-state-sync/gameflow'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import {
   addBot,
   createPractice5x5,

@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useAppStore } from '@shared/renderer/features/app/store'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import { laNotification } from '@shared/renderer/notification'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
