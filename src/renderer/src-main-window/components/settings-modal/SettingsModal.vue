@@ -21,7 +21,8 @@
           />
         </div>
         <div class="about-para">
-          <LeagueAkariSpan bold /> (Version {{ app.version }}) 是一个免费、开源的、基于 Electron
+          <LeagueAkariSpan bold @click="handleDoubleClick" /> (Version {{ app.version }})
+          是一个免费、开源的、基于 Electron
           的应用程序，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其所有实现都依赖
           <a target="_blank" href="https://riot-api-libraries.readthedocs.io/en/latest/lcu.html"
             >League Client Update (LCU)</a
@@ -85,8 +86,8 @@
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { mainCall } from '@shared/renderer/utils/ipc'
-import { NModal, NTabPane, NTabs } from 'naive-ui'
-import { useCssModule } from 'vue'
+import { NModal, NTabPane, NTabs, useMessage } from 'naive-ui'
+import { h, useCssModule } from 'vue'
 
 import AppSettings from './AppSettings.vue'
 import DebugSettings from './DebugSettings.vue'
@@ -99,6 +100,15 @@ const show = defineModel<boolean>('show', { default: false })
 
 const checkUpdates = async () => {
   mainCall('app/updates/check')
+}
+
+const message = useMessage()
+
+const handleDoubleClick = () => {
+  message.create(() => h(LeagueAkariSpan, { bold: true }), {
+    type: 'success',
+    keepAliveOnHover: true
+  })
 }
 </script>
 
