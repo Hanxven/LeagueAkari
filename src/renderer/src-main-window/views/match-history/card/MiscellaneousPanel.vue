@@ -19,9 +19,10 @@
     </div>
     <NDataTable
       virtual-scroll
+      striped
       max-height="60vh"
       min-height="30vh"
-      :scroll-x="1000"
+      :scroll-x="tableWidth"
       :data="tableData"
       :columns="columns"
       size="small"
@@ -56,6 +57,12 @@ const hasBan = computed(() => {
 })
 
 const gameData = useGameDataStore()
+
+const RESERVED_COLUMN_WIDTH = 120
+
+const tableWidth = computed(() => {
+  return props.game.participants.length * RESERVED_COLUMN_WIDTH
+})
 
 const championDisplay = (championId: number) => {
   return h('div', { style: { display: 'flex' } }, [
@@ -148,7 +155,7 @@ const statsConfigMap = {
   pentaKills: { name: '五杀' },
   // 天赋梦路!
   perk0: { name: '天赋0', render: perkDisplay },
-  perk0Var1: { name: '天赋0变量1', render: (a, b) => console.log(a, b) },
+  perk0Var1: { name: '天赋0变量1' },
   perk0Var2: { name: '天赋0变量2' },
   perk0Var3: { name: '天赋0变量3' },
   perk1: { name: '天赋1', render: perkDisplay },
@@ -259,7 +266,7 @@ const columns = computed(() => {
 
   c.push({
     key: 'propName',
-    width: 100,
+    minWidth: 100,
     fixed: 'left',
     render: (data) => h('span', { style: { 'font-weight': '700' } }, data.propName as string)
   })
@@ -267,6 +274,8 @@ const columns = computed(() => {
   props.game.participants.forEach((p) => {
     c.push({
       key: p.participantId,
+      maxWidth: RESERVED_COLUMN_WIDTH,
+
       title: () => {
         return h('div', { style: { display: 'flex' } }, [
           h(LcuImage, {
