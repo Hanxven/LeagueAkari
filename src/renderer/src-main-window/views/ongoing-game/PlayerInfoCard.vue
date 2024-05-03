@@ -44,7 +44,7 @@
                 <span class="small-text"
                   >相关对局：<span
                     class="encountered-game"
-                    v-for="g of savedInfo.encounteredGames.slice(10)"
+                    v-for="g of savedInfo.encounteredGames.slice(0, 10)"
                     @click="() => emits('showGame', g, puuid)"
                     >{{ g }}</span
                   ></span

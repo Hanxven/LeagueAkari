@@ -150,16 +150,17 @@ const formatMatchmakingSearchText = (search: GetSearch) => {
   align-items: center;
   height: 100%;
   padding: 8px 12px;
+  box-sizing: border-box;
 }
 
 .mode-image {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   margin-bottom: 16px;
 }
 
 .main-text {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   margin-bottom: 8px;
 }
@@ -169,7 +170,7 @@ const formatMatchmakingSearchText = (search: GetSearch) => {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   margin-bottom: 8px;
   max-width: 280px;

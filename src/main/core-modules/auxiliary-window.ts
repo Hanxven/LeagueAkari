@@ -15,7 +15,7 @@ import { displayAuxiliaryWindowTip, setAuxiliaryWindowTrayEnabled } from './plat
 const logger = createLogger('auxiliary-window')
 
 class AuxiliaryWindowSettings {
-  opacity: number = 1
+  opacity: number = 0.9
 
   enabled: boolean = true
 

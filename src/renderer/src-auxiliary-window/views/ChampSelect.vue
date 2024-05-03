@@ -1,8 +1,8 @@
 <template>
   <NScrollbar class="champ-select-wrapper">
-    <BenchChampionsMini style="margin-bottom: 8px" />
-    <BenchModeAutoGrab style="margin-bottom: 8px" />
-    <ChampSelectActions style="margin-bottom: 8px" />
+    <BenchChampionsMini style="margin-bottom: 4px" />
+    <BenchModeAutoGrab style="margin-bottom: 4px" />
+    <ChampSelectActions style="margin-bottom: 4px" />
     <ChampSelectOperations />
   </NScrollbar>
 </template>

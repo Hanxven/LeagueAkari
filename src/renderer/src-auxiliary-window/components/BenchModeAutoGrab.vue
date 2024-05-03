@@ -1,5 +1,5 @@
 <template>
-  <NCard v-if="as.settings.benchModeEnabled" size="small">
+  <NCard v-if="as.settings.benchModeEnabled && isBenchMode" size="small">
     <NFlex align="center" class="min-height-container" :gap="4" v-if="as.upcomingGrab">
       <LcuImage class="image" :src="championIcon(as.upcomingGrab?.championId)" />
       <span class="label">即将选择 {{ willGrabIn.toFixed(1) }} s</span>
@@ -17,11 +17,16 @@
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
+import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
+import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { useIntervalFn } from '@vueuse/core'
 import { NCard, NFlex } from 'naive-ui'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const as = useAutoSelectStore()
+const cs = useChampSelectStore()
+
+const isBenchMode = computed(() => isBenchEnabledSession(cs.session))
 
 const willGrabIn = ref(0)
 const { pause, resume } = useIntervalFn(

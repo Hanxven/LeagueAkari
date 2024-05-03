@@ -1,5 +1,10 @@
 <template>
-  <NPopover v-if="itemId && gameData.items[itemId]" :delay="300">
+  <NPopover
+    v-if="itemId && gameData.items[itemId]"
+    :delay="300"
+    :scrollable="true"
+    style="max-height: 50vh"
+  >
     <template #trigger>
       <LcuImage
         :src="gameData.items[itemId].iconPath"

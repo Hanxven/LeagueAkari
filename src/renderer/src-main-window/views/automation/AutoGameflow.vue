@@ -61,7 +61,7 @@
       </NRadioGroup>
     </ControlItem>
     <div class="divider"></div>
-    <ControlItem class="control-item-margin" label="自动回到房间开启">
+    <ControlItem class="control-item-margin" label="自动回到房间">
       <template #labelDescription>
         对局结束时回到房间。可能需要先启用
         <span style="font-weight: 700">自动点赞</span> 以跳过点赞投票阶段

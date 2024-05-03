@@ -411,18 +411,24 @@ const printAutoSearchMatchInfo = async (
 ) => {
   if (chat.conversations.customGame && autoGameflowState.willSearchMatch) {
     if (cancel === 'normal') {
-      chatSend(chat.conversations.customGame.id, `[League Akari] 自动匹配已取消`).catch()
+      chatSend(
+        chat.conversations.customGame.id,
+        `[League Akari] 自动匹配已取消`,
+        'celebration'
+      ).catch()
       return
     } else if (cancel === 'waiting-for-invitee') {
       chatSend(
         chat.conversations.customGame.id,
-        `[League Akari] 自动匹配已取消，等待被邀请者`
+        `[League Akari] 自动匹配已取消，等待被邀请者`,
+        'celebration'
       ).catch()
       return
     } else if (cancel === 'not-the-leader') {
       chatSend(
         chat.conversations.customGame.id,
-        `[League Akari] 自动匹配已取消，当前不是房间房主`
+        `[League Akari] 自动匹配已取消，当前不是房间房主`,
+        'celebration'
       ).catch()
       return
     }
@@ -430,7 +436,8 @@ const printAutoSearchMatchInfo = async (
     const time = (autoGameflowState.willSearchMatchAt - Date.now()) / 1e3
     chatSend(
       chat.conversations.customGame.id,
-      `[League Akari] 将在 ${Math.abs(time).toFixed()} 秒后自动匹配`
+      `[League Akari] 将在 ${Math.abs(time).toFixed()} 秒后自动匹配`,
+      'celebration'
     ).catch()
   }
 }

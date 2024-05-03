@@ -564,11 +564,6 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
     }
   })
 
-  if (!players.length) {
-    isSimulatingKeyboard = false
-    return
-  }
-
   const sendPlayers = players.filter((p) => cf.sendList[p.puuid])
 
   // 应对英雄重复的情况，一个典型是克隆模式

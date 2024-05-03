@@ -21,6 +21,7 @@ import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
   height: 100%;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 .sub {

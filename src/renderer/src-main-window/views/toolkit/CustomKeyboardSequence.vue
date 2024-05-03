@@ -1,7 +1,11 @@
 <template>
   <NCard size="small">
     <template #header><span class="card-header-title">自定义发送文本</span></template>
-    <ControlItem label="开启" class="control-item-margin">
+    <ControlItem
+      label="开启"
+      class="control-item-margin"
+      label-description="在游戏中使用 Delete 键"
+    >
       <NSwitch
         @update:value="(v) => setCksEnabled(v)"
         :value="cks.settings.enabled"

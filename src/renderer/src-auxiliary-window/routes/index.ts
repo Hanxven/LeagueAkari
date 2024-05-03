@@ -14,8 +14,8 @@ const router = createRouter({
       component: () => import('@auxiliary-window/views/ChampSelect.vue')
     },
     {
-      path: '/ready-check',
-      name: 'ready-check',
+      path: '/lounge',
+      name: 'lounge',
       component: () => import('@auxiliary-window/views/Lounge.vue')
     }
   ]

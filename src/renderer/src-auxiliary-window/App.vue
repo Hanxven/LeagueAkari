@@ -32,7 +32,7 @@ watch(
       case 'Matchmaking':
       case 'ReadyCheck':
       case 'Lobby':
-        router.replace({ name: 'ready-check' })
+        router.replace({ name: 'lounge' })
         break
       case 'ChampSelect':
         router.replace({ name: 'champ-select' })

@@ -1,26 +1,8 @@
 <template>
   <div class="ordered-champion-list-wrapper">
-    <div class="champions">
-      <LcuImage
-        :src="championIcon(c)"
-        class="champion"
-        :title="gameData.champions[c]?.name"
-        :class="{
-          'not-pickable':
-            gameflow.phase === 'ChampSelect' &&
-            (type === 'pick'
-              ? !champSelect.currentPickableChampions.has(c)
-              : !champSelect.currentBannableChampions.has(c))
-        }"
-        v-for="c of arr.slice(0, maxShow)"
-        :key="c"
-      />
-      <div class="hint" v-if="arr.length > maxShow">+{{ arr.length - maxShow }}</div>
-      <div class="hint" v-if="arr.length === 0">未选择</div>
-    </div>
     <NPopover trigger="click" ref="popover" v-model:show="show">
       <template #trigger>
-        <NButton size="tiny" type="primary" style="margin-left: 8px">编辑</NButton>
+        <NButton size="tiny" type="primary" style="margin-right: 8px">编辑</NButton>
       </template>
       <div class="editor-wrapper">
         <div class="operations">
@@ -95,6 +77,24 @@
         </div>
       </div>
     </NPopover>
+    <div class="champions">
+      <LcuImage
+        :src="championIcon(c)"
+        class="champion"
+        :title="gameData.champions[c]?.name"
+        :class="{
+          'not-pickable':
+            gameflow.phase === 'ChampSelect' &&
+            (type === 'pick'
+              ? !champSelect.currentPickableChampions.has(c)
+              : !champSelect.currentBannableChampions.has(c))
+        }"
+        v-for="c of arr.slice(0, maxShow)"
+        :key="c"
+      />
+      <div class="hint" v-if="arr.length > maxShow">+{{ arr.length - maxShow }}</div>
+      <div class="hint" v-if="arr.length === 0">未选择</div>
+    </div>
   </div>
 </template>
 
