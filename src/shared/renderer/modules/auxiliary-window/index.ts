@@ -18,8 +18,12 @@ export async function setupAuxiliaryWindow() {
   mainStateSync('auxiliary-window/settings/enabled', (s) => (aux.settings.enabled = s))
 }
 
-export function setEnableAuxiliaryWindow(enabled: boolean) {
+export function setAuxiliaryWindowEnabled(enabled: boolean) {
   return mainCall('auxiliary-window/settings/enabled/set', enabled)
+}
+
+export function setAuxiliaryWindowOpacity(opacity: number) {
+  return mainCall('auxiliary-window/settings/opacity/set', opacity)
 }
 
 export function resetAuxiliaryWindowPosition() {

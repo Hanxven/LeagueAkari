@@ -14,7 +14,7 @@ import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
   display: flex;
   position: relative;
   flex-direction: column;
-  top: calc(var(--title-bar-height) * -1);
+  top: calc(var(--title-bar-height) * -0.5);
   color: #8d8d8d;
   font-size: 14px;
   font-weight: 700;

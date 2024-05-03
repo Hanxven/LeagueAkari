@@ -5,7 +5,7 @@
         <NTabPane tab="流程" name="gameflow">
           <AutoGameflow class="tool" />
         </NTabPane>
-        <NTabPane tab="对局中" name="in-progress">
+        <NTabPane tab="英雄选择" name="champ-select">
           <AutoSelect class="tool" />
         </NTabPane>
         <NTabPane tab="其他" name="miscellaneous">

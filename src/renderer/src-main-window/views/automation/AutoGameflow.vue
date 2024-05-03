@@ -51,10 +51,12 @@
         @update:value="(val) => setAutoHonorStrategy(val)"
       >
         <NFlex :size="4">
-          <NRadio value="prefer-lobby-member">优先预组队成员</NRadio>
-          <NRadio value="only-lobby-member">仅预组队成员</NRadio>
-          <NRadio value="all-member">所有成员</NRadio>
-          <NRadio value="opt-out">永远跳过</NRadio>
+          <NRadio value="prefer-lobby-member" title="优先选择房间内的人员，其次是其他队友"
+            >优先预组队成员</NRadio
+          >
+          <NRadio value="only-lobby-member" title="只选择房间内的人员">仅预组队成员</NRadio>
+          <NRadio value="all-member" title="考虑任何人">所有成员</NRadio>
+          <NRadio value="opt-out" title="将直接跳过此阶段">永远跳过</NRadio>
         </NFlex>
       </NRadioGroup>
     </ControlItem>

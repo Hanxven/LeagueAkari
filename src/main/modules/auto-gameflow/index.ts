@@ -447,9 +447,6 @@ export function cancelAutoAccept(reason: 'accepted' | 'declined' | 'normal') {
     } else if (reason === 'declined') {
       logger.info(`取消了即将进行的接受 - 已被玩家通过客户端操作接受`)
     }
-    {
-      logger.info(`取消了即将进行的接受 - 已被玩家取消`)
-    }
   }
 }
 

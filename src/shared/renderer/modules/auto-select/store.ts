@@ -11,6 +11,11 @@ export interface UpcomingActionInfo {
   }
 }
 
+export interface UpcomingGrabInfo {
+  willGrabAt: number
+  championId: number
+}
+
 export const useAutoSelectStore = defineStore('feature:auto-select', () => {
   const settings = reactive({
     normalModeEnabled: false,
@@ -48,9 +53,12 @@ export const useAutoSelectStore = defineStore('feature:auto-select', () => {
 
   const upcomingBan = shallowRef<UpcomingActionInfo | null>(null)
 
+  const upcomingGrab = shallowRef<UpcomingGrabInfo | null>(null)
+
   return {
     settings,
     upcomingBan,
-    upcomingPick
+    upcomingPick,
+    upcomingGrab
   }
 })

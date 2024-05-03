@@ -11,22 +11,26 @@
         </template>
         <template v-if="a[0].completed">
           <div class="solution completed" v-if="a[0].type === 'pick'">
+            <LcuImage class="image" :src="championIcon(a[0].championId)" />
             <span class="label">已选择</span>
-            <LcuImage class="image" :src="championIcon(a[0].championId)" />
           </div>
-          <div class="solution completed" v-if="a[0].type === 'ban'">
-            <span class="label">已禁用</span>
+          <div class="solution completed" v-else-if="a[0].type === 'vote'">
             <LcuImage class="image" :src="championIcon(a[0].championId)" />
+            <span class="label">已投票</span>
+          </div>
+          <div class="solution completed" v-else-if="a[0].type === 'ban'">
+            <LcuImage class="image" :src="championIcon(a[0].championId)" />
+            <span class="label">已禁用</span>
           </div>
         </template>
         <template v-else>
           <div class="solution" v-if="as.upcomingPick && as.upcomingPick.action.id === a[0].id">
-            <span class="label">自动选择</span>
             <LcuImage class="image" :src="championIcon(as.upcomingPick.championId)" />
+            <span class="label">自动选择</span>
           </div>
           <div class="solution" v-if="as.upcomingBan && as.upcomingBan.action.id === a[0].id">
-            <span class="label">自动禁用</span>
             <LcuImage class="image" :src="championIcon(as.upcomingBan.championId)" />
+            <span class="label">自动禁用</span>
           </div>
         </template>
       </NTimelineItem>
@@ -51,6 +55,11 @@ const as = useAutoSelectStore()
 const selfActions = computed(() => {
   if (!cs.session) {
     return null
+  }
+
+  // 乱斗类模式没有
+  if (cs.session.benchEnabled) {
+    return
   }
 
   const memberMe = cs.session.myTeam.find((p) => p.puuid === summoner.me?.puuid)
@@ -132,13 +141,13 @@ const getTimelineTypeByAction = (action: Action) => {
   gap: 4px;
 
   .label {
-    font-size: 12px;
-    color: #ffffff;
+    font-size: 10px;
+    color: rgb(146, 146, 146);
   }
 
   .image {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     border-radius: 2px;
   }
 }

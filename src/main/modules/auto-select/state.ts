@@ -79,50 +79,48 @@ class AutoSelectState {
   settings = new AutoSelectSettings()
 
   get champSelectActionInfo() {
-    {
-      if (!cs.session || !cs.selfSummoner) {
-        return null
-      }
+    if (!cs.session || !cs.selfSummoner) {
+      return null
+    }
 
-      const memberMe = cs.session.myTeam.find((p) => p.puuid === summoner.me?.puuid)
+    const memberMe = cs.session.myTeam.find((p) => p.puuid === summoner.me?.puuid)
 
-      if (!memberMe) {
-        return null
-      }
+    if (!memberMe) {
+      return null
+    }
 
-      const result = cs.session.actions
-        .map((arr) => {
-          return arr.filter((a) => a.actorCellId === memberMe.cellId)
-        })
-        .filter((arr) => arr.length)
+    const result = cs.session.actions
+      .map((arr) => {
+        return arr.filter((a) => a.actorCellId === memberMe.cellId)
+      })
+      .filter((arr) => arr.length)
 
-      const pickArr: Action[] = []
-      for (const x of result) {
-        for (const xx of x) {
-          if (xx.type === 'pick') {
-            pickArr.push(xx)
-          }
+    const pickArr: Action[] = []
+    for (const x of result) {
+      for (const xx of x) {
+        if (xx.type === 'pick') {
+          pickArr.push(xx)
         }
       }
+    }
 
-      const banArr: Action[] = []
-      for (const x of result) {
-        for (const xx of x) {
-          if (xx.type === 'ban') {
-            banArr.push(xx)
-          }
+    const banArr: Action[] = []
+    for (const x of result) {
+      for (const xx of x) {
+        if (xx.type === 'ban') {
+          banArr.push(xx)
         }
       }
+    }
 
-      return {
-        pick: pickArr,
-        ban: banArr,
-        session: cs.session,
-        memberMe,
-        isActingNow: cs.selfSummoner.isActingNow,
-        currentPickables: cs.currentPickableChampions,
-        currentBannables: cs.currentBannableChampions
-      }
+    return {
+      pick: pickArr,
+      ban: banArr,
+      session: cs.session,
+      memberMe,
+      isActingNow: cs.selfSummoner.isActingNow,
+      currentPickables: cs.currentPickableChampions,
+      currentBannables: cs.currentBannableChampions
     }
   }
 
@@ -264,11 +262,31 @@ class AutoSelectState {
     }
   }
 
+  upcomingGrab: {
+    championId: number
+    willGrabAt: number
+  } | null = null
+
+  setUpcomingGrab(championId: number, at: number): void
+  setUpcomingGrab(clear: null): void
+  setUpcomingGrab(arg1: number | null, arg2?: number): void {
+    if (arg1 === null) {
+      this.upcomingGrab = null
+      return
+    }
+
+    this.upcomingGrab = {
+      championId: arg1,
+      willGrabAt: arg2!
+    }
+  }
+
   constructor() {
     makeAutoObservable(this, {
       champSelectActionInfo: computed.struct,
       upcomingBan: computed.struct,
-      upcomingPick: computed.struct
+      upcomingPick: computed.struct,
+      upcomingGrab: observable.struct
     })
   }
 }

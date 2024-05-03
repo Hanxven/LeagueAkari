@@ -1,8 +1,13 @@
 import { pinyin } from 'pinyin-pro'
 
-function isSubsequence(s: string, t: string): boolean {
+function isSubsequence(s: string, t: string, caseSensitive = false): boolean {
   if (s.length === 0) return true
   if (t.length === 0) return false
+
+  if (!caseSensitive) {
+    s = s.toLowerCase()
+    t = t.toLowerCase()
+  }
 
   let index = 0
   for (let i = 0; i < t.length && index < s.length; i++) {

@@ -57,32 +57,51 @@
       </div>
     </ControlItem>
     <ControlItem class="control-item-margin" label="创建 5v5 训练房间">
-      <NButton @click="handleCreatePractice5v5" size="tiny">创建</NButton>
+      <NFlex :gap="4">
+        <NButton @click="handleCreatePractice5v5" size="tiny">创建</NButton>
+        <NInput
+          :status="practice5v5LobbyName.length ? 'success' : 'warning'"
+          v-model:value="practice5v5LobbyName"
+          style="width: 180px"
+          size="tiny"
+        />
+      </NFlex>
     </ControlItem>
   </NCard>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import {
   addBot,
   createPractice5x5,
   createQueueLobby,
   getAvailableBots
 } from '@shared/renderer/http-api/lobby'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { laNotification } from '@shared/renderer/notification'
 import { AvailableBot } from '@shared/types/lcu/lobby'
-import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
-import { computed, reactive, shallowRef } from 'vue'
+import { NButton, NCard, NFlex, NInput, NSelect, useMessage } from 'naive-ui'
+import { computed, reactive, ref, shallowRef } from 'vue'
 
 const gameflow = useGameflowStore()
 const gameData = useGameDataStore()
 
+const getRandomLobbyName = () => {
+  return `AKARI_${(Date.now() % 10000000) + 10000000}`
+}
+
+const practice5v5LobbyName = ref(getRandomLobbyName())
+
 const handleCreatePractice5v5 = async () => {
   try {
-    await createPractice5x5(`LA_${(Date.now() % 10000000) + 10000000}`)
+    if (!practice5v5LobbyName.value) {
+      practice5v5LobbyName.value = getRandomLobbyName()
+    }
+
+    await createPractice5x5(practice5v5LobbyName.value)
+    practice5v5LobbyName.value = getRandomLobbyName()
   } catch (error) {
     laNotification.warn('房间工具', '尝试创建房间失败', error)
   }

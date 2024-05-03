@@ -21,11 +21,13 @@ let siw: Worker | null = null
 
 let tray: Tray
 
+let showAuxiliaryWindowMenuItem: MenuItem | null = null
+
 // 和平台相关的 API，目前仅限 Windows
 export function initWindowsPlatform() {
   tray = new Tray(icon)
 
-  const showAuxiliaryWindowMenuItem = new MenuItem({
+  showAuxiliaryWindowMenuItem = new MenuItem({
     label: '展示小窗',
     type: 'normal',
     click: () => {
@@ -158,5 +160,11 @@ export function displayAuxiliaryWindowTip() {
       icon: icon
     })
     auxiliaryWindowTipShowed = true
+  }
+}
+
+export function setAuxiliaryWindowTrayEnabled(enabled: boolean) {
+  if (showAuxiliaryWindowMenuItem) {
+    showAuxiliaryWindowMenuItem.enabled = enabled
   }
 }

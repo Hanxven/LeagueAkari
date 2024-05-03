@@ -45,7 +45,7 @@ const emits = defineEmits<{
 }>()
 
 const styles = useCssModule()
-const showAgainChecked = ref(true)
+const showAgainChecked = ref(false)
 
 const show = defineModel<boolean>('show', { default: false })
 </script>

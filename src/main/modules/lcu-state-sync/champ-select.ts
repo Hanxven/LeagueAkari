@@ -154,16 +154,15 @@ export function champSelectSync() {
             const s = await getChampSelectSummoner(self.cellId)
 
             // 如果没有被更新，用于区分首次加载的情况
-            if (champSelect.selfSummoner === null) {
+            if (!isCellSummonerUpdated) {
               champSelect.setSelfSummoner(s.data)
+              isCellSummonerUpdated = true
             }
           } catch (error) {
             mwNotification.warn('lcu-state-sync', '状态同步', '获取当前英雄选择召唤师状态失败')
             logger.warn(`获取当前英雄选择召唤师状态失败 ${formatError(error)}`)
           }
         }
-
-        isCellSummonerUpdated = true
       }
     }
   )
@@ -204,6 +203,7 @@ export function champSelectSync() {
 
   lcuEventBus.on<LcuEvent<ChampSelectSummoner>>('/lol-champ-select/v1/summoners/*', (event) => {
     if (event.data && event.data.isSelf) {
+      isCellSummonerUpdated = true
       champSelect.setSelfSummoner(event.data)
     }
   })

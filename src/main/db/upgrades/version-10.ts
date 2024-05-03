@@ -26,5 +26,5 @@ export async function v10_LA1_2_0initializationUpgrade(queryRunner: QueryRunner)
 
   await queryRunner.manager.save(Metadata.create('version', 10))
   await queryRunner.manager.save(Metadata.create('debugging-text-0', 'League Akari, Hanxven@2024'))
-  await queryRunner.manager.save(Metadata.create('debugging-text-1', 'Konata & Kagami'))
+  await queryRunner.manager.save(Metadata.create('debugging-text-1', 'Ayano'))
 }

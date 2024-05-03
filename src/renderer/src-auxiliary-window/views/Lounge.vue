@@ -1,9 +1,9 @@
 <template>
-  <div class="ready-check-wrapper">
+  <div class="lounge-wrapper">
     <LcuImage
       class="mode-image"
-      v-if="gameflow.session?.map?.assets['game-select-icon-hover']"
-      :src="gameflow.session?.map?.assets['game-select-icon-hover']"
+      v-if="gameflow.session?.map?.assets?.['game-select-icon-hover']"
+      :src="gameflow.session?.map?.assets?.['game-select-icon-hover']"
     />
     <template v-if="gameflow.phase === 'ReadyCheck'">
       <template v-if="autoGameflow.willAccept">
@@ -33,10 +33,9 @@
     </template>
     <template v-else-if="gameflow.phase === 'Matchmaking'">
       <span class="main-text">匹配中</span>
-      <span class="sub-text" v-if="matchmaking.search"
-        >{{ matchmaking.search.timeInQueue.toFixed(1) }} s /
-        {{ matchmaking.search.estimatedQueueTime.toFixed(1) }} s</span
-      >
+      <span class="sub-text" v-if="matchmaking.search">{{
+        formatMatchmakingSearchText(matchmaking.search)
+      }}</span>
     </template>
     <template v-else-if="autoGameflow.willSearchMatch">
       <span class="main-text">将自动开始匹配对局</span>
@@ -66,11 +65,12 @@
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { accept, decline } from '@shared/renderer/http-api/matchmaking'
 import { cancelAutoAccept, cancelAutoSearchMatch } from '@shared/renderer/modules/auto-gameflow'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { useMatchmakingStore } from '@shared/renderer/modules/lcu-state-sync/matchmaking'
-import { accept, decline } from '@shared/renderer/http-api/matchmaking'
+import { GetSearch } from '@shared/types/lcu/matchmaking'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton } from 'naive-ui'
 import { ref, watch } from 'vue'
@@ -130,13 +130,21 @@ watch(
   },
   { immediate: true }
 )
+
+const formatMatchmakingSearchText = (search: GetSearch) => {
+  if (search.lowPriorityData && search.lowPriorityData.penaltyTime) {
+    return `等待 ${search.lowPriorityData.penaltyTimeRemaining} s (${search.lowPriorityData.penaltyTime} s) `
+  }
+
+  return `${search.timeInQueue.toFixed(1)} s / ${search.estimatedQueueTime.toFixed(1)} s`
+}
 </script>
 
 <style lang="less" scoped>
-.ready-check-wrapper {
+.lounge-wrapper {
   display: flex;
   position: relative;
-  top: calc(var(--title-bar-height) * -1);
+  top: calc(var(--title-bar-height) * -0.5);
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -164,7 +172,7 @@ watch(
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 8px;
-  max-width: 300px;
+  max-width: 280px;
 }
 
 .sub-text {

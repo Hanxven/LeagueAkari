@@ -65,6 +65,21 @@ export async function setupAutoSelect() {
     'auto-select/settings/ban-teammate-intended-champion',
     (s) => (autoSelectState.settings.banTeammateIntendedChampion = s)
   )
+
+  mainStateSync(
+    'auto-select/upcoming-pick',
+    (s) => (autoSelectState.upcomingPick = s)
+  )
+
+  mainStateSync(
+    'auto-select/upcoming-ban',
+    (s) => (autoSelectState.upcomingBan = s)
+  )
+
+  mainStateSync(
+    'auto-select/upcoming-grab',
+    (s) => (autoSelectState.upcomingGrab = s)
+  )
 }
 
 export function setNormalModeAutoSelectEnabled(enabled: boolean) {

@@ -11,8 +11,25 @@
         <NSwitch
           size="small"
           :value="aux.settings.enabled"
-          @update:value="(val) => setEnableAuxiliaryWindow(val)"
+          @update:value="(val) => setAuxiliaryWindowEnabled(val)"
         />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="辅助窗口不透明度"
+        label-description="辅助窗口的半透明状态"
+        :label-width="320"
+      >
+        <NSlider
+          size=""
+          style="width: 120px"
+          :min="0.3"
+          :max="1"
+          :step="0.01"
+          :format-tooltip="(v) => `${(v * 100).toFixed()} %`"
+          @update:value="(val) => setAuxiliaryWindowOpacity(val)"
+          :value="aux.settings.opacity"
+        ></NSlider>
       </ControlItem>
       <ControlItem
         class="control-item-margin"
@@ -26,6 +43,21 @@
           @update:value="(val) => setAutoRouteOnGameStart(val)"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="重生倒计时"
+        label-description="在标题栏展示一个距离重生时间的指示器"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="respawnTimer.settings.enabled"
+          @update:value="(val) => setEnableRespawnTimer(val)"
+        />
+      </ControlItem>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">战绩页面</span></template>
       <ControlItem
         class="control-item-margin"
         label="更新页面战绩"
@@ -48,18 +80,6 @@
           size="small"
           :value="coreFunctionality.settings.fetchDetailedGame"
           @update:value="(val) => setFetchDetailedGame(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        label="重生倒计时"
-        label-description="在标题栏展示一个距离重生时间的指示器"
-        :label-width="320"
-      >
-        <NSwitch
-          size="small"
-          :value="respawnTimer.settings.enabled"
-          @update:value="(val) => setEnableRespawnTimer(val)"
         />
       </ControlItem>
     </NCard>
@@ -201,7 +221,8 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import {
   resetAuxiliaryWindowPosition,
-  setEnableAuxiliaryWindow
+  setAuxiliaryWindowEnabled,
+  setAuxiliaryWindowOpacity
 } from '@shared/renderer/modules/auxiliary-window'
 import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
 import {
@@ -219,7 +240,7 @@ import {
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { setEnableRespawnTimer } from '@shared/renderer/modules/respawn-timer'
 import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
-import { NButton, NCard, NInputNumber, NScrollbar, NSwitch } from 'naive-ui'
+import { NButton, NCard, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 const respawnTimer = useRespawnTimerStore()
 const coreFunctionality = useCoreFunctionalityStore()

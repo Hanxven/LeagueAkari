@@ -14,6 +14,7 @@
             size="tiny"
             :title="`随机一次 (剩余 ${rerollsRemaining})`"
             circle
+            secondary
             type="primary"
           >
             <template #icon>
@@ -24,6 +25,7 @@
             :disabled="rerollsRemaining === 0 || isRerolling"
             @click="() => handleReroll(true)"
             :title="`随机一次并立即取回 (剩余 ${rerollsRemaining})`"
+            secondary
             circle
             size="tiny"
           >

@@ -441,7 +441,7 @@ const handleBackToTop = () => {
   height: 100%;
   display: flex;
   position: relative;
-  top: calc(var(--title-bar-height) * -1);
+  top: calc(var(--title-bar-height) * -0.5);
   justify-content: center;
   align-items: center;
 

@@ -16,7 +16,6 @@ import { autoSelectState } from './state'
 const logger = createLogger('auto-select')
 
 let grabTimerId: NodeJS.Timeout | null = null
-let targetingChampion: number | null = null
 
 export async function setupAutoSelect() {
   stateSync()
@@ -65,6 +64,17 @@ export async function setupAutoSelect() {
 
       if (!pick.isActingNow) {
         if (!autoSelectState.settings.showIntent) {
+          return
+        }
+
+        if (autoSelectState.champSelectActionInfo?.memberMe.championId) {
+          return
+        }
+
+        const thatAction = autoSelectState.champSelectActionInfo?.pick.find(
+          (a) => a.id === pick.action.id
+        )
+        if (thatAction && thatAction.championId === pick.championId) {
           return
         }
 
@@ -169,14 +179,18 @@ export async function setupAutoSelect() {
   }
 
   const trySwap = async () => {
+    if (!autoSelectState.upcomingGrab) {
+      return
+    }
+
     try {
-      await benchSwap(targetingChampion!)
+      await benchSwap(autoSelectState.upcomingGrab.championId)
     } catch (error) {
-      mwNotification.warn('auto-select', '自动选择', `交换英雄失败`)
       logger.warn(`在尝试交换英雄时发生错误 ${formatError(error)}`)
+      mwNotification.warn('auto-select', '自动选择', `交换英雄失败`)
     } finally {
       grabTimerId = null
-      targetingChampion = null
+      autoSelectState.setUpcomingGrab(null)
     }
   }
 
@@ -191,8 +205,13 @@ export async function setupAutoSelect() {
   })
 
   reaction(
-    () => [simplifiedCsSession.get(), autoSelectState.settings.benchExpectedChampions] as const,
-    ([s, e], [ps]) => {
+    () =>
+      [
+        simplifiedCsSession.get(),
+        autoSelectState.settings.benchExpectedChampions,
+        autoSelectState.settings.benchModeEnabled
+      ] as const,
+    ([s, e, o], [ps]) => {
       if (!s) {
         if (ps) {
           benchChampions.clear()
@@ -212,20 +231,32 @@ export async function setupAutoSelect() {
         now
       )
 
+      if (!o) {
+        if (autoSelectState.upcomingGrab) {
+          clearTimeout(grabTimerId!)
+          grabTimerId = null
+          autoSelectState.setUpcomingGrab(null)
+        }
+        return
+      }
+
       // 对于有目标的情况，如果目标还存在期望列表中且还在选择台中，那么直接返回
       // 如果不存在期望列表中了，那么找一个新的
-      if (targetingChampion) {
-        if (e.includes(targetingChampion) && benchChampions.has(targetingChampion)) {
+      if (autoSelectState.upcomingGrab) {
+        if (
+          e.includes(autoSelectState.upcomingGrab.championId) &&
+          benchChampions.has(autoSelectState.upcomingGrab.championId)
+        ) {
           return
         } else {
-          logger.info(`取消了即将进行的英雄交换, 目标: ${targetingChampion}`)
+          logger.info(`取消了即将进行的英雄交换, 目标: ${autoSelectState.upcomingGrab.championId}`)
 
-          notifyInChat('cancel', targetingChampion)
-          if (grabTimerId) {
-            clearTimeout(grabTimerId)
+          notifyInChat('cancel', autoSelectState.upcomingGrab.championId)
+          if (autoSelectState.upcomingGrab) {
+            clearTimeout(grabTimerId!)
             grabTimerId = null
+            autoSelectState.setUpcomingGrab(null)
           }
-          targetingChampion = null
         }
       }
 
@@ -252,14 +283,24 @@ export async function setupAutoSelect() {
 
           logger.info(`目标交换英雄: ${c}`)
 
-          targetingChampion = c
-          notifyInChat('select', targetingChampion, waitTime)
+          autoSelectState.setUpcomingGrab(c, Date.now() + waitTime)
+          notifyInChat('select', autoSelectState.upcomingGrab!.championId, waitTime)
           grabTimerId = setTimeout(trySwap, waitTime)
           break
         }
       }
     },
     { equals: comparer.structural }
+  )
+
+  reaction(
+    () => gameflow.phase,
+    (phase) => {
+      if (phase !== 'ChampSelect' && autoSelectState.upcomingGrab) {
+        autoSelectState.setUpcomingGrab(null)
+        grabTimerId = null
+      }
+    }
   )
 
   logger.info('初始化完成')
@@ -285,11 +326,12 @@ async function notifyInChat(type: 'cancel' | 'select', championId: number, time 
 }
 
 export async function setBenchModeEnabled(enabled: boolean) {
-  if (!enabled && grabTimerId) {
-    logger.info(`已取消即将进行的交换：ID：${targetingChampion}`)
-    notifyInChat('cancel', targetingChampion!)
-    clearTimeout(grabTimerId)
-    targetingChampion = null
+  if (!enabled && autoSelectState.upcomingGrab) {
+    logger.info(`已取消即将进行的交换：ID：${autoSelectState.upcomingGrab!.championId}`)
+    notifyInChat('cancel', autoSelectState.upcomingGrab!.championId)
+    clearTimeout(grabTimerId!)
+    autoSelectState.setUpcomingGrab(null)
+    grabTimerId = null
   }
 
   autoSelectState.settings.benchModeEnabled = enabled
@@ -339,6 +381,8 @@ function stateSync() {
   ipcStateSync('auto-select/upcoming-pick', () => autoSelectState.upcomingPick)
 
   ipcStateSync('auto-select/upcoming-ban', () => autoSelectState.upcomingBan)
+
+  ipcStateSync('auto-select/upcoming-grab', () => autoSelectState.upcomingGrab)
 }
 
 function ipcCall() {

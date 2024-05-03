@@ -10,7 +10,7 @@ import icon from '../../../resources/LA_ICON.ico?asset'
 import { appState } from './app'
 import { lcuConnectionState } from './lcu-connection'
 import { createLogger } from './log'
-import { displayAuxiliaryWindowTip } from './platform'
+import { displayAuxiliaryWindowTip, setAuxiliaryWindowTrayEnabled } from './platform'
 
 const logger = createLogger('auxiliary-window')
 
@@ -90,12 +90,11 @@ export function createAuxiliaryWindow(): void {
   }
 
   auxiliaryWindow = new BrowserWindow({
-    width: 340,
-    height: 440,
-    minWidth: 340,
-    maxWidth: 480,
-    minHeight: 440,
-    maxHeight: 600,
+    width: 300,
+    height: 340,
+    maxHeight: 300,
+    maxWidth: 340,
+    resizable: false,
     frame: false,
     show: false,
     title: 'Mini Akari',
@@ -103,6 +102,7 @@ export function createAuxiliaryWindow(): void {
     maximizable: false,
     minimizable: false,
     icon,
+    fullscreenable: false,
     skipTaskbar: true,
     alwaysOnTop: true,
     webPreferences: {
@@ -327,6 +327,17 @@ export async function setupAuxiliaryWindow() {
       }
     },
     { fireImmediately: true, delay: 500, equals: comparer.shallow }
+  )
+
+  reaction(
+    () => auxiliaryWindowState.settings.enabled,
+    (e) => {
+      if (e) {
+        setAuxiliaryWindowTrayEnabled(true)
+      } else {
+        setAuxiliaryWindowTrayEnabled(false)
+      }
+    }
   )
 
   reaction(

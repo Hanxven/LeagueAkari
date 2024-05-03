@@ -47,7 +47,7 @@ const handlePin = (b: boolean) => {
 }
 
 .blurred :is(.title, .traffic) {
-  filter: brightness(0.6);
+  filter: brightness(0.8);
 }
 
 .title {
@@ -78,7 +78,7 @@ const handlePin = (b: boolean) => {
     -webkit-app-region: no-drag;
 
     &:active {
-      filter: brightness(0.6);
+      filter: brightness(0.8);
     }
   }
 
