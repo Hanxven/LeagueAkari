@@ -14,6 +14,9 @@ import { displayAuxiliaryWindowTip, setAuxiliaryWindowTrayEnabled } from './plat
 
 const logger = createLogger('auxiliary-window')
 
+const WINDOW_WIDTH = 300
+const WINDOW_HEIGHT = 340
+
 class AuxiliaryWindowSettings {
   opacity: number = 0.9
 
@@ -91,9 +94,9 @@ export function createAuxiliaryWindow(): void {
 
   auxiliaryWindow = new BrowserWindow({
     width: 300,
+    maxWidth: 300,
     height: 340,
-    maxHeight: 300,
-    maxWidth: 340,
+    maxHeight: 340,
     resizable: false,
     frame: false,
     show: false,
@@ -114,7 +117,11 @@ export function createAuxiliaryWindow(): void {
   })
 
   auxiliaryWindowState.setShow(false)
-  auxiliaryWindowState.setBounds(auxiliaryWindow.getBounds())
+
+  const bounds = auxiliaryWindow.getBounds()
+  bounds.width = WINDOW_WIDTH
+  bounds.height = WINDOW_HEIGHT
+  auxiliaryWindowState.setBounds(bounds)
 
   auxiliaryWindow.setOpacity(auxiliaryWindowState.settings.opacity)
 
@@ -382,6 +389,8 @@ function getLastWindowBounds() {
 }
 
 function saveWindowBounds(bounds: Rectangle) {
+  bounds.width = WINDOW_WIDTH
+  bounds.height = WINDOW_HEIGHT
   return setSetting('auxiliary-window/bounds', bounds)
 }
 
