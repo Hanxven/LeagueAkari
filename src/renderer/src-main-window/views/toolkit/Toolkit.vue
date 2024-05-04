@@ -4,6 +4,7 @@
       <NTabs type="line" animated>
         <NTabPane tab="过程中" name="in-process">
           <ChampionBench class="tool" />
+          <SkinSelection class="tool" />
           <InProcess class="tool" />
         </NTabPane>
         <NTabPane tab="房间" name="lobby">
@@ -27,6 +28,7 @@
 import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { NTabPane, NTabs } from 'naive-ui'
 import { ref } from 'vue'
+import SkinSelection from './SkinSelection.vue'
 
 import AvailabilityCheck from './AvailabilityCheck.vue'
 import ChampionBench from './ChampionBench.vue'

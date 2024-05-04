@@ -23,7 +23,7 @@
       />
     </NFlex>
     <NFlex align="center" v-if="isBenchMode" class="control-item">
-      <span class="label" style="flex: 1">自动交换</span>
+      <span class="label" style="flex: 1">自动选择</span>
       <NSwitch
         size="small"
         :value="as.settings.benchModeEnabled"

@@ -1,4 +1,4 @@
-import { ChampSelectSession, ChampSelectSummoner, GridChamp } from '@shared/types/lcu/champ-select'
+import { CarouselSkins, ChampSelectSession, ChampSelectSummoner, GridChamp } from '@shared/types/lcu/champ-select'
 
 import { request } from './common'
 
@@ -92,5 +92,21 @@ export function getChampSelectSummoner(cellId: number) {
   return request<ChampSelectSummoner>({
     url: `/lol-champ-select/v1/summoners/${cellId}`,
     method: 'GET'
+  })
+}
+
+export function setSkin(skinId: number) {
+  return request({
+    url: '/lol-champ-select/v1/session/my-selection',
+    method: 'PATCH',
+    data: {
+      selectedSkinId: skinId
+    }
+  })
+}
+
+export function getCarouselSkins() {
+  return request<CarouselSkins[]>({
+    url: '/lol-champ-select/v1/skin-carousel-skins'
   })
 }

@@ -209,7 +209,7 @@ const formatTeamText = (team: string) => {
         return `所有`
       }
 
-      return `小队 ${team}`
+      return `全体`
     }
   } else {
     if (gameflow.phase === 'ChampSelect') {
@@ -240,6 +240,7 @@ const showingGame = reactive({
   id: 0,
   puuid: ''
 })
+
 const isStandaloneMatchHistoryCardShow = ref(false)
 const handleShowGame = (gameId: number, puuid: string) => {
   showingGame.id = gameId

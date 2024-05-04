@@ -211,3 +211,75 @@ export interface OngoingTrade {
   responderIndex: number
   state: string
 }
+
+export interface CarouselSkins {
+  championId: number
+  childSkins: ChildSkin[]
+  chromaPreviewPath: null | string
+  disabled: boolean
+  emblems: Emblem[]
+  groupSplash: string
+  id: number
+  isBase: boolean
+  isChampionUnlocked: boolean
+  name: string
+  ownership: Ownership
+  productType: null
+  rarityGemPath: string
+  skinAugments: SkinAugments
+  splashPath: string
+  splashVideoPath: null
+  stillObtainable: boolean
+  tilePath: string
+  unlocked: boolean
+}
+
+interface Emblem {
+  emblemPath: EmblemPath
+  name: string
+  positions: Positions
+}
+
+interface Positions {
+  horizontal: string
+  vertical: string
+}
+
+interface EmblemPath {
+  large: string
+  small: string
+}
+
+export interface ChildSkin {
+  championId: number
+  chromaPreviewPath: string
+  colors: string[]
+  disabled: boolean
+  id: number
+  isBase: boolean
+  isChampionUnlocked: boolean
+  name: string
+  ownership: Ownership
+  parentSkinId: number
+  shortName: string
+  skinAugments: SkinAugments
+  splashPath: string
+  splashVideoPath: null
+  stage: number
+  stillObtainable: boolean
+  tilePath: string
+  unlocked: boolean
+}
+
+interface SkinAugments {}
+
+interface Ownership {
+  loyaltyReward: boolean
+  owned: boolean
+  rental: Rental
+  xboxGPReward: boolean
+}
+
+interface Rental {
+  rented: boolean
+}

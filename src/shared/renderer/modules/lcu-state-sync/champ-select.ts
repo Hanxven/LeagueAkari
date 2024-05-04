@@ -1,6 +1,6 @@
 import { ChampSelectSession } from '@shared/types/lcu/champ-select'
 import { defineStore } from 'pinia'
-import { shallowRef } from 'vue'
+import { ref, shallowRef } from 'vue'
 
 export const useChampSelectStore = defineStore('lcu:champ-select', () => {
   const session = shallowRef<ChampSelectSession | null>(null)
@@ -9,9 +9,12 @@ export const useChampSelectStore = defineStore('lcu:champ-select', () => {
   const currentPickableChampions = shallowRef(new Set<number>())
   const currentBannableChampions = shallowRef(new Set<number>())
 
+  const currentChampion = ref<number | null>(null)
+
   return {
     session,
     currentPickableChampions,
-    currentBannableChampions
+    currentBannableChampions,
+    currentChampion
   }
 })

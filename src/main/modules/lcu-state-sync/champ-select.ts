@@ -5,6 +5,7 @@ import {
   getBannableChampIds,
   getChampSelectSession,
   getChampSelectSummoner,
+  getCurrentChamp,
   getPickableChampIds
 } from '@main/http-api/champ-select'
 import { ipcStateSync } from '@main/utils/ipc'
@@ -20,6 +21,8 @@ import { summoner } from './summoner'
 
 class ChampSelectState {
   session: ChampSelectSession | null = null
+
+  currentChampion: number | null = 0
 
   currentPickableChampionArray: number[] = []
 
@@ -63,6 +66,10 @@ class ChampSelectState {
   setSelfSummoner(s: ChampSelectSummoner | null) {
     this.selfSummoner = s
   }
+
+  setCurrentChampion(c: number | null) {
+    this.currentChampion = c
+  }
 }
 
 export const champSelect = new ChampSelectState()
@@ -79,6 +86,8 @@ export function champSelectSync() {
     'lcu/champ-select/bannable-champion-ids',
     () => champSelect.currentBannableChampionArray
   )
+
+  ipcStateSync('lcu/champ-select/current-champion', () => champSelect.currentChampion)
 
   reaction(
     () => lcuConnectionState.state,
@@ -176,6 +185,25 @@ export function champSelectSync() {
     }
   )
 
+  reaction(
+    () => lcuConnectionState.state,
+    async (state) => {
+      if (state === 'connected') {
+        try {
+          const c = (await getCurrentChamp()).data
+          champSelect.setCurrentChampion(c)
+        } catch (error) {
+          if (isAxiosError(error) && error.response?.status === 404) {
+            champSelect.setCurrentChampion(null)
+            return
+          }
+
+          throw error
+        }
+      }
+    }
+  )
+
   lcuEventBus.on('/lol-champ-select/v1/session', (event) => {
     if (event.eventType === 'Delete') {
       champSelect.setSession(null)
@@ -206,5 +234,13 @@ export function champSelectSync() {
       isCellSummonerUpdated = true
       champSelect.setSelfSummoner(event.data)
     }
+  })
+
+  lcuEventBus.on<LcuEvent<number>>('/lol-champ-select/v1/current-champion', (event) => {
+    if (event.eventType === 'Delete') {
+      champSelect.setCurrentChampion(null)
+    }
+
+    champSelect.setCurrentChampion(event.data)
   })
 }

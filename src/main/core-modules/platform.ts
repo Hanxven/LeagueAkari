@@ -28,7 +28,7 @@ export function initWindowsPlatform() {
   tray = new Tray(icon)
 
   showAuxiliaryWindowMenuItem = new MenuItem({
-    label: '展示小窗',
+    label: '辅助窗口',
     type: 'normal',
     click: () => {
       showAuxiliaryWindow()

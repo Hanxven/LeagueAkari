@@ -75,6 +75,10 @@ function champSelectSync() {
     champSelect.currentBannableChampions.clear()
     s.forEach((c) => champSelect.currentBannableChampions.add(c))
   })
+
+  mainStateSync('lcu/champ-select/current-champion', (s: number) => {
+    champSelect.currentChampion = s
+  })
 }
 
 function gameDataSync() {
