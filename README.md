@@ -6,10 +6,6 @@
   />
 </div>
 
-# 不完全
-
-该提交版本内容尚未发布。
-
 # League Akari 
 
 利用 League Client Update (LCU) API 实现的工具集，功能很多。
@@ -18,13 +14,18 @@
 
 以标签页的形式展现不同玩家的战绩。
 
+
 ## 自动游戏流程
 
 这包括了自动开始匹配、自动接受对局、自动点赞和自动开始下一局四个部分。
 
+![自动游戏流](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/automation_gameflow.png '自动游戏流')
+
 ## 核心功能
 
 对局中队友或对手的分析。
+
+
 
 ## 自动选择和禁用
 
@@ -38,31 +39,74 @@
 
 包含了一些使用样例。
 
-一图胜千言。
+虽然这些不是全部，但一图胜千言。
 
 ## 这里是战绩
 
 查询任意一个召唤师，并进入到战绩主页。
 
-![查询召唤师](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/5.gif '查询召唤师')
+![标签页](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/main_page_match-history-tabs.png '标签页')
 
-## 快人一步
+![搜索](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/main_page_search_player.png '搜索')
 
-超\~级\~快速的英雄选择。
+标记一个召唤师。可以标记哦。
 
-![立即选择](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/2.gif '立即选择')
+![搜索](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/main_page_tagged-player.png '搜索')
 
 ## 完美的流程
 
 一切都在自动过程中。
 
-![完全自动化](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/3.gif '完全自动化')
+![自动选择2](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/automation_auto-select_custom.gif '自动选择2')
+
+![自动选择](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/automation_auto-select.png '自动选择')
+
+## 到处看看
+
+或许你可以提前知道很多东西...
+
+![对局中](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/ongoing.png '对局中')
 
 ## 大乱斗标配
 
 还在等内置 CD？我已经换了三次英雄了。
 
-![无内置冷却](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/4.gif '无内置冷却')
+![随机模式](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/aux_bench-mode.png '随机模式')
+
+## 自我娱乐
+
+练习英雄的时候，或许你需要创建一个 5x5 的练习房间，并添加 5 个一般人机。
+
+![房间工具](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/toolkit_lobby-tools.png '房间工具')
+
+## 最漂亮的背景
+
+使用最最拿手的、最好看的皮肤当作生涯背景，展现你的英雄喜好——即使你并没有这些英雄的皮肤。
+
+![生涯](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/toolkit_summoner-background.png '生涯')
+
+> 佐伊小姐~
+
+## 出尔反尔
+
+在接受对局后，你仍可以拒绝掉它。反之亦然，你也可以重新接受它。
+
+经常手滑点到拒绝的玩家可能会喜欢它。
+
+![自动接受](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/aux_accepted.png '自动接受')
+
+## 没什么用的功能
+
+发送一段自定义的抽象文本。EZ!
+
+![游戏内发送](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/toolkit_ingame-sending.png '游戏内发送')
+
+
+## 不可言说的
+
+如果你有炫彩皮肤，但是没有原皮肤，那么你可以...
+
+你仍可以使用它。
 
 # 更名通知
 

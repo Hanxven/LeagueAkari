@@ -1,14 +1,14 @@
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { LcuHttpError } from '@shared/renderer/http-api/common'
 import { getGame, getMatchHistory } from '@shared/renderer/http-api/match-history'
 import { getRankedStats } from '@shared/renderer/http-api/ranked'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { laNotification } from '@shared/renderer/notification'
 import { mainCall } from '@shared/renderer/utils/ipc'
-import { markRaw, watch } from 'vue'
+import { computed, markRaw, watch } from 'vue'
 
 import { MatchHistoryGameTabCard, SummonerTabMatchHistory, useMatchHistoryTabsStore } from './store'
 
@@ -32,11 +32,15 @@ export async function setupMatchHistoryTabs() {
     }
   )
 
+  const isEndGame = computed(
+    () => gameflow.phase === 'EndOfGame' || gameflow.phase === 'PreEndOfGame'
+  )
+
   // 游戏结束更新战绩
   watch(
-    () => gameflow.phase,
-    (phase, _prevP) => {
-      if (cf.settings.fetchAfterGame && phase === 'EndOfGame') {
+    () => isEndGame.value,
+    (is, _prevP) => {
+      if (cf.settings.fetchAfterGame && is) {
         Object.keys(cf.ongoingPlayers).forEach((key) => {
           if (mh.getTab(key)) {
             fetchTabFullData(key)
