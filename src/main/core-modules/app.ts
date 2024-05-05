@@ -6,6 +6,7 @@ import { respawnTimerState } from '@main/modules/respawn-timer/state'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants'
 import { GithubApiLatestRelease } from '@shared/types/github'
+import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { formatError } from '@shared/utils/errors'
 import axios from 'axios'
 import { app, dialog, shell } from 'electron'
@@ -35,6 +36,11 @@ class AppSettings {
    */
   showFreeSoftwareDeclaration: boolean = true
 
+  /**
+   * 关闭应用的默认行为
+   */
+  closeStrategy: MainWindowCloseStrategy = 'unset'
+
   setAutoConnect(enabled: boolean) {
     this.autoConnect = enabled
   }
@@ -45,6 +51,10 @@ class AppSettings {
 
   setShowFreeSoftwareDeclaration(enabled: boolean) {
     this.showFreeSoftwareDeclaration = enabled
+  }
+
+  setCloseStrategy(s: MainWindowCloseStrategy) {
+    this.closeStrategy = s
   }
 
   constructor() {
@@ -180,6 +190,7 @@ function stateSync() {
     'app/settings/show-free-software-declaration',
     () => appState.settings.showFreeSoftwareDeclaration
   )
+  ipcStateSync('app/settings/close-strategy', () => appState.settings.closeStrategy)
 }
 
 function ipcCall() {
@@ -198,6 +209,11 @@ function ipcCall() {
   onRendererCall('app/settings/show-free-software-declaration/set', async (_, enabled) => {
     appState.settings.setShowFreeSoftwareDeclaration(enabled)
     await setSetting('app/show-free-software-declaration', enabled)
+  })
+
+  onRendererCall('app/settings/close-strategy/set', async (_, s) => {
+    appState.settings.setCloseStrategy(s)
+    await setSetting('app/close-strategy', s)
   })
 
   // 处理前版本设置项迁移问题
@@ -237,6 +253,10 @@ async function loadSettings() {
       'app/show-free-software-declaration',
       appState.settings.showFreeSoftwareDeclaration
     )
+  )
+
+  appState.settings.setCloseStrategy(
+    await getSetting('app/close-strategy', appState.settings.closeStrategy)
   )
 }
 

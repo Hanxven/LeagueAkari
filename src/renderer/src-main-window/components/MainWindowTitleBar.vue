@@ -1,5 +1,40 @@
 <template>
   <div class="app-title-bar" :class="{ blurred: mw.focusState === 'blurred' }">
+    <NModal
+      style="width: 300px"
+      transform-origin="center"
+      preset="card"
+      v-model:show="isCloseConfirmationModelShow"
+      :z-index="10000000"
+    >
+      <template #header><span class="close-confirmation-header">退出 League Akari</span></template>
+      <NRadioGroup v-model:value="closeStrategy" size="small">
+        <NFlex vertical>
+          <NRadio value="minimize-to-tray">最小化到托盘区</NRadio>
+          <NRadio value="quit">退出程序</NRadio>
+        </NFlex>
+      </NRadioGroup>
+      <NFlex align="center" justify="space-between" style="margin-top: 12px">
+        <NCheckbox v-model:checked="isRememberCloseStrategy" style="margin-right: auto" size="small"
+          >记住选择</NCheckbox
+        >
+        <NFlex style="gap: 4px">
+          <NButton
+            style="font-size: 13px; width: 54px"
+            size="small"
+            @click="isCloseConfirmationModelShow = false"
+            >取消</NButton
+          >
+          <NButton
+            style="font-size: 13px; width: 54px"
+            size="small"
+            type="primary"
+            @click="handleReallyClose"
+            >确定</NButton
+          >
+        </NFlex>
+      </NFlex>
+    </NModal>
     <div class="title-bar-items" ref="titleBarItemsContainer">
       <div class="title-bar-item operation" @click="emits('openSettings')" title="通用设置">
         <NIcon class="icon"><SettingsIcon /></NIcon>
@@ -83,9 +118,11 @@
 
 <script setup lang="ts">
 import { useCompleteVisibility } from '@shared/renderer/compositions/useOverflowDetection'
+import { setCloseStrategy } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync/login'
+import { useMainWindowStore } from '@shared/renderer/modules/main-window/store'
 import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import {
@@ -99,10 +136,9 @@ import {
 } from '@vicons/carbon'
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { useIntervalFn } from '@vueuse/core'
-import { NIcon } from 'naive-ui'
+import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
 import { ref, watch } from 'vue'
-
-import { useMainWindowStore } from '@shared/renderer/modules/main-window/store'
+import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 
 const app = useAppStore()
 const mw = useMainWindowStore()
@@ -166,9 +202,41 @@ const handleMaximize = async () => {
   }
 }
 
+const isCloseConfirmationModelShow = ref(false)
+const closeStrategy = ref<MainWindowCloseStrategy>('minimize-to-tray')
+const isRememberCloseStrategy = ref<boolean>(false)
+
 const handleClose = async () => {
-  await mainCall('main-window/close')
+  if (app.settings.closeStrategy !== 'unset') {
+    mainCall('main-window/close', app.settings.closeStrategy)
+  } else {
+    isCloseConfirmationModelShow.value = true
+  }
 }
+
+const handleReallyClose = async () => {
+  if (isRememberCloseStrategy.value) {
+    await setCloseStrategy(closeStrategy.value)
+  }
+
+  await mainCall('main-window/close', closeStrategy.value)
+  isCloseConfirmationModelShow.value = false
+}
+
+watch(
+  () => isCloseConfirmationModelShow.value,
+  (show) => {
+    if (show) {
+      if (app.settings.closeStrategy === 'unset') {
+        closeStrategy.value = 'minimize-to-tray'
+        return
+      }
+
+      closeStrategy.value = app.settings.closeStrategy
+      isRememberCloseStrategy.value = false
+    }
+  }
+)
 
 const titleBarItemsContainer = ref<HTMLElement>()
 const respawnTimerTaskEl = ref<HTMLElement>()
@@ -193,7 +261,7 @@ const emits = defineEmits<{
   height: var(--title-bar-height);
   align-items: center;
   background-color: rgb(24, 27, 31);
-  z-index: 1000000; // header must be on top
+  z-index: 100000000; // header must be on top
   -webkit-app-region: drag;
 }
 
@@ -345,5 +413,10 @@ const emits = defineEmits<{
       color: #fff;
     }
   }
+}
+
+.close-confirmation-header {
+  font-weight: 700;
+  font-size: 16px;
 }
 </style>

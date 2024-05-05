@@ -1,3 +1,4 @@
+import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { defineStore } from 'pinia'
 import { VNode, reactive, ref } from 'vue'
 
@@ -48,7 +49,8 @@ export const useAppStore = defineStore('core:app', () => {
     fixWindowMethodAOptions: {
       baseWidth: 1280,
       baseHeight: 720
-    }
+    },
+    closeStrategy: 'unset' as MainWindowCloseStrategy
   })
 
   const titleBarTasks = ref<TitleBarTask[]>([])

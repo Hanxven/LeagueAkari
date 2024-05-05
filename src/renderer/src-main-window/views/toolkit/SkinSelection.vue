@@ -7,7 +7,7 @@
       label="选择"
       label-description="选择皮肤"
     >
-      <NFlex :gap="4">
+      <NFlex>
         <NSelect
           filterable
           style="width: 200px"

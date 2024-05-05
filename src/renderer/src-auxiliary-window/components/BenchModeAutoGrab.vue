@@ -1,10 +1,10 @@
 <template>
   <NCard v-if="as.settings.benchModeEnabled && isBenchMode" size="small">
-    <NFlex align="center" class="min-height-container" :gap="4" v-if="as.upcomingGrab">
+    <NFlex align="center" class="min-height-container" v-if="as.upcomingGrab">
       <LcuImage class="image" :src="championIcon(as.upcomingGrab?.championId)" />
       <span class="label">即将选择 {{ willGrabIn.toFixed(1) }} s</span>
     </NFlex>
-    <NFlex align="center" class="min-height-container" :gap="4" v-else>
+    <NFlex align="center" class="min-height-container" v-else>
       <span class="label" v-if="as.settings.benchExpectedChampions.length === 0"
         >自动选择没有设置期望英雄列表</span
       >

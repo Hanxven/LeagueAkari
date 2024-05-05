@@ -57,7 +57,7 @@
       </div>
     </ControlItem>
     <ControlItem class="control-item-margin" label="创建 5v5 训练房间">
-      <NFlex :gap="4">
+      <NFlex>
         <NButton @click="handleCreatePractice5v5" size="tiny">创建</NButton>
         <NInput
           :status="practice5v5LobbyName.length ? 'success' : 'warning'"

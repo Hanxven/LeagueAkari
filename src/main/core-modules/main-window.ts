@@ -1,11 +1,11 @@
 import { is } from '@electron-toolkit/utils'
+import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { BrowserWindow, shell } from 'electron'
 import { makeAutoObservable } from 'mobx'
 import { join } from 'node:path'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
 import { ipcStateSync, onRendererCall, sendEventToRenderer } from '../utils/ipc'
-import { appState } from './app'
 import { getAuxiliaryWindow } from './auxiliary-window'
 import { createLogger } from './log'
 
@@ -18,6 +18,8 @@ class MainWindowState {
 
   ready: boolean = false
 
+  isShow: boolean = true
+
   constructor() {
     makeAutoObservable(this)
   }
@@ -28,6 +30,10 @@ class MainWindowState {
 
   setFocus(f: 'focused' | 'blurred' = 'focused') {
     this.focus = f
+  }
+
+  setShow(show: boolean) {
+    this.isShow = show
   }
 
   setReady(ready: boolean) {
@@ -54,6 +60,12 @@ export function restoreAndFocus() {
 
 export function toggleMinimizeAndFocus() {
   if (mainWindow) {
+    if (!mainWindowState.isShow) {
+      mainWindow.show()
+      mainWindow.focus()
+      return
+    }
+
     if (mainWindow.isMinimized()) {
       mainWindow.restore()
       mainWindow.focus()
@@ -63,6 +75,8 @@ export function toggleMinimizeAndFocus() {
   }
 }
 
+const INITIAL_SHOW = false
+
 export function createMainWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1080,
@@ -70,7 +84,7 @@ export function createMainWindow(): void {
     minWidth: 800,
     minHeight: 520,
     frame: false,
-    show: false,
+    show: INITIAL_SHOW,
     title: 'League Akari',
     autoHideMenuBar: false,
     icon,
@@ -83,6 +97,8 @@ export function createMainWindow(): void {
     }
   })
 
+  mainWindowState.setShow(INITIAL_SHOW)
+
   mainWindow.on('ready-to-show', () => {
     mainWindowState.setReady(true)
 
@@ -90,6 +106,10 @@ export function createMainWindow(): void {
       mainWindow.show()
     }
   })
+
+  mainWindow.on('show', () => mainWindowState.setShow(true))
+
+  mainWindow.on('hide', () => mainWindowState.setShow(false))
 
   mainWindow.on('closed', () => {
     mainWindowState.setReady(false)
@@ -172,7 +192,12 @@ export function setupMainWindow() {
     mainWindow?.restore()
   })
 
-  onRendererCall('main-window/close', async () => {
+  onRendererCall('main-window/close', async (_, s: MainWindowCloseStrategy) => {
+    if (s === 'minimize-to-tray' || s === 'unset') {
+      mainWindow?.hide()
+      return
+    }
+
     const auxWindow = getAuxiliaryWindow()
     if (auxWindow) {
       auxWindow.close()

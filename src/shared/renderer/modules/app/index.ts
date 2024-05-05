@@ -1,6 +1,7 @@
 import { mainCall, mainStateSync } from '@shared/renderer/utils/ipc'
 
 import { useAppStore } from './store'
+import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 
 export async function setupApp() {
   const app = useAppStore()
@@ -21,6 +22,8 @@ export async function setupApp() {
     'app/settings/show-free-software-declaration',
     (s) => (app.settings.showFreeSoftwareDeclaration = s)
   )
+
+  mainStateSync('app/settings/close-strategy', (s) => (app.settings.closeStrategy = s))
 
   mainStateSync('app/updates/is-checking-updates', (s) => (app.updates.isCheckingUpdates = s))
 
@@ -51,4 +54,8 @@ export function setShowFreeSoftwareDeclaration(enabled: boolean) {
 
 export function setFixWindowMethodAOptions(options: { baseWidth: number; baseHeight: number }) {
   return mainCall('league-client-ux/settings/fix-window-method-a-options/set', options)
+}
+
+export function setCloseStrategy(s: MainWindowCloseStrategy) {
+  return mainCall('app/settings/close-strategy/set', s)
 }

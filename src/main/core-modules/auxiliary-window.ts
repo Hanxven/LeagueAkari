@@ -87,6 +87,8 @@ export function getAuxiliaryWindow() {
   return auxiliaryWindow
 }
 
+const INITIAL_SHOW = false
+
 export function createAuxiliaryWindow(): void {
   if (auxiliaryWindow) {
     return
@@ -99,7 +101,7 @@ export function createAuxiliaryWindow(): void {
     maxHeight: 340,
     resizable: false,
     frame: false,
-    show: false,
+    show: INITIAL_SHOW,
     title: 'Mini Akari',
     autoHideMenuBar: true,
     maximizable: false,
@@ -116,7 +118,7 @@ export function createAuxiliaryWindow(): void {
     }
   })
 
-  auxiliaryWindowState.setShow(false)
+  auxiliaryWindowState.setShow(INITIAL_SHOW)
 
   const bounds = auxiliaryWindow.getBounds()
   bounds.width = WINDOW_WIDTH
