@@ -8,7 +8,7 @@
     />
     <PlayerTagEditModal
       v-model:show="isPlayerTagEditModalShow"
-      :summoner-id="tagEditingSummonerId"
+      :puuid="tagEditingSummonerPuuid"
     />
     <div v-if="!isIdle" class="ongoing-game-inner">
       <!-- 蓝队 -->
@@ -249,10 +249,10 @@ const handleShowGame = (gameId: number, puuid: string) => {
 }
 
 const isPlayerTagEditModalShow = ref(false)
-const tagEditingSummonerId = ref('')
+const tagEditingSummonerPuuid = ref('')
 const handleTagEditing = (puuid: string) => {
   isPlayerTagEditModalShow.value = true
-  tagEditingSummonerId.value = puuid
+  tagEditingSummonerPuuid.value = puuid
 }
 
 const el = ref()

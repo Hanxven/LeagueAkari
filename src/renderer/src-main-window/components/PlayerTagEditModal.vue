@@ -26,16 +26,16 @@
         <NButton size="tiny" type="primary" @click="() => handleSaveTag()">保存</NButton>
       </div>
     </template>
-    <template v-else>加载中...</template>
+    <template v-else><span style="font-size: 12px">加载中...</span></template>
   </NModal>
 </template>
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { SavedPlayerInfo } from '@shared/renderer/modules/core-functionality/store'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
-import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
 import { laNotification } from '@shared/renderer/notification'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -64,7 +64,7 @@ watch([() => show.value, () => props.puuid], async ([sh, puuid]) => {
     return
   }
 
-  if (!summonerInfo.value && sh) {
+  if ((!summonerInfo.value || summonerInfo.value.puuid !== props.puuid) && sh) {
     try {
       const s = (await getSummonerByPuuid(puuid)).data
       summonerInfo.value = s

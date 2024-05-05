@@ -450,9 +450,9 @@ export function cancelAutoAccept(reason: 'accepted' | 'declined' | 'normal') {
     }
     autoGameflowState.clearAutoAccept()
     if (reason === 'accepted') {
-      logger.info(`取消了即将进行的接受 - 已被玩家通过客户端操作取消`)
+      logger.info(`取消了即将进行的接受 - 已完成`)
     } else if (reason === 'declined') {
-      logger.info(`取消了即将进行的接受 - 已被玩家通过客户端操作接受`)
+      logger.info(`取消了即将进行的接受 - 已完成`)
     }
   }
 }
