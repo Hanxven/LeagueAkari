@@ -6,7 +6,6 @@ import { markRaw } from 'vue'
 
 import { OngoingPlayer, useCoreFunctionalityStore } from './store'
 
-// 核心模块，战绩和对局中信息的自动化处理
 export async function setupCoreFunctionality() {
   const cf = useCoreFunctionalityStore()
 

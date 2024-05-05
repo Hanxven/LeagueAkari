@@ -208,7 +208,7 @@ export async function setupAutoGameflow() {
       } else if (s === 'waiting-for-invitees') {
         cancelAutoSearchMatch('waiting-for-invitee')
       } else if (s === 'not-the-leader') {
-        cancelAutoSearchMatch('waiting-for-invitee')
+        cancelAutoSearchMatch('not-the-leader')
       }
     },
     { equals: comparer.shallow }

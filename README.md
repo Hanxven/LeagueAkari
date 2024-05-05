@@ -50,7 +50,7 @@
 
 ## 2.2 完美的流程
 
-一切都在自动过程中。
+一切都在自动过程中，一秒内完成 3 ban + 1 pick 操作。
 
 ![自动选择2](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/automation_auto-select_custom.gif '自动选择2')
 
@@ -78,7 +78,7 @@
 
 ## 2.6 最漂亮的背景
 
-使用最最拿手的、最好看的皮肤当作生涯背景，展现你的英雄喜好——即使你并没有这些英雄的皮肤。
+使用最最拿手的、最漂亮的皮肤当作生涯背景，展现你的英雄喜好——即使你并没有这些英雄的皮肤。
 
 ![生涯](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/toolkit_summoner-background.png '生涯')
 
@@ -94,7 +94,7 @@
 
 ## 2.8 没什么用的功能
 
-发送一段自定义的抽象文本。EZ!
+发送一段自定义的抽象文本。或许这可以做一个结算画面？
 
 ![游戏内发送](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/toolkit_ingame-sending.png '游戏内发送')
 
@@ -115,7 +115,7 @@
 
 League Akari 是开源软件，所有已发行的主要版本（不包括特殊测试版本）都可由 Github 源码编译而来。
 
-**League Akari 不会在任何平台标价出售，且作者没有在任何平台开放捐赠渠道。**
+**League Akari 不会在任何平台标价出售，且作者不会在任何平台开放捐赠渠道。**
 
 League Akari 不会上传任何玩家数据，所有的数据记录皆在本地进行。
 
