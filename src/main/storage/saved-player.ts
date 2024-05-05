@@ -72,7 +72,11 @@ export function saveSavedPlayer(player: SavedPlayerSaveDto) {
   const savedPlayer = new SavedPlayer()
   const date = new Date()
   savedPlayer.puuid = player.puuid
-  savedPlayer.tag = player.tag || null
+
+  if (player.tag) {
+    savedPlayer.tag = player.tag
+  }
+
   savedPlayer.selfPuuid = player.selfPuuid
   savedPlayer.rsoPlatformId = player.rsoPlatformId
   savedPlayer.region = player.region
