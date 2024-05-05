@@ -16,6 +16,7 @@
           <Spectate class="tool" />
           <ChatAvailability class="tool" />
           <FakeRanked class="tool" />
+          <ChatStatusMessage class="tool" />
           <GameView class="tool" />
           <CustomKeyboardSequence class="tool" />
         </NTabPane>
@@ -40,6 +41,7 @@ import InProcess from './InProcess.vue'
 import LobbyTool from './LobbyTool.vue'
 import Spectate from './Spectate.vue'
 import SummonerBackground from './SummonerBackground.vue'
+import ChatStatusMessage from './ChatStatusMessage.vue'
 
 const el = ref()
 useKeepAliveScrollPositionMemo(el)

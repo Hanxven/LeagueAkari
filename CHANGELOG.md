@@ -1,5 +1,17 @@
 # v1.2.1 DRAFT
 
+## 新增
+
+- [UNFINISHED] 设置 profile icon
+
+- [UNFINISHED] 设置 status message
+
+- [UNFINISHED] 最小化到托盘区而不是关闭软件
+
+## 调整
+
+- 现在 KDA 发送在斗魂竞技场模式，会附带前四率。
+
 ## 修复
 
 - 标记的用户在再次遇到时被覆盖标记的问题。

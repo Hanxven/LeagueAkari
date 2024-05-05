@@ -93,3 +93,13 @@ export function friendRequests(gameName: string, tagLine: string) {
     }
   })
 }
+
+export function setChatStatusMessage(message: string) {
+  return request<ChatPerson>({
+    url: '/lol-chat/v1/me',
+    method: 'PUT',
+    data: {
+      statusMessage: message
+    }
+  })
+}

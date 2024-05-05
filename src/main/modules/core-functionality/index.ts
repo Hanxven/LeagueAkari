@@ -28,7 +28,7 @@ import { chat } from '../lcu-state-sync/chat'
 import { gameData } from '../lcu-state-sync/game-data'
 import { gameflow } from '../lcu-state-sync/gameflow'
 import { summoner } from '../lcu-state-sync/summoner'
-import { coreFunctionalityState as cf } from './state'
+import { coreFunctionalityState as cf, coreFunctionalityState } from './state'
 
 const playerAnalysisFetchLimiter = new PQueue()
 
@@ -621,6 +621,10 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
 
       if (isEmpty) {
         return `${name} 近期无有效对局`
+      }
+
+      if (coreFunctionalityState.ongoingGameInfo?.queueType === 'CHERRY') {
+        return `${name} 第一率${((analysis.cherryTop1s / analysis.cherryGames) * 100).toFixed()}% 第四率${((analysis.cherryTop4s / analysis.cherryGames) * 100).toFixed()}%`
       }
 
       const field1 =
