@@ -210,6 +210,7 @@ export function createAuxiliaryWindow(): void {
         width: WINDOW_WIDTH,
         height: WINDOW_HEIGHT
       })
+      auxiliaryWindow.setBounds(auxiliaryWindowState.bounds!)
     }
   })
 
@@ -426,9 +427,8 @@ function getCenteredRectangle(width: number, height: number) {
 
 function resetWindowPosition() {
   if (auxiliaryWindow) {
-    const b = auxiliaryWindow.getBounds()
-    const p = getCenteredRectangle(b.width, b.height)
-    auxiliaryWindow.setPosition(p.x, p.y)
+    const p = getCenteredRectangle(WINDOW_WIDTH, WINDOW_HEIGHT)
+    auxiliaryWindow.setBounds({ x: p.x, y: p.y, width: WINDOW_WIDTH, height: WINDOW_HEIGHT })
     logger.info('重置窗口位置到主显示器中心')
   }
 }

@@ -42,7 +42,7 @@ const handlePin = (b: boolean) => {
   position: relative;
   height: var(--title-bar-height);
   align-items: center;
-  z-index: 1000000; // header must be on top
+  z-index: 10000000;
   -webkit-app-region: drag;
 }
 
