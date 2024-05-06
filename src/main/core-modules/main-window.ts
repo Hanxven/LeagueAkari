@@ -6,6 +6,7 @@ import { join } from 'node:path'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
 import { ipcStateSync, onRendererCall, sendEventToRenderer } from '../utils/ipc'
+import { appState } from './app'
 import { getAuxiliaryWindow } from './auxiliary-window'
 import { createLogger } from './log'
 
@@ -192,8 +193,11 @@ export function setupMainWindow() {
     mainWindow?.restore()
   })
 
-  onRendererCall('main-window/close', async (_, s: MainWindowCloseStrategy) => {
-    if (s === 'minimize-to-tray' || s === 'unset') {
+  onRendererCall('main-window/close', async (_) => {
+    if (
+      appState.settings.closeStrategy === 'minimize-to-tray' ||
+      appState.settings.closeStrategy === 'unset'
+    ) {
       mainWindow?.hide()
       return
     }

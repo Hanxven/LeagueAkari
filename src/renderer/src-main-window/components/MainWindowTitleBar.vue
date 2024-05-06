@@ -125,6 +125,7 @@ import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync/login'
 import { useMainWindowStore } from '@shared/renderer/modules/main-window/store'
 import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
 import { mainCall } from '@shared/renderer/utils/ipc'
+import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import {
   Carbon as CarbonIcon,
   Hourglass as HourglassIcon,
@@ -138,7 +139,6 @@ import { Close as CloseIcon } from '@vicons/ionicons5'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
 import { ref, watch } from 'vue'
-import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 
 const app = useAppStore()
 const mw = useMainWindowStore()
@@ -208,7 +208,7 @@ const isRememberCloseStrategy = ref<boolean>(false)
 
 const handleClose = async () => {
   if (app.settings.closeStrategy !== 'unset') {
-    mainCall('main-window/close', app.settings.closeStrategy)
+    mainCall('main-window/close')
   } else {
     isCloseConfirmationModelShow.value = true
   }
@@ -219,7 +219,7 @@ const handleReallyClose = async () => {
     await setCloseStrategy(closeStrategy.value)
   }
 
-  await mainCall('main-window/close', closeStrategy.value)
+  await mainCall('main-window/close')
   isCloseConfirmationModelShow.value = false
 }
 
@@ -229,10 +229,10 @@ watch(
     if (show) {
       if (app.settings.closeStrategy === 'unset') {
         closeStrategy.value = 'minimize-to-tray'
-        return
+      } else {
+        closeStrategy.value = app.settings.closeStrategy
       }
 
-      closeStrategy.value = app.settings.closeStrategy
       isRememberCloseStrategy.value = false
     }
   }

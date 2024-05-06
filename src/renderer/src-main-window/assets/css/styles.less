@@ -13,6 +13,7 @@
   --title-bar-height: 30px;
   --scroll-bar-height: 6px;
   --scroll-bar-width: 6px;
+  --n-option-padding: 0 4px;
 }
 
 ::-webkit-scrollbar {
@@ -91,4 +92,8 @@ a:visited {
 // adjust for app title bar height
 .n-notification-container > .n-scrollbar > .n-scrollbar-container {
   max-height: calc(100vh - var(--title-bar-height)) !important;
+}
+
+.n-base-select-menu .n-base-select-option .n-base-select-option__content {
+  font-size: 12px;
 }
