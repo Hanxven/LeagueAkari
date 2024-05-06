@@ -91,3 +91,11 @@ export async function getSummonerAlias(name: string, tag: string) {
   const result = response.data[0]
   return result || null
 }
+
+export async function setSummonerIcon(profileIconId: number) {
+  return request({
+    url: '/lol-summoner/v1/current-summoner/icon',
+    method: 'PUT',
+    data: { profileIconId }
+  })
+}

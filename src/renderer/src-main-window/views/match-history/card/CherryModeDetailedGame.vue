@@ -257,7 +257,7 @@ const handleToSummoner = (puuid: string) => {
 
 <style lang="less" scoped>
 .detailed-game-card {
-  background-color: #343434;
+  background-color: rgb(45, 45, 45);
   border-radius: 4px;
   overflow: hidden;
 }

@@ -121,15 +121,18 @@ export function createAuxiliaryWindow(): void {
   auxiliaryWindowState.setShow(INITIAL_SHOW)
 
   const bounds = auxiliaryWindow.getBounds()
-  bounds.width = WINDOW_WIDTH
-  bounds.height = WINDOW_HEIGHT
-  auxiliaryWindowState.setBounds(bounds)
+  auxiliaryWindowState.setBounds({
+    x: bounds.x,
+    y: bounds.y,
+    width: WINDOW_WIDTH,
+    height: WINDOW_HEIGHT
+  })
 
   auxiliaryWindow.setOpacity(auxiliaryWindowState.settings.opacity)
 
   getLastWindowBounds().then((b) => {
     if (b && auxiliaryWindow) {
-      auxiliaryWindow.setBounds(b)
+      auxiliaryWindow.setBounds({ x: b.x, y: b.y, width: WINDOW_WIDTH, height: WINDOW_HEIGHT })
     }
   })
 
@@ -188,13 +191,25 @@ export function createAuxiliaryWindow(): void {
 
   auxiliaryWindow.on('move', () => {
     if (auxiliaryWindow) {
-      auxiliaryWindowState.setBounds(auxiliaryWindow.getBounds())
+      const bounds = auxiliaryWindow.getBounds()
+      auxiliaryWindowState.setBounds({
+        x: bounds.x,
+        y: bounds.y,
+        width: WINDOW_WIDTH,
+        height: WINDOW_HEIGHT
+      })
     }
   })
 
   auxiliaryWindow.on('resize', () => {
     if (auxiliaryWindow) {
-      auxiliaryWindowState.setBounds(auxiliaryWindow.getBounds())
+      const bounds = auxiliaryWindow.getBounds()
+      auxiliaryWindowState.setBounds({
+        x: bounds.x,
+        y: bounds.y,
+        width: WINDOW_WIDTH,
+        height: WINDOW_HEIGHT
+      })
     }
   })
 
@@ -381,6 +396,10 @@ export async function setupAuxiliaryWindow() {
 
   auxiliaryWindowState.settings.setOpacity(
     await getSetting('auxiliary-window/opacity', auxiliaryWindowState.settings.opacity)
+  )
+
+  auxiliaryWindowState.settings.setEnabled(
+    await getSetting('auxiliary-window/enabled', auxiliaryWindowState.settings.enabled)
   )
 
   logger.info('初始化完成')

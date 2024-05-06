@@ -431,7 +431,7 @@ const handleToSummoner = (puuid: string) => {
   padding: 0px 0px 0px 8px;
   border-radius: 4px;
   box-sizing: border-box;
-  background-color: rgb(52, 52, 52);
+  background-color: rgb(45, 45, 45);
   height: 96px;
   overflow: hidden;
 }
