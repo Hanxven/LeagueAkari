@@ -95,10 +95,12 @@ export function createAuxiliaryWindow(): void {
   }
 
   auxiliaryWindow = new BrowserWindow({
-    width: 300,
-    maxWidth: 300,
-    height: 340,
-    maxHeight: 340,
+    width: WINDOW_WIDTH,
+    minWidth: WINDOW_HEIGHT,
+    maxWidth: WINDOW_WIDTH,
+    height: WINDOW_HEIGHT,
+    minHeight: WINDOW_HEIGHT,
+    maxHeight: WINDOW_HEIGHT,
     resizable: false,
     frame: false,
     show: INITIAL_SHOW,
@@ -107,6 +109,7 @@ export function createAuxiliaryWindow(): void {
     maximizable: false,
     minimizable: false,
     icon,
+
     fullscreenable: false,
     skipTaskbar: true,
     alwaysOnTop: true,
@@ -210,7 +213,6 @@ export function createAuxiliaryWindow(): void {
         width: WINDOW_WIDTH,
         height: WINDOW_HEIGHT
       })
-      auxiliaryWindow.setBounds(auxiliaryWindowState.bounds!)
     }
   })
 

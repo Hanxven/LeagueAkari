@@ -1,14 +1,18 @@
 <template>
-  <NCard size="small" v-if="cs.currentChampion">
-    <NFlex align="center" class="control-item" style="gap: 2px">
+  <NCard size="small" v-if="cs.currentChampion && skinOptions.length">
+    <NFlex align="center" class="control-item" style="gap: 4px">
       <NSelect
-        :render-option="renderOption"
         size="tiny"
+        :render-label="renderLabel"
+        :render-tag="renderTag"
         style="flex: 1"
         v-model:value="currentSkinId"
+        :placeholder="`${skinOptions.length} 款皮肤可用`"
         :options="skinOptions"
       />
-      <NButton type="primary" secondary @click="handleSetSkin">设置</NButton>
+      <NButton :loading="isSettingSkin" type="primary" size="tiny" secondary @click="handleSetSkin"
+        >设置</NButton
+      >
     </NFlex>
   </NCard>
 </template>
@@ -20,45 +24,61 @@ import { getChampDetails } from '@shared/renderer/http-api/game-data'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { CarouselSkins } from '@shared/types/lcu/champ-select'
 import { ChampDetails } from '@shared/types/lcu/game-data'
-import { NButton, NCard, NFlex, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
-import { VNode, computed, h, ref, shallowRef, watch } from 'vue'
+import {
+  NButton,
+  NCard,
+  NFlex,
+  NSelect,
+  SelectRenderLabel,
+  SelectRenderTag,
+  useMessage
+} from 'naive-ui'
+import { computed, h, ref, shallowRef, watch } from 'vue'
 
 const cs = useChampSelectStore()
 
 const currentSkinId = ref<number>()
 const isSettingSkin = ref(false)
 
-const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) => {
+const renderLabel: SelectRenderLabel = (option) => {
   return h(
-    NTooltip,
-    { delay: 300, animated: false },
+    NFlex,
     {
-      trigger: () => node,
-      default: () => {
-        if (option.isChild) {
-          return h(LcuImage, {
-            src: option.chromaPreviewUrl as string,
-            cache: false,
-            style: {
-              height: '40px',
-              minWidth: '40px',
-              objectFit: 'contain'
-            }
-          })
-        } else {
-          return h(LcuImage, {
-            src: option.previewUrl as string,
-            cache: false,
-            style: {
-              height: '40px',
-              minWidth: '80px',
-              objectFit: 'contain'
-            }
-          })
+      align: 'center',
+      justify: 'center',
+      wrap: false,
+      style: { padding: '2px 4px' }
+    },
+    () => [
+      h(LcuImage, {
+        src: option.isChild ? (option.chromaPreviewUrl as string) : (option.previewUrl as string),
+        cache: false,
+        style: {
+          height: '20px',
+          width: '36px',
+          objectFit: 'contain',
+          borderRadius: '2px'
         }
-      }
-    }
+      }),
+      h(
+        'div',
+        {
+          style: {
+            fontSize: '10px',
+            overflow: 'hidden',
+            whiteSpace: 'no-wrap',
+            textOverflow: 'ellipsis'
+          },
+          title: option.label as string
+        },
+        option.label as string
+      )
+    ]
   )
+}
+
+const renderTag: SelectRenderTag = ({ option }) => {
+  return h('span', option.label as string)
 }
 
 const carouselSkins = shallowRef<CarouselSkins[]>([])
@@ -153,9 +173,9 @@ const handleSetSkin = async () => {
 
   try {
     await setSkin(currentSkinId.value)
-    message.success('已经成功设置皮肤')
+    message.success('成功设置皮肤')
   } catch (error) {
-    message.warning('尝试设置皮肤时失败')
+    message.warning('无法设置皮肤')
   } finally {
     isSettingSkin.value = false
   }

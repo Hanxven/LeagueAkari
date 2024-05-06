@@ -88,11 +88,20 @@ a:visited {
   width: calc(100% - 30px);
 }
 
-// adjust for app title bar height
 .n-notification-container > .n-scrollbar > .n-scrollbar-container {
   max-height: calc(100vh - var(--title-bar-height)) !important;
 }
 
 .n-timeline .n-timeline-item .n-timeline-item-content .n-timeline-item-content__meta {
   margin-bottom: 0px;
+}
+
+.n-message,
+.n-base-select-menu {
+  background-color: #5555552d;
+  backdrop-filter: blur(4px);
+}
+
+.n-base-select-menu .n-scrollbar {
+  height: 140px;
 }
