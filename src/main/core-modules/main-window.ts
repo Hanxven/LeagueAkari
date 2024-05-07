@@ -52,6 +52,12 @@ export function getMainWindow() {
 
 export function restoreAndFocus() {
   if (mainWindow) {
+    if (!mainWindowState.isShow) {
+      mainWindow.show()
+      mainWindow.focus()
+      return
+    }
+
     if (mainWindow.isMinimized()) {
       mainWindow.restore()
     }
