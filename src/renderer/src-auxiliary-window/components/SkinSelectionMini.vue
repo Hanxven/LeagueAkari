@@ -1,5 +1,8 @@
 <template>
-  <NCard size="small" v-if="cs.currentChampion && skinOptions.length">
+  <NCard
+    size="small"
+    v-if="aux.settings.showSkinSelector && cs.currentChampion && skinOptions.length"
+  >
     <NFlex align="center" class="control-item" style="gap: 4px">
       <NSelect
         size="tiny"
@@ -11,7 +14,7 @@
         :options="skinOptions"
       />
       <NButton :loading="isSettingSkin" type="primary" size="tiny" secondary @click="handleSetSkin"
-        >设置</NButton
+        >应用</NButton
       >
     </NFlex>
   </NCard>
@@ -21,6 +24,7 @@
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { getCarouselSkins, setSkin } from '@shared/renderer/http-api/champ-select'
 import { getChampDetails } from '@shared/renderer/http-api/game-data'
+import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { CarouselSkins } from '@shared/types/lcu/champ-select'
 import { ChampDetails } from '@shared/types/lcu/game-data'
@@ -39,6 +43,8 @@ const cs = useChampSelectStore()
 
 const currentSkinId = ref<number>()
 const isSettingSkin = ref(false)
+
+const aux = useAuxiliaryWindowStore()
 
 const renderLabel: SelectRenderLabel = (option) => {
   return h(

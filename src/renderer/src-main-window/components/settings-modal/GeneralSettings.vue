@@ -4,35 +4,6 @@
       <template #header><span class="card-header-title">通用</span></template>
       <ControlItem
         class="control-item-margin"
-        label="使用辅助窗口"
-        label-description="在一些游戏流程中使用辅助窗口来展示状态"
-        :label-width="320"
-      >
-        <NSwitch
-          size="small"
-          :value="aux.settings.enabled"
-          @update:value="(val) => setAuxiliaryWindowEnabled(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        label="辅助窗口不透明度"
-        label-description="辅助窗口的半透明状态"
-        :label-width="320"
-      >
-        <NSlider
-          size=""
-          style="width: 120px"
-          :min="0.3"
-          :max="1"
-          :step="0.01"
-          :format-tooltip="(v) => `${(v * 100).toFixed()} %`"
-          @update:value="(val) => setAuxiliaryWindowOpacity(val)"
-          :value="aux.settings.opacity"
-        ></NSlider>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
         label="自动切换到对局页面"
         label-description="在进入英雄选择或其他游戏状态时，自动切换到“对局”页面"
         :label-width="320"
@@ -144,6 +115,60 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">辅助窗口</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="使用辅助窗口"
+        label-description="在一些游戏流程中使用辅助窗口来展示状态以及提供便捷操作"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="aux.settings.enabled"
+          @update:value="(val) => setAuxiliaryWindowEnabled(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="辅助窗口不透明度"
+        label-description="辅助窗口的半透明状态"
+        :label-width="320"
+      >
+        <NSlider
+          size=""
+          style="width: 120px"
+          :min="0.3"
+          :max="1"
+          :step="0.01"
+          :format-tooltip="(v) => `${(v * 100).toFixed()} %`"
+          @update:value="(val) => setAuxiliaryWindowOpacity(val)"
+          :value="aux.settings.opacity"
+        ></NSlider>
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="皮肤设置器"
+        label-description="在辅助窗口展示一个设置皮肤的快捷入口"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="aux.settings.showSkinSelector"
+          @update:value="(val) => setShowSkinSelector(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="重设辅助窗口位置"
+        label-description="重新设置辅助窗口的位置，还原到默认主屏幕正中心"
+        :label-width="320"
+      >
+        <NButton size="tiny" type="warning" secondary @click="() => resetAuxiliaryWindowPosition()"
+          >重设</NButton
+        >
+      </ControlItem>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">KDA 简报</span></template>
       <ControlItem
         class="control-item-margin"
@@ -201,19 +226,6 @@
         />
       </ControlItem>
     </NCard>
-    <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">高级</span></template>
-      <ControlItem
-        class="control-item-margin"
-        label="重设辅助窗口位置"
-        label-description="重新设置辅助窗口的位置，还原到默认主屏幕正中心"
-        :label-width="320"
-      >
-        <NButton size="tiny" type="warning" @click="() => resetAuxiliaryWindowPosition()"
-          >重设</NButton
-        >
-      </ControlItem>
-    </NCard>
   </NScrollbar>
 </template>
 
@@ -224,6 +236,7 @@ import {
   setAuxiliaryWindowEnabled,
   setAuxiliaryWindowOpacity
 } from '@shared/renderer/modules/auxiliary-window'
+import { setShowSkinSelector } from '@shared/renderer/modules/auxiliary-window'
 import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
 import {
   setAutoRouteOnGameStart,

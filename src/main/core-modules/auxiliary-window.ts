@@ -22,12 +22,18 @@ class AuxiliaryWindowSettings {
 
   enabled: boolean = true
 
+  showSkinSelector: boolean = true
+
   setOpacity(opacity: number) {
     this.opacity = opacity
   }
 
   setEnabled(b: boolean) {
     this.enabled = b
+  }
+
+  setShowSkinSelector(b: boolean) {
+    this.showSkinSelector = b
   }
 
   constructor() {
@@ -260,6 +266,10 @@ export async function setupAuxiliaryWindow() {
   ipcStateSync('auxiliary-window/is-pinned', () => auxiliaryWindowState.isPinned)
   ipcStateSync('auxiliary-window/settings/opacity', () => auxiliaryWindowState.settings.opacity)
   ipcStateSync('auxiliary-window/settings/enabled', () => auxiliaryWindowState.settings.enabled)
+  ipcStateSync(
+    'auxiliary-window/settings/show-skin-selector',
+    () => auxiliaryWindowState.settings.showSkinSelector
+  )
 
   onRendererCall('auxiliary-window/size/set', async (_e, width, height, animate) => {
     auxiliaryWindow?.setSize(width, height, animate)
@@ -319,6 +329,11 @@ export async function setupAuxiliaryWindow() {
   onRendererCall('auxiliary-window/settings/enabled/set', async (_, enabled) => {
     auxiliaryWindowState.settings.setEnabled(enabled)
     await setSetting('auxiliary-window/enabled', enabled)
+  })
+
+  onRendererCall('auxiliary-window/settings/show-skin-selector/set', async (_, s) => {
+    auxiliaryWindowState.settings.setShowSkinSelector(s)
+    await setSetting('auxiliary-window/show-skin-selector', s)
   })
 
   reaction(
@@ -403,6 +418,13 @@ export async function setupAuxiliaryWindow() {
 
   auxiliaryWindowState.settings.setEnabled(
     await getSetting('auxiliary-window/enabled', auxiliaryWindowState.settings.enabled)
+  )
+
+  auxiliaryWindowState.settings.setShowSkinSelector(
+    await getSetting(
+      'auxiliary-window/show-skin-selector',
+      auxiliaryWindowState.settings.showSkinSelector
+    )
   )
 
   logger.info('初始化完成')

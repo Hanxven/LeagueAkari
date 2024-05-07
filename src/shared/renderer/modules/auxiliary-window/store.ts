@@ -9,7 +9,8 @@ export const useAuxiliaryWindowStore = defineStore('feature:auxiliary-window', (
 
   const settings = reactive({
     opacity: 1,
-    enabled: true
+    enabled: true,
+    showSkinSelector: true
   })
 
   return {

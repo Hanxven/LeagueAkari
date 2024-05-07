@@ -16,6 +16,11 @@ export async function setupAuxiliaryWindow() {
   mainStateSync('auxiliary-window/settings/opacity', (s) => (aux.settings.opacity = s))
 
   mainStateSync('auxiliary-window/settings/enabled', (s) => (aux.settings.enabled = s))
+
+  mainStateSync(
+    'auxiliary-window/settings/show-skin-selector',
+    (s) => (aux.settings.showSkinSelector = s)
+  )
 }
 
 export function setAuxiliaryWindowEnabled(enabled: boolean) {
@@ -28,4 +33,8 @@ export function setAuxiliaryWindowOpacity(opacity: number) {
 
 export function resetAuxiliaryWindowPosition() {
   return mainCall('auxiliary-window/reset-window-position')
+}
+
+export function setShowSkinSelector(b: boolean) {
+  return mainCall('auxiliary-window/settings/show-skin-selector/set', b)
 }
