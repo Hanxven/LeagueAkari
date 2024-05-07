@@ -583,24 +583,25 @@ const handleToSummoner = (puuid: string) => {
 .summary {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  padding: 10px 0;
   width: 126px;
-  font-size: 11px;
+  font-size: 10px;
+  line-height: 14px;
 
   .kpr {
-    color: rgb(223, 223, 223);
+    color: rgb(211, 211, 211);
   }
 
   .ddr {
-    color: rgb(236, 152, 92);
+    color: rgb(209, 134, 81);
   }
 
   .dtr {
-    color: rgb(98, 201, 94);
+    color: rgb(88, 184, 84);
   }
 
   .gr {
-    color: rgb(227, 180, 119);
+    color: rgb(206, 164, 109);
   }
 }
 

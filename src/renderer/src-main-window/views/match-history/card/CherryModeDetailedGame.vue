@@ -9,7 +9,7 @@
                 participants[0].stats.subteamPlacement <= (match.maxPlacement / 2) ? '胜利' : '失败'
               }})
             </th>
-            <th class="header-augments">增益</th>
+            <th class="header-augments">强化符文</th>
             <th class="header-kda">KDA</th>
             <th class="header-damage">伤害 / 承受</th>
             <th class="header-gold">金币</th>
