@@ -1359,6 +1359,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/luaparse@npm:^0.2.12":
+  version: 0.2.12
+  resolution: "@types/luaparse@npm:0.2.12"
+  checksum: 10c0/23bbb6631bfadbaaa9bdf123a3faa86149ce1882421d404fc6a023ec30945a2d427abc13de527062c90e55e59c8f261bd1c65063b75d0c788918f9b1d06ac22b
+  languageName: node
+  linkType: hard
+
 "@types/markdown-it@npm:^14.1.1":
   version: 14.1.1
   resolution: "@types/markdown-it@npm:14.1.1"
@@ -1738,6 +1745,22 @@ __metadata:
   version: 2.0.0
   resolution: "abbrev@npm:2.0.0"
   checksum: 10c0/f742a5a107473946f426c691c08daba61a1d15942616f300b5d32fd735be88fef5cba24201757b6c407fd564555fb48c751cfa33519b2605c8a7aadd22baf372
+  languageName: node
+  linkType: hard
+
+"acorn-walk@npm:^8.2.0":
+  version: 8.3.2
+  resolution: "acorn-walk@npm:8.3.2"
+  checksum: 10c0/7e2a8dad5480df7f872569b9dccff2f3da7e65f5353686b1d6032ab9f4ddf6e3a2cb83a9b52cf50b1497fd522154dda92f0abf7153290cc79cd14721ff121e52
+  languageName: node
+  linkType: hard
+
+"acorn@npm:^8.7.0":
+  version: 8.11.3
+  resolution: "acorn@npm:8.11.3"
+  bin:
+    acorn: bin/acorn
+  checksum: 10c0/3ff155f8812e4a746fee8ecff1f227d527c4c45655bb1fad6347c3cb58e46190598217551b1500f18542d2bbe5c87120cb6927f5a074a59166fbdd9468f0a299
   languageName: node
   linkType: hard
 
@@ -3935,6 +3958,7 @@ __metadata:
     "@trivago/prettier-plugin-sort-imports": "npm:^4.3.0"
     "@types/deep-eql": "npm:^4.0.2"
     "@types/lodash": "npm:^4.17.1"
+    "@types/luaparse": "npm:^0.2.12"
     "@types/markdown-it": "npm:^14.1.1"
     "@types/node": "npm:^20.12.10"
     "@types/semver": "npm:^7.5.8"
@@ -3953,6 +3977,7 @@ __metadata:
     electron-vite: "npm:2.2.0"
     less: "npm:^4.2.0"
     lodash: "npm:^4.17.21"
+    luaparse: "npm:^0.3.1"
     markdown-it: "npm:^14.1.0"
     mobx: "npm:^6.12.3"
     naive-ui: "npm:^2.38.2"
@@ -3967,6 +3992,7 @@ __metadata:
     typeorm: "npm:^0.3.20"
     typescript: "npm:^5.4.5"
     vite: "npm:^5.2.11"
+    vm2: "npm:^3.9.19"
     vue: "npm:^3.4.27"
     vue-router: "npm:^4.3.2"
     vue-tsc: "npm:^2.0.16"
@@ -4076,6 +4102,15 @@ __metadata:
   dependencies:
     yallist: "npm:^4.0.0"
   checksum: 10c0/cb53e582785c48187d7a188d3379c181b5ca2a9c78d2bce3e7dee36f32761d1c42983da3fe12b55cb74e1779fa94cdc2e5367c028a9b35317184ede0c07a30a9
+  languageName: node
+  linkType: hard
+
+"luaparse@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "luaparse@npm:0.3.1"
+  bin:
+    luaparse: bin/luaparse
+  checksum: 10c0/c96c6152c7b5d73c98d4f51e28d700697a865edd8f5c28b16f0c4c34b91f7d0493212f181394384c02291300d453bc0d3ddc2cc52abc73c3be213520bec84c53
   languageName: node
   linkType: hard
 
@@ -5854,6 +5889,18 @@ __metadata:
   bin:
     vite: bin/vite.js
   checksum: 10c0/664b8d68e4f5152ae16bd2041af1bbaf11c43630ac461835bc31ff7d019913b33e465386e09f66dc1037d7aeefbb06939e0173787c063319bc2bd30c3b9ad8e4
+  languageName: node
+  linkType: hard
+
+"vm2@npm:^3.9.19":
+  version: 3.9.19
+  resolution: "vm2@npm:3.9.19"
+  dependencies:
+    acorn: "npm:^8.7.0"
+    acorn-walk: "npm:^8.2.0"
+  bin:
+    vm2: bin/vm2
+  checksum: 10c0/16e8e6bb389ae88b8ffbc439e8d7c09db3b98f7f738440af5b78080d6cb35db66b41b0ad055cc59bcc45cb8e270ed850667207348e90760b430403741f72337a
   languageName: node
   linkType: hard
 

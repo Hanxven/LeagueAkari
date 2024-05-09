@@ -2,11 +2,36 @@
   <NCard size="small" v-if="benchChampions">
     <div class="outer">
       <div class="operations">
-        <LcuImage
-          class="champion-image"
-          style="border-radius: 50%; cursor: default"
-          :src="championIcon(selfChampionId || -1)"
-        />
+        <NTooltip
+          raw
+          :show-arrow="false"
+          content-class="xxx"
+          :duration="0"
+          :delay="300"
+          :disabled="!selfChampionWithBalance || !selfChampionWithBalance.balance.length"
+        >
+          <template #trigger>
+            <LcuImage
+              class="champion-image"
+              style="border-radius: 50%; cursor: default"
+              :src="championIcon(selfChampionWithBalance?.championId || -1)"
+            />
+          </template>
+          <div class="raw-popover">
+            <div
+              class="balance-item"
+              v-for="b of selfChampionWithBalance?.balance"
+              :key="b.meta.name"
+            >
+              <span class="balance-item-name">{{ b.meta.name }}</span>
+              <span
+                class="balance-item-value"
+                :class="{ buffed: b.status === 'buffed', nerfed: b.status === 'nerfed' }"
+                >{{ formatBalanceValue(b.value, b.meta.type === 'percentage') }}</span
+              >
+            </div>
+          </div>
+        </NTooltip>
         <div class="btns">
           <NButton
             @click="() => handleReroll()"
@@ -37,16 +62,37 @@
       </div>
       <NDivider vertical />
       <div class="champions">
-        <LcuImage
-          v-for="c of benchChampions"
+        <NTooltip
+          raw
+          :show-arrow="false"
+          content-class="xxx"
+          :duration="0"
+          :delay="300"
+          v-for="c of benchChampionsWithBalance"
           :key="c.championId"
-          class="champion-image"
-          :class="{
-            'champion-image-invalid': !cs.currentPickableChampions.has(c.championId)
-          }"
-          :src="championIcon(c.championId)"
-          @click="() => handleBenchSwap(c.championId)"
-        />
+          :disabled="!c.balance"
+        >
+          <template #trigger>
+            <LcuImage
+              class="champion-image"
+              :class="{
+                'champion-image-invalid': !cs.currentPickableChampions.has(c.championId)
+              }"
+              :src="championIcon(c.championId)"
+              @click="() => handleBenchSwap(c.championId)"
+            />
+          </template>
+          <div class="raw-popover">
+            <div class="balance-item" v-for="b of c.balance" :key="b.meta.name">
+              <span class="balance-item-name">{{ b.meta.name }}</span>
+              <span
+                class="balance-item-value"
+                :class="{ buffed: b.status === 'buffed', nerfed: b.status === 'nerfed' }"
+                >{{ formatBalanceValue(b.value, b.meta.type === 'percentage') }}</span
+              >
+            </div>
+          </div>
+        </NTooltip>
         <div
           v-for="_i of Math.max(10 - benchChampions.length, 0)"
           class="champion-image-placeholder"
@@ -58,16 +104,121 @@
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { benchSwap, reroll } from '@shared/renderer/http-api/champ-select'
+import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
-import { benchSwap, reroll } from '@shared/renderer/http-api/champ-select'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { nativeNotification } from '@shared/renderer/notification'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
-import { NButton, NCard, NDivider, NIcon } from 'naive-ui'
+import { NButton, NCard, NDivider, NIcon, NTooltip } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 const cs = useChampSelectStore()
+
+const eds = useExternalDataSourceStore()
+const gameflow = useGameflowStore()
+
+const gameMode = computed(() => {
+  if (!gameflow.session) {
+    return null
+  }
+
+  return gameflow.session.map.gameMode
+})
+
+const getBalanceData = (id: number) => {
+  if (!eds.balance || !gameMode.value) {
+    return null
+  }
+
+  return eds.balance.map[id]?.balance['aram'] || null
+}
+
+const BALANCE_TYPES: Record<
+  string,
+  {
+    name: string
+    impact: 'buff' | 'nerf'
+    type: 'percentage' | 'literal'
+    order: number
+  }
+> = {
+  dmg_dealt: {
+    name: '造成伤害',
+    impact: 'buff',
+    type: 'percentage',
+    order: 0
+  },
+  dmg_taken: {
+    name: '承受伤害',
+    impact: 'nerf',
+    type: 'percentage',
+    order: 1
+  },
+  healing: {
+    name: '治疗效果',
+    impact: 'buff',
+    type: 'percentage',
+    order: 2
+  },
+  shielding: {
+    name: '护盾效果',
+    impact: 'buff',
+    type: 'percentage',
+    order: 3
+  },
+  ability_haste: {
+    name: '技能急速',
+    impact: 'buff',
+    type: 'literal',
+    order: 4
+  },
+  mana_regen: {
+    name: '法力回复',
+    impact: 'buff',
+    type: 'percentage',
+    order: 5
+  },
+  energy_regen: {
+    name: '能量回复',
+    impact: 'buff',
+    type: 'percentage',
+    order: 6
+  },
+  attack_speed: {
+    name: '攻击速度',
+    impact: 'buff',
+    type: 'percentage',
+    order: 7
+  },
+  movement_speed: {
+    name: '移动速度',
+    impact: 'buff',
+    type: 'percentage',
+    order: 8
+  },
+  tenacity: {
+    name: '韧性',
+    impact: 'buff',
+    type: 'percentage',
+    order: 9
+  }
+}
+
+const STATUS_SORT_ORDER = {
+  nerfed: 1,
+  buffed: 0
+}
+
+const formatBalanceValue = (b: number, percentage = true) => {
+  if (percentage) {
+    return `${(100 * b).toFixed()} %`
+  } else {
+    return b > 0 ? `+${b}` : b
+  }
+}
 
 const benchChampions = computed(() => {
   if (!isBenchEnabledSession(cs.session)) {
@@ -75,6 +226,57 @@ const benchChampions = computed(() => {
   }
 
   return cs.session.benchChampions
+})
+
+const regulateBalance = (key: string, value: number) => {
+  let status: string
+  const meta = BALANCE_TYPES[key]
+  if (meta.type === 'percentage') {
+    if (meta.impact === 'buff') {
+      status = value >= 1.0 ? 'buffed' : 'nerfed'
+    } else {
+      status = value >= 1.0 ? 'nerfed' : 'buffed'
+    }
+  } else {
+    if (meta.impact === 'buff') {
+      status = value >= 0 ? 'buffed' : 'nerfed'
+    } else {
+      status = value >= 0 ? 'nerfed' : 'buffed'
+    }
+  }
+
+  return {
+    value,
+    status,
+    meta
+  }
+}
+
+const benchChampionsWithBalance = computed(() => {
+  if (!isBenchEnabledSession(cs.session)) {
+    return null
+  }
+
+  const champions = cs.session.benchChampions
+
+  return champions.map((c) => {
+    const balanceData = getBalanceData(c.championId)
+
+    return {
+      championId: c.championId,
+      balance: balanceData
+        ? Object.entries(balanceData)
+            .map((s) => regulateBalance(s[0], s[1]))
+            .toSorted((a, b) => {
+              return (
+                (STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status]) * 100 +
+                a.meta.order -
+                b.meta.order
+              )
+            })
+        : []
+    }
+  })
 })
 
 const rerollsRemaining = computed(() => {
@@ -85,7 +287,7 @@ const rerollsRemaining = computed(() => {
   return cs.session.rerollsRemaining
 })
 
-const selfChampionId = computed(() => {
+const selfChampionWithBalance = computed(() => {
   if (!cs.session) {
     return null
   }
@@ -93,7 +295,12 @@ const selfChampionId = computed(() => {
   const c = cs.session.myTeam.find((t) => t.cellId == cs.session?.localPlayerCellId)
 
   if (c) {
-    return c.championId
+    const b = getBalanceData(c.championId)
+
+    return {
+      championId: c.championId,
+      balance: b ? Object.entries(b).map((s) => regulateBalance(s[0], s[1])) : []
+    }
   }
 
   return null
@@ -132,15 +339,15 @@ const handleReroll = async (grabBack = false) => {
 
   isRerolling.value = true
   try {
-    const prevChampionId = selfChampionId.value
+    const prev = selfChampionWithBalance.value
 
     await reroll()
 
     // 使用一个简短的延时来实现，simple workaround
-    if (grabBack && prevChampionId !== null) {
+    if (grabBack && prev !== null) {
       window.setTimeout(async () => {
         if (benchChampions.value) {
-          await handleBenchSwap(prevChampionId)
+          await handleBenchSwap(prev.championId)
         }
       }, 25)
     }
@@ -204,5 +411,31 @@ const handleReroll = async (grabBack = false) => {
 .card-header-title {
   font-weight: bold;
   font-size: 18px;
+}
+
+.raw-popover {
+  background-color: rgba(0, 0, 0, 0.866);
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+
+.balance-item {
+  font-size: 10px;
+  color: rgb(204, 204, 204);
+
+  .balance-item-value {
+    display: inline-block;
+    text-align: end;
+    min-width: 36px;
+    white-space: nowrap;
+  }
+
+  .balance-item-value.buffed {
+    color: rgb(0, 219, 91);
+  }
+
+  .balance-item-value.nerfed {
+    color: rgb(255, 106, 0);
+  }
 }
 </style>

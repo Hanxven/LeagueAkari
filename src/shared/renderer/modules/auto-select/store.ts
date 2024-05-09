@@ -16,7 +16,7 @@ export interface UpcomingGrabInfo {
   championId: number
 }
 
-export const useAutoSelectStore = defineStore('feature:auto-select', () => {
+export const useAutoSelectStore = defineStore('module:auto-select', () => {
   const settings = reactive({
     normalModeEnabled: false,
 

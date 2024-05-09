@@ -14,14 +14,12 @@ import { setupDebug } from './debug'
 import { setupMatchHistoryTabs } from './match-history-tabs'
 
 export async function setupLeagueAkariFeatures() {
-  // 应用本身的相关状态
   await setupApp()
 
   await setupMainWindow()
 
   await setupAuxiliaryWindow()
 
-  // 所有涉及到 LCU 状态的更新
   await setupLcuStateSync()
 
   await setupDebug()

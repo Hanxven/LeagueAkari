@@ -18,6 +18,7 @@ import { setupLeagueAkariFeatures } from './modules'
 import { initStorageIpc } from './storage'
 import { sendEventToAllRenderer } from './utils/ipc'
 import { checkWmicAvailability } from './utils/shell'
+import './core-modules/vm'
 
 EventEmitter.defaultMaxListeners = 1000
 

@@ -1,6 +1,7 @@
-export interface NormalizedExternalDataSource {
-  dataSourceName: string
-  dataSourceVersion: string
+export interface NormalizedExternalRunesDataSource {
+  name: string
+  version: string
+  updateAt: Date
 
   getNormalizedChampionARAM(
     championId: number

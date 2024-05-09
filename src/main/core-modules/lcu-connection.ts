@@ -118,6 +118,9 @@ async function connectToLcu(auth1: LcuAuth) {
       return
     }
 
+    const { certificate, ...rest } = auth1
+    logger.info(`尝试连接，${JSON.stringify(rest)}`)
+
     lcuConnectionState.setConnecting()
 
     const ws = await initWebSocket(auth1)

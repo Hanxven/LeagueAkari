@@ -88,7 +88,7 @@ export interface TabState {
   }
 }
 /** 和战绩相关的一切基础功能 store */
-export const useMatchHistoryTabsStore = defineStore('feature:match-history-tabs', () => {
+export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs', () => {
   const {
     add,
     canCloseAllTemporary,

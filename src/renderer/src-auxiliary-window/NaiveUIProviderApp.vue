@@ -40,7 +40,8 @@ const themeOverrides: GlobalThemeOverrides = {
     fontSize: '12px',
     iconSize: '16px',
     iconMargin: '0 4px 0 0'
-  }
+  },
+  Popover: {}
 }
 </script>
 

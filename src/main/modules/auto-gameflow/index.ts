@@ -8,6 +8,7 @@ import { accept } from '@main/http-api/matchmaking'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
+import { TimeoutTask } from '@main/utils/timer'
 import { LcuEvent } from '@shared/types/lcu/event'
 import { Ballot } from '@shared/types/lcu/honorV2'
 import { formatError } from '@shared/utils/errors'
@@ -25,6 +26,17 @@ const logger = createLogger('auto-gameflow')
 let autoAcceptTimerId: NodeJS.Timeout | null = null
 let autoSearchMatchTimerId: NodeJS.Timeout | null = null
 let autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
+
+const AUTO_PLAY_AGAIN_DELAY = 2000
+
+const autoPlayAgainTask = new TimeoutTask(async () => {
+  try {
+    await playAgain()
+    logger.info('Play again, 返回房间')
+  } catch (error) {
+    logger.warn(`尝试 Play again 时失败 ${formatError(error)}`)
+  }
+})
 
 export async function setupAutoGameflow() {
   stateSync()
@@ -101,11 +113,11 @@ export async function setupAutoGameflow() {
     () => [isEndGame.get(), autoGameflowState.settings.playAgainEnabled] as const,
     async ([isEnd, enabled]) => {
       if (enabled && isEnd) {
-        try {
-          await playAgain()
-          logger.info('Play again, 返回房间')
-        } catch (error) {
-          logger.warn(`尝试 Play again 时失败 ${formatError(error)}`)
+        logger.info(`将在 ${AUTO_PLAY_AGAIN_DELAY} ms 后 play again`)
+        autoPlayAgainTask.start(AUTO_PLAY_AGAIN_DELAY)
+      } else {
+        if (autoPlayAgainTask.cancel()) {
+          logger.info(`play again 已取消`)
         }
       }
     },

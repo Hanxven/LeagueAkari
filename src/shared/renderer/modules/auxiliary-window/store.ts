@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 
-export const useAuxiliaryWindowStore = defineStore('feature:auxiliary-window', () => {
+export const useAuxiliaryWindowStore = defineStore('module:auxiliary-window', () => {
   const windowState = 'normal'
   const focusState = 'focused'
   const isShow = ref(false)

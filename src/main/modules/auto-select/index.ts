@@ -219,7 +219,7 @@ export async function setupAutoSelect() {
         return
       }
 
-      if (!s.benchEnabled || !autoSelectState.settings.benchModeEnabled) {
+      if (!s.benchEnabled) {
         return
       }
 
@@ -233,6 +233,7 @@ export async function setupAutoSelect() {
 
       if (!o) {
         if (autoSelectState.upcomingGrab) {
+          logger.info(`已取消即将进行的交换：ID：${autoSelectState.upcomingGrab.championId}`)
           clearTimeout(grabTimerId!)
           grabTimerId = null
           autoSelectState.setUpcomingGrab(null)

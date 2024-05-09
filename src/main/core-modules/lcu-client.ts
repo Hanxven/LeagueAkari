@@ -73,7 +73,7 @@ export async function initLeagueClientFunctions() {
   })
 
   // 检查英雄联盟渲染端是否存在，可能存在多个
-  onRendererCall('league-client-ux/lcu-auth/query', () => {
+  onRendererCall('league-client-ux/lcu-auth/query', async () => {
     return queryLcuAuth(LEAGUE_CLIENT_UX_PROCESS_NAME)
   })
 

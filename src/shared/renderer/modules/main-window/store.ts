@@ -10,7 +10,7 @@ export interface TitleBarTask {
   icon?: () => VNode
 }
 
-export const useMainWindowStore = defineStore('feature:main-window', () => {
+export const useMainWindowStore = defineStore('module:main-window', () => {
   const windowState = 'normal'
   const focusState = 'focused'
 

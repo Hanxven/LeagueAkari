@@ -10,7 +10,7 @@ export type PrintRules = Record<
 >
 
 // 有关各种功能的设置项
-export const useDebugStore = defineStore('feature:debug', () => {
+export const useDebugStore = defineStore('module:debug', () => {
   // 调试功能的打印事件
   const settings = reactive({
     printAllLcuEvents: false,

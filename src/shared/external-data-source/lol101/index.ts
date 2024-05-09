@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-import { NormalizedChampionInformation, NormalizedExternalDataSource } from '../normalized'
+import {
+  NormalizedChampionInformation,
+  NormalizedExternalRunesDataSource
+} from '../normalized/runes'
 
 export interface Lol101ChampDetails20240425 {
   status: string
@@ -139,10 +142,12 @@ const FABRICATED_USER_AGENT =
  *
  * 说实话如此奇妙的解析方式还是第一次见，估计 robustness 超级差
  */
-export class Lol101DataSource implements NormalizedExternalDataSource {
-  dataSourceName = 'LOL101'
+export class Lol101DataSource implements NormalizedExternalRunesDataSource {
+  name = 'LOL101'
 
-  dataSourceVersion = '2024-04-25T13:46:45.490Z'
+  version = '2024-04-25T13:46:45.490Z'
+
+  updateAt = new Date(2024, 3, 1)
 
   private axiosLol = axios.create({
     baseURL: 'https://lol.qq.com/',

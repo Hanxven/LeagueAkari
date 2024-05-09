@@ -3,6 +3,8 @@ import { MaybeRefOrGetter, toRef } from '@vueuse/core'
 import PQueue from 'p-queue'
 import { getCurrentScope, onScopeDispose, readonly, ref, watch } from 'vue'
 
+import { useAppStore } from '../modules/app/store'
+
 // 过快的访问频率概率导致 50x 错误，需要限制
 const globalAssetFetchingLimiter = new PQueue({
   concurrency: 10
@@ -24,6 +26,8 @@ export function useGameDataBlobUrl(
   immediate = true,
   cache = false
 ) {
+  const app = useAppStore()
+
   const url = ref<string>()
   const type = ref<string>()
   const unwrappedUrl = toRef(srcURL)
@@ -69,9 +73,9 @@ export function useGameDataBlobUrl(
     })
 
   watch(
-    unwrappedUrl,
-    () => {
-      if (unwrappedUrl.value) {
+    [() => unwrappedUrl.value, () => app.lcuConnectionState],
+    ([u, s]) => {
+      if (u && s === 'connected') {
         load()
       } else {
         url.value = undefined

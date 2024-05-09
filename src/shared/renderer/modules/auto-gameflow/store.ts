@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 
-export const useAutoGameflowStore = defineStore('feature:auto-gameflow', () => {
+export const useAutoGameflowStore = defineStore('module:auto-gameflow', () => {
   const settings = reactive({
     autoHonorEnabled: false,
     autoHonorStrategy: 'prefer-lobby-member',

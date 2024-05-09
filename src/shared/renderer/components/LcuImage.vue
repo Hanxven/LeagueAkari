@@ -17,9 +17,7 @@ const props = withDefaults(
 )
 
 // 直接在 beforeCreate 的时候就加载
-const { url, load } = useGameDataBlobUrl(() => props.src, false, props.cache)
-
-load()
+const { url, load } = useGameDataBlobUrl(() => props.src, true, props.cache)
 
 defineExpose({
   load

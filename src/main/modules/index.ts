@@ -4,6 +4,7 @@ import { setupAutoSelect } from './auto-select'
 import { setupCoreFunctionality } from './core-functionality'
 import { setupCustomKeyboardSequence } from './custom-keyboard-sequence'
 import { setupDebug } from './debug'
+import { setupExternalDataSource } from './external-data-source'
 import { setupLcuStateSync } from './lcu-state-sync'
 import { setupRespawnTimer } from './respawn-timer'
 
@@ -23,4 +24,6 @@ export async function setupLeagueAkariFeatures() {
   await setupRespawnTimer()
 
   await setupCustomKeyboardSequence()
+
+  await setupExternalDataSource()
 }

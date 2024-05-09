@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 
 export const useCustomKeyboardSequenceStore = defineStore(
-  'feature:custom-keyboard-sequence',
+  'module:custom-keyboard-sequence',
   () => {
     const settings = reactive({
       enabled: false,

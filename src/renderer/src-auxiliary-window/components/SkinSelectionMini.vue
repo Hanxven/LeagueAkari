@@ -157,9 +157,15 @@ watch(
       return
     }
 
+    currentSkinId.value = undefined
+
     try {
       const list = (await getCarouselSkins()).data
       carouselSkins.value = list
+
+      if (list.length) {
+        currentSkinId.value = list[0].id
+      }
 
       const cm = (await getChampDetails(c)).data
       championDetails.value = cm

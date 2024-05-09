@@ -57,7 +57,7 @@ export interface MatchHistoryWithState {
 }
 
 /** 和战绩相关的一切基础功能 store */
-export const useCoreFunctionalityStore = defineStore('feature:core-functionality', () => {
+export const useCoreFunctionalityStore = defineStore('module:core-functionality', () => {
   const ongoingPlayers = ref<
     Record<
       string, // puuid
