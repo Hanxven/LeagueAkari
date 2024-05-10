@@ -100,7 +100,8 @@ export function createMainWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       spellcheck: false,
-      backgroundThrottling: false
+      backgroundThrottling: false,
+      partition: 'persist:main-window'
     }
   })
 

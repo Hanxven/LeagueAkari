@@ -20,7 +20,6 @@ const balanceModes = new Map<string, string>([
 
 export async function setupExternalDataSource() {
   eds.balance.dataSource = new FandomWikiChampBalanceDataSource()
-  eds.balance.updateData()
 
   stateSync()
 

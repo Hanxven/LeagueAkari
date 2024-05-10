@@ -70,7 +70,7 @@
           :delay="300"
           v-for="c of benchChampionsWithBalance"
           :key="c.championId"
-          :disabled="!c.balance"
+          :disabled="!c.balance.length"
         >
           <template #trigger>
             <LcuImage

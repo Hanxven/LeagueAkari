@@ -123,7 +123,8 @@ export function createAuxiliaryWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       spellcheck: false,
-      backgroundThrottling: false
+      backgroundThrottling: false,
+      partition: 'persist:auxiliary-window'
     }
   })
 
@@ -138,6 +139,7 @@ export function createAuxiliaryWindow(): void {
   })
 
   auxiliaryWindow.setOpacity(auxiliaryWindowState.settings.opacity)
+  auxiliaryWindow.webContents.setZoomFactor(1)
 
   getLastWindowBounds().then((b) => {
     if (b && auxiliaryWindow) {
