@@ -156,4 +156,58 @@ export class FandomWikiChampBalanceDataSource implements ChampBalanceDataSourceV
 
     return ret
   }
+
+  validate(obj: any): boolean {
+    if (obj === null) {
+      return true
+    }
+
+    if (typeof obj !== 'object') {
+      return false
+    }
+
+    for (const key in obj) {
+      const info = obj[key]
+
+      if (
+        typeof info !== 'object' ||
+        info === null ||
+        typeof info.id !== 'number' ||
+        typeof info.balance !== 'object' ||
+        info.balance === null
+      ) {
+        return false
+      }
+
+      const modes = ['ar', 'aram', 'nb', 'ofa', 'urf', 'usb']
+      for (const mode of modes) {
+        const modeInfo = info.balance[mode]
+        if (modeInfo && typeof modeInfo !== 'object') {
+          return false
+        }
+
+        if (modeInfo) {
+          const properties = [
+            'dmg_dealt',
+            'dmg_taken',
+            'healing',
+            'shielding',
+            'ability_haste',
+            'mana_regen',
+            'energy_regen',
+            'attack_speed',
+            'movement_speed',
+            'tenacity'
+          ]
+          for (const prop of properties) {
+            if (modeInfo[prop] !== undefined && typeof modeInfo[prop] !== 'number') {
+              return false
+            }
+          }
+        }
+      }
+    }
+
+    return true
+  }
 }

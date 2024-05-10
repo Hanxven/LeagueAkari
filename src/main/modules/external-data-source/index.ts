@@ -13,10 +13,32 @@ const balanceModes = new Map<string, string>([
   ['ARAM', 'aram'],
   ['ONEFORALL', 'ofa'],
   ['URF', 'urf'],
-  ['ARURF', 'urf'],
-  ['CHERRY', 'ar']
-  // ['USB', 'usb'] // 终极魔典？
+  ['CHERRY', 'ar'],
+  ['ULTBOOK', 'usb']
 ])
+
+// 目前所有的可用模式 (截止到 2024-05-10)
+const _MODES = [
+  'ARAM', // 极地大乱斗
+  'ARSR', // 随机英雄的峡谷模式
+  'ASSASSINATE', // 血月杀
+  'CHERRY', // 竞技场
+  'CLASSIC', // 经典
+  'DOOMBOTSTEEMO', // 大提莫节
+  'FIRSTBLOOD', // 过载
+  'KINGPORO', // 魄罗大作战
+  'LCURGMDISABLED', // 测试模式
+  'NEXUSBLITZ', // 极限闪击
+  'ONEFORALL', // 克隆大作战
+  'PRACTICETOOL', // 训练模式
+  'SNOWURF', // 雪球的无限火力
+  'TFT', // 云顶之弈
+  'TUTORIAL_MODULE_1', // 新手教程1
+  'TUTORIAL_MODULE_2', // 新手教程2
+  'TUTORIAL_MODULE_3', // 新手教程3
+  'ULTBOOK', // 终极魔典
+  'URF' // 无限火力
+]
 
 export async function setupExternalDataSource() {
   eds.balance.dataSource = new FandomWikiChampBalanceDataSource()

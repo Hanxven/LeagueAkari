@@ -8,7 +8,7 @@ class ExternalDataSourceSettings {}
 
 class ChampBalanceDataSource {
   dataSource: ChampBalanceDataSourceV1
-  
+
   data: {
     map: ChampBalanceMapV1
     updateAt: Date
@@ -17,6 +17,10 @@ class ChampBalanceDataSource {
   async updateData() {
     const result = await this.dataSource.update()
     if (result) {
+      if (!this.dataSource.validate(result)) {
+        throw new Error('数据格式未通过验证，数据源格式可能发生变化')
+      }
+
       runInAction(() => {
         this.data = {
           map: this.dataSource.get()!,

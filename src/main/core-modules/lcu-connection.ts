@@ -92,8 +92,7 @@ async function initWebSocket(auth: LcuAuth) {
       Authorization: `Basic ${Buffer.from(`riot:${auth.password}`).toString('base64')}`
     },
     agent: new https.Agent({
-      localAddress: await getRandomAvailableLoopbackAddrWithPort(auth.port),
-      keepAlive: true
+      localAddress: await getRandomAvailableLoopbackAddrWithPort(auth.port)
     }),
     ca: auth.certificate,
     rejectUnauthorized: typeof auth.certificate !== 'undefined'

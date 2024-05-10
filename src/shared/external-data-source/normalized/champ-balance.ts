@@ -23,6 +23,11 @@ export interface ChampBalanceDataSourceV1 {
    * 更新数据
    */
   update(): Promise<ChampBalanceMapV1 | null>
+
+  /**
+   * 数据是否合法，null 也是合法数据
+   */
+  validate(obj: any): boolean
 }
 
 export interface ChampBalanceMapV1 {
