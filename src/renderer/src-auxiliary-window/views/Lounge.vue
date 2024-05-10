@@ -1,69 +1,73 @@
 <template>
   <div class="lounge-wrapper">
-    <LcuImage
-      class="mode-image"
-      v-if="gameflow.session?.map?.assets?.['game-select-icon-hover']"
-      :src="gameflow.session?.map?.assets?.['game-select-icon-hover']"
-    />
-    <template v-if="gameflow.phase === 'ReadyCheck'">
-      <template v-if="autoGameflow.willAccept">
-        <span class="main-text">将自动接受对局</span>
-        <span class="sub-text">{{ willAcceptIn.toFixed(1) }} s</span>
-        <NButton type="primary" size="tiny" @click="() => handleCancelAutoAccept()"
-          >取消本次自动接受</NButton
+    <div class="indications">
+      <LcuImage
+        class="mode-image"
+        v-if="gameflow.session?.map?.assets?.['game-select-icon-hover']"
+        :src="gameflow.session?.map?.assets?.['game-select-icon-hover']"
+      />
+      <template v-if="gameflow.phase === 'ReadyCheck'">
+        <template v-if="autoGameflow.willAccept">
+          <span class="main-text">自动接受 {{ willAcceptIn.toFixed(1) }} s</span>
+          <NButton type="primary" size="tiny" @click="() => handleCancelAutoAccept()"
+            >取消本次自动接受</NButton
+          >
+        </template>
+        <template v-else-if="matchmaking.readyCheck?.playerResponse === 'Accepted'">
+          <span class="main-text">对局已接受</span>
+          <span class="sub-text">已经接受的对局仍可拒绝</span>
+          <NButton type="warning" size="tiny" @click="() => handleDecline()">拒绝对局</NButton>
+        </template>
+        <template v-else-if="matchmaking.readyCheck?.playerResponse === 'Declined'">
+          <span class="main-text">对局已拒绝</span>
+          <span class="sub-text">已经取消的对局仍可接受</span>
+          <NButton type="primary" size="tiny" @click="() => handleAccept()">接受对局</NButton>
+        </template>
+        <template v-else>
+          <span class="main-text">等待接受对局</span>
+          <div class="btn-group">
+            <NButton type="primary" size="tiny" @click="() => handleAccept()">接受对局</NButton>
+            <NButton type="warning" size="tiny" @click="() => handleDecline()">拒绝对局</NButton>
+          </div>
+        </template>
+      </template>
+      <template v-else-if="gameflow.phase === 'Matchmaking'">
+        <span class="main-text">匹配中</span>
+        <span class="sub-text" v-if="matchmaking.search">{{
+          formatMatchmakingSearchText(matchmaking.search)
+        }}</span>
+      </template>
+      <template v-else-if="autoGameflow.willSearchMatch">
+        <span class="main-text">匹配对局 {{ willSearchMatchIn.toFixed(1) }} s</span>
+        <NButton type="primary" size="tiny" @click="() => handleCancelAutoSearchMatch()"
+          >取消本次自动匹配</NButton
         >
       </template>
-      <template v-else-if="matchmaking.readyCheck?.playerResponse === 'Accepted'">
-        <span class="main-text">对局已接受</span>
-        <span class="sub-text">已经接受的对局仍可拒绝</span>
-        <NButton type="warning" size="tiny" @click="() => handleDecline()">拒绝对局</NButton>
-      </template>
-      <template v-else-if="matchmaking.readyCheck?.playerResponse === 'Declined'">
-        <span class="main-text">对局已拒绝</span>
-        <span class="sub-text">已经取消的对局仍可接受</span>
-        <NButton type="primary" size="tiny" @click="() => handleAccept()">接受对局</NButton>
-      </template>
       <template v-else>
-        <span class="main-text">等待接受对局</span>
-        <div class="btn-group">
-          <NButton type="primary" size="tiny" @click="() => handleAccept()">接受对局</NButton>
-          <NButton type="warning" size="tiny" @click="() => handleDecline()">拒绝对局</NButton>
-        </div>
+        <span
+          class="main-text-2"
+          :title="`${gameflow.session?.map.gameModeName || '模式中'} · ${gameflow.session?.map.name || '地图'}`"
+          >{{ gameflow.session?.map.gameModeName || '模式中' }} ·
+          {{ gameflow.session?.map.name || '地图' }}</span
+        >
+        <span
+          class="sub-text"
+          v-if="
+            autoGameflow.settings.autoSearchMatchEnabled &&
+            autoGameflow.activityStartStatus === 'waiting-for-invitees'
+          "
+          >正在等待受邀请的玩家</span
+        >
       </template>
-    </template>
-    <template v-else-if="gameflow.phase === 'Matchmaking'">
-      <span class="main-text">匹配中</span>
-      <span class="sub-text" v-if="matchmaking.search">{{
-        formatMatchmakingSearchText(matchmaking.search)
-      }}</span>
-    </template>
-    <template v-else-if="autoGameflow.willSearchMatch">
-      <span class="main-text">将自动开始匹配对局</span>
-      <span class="sub-text">{{ willSearchMatchIn.toFixed(1) }} s</span>
-      <NButton type="primary" size="tiny" @click="() => handleCancelAutoSearchMatch()"
-        >取消本次自动匹配</NButton
-      >
-    </template>
-    <template v-else>
-      <span
-        class="main-text-2"
-        :title="`${gameflow.session?.map.gameModeName || '模式中'} · ${gameflow.session?.map.name || '地图'}`"
-        >{{ gameflow.session?.map.gameModeName || '模式中' }} ·
-        {{ gameflow.session?.map.name || '地图' }}</span
-      >
-      <span
-        class="sub-text"
-        v-if="
-          autoGameflow.settings.autoSearchMatchEnabled &&
-          autoGameflow.activityStartStatus === 'waiting-for-invitees'
-        "
-        >正在等待受邀请的玩家</span
-      >
-    </template>
+    </div>
+    <div class="bottom-actions">
+      <LoungeOperations />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import LoungeOperations from '@auxiliary-window/components/LoungeOperations.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { accept, decline } from '@shared/renderer/http-api/matchmaking'
 import { cancelAutoAccept, cancelAutoSearchMatch } from '@shared/renderer/modules/auto-gameflow'
@@ -144,13 +148,24 @@ const formatMatchmakingSearchText = (search: GetSearch) => {
 .lounge-wrapper {
   display: flex;
   position: relative;
-  top: calc(var(--title-bar-height) * -0.5);
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100%;
-  padding: 8px 12px;
+  padding: 12px;
   box-sizing: border-box;
+
+  .indications {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+  }
+
+  .bottom-actions {
+    width: 100%;
+  }
 }
 
 .mode-image {

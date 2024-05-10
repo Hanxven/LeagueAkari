@@ -33,15 +33,15 @@ import App from './App.vue'
 const themeOverrides: GlobalThemeOverrides = {
   Notification: { padding: '12px' },
   Card: {
-    color: '#0000'
+    color: '#0000',
+    paddingSmall: '4px 12px'
   },
   Message: {
     padding: '4px 8px',
     fontSize: '12px',
     iconSize: '16px',
     iconMargin: '0 4px 0 0'
-  },
-  Popover: {}
+  }
 }
 </script>
 
