@@ -159,6 +159,22 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        label="缩放"
+        label-description="可以调整辅助窗口的大小"
+        :label-width="320"
+      >
+        <NInputNumber
+          style="width: 100px"
+          size="tiny"
+          :min="1"
+          :max="3"
+          step="0.1"
+          :value="aux.settings.zoomFactor"
+          @update:value="(val) => setZoomFactor(val || 1.0)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         label="重设辅助窗口位置"
         label-description="重新设置辅助窗口的位置，还原到默认主屏幕正中心"
         :label-width="320"
@@ -236,7 +252,7 @@ import {
   setAuxiliaryWindowEnabled,
   setAuxiliaryWindowOpacity
 } from '@shared/renderer/modules/auxiliary-window'
-import { setShowSkinSelector } from '@shared/renderer/modules/auxiliary-window'
+import { setShowSkinSelector, setZoomFactor } from '@shared/renderer/modules/auxiliary-window'
 import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
 import {
   setAutoRouteOnGameStart,

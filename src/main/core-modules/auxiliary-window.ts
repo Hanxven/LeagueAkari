@@ -14,8 +14,8 @@ import { displayAuxiliaryWindowTip, setAuxiliaryWindowTrayEnabled } from './plat
 
 const logger = createLogger('auxiliary-window')
 
-const WINDOW_WIDTH = 300
-const WINDOW_HEIGHT = 340
+const WINDOW_BASE_WIDTH = 300
+const WINDOW_BASE_HEIGHT = 340
 
 class AuxiliaryWindowSettings {
   opacity: number = 0.9
@@ -23,6 +23,8 @@ class AuxiliaryWindowSettings {
   enabled: boolean = true
 
   showSkinSelector: boolean = true
+
+  zoomFactor: number = 1.0
 
   setOpacity(opacity: number) {
     this.opacity = opacity
@@ -34,6 +36,10 @@ class AuxiliaryWindowSettings {
 
   setShowSkinSelector(b: boolean) {
     this.showSkinSelector = b
+  }
+
+  setZoomFactor(f: number) {
+    this.zoomFactor = f
   }
 
   constructor() {
@@ -101,12 +107,12 @@ export function createAuxiliaryWindow(): void {
   }
 
   auxiliaryWindow = new BrowserWindow({
-    width: WINDOW_WIDTH,
-    minWidth: WINDOW_HEIGHT,
-    maxWidth: WINDOW_WIDTH,
-    height: WINDOW_HEIGHT,
-    minHeight: WINDOW_HEIGHT,
-    maxHeight: WINDOW_HEIGHT,
+    width: WINDOW_BASE_WIDTH,
+    height: WINDOW_BASE_HEIGHT,
+    minWidth: WINDOW_BASE_WIDTH,
+    maxWidth: WINDOW_BASE_WIDTH,
+    minHeight: WINDOW_BASE_HEIGHT,
+    maxHeight: WINDOW_BASE_HEIGHT,
     resizable: false,
     frame: false,
     show: INITIAL_SHOW,
@@ -115,7 +121,6 @@ export function createAuxiliaryWindow(): void {
     maximizable: false,
     minimizable: false,
     icon,
-
     fullscreenable: false,
     skipTaskbar: true,
     alwaysOnTop: true,
@@ -130,21 +135,18 @@ export function createAuxiliaryWindow(): void {
 
   auxiliaryWindowState.setShow(INITIAL_SHOW)
 
-  const bounds = auxiliaryWindow.getBounds()
-  auxiliaryWindowState.setBounds({
-    x: bounds.x,
-    y: bounds.y,
-    width: WINDOW_WIDTH,
-    height: WINDOW_HEIGHT
-  })
+  auxiliaryWindowState.setBounds(auxiliaryWindow.getBounds())
 
   auxiliaryWindow.setOpacity(auxiliaryWindowState.settings.opacity)
-  auxiliaryWindow.webContents.setZoomFactor(1)
 
   getLastWindowBounds().then((b) => {
-    if (b && auxiliaryWindow) {
-      auxiliaryWindow.setBounds({ x: b.x, y: b.y, width: WINDOW_WIDTH, height: WINDOW_HEIGHT })
+    if (b) {
+      auxiliaryWindowState.setBounds(b)
     }
+  })
+
+  auxiliaryWindow.webContents.on('did-finish-load', () => {
+    auxiliaryWindow?.webContents.setZoomFactor(auxiliaryWindowState.settings.zoomFactor)
   })
 
   auxiliaryWindow.webContents.setWindowOpenHandler((details) => {
@@ -203,24 +205,14 @@ export function createAuxiliaryWindow(): void {
   auxiliaryWindow.on('move', () => {
     if (auxiliaryWindow) {
       const bounds = auxiliaryWindow.getBounds()
-      auxiliaryWindowState.setBounds({
-        x: bounds.x,
-        y: bounds.y,
-        width: WINDOW_WIDTH,
-        height: WINDOW_HEIGHT
-      })
+      auxiliaryWindowState.setBounds(bounds)
     }
   })
 
   auxiliaryWindow.on('resize', () => {
     if (auxiliaryWindow) {
       const bounds = auxiliaryWindow.getBounds()
-      auxiliaryWindowState.setBounds({
-        x: bounds.x,
-        y: bounds.y,
-        width: WINDOW_WIDTH,
-        height: WINDOW_HEIGHT
-      })
+      auxiliaryWindowState.setBounds(bounds)
     }
   })
 
@@ -271,6 +263,10 @@ export async function setupAuxiliaryWindow() {
   ipcStateSync(
     'auxiliary-window/settings/show-skin-selector',
     () => auxiliaryWindowState.settings.showSkinSelector
+  )
+  ipcStateSync(
+    'auxiliary-window/settings/zoom-factor',
+    () => auxiliaryWindowState.settings.zoomFactor
   )
 
   onRendererCall('auxiliary-window/size/set', async (_e, width, height, animate) => {
@@ -336,6 +332,11 @@ export async function setupAuxiliaryWindow() {
   onRendererCall('auxiliary-window/settings/show-skin-selector/set', async (_, s) => {
     auxiliaryWindowState.settings.setShowSkinSelector(s)
     await setSetting('auxiliary-window/show-skin-selector', s)
+  })
+
+  onRendererCall('auxiliary-window/settings/zoom-factor/set', async (_, f) => {
+    auxiliaryWindowState.settings.setZoomFactor(f)
+    await setSetting('auxiliary-window/zoom-factor', f)
   })
 
   reaction(
@@ -414,6 +415,13 @@ export async function setupAuxiliaryWindow() {
     { equals: comparer.shallow }
   )
 
+  reaction(
+    () => auxiliaryWindowState.settings.zoomFactor,
+    () => {
+      adjustWindowSize()
+    }
+  )
+
   auxiliaryWindowState.settings.setOpacity(
     await getSetting('auxiliary-window/opacity', auxiliaryWindowState.settings.opacity)
   )
@@ -429,6 +437,13 @@ export async function setupAuxiliaryWindow() {
     )
   )
 
+  auxiliaryWindowState.settings.setZoomFactor(
+    await getSetting(
+      'auxiliary-window/settings/zoom-factor',
+      auxiliaryWindowState.settings.zoomFactor
+    )
+  )
+
   logger.info('初始化完成')
 }
 
@@ -437,8 +452,6 @@ function getLastWindowBounds() {
 }
 
 function saveWindowBounds(bounds: Rectangle) {
-  bounds.width = WINDOW_WIDTH
-  bounds.height = WINDOW_HEIGHT
   return setSetting('auxiliary-window/bounds', bounds)
 }
 
@@ -453,8 +466,35 @@ function getCenteredRectangle(width: number, height: number) {
 
 function resetWindowPosition() {
   if (auxiliaryWindow) {
-    const p = getCenteredRectangle(WINDOW_WIDTH, WINDOW_HEIGHT)
-    auxiliaryWindow.setBounds({ x: p.x, y: p.y, width: WINDOW_WIDTH, height: WINDOW_HEIGHT })
+    const p = getCenteredRectangle(
+      WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor,
+      WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor
+    )
+    auxiliaryWindow.setBounds({
+      x: p.x,
+      y: p.y,
+      width: WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor,
+      height: WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor
+    })
     logger.info('重置窗口位置到主显示器中心')
+  }
+}
+
+function adjustWindowSize() {
+  if (auxiliaryWindow) {
+    auxiliaryWindow.webContents.setZoomFactor(auxiliaryWindowState.settings.zoomFactor)
+
+    auxiliaryWindow.setMinimumSize(
+      Math.ceil(WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor),
+      Math.ceil(WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor)
+    )
+    auxiliaryWindow.setMaximumSize(
+      Math.ceil(WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor),
+      Math.ceil(WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor)
+    )
+    auxiliaryWindow.setSize(
+      Math.ceil(WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor),
+      Math.ceil(WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor)
+    )
   }
 }

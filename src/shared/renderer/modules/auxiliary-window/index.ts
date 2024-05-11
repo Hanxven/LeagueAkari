@@ -21,6 +21,8 @@ export async function setupAuxiliaryWindow() {
     'auxiliary-window/settings/show-skin-selector',
     (s) => (aux.settings.showSkinSelector = s)
   )
+
+  mainStateSync('auxiliary-window/settings/zoom-factor', (s) => (aux.settings.zoomFactor = s))
 }
 
 export function setAuxiliaryWindowEnabled(enabled: boolean) {
@@ -37,4 +39,8 @@ export function resetAuxiliaryWindowPosition() {
 
 export function setShowSkinSelector(b: boolean) {
   return mainCall('auxiliary-window/settings/show-skin-selector/set', b)
+}
+
+export function setZoomFactor(f: number) {
+  return mainCall('auxiliary-window/settings/zoom-factor/set', f)
 }
