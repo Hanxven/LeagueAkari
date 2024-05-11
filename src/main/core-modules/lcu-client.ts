@@ -3,7 +3,7 @@ import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { makeAutoObservable, observable } from 'mobx'
 
 import toolkit from '../native/laToolkitWin32x64.node'
-import { queryLcuAuth } from '../utils/shell'
+import { queryLcuAuth, queryLcuAuthNative } from '../utils/lcu-auth'
 import { appState } from './app'
 import { getHttpInstance } from './lcu-connection'
 import { createLogger } from './log'
@@ -36,6 +36,11 @@ class LeagueClientUxSettings {
 }
 
 export const leagueClientUxSettings = new LeagueClientUxSettings()
+
+function queryLeagueClientUxCommandLineNative() {
+  const pids = toolkit.getPidsByName('LeagueClientUx.exe')
+  console.log(pids.map((p) => toolkit.getCommandLine1(p)))
+}
 
 export async function initLeagueClientFunctions() {
   await loadSettings()
@@ -74,7 +79,7 @@ export async function initLeagueClientFunctions() {
 
   // 检查英雄联盟渲染端是否存在，可能存在多个
   onRendererCall('league-client-ux/lcu-auth/query', async () => {
-    return queryLcuAuth(LEAGUE_CLIENT_UX_PROCESS_NAME)
+    return queryLcuAuthNative(LEAGUE_CLIENT_UX_PROCESS_NAME)
   })
 
   logger.info('初始化完成')

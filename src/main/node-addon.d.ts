@@ -81,6 +81,17 @@ declare module '*/laToolkitWin32x64.node' {
       bottom: number
       shownState: numbre
     } | null
+
+    /**
+     * 获取进程 PID
+     */
+    getCommandLine1(pid: number): string
+
+    /**
+     * 获取进程名的 PID
+     * @param name 进程名
+     */
+    getPidsByName(name: string): number[]
   }
 
   const lt1: LeagueAkari1Addon

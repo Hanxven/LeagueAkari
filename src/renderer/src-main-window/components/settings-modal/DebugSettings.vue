@@ -138,7 +138,7 @@
     <NCard v-if="app.isAdministrator" size="small" style="margin-top: 8px">
       <template #header><LeagueAkariSpan class="card-header-title" /></template>
       <span class="text"
-        >League Akari 运行在管理员权限，仅用于实现命令行获取以及特定的客户端功能</span
+        >League Akari 运行在管理员权限，仅用于实现特定的客户端功能</span
       >
     </NCard>
   </NScrollbar>
