@@ -141,7 +141,7 @@ export function createAuxiliaryWindow(): void {
 
   getLastWindowBounds().then((b) => {
     if (b) {
-      auxiliaryWindowState.setBounds(b)
+      auxiliaryWindow?.setBounds(b)
     }
   })
 
@@ -438,10 +438,7 @@ export async function setupAuxiliaryWindow() {
   )
 
   auxiliaryWindowState.settings.setZoomFactor(
-    await getSetting(
-      'auxiliary-window/settings/zoom-factor',
-      auxiliaryWindowState.settings.zoomFactor
-    )
+    await getSetting('auxiliary-window/zoom-factor', auxiliaryWindowState.settings.zoomFactor)
   )
 
   logger.info('初始化完成')
@@ -496,5 +493,7 @@ function adjustWindowSize() {
       Math.ceil(WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor),
       Math.ceil(WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor)
     )
+
+    saveWindowBounds(auxiliaryWindow.getBounds())
   }
 }
