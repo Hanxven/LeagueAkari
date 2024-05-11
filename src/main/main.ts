@@ -11,13 +11,19 @@ import { setupAuxiliaryWindow } from './core-modules/auxiliary-window'
 import { initLeagueClientFunctions } from './core-modules/lcu-client'
 import { initLcuConnection } from './core-modules/lcu-connection'
 import { createLogger, initLogger } from './core-modules/log'
-import { createMainWindow, getMainWindow, setupMainWindow } from './core-modules/main-window'
+import {
+  createMainWindow,
+  getMainWindow,
+  mwNotification,
+  restoreAndFocus,
+  setupMainWindow
+} from './core-modules/main-window'
 import { initWindowsPlatform } from './core-modules/platform'
+import './core-modules/vm'
 import { initDatabase } from './db'
 import { setupLeagueAkariFeatures } from './modules'
 import { initStorageIpc } from './storage'
 import { sendEventToAllRenderer } from './utils/ipc'
-import './core-modules/vm'
 
 EventEmitter.defaultMaxListeners = 1000
 
@@ -25,11 +31,11 @@ configure({ enforceActions: 'observed' })
 
 const gotTheLock = app.requestSingleInstanceLock()
 
-const logger = createLogger('league-akari')
-
 if (!gotTheLock) {
   app.quit()
 }
+
+const logger = createLogger('league-akari')
 
 app.whenReady().then(async () => {
   appState.setReady(true)
@@ -65,15 +71,7 @@ app.whenReady().then(async () => {
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
       logger.info(`用户尝试启动第二个实例, cmd=${commandLine}, pwd=${workingDirectory}`)
 
-      const mainWindow = getMainWindow()
-      if (mainWindow) {
-        if (mainWindow.isMinimized()) {
-          mainWindow.restore()
-        }
-        mainWindow.focus()
-      } else {
-        createMainWindow()
-      }
+      restoreAndFocus()
 
       sendEventToAllRenderer('app/second-instance', commandLine, workingDirectory)
     })

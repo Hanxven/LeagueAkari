@@ -17,6 +17,8 @@ import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
 import { greeting } from '@shared/renderer/utils/greeting'
+import { onMainEvent } from '@shared/renderer/utils/ipc'
+import { useNotification } from 'naive-ui'
 import { ref, watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -75,7 +77,15 @@ const handleConfirmation = (notShowAgain: boolean) => {
   isShowingFreeSoftwareDeclaration.value = false
 }
 
-// check for updates
+const notification = useNotification()
+
+onMainEvent('app/second-instance', () => {
+  notification.info({
+    title: 'League Akari',
+    content: '因为 Akari 是独一无二的，所以同一时间只能有一个 Akari',
+    duration: 6000
+  })
+})
 </script>
 
 <style lang="less">

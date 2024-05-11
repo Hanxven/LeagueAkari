@@ -25,7 +25,6 @@ int GetProcessCommandLine1(DWORD pid, WCHAR** pdata, SIZE_T* psize) {
   size_t size;
   int ProcessCommandLineInformation = 60;
 
-  // 尝试打开进程句柄
   hProcess = OpenProcessFromPid(pid, PROCESS_QUERY_LIMITED_INFORMATION);
   if (hProcess == NULL)
     goto error;

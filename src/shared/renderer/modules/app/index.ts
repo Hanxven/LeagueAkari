@@ -1,7 +1,7 @@
 import { mainCall, mainStateSync } from '@shared/renderer/utils/ipc'
+import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 
 import { useAppStore } from './store'
-import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 
 export async function setupApp() {
   const app = useAppStore()
@@ -11,6 +11,8 @@ export async function setupApp() {
   })
 
   mainStateSync('app/settings/auto-connect', (s) => (app.settings.autoConnect = s))
+
+  mainStateSync('app/settings/use-wmic', (s) => (app.settings.useWmic = s))
 
   mainStateSync('app/settings/auto-check-updates', (s) => (app.settings.autoCheckUpdates = s))
 
@@ -42,6 +44,10 @@ export async function setupApp() {
 
 export function setAutoConnect(enabled: boolean) {
   return mainCall('app/settings/auto-connect/set', enabled)
+}
+
+export function setUseWmic(enabled: boolean) {
+  return mainCall('app/settings/use-wmic/set', enabled)
 }
 
 export function setAutoCheckUpdates(enabled: boolean) {

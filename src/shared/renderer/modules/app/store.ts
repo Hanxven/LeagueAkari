@@ -44,6 +44,7 @@ export const useAppStore = defineStore('core:app', () => {
 
   const settings = reactive({
     autoConnect: false,
+    useWmic: false,
     autoCheckUpdates: false,
     showFreeSoftwareDeclaration: false,
     fixWindowMethodAOptions: {

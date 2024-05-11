@@ -179,7 +179,7 @@ export async function queryLcuAuth(arg: string | number): Promise<LcuAuth[]> {
   })
 }
 
-export function queryLcuAuthNative(clientName: string) {
+export function queryLcuAuthNative(clientName: string): LcuAuth[] {
   const pids = toolkit.getPidsByName(clientName)
 
   const auths: LcuAuth[] = []

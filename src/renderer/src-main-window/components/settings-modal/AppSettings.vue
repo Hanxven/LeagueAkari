@@ -40,13 +40,30 @@
           :options="closeStrategies"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="使用 WMIC"
+        label-description="使用 WMIC 获取客户端命令行信息，而不是默认的 Win32 API 方式"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="app.settings.useWmic"
+          @update:value="(val: boolean) => setUseWmic(val)"
+        />
+      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { setAutoCheckUpdates, setAutoConnect, setCloseStrategy } from '@shared/renderer/modules/app'
+import {
+  setAutoCheckUpdates,
+  setAutoConnect,
+  setCloseStrategy,
+  setUseWmic
+} from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { NCard, NScrollbar, NSelect, NSwitch } from 'naive-ui'
 

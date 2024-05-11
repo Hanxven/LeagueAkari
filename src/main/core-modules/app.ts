@@ -27,6 +27,11 @@ class AppSettings {
   autoConnect: boolean = true
 
   /**
+   * 使用 WMIC 查询命令行，而不是默认的 NtQueryProcessInformation
+   */
+  useWmic: boolean = false
+
+  /**
    * 从 Github 拉取更新信息
    */
   autoCheckUpdates: boolean = true
@@ -43,6 +48,10 @@ class AppSettings {
 
   setAutoConnect(enabled: boolean) {
     this.autoConnect = enabled
+  }
+
+  setUseWmic(enabled: boolean) {
+    this.useWmic = enabled
   }
 
   setAutoCheckUpdates(enabled: boolean) {
@@ -217,6 +226,7 @@ function stateSync() {
     () => appState.settings.showFreeSoftwareDeclaration
   )
   ipcStateSync('app/settings/close-strategy', () => appState.settings.closeStrategy)
+  ipcStateSync('app/settings/use-wmic', () => appState.settings.useWmic)
 }
 
 function ipcCall() {
@@ -240,6 +250,11 @@ function ipcCall() {
   onRendererCall('app/settings/close-strategy/set', async (_, s) => {
     appState.settings.setCloseStrategy(s)
     await setSetting('app/close-strategy', s)
+  })
+
+  onRendererCall('app/settings/use-wmic/set', async (_, s) => {
+    appState.settings.setUseWmic(s)
+    await setSetting('app/use-wmic', s)
   })
 
   // 处理前版本设置项迁移问题
@@ -284,6 +299,8 @@ async function loadSettings() {
   appState.settings.setCloseStrategy(
     await getSetting('app/close-strategy', appState.settings.closeStrategy)
   )
+
+  appState.settings.setUseWmic(await getSetting('app/use-wmic', appState.settings.useWmic))
 }
 
 /**

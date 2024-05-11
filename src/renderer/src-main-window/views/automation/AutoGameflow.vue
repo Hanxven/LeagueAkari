@@ -76,7 +76,7 @@
     <ControlItem
       class="control-item-margin"
       label="自动匹配对局"
-      label-description="在可匹配对局时，将自动开始匹配对局。如有正在邀请中的玩家，则等待"
+      label-description="在可匹配对局时，将自动开始匹配对局"
     >
       <NSwitch
         :value="autoGameflow.settings.autoSearchMatchEnabled"

@@ -1,5 +1,4 @@
 import { is } from '@electron-toolkit/utils'
-import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { BrowserWindow, shell } from 'electron'
 import { makeAutoObservable } from 'mobx'
 import { join } from 'node:path'
