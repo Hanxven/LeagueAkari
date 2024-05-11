@@ -21,6 +21,8 @@ class AutoGameflowSettings {
 
   autoSearchMatchEnabled: boolean = false
   autoSearchMatchDelaySeconds: number = 5
+  autoSearchMatchMinimumMembers = 1 // 最低满足人数
+  autoSearchMatchWaitForInvitees: boolean = true // 等待邀请中的用户
 
   setAutoHonorEnabled(enabled: boolean) {
     this.autoHonorEnabled = enabled
@@ -48,6 +50,14 @@ class AutoGameflowSettings {
 
   setAutoSearchMatchDelaySeconds(seconds: number) {
     this.autoSearchMatchDelaySeconds = seconds
+  }
+
+  setAutoSearchMatchMinimumMembers(count: number) {
+    this.autoSearchMatchMinimumMembers = count
+  }
+
+  setAutoSearchMatchWaitForInvitees(yes: boolean) {
+    this.autoSearchMatchWaitForInvitees = yes
   }
 
   constructor() {
@@ -94,10 +104,15 @@ class AutoGameflowState {
       return 'unavailable'
     }
 
-    const hasPendingInvitation = lobby.lobby.invitations.some((i) => i.state === 'Pending')
+    if (this.settings.autoSearchMatchWaitForInvitees) {
+      const hasPendingInvitation = lobby.lobby.invitations.some((i) => i.state === 'Pending')
+      if (hasPendingInvitation) {
+        return 'waiting-for-invitees'
+      }
+    }
 
-    if (hasPendingInvitation) {
-      return 'waiting-for-invitees'
+    if (lobby.lobby.members.length < this.settings.autoSearchMatchMinimumMembers) {
+      return 'insufficient-members'
     }
 
     if (lobby.lobby.canStartActivity) {

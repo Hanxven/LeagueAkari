@@ -50,6 +50,16 @@ export async function setupAutoGameflow() {
     'auto-gameflow/activity-start-status',
     (s) => (autoGameflow.activityStartStatus = s)
   )
+
+  mainStateSync(
+    'auto-gameflow/settings/auto-search-match-minimum-members',
+    (s) => (autoGameflow.settings.autoSearchMatchMinimumMembers = s)
+  )
+
+  mainStateSync(
+    'auto-gameflow/settings/auto-search-match-wait-for-invitees',
+    (s) => (autoGameflow.settings.autoSearchMatchWaitForInvitees = s)
+  )
 }
 
 export function setAutoHonorEnabled(enabled: boolean) {
@@ -86,4 +96,12 @@ export async function setAutoSearchMatchDelaySeconds(seconds: number) {
 
 export async function cancelAutoSearchMatch() {
   return mainCall('auto-gameflow/cancel-auto-search-match')
+}
+
+export async function setAutoSearchMatchMinimumMembers(count: number) {
+  return mainCall('auto-gameflow/settings/auto-search-match-minimum-members/set', count)
+}
+
+export async function setAutoSearchMatchWaitForInvitees(yes: number) {
+  return mainCall('auto-gameflow/settings/auto-search-match-wait-for-invitees/set', yes)
 }

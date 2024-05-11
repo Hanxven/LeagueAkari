@@ -18,8 +18,8 @@ interface SavedPlayerSaveDto extends SavedPlayerQueryDto {
 }
 
 export function querySavedPlayer(query: SavedPlayerQueryDto) {
-  if (!query.puuid || !query.selfPuuid || !query.region || !query.rsoPlatformId) {
-    throw new Error('puuid, selfPuuid, region or rsoPlatformId cannot be empty')
+  if (!query.puuid || !query.selfPuuid || !query.region) {
+    throw new Error('puuid, selfPuuid or region cannot be empty')
   }
 
   return dataSource.manager.findOneBy(SavedPlayer, {
@@ -31,8 +31,8 @@ export function querySavedPlayer(query: SavedPlayerQueryDto) {
 }
 
 export async function querySavedPlayerWithGames(query: SavedPlayerQueryDto) {
-  if (!query.puuid || !query.selfPuuid || !query.region || !query.rsoPlatformId) {
-    throw new Error('puuid, selfPuuid, region or rsoPlatformId cannot be empty')
+  if (!query.puuid || !query.selfPuuid || !query.region) {
+    throw new Error('puuid, selfPuuid or region cannot be empty')
   }
 
   const savedPlayer = await dataSource.manager.findOneBy(SavedPlayer, {
@@ -57,16 +57,16 @@ export async function querySavedPlayerWithGames(query: SavedPlayerQueryDto) {
 }
 
 export function deleteSavedPlayer(query: SavedPlayerQueryDto) {
-  if (!query.puuid || !query.selfPuuid || !query.region || !query.rsoPlatformId) {
-    throw new Error('puuid, selfPuuid, region or rsoPlatformId cannot be empty')
+  if (!query.puuid || !query.selfPuuid || !query.region) {
+    throw new Error('puuid, selfPuuid or region cannot be empty')
   }
 
   return dataSource.manager.delete(SavedPlayer, query)
 }
 
 export function saveSavedPlayer(player: SavedPlayerSaveDto) {
-  if (!player.puuid || !player.selfPuuid || !player.region || !player.rsoPlatformId) {
-    throw new Error('puuid, selfPuuid, region or rsoPlatformId cannot be empty')
+  if (!player.puuid || !player.selfPuuid || !player.region) {
+    throw new Error('puuid, selfPuuid or region cannot be empty')
   }
 
   const savedPlayer = new SavedPlayer()

@@ -5,6 +5,8 @@ import { mkdirSync, rmSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { Logger, format, transports, createLogger as winstonCreateLogger } from 'winston'
 
+import { addQuitTask } from './app'
+
 let winstonLogger: Logger | null = null
 
 export function initLogger() {
@@ -44,6 +46,19 @@ export function initLogger() {
       })
     ]
   })
+
+  addQuitTask(
+    () =>
+      new Promise((resolve) => {
+        if (winstonLogger) {
+          winstonLogger.end(() => {
+            resolve()
+          })
+        } else {
+          resolve()
+        }
+      })
+  )
 
   onRendererCall('logs/dir/open', () => {
     return shell.openPath(logsDir)

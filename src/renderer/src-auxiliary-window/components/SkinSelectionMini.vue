@@ -84,7 +84,7 @@ const renderLabel: SelectRenderLabel = (option) => {
 }
 
 const renderTag: SelectRenderTag = ({ option }) => {
-  return h('span', option.label as string)
+  return h('span', { style: 'font-size: 10px;' }, option.label as string)
 }
 
 const carouselSkins = shallowRef<CarouselSkins[]>([])

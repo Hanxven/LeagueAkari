@@ -50,14 +50,14 @@
           >{{ gameflow.session?.map.gameModeName || '模式中' }} ·
           {{ gameflow.session?.map.name || '地图' }}</span
         >
-        <span
-          class="sub-text"
-          v-if="
-            autoGameflow.settings.autoSearchMatchEnabled &&
-            autoGameflow.activityStartStatus === 'waiting-for-invitees'
-          "
-          >正在等待受邀请的玩家</span
-        >
+        <template v-if="autoGameflow.settings.autoSearchMatchEnabled">
+          <span class="sub-text" v-if="autoGameflow.activityStartStatus === 'insufficient-members'"
+            >自动匹配需达到 {{ autoGameflow.settings.autoSearchMatchMinimumMembers }} 人</span
+          >
+          <span class="sub-text" v-else-if="autoGameflow.activityStartStatus === 'waiting-for-invitees'"
+            >正在等待受邀请的玩家</span
+          >
+        </template>
       </template>
     </div>
     <div class="bottom-actions">

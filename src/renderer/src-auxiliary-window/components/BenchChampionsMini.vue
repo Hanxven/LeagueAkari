@@ -6,7 +6,7 @@
           raw
           :show-arrow="false"
           content-class="xxx"
-          :duration="0"
+          :duration="100"
           :delay="300"
           :disabled="!selfChampionWithBalance || !selfChampionWithBalance.balance.length"
         >
@@ -65,8 +65,7 @@
         <NTooltip
           raw
           :show-arrow="false"
-          content-class="xxx"
-          :duration="0"
+          :duration="100"
           :delay="300"
           v-for="c of benchChampionsWithBalance"
           :key="c.championId"

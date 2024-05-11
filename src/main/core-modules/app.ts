@@ -11,7 +11,7 @@ import { formatError } from '@shared/utils/errors'
 import axios from 'axios'
 import { app, dialog, shell } from 'electron'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
-import { lt } from 'semver'
+import { gt, lt } from 'semver'
 
 import toolkit from '../native/laToolkitWin32x64.node'
 import { ipcStateSync, onRendererCall } from '../utils/ipc'
@@ -103,6 +103,12 @@ class AppState {
 
 export const appState = new AppState()
 
+const quitTasks: (() => Promise<void> | void)[] = []
+
+export function addQuitTask(fn: () => Promise<void> | void) {
+  quitTasks.push(fn)
+}
+
 // 基础通讯 API
 export async function initApp() {
   appState.setElevated(toolkit.isElevated())
@@ -124,6 +130,21 @@ export async function initApp() {
       logger.warn(`检查更新失败 ${formatError(error)}`)
     }
   }
+
+  app.on('before-quit', async (e) => {
+    if (quitTasks.length) {
+      e.preventDefault()
+
+      while (quitTasks.length) {
+        const t = quitTasks.shift()
+        try {
+          await t!()
+        } catch {}
+      }
+
+      app.quit()
+    }
+  })
 
   logger.info('初始化完成')
 }
@@ -166,8 +187,13 @@ export async function checkUpdates() {
       runInAction(() => {
         appState.updates.newUpdates = null
       })
-      mwNotification.success('app', '检查更新', `目前是最新版本 (${currentVersion})`)
-      logger.info(`目前是最新版本, 当前 ${currentVersion}, Github ${versionString}`)
+      if (gt(currentVersion, versionString)) {
+        mwNotification.success('app', '检查更新', `该版本高于发布版本 (${currentVersion})`)
+        logger.info(`该版本高于发布版本, 当前 ${currentVersion}, Github ${versionString}`)
+      } else {
+        mwNotification.success('app', '检查更新', `目前是最新版本 (${currentVersion})`)
+        logger.info(`目前是最新版本, 当前 ${currentVersion}, Github ${versionString}`)
+      }
     }
   } catch (error) {
     mwNotification.warn('app', '检查更新', `当前检查更新失败 ${(error as Error).message}`)

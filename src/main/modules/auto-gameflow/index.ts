@@ -217,10 +217,8 @@ export async function setupAutoGameflow() {
         autoSearchMatchCountdownTimerId = setInterval(printAutoSearchMatchInfo, 1000)
       } else if (s === 'unavailable' || s === 'cannot-start-activity') {
         cancelAutoSearchMatch('normal')
-      } else if (s === 'waiting-for-invitees') {
-        cancelAutoSearchMatch('waiting-for-invitee')
-      } else if (s === 'not-the-leader') {
-        cancelAutoSearchMatch('not-the-leader')
+      } else {
+        cancelAutoSearchMatch(s)
       }
     },
     { equals: comparer.shallow }
@@ -267,6 +265,16 @@ function stateSync() {
   ipcStateSync(
     'auto-gameflow/settings/auto-search-match-delay-seconds',
     () => autoGameflowState.settings.autoSearchMatchDelaySeconds
+  )
+
+  ipcStateSync(
+    'auto-gameflow/settings/auto-search-match-minimum-members',
+    () => autoGameflowState.settings.autoSearchMatchMinimumMembers
+  )
+
+  ipcStateSync(
+    'auto-gameflow/settings/auto-search-match-wait-for-invitees',
+    () => autoGameflowState.settings.autoSearchMatchWaitForInvitees
   )
 
   ipcStateSync('auto-gameflow/will-search-match', () => autoGameflowState.willSearchMatch)
@@ -332,6 +340,22 @@ function ipcCall() {
       await setSetting('auto-gameflow/auto-search-match-delay-seconds', seconds)
     }
   )
+
+  onRendererCall(
+    'auto-gameflow/settings/auto-search-match-minimum-members/set',
+    async (_, members: number) => {
+      autoGameflowState.settings.setAutoSearchMatchMinimumMembers(members)
+      await setSetting('auto-gameflow/auto-search-minimum-members', members)
+    }
+  )
+
+  onRendererCall(
+    'auto-gameflow/settings/auto-search-match-wait-for-invitees/set',
+    async (_, yes: boolean) => {
+      autoGameflowState.settings.setAutoSearchMatchWaitForInvitees(yes)
+      await setSetting('auto-gameflow/auto-search-match-wait-for-invitees', yes)
+    }
+  )
 }
 
 async function loadSettings() {
@@ -390,6 +414,20 @@ async function loadSettings() {
       autoGameflowState.settings.autoSearchMatchDelaySeconds
     )
   )
+
+  autoGameflowState.settings.setAutoSearchMatchMinimumMembers(
+    await getSetting(
+      'auto-gameflow/auto-search-minimum-members',
+      autoGameflowState.settings.autoSearchMatchMinimumMembers
+    )
+  )
+
+  autoGameflowState.settings.setAutoSearchMatchWaitForInvitees(
+    await getSetting(
+      'auto-gameflow/auto-search-wait-for-invitees',
+      autoGameflowState.settings.autoSearchMatchWaitForInvitees
+    )
+  )
 }
 
 const acceptMatch = async () => {
@@ -409,18 +447,17 @@ const startMatchmaking = async () => {
       clearInterval(autoSearchMatchCountdownTimerId)
       autoSearchMatchCountdownTimerId = null
     }
+    autoGameflowState.clearAutoSearchMatch()
+    autoSearchMatchTimerId = null
     await searchMatch()
   } catch (error) {
     mwNotification.warn('auto-gameflow', '自动匹配', '尝试开始匹配时出现问题')
     logger.warn(`无法开始匹配 ${formatError(error)}`)
   }
-  autoGameflowState.clearAutoSearchMatch()
-  autoSearchMatchTimerId = null
+
 }
 
-const printAutoSearchMatchInfo = async (
-  cancel?: 'normal' | 'waiting-for-invitee' | 'not-the-leader'
-) => {
+const printAutoSearchMatchInfo = async (cancel?: string) => {
   if (chat.conversations.customGame && autoGameflowState.willSearchMatch) {
     if (cancel === 'normal') {
       chatSend(
@@ -469,7 +506,7 @@ export function cancelAutoAccept(reason: 'accepted' | 'declined' | 'normal') {
   }
 }
 
-export function cancelAutoSearchMatch(reason: 'normal' | 'waiting-for-invitee' | 'not-the-leader') {
+export function cancelAutoSearchMatch(reason: string) {
   if (autoGameflowState.willSearchMatch) {
     if (autoSearchMatchTimerId) {
       clearTimeout(autoSearchMatchTimerId)
@@ -479,7 +516,8 @@ export function cancelAutoSearchMatch(reason: 'normal' | 'waiting-for-invitee' |
       printAutoSearchMatchInfo(reason)
       clearInterval(autoSearchMatchCountdownTimerId)
       autoSearchMatchCountdownTimerId = null
-    }
+    }3
+    
     autoGameflowState.clearAutoSearchMatch()
     logger.info(`即将进行的自动匹配对局已取消，${reason}`)
   }

@@ -86,6 +86,31 @@
     </ControlItem>
     <ControlItem
       class="control-item-margin"
+      label="最低人数"
+      :label-description="`自动开始匹配需满足人数达到 ${autoGameflow.settings.autoSearchMatchMinimumMembers} 人`"
+    >
+      <NInputNumber
+        :value="autoGameflow.settings.autoSearchMatchMinimumMembers"
+        @update:value="(val) => setAutoSearchMatchMinimumMembers(val || 1)"
+        :min="1"
+        :max="99"
+        size="tiny"
+        style="width: 80px"
+      />
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="等待邀请中成员"
+      label-description="自动开启匹配将等待所有被邀请的玩家做出回应"
+    >
+      <NSwitch
+        :value="autoGameflow.settings.autoSearchMatchWaitForInvitees"
+        @update:value="(val) => setAutoSearchMatchWaitForInvitees(val)"
+        size="small"
+      />
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
       label="匹配前等待时间 (s)"
       label-description="在可匹配对局时，预留的等待时间，单位为秒"
     >
@@ -111,6 +136,8 @@ import {
   setAutoHonorStrategy,
   setAutoSearchMatchDelaySeconds,
   setAutoSearchMatchEnabled,
+  setAutoSearchMatchMinimumMembers,
+  setAutoSearchMatchWaitForInvitees,
   setPlayAgainEnabled
 } from '@shared/renderer/modules/auto-gameflow'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'

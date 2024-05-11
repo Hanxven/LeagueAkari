@@ -7,6 +7,7 @@ import { Worker } from 'node:worker_threads'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
 import sendInputWorker from '../workers/send-input?nodeWorker'
+import { addQuitTask } from './app'
 import { showAuxiliaryWindow } from './auxiliary-window'
 import { createLogger } from './log'
 import { restoreAndFocus, toggleMinimizeAndFocus } from './main-window'
@@ -123,7 +124,7 @@ export function initWindowsPlatform() {
     }
   })
 
-  app.on('before-quit', () => {
+  addQuitTask(() => {
     siw?.terminate()
     gkl.kill()
   })
