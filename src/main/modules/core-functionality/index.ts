@@ -2,6 +2,7 @@ import { lcuConnectionState } from '@main/core-modules/lcu-connection'
 import { createLogger } from '@main/core-modules/log'
 import { mwNotification } from '@main/core-modules/main-window'
 import { pSendKey, pSendKeys, winPlatformEventBus } from '@main/core-modules/platform'
+import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { getChampSelectSession } from '@main/http-api/champ-select'
 import { chatSend } from '@main/http-api/chat'
 import { getGameflowSession } from '@main/http-api/gameflow'
@@ -17,10 +18,13 @@ import {
   sendEventToAllRenderer as sendEventToAllRenderers
 } from '@main/utils/ipc'
 import { EMPTY_PUUID } from '@shared/constants'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
 import { formatError } from '@shared/utils/errors'
+import { summonerName } from '@shared/utils/name'
 import { sleep } from '@shared/utils/sleep'
 import { calculateTogetherTimes, removeSubsets } from '@shared/utils/team-up-calc'
+import dayjs from 'dayjs'
 import { computed, observable, reaction, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
 
@@ -117,6 +121,74 @@ export async function setupCoreFunctionality() {
       }
     },
     { delay: 500 }
+  )
+
+  const formatTagRemindingText = (
+    summonerInfo: SummonerInfo,
+    savedInfo: SavedPlayer & { encounteredGames: number[] }
+  ) => {
+    const { gameName, tagLine } = summonerInfo
+    const rt = dayjs(savedInfo.lastMetAt).locale('zh-cn').fromNow()
+    return `[League Akari] 已标记的玩家 (${rt} 遇见) ${summonerName(gameName, tagLine)}: ${savedInfo.tag}`
+  }
+
+  const tagSentPlayers = new Set<string>()
+  const tagRemindingQueue = new PQueue({
+    interval: 100,
+    intervalCap: 1,
+    autoStart: false
+  })
+
+  reaction(
+    () => Array.from(cf.ongoingPlayers.values()).map((p) => [p.summoner, p.savedInfo] as const),
+    (si) => {
+      for (const [s, t] of si) {
+        if (!s || !t) {
+          continue
+        }
+
+        if (tagSentPlayers.has(s.puuid)) {
+          return
+        }
+
+        const task = async () => {
+          if (chat.conversations.championSelect) {
+            chatSend(
+              chat.conversations.championSelect.id,
+              formatTagRemindingText(s, t),
+              'celebration'
+            ).catch()
+          }
+        }
+
+        if (t.tag) {
+          tagSentPlayers.add(s.puuid)
+          tagRemindingQueue.add(task)
+        }
+      }
+    },
+    { delay: 100 }
+  )
+
+  reaction(
+    () => chat.conversations.championSelect,
+    (c) => {
+      if (c) {
+        tagRemindingQueue.start()
+      } else {
+        tagRemindingQueue.pause()
+      }
+    }
+  )
+
+  reaction(
+    () => cf.ongoingState,
+    (s) => {
+      if (s === 'unavailable') {
+        tagSentPlayers.clear()
+        tagRemindingQueue.clear()
+      }
+    }
   )
 
   const isEndGame = computed(
@@ -624,7 +696,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
       }
 
       if (coreFunctionalityState.ongoingGameInfo?.queueType === 'CHERRY') {
-        return `${name} 第一率${((analysis.cherryTop1s / analysis.cherryGames) * 100).toFixed()}% 第四率${((analysis.cherryTop4s / analysis.cherryGames) * 100).toFixed()}%`
+        return `${name} 第一率${((analysis.cherryTop1s / analysis.cherryGames) * 100).toFixed()}% 前四率${((analysis.cherryTop4s / analysis.cherryGames) * 100).toFixed()}%`
       }
 
       const field1 =

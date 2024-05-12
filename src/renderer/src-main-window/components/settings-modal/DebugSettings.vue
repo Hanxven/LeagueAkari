@@ -47,12 +47,18 @@
           >日志目录</NButton
         >
       </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        label="应用数据目录"
-        label-description="打开 League Akari 应用文件存储目录。删除该目录不会影响正常运行，但会丢失所有已储存的信息"
-        :label-width="320"
-      >
+      <ControlItem class="control-item-margin" label="应用数据目录" :label-width="320">
+        <template #labelDescription>
+          打开 League Akari
+          应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
+          <NPopover>
+            <template #trigger>
+              <span style="font-weight: 700; color: #fff; cursor: pointer;">详情</span>
+            </template>
+            <div style="font-size: 12px">该目录下：</div>
+            <div style="font-size: 12px">LeagueAkari.db - 存储用户设置、已标记的玩家等信息</div>
+          </NPopover>
+        </template>
         <NButton size="tiny" secondary type="primary" @click="() => handleShowUserDataDir()"
           >应用目录</NButton
         >
@@ -121,7 +127,7 @@
               <CopyableText :text="app.lcuAuth?.region ?? '-'">{{
                 app.lcuAuth?.region
                   ? regionText[app.lcuAuth.region] || app.lcuAuth.region
-                  : app.lcuAuth?.region
+                  : app.lcuAuth?.region || '-'
               }}</CopyableText>
             </td>
           </tr>
@@ -137,9 +143,7 @@
     </NCard>
     <NCard v-if="app.isAdministrator" size="small" style="margin-top: 8px">
       <template #header><LeagueAkariSpan class="card-header-title" /></template>
-      <span class="text"
-        >League Akari 运行在管理员权限，仅用于实现特定的客户端功能</span
-      >
+      <span class="text">League Akari 运行在管理员权限，仅用于实现特定的客户端功能</span>
     </NCard>
   </NScrollbar>
 </template>
@@ -163,6 +167,7 @@ import {
   NDataTable,
   NFlex,
   NModal,
+  NPopover,
   NScrollbar,
   NTable
 } from 'naive-ui'

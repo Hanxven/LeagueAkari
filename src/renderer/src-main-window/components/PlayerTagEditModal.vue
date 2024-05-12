@@ -120,8 +120,8 @@ const handleSaveTag = async () => {
 
     emits('edited', props.puuid)
     show.value = false
-  } catch {
-    laNotification.warn('玩家标记', '无法更新玩家标记')
+  } catch (error) {
+    laNotification.warn('玩家标记', '无法更新玩家标记', error)
   }
 }
 </script>

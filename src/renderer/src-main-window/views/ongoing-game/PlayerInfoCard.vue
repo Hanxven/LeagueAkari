@@ -1,11 +1,5 @@
 <template>
-  <div
-    class="player-info-card"
-    :class="{
-      'privacy-private': summonerInfo?.privacy === 'PRIVATE' && !isSelf,
-      'win-rate-team': analysis.maybeWinRateTeam && !isSelf
-    }"
-  >
+  <div class="player-info-card" :class="playerTypeClass">
     <div class="header-line">
       <LcuImage class="avatar" :src="championId ? championIcon(championId) : championIcon(-1)" />
       <div class="header-line-right-side">
@@ -270,6 +264,19 @@ const props = defineProps<{
 }>()
 
 const gameData = useGameDataStore()
+const analysis = computed(() => getAnalysis(matchHistoryList.value))
+
+const playerTypeClass = computed(() => {
+  if (props.savedInfo?.tag && !props.isSelf) {
+    return ['tagged']
+  } else if (props.summonerInfo?.privacy === 'PRIVATE' && !props.isSelf) {
+    return ['privacy-private']
+  } else if (analysis.value.maybeWinRateTeam && !props.isSelf) {
+    return ['win-rate-team']
+  } else {
+    return []
+  }
+})
 
 const chineseNumber = ['一', '二', '三', '四', '五', '六', '七', '八']
 const formatResultText = (
@@ -337,8 +344,6 @@ const { list, containerProps, wrapperProps } = useVirtualList(matchHistoryList, 
   itemHeight: matchHistoryItemHeight + matchHistoryItemMargin,
   overscan: 1
 })
-
-const analysis = computed(() => getAnalysis(matchHistoryList.value))
 </script>
 
 <style lang="less" scoped>
@@ -354,6 +359,10 @@ const analysis = computed(() => getAnalysis(matchHistoryList.value))
 
 .player-info-card.privacy-private {
   background-color: rgb(62, 39, 39);
+}
+
+.player-info-card.tagged {
+  background-color: rgb(18, 37, 52);
 }
 
 .player-info-card.win-rate-team {

@@ -2,6 +2,9 @@ import 'reflect-metadata'
 
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { formatError } from '@shared/utils/errors'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { BrowserWindow, app, dialog } from 'electron'
 import { configure } from 'mobx'
 import EventEmitter from 'node:events'
@@ -11,19 +14,16 @@ import { setupAuxiliaryWindow } from './core-modules/auxiliary-window'
 import { initLeagueClientFunctions } from './core-modules/lcu-client'
 import { initLcuConnection } from './core-modules/lcu-connection'
 import { createLogger, initLogger } from './core-modules/log'
-import {
-  createMainWindow,
-  getMainWindow,
-  mwNotification,
-  restoreAndFocus,
-  setupMainWindow
-} from './core-modules/main-window'
+import { createMainWindow, restoreAndFocus, setupMainWindow } from './core-modules/main-window'
 import { initWindowsPlatform } from './core-modules/platform'
 import './core-modules/vm'
 import { initDatabase } from './db'
 import { setupLeagueAkariFeatures } from './modules'
 import { initStorageIpc } from './storage'
 import { sendEventToAllRenderer } from './utils/ipc'
+
+dayjs.extend(relativeTime)
+dayjs.extend(duration)
 
 EventEmitter.defaultMaxListeners = 1000
 

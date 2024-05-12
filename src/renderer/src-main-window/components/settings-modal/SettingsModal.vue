@@ -28,31 +28,11 @@
             >League Client Update (LCU)</a
           >。
         </div>
-        <div class="about-para" style="font-weight: bold; margin: 12px 0">引用：</div>
         <div class="about-para">
-          第三方 LCU HTTP API 文档 (内容已停止更新)：<a
+          项目参考：<a
             target="_blank"
-            href="https://www.mingweisamuel.com/lcu-schema/tool/#/"
-            >Swagger</a
-          >.
-        </div>
-        <div class="about-para">
-          第三方 LCU HTTP API 文档：<a
-            target="_blank"
-            href="https://github.com/KebsCS/lcu-and-riotclient-api"
-            >Github Repo</a
-          >.
-        </div>
-        <div class="about-para">
-          第三方静态文件文档：<a
-            target="_blank"
-            href="https://www.communitydragon.org/documentation/assets"
-            >Community Dragon</a
-          >.
-        </div>
-        <div class="about-para">
-          第三方调试工具：<a target="_blank" href="https://github.com/PenguLoader/PenguLoader"
-            >Pengu Loader</a
+            href="https://github.com/Hanxven/LeagueAkari?tab=readme-ov-file#8-%E5%8F%82%E8%80%83"
+            >参考</a
           >.
         </div>
         <div class="about-para">

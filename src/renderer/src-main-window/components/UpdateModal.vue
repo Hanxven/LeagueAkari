@@ -26,7 +26,7 @@
           >Github 下载</a
         >
       </div>
-      <NScrollbar style="max-height: 30vh" :class="styles['markdown-text-scroll-wrapper']">
+      <NScrollbar style="max-height: 50vh" :class="styles['markdown-text-scroll-wrapper']">
         <div class="markdown-text" v-html="markdownHtmlText"></div>
       </NScrollbar>
       <div class="para" style="font-style: italic">
@@ -138,6 +138,10 @@ const show = defineModel<boolean>('show', { default: false })
 
   blockquote + blockquote {
     margin-top: 4px;
+  }
+
+  img {
+    max-width: 100%;
   }
 }
 </style>

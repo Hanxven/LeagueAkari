@@ -18,13 +18,13 @@ interface LeagueAkariNotificationEvent {
 const bus = useEventBus<LeagueAkariNotificationEvent>(Symbol('notifications'))
 
 export const laNotification = {
-  info: (title: string, content: string, error?: any, options?: object) =>
+  info: (title: string, content: string | (() => VNodeChild), error?: any, options?: object) =>
     bus.emit({ type: 'info', title, content, error, options }),
-  warn: (title: string, content: string, error?: any, options?: object) =>
+  warn: (title: string, content: string | (() => VNodeChild), error?: any, options?: object) =>
     bus.emit({ type: 'warning', title, content, error, options }),
-  error: (title: string, content: string, error?: any, options?: object) =>
+  error: (title: string, content: string | (() => VNodeChild), error?: any, options?: object) =>
     bus.emit({ type: 'error', title, content, error, options }),
-  success: (title: string, content: string, error?: any, options?: object) =>
+  success: (title: string, content: string | (() => VNodeChild), error?: any, options?: object) =>
     bus.emit({ type: 'success', title, content, error, options })
 }
 

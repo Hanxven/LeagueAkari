@@ -27,7 +27,7 @@ class AppSettings {
   autoConnect: boolean = true
 
   /**
-   * 使用 WMIC 查询命令行，而不是默认的 NtQueryProcessInformation
+   * 使用 WMIC 查询命令行，而不是默认的 NtQueryInformationProcess
    */
   useWmic: boolean = false
 

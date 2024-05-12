@@ -6,7 +6,7 @@
   />
 </div>
 
-# 1. League Akari 
+# 1. League Akari
 
 利用 League Client Update (LCU) API 实现的工具集，功能很多。
 
@@ -28,13 +28,13 @@
 
 ## 1.5 其他功能
 
-不多赘述，尽在探索中。
+尽在探索。
 
 # 2. 使用样例
 
-包含了一些使用样例。
+包含了部分功能的使用样例。
 
-虽然这些不是全部，但一图胜千言。
+一图胜千言。
 
 ## 2.1 这里是战绩
 
@@ -98,13 +98,6 @@
 
 ![游戏内发送](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/toolkit_ingame-sending.png '游戏内发送')
 
-
-## 2.9 不可言说的
-
-如果你有炫彩皮肤，但是没有原皮肤，那么你可以...
-
-你仍可以使用它。
-
 # 3. 更名通知
 
 该项目的前名称为 `League-Toolkit`。由于和 Github 现有项目重名，现更名为 `LeagueAkari`。
@@ -145,11 +138,11 @@ Github Issues 是最重要的反馈渠道，请精准描述您的需求、遇到
 
 ## 6.4 企鹅群组
 
-但或许有一个群组会更好。
+一个适合反馈 BUG、提出建议以及闲聊的好地方。
 
 企鹅群组：301157623
 
-# 7. 编译 & 构建 & 运行
+# 7. 通过源码 - 编译 & 构建 & 运行
 
 包括 Electron 主程序以及 Node Addons。
 
@@ -159,22 +152,52 @@ Github Issues 是最重要的反馈渠道，请精准描述您的需求、遇到
 
 dev：`yarn dev`
 
-build（for Windows）: `yarn build:win`
+build（for Windows only）: `yarn build:win`
 
 ## 7.2 Node Addon
 
-需要 MSVC 编译环境。
+需要 MSVC 编译环境和 `node-gyp`。
 
 Node Addons 使 League Akari 具备更强大的功能，因为它为其提供了操作系统级 API 的调用入口。
 
 如果你修改了 `addons/*` 下的模块内容，请重新编译。
 
 ```bash
+yarn install
+```
+
+```bash
 node-gyp configure
 node-gyp build
 ```
 
-# 8. 免责声明
+# 8. 参考
+
+League Akari 的实现参考了许多现有的优秀开源项目，这些项目为软件的部分模块开发提供了清晰的思路指导，特此表示感谢。❤️
+
+[LCU API 文档 1](https://www.mingweisamuel.com/lcu-schema/tool/#/)
+
+[LCU 文档 - League of Legends LCU and Riot Client API Docs](https://github.com/KebsCS/lcu-and-riotclient-api)
+
+[Community Dragon](https://www.communitydragon.org/documentation/assets)
+
+[Pengu Loader - ✨ The ultimate JavaScript plugin loader, build your unmatched LoL Client.](https://github.com/PenguLoader/PenguLoader)
+
+[Seraphine - 英雄联盟战绩查询工具](https://github.com/Zzaphkiel/Seraphine)
+
+[lol-helper - 英雄联盟工具,LCU API,一键喊话,战绩查询,一键发送战绩,更改段位显示,更改背景页,牛马/上等马/下等马,彩虹屁,禁用英雄 ,秒选英雄,解锁炫彩皮肤等](https://github.com/4379711/lol-helper)
+
+[Joi - 一个英雄联盟助手工具](https://github.com/watchingfun/Joi)
+
+[fix-lcu-window - 解决《英雄联盟》客户端异常窗口大小的问题。](https://github.com/LeagueTavern/fix-lcu-window)
+
+[vscode-league-respawn-timer - An extension to display League of Legends player respawn time in Visual Studio Code.](https://github.com/Coooookies/vscode-league-respawn-timer)
+
+[LeaguePrank](https://github.com/LeagueTavern/LeaguePrank)
+
+[frank - A bran-new League of Legends assistant software, a replacement for WeGame.](https://github.com/Java-S12138/frank)
+
+# 9. 免责声明
 
 本软件作为基于 Riot 提供的 League Client Update (LCU) API 开发的辅助工具，由于其设计和实施均未采用侵入性技术手段，理论上不会直接干预或修改游戏数据。然而，需明确指出的是，虽然本软件在原理上并未直接修改游戏内部数据，但在游戏环境的持续更新和演变中 (如未来腾讯可能的反作弊系统或其他保护服务的更新)，无法完全排除由于版本更新导致的兼容性问题或其他意外后果。
 

@@ -158,6 +158,22 @@ class AutoSelectState {
       }
     })
 
+    // 队友已经选择的英雄不可用
+    a.session.myTeam.forEach((m) => {
+      unpickables.add(m.championId)
+    })
+
+    // 不允许重复选择时，场上已经选择的英雄不能选择
+    if (!a.session.allowDuplicatePicks) {
+      a.session.actions.forEach((arr) => {
+        arr.forEach((ac) => {
+          if (ac.completed) {
+            unpickables.add(ac.championId)
+          }
+        })
+      })
+    }
+
     // 不能选择当前已经禁用完毕的英雄
     a.session.actions.forEach((arr) =>
       arr.forEach((a) => {
