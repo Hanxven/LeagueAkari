@@ -85,8 +85,8 @@ const INITIAL_SHOW = false
 
 export function createMainWindow(): void {
   mainWindow = new BrowserWindow({
-    width: 1080,
-    height: 768,
+    width: 1000,
+    height: 700,
     minWidth: 800,
     minHeight: 520,
     frame: false,
@@ -199,11 +199,10 @@ export function setupMainWindow() {
     mainWindow?.restore()
   })
 
-  onRendererCall('main-window/close', async (_) => {
-    if (
-      appState.settings.closeStrategy === 'minimize-to-tray' ||
-      appState.settings.closeStrategy === 'unset'
-    ) {
+  onRendererCall('main-window/close', async (_, strategy) => {
+    const s = strategy || appState.settings.closeStrategy
+    
+    if (s === 'minimize-to-tray' || s === 'unset') {
       mainWindow?.hide()
       return
     }

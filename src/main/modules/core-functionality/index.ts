@@ -128,11 +128,15 @@ export async function setupCoreFunctionality() {
     savedInfo: SavedPlayer & { encounteredGames: number[] }
   ) => {
     const { gameName, tagLine } = summonerInfo
-    const rt = dayjs(savedInfo.lastMetAt).locale('zh-cn').fromNow()
-    return `[League Akari] 已标记的玩家 (${rt} 遇见) ${summonerName(gameName, tagLine)}: ${savedInfo.tag}`
+    if (savedInfo.lastMetAt) {
+      const rt = dayjs(savedInfo.lastMetAt).locale('zh-cn').fromNow()
+      return `[League Akari] 已标记的玩家 (${rt} 遇见) ${summonerName(gameName, tagLine)}: ${savedInfo.tag}`
+    } else {
+      return `[League Akari] 已标记的玩家 ${summonerName(gameName, tagLine)}: ${savedInfo.tag}`
+    }
   }
 
-  const tagSentPlayers = new Set<string>()
+  const tagSendQueuedPlayers = new Set<string>()
   const tagRemindingQueue = new PQueue({
     interval: 100,
     intervalCap: 1,
@@ -147,27 +151,29 @@ export async function setupCoreFunctionality() {
           continue
         }
 
-        if (tagSentPlayers.has(s.puuid)) {
+        if (tagSendQueuedPlayers.has(s.puuid)) {
           return
         }
 
         const task = async () => {
           if (chat.conversations.championSelect) {
-            chatSend(
-              chat.conversations.championSelect.id,
-              formatTagRemindingText(s, t),
-              'celebration'
-            ).catch()
+            try {
+              await chatSend(
+                chat.conversations.championSelect.id,
+                formatTagRemindingText(s, t),
+                'celebration'
+              )
+            } catch {}
           }
         }
 
         if (t.tag) {
-          tagSentPlayers.add(s.puuid)
+          tagSendQueuedPlayers.add(s.puuid)
           tagRemindingQueue.add(task)
         }
       }
     },
-    { delay: 100 }
+    { delay: 50 }
   )
 
   reaction(
@@ -185,7 +191,7 @@ export async function setupCoreFunctionality() {
     () => cf.ongoingState,
     (s) => {
       if (s === 'unavailable') {
-        tagSentPlayers.clear()
+        tagSendQueuedPlayers.clear()
         tagRemindingQueue.clear()
       }
     }

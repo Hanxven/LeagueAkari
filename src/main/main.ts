@@ -3,6 +3,7 @@ import 'reflect-metadata'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { formatError } from '@shared/utils/errors'
 import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { BrowserWindow, app, dialog } from 'electron'
@@ -90,11 +91,13 @@ app.on('window-all-closed', () => {
 })
 
 process.on('uncaughtException', (e) => {
+  console.error(e)
   logger.error(`uncaughtException: ${formatError(e)}`)
   dialog.showErrorBox('未捕获的异常', e.message)
   app.quit()
 })
 
 process.on('unhandledRejection', (e) => {
+  console.error(e)
   logger.error(`unhandledRejection: ${formatError(e)}`)
 })

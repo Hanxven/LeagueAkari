@@ -21,7 +21,7 @@
             }}</span
           >
           <span class="tag self" v-if="isSelf">我</span>
-          <NPopover v-if="savedInfo && !isSelf" placement="bottom">
+          <NPopover v-if="savedInfo && savedInfo.lastMetAt && !isSelf" placement="bottom">
             <template #trigger>
               <span
                 :title="`曾在 ${formattedRelativeTime} 遇见过，共遇见过 ${savedInfo.encounteredGames.length} 次`"
@@ -315,7 +315,7 @@ const formatModeText = (queueId: number, isPracticeTool: boolean = false) => {
 const formattedRelativeTime = ref('')
 const { resume, pause } = useTimeoutPoll(
   () => {
-    if (props.savedInfo) {
+    if (props.savedInfo && props.savedInfo?.lastMetAt) {
       formattedRelativeTime.value = dayjs(props.savedInfo.lastMetAt).locale('zh-cn').fromNow()
     }
   },

@@ -73,7 +73,7 @@ export function saveSavedPlayer(player: SavedPlayerSaveDto) {
   const date = new Date()
   savedPlayer.puuid = player.puuid
 
-  if (player.tag) {
+  if (player.tag !== undefined) {
     savedPlayer.tag = player.tag
   }
 

@@ -217,9 +217,11 @@ const handleClose = async () => {
 const handleReallyClose = async () => {
   if (isRememberCloseStrategy.value) {
     await setCloseStrategy(closeStrategy.value)
+    await mainCall('main-window/close')
+  } else {
+    await mainCall('main-window/close', closeStrategy.value)
   }
 
-  await mainCall('main-window/close')
   isCloseConfirmationModelShow.value = false
 }
 
