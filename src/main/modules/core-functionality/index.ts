@@ -163,7 +163,9 @@ export async function setupCoreFunctionality() {
                 formatTagRemindingText(s, t),
                 'celebration'
               )
-            } catch {}
+            } catch {
+              logger.warn(`尝试发送 ${formatTagRemindingText(s, t)} 时失败`)
+            }
           }
         }
 

@@ -9,25 +9,33 @@
       <template v-if="gameflow.phase === 'ReadyCheck'">
         <template v-if="autoGameflow.willAccept">
           <span class="main-text">自动接受 {{ willAcceptIn.toFixed(1) }} s</span>
-          <NButton type="primary" size="tiny" @click="() => handleCancelAutoAccept()"
+          <NButton type="primary" secondary size="tiny" @click="() => handleCancelAutoAccept()"
             >取消本次自动接受</NButton
           >
         </template>
         <template v-else-if="matchmaking.readyCheck?.playerResponse === 'Accepted'">
           <span class="main-text">对局已接受</span>
           <span class="sub-text">已经接受的对局仍可拒绝</span>
-          <NButton type="warning" size="tiny" @click="() => handleDecline()">拒绝对局</NButton>
+          <NButton type="warning" secondary size="tiny" @click="() => handleDecline()"
+            >拒绝对局</NButton
+          >
         </template>
         <template v-else-if="matchmaking.readyCheck?.playerResponse === 'Declined'">
           <span class="main-text">对局已拒绝</span>
           <span class="sub-text">已经取消的对局仍可接受</span>
-          <NButton type="primary" size="tiny" @click="() => handleAccept()">接受对局</NButton>
+          <NButton type="primary" secondary size="tiny" @click="() => handleAccept()"
+            >接受对局</NButton
+          >
         </template>
         <template v-else>
           <span class="main-text">等待接受对局</span>
           <div class="btn-group">
-            <NButton type="primary" size="tiny" @click="() => handleAccept()">接受对局</NButton>
-            <NButton type="warning" size="tiny" @click="() => handleDecline()">拒绝对局</NButton>
+            <NButton type="primary" secondary size="tiny" @click="() => handleAccept()"
+              >接受对局</NButton
+            >
+            <NButton type="warning" secondary size="tiny" @click="() => handleDecline()"
+              >拒绝对局</NButton
+            >
           </div>
         </template>
       </template>
@@ -39,7 +47,7 @@
       </template>
       <template v-else-if="autoGameflow.willSearchMatch">
         <span class="main-text">匹配对局 {{ willSearchMatchIn.toFixed(1) }} s</span>
-        <NButton type="primary" size="tiny" @click="() => handleCancelAutoSearchMatch()"
+        <NButton type="primary" secondary size="tiny" @click="() => handleCancelAutoSearchMatch()"
           >取消本次自动匹配</NButton
         >
       </template>
@@ -54,7 +62,9 @@
           <span class="sub-text" v-if="autoGameflow.activityStartStatus === 'insufficient-members'"
             >自动匹配需达到 {{ autoGameflow.settings.autoSearchMatchMinimumMembers }} 人</span
           >
-          <span class="sub-text" v-else-if="autoGameflow.activityStartStatus === 'waiting-for-invitees'"
+          <span
+            class="sub-text"
+            v-else-if="autoGameflow.activityStartStatus === 'waiting-for-invitees'"
             >正在等待受邀请的玩家</span
           >
         </template>

@@ -3,6 +3,7 @@ import { mwNotification } from '@main/core-modules/main-window'
 import { getConversations, getMe, getParticipants } from '@main/http-api/chat'
 import { ipcStateSync } from '@main/utils/ipc'
 import { ChatPerson, Conversation } from '@shared/types/lcu/chat'
+import { LcuEvent } from '@shared/types/lcu/event'
 import { formatError } from '@shared/utils/errors'
 import { reaction, runInAction } from 'mobx'
 import { makeAutoObservable, observable } from 'mobx'
@@ -97,19 +98,20 @@ export function chatSync() {
   ipcStateSync('lcu/chat/conversations/post-game', () => chat.conversations.postGame)
   ipcStateSync('lcu/chat/conversations/custom-game', () => chat.conversations.customGame)
 
-  lcuEventBus.on('/lol-chat/v1/conversations/:id', (event, { id }) => {
+  lcuEventBus.on<LcuEvent<Conversation>>('/lol-chat/v1/conversations/:id', (event, { id }) => {
     if (event.eventType === 'Delete') {
-      if (chat.conversations.championSelect?.id === id) {
+      const decodedId = decodeURIComponent(id) // 需要解码
+      if (chat.conversations.championSelect?.id === decodedId) {
         runInAction(() => {
           chat.setConversationChampSelect(null)
           chat.setParticipantsChampSelect(null)
         })
-      } else if (chat.conversations.postGame?.id === id) {
+      } else if (chat.conversations.postGame?.id === decodedId) {
         runInAction(() => {
           chat.setConversationPostGame(null)
           chat.setParticipantsPostGame(null)
         })
-      } else if (chat.conversations.customGame?.id === id) {
+      } else if (chat.conversations.customGame?.id === decodedId) {
         runInAction(() => {
           chat.setConversationCustomGame(null)
           chat.setParticipantsPostGame(null)
@@ -120,6 +122,10 @@ export function chatSync() {
 
     switch (event.data.type) {
       case 'championSelect':
+        if (!event.data.id.includes('lol-champ-select')) {
+          return
+        }
+
         if (event.eventType === 'Create') {
           runInAction(() => {
             chat.setConversationChampSelect(event.data)
@@ -221,24 +227,34 @@ export function chatSync() {
         try {
           const cvs = (await getConversations()).data
 
+          const t: Promise<any>[] = []
           for (const c of cvs) {
-            switch (c.type) {
-              case 'championSelect':
-                chat.setConversationChampSelect(c)
-                const ids1 = (await getParticipants(c.id)).data.map((cc) => cc.summonerId)
-                runInAction(() => chat.setParticipantsChampSelect(ids1))
-                break
-              case 'postGame':
-                chat.setConversationPostGame(c)
-                const ids2 = (await getParticipants(c.id)).data.map((cc) => cc.summonerId)
-                runInAction(() => chat.setParticipantsPostGame(ids2))
-                break
-              case 'customGame':
-                chat.setConversationCustomGame(c)
-                const ids3 = (await getParticipants(c.id)).data.map((cc) => cc.summonerId)
-                runInAction(() => chat.setParticipantsCustomGame(ids3))
+            const _load = async () => {
+              switch (c.type) {
+                case 'championSelect':
+                  if (!c.id.includes('lol-champ-select')) {
+                    return
+                  }
+
+                  chat.setConversationChampSelect(c)
+                  const ids1 = (await getParticipants(c.id)).data.map((cc) => cc.summonerId)
+                  runInAction(() => chat.setParticipantsChampSelect(ids1))
+                  break
+                case 'postGame':
+                  chat.setConversationPostGame(c)
+                  const ids2 = (await getParticipants(c.id)).data.map((cc) => cc.summonerId)
+                  runInAction(() => chat.setParticipantsPostGame(ids2))
+                  break
+                case 'customGame':
+                  chat.setConversationCustomGame(c)
+                  const ids3 = (await getParticipants(c.id)).data.map((cc) => cc.summonerId)
+                  runInAction(() => chat.setParticipantsCustomGame(ids3))
+              }
             }
+            t.push(_load())
           }
+
+          Promise.allSettled(t)
         } catch (error) {
           if ((error as any)?.response?.data?.message !== 'not connected to RC chat yet') {
             mwNotification.warn('lcu-state-sync', '状态同步', '获取现有对话失败')
