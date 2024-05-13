@@ -22,7 +22,7 @@ class CoreFunctionalitySettings {
 
   useAuxiliaryWindow: boolean = true
 
-  playerAnalysisFetchConcurrency: number = 10
+  playerAnalysisFetchConcurrency: number = 3
 
   constructor() {
     makeAutoObservable(this)

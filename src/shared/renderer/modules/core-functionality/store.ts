@@ -113,7 +113,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     sendKdaThreshold: 0,
 
     // 对局中战绩获取的最大并发限制
-    playerAnalysisFetchConcurrency: 10
+    playerAnalysisFetchConcurrency: 5
   })
 
   return {

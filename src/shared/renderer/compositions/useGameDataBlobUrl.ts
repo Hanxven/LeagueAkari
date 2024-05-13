@@ -7,7 +7,7 @@ import { useAppStore } from '../modules/app/store'
 
 // 过快的访问频率概率导致 50x 错误，需要限制
 const globalAssetFetchingLimiter = new PQueue({
-  concurrency: 10
+  concurrency: 8
 })
 
 const assetsCacheMap = new Map<string, string>()
