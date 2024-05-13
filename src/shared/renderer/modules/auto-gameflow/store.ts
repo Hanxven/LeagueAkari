@@ -11,13 +11,17 @@ export const useAutoGameflowStore = defineStore('module:auto-gameflow', () => {
     autoSearchMatchEnabled: false,
     autoSearchMatchDelaySeconds: 0,
     autoSearchMatchMinimumMembers: 0,
-    autoSearchMatchWaitForInvitees: true
+    autoSearchMatchWaitForInvitees: true,
+    autoSearchMatchRematchStrategy: 'never',
+    autoSearchMatchRematchFixedDuration: 2
   })
 
   const willAccept = ref(false)
 
   // 即将自动接受对局的时间 (有误差)
   const willAcceptAt = ref(-1)
+
+  const willRematchAt = ref(-1)
 
   const willSearchMatch = ref(false)
 
@@ -30,6 +34,7 @@ export const useAutoGameflowStore = defineStore('module:auto-gameflow', () => {
     willAccept,
     willAcceptAt,
     willSearchMatch,
+    willRematchAt,
     willSearchMatchAt,
     activityStartStatus
   }

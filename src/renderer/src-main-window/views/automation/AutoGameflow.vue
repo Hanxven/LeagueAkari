@@ -7,7 +7,7 @@
       label-description="当匹配到玩家时，自动确认"
     >
       <NSwitch
-        :value="autoGameflow.settings.autoAcceptEnabled"
+        :value="agf.settings.autoAcceptEnabled"
         @update:value="(val) => setAutoAcceptEnabled(val)"
         size="small"
       />
@@ -19,7 +19,7 @@
     >
       <NInputNumber
         style="width: 80px"
-        :value="autoGameflow.settings.autoAcceptDelaySeconds"
+        :value="agf.settings.autoAcceptDelaySeconds"
         @update:value="(value) => setAutoAcceptDelaySeconds(value || 0)"
         placeholder="秒"
         :min="0"
@@ -34,7 +34,7 @@
       label-description="在游戏结束时，自动点赞一位队友。若不存在可点赞的玩家，将跳过点赞阶段"
     >
       <NSwitch
-        :value="autoGameflow.settings.autoHonorEnabled"
+        :value="agf.settings.autoHonorEnabled"
         @update:value="(val) => setAutoHonorEnabled(val)"
         size="small"
       />
@@ -47,7 +47,7 @@
       <NRadioGroup
         size="small"
         name="radio-group"
-        :value="autoGameflow.settings.autoHonorStrategy"
+        :value="agf.settings.autoHonorStrategy"
         @update:value="(val) => setAutoHonorStrategy(val)"
       >
         <NFlex :size="4">
@@ -67,7 +67,7 @@
         <span style="font-weight: 700">自动点赞</span> 以跳过点赞投票阶段
       </template>
       <NSwitch
-        :value="autoGameflow.settings.playAgainEnabled"
+        :value="agf.settings.playAgainEnabled"
         @update:value="(val) => setPlayAgainEnabled(val)"
         size="small"
       />
@@ -79,7 +79,7 @@
       label-description="在可匹配对局时，将自动开始匹配对局"
     >
       <NSwitch
-        :value="autoGameflow.settings.autoSearchMatchEnabled"
+        :value="agf.settings.autoSearchMatchEnabled"
         @update:value="(val) => setAutoSearchMatchEnabled(val)"
         size="small"
       />
@@ -87,10 +87,10 @@
     <ControlItem
       class="control-item-margin"
       label="最低人数"
-      :label-description="`自动开始匹配需满足人数达到 ${autoGameflow.settings.autoSearchMatchMinimumMembers} 人`"
+      :label-description="`自动开始匹配需满足人数达到 ${agf.settings.autoSearchMatchMinimumMembers} 人`"
     >
       <NInputNumber
-        :value="autoGameflow.settings.autoSearchMatchMinimumMembers"
+        :value="agf.settings.autoSearchMatchMinimumMembers"
         @update:value="(val) => setAutoSearchMatchMinimumMembers(val || 1)"
         :min="1"
         :max="99"
@@ -104,7 +104,7 @@
       label-description="自动开启匹配将等待所有被邀请的玩家做出回应"
     >
       <NSwitch
-        :value="autoGameflow.settings.autoSearchMatchWaitForInvitees"
+        :value="agf.settings.autoSearchMatchWaitForInvitees"
         @update:value="(val) => setAutoSearchMatchWaitForInvitees(val)"
         size="small"
       />
@@ -116,10 +116,46 @@
     >
       <NInputNumber
         style="width: 80px"
-        :value="autoGameflow.settings.autoSearchMatchDelaySeconds"
+        :value="agf.settings.autoSearchMatchDelaySeconds"
         @update:value="(value) => setAutoSearchMatchDelaySeconds(value || 0)"
         placeholder="秒"
         :min="0"
+        :max="20"
+        size="tiny"
+      />
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="停止匹配策略"
+      label-description="在某些情况下，自动停止匹配状态。当自动匹配开启时，将会重新开始匹配"
+    >
+      <NRadioGroup
+        :value="agf.settings.autoSearchMatchRematchStrategy"
+        @update:value="(s) => setAutoSearchMatchRematchStrategy(s)"
+        size="small"
+      >
+        <NFlex>
+          <NRadio value="never" title="永远不停止">永不</NRadio>
+          <NRadio value="fixed-duration" title="超过指定时间后立即停止">固定时间</NRadio>
+          <NRadio value="estimated-duration" title="超过系统队列预估时间后立即停止"
+            >超过队列预估时间</NRadio
+          >
+        </NFlex>
+      </NRadioGroup>
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="退出匹配时间 (s)"
+      label-description="在超过该时间后，将停止匹配，单位为秒"
+      :disabled="agf.settings.autoSearchMatchRematchStrategy !== 'fixed-duration'"
+    >
+      <NInputNumber
+        :disabled="agf.settings.autoSearchMatchRematchStrategy !== 'fixed-duration'"
+        style="width: 80px"
+        :value="agf.settings.autoSearchMatchRematchFixedDuration"
+        @update:value="(value) => setAutoSearchMatchRematchFixedDuration(value || 2)"
+        placeholder="秒"
+        :min="2"
         :max="20"
         size="tiny"
       />
@@ -137,13 +173,15 @@ import {
   setAutoSearchMatchDelaySeconds,
   setAutoSearchMatchEnabled,
   setAutoSearchMatchMinimumMembers,
+  setAutoSearchMatchRematchFixedDuration,
+  setAutoSearchMatchRematchStrategy,
   setAutoSearchMatchWaitForInvitees,
   setPlayAgainEnabled
 } from '@shared/renderer/modules/auto-gameflow'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NSwitch } from 'naive-ui'
 
-const autoGameflow = useAutoGameflowStore()
+const agf = useAutoGameflowStore()
 </script>
 
 <style lang="less" scoped>

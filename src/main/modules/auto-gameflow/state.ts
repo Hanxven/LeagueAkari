@@ -10,6 +10,8 @@ export type AutoHonorStrategy =
   | 'all-member' // 随机所有可点赞玩家
   | 'opt-out' // 直接跳过
 
+export type AutoRematchStrategy = 'never' | 'fixed-duration' | 'estimated-duration'
+
 class AutoGameflowSettings {
   autoHonorEnabled: boolean = false
   autoHonorStrategy: AutoHonorStrategy = 'prefer-lobby-member'
@@ -20,6 +22,9 @@ class AutoGameflowSettings {
   autoAcceptDelaySeconds: number = 0
 
   autoSearchMatchEnabled: boolean = false
+  autoSearchMaximumMatchDuration: number = 0
+  autoSearchMatchRematchStrategy: AutoRematchStrategy = 'never'
+  autoSearchMatchRematchFixedDuration: number = 2
   autoSearchMatchDelaySeconds: number = 5
   autoSearchMatchMinimumMembers = 1 // 最低满足人数
   autoSearchMatchWaitForInvitees: boolean = true // 等待邀请中的用户
@@ -58,6 +63,14 @@ class AutoGameflowSettings {
 
   setAutoSearchMatchWaitForInvitees(yes: boolean) {
     this.autoSearchMatchWaitForInvitees = yes
+  }
+
+  setAutoSearchMatchRematchStrategy(s: AutoRematchStrategy) {
+    this.autoSearchMatchRematchStrategy = s
+  }
+
+  setAutoSearchMatchRematchFixedDuration(seconds: number) {
+    this.autoSearchMatchRematchFixedDuration = seconds
   }
 
   constructor() {

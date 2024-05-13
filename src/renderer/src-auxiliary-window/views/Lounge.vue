@@ -7,7 +7,7 @@
         :src="gameflow.session?.map?.assets?.['game-select-icon-hover']"
       />
       <template v-if="gameflow.phase === 'ReadyCheck'">
-        <template v-if="autoGameflow.willAccept">
+        <template v-if="agf.willAccept">
           <span class="main-text">自动接受 {{ willAcceptIn.toFixed(1) }} s</span>
           <NButton type="primary" secondary size="tiny" @click="() => handleCancelAutoAccept()"
             >取消本次自动接受</NButton
@@ -44,8 +44,17 @@
         <span class="sub-text" v-if="matchmaking.search">{{
           formatMatchmakingSearchText(matchmaking.search)
         }}</span>
+        <NButton
+          :loading="isCancelingSearching"
+          type="warning"
+          secondary
+          size="tiny"
+          @click="() => handleCancelSearching()"
+          ><template v-if="agf.settings.autoSearchMatchEnabled">停止匹配并取消自动匹配</template
+          ><template v-else>停止匹配</template></NButton
+        >
       </template>
-      <template v-else-if="autoGameflow.willSearchMatch">
+      <template v-else-if="agf.willSearchMatch">
         <span class="main-text">匹配对局 {{ willSearchMatchIn.toFixed(1) }} s</span>
         <NButton type="primary" secondary size="tiny" @click="() => handleCancelAutoSearchMatch()"
           >取消本次自动匹配</NButton
@@ -58,13 +67,11 @@
           >{{ gameflow.session?.map.gameModeName || '模式中' }} ·
           {{ gameflow.session?.map.name || '地图' }}</span
         >
-        <template v-if="autoGameflow.settings.autoSearchMatchEnabled">
-          <span class="sub-text" v-if="autoGameflow.activityStartStatus === 'insufficient-members'"
-            >自动匹配需达到 {{ autoGameflow.settings.autoSearchMatchMinimumMembers }} 人</span
+        <template v-if="agf.settings.autoSearchMatchEnabled">
+          <span class="sub-text" v-if="agf.activityStartStatus === 'insufficient-members'"
+            >自动匹配需达到 {{ agf.settings.autoSearchMatchMinimumMembers }} 人</span
           >
-          <span
-            class="sub-text"
-            v-else-if="autoGameflow.activityStartStatus === 'waiting-for-invitees'"
+          <span class="sub-text" v-else-if="agf.activityStartStatus === 'waiting-for-invitees'"
             >正在等待受邀请的玩家</span
           >
         </template>
@@ -79,8 +86,13 @@
 <script setup lang="ts">
 import LoungeOperations from '@auxiliary-window/components/LoungeOperations.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { deleteSearchMatch } from '@shared/renderer/http-api/lobby'
 import { accept, decline } from '@shared/renderer/http-api/matchmaking'
-import { cancelAutoAccept, cancelAutoSearchMatch } from '@shared/renderer/modules/auto-gameflow'
+import {
+  cancelAutoAccept,
+  cancelAutoSearchMatch,
+  setAutoSearchMatchEnabled
+} from '@shared/renderer/modules/auto-gameflow'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { useMatchmakingStore } from '@shared/renderer/modules/lcu-state-sync/matchmaking'
@@ -89,14 +101,14 @@ import { useIntervalFn } from '@vueuse/core'
 import { NButton } from 'naive-ui'
 import { ref, watch } from 'vue'
 
-const autoGameflow = useAutoGameflowStore()
+const agf = useAutoGameflowStore()
 const gameflow = useGameflowStore()
 const matchmaking = useMatchmakingStore()
 
 const willAcceptIn = ref(0)
 const { pause: pauseAC, resume: resumeAC } = useIntervalFn(
   () => {
-    const s = (autoGameflow.willAcceptAt - Date.now()) / 1e3
+    const s = (agf.willAcceptAt - Date.now()) / 1e3
     willAcceptIn.value = Math.abs(Math.max(s, 0))
   },
   100,
@@ -106,7 +118,7 @@ const { pause: pauseAC, resume: resumeAC } = useIntervalFn(
 const willSearchMatchIn = ref(0)
 const { pause: pauseAS, resume: resumeAS } = useIntervalFn(
   () => {
-    const s = (autoGameflow.willSearchMatchAt - Date.now()) / 1e3
+    const s = (agf.willSearchMatchAt - Date.now()) / 1e3
     willSearchMatchIn.value = Math.abs(Math.max(s, 0))
   },
   100,
@@ -121,8 +133,19 @@ const handleCancelAutoAccept = () => cancelAutoAccept()
 
 const handleCancelAutoSearchMatch = () => cancelAutoSearchMatch()
 
+const isCancelingSearching = ref(false)
+const handleCancelSearching = async () => {
+  try {
+    isCancelingSearching.value = true
+    await deleteSearchMatch()
+  } finally {
+    isCancelingSearching.value = false
+  }
+  setAutoSearchMatchEnabled(false)
+}
+
 watch(
-  () => autoGameflow.willAccept,
+  () => agf.willAccept,
   (ok) => {
     if (ok) {
       resumeAC()
@@ -134,7 +157,7 @@ watch(
 )
 
 watch(
-  () => autoGameflow.willSearchMatch,
+  () => agf.willSearchMatch,
   (ok) => {
     if (ok) {
       resumeAS()
@@ -148,6 +171,10 @@ watch(
 const formatMatchmakingSearchText = (search: GetSearch) => {
   if (search.lowPriorityData && search.lowPriorityData.penaltyTime) {
     return `等待 ${search.lowPriorityData.penaltyTimeRemaining} s (${search.lowPriorityData.penaltyTime} s) `
+  }
+
+  if (agf.settings.autoSearchMatchRematchStrategy === 'fixed-duration') {
+    return `${search.timeInQueue.toFixed(1)} s (最多 ${agf.settings.autoSearchMatchRematchFixedDuration.toFixed()} s) / ${search.estimatedQueueTime.toFixed(1)} s`
   }
 
   return `${search.timeInQueue.toFixed(1)} s / ${search.estimatedQueueTime.toFixed(1)} s`

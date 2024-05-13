@@ -3,7 +3,7 @@ import { createLogger } from '@main/core-modules/log'
 import { mwNotification } from '@main/core-modules/main-window'
 import { chatSend } from '@main/http-api/chat'
 import { honor } from '@main/http-api/honor-v2'
-import { getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
+import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
 import { accept } from '@main/http-api/matchmaking'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { getSetting, setSetting } from '@main/storage/settings'
@@ -16,8 +16,9 @@ import { comparer, computed, reaction } from 'mobx'
 
 import { chat } from '../lcu-state-sync/chat'
 import { gameflow } from '../lcu-state-sync/gameflow'
+import { matchmaking } from '../lcu-state-sync/matchmaking'
 import { summoner } from '../lcu-state-sync/summoner'
-import { autoGameflowState } from './state'
+import { AutoRematchStrategy as AutoSearchRematchStrategy, autoGameflowState } from './state'
 
 const HONOR_CATEGORY = ['COOL', 'SHOTCALLER', 'HEART'] as const
 
@@ -224,6 +225,48 @@ export async function setupAutoGameflow() {
     { equals: comparer.shallow }
   )
 
+  const simplifiedSearchState = computed(() => {
+    if (!matchmaking.search) {
+      return null
+    }
+
+    return {
+      timeInQueue: matchmaking.search.timeInQueue,
+      estimatedQueueTime: matchmaking.search.estimatedQueueTime,
+      searchState: matchmaking.search.searchState
+    }
+  })
+
+  reaction(
+    () =>
+      [
+        simplifiedSearchState.get(),
+        autoGameflowState.settings.autoSearchMatchRematchStrategy,
+        autoGameflowState.settings.autoSearchMatchRematchFixedDuration
+      ] as const,
+    ([s, st, d]) => {
+      if (st === 'never' || !s || s.searchState !== 'Searching') {
+        return
+      }
+
+      if (st === 'fixed-duration') {
+        if (s.timeInQueue >= d) {
+          deleteSearchMatch().catch((e) => {
+            logger.warn(`尝试取消匹配时失败 ${formatError(e)}`)
+          })
+          return
+        }
+      } else if (st === 'estimated-duration') {
+        if (s.timeInQueue >= s.estimatedQueueTime) {
+          deleteSearchMatch().catch((e) => {
+            logger.warn(`尝试取消匹配时失败 ${formatError(e)}`)
+          })
+        }
+      }
+    },
+    { equals: comparer.structural }
+  )
+
   logger.info('初始化完成')
 }
 
@@ -275,6 +318,16 @@ function stateSync() {
   ipcStateSync(
     'auto-gameflow/settings/auto-search-match-wait-for-invitees',
     () => autoGameflowState.settings.autoSearchMatchWaitForInvitees
+  )
+
+  ipcStateSync(
+    'auto-gameflow/settings/auto-search-match-rematch-strategy',
+    () => autoGameflowState.settings.autoSearchMatchRematchStrategy
+  )
+
+  ipcStateSync(
+    'auto-gameflow/settings/auto-search-match-rematch-fixed-duration',
+    () => autoGameflowState.settings.autoSearchMatchRematchFixedDuration
   )
 
   ipcStateSync('auto-gameflow/will-search-match', () => autoGameflowState.willSearchMatch)
@@ -356,6 +409,22 @@ function ipcCall() {
       await setSetting('auto-gameflow/auto-search-match-wait-for-invitees', yes)
     }
   )
+
+  onRendererCall(
+    'auto-gameflow/settings/auto-search-match-rematch-strategy/set',
+    async (_, s: AutoSearchRematchStrategy) => {
+      autoGameflowState.settings.setAutoSearchMatchRematchStrategy(s)
+      await setSetting('auto-gameflow/auto-search-match-rematch-strategy', s)
+    }
+  )
+
+  onRendererCall(
+    'auto-gameflow/settings/auto-search-match-rematch-fixed-duration/set',
+    async (_, s: number) => {
+      autoGameflowState.settings.setAutoSearchMatchRematchFixedDuration(s)
+      await setSetting('auto-gameflow/auto-search-match-rematch-fixed-duration', s)
+    }
+  )
 }
 
 async function loadSettings() {
@@ -428,6 +497,20 @@ async function loadSettings() {
       autoGameflowState.settings.autoSearchMatchWaitForInvitees
     )
   )
+
+  autoGameflowState.settings.setAutoSearchMatchRematchStrategy(
+    await getSetting(
+      'auto-gameflow/auto-search-match-rematch-strategy',
+      autoGameflowState.settings.autoSearchMatchRematchStrategy
+    )
+  )
+
+  autoGameflowState.settings.setAutoSearchMatchRematchFixedDuration(
+    await getSetting(
+      'auto-gameflow/auto-search-match-rematch-fixed-duration',
+      autoGameflowState.settings.autoSearchMatchRematchFixedDuration
+    )
+  )
 }
 
 const acceptMatch = async () => {
@@ -454,7 +537,6 @@ const startMatchmaking = async () => {
     mwNotification.warn('auto-gameflow', '自动匹配', '尝试开始匹配时出现问题')
     logger.warn(`无法开始匹配 ${formatError(error)}`)
   }
-
 }
 
 const printAutoSearchMatchInfo = async (cancel?: string) => {
@@ -516,8 +598,9 @@ export function cancelAutoSearchMatch(reason: string) {
       printAutoSearchMatchInfo(reason)
       clearInterval(autoSearchMatchCountdownTimerId)
       autoSearchMatchCountdownTimerId = null
-    }3
-    
+    }
+    3
+
     autoGameflowState.clearAutoSearchMatch()
     logger.info(`即将进行的自动匹配对局已取消，${reason}`)
   }

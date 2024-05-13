@@ -60,6 +60,16 @@ export async function setupAutoGameflow() {
     'auto-gameflow/settings/auto-search-match-wait-for-invitees',
     (s) => (autoGameflow.settings.autoSearchMatchWaitForInvitees = s)
   )
+
+  mainStateSync(
+    'auto-gameflow/settings/auto-search-match-rematch-strategy',
+    (s) => (autoGameflow.settings.autoSearchMatchRematchStrategy = s)
+  )
+
+  mainStateSync(
+    'auto-gameflow/settings/auto-search-match-rematch-fixed-duration',
+    (s) => (autoGameflow.settings.autoSearchMatchRematchFixedDuration = s)
+  )
 }
 
 export function setAutoHonorEnabled(enabled: boolean) {
@@ -104,4 +114,12 @@ export async function setAutoSearchMatchMinimumMembers(count: number) {
 
 export async function setAutoSearchMatchWaitForInvitees(yes: number) {
   return mainCall('auto-gameflow/settings/auto-search-match-wait-for-invitees/set', yes)
+}
+
+export async function setAutoSearchMatchRematchStrategy(s: string) {
+  return mainCall('auto-gameflow/settings/auto-search-match-rematch-strategy/set', s)
+}
+
+export async function setAutoSearchMatchRematchFixedDuration(s: number) {
+  return mainCall('auto-gameflow/settings/auto-search-match-rematch-fixed-duration/set', s)
 }
