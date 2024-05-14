@@ -131,10 +131,17 @@ const handleDecline = () => decline()
 
 const handleCancelAutoAccept = () => cancelAutoAccept()
 
-const handleCancelAutoSearchMatch = () => cancelAutoSearchMatch()
+const handleCancelAutoSearchMatch = async () => {
+  await setAutoSearchMatchEnabled(false)
+  cancelAutoSearchMatch()
+}
 
 const isCancelingSearching = ref(false)
 const handleCancelSearching = async () => {
+  if (isCancelingSearching.value) {
+    return
+  }
+
   try {
     isCancelingSearching.value = true
     await deleteSearchMatch()

@@ -1,5 +1,5 @@
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
-import { LcuAuth, RIOT_CERTIFICATE } from '@main/utils/lcu-auth'
+import { LcuAuth } from '@main/utils/lcu-auth'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosInstance, isAxiosError } from 'axios'
@@ -7,8 +7,6 @@ import https from 'https'
 import { comparer, makeAutoObservable, observable, reaction } from 'mobx'
 import { WebSocket } from 'ws'
 
-import { getRandomAvailableLoopbackAddrWithPort } from '../utils/loopback'
-import { appState } from './app'
 import { createLogger } from './log'
 
 export type LcuConnectionStateType = 'connecting' | 'connected' | 'disconnected'
@@ -52,7 +50,7 @@ const GAME_CLIENT_BASE_URL = 'https://127.0.0.1:2999'
 
 export const gameClientHttpRequest = axios.create({
   baseURL: GAME_CLIENT_BASE_URL,
-  httpsAgent: new https.Agent({ ca: RIOT_CERTIFICATE })
+  httpsAgent: new https.Agent({ rejectUnauthorized: false })
 })
 
 const PING_URL = '/riotclient/auth-token'
@@ -65,8 +63,7 @@ async function initHttpInstance(auth: LcuAuth) {
       Authorization: `Basic ${Buffer.from(`riot:${auth.password}`).toString('base64')}`
     },
     httpsAgent: new https.Agent({
-      ca: auth.certificate,
-      localAddress: await getRandomAvailableLoopbackAddrWithPort(auth.port)
+      rejectUnauthorized: false
     }),
     timeout: REQUEST_TIMEOUT_MS,
     proxy: false

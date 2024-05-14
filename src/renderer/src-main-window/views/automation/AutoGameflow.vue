@@ -146,7 +146,11 @@
     <ControlItem
       class="control-item-margin"
       label="退出匹配时间 (s)"
-      label-description="在超过该时间后，将停止匹配，单位为秒"
+      :label-description="
+        agf.settings.autoSearchMatchRematchStrategy !== 'fixed-duration'
+          ? `该选项仅当停止匹配策略为固定时间时生效`
+          : `在超过该时间后，将停止匹配，单位为秒`
+      "
       :disabled="agf.settings.autoSearchMatchRematchStrategy !== 'fixed-duration'"
     >
       <NInputNumber

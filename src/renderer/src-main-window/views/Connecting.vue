@@ -128,7 +128,6 @@ useTimeoutPoll(
   async () => {
     try {
       existingClients.value = await mainCall('league-client-ux/lcu-auth/query')
-      console.log('当前客户端', existingClients.value)
     } catch (error) {
       laNotification.warn(
         '进程轮询',
