@@ -9,7 +9,7 @@ import { GithubApiLatestRelease } from '@shared/types/github'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { formatError } from '@shared/utils/errors'
 import axios from 'axios'
-import { app, dialog, shell } from 'electron'
+import { app, shell } from 'electron'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
 import { gt, lt } from 'semver'
 
@@ -125,12 +125,6 @@ export async function initApp() {
   stateSync()
   ipcCall()
   await loadSettings()
-
-  if (!appState.isAdministrator) {
-    logger.error('Insufficient permissions, League Akari can only run upon Administrator')
-    dialog.showErrorBox('缺乏必要权限', '本工具依赖管理员权限，以获取必要的命令行信息。')
-    throw new Error('insufficient permissions')
-  }
 
   if (appState.settings.autoCheckUpdates) {
     try {

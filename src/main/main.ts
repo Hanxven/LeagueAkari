@@ -49,9 +49,9 @@ app.whenReady().then(async () => {
 
   try {
     initLogger()
-    initWindowsPlatform()
     await initDatabase()
     await initApp()
+    initWindowsPlatform()
     await initLcuConnection()
     initStorageIpc()
     await initLeagueClientFunctions()

@@ -14,7 +14,6 @@
       <div v-if="!queueType" class="tip" style="margin-top: 4px">
         展示优先级：单双排位 > 灵活排位 > 云顶之弈 > 竞技场
       </div>
-      <div class="tip">仅展示本赛季段位信息</div>
     </NPopover>
   </template>
   <div class="summoner-rank" v-else>无段位</div>
@@ -39,7 +38,7 @@ const queueTypeText: Record<string, string> = {
   RANKED_TFT: '云顶之弈',
   RANKED_TFT_TURBO: '云顶之弈 Turbo',
   RANKED_TFT_DOUBLE_UP: '云顶之弈 Double',
-  CHERRY: '竞技场'
+  CHERRY: '斗魂竞技场'
 }
 
 // 越大的值代表更高的优先级
@@ -170,7 +169,7 @@ const formatRankText = (rank: RankedEntry, simple = false) => {
     textArr.push(`胜场 ${rank.wins}`)
   }
 
-  if (highestTier && !simple) {
+  if (highestTier && (!simple || textArr.length <= 1)) {
     if (rank.highestDivision === 'NA') {
       textArr.push(`赛季最高 ${highestTier}`)
     } else {
@@ -178,7 +177,7 @@ const formatRankText = (rank: RankedEntry, simple = false) => {
     }
   }
 
-  if (previousHighestTier && !simple) {
+  if (previousHighestTier && (!simple || textArr.length <= 1)) {
     if (rank.previousSeasonHighestDivision === 'NA') {
       textArr.push(`历史最高 ${previousHighestTier}`)
     } else {

@@ -3,7 +3,7 @@ import { gameflow } from '@main/modules/lcu-state-sync/gameflow'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { BrowserWindow, Rectangle, screen, shell } from 'electron'
-import { comparer, makeAutoObservable, reaction } from 'mobx'
+import { comparer, computed, makeAutoObservable, reaction } from 'mobx'
 import { join } from 'path'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
@@ -394,23 +394,31 @@ export async function setupAuxiliaryWindow() {
     }
   )
 
+  const showPhase = computed(() => {
+    switch (gameflow.phase) {
+      case 'Matchmaking':
+      case 'ReadyCheck':
+      case 'Lobby':
+        return 'lounge'
+      case 'ChampSelect':
+        return 'champ-select'
+    }
+
+    return 'no-activity'
+  })
+
   reaction(
-    () => [gameflow.phase, auxiliaryWindowState.isReady] as const,
+    () => [showPhase.get(), auxiliaryWindowState.isReady] as const,
     ([phase, b]) => {
       if (!b) {
         return
       }
 
-      switch (phase) {
-        case 'Matchmaking':
-        case 'ReadyCheck':
-        case 'ChampSelect':
-        case 'Lobby':
-          showAuxiliaryWindow()
-          return
+      if (phase === 'no-activity') {
+        hideAuxiliaryWindow()
+      } else {
+        showAuxiliaryWindow()
       }
-
-      hideAuxiliaryWindow()
     },
     { equals: comparer.shallow }
   )

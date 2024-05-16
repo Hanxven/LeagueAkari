@@ -352,7 +352,7 @@ const { list, containerProps, wrapperProps } = useVirtualList(matchHistoryList, 
   flex-direction: column;
   box-sizing: border-box;
   padding: 8px;
-  border-radius: 4px;
+  border-radius: 2px;
   background-color: rgb(53, 53, 53);
   height: 188px;
 }

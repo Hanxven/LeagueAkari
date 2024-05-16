@@ -29,7 +29,7 @@ export function initWindowsPlatform() {
   let pageUpShortcut = false
   let pageDownShortcut = false
   let deleteShortcut = false
-  
+
   if (appState.isAdministrator) {
     gkl = new GlobalKeyboardListener()
     siw = sendInputWorker({})
@@ -120,7 +120,7 @@ export function initWindowsPlatform() {
   })
 
   onRendererCall('windows/send-key', (_, key, pressed) => {
-    if (!appState.isAdministrator) {
+    if (appState.isAdministrator) {
       throw new Error('insufficient permissions')
     }
 
@@ -128,7 +128,7 @@ export function initWindowsPlatform() {
   })
 
   onRendererCall('windows/send-keys', (_, str) => {
-    if (!appState.isAdministrator) {
+    if (appState.isAdministrator) {
       throw new Error('insufficient permissions')
     }
 
