@@ -2,12 +2,16 @@ import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { LcuAuth } from '@main/utils/lcu-auth'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { formatError } from '@shared/utils/errors'
+import { sleep } from '@shared/utils/sleep'
 import axios, { AxiosInstance, isAxiosError } from 'axios'
 import https from 'https'
-import { comparer, makeAutoObservable, observable, reaction } from 'mobx'
+import { comparer, computed, makeAutoObservable, observable, reaction } from 'mobx'
 import { WebSocket } from 'ws'
 
+import { appState } from './app'
+import { getLaunchedClients } from './lcu-client'
 import { createLogger } from './log'
+import { mwNotification } from './main-window'
 
 export type LcuConnectionStateType = 'connecting' | 'connected' | 'disconnected'
 
@@ -18,8 +22,16 @@ class LcuConnectionState {
 
   auth: LcuAuth | null = null
 
+  launchedClients: LcuAuth[] = []
+
+  connectingClient: LcuAuth | null = null
+
   constructor() {
-    makeAutoObservable(this, { auth: observable.ref })
+    makeAutoObservable(this, {
+      auth: observable.ref,
+      launchedClients: observable.struct,
+      connectingClient: observable.struct
+    })
   }
 
   setConnected(auth: LcuAuth) {
@@ -36,17 +48,30 @@ class LcuConnectionState {
     this.state = 'disconnected'
     this.auth = null
   }
+
+  setLaunchedClients(c: LcuAuth[]) {
+    this.launchedClients = c
+  }
+
+  setConnectingClient(c: LcuAuth | null) {
+    this.connectingClient = c
+  }
 }
 
 export const lcuConnectionState = new LcuConnectionState()
 
 export const lcuEventBus = new RadixEventEmitter()
 
+let clientPollTimerId: NodeJS.Timeout
+
 let lcuHttpRequest: AxiosInstance | null = null
 let ws: WebSocket | null = null
 
 // a fixed url of LOL game client
 const GAME_CLIENT_BASE_URL = 'https://127.0.0.1:2999'
+
+const CLIENT_CMD_POLL_INTERVAL = 2000
+const CONNECT_TO_LCU_RETRY_INTERVAL = 750
 
 export const gameClientHttpRequest = axios.create({
   baseURL: GAME_CLIENT_BASE_URL,
@@ -104,18 +129,18 @@ export function getWebSocket() {
 
 const INTERVAL_TIMEOUT = 12500
 
-async function connectToLcu(auth1: LcuAuth) {
+async function connectToLcu(auth: LcuAuth) {
   try {
     if (lcuConnectionState.state === 'connecting' || lcuConnectionState.state === 'connected') {
       return
     }
 
-    const { certificate, ...rest } = auth1
+    const { certificate, ...rest } = auth
     logger.info(`尝试连接，${JSON.stringify(rest)}`)
 
     lcuConnectionState.setConnecting()
 
-    const ws = await initWebSocket(auth1)
+    const ws = await initWebSocket(auth)
 
     let timeoutTimer: NodeJS.Timeout
     await new Promise<void>((resolve, reject) => {
@@ -127,7 +152,7 @@ async function connectToLcu(auth1: LcuAuth) {
 
       ws.on('open', async () => {
         try {
-          await initHttpInstance(auth1)
+          await initHttpInstance(auth)
           clearTimeout(timeoutTimer)
         } catch (error) {
           reject(error)
@@ -135,7 +160,7 @@ async function connectToLcu(auth1: LcuAuth) {
 
         ws.send(JSON.stringify([5, 'OnJsonApiEvent']))
 
-        lcuConnectionState.setConnected(auth1)
+        lcuConnectionState.setConnected(auth)
         resolve()
       })
 
@@ -143,7 +168,7 @@ async function connectToLcu(auth1: LcuAuth) {
         lcuConnectionState.setDisconnected()
         logger.warn(`LCU WebSocket 发生错误: ${formatError(error)}`)
         clearTimeout(timeoutTimer)
-        reject(new Error('disconnected'))
+        reject(error)
       })
     })
 
@@ -170,9 +195,98 @@ async function connectToLcu(auth1: LcuAuth) {
   }
 }
 
+async function doConnectingLoop() {
+  while (true) {
+    // 连接途中，目标丢失，停止连接
+    if (!lcuConnectionState.connectingClient) {
+      break
+    }
+
+    // 目标连接对象已不在当前启动列表中，停止连接
+    if (
+      !lcuConnectionState.launchedClients.find(
+        (c) => c.pid === lcuConnectionState.connectingClient?.pid
+      )
+    ) {
+      lcuConnectionState.setConnectingClient(null)
+      break
+    }
+
+    try {
+      await connectToLcu(lcuConnectionState.connectingClient)
+      lcuConnectionState.setConnectingClient(null) // finished connecting!
+      break
+    } catch (error) {
+      if ((error as any).code !== 'ECONNREFUSED') {
+        logger.error(`尝试连接到 LCU 客户端时发生错误 ${formatError(error)}`)
+      }
+    }
+
+    await sleep(CONNECT_TO_LCU_RETRY_INTERVAL)
+  }
+}
+
 export async function initLcuConnection() {
   ipcStateSync('lcu-connection/state', () => lcuConnectionState.state)
   ipcStateSync('lcu-connection/auth', () => lcuConnectionState.auth)
+  ipcStateSync('lcu-connection/launched-clients', () => lcuConnectionState.launchedClients)
+  ipcStateSync('lcu-connection/connecting-client', () => lcuConnectionState.connectingClient)
+
+  const pollTiming = computed(() => {
+    if (lcuConnectionState.state === 'connected') {
+      return 'stop-it!'
+    }
+    return 'do-polling！'
+  })
+
+  reaction(
+    () => pollTiming.get(),
+    (state) => {
+      if (state === 'stop-it!') {
+        lcuConnectionState.setLaunchedClients([])
+        clearInterval(clientPollTimerId)
+        return
+      }
+
+      const _pollFn = async () => {
+        try {
+          lcuConnectionState.setLaunchedClients(await getLaunchedClients())
+        } catch (error) {
+          mwNotification.error('lcu-connection', '进程轮询', '在获取客户端进程信息时发生错误')
+          logger.error(`获取客户端信息时失败 ${formatError(error)}`)
+        }
+      }
+
+      _pollFn()
+      clientPollTimerId = setInterval(_pollFn, CLIENT_CMD_POLL_INTERVAL)
+    },
+    { fireImmediately: true }
+  )
+
+  reaction(
+    () => lcuConnectionState.connectingClient,
+    (auth) => {
+      if (!auth) {
+        return
+      }
+
+      doConnectingLoop()
+    }
+  )
+
+  // 自动连接 - 当客户端唯一时，自动连接到 LCU 客户端
+  reaction(
+    () => [appState.settings.autoConnect, lcuConnectionState.launchedClients] as const,
+    async ([s, c]) => {
+      if (s) {
+        if (c.length === 1) {
+          lcuConnectionState.setConnectingClient(c[0])
+        } else {
+          lcuConnectionState.setConnectingClient(null)
+        }
+      }
+    }
+  )
 
   reaction(
     () => [lcuConnectionState.auth, lcuConnectionState.state] as const,
@@ -187,8 +301,8 @@ export async function initLcuConnection() {
     { equals: comparer.shallow }
   )
 
-  onRendererCall('lcu-connection/connect', async (_, auth1: LcuAuth) => {
-    await connectToLcu(auth1)
+  onRendererCall('lcu-connection/connect', async (_, auth: LcuAuth) => {
+    lcuConnectionState.setConnectingClient(auth)
   })
 
   onRendererCall('lcu-connection/disconnect', async () => {

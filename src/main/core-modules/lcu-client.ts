@@ -37,6 +37,18 @@ class LeagueClientUxSettings {
 
 export const leagueClientUxSettings = new LeagueClientUxSettings()
 
+export async function getLaunchedClients() {
+  if (appState.settings.useWmic) {
+    if (!appState.isAdministrator) {
+      throw new Error('insufficient permissions')
+    }
+
+    return queryLcuAuth(LEAGUE_CLIENT_UX_PROCESS_NAME)
+  }
+
+  return queryLcuAuthNative(LEAGUE_CLIENT_UX_PROCESS_NAME)
+}
+
 export async function initLeagueClientFunctions() {
   await loadSettings()
 

@@ -40,6 +40,10 @@ export async function setupApp() {
   mainStateSync('lcu-connection/auth', (s) => (app.lcuAuth = s))
 
   mainStateSync('lcu-connection/state', (s) => (app.lcuConnectionState = s))
+
+  mainStateSync('lcu-connection/connecting-client', (s) => (app.connectingClient = s))
+
+  mainStateSync('lcu-connection/launched-clients', (s) => (app.launchedClients = s))
 }
 
 export function setAutoConnect(enabled: boolean) {

@@ -11,22 +11,22 @@
           summonerName(summonerInfo.gameName || summonerInfo.displayName, summonerInfo.tagLine)
         }}</span>
       </div>
-      <div style="margin-top: 12px">
-        <NInput
-          v-model:value="text"
-          :placeholder="`填写对 ${summonerName(summonerInfo.gameName || summonerInfo.displayName, summonerInfo.tagLine)} 的标记内容`"
-          type="textarea"
-          :autosize="{ minRows: 3, maxRows: 4 }"
-          size="tiny"
-          ref="el"
-        ></NInput>
-      </div>
-      <div style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 4px">
-        <NButton size="tiny" @click="show = false">取消</NButton>
-        <NButton size="tiny" type="primary" @click="() => handleSaveTag()">保存</NButton>
-      </div>
     </template>
     <template v-else><span style="font-size: 12px">加载中...</span></template>
+    <div style="margin-top: 12px">
+      <NInput
+        v-model:value="text"
+        :placeholder="`填写对 ${summonerName(summonerInfo?.gameName || summonerInfo?.displayName, summonerInfo?.tagLine, props.puuid)} 的标记内容`"
+        type="textarea"
+        :autosize="{ minRows: 3, maxRows: 4 }"
+        size="tiny"
+        ref="el"
+      ></NInput>
+    </div>
+    <div style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 4px">
+      <NButton size="tiny" @click="show = false">取消</NButton>
+      <NButton size="tiny" type="primary" @click="() => handleSaveTag()">保存</NButton>
+    </div>
   </NModal>
 </template>
 

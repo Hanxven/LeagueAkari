@@ -1,6 +1,6 @@
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { defineStore } from 'pinia'
-import { VNode, reactive, ref } from 'vue'
+import { VNode, reactive, ref, shallowRef } from 'vue'
 
 interface NewUpdates {
   currentVersion: string
@@ -40,7 +40,10 @@ export const useAppStore = defineStore('core:app', () => {
   })
 
   const lcuConnectionState = ref<LcuConnectionState>('connecting')
-  const lcuAuth = ref<LcuAuth | null>(null)
+  const lcuAuth = shallowRef<LcuAuth | null>(null)
+
+  const connectingClient = shallowRef<LcuAuth | null>(null)
+  const launchedClients = shallowRef<LcuAuth[]>([])
 
   const settings = reactive({
     autoConnect: false,
@@ -63,6 +66,8 @@ export const useAppStore = defineStore('core:app', () => {
     settings,
     lcuAuth,
     lcuConnectionState,
-    titleBarTasks
+    titleBarTasks,
+    connectingClient,
+    launchedClients
   }
 })
