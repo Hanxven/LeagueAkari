@@ -185,42 +185,52 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">KDA 简报</span></template>
+      <template #header
+        ><span class="card-header-title" :class="{ disabled: !app.isAdministrator }">{{
+          app.isAdministrator ? 'KDA 简报' : 'KDA 简报 (需要管理员权限)'
+        }}</span></template
+      >
       <ControlItem
+        :disabled="!app.isAdministrator"
         class="control-item-margin"
         label="启用 KDA 发送"
         :label-description="`在对局中或英雄选择中，使用 PageUp 发送己方队伍数据，使用 PageDown 发送敌方队伍 KDA 数据。英雄选择中通过聊天室发送。游戏内发送基于模拟键盘实现，因此在发送前，确保游戏内聊天框是关闭状态。游戏内发送途中，按住 Shift 可将信息发送到全局。统计对局的数量为 ${coreFunctionality.settings.matchHistoryLoadCount} 场，等同于对局战绩分析数量`"
         :label-width="320"
       >
-        <template #labelDescription>
-          <span style="font-weight: 700; color: rgb(0, 179, 195)">PageUp</span> - 发送友方 KDA
-          简报，<span style="font-weight: 700; color: rgb(0, 179, 195)">PageDown</span> - 发送敌方
-          KDA 简报<br />
-          在英雄选择中时，将通过聊天室发送。在游戏进行中时，将通过模拟键盘输入发送<br />
-          <span style="font-style: italic">🚩 在游戏中发送时，确保聊天框处于关闭状态</span><br />
-          <span style="font-style: italic"
-            >🚩 在游戏中发送时，可在发送全程按住 Shift 将消息发送到全局</span
-          ><br />
-          <span style="font-style: italic"
-            >KDA 分析局数和 <span style="font-weight: 700">对局战绩分析数量</span> 一致。({{
-              coreFunctionality.settings.matchHistoryLoadCount
-            }}
-            场)</span
-          >
+        <template #labelDescription="{ disabled }">
+          <div :style="{ filter: disabled ? 'brightness(0.6)' : 'unset' }">
+            <span style="font-weight: 700; color: rgb(0, 179, 195)">PageUp</span> - 发送友方 KDA
+            简报，<span style="font-weight: 700; color: rgb(0, 179, 195)">PageDown</span> - 发送敌方
+            KDA 简报<br />
+            在英雄选择中时，将通过聊天室发送。在游戏进行中时，将通过模拟键盘输入发送<br />
+            <span style="font-style: italic">🚩 在游戏中发送时，确保聊天框处于关闭状态</span><br />
+            <span style="font-style: italic"
+              >🚩 在游戏中发送时，可在发送全程按住 Shift 将消息发送到全局</span
+            ><br />
+            <span style="font-style: italic"
+              >KDA 分析局数和 <span style="font-weight: 700">对局战绩分析数量</span> 一致。({{
+                coreFunctionality.settings.matchHistoryLoadCount
+              }}
+              场)</span
+            >
+          </div>
         </template>
         <NSwitch
+          :disabled="!app.isAdministrator"
           size="small"
           :value="coreFunctionality.settings.sendKdaInGame"
           @update:value="(val) => setSendKdaInGame(val)"
         />
       </ControlItem>
       <ControlItem
+        :disabled="!app.isAdministrator"
         class="control-item-margin"
         label="KDA 发送最低值"
         label-description="仅当需发送对象的 KDA 值大于此值时，才会发送"
         :label-width="320"
       >
         <NInputNumber
+          :disabled="!app.isAdministrator"
           style="width: 100px"
           size="tiny"
           :min="0"
@@ -230,12 +240,14 @@
         />
       </ControlItem>
       <ControlItem
+        :disabled="!app.isAdministrator"
         class="control-item-margin"
         label="KDA 发送时附带预组队信息"
         label-description="在发送 KDA 数据时，将可能的预组队信息也一并发送"
         :label-width="320"
       >
         <NSwitch
+          :disabled="!app.isAdministrator"
           size="small"
           :value="coreFunctionality.settings.sendKdaInGameWithPreMadeTeams"
           @update:value="(val) => setSendKdaInGameWithPreMadeTeams(val)"
@@ -247,6 +259,7 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import {
   resetAuxiliaryWindowPosition,
   setAuxiliaryWindowEnabled,
@@ -274,6 +287,7 @@ import { NButton, NCard, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naiv
 const respawnTimer = useRespawnTimerStore()
 const coreFunctionality = useCoreFunctionalityStore()
 const aux = useAuxiliaryWindowStore()
+const app = useAppStore()
 </script>
 
 <style lang="less" scoped>
@@ -286,5 +300,9 @@ const aux = useAuxiliaryWindowStore()
 .card-header-title {
   font-weight: bold;
   font-size: 18px;
+}
+
+.card-header-title.disabled {
+  color: rgb(97, 97, 97);
 }
 </style>

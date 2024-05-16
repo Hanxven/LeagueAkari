@@ -43,7 +43,7 @@
       <ControlItem
         class="control-item-margin"
         label="使用 WMIC"
-        label-description="使用 WMIC 获取客户端命令行信息，而不是默认的 Win32 API 方式"
+        label-description="使用 WMIC 获取客户端命令行信息，而不是默认的 Win32 API 方式。需要管理员权限"
         :label-width="320"
       >
         <NSwitch

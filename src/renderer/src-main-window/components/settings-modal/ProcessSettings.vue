@@ -37,16 +37,16 @@
       <template #header><span class="card-header-title">League Client UX</span></template>
       <ControlItem
         class="control-item-margin"
-        v-if="app.isAdministrator"
-        label="调整窗口大小"
-        label-description="以 WinAPI 方式调整窗口的大小，请谨慎使用该功能。在客户端界面大小不正确时，可尝试此操作"
+        :disabled="!app.isAdministrator"
+        :label="app.isAdministrator ? '调整窗口大小' : '调整窗口大小 (需要管理员权限)'"
+        label-description="FixLCUWindow - 以 WinAPI 方式调整窗口的大小。在客户端界面大小不正确时，可尝试此操作"
         :label-width="320"
       >
         <div class="control" style="display: flex; gap: 4px; align-items: baseline">
           <NInputNumber
             style="width: 80px"
             size="tiny"
-            :disabled="app.lcuConnectionState !== 'connected'"
+            :disabled="!app.isAdministrator || app.lcuConnectionState !== 'connected'"
             :show-button="false"
             :min="1"
             @update:value="
@@ -64,7 +64,7 @@
           <NInputNumber
             ref="fixWindowInputButton2"
             style="width: 80px"
-            :disabled="app.lcuConnectionState !== 'connected'"
+            :disabled="!app.isAdministrator || app.lcuConnectionState !== 'connected'"
             size="tiny"
             :show-button="false"
             :min="1"
@@ -80,7 +80,7 @@
             ><template #prefix>H</template>
           </NInputNumber>
           <NButton
-            :disabled="app.lcuConnectionState !== 'connected'"
+            :disabled="!app.isAdministrator || app.lcuConnectionState !== 'connected'"
             size="tiny"
             secondary
             type="warning"
@@ -140,10 +140,10 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { setFixWindowMethodAOptions } from '@shared/renderer/modules/app'
-import { useAppStore } from '@shared/renderer/modules/app/store'
 import { quit } from '@shared/renderer/http-api/process-control'
 import { killUx, launchUx, restartUx } from '@shared/renderer/http-api/riotclient'
+import { setFixWindowMethodAOptions } from '@shared/renderer/modules/app'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import { NButton, NCard, NInputNumber, NScrollbar, useDialog } from 'naive-ui'
 import { reactive, ref } from 'vue'

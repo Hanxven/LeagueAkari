@@ -6,10 +6,7 @@
       :self-puuid="showingGame.puuid"
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
-    <PlayerTagEditModal
-      v-model:show="isPlayerTagEditModalShow"
-      :puuid="tagEditingSummonerPuuid"
-    />
+    <PlayerTagEditModal v-model:show="isPlayerTagEditModalShow" :puuid="tagEditingSummonerPuuid" />
     <div v-if="!isIdle" class="ongoing-game-inner">
       <!-- 蓝队 -->
       <DefineOngoingTeam v-slot="{ participants, team }">
@@ -92,7 +89,11 @@
           </div>
         </div>
       </NCard>
-      <NCard v-if="cf.settings.sendKdaInGame" style="background-color: transparent" size="small">
+      <NCard
+        v-if="app.isAdministrator && cf.settings.sendKdaInGame"
+        style="background-color: transparent"
+        size="small"
+      >
         <template #header><span class="card-header-title">KDA 简报</span></template>
         <span style="font-size: 13px; margin-bottom: 12px; display: block"
           >在英雄选择中或游戏内发送 KDA 简报已启用，在设置 -> 战绩 -> KDA 简报 中配置通用选项。
@@ -134,6 +135,7 @@ import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import { setInGameKdaSendPlayer } from '@shared/renderer/modules/core-functionality'
 import {
   OngoingPlayer,
@@ -157,6 +159,8 @@ const cf = useCoreFunctionalityStore()
 const router = useRouter()
 const gameflow = useGameflowStore()
 const summoner = useSummonerStore()
+
+const app = useAppStore()
 
 const handleToSummoner = (puuid: string) => {
   if (!puuid || puuid === EMPTY_PUUID) {

@@ -38,7 +38,12 @@
             </div>
           </NScrollbar>
         </div>
-        <div v-else class="text-line-1">等待游戏客户端启动</div>
+        <div v-else class="text-line-1">
+          <template v-if="!app.isAdministrator && app.settings.useWmic"
+            >基于 WMIC 的连接方式需要管理员权限</template
+          >
+          <template v-else>等待游戏客户端启动</template>
+        </div>
       </template>
       <div v-else class="connected-text">已连接，加载中</div>
     </div>

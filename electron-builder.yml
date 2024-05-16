@@ -22,7 +22,6 @@ win:
   target: 7z
   executableName: LeagueAkari
   icon: resources/LA_ICON.ico
-  requestedExecutionLevel: highestAvailable
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

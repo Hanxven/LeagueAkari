@@ -218,6 +218,11 @@ async function doConnectingLoop() {
       break
     } catch (error) {
       if ((error as any).code !== 'ECONNREFUSED') {
+        mwNotification.error(
+          'lcu-connection',
+          '连接错误',
+          `尝试连接到 LCU 时发生错误：${(error as any)?.message}`
+        )
         logger.error(`尝试连接到 LCU 客户端时发生错误 ${formatError(error)}`)
       }
     }
@@ -236,6 +241,11 @@ export async function initLcuConnection() {
     if (lcuConnectionState.state === 'connected') {
       return 'stop-it!'
     }
+
+    if (!appState.isAdministrator && appState.settings.useWmic) {
+      return 'stop-it!'
+    }
+
     return 'do-polling！'
   })
 
