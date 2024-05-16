@@ -10,25 +10,9 @@
 
 利用 League Client Update (LCU) API 实现的工具集，功能很多。
 
-## 1.1 战绩页面
+# 1.1 使用方法
 
-以标签页的形式展现不同玩家的战绩。
-
-## 1.2 自动游戏流程
-
-这包括了自动开始匹配、自动接受对局、自动点赞和自动开始下一局四个部分。
-
-## 1.3 核心功能
-
-对局中队友或对手的分析。
-
-## 1.4 自动选择和禁用
-
-普通模式、排位模式或大乱斗模式的英雄自动选择和禁用。
-
-## 1.5 其他功能
-
-尽在探索。
+在右侧 Release 中寻找最新的构建版本，解压后即可运行。
 
 # 2. 使用样例
 
@@ -38,7 +22,7 @@
 
 ## 2.1 这里是战绩
 
-查询任意一个召唤师，并进入到战绩主页。
+你可以查询同大区任何一位玩家，即使它的生涯是隐藏的。
 
 ![标签页](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/main_page_match-history-tabs.png '标签页')
 
@@ -52,11 +36,15 @@
 
 一切都在自动过程中，一秒内完成 3 ban + 1 pick 操作。
 
+普通模式，大乱斗模式，排位模式，都支持。
+
 ![自动选择2](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/automation_auto-select_custom.gif '自动选择2')
 
 ![自动选择](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/automation_auto-select.png '自动选择')
 
 ![自动游戏流](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/automation_gameflow.png '自动游戏流')
+
+你可以设置多个意向的英雄，保证在不可用时（被选，被 ban，被热禁用）切换到另一个选项。
 
 ## 2.3 到处看看
 
@@ -67,6 +55,8 @@
 ## 2.4 大乱斗标配
 
 还在等内置 CD？我已经换了三次英雄了。
+
+顺便提前知道这些英雄的平衡性 BUFF。
 
 ![随机模式](https://github.com/Hanxven/LeagueAkari/raw/HEAD/pictures/aux_bench-mode.png '随机模式')
 

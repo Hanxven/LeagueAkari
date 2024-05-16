@@ -25,12 +25,13 @@ export class TimeoutTask {
   }
 
   /**
-   * 进行预设的任务
+   * 进行预设的任务。如果已经有一个任务，则取消旧任务
    * @param timeout 时限
-   * @returns 
+   * @returns
    */
   start(timeout: number) {
     if (this._started) {
+      clearTimeout(this._timerId)
       return
     }
 
@@ -39,5 +40,14 @@ export class TimeoutTask {
       this._fn()
       this._started = false
     }, timeout) as unknown as NodeJS.Timeout
+  }
+
+  setTask(fn: Function) {
+    if (this._started) {
+      clearTimeout(this._timerId)
+      return
+    }
+
+    this._fn = fn
   }
 }

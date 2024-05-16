@@ -216,6 +216,8 @@ export function chatSync() {
           mwNotification.warn('lcu-state-sync', '状态同步', '获取聊天状态失败')
           logger.warn(`获取聊天状态失败 ${formatError(error)}`)
         }
+      } else {
+        chat.setMe(null)
       }
     }
   )
@@ -261,6 +263,14 @@ export function chatSync() {
             logger.warn(`无法获取当前的对话 ${formatError(error)}`)
           }
         }
+      } else {
+        chat.setConversationChampSelect(null)
+        chat.setConversationPostGame(null)
+        chat.setConversationCustomGame(null)
+        chat.setParticipantsChampSelect(null)
+        chat.setParticipantsChampSelect(null)
+        chat.setParticipantsPostGame(null)
+        chat.setParticipantsCustomGame(null)
       }
     }
   )

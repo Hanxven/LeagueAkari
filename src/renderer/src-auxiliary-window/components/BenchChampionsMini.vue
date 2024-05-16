@@ -5,7 +5,6 @@
         <NTooltip
           raw
           :show-arrow="false"
-          content-class="xxx"
           :duration="100"
           :delay="300"
           :disabled="!selfChampionWithBalance || !selfChampionWithBalance.balance.length"
@@ -13,6 +12,11 @@
           <template #trigger>
             <LcuImage
               class="champion-image"
+              :class="{
+                buffed: selfChampionWithBalance?.overallBalance === 'buffed',
+                nerfed: selfChampionWithBalance?.overallBalance === 'nerfed',
+                balanced: selfChampionWithBalance?.overallBalance === 'balanced'
+              }"
               style="border-radius: 50%; cursor: default"
               :src="championIcon(selfChampionWithBalance?.championId || -1)"
             />
@@ -30,6 +34,7 @@
                 >{{ formatBalanceValue(b.value, b.meta.type === 'percentage') }}</span
               >
             </div>
+            <div class="balance-data-source-name">{{ eds.balance?.name }}</div>
           </div>
         </NTooltip>
         <div class="btns">
@@ -75,7 +80,10 @@
             <LcuImage
               class="champion-image"
               :class="{
-                'champion-image-invalid': !cs.currentPickableChampions.has(c.championId)
+                'champion-image-invalid': !cs.currentPickableChampions.has(c.championId),
+                buffed: c.overallBalance === 'buffed',
+                nerfed: c.overallBalance === 'nerfed',
+                balanced: c.overallBalance === 'balanced'
               }"
               :src="championIcon(c.championId)"
               @click="() => handleBenchSwap(c.championId)"
@@ -90,6 +98,7 @@
                 >{{ formatBalanceValue(b.value, b.meta.type === 'percentage') }}</span
               >
             </div>
+            <div class="balance-data-source-name">{{ eds.balance?.name }}</div>
           </div>
         </NTooltip>
         <div
@@ -228,7 +237,7 @@ const benchChampions = computed(() => {
 })
 
 const regulateBalance = (key: string, value: number) => {
-  let status: string
+  let status: 'buffed' | 'nerfed'
   const meta = BALANCE_TYPES[key]
   if (meta.type === 'percentage') {
     if (meta.impact === 'buff') {
@@ -260,20 +269,39 @@ const benchChampionsWithBalance = computed(() => {
 
   return champions.map((c) => {
     const balanceData = getBalanceData(c.championId)
+    const arr = Object.entries(balanceData || [])
+      .map((s) => regulateBalance(s[0], s[1]))
+      .toSorted((a, b) => {
+        return (
+          (STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status]) * 100 +
+          a.meta.order -
+          b.meta.order
+        )
+      })
+
+    let overallBalance = 'unbalanced'
+    for (const a of arr) {
+      if (a.status === 'buffed') {
+        if (overallBalance === 'nerfed') {
+          overallBalance = 'balanced'
+          break
+        } else {
+          overallBalance = 'buffed'
+        }
+      } else if (a.status === 'nerfed') {
+        if (overallBalance === 'buffed') {
+          overallBalance = 'balanced'
+          break
+        } else {
+          overallBalance = 'nerfed'
+        }
+      }
+    }
 
     return {
       championId: c.championId,
-      balance: balanceData
-        ? Object.entries(balanceData)
-            .map((s) => regulateBalance(s[0], s[1]))
-            .toSorted((a, b) => {
-              return (
-                (STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status]) * 100 +
-                a.meta.order -
-                b.meta.order
-              )
-            })
-        : []
+      overallBalance,
+      balance: arr
     }
   })
 })
@@ -295,10 +323,32 @@ const selfChampionWithBalance = computed(() => {
 
   if (c) {
     const b = getBalanceData(c.championId)
+    const arr = Object.entries(b || []).map((s) => regulateBalance(s[0], s[1]))
+
+    // 重复的代码，日后封装
+    let overallBalance = 'unbalanced'
+    for (const a of arr) {
+      if (a.status === 'buffed') {
+        if (overallBalance === 'nerfed') {
+          overallBalance = 'balanced'
+          break
+        } else {
+          overallBalance = 'buffed'
+        }
+      } else if (a.status === 'nerfed') {
+        if (overallBalance === 'buffed') {
+          overallBalance = 'balanced'
+          break
+        } else {
+          overallBalance = 'nerfed'
+        }
+      }
+    }
 
     return {
       championId: c.championId,
-      balance: b ? Object.entries(b).map((s) => regulateBalance(s[0], s[1])) : []
+      overallBalance,
+      balance: arr
     }
   }
 
@@ -392,11 +442,31 @@ const handleReroll = async (grabBack = false) => {
   height: 24px;
   border-radius: 2px;
   cursor: pointer;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgb(72, 72, 72);
+}
+// user/v1/
+.champion-image.buffed {
+  border-width: 1px;
+  border-color: rgb(0, 161, 67);
+}
+
+.champion-image.nerfed {
+  border-width: 1px;
+  border-color: rgb(181, 75, 0);
+}
+
+.champion-image.balanced {
+  border-width: 1px;
+  border-style: solid;
+  border-image: linear-gradient(to bottom right, rgb(0, 161, 67) 50%, rgb(181, 75, 0) 50%) 1;
 }
 
 .champion-image-invalid {
   cursor: not-allowed;
-  filter: grayscale(1);
+  filter: grayscale(0.6);
 }
 
 .champion-image-placeholder {
@@ -436,5 +506,11 @@ const handleReroll = async (grabBack = false) => {
   .balance-item-value.nerfed {
     color: rgb(255, 106, 0);
   }
+}
+
+.balance-data-source-name {
+  margin-top: 4px;
+  font-size: 10px;
+  color: rgb(145, 145, 145);
 }
 </style>

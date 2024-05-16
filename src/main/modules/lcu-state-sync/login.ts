@@ -47,6 +47,8 @@ export function loginSync() {
           mwNotification.warn('lcu-state-sync', '状态同步', '获取登录队列信息失败')
           logger.warn(`获取登录队列信息失败 ${formatError(error)}`)
         }
+      } else {
+        login.setLoginQueueState(null)
       }
     }
   )

@@ -1,5 +1,4 @@
 <template>
-  <!-- 这种套 template ... TODO improve it -->
   <template v-if="showingRank">
     <NPopover placement="bottom" :disabled="!simple && sortedRankedQueues.length <= 1">
       <template #trigger>
@@ -106,22 +105,46 @@ const sortedRankedQueues = computed(() => {
       }
 
       const aTier = tierOrderMap[a.tier] || 0
+      const apTier = tierOrderMap[a.previousSeasonHighestTier] || 0
       const bTier = tierOrderMap[b.tier] || 0
+      const bpTier = tierOrderMap[b.previousSeasonHighestTier] || 0
       const aDivision = tierDivisionOrderMap[a.division] || 0
       const bDivision = tierDivisionOrderMap[b.division] || 0
-      return bQueue * 100 + bTier * 10 + bDivision - (aQueue * 100 + aTier * 10 + aDivision)
+      const apDivision = tierDivisionOrderMap[a.previousSeasonHighestDivision] || 0
+      const bpDivision = tierDivisionOrderMap[b.previousSeasonHighestDivision] || 0
+
+      if (aQueue !== bQueue) {
+        return bQueue - aQueue
+      }
+
+      if (a.tier && b.tier) {
+        if (aTier !== bTier) {
+          return bTier - aTier
+        }
+
+        return bDivision - aDivision
+      } else {
+        if (apTier !== bpTier) {
+          return bpTier - apTier
+        }
+
+        return bpDivision - apDivision
+      }
     })
-    .filter((q) => q.tier || q.highestTier)
+    .filter((q) => q.tier || q.highestTier || q.previousSeasonHighestTier)
 })
 
 const showingRank = computed(() => {
-  return sortedRankedQueues.value.find((q) => q.tier || q.highestTier)
+  return sortedRankedQueues.value.find(
+    (q) => q.tier || q.highestTier || q.previousSeasonHighestTier
+  )
 })
 
 const formatRankText = (rank: RankedEntry, simple = false) => {
   const tier = tierTextMap[rank.tier]
   const queueType = queueTypeText[rank.queueType]
   const highestTier = tierTextMap[rank.highestTier]
+  const previousHighestTier = tierTextMap[rank.previousSeasonHighestTier]
 
   const textArr: string[] = []
 
@@ -149,9 +172,17 @@ const formatRankText = (rank: RankedEntry, simple = false) => {
 
   if (highestTier && !simple) {
     if (rank.highestDivision === 'NA') {
-      textArr.push(`最高 ${highestTier}`)
+      textArr.push(`赛季最高 ${highestTier}`)
     } else {
-      textArr.push(`最高 ${highestTier} ${rank.highestDivision}`)
+      textArr.push(`赛季最高 ${highestTier} ${rank.highestDivision}`)
+    }
+  }
+
+  if (previousHighestTier && !simple) {
+    if (rank.previousSeasonHighestDivision === 'NA') {
+      textArr.push(`历史最高 ${previousHighestTier}`)
+    } else {
+      textArr.push(`历史最高 ${previousHighestTier} ${rank.previousSeasonHighestDivision}`)
     }
   }
 

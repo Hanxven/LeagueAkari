@@ -1,3 +1,5 @@
+import { reaction } from 'mobx'
+
 import { setupAutoGameflow } from './auto-gameflow'
 import { setupAutoReply } from './auto-reply'
 import { setupAutoSelect } from './auto-select'

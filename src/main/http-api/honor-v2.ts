@@ -1,3 +1,5 @@
+import { Ballot } from '@shared/types/lcu/honorV2'
+
 import { request } from './common'
 
 export function honor(
@@ -15,5 +17,12 @@ export function honor(
       summonerId,
       puuid
     }
+  })
+}
+
+export function getBallot() {
+  return request<Ballot>({
+    url: '/lol-honor-v2/v1/ballot',
+    method: 'GET'
   })
 }

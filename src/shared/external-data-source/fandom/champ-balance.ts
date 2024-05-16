@@ -24,9 +24,13 @@ const BALANCE_TYPES = [
 ] as const
 
 export class FandomWikiChampBalanceDataSource implements ChampBalanceDataSourceV1 {
-  private _name = 'fandom-wiki'
+  static UPDATE_INTERVAL = 60 * 60 * 1e3
+
+  private _name = 'Fandom Wiki'
 
   private _version = 'v1.0.0'
+
+  private _id = 'fandom-wiki'
 
   private _updateAt = new Date(1990, 0, 1)
 
@@ -42,13 +46,21 @@ export class FandomWikiChampBalanceDataSource implements ChampBalanceDataSourceV
     return this._name
   }
 
+  get id() {
+    return this._id
+  }
+
   get() {
     return this._data
   }
 
-  async update() {
+  async update(force?: boolean) {
     // 更新间隔是 1 小时
-    if (!this._data || Date.now() - this._updateAt.getTime() > 60 * 60 * 1e3) {
+    if (
+      force ||
+      !this._data ||
+      Date.now() - this._updateAt.getTime() > FandomWikiChampBalanceDataSource.UPDATE_INTERVAL
+    ) {
       const raw = await this._fetchScriptRawString()
       this._data = this._parseBalanceData(raw)
       this._updateAt = new Date()

@@ -105,6 +105,8 @@ export function champSelectSync() {
           mwNotification.warn('lcu-state-sync', '状态同步', '获取 champ-select 会话失败')
           logger.warn(`获取 champ-select 会话失败 ${formatError(error)}`)
         }
+      } else {
+        champSelect.setSession(null)
       }
     }
   )
@@ -148,6 +150,9 @@ export function champSelectSync() {
           mwNotification.warn('lcu-state-sync', '状态同步', '获取可选英雄/可禁用英雄失败')
           logger.warn(`获取可选英雄/可禁用英雄失败 ${formatError(error)}`)
         }
+      } else {
+        champSelect.setCurrentPickableChampionArray([])
+        champSelect.setCurrentBannableChampionArray([])
       }
     }
   )
@@ -180,6 +185,7 @@ export function champSelectSync() {
     () => lcuConnectionState.state,
     (state) => {
       if (state !== 'connected') {
+        champSelect.setSelfSummoner(null)
         isCellSummonerUpdated = false
       }
     }
@@ -200,6 +206,8 @@ export function champSelectSync() {
 
           throw error
         }
+      } else {
+        champSelect.setCurrentChampion(null)
       }
     }
   )

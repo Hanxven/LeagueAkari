@@ -47,6 +47,8 @@ export function lobbySync() {
           mwNotification.warn('lcu-state-sync', '状态同步', '获取房间信息失败')
           logger.warn(`获取房间信息失败 ${formatError(error)}`)
         }
+      } else {
+        lobby.setLobby(null)
       }
     }
   )

@@ -10,6 +10,7 @@ class ChampBalanceDataSource {
   dataSource: ChampBalanceDataSourceV1
 
   data: {
+    name: string
     map: ChampBalanceMapV1
     updateAt: Date
   } | null = null
@@ -23,6 +24,7 @@ class ChampBalanceDataSource {
 
       runInAction(() => {
         this.data = {
+          name: this.dataSource.name,
           map: this.dataSource.get()!,
           updateAt: this.dataSource.updateAt
         }

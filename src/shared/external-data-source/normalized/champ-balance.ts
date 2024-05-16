@@ -5,6 +5,11 @@ export interface ChampBalanceDataSourceV1 {
   name: string
 
   /**
+   * 唯一标识
+   */
+  id: string
+
+  /**
    * 数据源版本
    */
   version: string
@@ -22,7 +27,7 @@ export interface ChampBalanceDataSourceV1 {
   /**
    * 更新数据
    */
-  update(): Promise<ChampBalanceMapV1 | null>
+  update(force?: boolean): Promise<ChampBalanceMapV1 | null>
 
   /**
    * 数据是否合法，null 也是合法数据

@@ -37,11 +37,6 @@ class LeagueClientUxSettings {
 
 export const leagueClientUxSettings = new LeagueClientUxSettings()
 
-function queryLeagueClientUxCommandLineNative() {
-  const pids = toolkit.getPidsByName('LeagueClientUx.exe')
-  console.log(pids.map((p) => toolkit.getCommandLine1(p)))
-}
-
 export async function initLeagueClientFunctions() {
   await loadSettings()
 
@@ -80,6 +75,10 @@ export async function initLeagueClientFunctions() {
   // 检查英雄联盟渲染端是否存在，可能存在多个
   onRendererCall('league-client-ux/lcu-auth/query', async () => {
     if (appState.settings.useWmic) {
+      if (!appState.isAdministrator) {
+        throw new Error('insufficient permissions')
+      }
+
       return queryLcuAuth(LEAGUE_CLIENT_UX_PROCESS_NAME)
     }
 

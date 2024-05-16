@@ -63,6 +63,8 @@ export interface RankedEntry {
   previousSeasonEndTier: string
   provisionalGameThreshold: number
   provisionalGamesRemaining: number
+  previousSeasonHighestTier: string
+  previousSeasonHighestDivision: string
   queueType: string
   ratedRating: number
   ratedTier: string

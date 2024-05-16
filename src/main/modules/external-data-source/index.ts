@@ -77,5 +77,5 @@ export async function setupExternalDataSource() {
 }
 
 function stateSync() {
-  ipcStateSync('external-data-source/balance', () => eds.balance.data)
+  ipcStateSync('external-data-source/balance/data', () => eds.balance.data)
 }

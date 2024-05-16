@@ -9,13 +9,12 @@ import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { TimeoutTask } from '@main/utils/timer'
-import { LcuEvent } from '@shared/types/lcu/event'
-import { Ballot } from '@shared/types/lcu/honorV2'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed, reaction } from 'mobx'
 
 import { chat } from '../lcu-state-sync/chat'
 import { gameflow } from '../lcu-state-sync/gameflow'
+import { honorState } from '../lcu-state-sync/honor'
 import { matchmaking } from '../lcu-state-sync/matchmaking'
 import { summoner } from '../lcu-state-sync/summoner'
 import { AutoRematchStrategy as AutoSearchRematchStrategy, autoGameflowState } from './state'
@@ -28,98 +27,115 @@ let autoAcceptTimerId: NodeJS.Timeout | null = null
 let autoSearchMatchTimerId: NodeJS.Timeout | null = null
 let autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
 
-const AUTO_PLAY_AGAIN_DELAY = 2000
+// 等待点赞页面的最大时间
+const PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT = 3250
 
-const autoPlayAgainTask = new TimeoutTask(async () => {
+// 预留时间
+const PLAY_AGAIN_BUFFER_TIMEOUT = 750
+
+async function playAgainFn() {
   try {
-    await playAgain()
     logger.info('Play again, 返回房间')
+    await playAgain()
   } catch (error) {
     logger.warn(`尝试 Play again 时失败 ${formatError(error)}`)
   }
-})
+}
+
+const playAgainTask = new TimeoutTask(playAgainFn)
 
 export async function setupAutoGameflow() {
   stateSync()
   ipcCall()
   await loadSettings()
 
-  // 结算点赞
-  lcuEventBus.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (message) => {
-    if (message.eventType === 'Create' && autoGameflowState.settings.autoHonorEnabled) {
-      try {
-        if (autoGameflowState.settings.autoHonorStrategy === 'opt-out') {
-          await honor(message.data.gameId, 'OPT_OUT', 0)
-          return
-        }
+  // 自动点赞
+  reaction(
+    () => [honorState.ballot, autoGameflowState.settings.autoHonorEnabled] as const,
+    async ([b, e]) => {
+      if (b) {
+        playAgainTask.cancel()
+      }
 
-        const eligiblePlayers = message.data.eligiblePlayers
-        const honorablePlayerIds: number[] = []
+      if (b && e) {
+        try {
+          if (autoGameflowState.settings.autoHonorStrategy === 'opt-out') {
+            await honor(b.gameId, 'OPT_OUT', 0)
+            return
+          }
 
-        if (autoGameflowState.settings.autoHonorStrategy === 'all-member') {
-          honorablePlayerIds.push(...eligiblePlayers.map((p) => p.summonerId))
-        } else {
-          const eligiblePlayerIds = new Set(eligiblePlayers.map((p) => p.summonerId))
-          const eogStatus = (await getEogStatus()).data
-          const lobbyMemberPuuids = [
-            ...eogStatus.eogPlayers,
-            ...eogStatus.leftPlayers,
-            ...eogStatus.readyPlayers
-          ]
-          const lobbyMemberSummoners = (
-            await Promise.all(
-              lobbyMemberPuuids.map(async (p) => (await getSummonerByPuuid(p)).data)
+          const eligiblePlayers = b.eligiblePlayers
+          const honorablePlayerIds: number[] = []
+
+          if (autoGameflowState.settings.autoHonorStrategy === 'all-member') {
+            honorablePlayerIds.push(...eligiblePlayers.map((p) => p.summonerId))
+          } else {
+            const eligiblePlayerIds = new Set(eligiblePlayers.map((p) => p.summonerId))
+            const eogStatus = (await getEogStatus()).data
+            const lobbyMemberPuuids = [
+              ...eogStatus.eogPlayers,
+              ...eogStatus.leftPlayers,
+              ...eogStatus.readyPlayers
+            ]
+            const lobbyMemberSummoners = (
+              await Promise.all(
+                lobbyMemberPuuids.map(async (p) => (await getSummonerByPuuid(p)).data)
+              )
+            ).filter((p) => p.summonerId !== summoner.me?.summonerId)
+
+            const honorableLobbyMembers = lobbyMemberSummoners.filter((p) =>
+              eligiblePlayerIds.has(p.summonerId)
             )
-          ).filter((p) => p.summonerId !== summoner.me?.summonerId)
 
-          const honorableLobbyMembers = lobbyMemberSummoners.filter((p) =>
-            eligiblePlayerIds.has(p.summonerId)
-          )
-
-          if (autoGameflowState.settings.autoHonorStrategy === 'only-lobby-member') {
-            honorablePlayerIds.push(...honorableLobbyMembers.map((p) => p.summonerId))
-          } else if (autoGameflowState.settings.autoHonorStrategy === 'prefer-lobby-member') {
-            if (honorableLobbyMembers.length === 0) {
-              honorablePlayerIds.push(...eligiblePlayers.map((p) => p.summonerId))
-            } else {
+            if (autoGameflowState.settings.autoHonorStrategy === 'only-lobby-member') {
               honorablePlayerIds.push(...honorableLobbyMembers.map((p) => p.summonerId))
+            } else if (autoGameflowState.settings.autoHonorStrategy === 'prefer-lobby-member') {
+              if (honorableLobbyMembers.length === 0) {
+                honorablePlayerIds.push(...eligiblePlayers.map((p) => p.summonerId))
+              } else {
+                honorablePlayerIds.push(...honorableLobbyMembers.map((p) => p.summonerId))
+              }
             }
           }
-        }
 
-        if (honorablePlayerIds.length) {
-          const category = HONOR_CATEGORY[Math.floor(Math.random() * HONOR_CATEGORY.length)]
-          const candidate =
-            honorablePlayerIds[Math.floor(Math.random() * honorablePlayerIds.length)]
-          await honor(message.data.gameId, category, candidate)
+          if (honorablePlayerIds.length) {
+            const category = HONOR_CATEGORY[Math.floor(Math.random() * HONOR_CATEGORY.length)]
+            const candidate =
+              honorablePlayerIds[Math.floor(Math.random() * honorablePlayerIds.length)]
 
-          logger.info(`给玩家: ${candidate} 点赞, for ${category}, game ID: ${message.data.gameId}`)
-        } else {
-          await honor(message.data.gameId, 'OPT_OUT', 0)
-          logger.info('跳过点赞阶段')
+            await honor(b.gameId, category, candidate)
+
+            logger.info(`给玩家: ${candidate} 点赞, for ${category}, game ID: ${b.gameId}`)
+          } else {
+            await honor(b.gameId, 'OPT_OUT', 0)
+            logger.info('跳过点赞阶段')
+          }
+        } catch (error) {
+          mwNotification.warn('auto-gameflow', '自动点赞', '尝试自动点赞出现问题')
+          logger.warn(`无法给玩家点赞 ${formatError(error)}`)
         }
-      } catch (error) {
-        mwNotification.warn('auto-gameflow', '自动点赞', '尝试自动点赞出现问题')
-        logger.warn(`无法给玩家点赞 ${formatError(error)}`)
       }
-    }
-  })
-
-  const isEndGame = computed(
-    () => gameflow.phase === 'EndOfGame' || gameflow.phase === 'PreEndOfGame'
+    },
+    { equals: comparer.shallow /* ballot 不会 Update，只会 Create 和 Delete */ }
   )
 
-  // 自动回到房间
   reaction(
-    () => [isEndGame.get(), autoGameflowState.settings.playAgainEnabled] as const,
-    async ([isEnd, enabled]) => {
-      if (enabled && isEnd) {
-        logger.info(`将在 ${AUTO_PLAY_AGAIN_DELAY} ms 后 play again`)
-        autoPlayAgainTask.start(AUTO_PLAY_AGAIN_DELAY)
-      } else {
-        if (autoPlayAgainTask.cancel()) {
-          logger.info(`play again 已取消`)
-        }
+    () => [gameflow.phase, autoGameflowState.settings.playAgainEnabled] as const,
+    async ([phase, enabled]) => {
+      if (!enabled || (phase !== 'PreEndOfGame' && phase !== 'EndOfGame')) {
+        playAgainTask.cancel()
+        return
+      }
+
+      // 在某些模式中，可能会出现仅有 PreEndOfGame 的情况，需要做一个计时器
+      if (phase === 'PreEndOfGame' && enabled) {
+        playAgainTask.start(PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT)
+        return
+      }
+
+      if (phase === 'EndOfGame' && enabled) {
+        playAgainTask.start(PLAY_AGAIN_BUFFER_TIMEOUT)
+        return
       }
     },
     { equals: comparer.shallow }
@@ -233,7 +249,8 @@ export async function setupAutoGameflow() {
     return {
       timeInQueue: matchmaking.search.timeInQueue,
       estimatedQueueTime: matchmaking.search.estimatedQueueTime,
-      searchState: matchmaking.search.searchState
+      searchState: matchmaking.search.searchState,
+      lowPriorityData: matchmaking.search.lowPriorityData
     }
   })
 
@@ -249,15 +266,17 @@ export async function setupAutoGameflow() {
         return
       }
 
+      const penaltyTime = s.lowPriorityData.penaltyTime
+
       if (st === 'fixed-duration') {
-        if (s.timeInQueue >= d) {
+        if (s.timeInQueue + penaltyTime >= d) {
           deleteSearchMatch().catch((e) => {
             logger.warn(`尝试取消匹配时失败 ${formatError(e)}`)
           })
           return
         }
       } else if (st === 'estimated-duration') {
-        if (s.timeInQueue >= s.estimatedQueueTime) {
+        if (s.timeInQueue + penaltyTime >= s.estimatedQueueTime) {
           deleteSearchMatch().catch((e) => {
             logger.warn(`尝试取消匹配时失败 ${formatError(e)}`)
           })
