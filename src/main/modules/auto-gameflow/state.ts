@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx'
 
 import { gameflow } from '../lcu-state-sync/gameflow'
 import { lobby } from '../lcu-state-sync/lobby'
+import { matchmaking } from '../lcu-state-sync/matchmaking'
 import { summoner } from '../lcu-state-sync/summoner'
 
 export type AutoHonorStrategy =
@@ -115,6 +116,18 @@ class AutoGameflowState {
       }
     } else {
       return 'unavailable'
+    }
+
+    if (matchmaking.search) {
+      const errors = matchmaking.search.errors
+      const maxPenaltyTime = errors.reduce(
+        (prev, cur) => Math.max(cur.penaltyTimeRemaining, prev),
+        -Infinity
+      )
+
+      if (maxPenaltyTime > 0) {
+        return 'waiting-for-penalty-time'
+      }
     }
 
     if (this.settings.autoSearchMatchWaitForInvitees) {

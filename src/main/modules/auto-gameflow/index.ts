@@ -581,6 +581,13 @@ const printAutoSearchMatchInfo = async (cancel?: string) => {
         'celebration'
       ).catch()
       return
+    } else if (cancel === 'waiting-for-penalty-time') {
+      chatSend(
+        chat.conversations.customGame.id,
+        `[League Akari] 自动匹配已取消，等待秒退计时器`,
+        'celebration'
+      ).catch()
+      return
     }
 
     const time = (autoGameflowState.willSearchMatchAt - Date.now()) / 1e3
@@ -618,7 +625,6 @@ export function cancelAutoSearchMatch(reason: string) {
       clearInterval(autoSearchMatchCountdownTimerId)
       autoSearchMatchCountdownTimerId = null
     }
-    3
 
     autoGameflowState.clearAutoSearchMatch()
     logger.info(`即将进行的自动匹配对局已取消，${reason}`)

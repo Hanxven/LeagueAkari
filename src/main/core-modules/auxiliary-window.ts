@@ -108,9 +108,9 @@ export function createAuxiliaryWindow(): void {
 
   auxiliaryWindow = new BrowserWindow({
     width: WINDOW_BASE_WIDTH,
-    height: WINDOW_BASE_HEIGHT,
     minWidth: WINDOW_BASE_WIDTH,
     maxWidth: WINDOW_BASE_WIDTH,
+    height: WINDOW_BASE_HEIGHT,
     minHeight: WINDOW_BASE_HEIGHT,
     maxHeight: WINDOW_BASE_HEIGHT,
     resizable: false,
@@ -478,8 +478,8 @@ function resetWindowPosition() {
     auxiliaryWindow.setBounds({
       x: p.x,
       y: p.y,
-      width: WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor,
-      height: WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor
+      width: Math.ceil(WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor),
+      height: Math.ceil(WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor)
     })
     logger.info('重置窗口位置到主显示器中心')
   }

@@ -68,7 +68,10 @@
           {{ gameflow.session?.map.name || '地图' }}</span
         >
         <template v-if="agf.settings.autoSearchMatchEnabled">
-          <span class="sub-text" v-if="agf.activityStartStatus === 'insufficient-members'"
+          <span class="sub-text" v-if="penaltyTime"
+            >等待秒退计时器 {{ penaltyTime.toFixed() }} s</span
+          >
+          <span class="sub-text" v-else-if="agf.activityStartStatus === 'insufficient-members'"
             >自动匹配需达到 {{ agf.settings.autoSearchMatchMinimumMembers }} 人</span
           >
           <span class="sub-text" v-else-if="agf.activityStartStatus === 'waiting-for-invitees'"
@@ -99,7 +102,7 @@ import { useMatchmakingStore } from '@shared/renderer/modules/lcu-state-sync/mat
 import { GetSearch } from '@shared/types/lcu/matchmaking'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton } from 'naive-ui'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const agf = useAutoGameflowStore()
 const gameflow = useGameflowStore()
@@ -150,6 +153,25 @@ const handleCancelSearching = async () => {
   }
   setAutoSearchMatchEnabled(false)
 }
+
+const penaltyTime = computed(() => {
+  if (!matchmaking.search) {
+    return null
+  }
+
+  const errors = matchmaking.search.errors
+
+  if (!errors.length) {
+    return null
+  }
+
+  const maxPenaltyTime = errors.reduce(
+    (prev, cur) => Math.max(cur.penaltyTimeRemaining, prev),
+    -Infinity
+  )
+
+  return maxPenaltyTime
+})
 
 watch(
   () => agf.willAccept,
