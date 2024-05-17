@@ -120,7 +120,6 @@
         size="small"
       ></NSwitch>
     </ControlItem>
-
     <ControlItem
       class="control-item-margin"
       label="无视队友预选"
@@ -135,6 +134,7 @@
     <ControlItem class="control-item-margin" label="意向英雄">
       <OrderedChampionList
         :value="autoSelect.settings.bannedChampions"
+        allow-empty
         type="ban"
         @update:value="(list) => setNormalModeBannedChampions(list)"
       />

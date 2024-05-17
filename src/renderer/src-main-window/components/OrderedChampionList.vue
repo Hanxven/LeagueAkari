@@ -109,10 +109,17 @@ import { NButton, NPopover, NSelect } from 'naive-ui'
 import { computed, nextTick, ref, watch } from 'vue'
 
 const props = withDefaults(
-  defineProps<{ value?: number[]; maxShow?: number; maxCount?: number; type?: 'pick' | 'ban' }>(),
+  defineProps<{
+    value?: number[]
+    maxShow?: number
+    maxCount?: number
+    type?: 'pick' | 'ban'
+    allowEmpty?: boolean
+  }>(),
   {
     maxShow: 6,
     maxCount: Infinity,
+    allowEmpty: false,
     type: 'pick'
   }
 )
@@ -154,7 +161,13 @@ const championOptions = computed(() => {
   )
 
   return sorted
-    .filter((b) => b.id !== 0 && b.id !== -1)
+    .filter((b) => {
+      if (props.allowEmpty) {
+        return b.id !== 0
+      }
+
+      return b.id !== 0 && b.id !== -1
+    })
     .map((b) => ({
       value: b.id,
       label: b.name,

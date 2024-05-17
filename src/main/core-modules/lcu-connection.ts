@@ -146,8 +146,9 @@ async function connectToLcu(auth: LcuAuth) {
     await new Promise<void>((resolve, reject) => {
       timeoutTimer = setTimeout(() => {
         ws.close()
-        logger.warn(`LCU 连接超时, 最大限时 ${INTERVAL_TIMEOUT} ms`)
-        reject(new Error('timeout trying to connect to LCU Websocket'))
+        const error = new Error(`timeout trying to connect to LCU Websocket: ${INTERVAL_TIMEOUT}ms`)
+        error.name = 'LCU:TIMEOUT'
+        reject(error)
       }, INTERVAL_TIMEOUT)
 
       ws.on('open', async () => {
@@ -166,7 +167,6 @@ async function connectToLcu(auth: LcuAuth) {
 
       ws.on('error', (error) => {
         lcuConnectionState.setDisconnected()
-        logger.warn(`LCU WebSocket 发生错误: ${formatError(error)}`)
         clearTimeout(timeoutTimer)
         reject(error)
       })
@@ -188,8 +188,6 @@ async function connectToLcu(auth: LcuAuth) {
       }
     })
   } catch (error) {
-    logger.warn(`LCU 连接错误: ${formatError(error)}`)
-
     lcuConnectionState.setDisconnected()
     throw error
   }

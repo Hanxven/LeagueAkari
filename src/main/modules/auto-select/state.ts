@@ -236,10 +236,10 @@ class AutoSelectState {
 
     const unbannables = new Set<number>()
 
-    // 已经禁用过的无需再 ban
+    // 已经禁用过的无需再 ban，空 ban 除外
     a.session.actions.forEach((arr) =>
       arr.forEach((a) => {
-        if (a.type === 'ban' && a.completed) {
+        if (a.type === 'ban' && a.completed && a.id !== -1) {
           unbannables.add(a.championId)
         }
       })
@@ -260,7 +260,8 @@ class AutoSelectState {
     }
 
     const bannables = autoSelectState.settings.bannedChampions.filter(
-      (c) => !unbannables.has(c) && a.currentBannables.has(c)
+      (c) =>
+        (c == -1 && !a.session.isCustomGame) || (!unbannables.has(c) && a.currentBannables.has(c))
     )
 
     if (!bannables.length) {
