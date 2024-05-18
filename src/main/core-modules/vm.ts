@@ -1,4 +1,5 @@
 import { logger } from '@main/modules/lcu-state-sync/common'
+import { StatsSend } from '@shared/external-data-source/normalized/stats-send'
 import { formatError } from '@shared/utils/errors'
 import { app } from 'electron'
 import { join } from 'node:path'
@@ -32,4 +33,28 @@ export function runCodeInAkariContext(code: string) {
   } catch (error) {
     logger.warn(`VM 环境出现错误 ${formatError(error)}`)
   }
+}
+
+export function runCustomSendStatsScript(code: string) {
+  const clazz: { new (): StatsSend } = runCodeInAkariContext(code)
+
+  if (typeof clazz !== 'function') {
+    throw new Error('not a function')
+  }
+
+  const i = new clazz()
+
+  if (
+    typeof i.id !== 'string' ||
+    typeof i.name !== 'string' ||
+    typeof i.version !== 'string' ||
+    typeof i.getStatLines !== 'function' ||
+    !i.id ||
+    !i.name ||
+    !i.version
+  ) {
+    throw new Error('invalid form')
+  }
+
+  // const stats = i.getStatLines(info?)
 }

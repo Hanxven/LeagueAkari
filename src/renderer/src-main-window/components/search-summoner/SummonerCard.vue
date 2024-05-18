@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
@@ -143,3 +143,4 @@ const handleToSummoner = () => {
   white-space: nowrap;
 }
 </style>
+@shared/constants/common

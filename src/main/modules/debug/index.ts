@@ -1,4 +1,4 @@
-import { lcuEventBus } from '@main/core-modules/lcu-connection'
+import { lcuEventBus, setWebSocketSubscribeAll } from '@main/core-modules/lcu-connection'
 import { createLogger } from '@main/core-modules/log'
 import { getMainWindow } from '@main/core-modules/main-window'
 import { ipcStateSync, onRendererCall, sendEventToRenderer } from '@main/utils/ipc'
@@ -21,20 +21,24 @@ function stateSync() {
 
 function ipcCall() {
   onRendererCall('debug/settings/send-all-native-lcu-events/set', async (_, enabled) => {
-    if (enabled) {
-      logger.info('发送所有 LCU 事件到 Main Window')
-    } else {
-      logger.info('取消发送所有 LCU 事件到 Main Window')
-    }
+    try {
+      if (enabled) {
+        logger.info('发送所有 LCU 事件到 Main Window')
+        setWebSocketSubscribeAll(true)
+      } else {
+        logger.info('取消发送所有 LCU 事件到 Main Window')
+        setWebSocketSubscribeAll(false)
+      }
 
-    debugState.settings.setSendAllNativeLcuEvents(enabled)
+      debugState.settings.setSendAllNativeLcuEvents(enabled)
+    } catch {}
   })
 
   lcuEventBus.on('/**', (data) => {
     if (debugState.settings.sendAllNativeLcuEvents) {
       const mw = getMainWindow()
 
-      // send only to the main window (for debugging)
+      // send only to the main window (for only debugging)
       if (mw) {
         sendEventToRenderer(mw.webContents, 'debug/native-lcu-event', data)
       }

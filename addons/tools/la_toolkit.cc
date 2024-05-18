@@ -80,7 +80,6 @@ Napi::String GetCommandLine1(const Napi::CallbackInfo& info) {
   WCHAR* cmdline = NULL;
   SIZE_T cmdline_size = 0;
 
-  // 调用你的原始C函数
   int result = GetProcessCommandLine1(pid, &cmdline, &cmdline_size);
   if (result == 0 && cmdline != NULL) {
     std::u16string cmd(reinterpret_cast<char16_t*>(cmdline));

@@ -1,6 +1,6 @@
 import { lcuConnectionState } from '@main/core-modules/lcu-connection'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
-import { EMPTY_PUUID } from '@shared/constants'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'

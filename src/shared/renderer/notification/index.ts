@@ -1,4 +1,4 @@
-import { LEAGUE_AKARI_DEFAULT_NOTIFICATION_DURATION } from '@shared/constants'
+import { LEAGUE_AKARI_DEFAULT_NOTIFICATION_DURATION } from '@shared/constants/common'
 import { mainCall, onMainEvent } from '@shared/renderer/utils/ipc'
 import { useEventBus } from '@vueuse/core'
 import dayjs from 'dayjs'

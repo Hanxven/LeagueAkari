@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
@@ -369,3 +369,4 @@ useKeepAliveScrollPositionMemo(el)
   }
 }
 </style>
+@shared/constants/common

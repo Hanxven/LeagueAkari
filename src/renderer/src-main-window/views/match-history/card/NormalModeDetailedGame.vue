@@ -173,7 +173,7 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
@@ -457,3 +457,4 @@ table {
   color: rgb(167, 167, 255);
 }
 </style>
+@shared/constants/common

@@ -17,7 +17,7 @@ import {
   onRendererCall,
   sendEventToAllRenderer as sendEventToAllRenderers
 } from '@main/utils/ipc'
-import { EMPTY_PUUID } from '@shared/constants'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
 import { formatError } from '@shared/utils/errors'

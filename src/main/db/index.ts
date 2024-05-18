@@ -1,4 +1,4 @@
-import { LEAGUE_AKARI_DB_FILENAME } from '@shared/constants'
+import { LEAGUE_AKARI_DB_FILENAME } from '@shared/constants/common'
 import { app } from 'electron'
 import { join } from 'node:path'
 import { DataSource } from 'typeorm'

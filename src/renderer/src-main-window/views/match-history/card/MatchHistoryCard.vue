@@ -206,7 +206,7 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
@@ -779,3 +779,4 @@ const handleToSummoner = (puuid: string) => {
   font-size: 12px;
 }
 </style>
+@shared/constants/common

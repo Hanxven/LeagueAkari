@@ -140,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import AugmentDisplay from '@shared/renderer/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
@@ -451,3 +451,4 @@ table {
   margin: 4px 0px;
 }
 </style>
+@shared/constants/common

@@ -1,5 +1,6 @@
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { LcuAuth } from '@main/utils/lcu-auth'
+import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
@@ -127,6 +128,45 @@ export function getWebSocket() {
   return ws
 }
 
+export function setWebSocketSubscribeAll(enabled: boolean) {
+  if (!ws) {
+    return Promise.reject(new Error('LCU is not connected'))
+  }
+
+  const _sendSubscribeTask = (code: number, eventName: string) =>
+    new Promise<void>((resolve, reject) => {
+      ws?.send(JSON.stringify([code, eventName]), (error) => {
+        if (error instanceof Error) {
+          reject(error)
+        } else {
+          resolve()
+        }
+      })
+    })
+
+  if (enabled) {
+    const subTasks = SUBSCRIBED_LCU_ENDPOINTS.map((eventName) => _sendSubscribeTask(6, eventName))
+
+    subTasks.push(_sendSubscribeTask(5, 'OnJsonApiEvent'))
+
+    return new Promise<void>((resolve, reject) =>
+      Promise.all(subTasks)
+        .then(() => resolve())
+        .catch(reject)
+    )
+  } else {
+    const subTasks = SUBSCRIBED_LCU_ENDPOINTS.map((eventName) => _sendSubscribeTask(5, eventName))
+
+    subTasks.unshift(_sendSubscribeTask(6, 'OnJsonApiEvent'))
+
+    return new Promise<void>((resolve, reject) =>
+      Promise.all(subTasks)
+        .then(() => resolve())
+        .catch(reject)
+    )
+  }
+}
+
 const INTERVAL_TIMEOUT = 12500
 
 async function connectToLcu(auth: LcuAuth) {
@@ -159,10 +199,29 @@ async function connectToLcu(auth: LcuAuth) {
           reject(error)
         }
 
-        ws.send(JSON.stringify([5, 'OnJsonApiEvent']))
+        const _sendTask = (eventName: string) =>
+          new Promise<void>((resolve, reject) => {
+            ws.send(JSON.stringify([5, eventName]), (error) => {
+              if (error instanceof Error) {
+                reject(error)
+              } else {
+                resolve()
+              }
+            })
+          })
 
-        lcuConnectionState.setConnected(auth)
-        resolve()
+        const subTasks = SUBSCRIBED_LCU_ENDPOINTS.map((eventName) => _sendTask(eventName))
+
+        Promise.all(subTasks)
+          .then(() => {
+            lcuConnectionState.setConnected(auth)
+            resolve()
+          })
+          .catch((error) => {
+            lcuConnectionState.setDisconnected()
+            ws.close()
+            reject(error)
+          })
       })
 
       ws.on('error', (error) => {
@@ -179,10 +238,10 @@ async function connectToLcu(auth: LcuAuth) {
 
     ws.on('message', (msg) => {
       try {
-        const data = JSON.parse(msg.toString())[2]
+        const data = JSON.parse(msg.toString())
 
         // self main process
-        lcuEventBus.emit(data.uri, data)
+        lcuEventBus.emit(data[2].uri, data[2])
       } catch {
         /* TODO NOTHING */
       }
