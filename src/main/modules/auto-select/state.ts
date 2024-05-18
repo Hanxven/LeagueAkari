@@ -142,6 +142,10 @@ class AutoSelectState {
       return null
     }
 
+    if (a.memberMe.championId) {
+      return null
+    }
+
     // 第一个能用的 action
     const first = a.pick.find((e) => !e.completed)
 

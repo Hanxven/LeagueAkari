@@ -25,6 +25,7 @@ export async function setupAutoSelect() {
   reaction(
     () => autoSelectState.upcomingPick,
     async (pick) => {
+      console.log(pick)
       if (!pick) {
         return
       }
@@ -64,6 +65,10 @@ export async function setupAutoSelect() {
 
       if (!pick.isActingNow) {
         if (!autoSelectState.settings.showIntent) {
+          return
+        }
+
+        if (autoSelectState.champSelectActionInfo?.session.isCustomGame) {
           return
         }
 

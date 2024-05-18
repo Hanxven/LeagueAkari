@@ -17,7 +17,7 @@ import { gameflow } from '../lcu-state-sync/gameflow'
 import { honorState } from '../lcu-state-sync/honor'
 import { matchmaking } from '../lcu-state-sync/matchmaking'
 import { summoner } from '../lcu-state-sync/summoner'
-import { AutoRematchStrategy as AutoSearchRematchStrategy, autoGameflowState } from './state'
+import { AutoSearchRematchStrategy, autoGameflowState } from './state'
 
 const HONOR_CATEGORY = ['COOL', 'SHOTCALLER', 'HEART'] as const
 
@@ -29,6 +29,9 @@ let autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
 
 // 等待点赞页面的最大时间
 const PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT = 3250
+
+// 位于结算时间的最大超时缓冲，用于处理卡在结算的情况
+const PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT = 10000
 
 // 预留时间
 const PLAY_AGAIN_BUFFER_TIMEOUT = 750
@@ -122,18 +125,32 @@ export async function setupAutoGameflow() {
   reaction(
     () => [gameflow.phase, autoGameflowState.settings.playAgainEnabled] as const,
     async ([phase, enabled]) => {
-      if (!enabled || (phase !== 'PreEndOfGame' && phase !== 'EndOfGame')) {
+      if (
+        !enabled ||
+        (phase !== 'WaitingForStats' && phase !== 'PreEndOfGame' && phase !== 'EndOfGame')
+      ) {
         playAgainTask.cancel()
+        return
+      }
+
+      // 如果停留在结算页面时间过长，将考虑返回
+      if (phase === 'WaitingForStats' && enabled) {
+        logger.info(
+          `位于 WaitingForStats 的自动返回房间超时计时 ${PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT} ms`
+        )
+        playAgainTask.start(PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT)
         return
       }
 
       // 在某些模式中，可能会出现仅有 PreEndOfGame 的情况，需要做一个计时器
       if (phase === 'PreEndOfGame' && enabled) {
+        logger.info(`等待点赞事件 ${PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT} ms`)
         playAgainTask.start(PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT)
         return
       }
 
       if (phase === 'EndOfGame' && enabled) {
+        logger.info(`将在 ${PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT} ms 后回到房间`)
         playAgainTask.start(PLAY_AGAIN_BUFFER_TIMEOUT)
         return
       }

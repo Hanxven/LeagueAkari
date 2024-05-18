@@ -32,7 +32,7 @@ export function initLogger() {
     format: format.combine(
       format.timestamp(),
       format.printf(({ level, message, module, timestamp }) => {
-        return `[${timestamp}] [${module}] [${level}] ${message}`
+        return `[${dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss:SSS')}] [${module}] [${level}] ${message}`
       })
     ),
     transports: [

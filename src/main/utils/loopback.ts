@@ -42,9 +42,9 @@ export async function getRandomAvailableLoopbackAddrWithPort(port: number) {
       throw new Error('max tries exceeded')
     }
 
-    const a = randomInt(0, 255)
-    const b = randomInt(0, 255)
-    const c = randomInt(2, 255)
+    const a = randomInt(0, 255, true)
+    const b = randomInt(0, 255, true)
+    const c = randomInt(2, 255, true)
     const host = `127.${a}.${b}.${c}`
 
     if (await checkIfPortInUse(host, port)) {

@@ -15,7 +15,7 @@ import { displayAuxiliaryWindowTip, setAuxiliaryWindowTrayEnabled } from './plat
 const logger = createLogger('auxiliary-window')
 
 const WINDOW_BASE_WIDTH = 300
-const WINDOW_BASE_HEIGHT = 340
+const WINDOW_BASE_HEIGHT = 350
 
 class AuxiliaryWindowSettings {
   opacity: number = 0.9
@@ -101,18 +101,18 @@ export function getAuxiliaryWindow() {
 
 const INITIAL_SHOW = false
 
-export function createAuxiliaryWindow(): void {
+export function createAuxiliaryWindow() {
   if (auxiliaryWindow) {
     return
   }
 
   auxiliaryWindow = new BrowserWindow({
-    width: WINDOW_BASE_WIDTH,
-    minWidth: WINDOW_BASE_WIDTH,
-    maxWidth: WINDOW_BASE_WIDTH,
-    height: WINDOW_BASE_HEIGHT,
-    minHeight: WINDOW_BASE_HEIGHT,
-    maxHeight: WINDOW_BASE_HEIGHT,
+    width: WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor,
+    height: WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor,
+    minWidth: WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor,
+    maxWidth: WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor,
+    minHeight: WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor,
+    maxHeight: WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor,
     resizable: false,
     frame: false,
     show: INITIAL_SHOW,
@@ -133,17 +133,15 @@ export function createAuxiliaryWindow(): void {
     }
   })
 
-  auxiliaryWindowState.setShow(INITIAL_SHOW)
-
-  auxiliaryWindowState.setBounds(auxiliaryWindow.getBounds())
-
-  auxiliaryWindow.setOpacity(auxiliaryWindowState.settings.opacity)
-
-  getLastWindowBounds().then((b) => {
-    if (b) {
-      auxiliaryWindow?.setBounds(b)
+  getLastWindowBounds().then((r) => {
+    if (r) {
+      auxiliaryWindow?.setPosition(r.x, r.y)
     }
   })
+
+  auxiliaryWindowState.setShow(INITIAL_SHOW)
+
+  auxiliaryWindow.setOpacity(auxiliaryWindowState.settings.opacity)
 
   auxiliaryWindow.webContents.on('did-finish-load', () => {
     auxiliaryWindow?.webContents.setZoomFactor(auxiliaryWindowState.settings.zoomFactor)
@@ -457,6 +455,8 @@ function getLastWindowBounds() {
 }
 
 function saveWindowBounds(bounds: Rectangle) {
+  bounds.width = WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor
+  bounds.height = WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor
   return setSetting('auxiliary-window/bounds', bounds)
 }
 

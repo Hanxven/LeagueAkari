@@ -128,10 +128,13 @@ export function getWebSocket() {
   return ws
 }
 
+let sendAll = false
 export function setWebSocketSubscribeAll(enabled: boolean) {
   if (!ws) {
     return Promise.reject(new Error('LCU is not connected'))
   }
+
+  console.log('Here, set', enabled)
 
   const _sendSubscribeTask = (code: number, eventName: string) =>
     new Promise<void>((resolve, reject) => {
@@ -145,6 +148,10 @@ export function setWebSocketSubscribeAll(enabled: boolean) {
     })
 
   if (enabled) {
+    if (sendAll) {
+      return
+    }
+
     const subTasks = SUBSCRIBED_LCU_ENDPOINTS.map((eventName) => _sendSubscribeTask(6, eventName))
 
     subTasks.push(_sendSubscribeTask(5, 'OnJsonApiEvent'))
@@ -155,6 +162,10 @@ export function setWebSocketSubscribeAll(enabled: boolean) {
         .catch(reject)
     )
   } else {
+    if (!sendAll) {
+      return
+    }
+
     const subTasks = SUBSCRIBED_LCU_ENDPOINTS.map((eventName) => _sendSubscribeTask(5, eventName))
 
     subTasks.unshift(_sendSubscribeTask(6, 'OnJsonApiEvent'))
@@ -199,9 +210,9 @@ async function connectToLcu(auth: LcuAuth) {
           reject(error)
         }
 
-        const _sendTask = (eventName: string) =>
+        const _sendTask = (code: number, eventName: string) =>
           new Promise<void>((resolve, reject) => {
-            ws.send(JSON.stringify([5, eventName]), (error) => {
+            ws.send(JSON.stringify([code, eventName]), (error) => {
               if (error instanceof Error) {
                 reject(error)
               } else {
@@ -210,7 +221,7 @@ async function connectToLcu(auth: LcuAuth) {
             })
           })
 
-        const subTasks = SUBSCRIBED_LCU_ENDPOINTS.map((eventName) => _sendTask(eventName))
+        const subTasks = SUBSCRIBED_LCU_ENDPOINTS.map((eventName) => _sendTask(5, eventName))
 
         Promise.all(subTasks)
           .then(() => {

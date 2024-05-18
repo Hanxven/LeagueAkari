@@ -56,8 +56,8 @@ app.whenReady().then(async () => {
     initStorageIpc()
     await initLeagueClientFunctions()
     await setupLeagueAkariFeatures()
-    setupMainWindow()
     await setupAuxiliaryWindow()
+    setupMainWindow()
 
     logger.info('LEAGUE AKARI 核心模块初始化完成')
 

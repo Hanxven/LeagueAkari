@@ -159,8 +159,7 @@
         :value="agf.settings.autoSearchMatchRematchFixedDuration"
         @update:value="(value) => setAutoSearchMatchRematchFixedDuration(value || 2)"
         placeholder="秒"
-        :min="2"
-        :max="20"
+        :min="1"
         size="tiny"
       />
     </ControlItem>
