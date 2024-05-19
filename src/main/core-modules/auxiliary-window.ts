@@ -135,7 +135,7 @@ export function createAuxiliaryWindow() {
 
   getLastWindowBounds().then((r) => {
     if (r) {
-      auxiliaryWindow?.setPosition(r.x, r.y)
+      adjustWindowSize(r.x, r.y)
     }
   })
 
@@ -251,7 +251,7 @@ export function hideAuxiliaryWindow(isManually = false) {
   }
 }
 
-export async function setupAuxiliaryWindow() {
+export async function initAuxiliaryWindow() {
   ipcStateSync('auxiliary-window/state', () => auxiliaryWindowState.state)
   ipcStateSync('auxiliary-window/focus', () => auxiliaryWindowState.focus)
   ipcStateSync('auxiliary-window/is-show', () => auxiliaryWindowState.isShow)
@@ -475,6 +475,7 @@ function resetWindowPosition() {
       WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor,
       WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor
     )
+    auxiliaryWindow.webContents.setZoomFactor(auxiliaryWindowState.settings.zoomFactor)
     auxiliaryWindow.setBounds({
       x: p.x,
       y: p.y,
@@ -485,7 +486,7 @@ function resetWindowPosition() {
   }
 }
 
-function adjustWindowSize() {
+function adjustWindowSize(x?: number, y?: number) {
   if (auxiliaryWindow) {
     auxiliaryWindow.webContents.setZoomFactor(auxiliaryWindowState.settings.zoomFactor)
 
@@ -497,10 +498,12 @@ function adjustWindowSize() {
       Math.ceil(WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor),
       Math.ceil(WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor)
     )
-    auxiliaryWindow.setSize(
-      Math.ceil(WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor),
-      Math.ceil(WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor)
-    )
+    auxiliaryWindow.setBounds({
+      x,
+      y,
+      width: Math.ceil(WINDOW_BASE_WIDTH * auxiliaryWindowState.settings.zoomFactor),
+      height: Math.ceil(WINDOW_BASE_HEIGHT * auxiliaryWindowState.settings.zoomFactor)
+    })
 
     saveWindowBounds(auxiliaryWindow.getBounds())
   }

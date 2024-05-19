@@ -10,15 +10,15 @@ type ResultType = { players: string[]; times: number; ids: Set<string> }
  * 用于高效分析预组队情况的图结构
  */
 export class TeamUpGraph {
-  private adjacencyList: Map<string, Map<string, Edge>>
+  private _adjacencyList: Map<string, Map<string, Edge>>
 
   constructor() {
-    this.adjacencyList = new Map()
+    this._adjacencyList = new Map()
   }
 
   addVertex(vertex: string): void {
-    if (!this.adjacencyList.has(vertex)) {
-      this.adjacencyList.set(vertex, new Map())
+    if (!this._adjacencyList.has(vertex)) {
+      this._adjacencyList.set(vertex, new Map())
     }
   }
 
@@ -26,8 +26,8 @@ export class TeamUpGraph {
     this.addVertex(vertex1)
     this.addVertex(vertex2)
 
-    let list1 = this.adjacencyList.get(vertex1) || new Map()
-    let list2 = this.adjacencyList.get(vertex2) || new Map()
+    let list1 = this._adjacencyList.get(vertex1) || new Map()
+    let list2 = this._adjacencyList.get(vertex2) || new Map()
 
     let edge1 = list1.get(vertex2)
     if (edge1) {
@@ -55,7 +55,7 @@ export class TeamUpGraph {
 
       for (let i = 0; i < players.length; i++) {
         for (let j = i + 1; j < players.length; j++) {
-          const adjacencyMap = this.adjacencyList.get(players[i])
+          const adjacencyMap = this._adjacencyList.get(players[i])
           if (!adjacencyMap) {
             count = 0
             break

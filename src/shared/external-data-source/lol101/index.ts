@@ -149,14 +149,14 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
 
   updateAt = new Date(2024, 3, 1)
 
-  private axiosLol = axios.create({
+  private _axiosLol = axios.create({
     baseURL: 'https://lol.qq.com/',
     headers: {
       'User-Agent': FABRICATED_USER_AGENT
     }
   })
 
-  private axiosSwGame = axios.create({
+  private _axiosSwGame = axios.create({
     baseURL: 'https://lol.sw.game.qq.com/',
     headers: {
       'User-Agent': FABRICATED_USER_AGENT,
@@ -165,7 +165,7 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
   })
 
   async getChampionDetailNormal(championId: number) {
-    const result = await this.axiosLol.get(
+    const result = await this._axiosLol.get(
       `/act/lbp/common/guides/champDetail/champDetail_${championId}.js`
     )
 
@@ -180,7 +180,7 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
   }
 
   async getChampionDetailARAM(championId: number) {
-    const result = await this.axiosSwGame.get(
+    const result = await this._axiosSwGame.get(
       `/lol/lwdcommact/a20211015billboard/a20211015api/fighthero?dtstatdate=20240424&championid=${championId}&callback=getFightheroCallback`
     )
 
@@ -196,19 +196,19 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
     const shit = JSON.parse(JSON.parse(rawResponse).data.result)
 
     return {
-      timeSelectionWinRate: this.parseTimeSectionWinRate(shit.timesectionwinrate),
-      runes: this.parseStyleDetails(shit.styledetails),
-      spells: this.parseSpells(shit.spellid),
-      singleItems: this.parseItems(shit.itemover),
-      staringItems: this.parseItems(shit.itemout),
-      coreItems: this.parseItems(shit.itemcore),
-      shoes: this.parseItems(shit.itemshoes),
-      duoChampions: this.parseDuoChampions(shit.doublechampiondetails),
-      skillBuilds: this.parseRecommendedSkills(shit.skilllist)
+      timeSelectionWinRate: this._parseTimeSectionWinRate(shit.timesectionwinrate),
+      runes: this._parseStyleDetails(shit.styledetails),
+      spells: this._parseSpells(shit.spellid),
+      singleItems: this._parseItems(shit.itemover),
+      staringItems: this._parseItems(shit.itemout),
+      coreItems: this._parseItems(shit.itemcore),
+      shoes: this._parseItems(shit.itemshoes),
+      duoChampions: this._parseDuoChampions(shit.doublechampiondetails),
+      skillBuilds: this._parseRecommendedSkills(shit.skilllist)
     }
   }
 
-  private parseTimeSectionWinRate(raw: string) {
+  private _parseTimeSectionWinRate(raw: string) {
     const sections = raw?.split('#')
     return (
       sections?.map((section) => {
@@ -218,7 +218,7 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
     )
   }
 
-  private parseStyleDetails(raw: string) {
+  private _parseStyleDetails(raw: string) {
     const details = raw?.split('#')
     return (
       details?.map((detail) => {
@@ -235,7 +235,7 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
     )
   }
 
-  private parseSpells(raw: string) {
+  private _parseSpells(raw: string) {
     const spells = raw?.split('#')
     return (
       spells?.map((spell) => {
@@ -250,7 +250,7 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
     )
   }
 
-  private parseItems(raw: string) {
+  private _parseItems(raw: string) {
     const items = raw?.split('#')
     return (
       items?.map((item) => {
@@ -265,7 +265,7 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
     )
   }
 
-  private parseDuoChampions(raw: string) {
+  private _parseDuoChampions(raw: string) {
     const details = raw?.split('#')
     return (
       details?.map((detail) => {
@@ -279,7 +279,7 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
     )
   }
 
-  private parseRecommendedSkills(raw: string) {
+  private _parseRecommendedSkills(raw: string) {
     const skillList = raw?.split('_')
     const [skills, order] = skillList
     const skillUpgradeDetails = skills?.split('#').map((skill) => {
@@ -298,7 +298,7 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
     )
   }
 
-  private parseUpdateDate(result: any, response: any) {
+  private _parseUpdateDate(result: any, response: any) {
     const dt = result.dtstatdate || response.update.split(' ')[0]
     return dt ? `${dt.substr(0, 4)}-${dt.substr(4, 2)}-${dt.substr(6, 2)}` : null
   }

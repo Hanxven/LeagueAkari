@@ -11,13 +11,12 @@ import { configure } from 'mobx'
 import EventEmitter from 'node:events'
 
 import { appState, initApp } from './core-modules/app'
-import { setupAuxiliaryWindow } from './core-modules/auxiliary-window'
+import { initAuxiliaryWindow } from './core-modules/auxiliary-window'
 import { initLeagueClientFunctions } from './core-modules/lcu-client'
 import { initLcuConnection } from './core-modules/lcu-connection'
 import { createLogger, initLogger } from './core-modules/log'
-import { createMainWindow, restoreAndFocus, setupMainWindow } from './core-modules/main-window'
+import { createMainWindow, initMainWindow, restoreAndFocus } from './core-modules/main-window'
 import { initWindowsPlatform } from './core-modules/platform'
-import './core-modules/vm'
 import { initDatabase } from './db'
 import { setupLeagueAkariFeatures } from './modules'
 import { initStorageIpc } from './storage'
@@ -56,10 +55,10 @@ app.whenReady().then(async () => {
     initStorageIpc()
     await initLeagueClientFunctions()
     await setupLeagueAkariFeatures()
-    await setupAuxiliaryWindow()
-    setupMainWindow()
+    await initAuxiliaryWindow()
+    initMainWindow()
 
-    logger.info('LEAGUE AKARI 核心模块初始化完成')
+    logger.info('League Akari 核心模块初始化完成')
 
     createMainWindow()
 

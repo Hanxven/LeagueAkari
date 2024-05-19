@@ -32,7 +32,6 @@ export class TimeoutTask {
   start(timeout: number) {
     if (this._started) {
       clearTimeout(this._timerId)
-      return
     }
 
     this._started = true
@@ -45,7 +44,6 @@ export class TimeoutTask {
   setTask(fn: Function) {
     if (this._started) {
       clearTimeout(this._timerId)
-      return
     }
 
     this._fn = fn

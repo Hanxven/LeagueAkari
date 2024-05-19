@@ -36,46 +36,46 @@ export function groupBy<T extends Record<string, any>>(
 }
 
 export class LruMap<K, V> {
-  private limit: number
-  private cache: Map<K, V>
+  private _limit: number
+  private _cache: Map<K, V>
 
   constructor(limit: number) {
-    this.limit = limit
-    this.cache = new Map<K, V>()
+    this._limit = limit
+    this._cache = new Map<K, V>()
   }
 
   get(key: K): V | undefined {
-    if (this.cache.has(key)) {
-      const value = this.cache.get(key)
-      this.cache.delete(key)
-      this.cache.set(key, value!)
+    if (this._cache.has(key)) {
+      const value = this._cache.get(key)
+      this._cache.delete(key)
+      this._cache.set(key, value!)
       return value
     }
     return undefined
   }
 
   set(key: K, value: V): void {
-    if (this.cache.has(key)) {
-      this.cache.delete(key)
-    } else if (this.cache.size === this.limit) {
-      this.removeOldestItem()
+    if (this._cache.has(key)) {
+      this._cache.delete(key)
+    } else if (this._cache.size === this._limit) {
+      this._removeOldestItem()
     }
-    this.cache.set(key, value)
+    this._cache.set(key, value)
   }
 
   setLimit(newLimit: number): void {
-    this.limit = newLimit
-    while (this.cache.size > this.limit) {
-      this.removeOldestItem()
+    this._limit = newLimit
+    while (this._cache.size > this._limit) {
+      this._removeOldestItem()
     }
   }
 
   has(key: K): boolean {
-    return this.cache.has(key)
+    return this._cache.has(key)
   }
 
-  private removeOldestItem(): void {
-    const firstKey = this.cache.keys().next().value
-    this.cache.delete(firstKey)
+  private _removeOldestItem(): void {
+    const firstKey = this._cache.keys().next().value
+    this._cache.delete(firstKey)
   }
 }

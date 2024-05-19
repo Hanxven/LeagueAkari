@@ -25,7 +25,6 @@ export async function setupAutoSelect() {
   reaction(
     () => autoSelectState.upcomingPick,
     async (pick) => {
-      console.log(pick)
       if (!pick) {
         return
       }

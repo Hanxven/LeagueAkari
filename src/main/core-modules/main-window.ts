@@ -171,7 +171,7 @@ export function createMainWindow(): void {
   logger.info('Main Window 已创建')
 }
 
-export function setupMainWindow() {
+export function initMainWindow() {
   ipcStateSync('main-window/state', () => mainWindowState.state)
   ipcStateSync('main-window/focus', () => mainWindowState.focus)
 
@@ -201,7 +201,7 @@ export function setupMainWindow() {
 
   onRendererCall('main-window/close', async (_, strategy) => {
     const s = strategy || appState.settings.closeStrategy
-    
+
     if (s === 'minimize-to-tray' || s === 'unset') {
       mainWindow?.hide()
       return
