@@ -1,7 +1,6 @@
-import { QueryRunner, Table, TableColumn, TableIndex } from 'typeorm'
+import { QueryRunner, TableColumn, TableIndex } from 'typeorm'
 
 import { EncounteredGame } from '../entities/EncounteredGame'
-import { Metadata } from '../entities/Metadata'
 
 /**
  * The first version of League Akari 1.2.0
@@ -31,5 +30,5 @@ export async function v15_LA1_2_2Upgrade(queryRunner: QueryRunner) {
     )
   }
 
-  await queryRunner.manager.save(Metadata.create('version', 15))
+  await queryRunner.query(`UPDATE Metadata SET value = json('15') WHERE key = 'version'`)
 }
