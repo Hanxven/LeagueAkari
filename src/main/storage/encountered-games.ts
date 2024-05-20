@@ -8,6 +8,7 @@ interface EncounteredGameQueryDto {
   puuid: string
   region: string
   rsoPlatformId: string
+  queueType?: string
   pageSize?: number
   page?: number
   timeOrder?: 'desc' | 'asc'
@@ -19,6 +20,7 @@ interface EncounteredGameSaveDto {
   region: string
   rsoPlatformId: string
   gameId: number
+  queueType: string
 }
 
 const ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = 40
@@ -35,7 +37,8 @@ export async function queryEncounteredGames(query: EncounteredGameQueryDto) {
       selfPuuid: Equal(query.selfPuuid),
       puuid: Equal(query.puuid),
       region: Equal(query.region),
-      rsoPlatformId: Equal(query.rsoPlatformId)
+      rsoPlatformId: Equal(query.rsoPlatformId),
+      queueType: query.queueType ? Equal(query.queueType) : undefined
     },
     order: { updateAt: query.timeOrder || 'desc' },
     take,
@@ -52,6 +55,7 @@ export async function saveEncounteredGame(dto: EncounteredGameSaveDto) {
   g.rsoPlatformId = dto.rsoPlatformId
   g.selfPuuid = dto.selfPuuid
   g.puuid = dto.puuid
+  g.queueType = dto.queueType || ''
   g.updateAt = new Date()
   return dataSource.manager.save(g)
 }

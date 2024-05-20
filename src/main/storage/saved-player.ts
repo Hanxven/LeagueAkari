@@ -12,6 +12,10 @@ interface SavedPlayerQueryDto {
   region: string
 }
 
+interface WithEncounteredGamesQueryDto {
+  queueType: string
+}
+
 interface SavedPlayerSaveDto extends SavedPlayerQueryDto {
   tag?: string
   encountered: boolean // 在遇到时更新
@@ -30,7 +34,9 @@ export function querySavedPlayer(query: SavedPlayerQueryDto) {
   })
 }
 
-export async function querySavedPlayerWithGames(query: SavedPlayerQueryDto) {
+export async function querySavedPlayerWithGames(
+  query: SavedPlayerQueryDto & WithEncounteredGamesQueryDto
+) {
   if (!query.puuid || !query.selfPuuid || !query.region) {
     throw new Error('puuid, selfPuuid or region cannot be empty')
   }
@@ -47,7 +53,8 @@ export async function querySavedPlayerWithGames(query: SavedPlayerQueryDto) {
       puuid: query.puuid,
       selfPuuid: query.selfPuuid,
       region: query.region,
-      rsoPlatformId: query.rsoPlatformId
+      rsoPlatformId: query.rsoPlatformId,
+      queueType: query.queueType
     })
 
     return { ...savedPlayer, encounteredGames: encounteredGames.map((g) => g.gameId) }
@@ -102,7 +109,10 @@ export async function initSavedPlayersStorageIpc() {
     return querySavedPlayer(query)
   })
 
-  onRendererCall('storage/saved-player-with-games/query', (_, query: SavedPlayerQueryDto) => {
-    return querySavedPlayerWithGames(query)
-  })
+  onRendererCall(
+    'storage/saved-player-with-games/query',
+    (_, query: SavedPlayerQueryDto & WithEncounteredGamesQueryDto) => {
+      return querySavedPlayerWithGames(query)
+    }
+  )
 }

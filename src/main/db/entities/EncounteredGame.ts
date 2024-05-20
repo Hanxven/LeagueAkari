@@ -40,4 +40,11 @@ export class EncounteredGame {
   @Column({ type: 'datetime', nullable: false })
   @Index('encountered_games_update_at_index')
   updateAt: Date
+
+  /**
+   * 队列类型，空为 unset
+   */
+  @Column({ type: 'varchar', nullable: false })
+  @Index('encountered_games_queue_type')
+  queueType: string
 }

@@ -1,15 +1,19 @@
 import { createLogger } from '@main/core-modules/log'
 import { LEAGUE_AKARI_DB_CURRENT_VERSION } from '@shared/constants/common'
-import { unlinkSync } from 'node:fs'
+import dayjs from 'dayjs'
+import { existsSync, renameSync, unlinkSync } from 'node:fs'
+import { join } from 'node:path'
 import { DataSource, QueryRunner } from 'typeorm'
 
 import { v10_LA1_2_0initializationUpgrade } from './version-10'
+import { v15_LA1_2_2Upgrade } from './version-15'
 
 const logger = createLogger('database')
 
 const upgrades = {
   // 10 is the first version starting with League Akari 1.2.0
-  10: v10_LA1_2_0initializationUpgrade
+  10: v10_LA1_2_0initializationUpgrade,
+  15: v15_LA1_2_2Upgrade
 }
 
 /**
@@ -26,6 +30,8 @@ export async function performUpgrades(r: QueryRunner, currentVersion: number) {
     logger.info(`正在执行版本 ${v} 的迁移`)
     await fn(r)
   }
+
+  logger.info(`完成数据库升级`)
 }
 
 export async function checkAndInitializeDatabase(dataSource: DataSource) {
@@ -120,6 +126,13 @@ async function initializeDatabase(dataSource: DataSource) {
 
 async function recreateDatabase(dataSource: DataSource, dbPath: string) {
   await dataSource.destroy()
-  unlinkSync(dbPath)
+
+  if (existsSync(dbPath)) {
+    const backupPath = join(dbPath, `../${dayjs().format('YYYYMMDDHHmmssSSS')}_bk.db`)
+
+    renameSync(dbPath, backupPath)
+    logger.info(`原数据库已放置于 ${backupPath}`)
+  }
+
   await dataSource.initialize()
 }
