@@ -150,7 +150,7 @@ export async function setupAutoGameflow() {
       }
 
       if (phase === 'EndOfGame' && enabled) {
-        logger.info(`将在 ${PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT} ms 后回到房间`)
+        logger.info(`将在 ${PLAY_AGAIN_BUFFER_TIMEOUT} ms 后回到房间`)
         playAgainTask.start(PLAY_AGAIN_BUFFER_TIMEOUT)
         return
       }

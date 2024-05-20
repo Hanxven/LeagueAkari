@@ -91,6 +91,9 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     fetchAfterGame: true,
     autoRouteOnGameStart: true,
 
+    // 是否开启对局分析
+    ongoingAnalysisEnabled: false,
+
     // 用于判断预组队的阈值
     preMadeTeamThreshold: 3,
 

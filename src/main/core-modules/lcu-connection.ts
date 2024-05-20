@@ -114,6 +114,7 @@ async function initWebSocket(auth: LcuAuth) {
     headers: {
       Authorization: `Basic ${Buffer.from(`riot:${auth.password}`).toString('base64')}`
     },
+    protocol: 'wamp',
     rejectUnauthorized: false
   })
 

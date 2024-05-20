@@ -4,18 +4,6 @@
       <template #header><span class="card-header-title">通用</span></template>
       <ControlItem
         class="control-item-margin"
-        label="自动切换到对局页面"
-        label-description="在进入英雄选择或其他游戏状态时，自动切换到“对局”页面"
-        :label-width="320"
-      >
-        <NSwitch
-          size="small"
-          :value="coreFunctionality.settings.autoRouteOnGameStart"
-          @update:value="(val) => setAutoRouteOnGameStart(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
         label="重生倒计时"
         label-description="在标题栏展示一个距离重生时间的指示器"
         :label-width="320"
@@ -56,6 +44,30 @@
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">对局分析</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="对局分析"
+        label-description="在进入英雄选择中或对局时，将进行对局分析"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="coreFunctionality.settings.ongoingAnalysisEnabled"
+          @update:value="(val) => setOngoingAnalysisEnabled(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="自动切换到对局页面"
+        label-description="在进入英雄选择或其他游戏状态时，自动切换到“对局”页面"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="coreFunctionality.settings.autoRouteOnGameStart"
+          @update:value="(val) => setAutoRouteOnGameStart(val)"
+        />
+      </ControlItem>
       <ControlItem
         class="control-item-margin"
         label="对局战绩分析数量"
@@ -272,6 +284,7 @@ import {
   setFetchAfterGame,
   setFetchDetailedGame,
   setMatchHistoryLoadCount,
+  setOngoingAnalysisEnabled,
   setPlayerAnalysisFetchConcurrency,
   setPreMadeThreshold,
   setSendKdaInGame,

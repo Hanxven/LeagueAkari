@@ -11,6 +11,9 @@ import { gameflow } from '../lcu-state-sync/gameflow'
 
 class CoreFunctionalitySettings {
   fetchAfterGame: boolean = true
+
+  ongoingAnalysisEnabled: boolean = true
+
   autoRouteOnGameStart: boolean = true
   preMadeTeamThreshold: number = 3
   teamAnalysisPreloadCount: number = 4
@@ -26,6 +29,10 @@ class CoreFunctionalitySettings {
 
   constructor() {
     makeAutoObservable(this)
+  }
+
+  setOngoingAnalysisEnabled(value: boolean) {
+    this.ongoingAnalysisEnabled = value
   }
 
   setFetchAfterGame(value: boolean) {

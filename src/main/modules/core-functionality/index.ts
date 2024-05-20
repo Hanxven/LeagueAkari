@@ -3,20 +3,14 @@ import { createLogger } from '@main/core-modules/log'
 import { mwNotification } from '@main/core-modules/main-window'
 import { pSendKey, pSendKeys, winPlatformEventBus } from '@main/core-modules/platform'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
-import { getChampSelectSession } from '@main/http-api/champ-select'
 import { chatSend } from '@main/http-api/chat'
-import { getGameflowSession } from '@main/http-api/gameflow'
 import { getGame, getMatchHistory } from '@main/http-api/match-history'
 import { getRankedStats } from '@main/http-api/ranked'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { saveEncounteredGame } from '@main/storage/encountered-games'
 import { querySavedPlayerWithGames, saveSavedPlayer } from '@main/storage/saved-player'
 import { getSetting, setSetting } from '@main/storage/settings'
-import {
-  ipcStateSync,
-  onRendererCall,
-  sendEventToAllRenderer as sendEventToAllRenderers
-} from '@main/utils/ipc'
+import { ipcStateSync, onRendererCall, sendEventToAllRenderers } from '@main/utils/ipc'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
@@ -25,9 +19,10 @@ import { summonerName } from '@shared/utils/name'
 import { sleep } from '@shared/utils/sleep'
 import { calculateTogetherTimes, removeSubsets } from '@shared/utils/team-up-calc'
 import dayjs from 'dayjs'
-import { computed, observable, reaction, runInAction, toJS } from 'mobx'
+import { comparer, computed, observable, reaction, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
 
+import { champSelect } from '../lcu-state-sync/champ-select'
 import { chat } from '../lcu-state-sync/chat'
 import { gameData } from '../lcu-state-sync/game-data'
 import { gameflow } from '../lcu-state-sync/gameflow'
@@ -46,6 +41,8 @@ const FETCH_PRIORITY = {
   GAME: 79
 } as const
 
+let controller: AbortController | null = null
+
 /**
  * League Akari 的核心功能群
  */
@@ -56,14 +53,12 @@ export async function setupCoreFunctionality() {
 
   playerAnalysisFetchLimiter.concurrency = cf.settings.playerAnalysisFetchConcurrency
 
-  let controller: AbortController | null = null
-
   // 控制对局分析的加载选项
   // 在条件不满足时会取消所有正在进行的网络排队请求
   reaction(
-    () => cf.ongoingState,
-    async (state) => {
-      if (state === 'unavailable') {
+    () => [cf.ongoingState, cf.settings.ongoingAnalysisEnabled] as const,
+    async ([state, s]) => {
+      if (state === 'unavailable' || !s) {
         sendEventToAllRenderers('core-functionality/ongoing-player/clear')
         cf.clearOngoingVars()
         controller?.abort()
@@ -85,7 +80,8 @@ export async function setupCoreFunctionality() {
         mwNotification.warn('core-functionality', '对局中', '无法加载对局中信息')
         logger.warn(`加载对局中信息时发生错误:  ${formatError(error)}, in ${state}`)
       }
-    }
+    },
+    { equals: comparer.shallow }
   )
 
   // KDA 发送列表初始化
@@ -273,7 +269,11 @@ function handleAbortError(e: any) {
  * team: 'our': 临时的己方队伍; 'their': 临时的对方队伍
  */
 async function champSelectQuery(signal: AbortSignal) {
-  const session = (await getChampSelectSession()).data
+  const session = champSelect.session
+
+  if (!session) {
+    return
+  }
 
   const m = session.myTeam
     .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
@@ -293,7 +293,11 @@ async function champSelectQuery(signal: AbortSignal) {
 }
 
 async function inGameQuery(signal: AbortSignal) {
-  const session = (await getGameflowSession()).data
+  const session = gameflow.session
+
+  if (!session) {
+    return
+  }
 
   const m = session.gameData.teamOne
     .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
@@ -320,7 +324,7 @@ async function inGameQuery(signal: AbortSignal) {
  * - 数据库中已记录的数据
  * - 战绩信息
  */
-async function loadPlayerStats(signal: AbortSignal, puuid: string) {
+async function loadPlayerStats(signal: AbortSignal, puuid: string, retries = 2) {
   if (!cf.ongoingPlayers.has(puuid)) {
     runInAction(() => cf.ongoingPlayers.set(puuid, observable({ puuid }, {}, { deep: false })))
     sendEventToAllRenderers('core-functionality/ongoing-player/new', puuid)
@@ -402,7 +406,12 @@ async function loadPlayerStats(signal: AbortSignal, puuid: string) {
         const matchHistory = await playerAnalysisFetchLimiter
           .add(
             () =>
-              getMatchHistory(summonerInfo.data.puuid, 0, cf.settings.matchHistoryLoadCount - 1),
+              getMatchHistory(
+                summonerInfo.data.puuid,
+                0,
+                cf.settings.matchHistoryLoadCount - 1,
+                retries
+              ),
             { signal, priority: FETCH_PRIORITY.MATCH_HISTORY }
           )
           .catch(handleAbortError)
@@ -807,6 +816,11 @@ function stateSync() {
     () => cf.settings.autoRouteOnGameStart
   )
 
+  ipcStateSync(
+    'core-functionality/settings/ongoing-analysis-enabled',
+    () => cf.settings.ongoingAnalysisEnabled
+  )
+
   ipcStateSync('core-functionality/settings/fetch-after-game', () => cf.settings.fetchAfterGame)
 
   ipcStateSync(
@@ -929,6 +943,11 @@ function ipcCall() {
     }
   )
 
+  onRendererCall('core-functionality/settings/ongoing-analysis-enabled/set', async (_, enabled) => {
+    cf.settings.setOngoingAnalysisEnabled(enabled)
+    await setSetting('core-functionality/ongoing-analysis-enabled', enabled)
+  })
+
   onRendererCall('core-functionality/settings/send-kda-threshold/set', async (_, threshold) => {
     if (threshold < 0) {
       threshold = 0
@@ -1034,6 +1053,13 @@ async function loadSettings() {
     await getSetting(
       'core-functionality/player-analysis-fetch-concurrency',
       cf.settings.playerAnalysisFetchConcurrency
+    )
+  )
+
+  cf.settings.setOngoingAnalysisEnabled(
+    await getSetting(
+      'core-functionality/ongoing-analysis-enabled',
+      cf.settings.ongoingAnalysisEnabled
     )
   )
 }

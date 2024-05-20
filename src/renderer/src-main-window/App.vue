@@ -46,6 +46,10 @@ watchEffect(() => {
 watch(
   () => cf.ongoingState,
   (state) => {
+    if (!cf.settings.autoRouteOnGameStart || !cf.settings.ongoingAnalysisEnabled) {
+      return
+    }
+
     if (state === 'champ-select' || state === 'in-game') {
       if (router.currentRoute.value.name !== 'ongoing-name') {
         router.replace({ name: 'ongoing-game' })

@@ -1,4 +1,4 @@
-import { onRendererCall, sendEventToAllRenderer, sendEventToRenderer } from '@main/utils/ipc'
+import { onRendererCall, sendEventToAllRenderers, sendEventToRenderer } from '@main/utils/ipc'
 import { Menu, MenuItem, Notification, Tray, app } from 'electron'
 import { GlobalKeyboardListener } from 'node-global-key-listener'
 import { randomUUID } from 'node:crypto'
@@ -49,15 +49,15 @@ export function initWindowsPlatform() {
         if (event.name === 'PAGE UP' && pageUpShortcut) {
           pageUpShortcut = false
           winPlatformEventBus.emit('windows/global-key/page-up')
-          sendEventToAllRenderer('windows/global-key/page-up')
+          sendEventToAllRenderers('windows/global-key/page-up')
         } else if (event.name === 'PAGE DOWN' && pageDownShortcut) {
           pageDownShortcut = false
           winPlatformEventBus.emit('windows/global-key/page-down')
-          sendEventToAllRenderer('windows/global-key/page-down')
+          sendEventToAllRenderers('windows/global-key/page-down')
         } else if (event.name === 'DELETE' && deleteShortcut) {
           deleteShortcut = false
           winPlatformEventBus.emit('windows/global-key/delete')
-          sendEventToAllRenderer('windows/global-key/delete')
+          sendEventToAllRenderers('windows/global-key/delete')
         }
       }
     })

@@ -76,7 +76,7 @@ export function ipcHandleRendererStandardized(
  * @param eventName
  * @param args
  */
-export function sendEventToAllRenderer(eventName: string, ...args: any[]) {
+export function sendEventToAllRenderers(eventName: string, ...args: any[]) {
   for (const win of BrowserWindow.getAllWindows()) {
     win.webContents.send(`event:${eventName}`, ...args)
   }

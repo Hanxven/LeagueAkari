@@ -95,6 +95,11 @@ export async function setupCoreFunctionality() {
   )
 
   mainStateSync(
+    'core-functionality/settings/ongoing-analysis-enabled',
+    (s) => (cf.settings.ongoingAnalysisEnabled = s)
+  )
+
+  mainStateSync(
     'core-functionality/settings/fetch-detailed-game',
     (s) => (cf.settings.fetchDetailedGame = s)
   )
@@ -190,4 +195,8 @@ export function resetAuxiliaryWindowPosition() {
 
 export function setPlayerAnalysisFetchConcurrency(limit: number) {
   return mainCall('core-functionality/settings/player-analysis-fetch-concurrency/set', limit)
+}
+
+export function setOngoingAnalysisEnabled(enabled: number) {
+  return mainCall('core-functionality/settings/ongoing-analysis-enabled/set', enabled)
 }

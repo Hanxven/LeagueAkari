@@ -20,7 +20,7 @@ import { initWindowsPlatform } from './core-modules/platform'
 import { initDatabase } from './db'
 import { setupLeagueAkariFeatures } from './modules'
 import { initStorageIpc } from './storage'
-import { sendEventToAllRenderer } from './utils/ipc'
+import { sendEventToAllRenderers } from './utils/ipc'
 
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
@@ -73,7 +73,7 @@ app.whenReady().then(async () => {
 
       restoreAndFocus()
 
-      sendEventToAllRenderer('app/second-instance', commandLine, workingDirectory)
+      sendEventToAllRenderers('app/second-instance', commandLine, workingDirectory)
     })
   } catch (e) {
     logger.error(`Failed to initialize League Akari, due to ${formatError(e)}`)
