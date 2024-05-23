@@ -10,6 +10,8 @@
 
 - [UNFINISHED] [测试] 提供一个 OP.GG 数据源，用于标记 ARAM 模式的符文指导功能。
 
+- [UNFINISHED] 提供了一个自毁功能，用于移除 League Akari。
+
 ## 调整
 
 - 将不再默认以管理员权限启动。

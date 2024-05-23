@@ -136,7 +136,7 @@ const handleApplyToProfile = async () => {
 
   try {
     await setSummonerBackgroundSkin(currentSkinId.value)
-    message.success('成功', { duration: 500 })
+    message.success('成功', { duration: 1000 })
   } catch {
     message.warning('无法设置', { duration: 1000 })
   } finally {

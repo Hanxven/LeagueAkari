@@ -30,8 +30,8 @@
                   <div class="champion-level">{{ p.stats.champLevel }}</div>
                 </div>
                 <div class="summoner-spells">
-                  <SummonerSpellDisplay :spell-id="p.spell1Id" :size="18" />
-                  <SummonerSpellDisplay :spell-id="p.spell2Id" :size="18" />
+                  <SummonerSpellDisplay :spell-id="p.spell1Id" :size="16" />
+                  <SummonerSpellDisplay :spell-id="p.spell2Id" :size="16" />
                 </div>
                 <div class="name-and-rank">
                   <div
@@ -281,7 +281,7 @@ table {
 }
 
 .team-header {
-  font-size: 12px;
+  font-size: 11px;
   height: 30px;
 
   th {
@@ -305,8 +305,8 @@ table {
 
 .champion {
   position: relative;
-  height: 40px;
-  width: 40px;
+  height: 34px;
+  width: 34px;
 }
 
 .champion-icon {
@@ -323,7 +323,7 @@ table {
   height: 16px;
   line-height: 16px;
   text-align: center;
-  font-size: 12px;
+  font-size: 10px;
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.621);
 }
@@ -332,9 +332,9 @@ table {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 40px;
-  width: 18px;
-  gap: 4px;
+  height: 34px;
+  width: 16px;
+  gap: 2px;
 }
 
 .items {
@@ -418,23 +418,23 @@ table {
   color: rgb(214, 214, 214);
 
   .kda-text {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .kda-ratio {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
   }
 }
 
 .damage {
   color: rgb(214, 214, 214);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .gold {
   text-align: center;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .team {
@@ -442,7 +442,7 @@ table {
 }
 
 .participant {
-  height: 50px;
+  height: 40px;
 }
 
 .divider {

@@ -31,12 +31,12 @@
                   <div class="champion-level">{{ p.stats.champLevel }}</div>
                 </div>
                 <div class="summoner-spells">
-                  <SummonerSpellDisplay :spell-id="p.spell1Id" :size="18" />
-                  <SummonerSpellDisplay :spell-id="p.spell2Id" :size="18" />
+                  <SummonerSpellDisplay :spell-id="p.spell1Id" :size="16" />
+                  <SummonerSpellDisplay :spell-id="p.spell2Id" :size="16" />
                 </div>
                 <div class="perks" v-if="p.stats.perkPrimaryStyle && p.stats.perkSubStyle">
-                  <PerkDisplay :perk-id="p.stats.perk0" :size="18" />
-                  <PerkstyleDisplay :perkstyle-id="p.stats.perkSubStyle" :size="18" />
+                  <PerkDisplay :perk-id="p.stats.perk0" :size="16" />
+                  <PerkstyleDisplay :perkstyle-id="p.stats.perkSubStyle" :size="16" />
                 </div>
                 <div class="name-and-rank">
                   <div class="name">
@@ -342,7 +342,7 @@ table {
   height: 16px;
   line-height: 16px;
   text-align: center;
-  font-size: 12px;
+  font-size: 10px;
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.621);
 }
@@ -352,9 +352,9 @@ table {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 40px;
-  width: 18px;
-  gap: 4px;
+  height: 34px;
+  width: 16px;
+  gap: 2px;
 }
 
 .items {
@@ -407,26 +407,26 @@ table {
   color: rgb(214, 214, 214);
 
   .kda-text {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .kda-ratio {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
   }
 }
 
 .damage {
   color: rgb(214, 214, 214);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .wards {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .cs {
-  font-size: 12px;
+  font-size: 11px;
 
   .cs-count {
     font-weight: 700;
@@ -435,7 +435,7 @@ table {
 
 .gold {
   text-align: center;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .team {
@@ -457,4 +457,3 @@ table {
   color: rgb(167, 167, 255);
 }
 </style>
-@shared/constants/common
