@@ -3,8 +3,6 @@ import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { MatchHistoryWithState } from '@shared/utils/analysis'
 
-import { AkariApi } from './akari-vm'
-
 export interface PlayerOngoingInformation {
   matchHistory: MatchHistoryWithState[]
   summoner?: SummonerInfo
@@ -19,12 +17,12 @@ export interface OngoingInformation {
 /**
  * 必须实现的功能
  */
-export interface StatsSend {
+export interface StatsSendExportedClass {
   name: string
 
   version: string
 
   id: string
 
-  getStatLines(info: OngoingInformation): string[]
+  getStatLines(info: OngoingInformation, settings: Record<string, any>): string[]
 }

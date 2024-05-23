@@ -22,7 +22,7 @@ class AuxiliaryWindowSettings {
 
   enabled: boolean = true
 
-  showSkinSelector: boolean = true
+  showSkinSelector: boolean = false
 
   zoomFactor: number = 1.0
 

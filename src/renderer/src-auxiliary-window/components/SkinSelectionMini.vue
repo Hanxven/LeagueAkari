@@ -122,7 +122,11 @@ const skinOptions = computed(() => {
   }[] = []
 
   for (const skin of carouselSkins.value) {
-    if (!skin.disabled && skin.unlocked) {
+    if (!skin.unlocked) {
+      continue
+    }
+
+    if (!skin.disabled) {
       flattedSkins.push({
         label: championSkinNameMap.value[skin.id] || skin.name,
         value: skin.id,

@@ -267,9 +267,22 @@ export async function setupAutoGameflow() {
       timeInQueue: matchmaking.search.timeInQueue,
       estimatedQueueTime: matchmaking.search.estimatedQueueTime,
       searchState: matchmaking.search.searchState,
-      lowPriorityData: matchmaking.search.lowPriorityData
+      lowPriorityData: matchmaking.search.lowPriorityData,
+      isCurrentlyInQueue: matchmaking.search.isCurrentlyInQueue
     }
   })
+
+  let penaltyTime = 0
+  reaction(
+    () => Boolean(simplifiedSearchState.get()),
+    (hasSearchState) => {
+      if (hasSearchState) {
+        penaltyTime = simplifiedSearchState.get()?.lowPriorityData.penaltyTime || 0
+      } else {
+        penaltyTime = 0
+      }
+    }
+  )
 
   reaction(
     () =>
@@ -283,17 +296,19 @@ export async function setupAutoGameflow() {
         return
       }
 
-      const penaltyTime = s.lowPriorityData.penaltyTime
+      if (!s.isCurrentlyInQueue) {
+        return
+      }
 
       if (st === 'fixed-duration') {
-        if (s.timeInQueue + penaltyTime >= d) {
+        if (s.timeInQueue - penaltyTime >= d) {
           deleteSearchMatch().catch((e) => {
             logger.warn(`尝试取消匹配时失败 ${formatError(e)}`)
           })
           return
         }
       } else if (st === 'estimated-duration') {
-        if (s.timeInQueue + penaltyTime >= s.estimatedQueueTime) {
+        if (s.timeInQueue - penaltyTime >= s.estimatedQueueTime) {
           deleteSearchMatch().catch((e) => {
             logger.warn(`尝试取消匹配时失败 ${formatError(e)}`)
           })

@@ -265,6 +265,26 @@
           @update:value="(val) => setSendKdaInGameWithPreMadeTeams(val)"
         />
       </ControlItem>
+      <ControlItem
+        v-if="false"
+        :disabled="!app.isAdministrator"
+        class="control-item-margin"
+        label="使用自定义脚本"
+        label-description="使用自定义脚本生成发送的文本内容"
+        :label-width="320"
+      >
+        <NFlex>
+          <NInput
+            placeholder="提供路径"
+            style="max-width: 240px"
+            :disabled="!app.isAdministrator"
+            size="tiny"
+          />
+          <NButton secondary type="primary" :disabled="!app.isAdministrator" size="tiny"
+            >浏览</NButton
+          >
+        </NFlex>
+      </ControlItem>
     </NCard>
   </NScrollbar>
 </template>
@@ -295,7 +315,7 @@ import {
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { setEnableRespawnTimer } from '@shared/renderer/modules/respawn-timer'
 import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
-import { NButton, NCard, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
+import { NButton, NCard, NFlex, NInput, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 const respawnTimer = useRespawnTimerStore()
 const coreFunctionality = useCoreFunctionalityStore()

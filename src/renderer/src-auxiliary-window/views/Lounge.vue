@@ -64,8 +64,7 @@
         <span
           class="main-text-2"
           :title="`${gameflow.session?.map.gameModeName || '模式中'} · ${gameflow.session?.map.name || '地图'}`"
-          >{{ gameflow.session?.map.gameModeName || '模式中' }} ·
-          {{ gameflow.session?.map.name || '地图' }}</span
+          >{{ formatMapModeText() }}</span
         >
         <template v-if="agf.settings.autoSearchMatchEnabled">
           <span class="sub-text" v-if="penaltyTime"
@@ -102,7 +101,7 @@ import { useMatchmakingStore } from '@shared/renderer/modules/lcu-state-sync/mat
 import { GetSearch } from '@shared/types/lcu/matchmaking'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton } from 'naive-ui'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 
 const agf = useAutoGameflowStore()
 const gameflow = useGameflowStore()
@@ -117,6 +116,10 @@ const { pause: pauseAC, resume: resumeAC } = useIntervalFn(
   100,
   { immediate: false, immediateCallback: true }
 )
+
+watchEffect(() => {
+  console.log(matchmaking.search)
+})
 
 const willSearchMatchIn = ref(0)
 const { pause: pauseAS, resume: resumeAS } = useIntervalFn(
@@ -196,6 +199,17 @@ watch(
   },
   { immediate: true }
 )
+
+const formatMapModeText = () => {
+  const gameModeName = gameflow.session?.map.gameModeName || '模式中'
+  const mapName = gameflow.session?.map.name || '地图'
+
+  if (gameModeName === mapName) {
+    return gameModeName
+  }
+
+  return `${gameModeName} · ${mapName}`
+}
 
 const formatMatchmakingSearchText = (search: GetSearch) => {
   if (search.lowPriorityData && search.lowPriorityData.penaltyTime) {

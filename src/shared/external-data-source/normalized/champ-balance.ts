@@ -19,15 +19,13 @@ export interface ChampBalanceDataSourceV1 {
    */
   updateAt: Date
 
-  /**
-   * 获取数据
-   */
-  get(): ChampBalanceMapV1 | null
+  /** 获取数据 */
+  get data(): ChampBalanceMapV1 | null
 
   /**
    * 更新数据
    */
-  update(force?: boolean): Promise<ChampBalanceMapV1 | null>
+  update(): Promise<ChampBalanceMapV1 | null>
 
   /**
    * 数据是否合法，null 也是合法数据

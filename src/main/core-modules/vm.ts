@@ -1,5 +1,5 @@
 import { logger } from '@main/modules/lcu-state-sync/common'
-import { StatsSend } from '@shared/external-data-source/normalized/stats-send'
+import { StatsSendExportedClass } from '@shared/external-data-source/normalized/stats-send'
 import { formatError } from '@shared/utils/errors'
 import { app } from 'electron'
 import { join } from 'node:path'
@@ -35,8 +35,8 @@ export function runCodeInAkariContext(code: string) {
   }
 }
 
-export function runCustomSendStatsScript(code: string) {
-  const clazz: { new (): StatsSend } = runCodeInAkariContext(code)
+export function runCustomSendStatsScript(code: string, settings: Record<string, any>) {
+  const clazz: { new (): StatsSendExportedClass } = runCodeInAkariContext(code)
 
   if (typeof clazz !== 'function') {
     throw new Error('not a function')
@@ -53,8 +53,8 @@ export function runCustomSendStatsScript(code: string) {
     !i.name ||
     !i.version
   ) {
-    throw new Error('invalid form')
+    throw new Error('invalid type structure, it must implement `StatSendExportedClass`')
   }
 
-  // const stats = i.getStatLines(info?)
+  // const stats = i.getStatLines(info?, settings)
 }

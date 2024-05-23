@@ -466,7 +466,7 @@ const handleReroll = async (grabBack = false) => {
 
 .champion-image-invalid {
   cursor: not-allowed;
-  filter: grayscale(0.6);
+  filter: grayscale(0.8);
 }
 
 .champion-image-placeholder {

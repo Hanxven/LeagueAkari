@@ -9,13 +9,23 @@ class ExternalDataSourceSettings {}
 class ChampBalanceDataSource {
   dataSource: ChampBalanceDataSourceV1
 
+  static UPDATE_INTERVAL = 60 * 60 * 1e3
+
   data: {
     name: string
+    id: string
     map: ChampBalanceMapV1
     updateAt: Date
   } | null = null
 
   async updateData() {
+    if (
+      this.data &&
+      Date.now() - this.dataSource.updateAt.getTime() < ChampBalanceDataSource.UPDATE_INTERVAL
+    ) {
+      return
+    }
+
     const result = await this.dataSource.update()
     if (result) {
       if (!this.dataSource.validate(result)) {
@@ -25,7 +35,8 @@ class ChampBalanceDataSource {
       runInAction(() => {
         this.data = {
           name: this.dataSource.name,
-          map: this.dataSource.get()!,
+          map: result,
+          id: this.dataSource.id,
           updateAt: this.dataSource.updateAt
         }
       })

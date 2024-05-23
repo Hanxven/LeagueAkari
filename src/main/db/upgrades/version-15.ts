@@ -3,7 +3,7 @@ import { QueryRunner, TableColumn, TableIndex } from 'typeorm'
 import { EncounteredGame } from '../entities/EncounteredGame'
 
 /**
- * The first version of League Akari 1.2.0
+ * Version 15 - Add column `queueType` to table EncounteredGames
  */
 export async function v15_LA1_2_2Upgrade(queryRunner: QueryRunner) {
   const encounteredGames = queryRunner.connection.getMetadata(EncounteredGame)

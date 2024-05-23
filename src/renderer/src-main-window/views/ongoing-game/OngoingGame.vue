@@ -7,7 +7,7 @@
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
     <PlayerTagEditModal v-model:show="isPlayerTagEditModalShow" :puuid="tagEditingSummonerPuuid" />
-    <div v-if="!isIdle" class="ongoing-game-inner">
+    <div v-if="!isIdle && cf.settings.ongoingAnalysisEnabled" class="ongoing-game-inner">
       <!-- 蓝队 -->
       <DefineOngoingTeam v-slot="{ participants, team }">
         <div class="team">
@@ -124,7 +124,13 @@
     </div>
     <div v-else class="no-ongoing-game">
       <LeagueAkariSpan bold class="akari-text" />
-      <div style="font-size: 14px; font-weight: normal; color: #666">没有正在进行中的游戏</div>
+      <div
+        v-if="cf.settings.ongoingAnalysisEnabled"
+        style="font-size: 14px; font-weight: normal; color: #666"
+      >
+        没有正在进行中的游戏
+      </div>
+      <div v-else style="font-size: 14px; font-weight: normal; color: #666">对局分析已禁用</div>
     </div>
   </div>
 </template>

@@ -13,7 +13,7 @@ interface SavedPlayerQueryDto {
 }
 
 interface WithEncounteredGamesQueryDto {
-  queueType: string
+  queueType?: string
 }
 
 interface SavedPlayerSaveDto extends SavedPlayerQueryDto {

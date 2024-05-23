@@ -63,7 +63,7 @@ export async function setupExternalDataSource() {
       if (balanceModes.has(mode)) {
         try {
           logger.info(
-            `更新英雄平衡性数据，数据源 ${eds.balance.dataSource.name} ${eds.balance.dataSource.version}`
+            `更新英雄平衡性数据，数据源 ${eds.balance.dataSource.name}  ${eds.balance.dataSource.id} ${eds.balance.dataSource.version}`
           )
           await eds.balance.updateData()
         } catch (error) {

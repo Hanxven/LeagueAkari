@@ -18,8 +18,7 @@ export async function v10_LA1_2_0initializationUpgrade(queryRunner: QueryRunner)
           type: 'json'
         }
       ]
-    }),
-    true
+    })
   )
 
   await queryRunner.createTable(

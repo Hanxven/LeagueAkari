@@ -4,7 +4,6 @@
       <NTabs type="line" animated>
         <NTabPane tab="过程中" name="in-process">
           <ChampionBench class="tool" />
-          <SkinSelection class="tool" />
           <InProcess class="tool" />
         </NTabPane>
         <NTabPane tab="房间" name="lobby">
@@ -29,11 +28,11 @@
 import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { NTabPane, NTabs } from 'naive-ui'
 import { ref } from 'vue'
-import SkinSelection from './SkinSelection.vue'
 
 import AvailabilityCheck from './AvailabilityCheck.vue'
 import ChampionBench from './ChampionBench.vue'
 import ChatAvailability from './ChatAvailability.vue'
+import ChatStatusMessage from './ChatStatusMessage.vue'
 import CustomKeyboardSequence from './CustomKeyboardSequence.vue'
 import FakeRanked from './FakeRanked.vue'
 import GameView from './GameView.vue'
@@ -41,7 +40,6 @@ import InProcess from './InProcess.vue'
 import LobbyTool from './LobbyTool.vue'
 import Spectate from './Spectate.vue'
 import SummonerBackground from './SummonerBackground.vue'
-import ChatStatusMessage from './ChatStatusMessage.vue'
 
 const el = ref()
 useKeepAliveScrollPositionMemo(el)

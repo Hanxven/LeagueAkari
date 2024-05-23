@@ -223,7 +223,8 @@ export async function setupCoreFunctionality() {
             rsoPlatformId: lcuConnectionState.auth!.rsoPlatformId,
             selfPuuid: summoner.me!.puuid,
             puuid: p.puuid,
-            gameId: gameflow.session!.gameData.gameId
+            gameId: gameflow.session!.gameData.gameId,
+            queueType: cf.ongoingGameInfo?.queueType || ''
           })
 
           const r = await Promise.allSettled([task1, task2])
@@ -365,7 +366,8 @@ async function loadPlayerStats(signal: AbortSignal, puuid: string, retries = 2) 
         region: auth.region,
         rsoPlatformId: auth.rsoPlatformId,
         selfPuuid: me.puuid,
-        puuid: puuid
+        puuid: puuid,
+        queueType: cf.ongoingGameInfo?.queueType === 'TFT' ? 'TFT' : undefined
       })
 
       if (savedInfo) {
