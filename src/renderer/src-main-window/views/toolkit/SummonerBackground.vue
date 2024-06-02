@@ -44,9 +44,9 @@
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { getChampDetails } from '@shared/renderer/http-api/game-data'
 import { setSummonerBackgroundSkin } from '@shared/renderer/http-api/summoner'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { ChampSkin } from '@shared/types/lcu/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
@@ -137,7 +137,8 @@ const handleApplyToProfile = async () => {
   try {
     await setSummonerBackgroundSkin(currentSkinId.value)
     message.success('成功', { duration: 1000 })
-  } catch {
+  } catch (error) {
+    console.warn(error)
     message.warning('无法设置', { duration: 1000 })
   } finally {
     isProceeding.value = false

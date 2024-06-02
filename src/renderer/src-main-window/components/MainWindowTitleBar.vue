@@ -124,7 +124,7 @@ import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/sto
 import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync/login'
 import { useMainWindowStore } from '@shared/renderer/modules/main-window/store'
 import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
-import { mainCall } from '@shared/renderer/utils/ipc'
+import { mainCall, onMainEvent } from '@shared/renderer/utils/ipc'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import {
   Carbon as CarbonIcon,
@@ -207,12 +207,12 @@ const closeStrategy = ref<MainWindowCloseStrategy>('minimize-to-tray')
 const isRememberCloseStrategy = ref<boolean>(false)
 
 const handleClose = async () => {
-  if (app.settings.closeStrategy !== 'unset') {
-    mainCall('main-window/close')
-  } else {
-    isCloseConfirmationModelShow.value = true
-  }
+  mainCall('main-window/close')
 }
+
+onMainEvent('main-window/close-asking', () => {
+  isCloseConfirmationModelShow.value = true
+})
 
 const handleReallyClose = async () => {
   if (isRememberCloseStrategy.value) {

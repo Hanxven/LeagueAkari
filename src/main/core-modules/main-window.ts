@@ -1,12 +1,17 @@
 import { is } from '@electron-toolkit/utils'
-import { BrowserWindow, shell } from 'electron'
+import { BrowserWindow, Event, app, shell } from 'electron'
 import { makeAutoObservable } from 'mobx'
 import { join } from 'node:path'
 
 import icon from '../../../resources/LA_ICON.ico?asset'
-import { ipcStateSync, onRendererCall, sendEventToRenderer } from '../utils/ipc'
+import {
+  ipcStateSync,
+  onRendererCall,
+  sendEventToAllRenderers,
+  sendEventToRenderer
+} from '../utils/ipc'
 import { appState } from './app'
-import { getAuxiliaryWindow } from './auxiliary-window'
+import { auxiliaryWindowState, getAuxiliaryWindow } from './auxiliary-window'
 import { createLogger } from './log'
 
 const logger = createLogger('main-window')
@@ -83,6 +88,37 @@ export function toggleMinimizeAndFocus() {
 
 const INITIAL_SHOW = false
 
+let willClose = false
+let currentCloseStrategy: string | null = null
+function handleCloseMainWindow(event: Event) {
+  if (willClose) {
+    getAuxiliaryWindow()?.close()
+    return
+  }
+
+  const s = currentCloseStrategy || appState.settings.closeStrategy
+
+  currentCloseStrategy = null
+
+  if (s === 'minimize-to-tray') {
+    event.preventDefault()
+    mainWindow?.hide()
+    return
+  } else if (s === 'unset') {
+    event.preventDefault()
+
+    if (!mainWindowState.isShow) {
+      mainWindow?.show()
+    }
+
+    sendEventToAllRenderers('main-window/close-asking')
+    return
+  }
+
+  willClose = true
+  mainWindow?.close()
+}
+
 export function createMainWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1000,
@@ -154,6 +190,10 @@ export function createMainWindow(): void {
     mainWindowState.setFocus('blurred')
   })
 
+  mainWindow.on('close', (event) => {
+    handleCloseMainWindow(event)
+  })
+
   mainWindow.on('page-title-updated', (e) => e.preventDefault())
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -200,18 +240,7 @@ export function initMainWindow() {
   })
 
   onRendererCall('main-window/close', async (_, strategy) => {
-    const s = strategy || appState.settings.closeStrategy
-
-    if (s === 'minimize-to-tray' || s === 'unset') {
-      mainWindow?.hide()
-      return
-    }
-
-    const auxWindow = getAuxiliaryWindow()
-    if (auxWindow) {
-      auxWindow.close()
-    }
-
+    currentCloseStrategy = strategy
     mainWindow?.close()
   })
 
@@ -237,6 +266,10 @@ export function initMainWindow() {
 
   onRendererCall('main-window/set-always-on-top', (_, flag, level, relativeLevel) => {
     mainWindow?.setAlwaysOnTop(flag, level, relativeLevel)
+  })
+
+  app.on('before-quit', () => {
+    currentCloseStrategy = 'quit'
   })
 
   logger.info('初始化完成')

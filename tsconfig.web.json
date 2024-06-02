@@ -8,7 +8,7 @@
     "src/renderer/src-auxiliary-window/**/*.vue",
     "src/preload/*.d.ts",
     "src/shared/**/*"
-, "src/shared/external-data-source/normalized/runes.ts"  ],
+, "src/shared/external-data-source/normalized/champ-builds.ts", "src/shared/external-data-source/normalized/champ-balance.ts"  ],
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],

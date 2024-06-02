@@ -81,7 +81,7 @@ export async function setupCoreFunctionality() {
         logger.warn(`加载对局中信息时发生错误:  ${formatError(error)}, in ${state}`)
       }
     },
-    { equals: comparer.shallow }
+    { equals: comparer.shallow, fireImmediately: true }
   )
 
   // KDA 发送列表初始化

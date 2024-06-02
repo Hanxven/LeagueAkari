@@ -59,13 +59,13 @@
 </template>
 
 <script setup lang="ts">
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import {
   getSummoner,
   getSummonerAlias,
   getSummonerByName,
   getSummonerByPuuid
 } from '@shared/renderer/http-api/summoner'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { inferType, resolveSummonerName } from '@shared/utils/identity'
 import { AutoCompleteOption, NAutoComplete, NButton } from 'naive-ui'
@@ -129,14 +129,26 @@ const handleSearch = async () => {
       tasks.push(
         (async () => {
           if (type.isWithTagLine) {
-            const [name, tag] = resolveSummonerName(type.value)
-            const summoner2 = await getSummonerAlias(name, tag)
-            if (summoner2) {
-              byNameResult.value = summoner2
+            try {
+              const [name, tag] = resolveSummonerName(type.value)
+              const summoner2 = await getSummonerAlias(name, tag)
+              if (summoner2) {
+                byNameResult.value = summoner2
+              }
+            } catch (error) {
+              console.warn(`查找名称+TagLine ${type.value}`, error)
             }
           } else {
-            const summoner2 = await getSummonerByName(type.value)
-            byNameResult.value = summoner2.data
+            if (summoner.newIdSystemEnabled) {
+              return
+            }
+
+            try {
+              const summoner2 = await getSummonerByName(type.value)
+              byNameResult.value = summoner2.data
+            } catch (error) {
+              console.warn(`查找名称 ${type.value}`, error)
+            }
           }
         })()
       )
@@ -144,16 +156,24 @@ const handleSearch = async () => {
     if (type.type === 'puuid') {
       tasks.push(
         (async () => {
-          const summoner = await getSummonerByPuuid(type.value)
-          byPuuidResult.value = summoner.data
+          try {
+            const summoner = await getSummonerByPuuid(type.value)
+            byPuuidResult.value = summoner.data
+          } catch (error) {
+            console.warn(`查找 PUUID ${type.value}`, error)
+          }
         })()
       )
     }
     if (type.type === 'summonerId') {
       tasks.push(
         (async () => {
-          const summoner = await getSummoner(type.value)
-          bySummonerIdResult.value = summoner.data
+          try {
+            const summoner = await getSummoner(type.value)
+            bySummonerIdResult.value = summoner.data
+          } catch (error) {
+            console.warn(`查找召唤师 ID ${type.value}`, error)
+          }
         })()
       )
     }

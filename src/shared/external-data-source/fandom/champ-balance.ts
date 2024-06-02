@@ -26,7 +26,7 @@ const BALANCE_TYPES = [
 export class FandomWikiChampBalanceDataSource implements ChampBalanceDataSourceV1 {
   private _name = 'Fandom Wiki'
 
-  private _version = 'v1.0.0'
+  private _version = 'v0.0.1'
 
   private _id = 'fandom-wiki'
 

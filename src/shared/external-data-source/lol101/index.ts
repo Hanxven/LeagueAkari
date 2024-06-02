@@ -1,9 +1,6 @@
 import axios from 'axios'
 
-import {
-  NormalizedChampionInformation,
-  NormalizedExternalRunesDataSource
-} from '../normalized/runes'
+import { NormalizedExternalChampBuildDataSourceMeta } from '../normalized/champ-build'
 
 export interface Lol101ChampDetails20240425 {
   status: string
@@ -142,8 +139,10 @@ const FABRICATED_USER_AGENT =
  *
  * 说实话如此奇妙的解析方式还是第一次见，估计 robustness 超级差
  */
-export class Lol101DataSource implements NormalizedExternalRunesDataSource {
+export class Lol101DataSource implements NormalizedExternalChampBuildDataSourceMeta {
   name = 'LOL101'
+
+  id = 'lol101'
 
   version = '2024-04-25T13:46:45.490Z'
 
@@ -303,7 +302,67 @@ export class Lol101DataSource implements NormalizedExternalRunesDataSource {
     return dt ? `${dt.substr(0, 4)}-${dt.substr(4, 2)}-${dt.substr(6, 2)}` : null
   }
 
-  getNormalizedChampionARAM(championId: number): Promise<NormalizedChampionInformation> {
+  getNormalizedChampionARAM(championId: number): Promise<Lol101ChampionInformation> {
     return this.getChampionDetailARAM(championId)
   }
+}
+
+export interface Lol101ChampionInformation {
+  timeSelectionWinRate?: Array<{
+    time: string
+    winRate: number
+  }> | null
+
+  runes?: Array<{
+    primaryPerks: number[]
+    secondaryPerks: number[]
+    statShards: number[]
+    pickRate: number
+    winRate: number
+  }> | null
+
+  spells?: Array<{
+    spellIds: number[]
+    pickRate: number
+    winRate: number
+  }> | null
+
+  singleItems?: Array<{
+    itemIds: number[]
+    pickRate: number
+    winRate: number
+  }> | null
+
+  staringItems?: Array<{
+    itemIds: number[]
+    pickRate: number
+    winRate: number
+  }> | null
+
+  coreItems?: Array<{
+    itemIds: number[]
+    pickRate: number
+    winRate: number
+  }> | null
+
+  shoes?: Array<{
+    itemIds: number[]
+    pickRate: number
+    winRate: number
+  }> | null
+
+  // maybe only 101 has
+  duoChampions?: Array<{
+    championId: number
+    pickRate: number
+    winRate: number
+  }> | null
+
+  skillBuilds?: {
+    skillLevelingOrder: number[] | number[][]
+    skillUpgradeDetails: Array<{
+      sequence: number[]
+      pickRate: number
+    }>
+  } | null
 }

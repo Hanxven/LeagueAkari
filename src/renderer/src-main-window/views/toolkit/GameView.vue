@@ -9,7 +9,9 @@
     >
       <div style="display: flex; align-items: center; gap: 8px">
         <NInputNumber :show-button="false" v-model:value="gameId" size="tiny" />
-        <NButton @click="handleInspect" size="tiny" type="primary">查看</NButton>
+        <NButton :disabled="!gameId" @click="handleInspect" size="tiny" type="primary"
+          >查看</NButton
+        >
       </div>
     </ControlItem>
   </NCard>

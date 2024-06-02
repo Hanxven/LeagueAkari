@@ -32,9 +32,9 @@ import {
 import App from './App.vue'
 
 const themeOverrides: GlobalThemeOverrides = {
-  Notification: { padding: '12px', color: '#272727' },
+  Notification: { padding: '12px', color: '#313131fa' },
   Popover: {
-    color: '#272727fa'
+    color: '#313131fa'
   },
   Message: {
     color: '#272727'
@@ -44,6 +44,6 @@ const themeOverrides: GlobalThemeOverrides = {
 
 <style>
 #g {
-  color: #1a253f;
+  color: #313131fa;
 }
 </style>

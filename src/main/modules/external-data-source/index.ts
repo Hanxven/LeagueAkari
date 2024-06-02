@@ -2,8 +2,9 @@ import { createLogger } from '@main/core-modules/log'
 import { ipcStateSync } from '@main/utils/ipc'
 import { FandomWikiChampBalanceDataSource } from '@shared/external-data-source/fandom/champ-balance'
 import { formatError } from '@shared/utils/errors'
-import { computed, reaction } from 'mobx'
+import { comparer, computed, reaction } from 'mobx'
 
+import { champSelect } from '../lcu-state-sync/champ-select'
 import { gameflow } from '../lcu-state-sync/gameflow'
 import { externalDataSourceState as eds } from './state'
 
@@ -40,37 +41,61 @@ const _MODES = [
   'URF' // 无限火力
 ]
 
-export async function setupExternalDataSource() {
-  eds.balance.dataSource = new FandomWikiChampBalanceDataSource()
+async function updateBalanceData(gameMode: string, _queueType: string) {
+  if (balanceModes.has(gameMode)) {
+    try {
+      logger.info(
+        `更新英雄平衡性数据，数据源 ${eds.balance.fandom.name}  ${eds.balance.fandom.id} ${eds.balance.fandom.version}`
+      )
+      await eds.balance.updateData()
+    } catch (error) {
+      logger.warn(`获取英雄平衡性数据源时发生错误 ${formatError(error)}`)
+    }
+  }
+}
 
+async function updateChampBuildData(chamionId: number, gameMode: string, _queueType: string) {
+  // ARAM only now
+  if (gameMode === 'ARAM') {
+    const r = await eds.champBuild.opgg.getChampionARAM(chamionId)
+  }
+}
+
+export async function setupExternalDataSource() {
   stateSync()
 
-  const gameMode = computed(() => {
+  const gameInfo = computed(() => {
     if (!gameflow.session) {
       return null
     }
 
-    return gameflow.session.map.gameMode
+    return {
+      gameMode: gameflow.session.map.gameMode,
+      queueType: gameflow.session.gameData.queue.type
+    }
   })
 
   reaction(
-    () => gameMode.get(),
-    async (mode) => {
-      if (!mode) {
+    () => gameInfo.get(),
+    async (info) => {
+      if (!info) {
         return
       }
 
-      if (balanceModes.has(mode)) {
-        try {
-          logger.info(
-            `更新英雄平衡性数据，数据源 ${eds.balance.dataSource.name}  ${eds.balance.dataSource.id} ${eds.balance.dataSource.version}`
-          )
-          await eds.balance.updateData()
-        } catch (error) {
-          logger.warn(`获取英雄平衡性数据源时发生错误 ${formatError(error)}`)
-        }
-      }
+      updateBalanceData(info.gameMode, info.queueType)
     }
+  )
+
+  reaction(
+    () => [champSelect.currentChampion, gameInfo.get()] as const,
+    ([c, i]) => {
+      if (!c || !i) {
+        return
+      }
+
+      updateChampBuildData(c, i.gameMode, i.queueType)
+    },
+    { equals: comparer.structural }
   )
 
   logger.info('初始化完成')
