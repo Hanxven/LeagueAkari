@@ -56,7 +56,7 @@ export async function setupCoreFunctionality() {
   // 控制对局分析的加载选项
   // 在条件不满足时会取消所有正在进行的网络排队请求
   reaction(
-    () => [cf.ongoingState, cf.settings.ongoingAnalysisEnabled] as const,
+    () => [cf.queryState, cf.settings.ongoingAnalysisEnabled] as const,
     async ([state, s]) => {
       if (state === 'unavailable' || !s) {
         sendEventToAllRenderers('core-functionality/ongoing-player/clear')
@@ -112,7 +112,7 @@ export async function setupCoreFunctionality() {
       ] as const,
     () => {
       const result = analyzeTeamUp()
-      if (result && cf.ongoingState !== 'unavailable') {
+      if (result && cf.queryState !== 'unavailable') {
         runInAction(() => (cf.ongoingPreMadeTeams = result))
       }
     },
@@ -186,7 +186,7 @@ export async function setupCoreFunctionality() {
   )
 
   reaction(
-    () => cf.ongoingState,
+    () => cf.queryState,
     (s) => {
       if (s === 'unavailable') {
         tagSendQueuedPlayers.clear()
@@ -271,7 +271,6 @@ function handleAbortError(e: any) {
  */
 async function champSelectQuery(signal: AbortSignal) {
   const session = champSelect.session
-
   if (!session) {
     return
   }
@@ -599,7 +598,7 @@ const SEND_INTERVAL = 65
  * @param teamSide 发送阵营
  */
 async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
-  if (!cf.settings.sendKdaInGame || cf.ongoingState === 'unavailable') {
+  if (!cf.settings.sendKdaInGame || cf.queryState === 'unavailable') {
     return
   }
 
@@ -762,7 +761,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
     return
   }
 
-  if (cf.ongoingState === 'champ-select') {
+  if (cf.queryState === 'champ-select') {
     if (chat.conversations.championSelect) {
       for (let i = 0; i < texts.length; i++) {
         tasks.push(() => chatSend(chat.conversations.championSelect!.id, texts[i]))
@@ -772,7 +771,7 @@ async function sendPlayerStatsInGame(teamSide: 'our' | 'their') {
         }
       }
     }
-  } else if (cf.ongoingState === 'in-game') {
+  } else if (cf.queryState === 'in-game') {
     for (let i = 0; i < texts.length; i++) {
       tasks.push(async () => {
         pSendKey(13, true)
@@ -805,7 +804,7 @@ function stateSync() {
 
   ipcStateSync('core-functionality/ongoing-game-info', () => cf.ongoingGameInfo)
 
-  ipcStateSync('core-functionality/ongoing-state', () => cf.ongoingState)
+  ipcStateSync('core-functionality/ongoing-state', () => cf.queryState)
 
   ipcStateSync('core-functionality/ongoing-champion-selections', () => cf.ongoingChampionSelections)
 

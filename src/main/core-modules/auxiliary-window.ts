@@ -10,7 +10,7 @@ import icon from '../../../resources/LA_ICON.ico?asset'
 import { appState } from './app'
 import { lcuConnectionState } from './lcu-connection'
 import { createLogger } from './log'
-import { displayAuxiliaryWindowTip, setAuxiliaryWindowTrayEnabled } from './platform'
+import { setAuxiliaryWindowTrayEnabled } from './platform'
 
 const logger = createLogger('auxiliary-window')
 
@@ -242,11 +242,8 @@ export function showAuxiliaryWindow() {
   }
 }
 
-export function hideAuxiliaryWindow(isManually = false) {
+export function hideAuxiliaryWindow() {
   if (auxiliaryWindow && auxiliaryWindowState.isShow) {
-    if (isManually) {
-      displayAuxiliaryWindowTip()
-    }
     auxiliaryWindow.hide()
   }
 }
@@ -300,7 +297,7 @@ export async function initAuxiliaryWindow() {
   })
 
   onRendererCall('auxiliary-window/hide', () => {
-    hideAuxiliaryWindow(true)
+    hideAuxiliaryWindow()
   })
 
   onRendererCall('auxiliary-window/show', (_) => {

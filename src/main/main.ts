@@ -18,7 +18,7 @@ import { createLogger, initLogger } from './core-modules/log'
 import { createMainWindow, initMainWindow, restoreAndFocus } from './core-modules/main-window'
 import { initWindowsPlatform } from './core-modules/platform'
 import { initDatabase } from './db'
-import { setupLeagueAkariFeatures } from './modules'
+import { setupLeagueAkariFeatures, setupLeagueAkariModules } from './modules'
 import { initStorageIpc } from './storage'
 import { sendEventToAllRenderers } from './utils/ipc'
 
@@ -55,6 +55,7 @@ app.whenReady().then(async () => {
     initStorageIpc()
     await initLeagueClientFunctions()
     await setupLeagueAkariFeatures()
+    await setupLeagueAkariModules()
     await initAuxiliaryWindow()
     initMainWindow()
 

@@ -151,26 +151,6 @@ export function pSendKeys(str: string) {
   siw?.postMessage({ type: 'string', data: str })
 }
 
-let auxiliaryWindowTipShowed = false
-
-export function displayAuxiliaryWindowTip() {
-  if (auxiliaryWindowTipShowed) {
-    return
-  }
-
-  if (tray) {
-    tray.displayBalloon({
-      title: 'League Akari',
-      content: '辅助小窗仍可在托盘区图标还原',
-      respectQuietTime: true,
-      noSound: true,
-      iconType: 'custom',
-      icon: icon
-    })
-    auxiliaryWindowTipShowed = true
-  }
-}
-
 export function setAuxiliaryWindowTrayEnabled(enabled: boolean) {
   if (showAuxiliaryWindowMenuItem) {
     showAuxiliaryWindowMenuItem.enabled = enabled

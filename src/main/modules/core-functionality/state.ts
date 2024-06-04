@@ -145,7 +145,7 @@ class CoreFunctionalityState {
    * 当前进行的英雄选择
    */
   get ongoingChampionSelections() {
-    if (this.ongoingState === 'champ-select') {
+    if (this.queryState === 'champ-select') {
       if (!champSelect.session) {
         return null
       }
@@ -164,7 +164,7 @@ class CoreFunctionalityState {
       })
 
       return selections
-    } else if (this.ongoingState === 'in-game') {
+    } else if (this.queryState === 'in-game') {
       if (!gameflow.session) {
         return null
       }
@@ -198,7 +198,7 @@ class CoreFunctionalityState {
    * 当前对局的队伍分配
    */
   get ongoingTeams() {
-    if (this.ongoingState === 'champ-select') {
+    if (this.queryState === 'champ-select') {
       if (!champSelect.session) {
         return null
       }
@@ -226,7 +226,7 @@ class CoreFunctionalityState {
         })
 
       return teams
-    } else if (this.ongoingState === 'in-game') {
+    } else if (this.queryState === 'in-game') {
       if (!gameflow.session) {
         return null
       }
@@ -270,22 +270,23 @@ class CoreFunctionalityState {
    *
    * in-game - 在游戏中或游戏结算中
    */
-  get ongoingState() {
+  get queryState() {
     if (lcuConnectionState.state !== 'connected') {
       return 'unavailable'
     }
 
-    if (gameflow.phase === 'ChampSelect') {
+    if (gameflow.phase === 'ChampSelect' && champSelect.session) {
       return 'champ-select'
     }
 
     if (
-      gameflow.phase === 'GameStart' ||
-      gameflow.phase === 'InProgress' ||
-      gameflow.phase === 'WaitingForStats' ||
-      gameflow.phase === 'PreEndOfGame' ||
-      gameflow.phase === 'EndOfGame' ||
-      gameflow.phase === 'Reconnect'
+      gameflow.session &&
+      (gameflow.phase === 'GameStart' ||
+        gameflow.phase === 'InProgress' ||
+        gameflow.phase === 'WaitingForStats' ||
+        gameflow.phase === 'PreEndOfGame' ||
+        gameflow.phase === 'EndOfGame' ||
+        gameflow.phase === 'Reconnect')
     ) {
       return 'in-game'
     }

@@ -11,7 +11,7 @@ import {
   sendEventToRenderer
 } from '../utils/ipc'
 import { appState } from './app'
-import { auxiliaryWindowState, getAuxiliaryWindow } from './auxiliary-window'
+import { getAuxiliaryWindow } from './auxiliary-window'
 import { createLogger } from './log'
 
 const logger = createLogger('main-window')
@@ -88,8 +88,12 @@ export function toggleMinimizeAndFocus() {
 
 const INITIAL_SHOW = false
 
+// 用于指示窗口的下一次真正地关闭
 let willClose = false
+
+// 用于指示窗口下一次关闭策略
 let currentCloseStrategy: string | null = null
+
 function handleCloseMainWindow(event: Event) {
   if (willClose) {
     getAuxiliaryWindow()?.close()
