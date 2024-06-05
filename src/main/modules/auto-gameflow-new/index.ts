@@ -35,8 +35,12 @@ export class AutoGameflowModule extends MobxBasedModule {
   static PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT = 10000
   static PLAY_AGAIN_BUFFER_TIMEOUT = 750
 
+  constructor() {
+    super('auto-gameflow')
+  }
+
   override async onRegister(manager: LeagueAkariModuleManager) {
-    super.onRegister(manager)
+    await super.onRegister(manager)
     this._setupSettingsStateSync()
     this._setupModuleStateSync()
     this._setupModuleMethodCall()
@@ -84,11 +88,11 @@ export class AutoGameflowModule extends MobxBasedModule {
   }
 
   private _setupModuleStateSync() {
-    this.simpleSync('auto-gameflow/will-accept', () => this.state.willAccept)
-    this.simpleSync('auto-gameflow/will-accept-at', () => this.state.willAcceptAt)
-    this.simpleSync('auto-gameflow/will-search-match', () => this.state.willSearchMatch)
-    this.simpleSync('auto-gameflow/will-search-match-at', () => this.state.willSearchMatchAt)
-    this.simpleSync('auto-gameflow/activity-start-status', () => this.state.activityStartStatus)
+    this.simpleSync('will-accept', () => this.state.willAccept)
+    this.simpleSync('will-accept-at', () => this.state.willAcceptAt)
+    this.simpleSync('will-search-match', () => this.state.willSearchMatch)
+    this.simpleSync('will-search-match-at', () => this.state.willSearchMatchAt)
+    this.simpleSync('activity-start-status', () => this.state.activityStartStatus)
   }
 
   private async _loadSettings() {
@@ -166,56 +170,59 @@ export class AutoGameflowModule extends MobxBasedModule {
   }
 
   private _setupModuleMethodCall() {
-    this.onCall('set-setting/auto-honor-enabled', async (newValue) => {
-      this.state.settings.setAutoHonorEnabled(newValue)
-      await setSetting('auto-gameflow/auto-honor-enabled', newValue)
+    this.onCall('set-setting/auto-honor-enabled', async (value) => {
+      this.state.settings.setAutoHonorEnabled(value)
+      await setSetting('auto-gameflow/auto-honor-enabled', value)
     })
-    this.onCall('set-setting/auto-honor-strategy', async (newValue) => {
-      this.state.settings.setAutoHonorStrategy(newValue)
-      await setSetting('auto-gameflow/auto-honor-strategy', newValue)
+    this.onCall('set-setting/auto-honor-strategy', async (value) => {
+      this.state.settings.setAutoHonorStrategy(value)
+      await setSetting('auto-gameflow/auto-honor-strategy', value)
     })
-    this.onCall('set-setting/play-again-enabled', async (newValue) => {
-      this.state.settings.setPlayAgainEnabled(newValue)
-      await setSetting('auto-gameflow/play-again-enabled', newValue)
+    this.onCall('set-setting/play-again-enabled', async (value) => {
+      this.state.settings.setPlayAgainEnabled(value)
+      await setSetting('auto-gameflow/play-again-enabled', value)
     })
-    this.onCall('set-setting/auto-accept-enabled', async (newValue) => {
-      if (!newValue) {
+    this.onCall('set-setting/auto-accept-enabled', async (value) => {
+      if (!value) {
         this.cancelAutoAccept('normal')
       }
 
-      this.state.settings.setAutoAcceptEnabled(newValue)
-      await setSetting('auto-gameflow/auto-accept-enabled', newValue)
+      this.state.settings.setAutoAcceptEnabled(value)
+      await setSetting('auto-gameflow/auto-accept-enabled', value)
     })
-    this.onCall('set-setting/auto-accept-delay-seconds', async (newValue) => {
-      this.state.settings.setAutoAcceptDelaySeconds(newValue)
-      await setSetting('auto-gameflow/auto-accept-delay-seconds', newValue)
+    this.onCall('set-setting/auto-accept-delay-seconds', async (value) => {
+      this.state.settings.setAutoAcceptDelaySeconds(value)
+      await setSetting('auto-gameflow/auto-accept-delay-seconds', value)
     })
-    this.onCall('set-setting/auto-search-match-enabled', async (newValue) => {
-      this.state.settings.setAutoSearchMatchEnabled(newValue)
-      await setSetting('auto-gameflow/auto-search-match-enabled', newValue)
+    this.onCall('set-setting/auto-search-match-enabled', async (value) => {
+      this.state.settings.setAutoSearchMatchEnabled(value)
+      await setSetting('auto-gameflow/auto-search-match-enabled', value)
     })
-    this.onCall('set-setting/auto-search-match-delay-seconds', async (newValue) => {
-      this.state.settings.setAutoSearchMatchDelaySeconds(newValue)
-      await setSetting('auto-gameflow/auto-search-match-delay-seconds', newValue)
+    this.onCall('set-setting/auto-search-match-delay-seconds', async (value) => {
+      this.state.settings.setAutoSearchMatchDelaySeconds(value)
+      await setSetting('auto-gameflow/auto-search-match-delay-seconds', value)
     })
-    this.onCall('set-setting/auto-search-match-minimum-members', async (newValue) => {
-      this.state.settings.setAutoSearchMatchMinimumMembers(newValue)
-      await setSetting('auto-gameflow/auto-search-minimum-members', newValue)
+    this.onCall('set-setting/auto-search-match-minimum-members', async (value) => {
+      this.state.settings.setAutoSearchMatchMinimumMembers(value)
+      await setSetting('auto-gameflow/auto-search-minimum-members', value)
     })
-    this.onCall('set-setting/auto-search-match-wait-for-invitees', async (newValue) => {
-      this.state.settings.setAutoSearchMatchWaitForInvitees(newValue)
-      await setSetting('auto-gameflow/auto-search-match-wait-for-invitees', newValue)
+    this.onCall('set-setting/auto-search-match-wait-for-invitees', async (value) => {
+      this.state.settings.setAutoSearchMatchWaitForInvitees(value)
+      await setSetting('auto-gameflow/auto-search-match-wait-for-invitees', value)
     })
-    this.onCall('set-setting/auto-search-match-rematch-strategy', async (newValue) => {
-      this.state.settings.setAutoSearchMatchRematchStrategy(newValue)
-      await setSetting('auto-gameflow/auto-search-match-rematch-strategy', newValue)
+    this.onCall('set-setting/auto-search-match-rematch-strategy', async (value) => {
+      this.state.settings.setAutoSearchMatchRematchStrategy(value)
+      await setSetting('auto-gameflow/auto-search-match-rematch-strategy', value)
     })
-    this.onCall('set-setting/auto-search-match-rematch-fixed-duration', async (newValue) => {
-      this.state.settings.setAutoSearchMatchRematchFixedDuration(newValue)
-      await setSetting('auto-gameflow/auto-search-match-rematch-fixed-duration', newValue)
+    this.onCall('set-setting/auto-search-match-rematch-fixed-duration', async (value) => {
+      this.state.settings.setAutoSearchMatchRematchFixedDuration(value)
+      await setSetting('auto-gameflow/auto-search-match-rematch-fixed-duration', value)
     })
-    this.onCall('auto-gameflow/cancel-auto-accept', () => {
+    this.onCall('cancel-auto-accept', () => {
       this.cancelAutoAccept('normal')
+    })
+    this.onCall('cancel-auto-search-match', () => {
+      this.cancelAutoSearchMatch('normal')
     })
   }
 
@@ -399,7 +406,10 @@ export class AutoGameflowModule extends MobxBasedModule {
           }
         }
       },
-      { equals: comparer.shallow /* ballot 不会 Update，只会 Create 和 Delete */ }
+      {
+        equals: comparer.shallow /* ballot 不会 Update，只会 Create 和 Delete */,
+        fireImmediately: true
+      }
     )
   }
 
@@ -410,7 +420,8 @@ export class AutoGameflowModule extends MobxBasedModule {
         if (!enabled) {
           this.cancelAutoSearchMatch('normal')
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     this.autoDisposeReaction(
@@ -444,7 +455,7 @@ export class AutoGameflowModule extends MobxBasedModule {
           this.cancelAutoSearchMatch(s)
         }
       },
-      { equals: comparer.shallow }
+      { equals: comparer.shallow, fireImmediately: true }
     )
 
     const simplifiedSearchState = computed(() => {
@@ -470,7 +481,8 @@ export class AutoGameflowModule extends MobxBasedModule {
         } else {
           penaltyTime = 0
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     this.autoDisposeReaction(
@@ -504,7 +516,7 @@ export class AutoGameflowModule extends MobxBasedModule {
           }
         }
       },
-      { equals: comparer.structural }
+      { equals: comparer.structural, fireImmediately: true }
     )
   }
 
@@ -537,7 +549,8 @@ export class AutoGameflowModule extends MobxBasedModule {
           }
           this.state.clearAutoAccept()
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     this.autoDisposeReaction(
@@ -546,7 +559,8 @@ export class AutoGameflowModule extends MobxBasedModule {
         if (!enabled) {
           this.cancelAutoAccept('normal')
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     lcuEventBus.on('/lol-matchmaking/v1/ready-check', (event) => {
@@ -595,9 +609,9 @@ export class AutoGameflowModule extends MobxBasedModule {
           return
         }
       },
-      { equals: comparer.shallow }
+      { equals: comparer.shallow, fireImmediately: true }
     )
   }
 }
 
-export const autoGameflowModule = new AutoGameflowModule('auto-gameflow')
+export const autoGameflowModule = new AutoGameflowModule()

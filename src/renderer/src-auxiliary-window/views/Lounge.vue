@@ -117,10 +117,6 @@ const { pause: pauseAC, resume: resumeAC } = useIntervalFn(
   { immediate: false, immediateCallback: true }
 )
 
-watchEffect(() => {
-  console.log(matchmaking.search)
-})
-
 const willSearchMatchIn = ref(0)
 const { pause: pauseAS, resume: resumeAS } = useIntervalFn(
   () => {

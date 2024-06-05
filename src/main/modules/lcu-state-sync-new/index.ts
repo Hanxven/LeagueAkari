@@ -23,6 +23,7 @@ import { getBallot } from '@main/http-api/honor-v2'
 import { getLobby } from '@main/http-api/lobby'
 import { getLoginQueueState } from '@main/http-api/login'
 import { getCurrentSummoner } from '@main/http-api/summoner'
+import { LeagueAkariModuleManager } from '@shared/akari/main-module-manager'
 import { MobxBasedModule } from '@shared/akari/mobx-based-module'
 import { ChampSelectSummoner } from '@shared/types/lcu/champ-select'
 import { Conversation } from '@shared/types/lcu/chat'
@@ -43,7 +44,7 @@ import { LoginState } from './login'
 import { MatchmakingState } from './matchmaking'
 import { SummonerState } from './summoner'
 
-class LcuSyncModule extends MobxBasedModule {
+export class LcuSyncModule extends MobxBasedModule {
   public gameflow = new GameflowState()
   public chat = new ChatState()
   public honor = new HonorState()
@@ -62,8 +63,13 @@ class LcuSyncModule extends MobxBasedModule {
     concurrency: 3
   })
 
-  override onRegister() {
-    this._setupGameflowSync()
+  constructor() {
+    super('lcu-state-sync')
+  }
+
+  override async onRegister(manager: LeagueAkariModuleManager) {
+    await super.onRegister(manager)
+
     this._syncGameflow()
     this._syncLcuChampSelect()
     this._syncLcuChat()
@@ -75,45 +81,6 @@ class LcuSyncModule extends MobxBasedModule {
     this._syncLcuSummoner()
 
     this._logger.info('初始化完成')
-  }
-
-  private _setupGameflowSync() {
-    this.simpleSync('lcu/gameflow/phase', () => this.gameflow.phase)
-    this.simpleSync('lcu/gameflow/session', () => this.gameflow.session)
-
-    this.autoDisposeReaction(
-      () => lcuConnectionState.state,
-      async (state) => {
-        if (state === 'connected') {
-          this.gameflow.setPhase((await getGameflowPhase()).data)
-        } else {
-          this.gameflow.setPhase(null)
-        }
-      }
-    )
-
-    this.autoDisposeReaction(
-      () => lcuConnectionState.state,
-      async (state) => {
-        if (state === 'connected') {
-          try {
-            this.gameflow.setSession((await getGameflowSession()).data)
-          } catch {
-            this.gameflow.setSession(null)
-          }
-        } else {
-          this.gameflow.setSession(null)
-        }
-      }
-    )
-
-    lcuEventBus.on('/lol-gameflow/v1/gameflow-phase', (event) => {
-      this.gameflow.setPhase(event.data)
-    })
-
-    lcuEventBus.on('/lol-gameflow/v1/session', (event) => {
-      this.gameflow.setSession(event.data)
-    })
   }
 
   private _syncLcuGameData() {
@@ -129,15 +96,16 @@ class LcuSyncModule extends MobxBasedModule {
       () => lcuConnectionState.state,
       (state) => {
         if (state === 'connected') {
-          this._gameDataLimiter.add(this._loadSummonerSpells)
-          this._gameDataLimiter.add(this._loadItems)
-          this._gameDataLimiter.add(this._loadQueues)
-          this._gameDataLimiter.add(this._loadPerks)
-          this._gameDataLimiter.add(this._loadPerkstyles)
-          this._gameDataLimiter.add(this._loadAugments)
-          this._gameDataLimiter.add(this._loadChampions)
+          this._gameDataLimiter.add(() => this._loadSummonerSpells())
+          this._gameDataLimiter.add(() => this._loadItems())
+          this._gameDataLimiter.add(() => this._loadQueues())
+          this._gameDataLimiter.add(() => this._loadPerks())
+          this._gameDataLimiter.add(() => this._loadPerkstyles())
+          this._gameDataLimiter.add(() => this._loadAugments())
+          this._gameDataLimiter.add(() => this._loadChampions())
         }
-      }
+      },
+      { fireImmediately: true }
     )
   }
 
@@ -262,7 +230,8 @@ class LcuSyncModule extends MobxBasedModule {
         } else {
           this.honor.setBallot(null)
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     lcuEventBus.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (event) => {
@@ -309,7 +278,8 @@ class LcuSyncModule extends MobxBasedModule {
         } else {
           this.champSelect.setSession(null)
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     // 处理中场进入的情况，主动获取可用英雄列表
@@ -355,7 +325,8 @@ class LcuSyncModule extends MobxBasedModule {
           this.champSelect.setCurrentPickableChampionArray([])
           this.champSelect.setCurrentBannableChampionArray([])
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     let isCellSummonerUpdated = false
@@ -379,7 +350,8 @@ class LcuSyncModule extends MobxBasedModule {
             }
           }
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     this.autoDisposeReaction(
@@ -389,7 +361,8 @@ class LcuSyncModule extends MobxBasedModule {
           this.champSelect.setSelfSummoner(null)
           isCellSummonerUpdated = false
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     this.autoDisposeReaction(
@@ -410,7 +383,8 @@ class LcuSyncModule extends MobxBasedModule {
         } else {
           this.champSelect.setCurrentChampion(null)
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     lcuEventBus.on('/lol-champ-select/v1/session', (event) => {
@@ -584,7 +558,8 @@ class LcuSyncModule extends MobxBasedModule {
         } else {
           this.chat.setMe(null)
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     this.autoDisposeReaction(
@@ -637,7 +612,8 @@ class LcuSyncModule extends MobxBasedModule {
           this.chat.setParticipantsPostGame(null)
           this.chat.setParticipantsCustomGame(null)
         }
-      }
+      },
+      { fireImmediately: true }
     )
   }
 
@@ -667,7 +643,8 @@ class LcuSyncModule extends MobxBasedModule {
         } else {
           this.gameflow.setPhase(null)
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     this.autoDisposeReaction(
@@ -682,7 +659,8 @@ class LcuSyncModule extends MobxBasedModule {
         } else {
           this.gameflow.setSession(null)
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     lcuEventBus.on('/lol-gameflow/v1/gameflow-phase', (event) => {
@@ -720,7 +698,8 @@ class LcuSyncModule extends MobxBasedModule {
         } else {
           this.lobby.setLobby(null)
         }
-      }
+      },
+      { fireImmediately: true }
     )
   }
 
@@ -750,7 +729,8 @@ class LcuSyncModule extends MobxBasedModule {
         } else {
           this.login.setLoginQueueState(null)
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     this.autoDisposeReaction(
@@ -759,7 +739,8 @@ class LcuSyncModule extends MobxBasedModule {
         if (isQueueing) {
           this._logger.info(`正在登录排队中`)
         }
-      }
+      },
+      { fireImmediately: true }
     )
   }
 
@@ -819,4 +800,4 @@ class LcuSyncModule extends MobxBasedModule {
   }
 }
 
-export const lcuModule = new LcuSyncModule('lcu-state-sync')
+export const lcuModule = new LcuSyncModule()

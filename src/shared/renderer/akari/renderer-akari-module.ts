@@ -1,14 +1,15 @@
 import { LeagueAkariRendererModuleManager } from './renderer-module-manager'
 
-type CallbackFn<T = any> = (data: T) => void
+type CallbackFn = (...args: any[]) => void
 
+/**
+ * League Akari 中，负责与主进程通信的模块
+ */
 export class LeagueAkariRendererModule {
   private _eventMap = new Map<string, Set<CallbackFn>>()
+  private _manager: LeagueAkariRendererModuleManager | null = null
 
-  constructor(
-    private _moduleId: string,
-    private _manager: LeagueAkariRendererModuleManager | null = null
-  ) {}
+  constructor(private _moduleId: string) {}
 
   get id() {
     return this._moduleId
@@ -22,14 +23,18 @@ export class LeagueAkariRendererModule {
   }
 
   call<T = any>(methodName: string, ...args: any[]) {
-    return this._manager?.call<T>(this._moduleId, methodName, ...args)
+    if (!this._manager) {
+      throw new Error('Akari Manager is not ready')
+    }
+
+    return this._manager.call<T>(this._moduleId, methodName, ...args)
   }
 
-  dispatchEvent<T = any>(eventName: string, data: T) {
-    this._eventMap.get(eventName)?.forEach((fn) => fn(data))
+  dispatchEvent(eventName: string, ...args: any[]) {
+    this._eventMap.get(eventName)?.forEach((fn) => fn(...args))
   }
 
-  onEvent<T = any>(eventName: string, fn: CallbackFn<T>) {
+  onEvent(eventName: string, fn: CallbackFn) {
     if (!this._eventMap.has(eventName)) {
       this._eventMap.set(eventName, new Set())
     }

@@ -11,9 +11,8 @@ export class LeagueAkariRendererModuleManager {
       throw new Error(`Module of Id '${module.id}' already registered`)
     }
 
-    await LeagueAkariRendererIpc.call('module-manager/renderer-register', module.id)
-
     await module.onRegister(this)
+    await LeagueAkariRendererIpc.call('module-manager/renderer-register', module.id)
     this._modules.set(module.id, module)
   }
 
@@ -22,15 +21,14 @@ export class LeagueAkariRendererModuleManager {
       throw new Error(`Module of ID '${moduleId}' not found`)
     }
 
+    await this._modules.get(moduleId)!.onUnregister()
     await LeagueAkariRendererIpc.call('module-manager/renderer-register', moduleId)
-
-    await this._modules.get(moduleId)?.onUnregister()
     this._modules.delete(moduleId)
   }
 
   setup() {
-    LeagueAkariRendererIpc.onEvent('module-manager/event', (_, moduleId, eventName, data) => {
-      this._modules.get(moduleId)?.dispatchEvent(eventName, data)
+    LeagueAkariRendererIpc.onEvent('module-manager/event', (_, moduleId, eventName, ...args) => {
+      this._modules.get(moduleId)?.dispatchEvent(eventName, ...args)
     })
   }
 

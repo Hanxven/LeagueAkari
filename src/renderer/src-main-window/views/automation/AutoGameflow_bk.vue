@@ -8,7 +8,7 @@
     >
       <NSwitch
         :value="agf.settings.autoAcceptEnabled"
-        @update:value="(val) => am.setAutoAcceptEnabled(val)"
+        @update:value="(val) => setAutoAcceptEnabled(val)"
         size="small"
       />
     </ControlItem>
@@ -20,7 +20,7 @@
       <NInputNumber
         style="width: 80px"
         :value="agf.settings.autoAcceptDelaySeconds"
-        @update:value="(value) => am.setAutoAcceptDelaySeconds(value || 0)"
+        @update:value="(value) => setAutoAcceptDelaySeconds(value || 0)"
         placeholder="秒"
         :min="0"
         :max="10"
@@ -35,7 +35,7 @@
     >
       <NSwitch
         :value="agf.settings.autoHonorEnabled"
-        @update:value="(val) => am.setAutoHonorEnabled(val)"
+        @update:value="(val) => setAutoHonorEnabled(val)"
         size="small"
       />
     </ControlItem>
@@ -48,7 +48,7 @@
         size="small"
         name="radio-group"
         :value="agf.settings.autoHonorStrategy"
-        @update:value="(val) => am.setAutoHonorStrategy(val)"
+        @update:value="(val) => setAutoHonorStrategy(val)"
       >
         <NFlex :size="4">
           <NRadio value="prefer-lobby-member" title="优先选择房间内的人员，其次是其他队友"
@@ -68,7 +68,7 @@
       </template>
       <NSwitch
         :value="agf.settings.playAgainEnabled"
-        @update:value="(val) => am.setPlayAgainEnabled(val)"
+        @update:value="(val) => setPlayAgainEnabled(val)"
         size="small"
       />
     </ControlItem>
@@ -80,7 +80,7 @@
     >
       <NSwitch
         :value="agf.settings.autoSearchMatchEnabled"
-        @update:value="(val) => am.setAutoSearchMatchEnabled(val)"
+        @update:value="(val) => setAutoSearchMatchEnabled(val)"
         size="small"
       />
     </ControlItem>
@@ -91,7 +91,7 @@
     >
       <NInputNumber
         :value="agf.settings.autoSearchMatchMinimumMembers"
-        @update:value="(val) => am.setAutoSearchMatchMinimumMembers(val || 1)"
+        @update:value="(val) => setAutoSearchMatchMinimumMembers(val || 1)"
         :min="1"
         :max="99"
         size="tiny"
@@ -105,7 +105,7 @@
     >
       <NSwitch
         :value="agf.settings.autoSearchMatchWaitForInvitees"
-        @update:value="(val) => am.setAutoSearchMatchWaitForInvitees(val)"
+        @update:value="(val) => setAutoSearchMatchWaitForInvitees(val)"
         size="small"
       />
     </ControlItem>
@@ -117,7 +117,7 @@
       <NInputNumber
         style="width: 80px"
         :value="agf.settings.autoSearchMatchDelaySeconds"
-        @update:value="(value) => am.setAutoSearchMatchDelaySeconds(value || 0)"
+        @update:value="(value) => setAutoSearchMatchDelaySeconds(value || 0)"
         placeholder="秒"
         :min="0"
         :max="20"
@@ -131,7 +131,7 @@
     >
       <NRadioGroup
         :value="agf.settings.autoSearchMatchRematchStrategy"
-        @update:value="(s) => am.setAutoSearchMatchRematchStrategy(s)"
+        @update:value="(s) => setAutoSearchMatchRematchStrategy(s)"
         size="small"
       >
         <NFlex>
@@ -157,7 +157,7 @@
         :disabled="agf.settings.autoSearchMatchRematchStrategy !== 'fixed-duration'"
         style="width: 80px"
         :value="agf.settings.autoSearchMatchRematchFixedDuration"
-        @update:value="(value) => am.setAutoSearchMatchRematchFixedDuration(value || 2)"
+        @update:value="(value) => setAutoSearchMatchRematchFixedDuration(value || 2)"
         placeholder="秒"
         :min="1"
         size="tiny"
@@ -168,7 +168,19 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { autoGameflowRendererModule as am } from '@shared/renderer/modules/auto-gameflow-new'
+import {
+  setAutoAcceptDelaySeconds,
+  setAutoAcceptEnabled,
+  setAutoHonorEnabled,
+  setAutoHonorStrategy,
+  setAutoSearchMatchDelaySeconds,
+  setAutoSearchMatchEnabled,
+  setAutoSearchMatchMinimumMembers,
+  setAutoSearchMatchRematchFixedDuration,
+  setAutoSearchMatchRematchStrategy,
+  setAutoSearchMatchWaitForInvitees,
+  setPlayAgainEnabled
+} from '@shared/renderer/modules/auto-gameflow'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NSwitch } from 'naive-ui'
 

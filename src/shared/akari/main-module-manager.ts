@@ -80,7 +80,11 @@ export class LeagueAkariModuleManager {
     this._ipcMainDisposers.clear()
   }
 
-  sendEvent<T>(moduleId: string, eventName: string, data: T) {
-    this._subscribers.get(moduleId)?.forEach((w) => LeagueAkariIpc.sendEvent(w, eventName, data))
+  sendEvent(moduleId: string, eventName: string, ...args: any[]) {
+    this._subscribers
+      .get(moduleId)
+      ?.forEach((w) =>
+        LeagueAkariIpc.sendEvent(w, 'module-manager/event', moduleId, eventName, ...args)
+      )
   }
 }

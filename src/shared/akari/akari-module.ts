@@ -2,6 +2,9 @@ import { LeagueAkariModuleManager } from './main-module-manager'
 
 type CallbackFn<T = any> = (...args: any[]) => Promise<T> | T
 
+/**
+ * League Akari 中，基本的功能单元
+ */
 export class LeagueAkariModule {
   private _methodMap = new Map<string, CallbackFn>()
   private _manager: LeagueAkariModuleManager | null = null
@@ -27,8 +30,8 @@ export class LeagueAkariModule {
     return this._methodMap.get(methodName)?.(...args)
   }
 
-  sendEvent<T = any>(eventName: string, data: T) {
-    this._manager?.sendEvent(this._moduleId, eventName, data)
+  sendEvent(eventName: string, ...args: any[]) {
+    this._manager?.sendEvent(this._moduleId, eventName, ...args)
   }
 
   onCall<T = any>(methodName: string, fn: CallbackFn<T>) {

@@ -361,7 +361,7 @@ const composedResultClass = computed(() => {
 const formattedModeText = computed(() => {
   return props.game.gameMode === 'PRACTICETOOL'
     ? '训练模式'
-    : gameData.queues[props.game.queueId].name ?? props.game.queueId
+    : gameData.queues[props.game.queueId]?.name ?? props.game.queueId
 })
 
 const isModalShow = ref(false)
