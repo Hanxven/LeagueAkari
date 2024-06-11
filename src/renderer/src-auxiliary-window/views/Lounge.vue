@@ -90,18 +90,14 @@ import LoungeOperations from '@auxiliary-window/components/LoungeOperations.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { deleteSearchMatch } from '@shared/renderer/http-api/lobby'
 import { accept, decline } from '@shared/renderer/http-api/matchmaking'
-import {
-  cancelAutoAccept,
-  cancelAutoSearchMatch,
-  setAutoSearchMatchEnabled
-} from '@shared/renderer/modules/auto-gameflow'
+import { autoGameflowRendererModule as agfm } from '@shared/renderer/modules/auto-gameflow-new'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { useMatchmakingStore } from '@shared/renderer/modules/lcu-state-sync/matchmaking'
 import { GetSearch } from '@shared/types/lcu/matchmaking'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton } from 'naive-ui'
-import { computed, ref, watch, watchEffect } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const agf = useAutoGameflowStore()
 const gameflow = useGameflowStore()
@@ -131,11 +127,11 @@ const handleAccept = () => accept()
 
 const handleDecline = () => decline()
 
-const handleCancelAutoAccept = () => cancelAutoAccept()
+const handleCancelAutoAccept = () => agfm.cancelAutoAccept()
 
 const handleCancelAutoSearchMatch = async () => {
-  await setAutoSearchMatchEnabled(false)
-  cancelAutoSearchMatch()
+  await agfm.setAutoSearchMatchEnabled(false)
+  agfm.cancelAutoSearchMatch()
 }
 
 const isCancelingSearching = ref(false)
@@ -150,7 +146,8 @@ const handleCancelSearching = async () => {
   } finally {
     isCancelingSearching.value = false
   }
-  setAutoSearchMatchEnabled(false)
+
+  agfm.setAutoSearchMatchEnabled(false)
 }
 
 const penaltyTime = computed(() => {

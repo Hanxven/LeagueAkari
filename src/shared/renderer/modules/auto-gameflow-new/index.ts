@@ -81,7 +81,7 @@ export class AutoGameflowRendererModule extends StateSyncModule {
   }
 
   async setAutoSearchMatchDelaySeconds(value: number) {
-    return this.call('et-setting/auto-search-match-delay-seconds', value)
+    return this.call('set-setting/auto-search-match-delay-seconds', value)
   }
 
   async setAutoSearchMatchMinimumMembers(value: number) {

@@ -3,70 +3,98 @@ import { WebContents } from 'electron'
 import { LeagueAkariModule } from './akari-module'
 import { LeagueAkariIpc } from './main-ipc'
 
+type ModuleInfo = {
+  id: string
+  module: LeagueAkariModule
+  subscribers: Set<WebContents>
+}
+
+/**
+ * 主进程进程模块中心，同时为渲染进程提供连接服务。主进程有且只有一个此实例
+ */
 export class LeagueAkariModuleManager {
-  private _modules = new Map<string, LeagueAkariModule>()
-
-  private _subscribers = new Map<string, Set<WebContents>>()
-
+  private _modules = new Map<string, ModuleInfo>()
   private _ipcMainDisposers = new Set<Function>()
-
-  constructor() {}
 
   async register(module: LeagueAkariModule) {
     if (this._modules.has(module.id)) {
-      throw new Error(`Module of Id '${module.id}' already registered`)
+      throw new Error(`Module of Id '${module.id}' was already registered`)
+    }
+
+    const moduleDeps = module.dependencies
+    for (const dep of moduleDeps) {
+      if (!this._modules.has(dep)) {
+        throw new Error(`Dependency module of ID ${dep} for ${module.id} is not satisfied`)
+      }
     }
 
     await module.onRegister(this)
-    this._modules.set(module.id, module)
-    this._subscribers.set(module.id, new Set())
+    this._modules.set(module.id, {
+      id: module.id,
+      module,
+      subscribers: new Set()
+    })
   }
 
   async unregister(moduleId: string) {
-    if (this._modules.has(moduleId)) {
-      throw new Error(`Module of ID '${moduleId}' not found`)
+    if (!this._modules.has(moduleId)) {
+      throw new Error(`Module of ID '${moduleId}' is not registered`)
     }
 
-    await this._modules.get(moduleId)?.onUnregister()
+    for (const [_, m] of this._modules) {
+      const dependent = m.module.dependencies.find((md) => md === moduleId)
+      if (dependent) {
+        throw new Error(`Module of ${dependent} rely on ${moduleId}`)
+      }
+    }
+
+    await this._modules.get(moduleId)!.module.onUnregister()
     this._modules.delete(moduleId)
-    this._subscribers.delete(moduleId)
+  }
+
+  getModule(moduleId: string) {
+    if (this._modules.has(moduleId)) {
+      return this._modules.get(moduleId)!.module
+    }
+
+    return null
   }
 
   setup() {
     const d1 = LeagueAkariIpc.onCall(
       'module-manager/renderer-register',
       (event, moduleId: string) => {
-        const module = this._modules.get(moduleId)
+        const moduleInfo = this._modules.get(moduleId)
 
-        if (!module) {
-          throw new Error(`No module of ID ${module}`)
+        if (!moduleInfo) {
+          throw new Error(`No module of ID ${moduleId}`)
         }
 
         event.sender.on('destroyed', () => {
-          this._subscribers.get(module.id)?.delete(event.sender)
+          this._modules.get(moduleId)?.subscribers.delete(event.sender)
         })
 
-        this._subscribers.get(module.id)?.add(event.sender)
+        this._modules.get(moduleId)?.subscribers.add(event.sender)
       }
     )
 
     const d2 = LeagueAkariIpc.onCall(
       'module-manager/renderer-unregister',
       (event, moduleId: string) => {
-        const module = this._modules.get(moduleId)
+        const moduleInfo = this._modules.get(moduleId)
 
-        if (!module) {
-          throw new Error(`No module of ID ${module}`)
+        if (!moduleInfo) {
+          throw new Error(`No module of ID ${moduleId}`)
         }
 
-        this._subscribers.get(module.id)?.delete(event.sender)
+        this._modules.get(moduleId)?.subscribers.delete(event.sender)
       }
     )
 
     const d3 = LeagueAkariIpc.onCall(
       'module-manager/call',
       (_, moduleId: string, methodName: string, ...args: any[]) => {
-        return this._modules.get(moduleId)?.dispatchCall(methodName, ...args)
+        return this._modules.get(moduleId)?.module.dispatchCall(methodName, ...args)
       }
     )
 
@@ -75,15 +103,19 @@ export class LeagueAkariModuleManager {
     this._ipcMainDisposers.add(d3)
   }
 
-  unload() {
+  async unload() {
+    for (const [_, m] of this._modules) {
+      await m.module.onUnregister()
+    }
+
     this._ipcMainDisposers.forEach((fn) => fn())
     this._ipcMainDisposers.clear()
   }
 
   sendEvent(moduleId: string, eventName: string, ...args: any[]) {
-    this._subscribers
+    this._modules
       .get(moduleId)
-      ?.forEach((w) =>
+      ?.subscribers?.forEach((w) =>
         LeagueAkariIpc.sendEvent(w, 'module-manager/event', moduleId, eventName, ...args)
       )
   }

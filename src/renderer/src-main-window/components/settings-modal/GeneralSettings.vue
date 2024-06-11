@@ -10,7 +10,7 @@
       >
         <NSwitch
           size="small"
-          :value="respawnTimer.settings.enabled"
+          :value="rt.settings.enabled"
           @update:value="(val) => setEnableRespawnTimer(val)"
         />
       </ControlItem>
@@ -25,8 +25,8 @@
       >
         <NSwitch
           size="small"
-          :value="coreFunctionality.settings.fetchAfterGame"
-          @update:value="(val) => setFetchAfterGame(val)"
+          :value="cf.settings.fetchAfterGame"
+          @update:value="(val) => cfm.setFetchAfterGame(val)"
         />
       </ControlItem>
       <ControlItem
@@ -37,8 +37,8 @@
       >
         <NSwitch
           size="small"
-          :value="coreFunctionality.settings.fetchDetailedGame"
-          @update:value="(val) => setFetchDetailedGame(val)"
+          :value="cf.settings.fetchDetailedGame"
+          @update:value="(val) => cfm.setFetchDetailedGame(val)"
         />
       </ControlItem>
     </NCard>
@@ -52,8 +52,8 @@
       >
         <NSwitch
           size="small"
-          :value="coreFunctionality.settings.ongoingAnalysisEnabled"
-          @update:value="(val) => setOngoingAnalysisEnabled(val)"
+          :value="cf.settings.ongoingAnalysisEnabled"
+          @update:value="(val) => cfm.setOngoingAnalysisEnabled(val)"
         />
       </ControlItem>
       <ControlItem
@@ -64,8 +64,8 @@
       >
         <NSwitch
           size="small"
-          :value="coreFunctionality.settings.autoRouteOnGameStart"
-          @update:value="(val) => setAutoRouteOnGameStart(val)"
+          :value="cf.settings.autoRouteOnGameStart"
+          @update:value="(val) => cfm.setAutoRouteOnGameStart(val)"
         />
       </ControlItem>
       <ControlItem
@@ -79,22 +79,22 @@
           size="tiny"
           :min="2"
           :max="200"
-          :value="coreFunctionality.settings.matchHistoryLoadCount"
-          @update:value="(val) => setMatchHistoryLoadCount(val || 20)"
+          :value="cf.settings.matchHistoryLoadCount"
+          @update:value="(val) => cfm.setMatchHistoryLoadCount(val || 20)"
         />
       </ControlItem>
       <ControlItem
         class="control-item-margin"
         label="预组队判定阈值"
-        :label-description="`目标玩家群体出现在同一阵营超过 ${coreFunctionality.settings.preMadeTeamThreshold} 次时，则判定为预组队。不能超过预组队分析样本局数`"
+        :label-description="`目标玩家群体出现在同一阵营超过 ${cf.settings.preMadeTeamThreshold} 次时，则判定为预组队。不能超过预组队分析样本局数`"
         :label-width="320"
       >
         <NInputNumber
           style="width: 100px"
           size="tiny"
           :min="2"
-          :value="coreFunctionality.settings.preMadeTeamThreshold"
-          @update:value="(val) => setPreMadeThreshold(val || 3)"
+          :value="cf.settings.preMadeTeamThreshold"
+          @update:value="(val) => cfm.setPreMadeTeamThreshold(val || 3)"
         />
       </ControlItem>
       <ControlItem
@@ -107,8 +107,8 @@
           style="width: 100px"
           size="tiny"
           :min="2"
-          :value="coreFunctionality.settings.teamAnalysisPreloadCount"
-          @update:value="(val) => setTeamAnalysisPreloadCount(val || 4)"
+          :value="cf.settings.teamAnalysisPreloadCount"
+          @update:value="(val) => cfm.setTeamAnalysisPreloadCount(val || 4)"
         />
       </ControlItem>
       <ControlItem
@@ -121,8 +121,8 @@
           style="width: 100px"
           size="tiny"
           :min="1"
-          :value="coreFunctionality.settings.playerAnalysisFetchConcurrency"
-          @update:value="(val) => setPlayerAnalysisFetchConcurrency(val || 10)"
+          :value="cf.settings.playerAnalysisFetchConcurrency"
+          @update:value="(val) => cfm.setPlayerAnalysisFetchConcurrency(val || 10)"
         />
       </ControlItem>
     </NCard>
@@ -206,7 +206,7 @@
         :disabled="!app.isAdministrator"
         class="control-item-margin"
         label="启用 KDA 发送"
-        :label-description="`在对局中或英雄选择中，使用 PageUp 发送己方队伍数据，使用 PageDown 发送敌方队伍 KDA 数据。英雄选择中通过聊天室发送。游戏内发送基于模拟键盘实现，因此在发送前，确保游戏内聊天框是关闭状态。游戏内发送途中，按住 Shift 可将信息发送到全局。统计对局的数量为 ${coreFunctionality.settings.matchHistoryLoadCount} 场，等同于对局战绩分析数量`"
+        :label-description="`在对局中或英雄选择中，使用 PageUp 发送己方队伍数据，使用 PageDown 发送敌方队伍 KDA 数据。英雄选择中通过聊天室发送。游戏内发送基于模拟键盘实现，因此在发送前，确保游戏内聊天框是关闭状态。游戏内发送途中，按住 Shift 可将信息发送到全局。统计对局的数量为 ${cf.settings.matchHistoryLoadCount} 场，等同于对局战绩分析数量`"
         :label-width="320"
       >
         <template #labelDescription="{ disabled }">
@@ -221,7 +221,7 @@
             ><br />
             <span style="font-style: italic"
               >KDA 分析局数和 <span style="font-weight: 700">对局战绩分析数量</span> 一致。({{
-                coreFunctionality.settings.matchHistoryLoadCount
+                cf.settings.matchHistoryLoadCount
               }}
               场)</span
             >
@@ -230,8 +230,8 @@
         <NSwitch
           :disabled="!app.isAdministrator"
           size="small"
-          :value="coreFunctionality.settings.sendKdaInGame"
-          @update:value="(val) => setSendKdaInGame(val)"
+          :value="cf.settings.sendKdaInGame"
+          @update:value="(val) => cfm.setSendKdaInGame(val)"
         />
       </ControlItem>
       <ControlItem
@@ -247,8 +247,8 @@
           size="tiny"
           :min="0"
           step="0.1"
-          :value="coreFunctionality.settings.sendKdaThreshold"
-          @update:value="(val) => setSendKdaThreshold(val || 0)"
+          :value="cf.settings.sendKdaThreshold"
+          @update:value="(val) => cfm.setSendKdaThreshold(val || 0)"
         />
       </ControlItem>
       <ControlItem
@@ -261,8 +261,8 @@
         <NSwitch
           :disabled="!app.isAdministrator"
           size="small"
-          :value="coreFunctionality.settings.sendKdaInGameWithPreMadeTeams"
-          @update:value="(val) => setSendKdaInGameWithPreMadeTeams(val)"
+          :value="cf.settings.sendKdaInGameWithPreMadeTeams"
+          @update:value="(val) => cfm.setSendKdaInGameWithPreMadeTeams(val)"
         />
       </ControlItem>
       <ControlItem
@@ -299,26 +299,14 @@ import {
 } from '@shared/renderer/modules/auxiliary-window'
 import { setShowSkinSelector, setZoomFactor } from '@shared/renderer/modules/auxiliary-window'
 import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
-import {
-  setAutoRouteOnGameStart,
-  setFetchAfterGame,
-  setFetchDetailedGame,
-  setMatchHistoryLoadCount,
-  setOngoingAnalysisEnabled,
-  setPlayerAnalysisFetchConcurrency,
-  setPreMadeThreshold,
-  setSendKdaInGame,
-  setSendKdaInGameWithPreMadeTeams,
-  setSendKdaThreshold,
-  setTeamAnalysisPreloadCount
-} from '@shared/renderer/modules/core-functionality'
+import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality-new'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { setEnableRespawnTimer } from '@shared/renderer/modules/respawn-timer'
 import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
 import { NButton, NCard, NFlex, NInput, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
-const respawnTimer = useRespawnTimerStore()
-const coreFunctionality = useCoreFunctionalityStore()
+const rt = useRespawnTimerStore()
+const cf = useCoreFunctionalityStore()
 const aux = useAuxiliaryWindowStore()
 const app = useAppStore()
 </script>

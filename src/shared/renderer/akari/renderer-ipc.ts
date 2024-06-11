@@ -3,6 +3,9 @@ import { IpcRendererEvent } from 'electron'
 
 declare var window: any
 
+/**
+ * IPC 工具类
+ */
 export class LeagueAkariRendererIpc {
   static call<T = any>(resName: string, ...args: any[]) {
     return LeagueAkariRendererIpc._doCall<T>(`call:${resName}`, ...args)

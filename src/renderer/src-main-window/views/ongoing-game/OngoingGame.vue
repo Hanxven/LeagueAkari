@@ -109,7 +109,7 @@
               v-for="player of team"
               :key="player.puuid"
               :checked="cf.sendList[player.puuid]"
-              @update:checked="(val) => setInGameKdaSendPlayer(player.puuid, val)"
+              @update:checked="(val) => cfm.setSendPlayer(player.puuid, val)"
               >{{
                 summonerName(
                   player.summoner?.gameName || player.summoner?.displayName,
@@ -142,7 +142,7 @@ import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { useAppStore } from '@shared/renderer/modules/app/store'
-import { setInGameKdaSendPlayer } from '@shared/renderer/modules/core-functionality'
+import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality-new'
 import {
   OngoingPlayer,
   useCoreFunctionalityStore

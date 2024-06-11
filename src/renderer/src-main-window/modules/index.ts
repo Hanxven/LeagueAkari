@@ -4,10 +4,10 @@ import { autoGameflowRendererModule } from '@shared/renderer/modules/auto-gamefl
 import { setupAutoReply } from '@shared/renderer/modules/auto-reply'
 import { setupAutoSelect } from '@shared/renderer/modules/auto-select'
 import { setupAuxiliaryWindow } from '@shared/renderer/modules/auxiliary-window'
-import { setupCoreFunctionality } from '@shared/renderer/modules/core-functionality'
+import { coreFunctionalityRendererModule } from '@shared/renderer/modules/core-functionality-new'
 import { setupCustomKeyboardSequence } from '@shared/renderer/modules/custom-keyboard-sequence'
 import { setupGameData } from '@shared/renderer/modules/game-data'
-import { lcuRendererModule } from '@shared/renderer/modules/lcu-state-sync-new'
+import { lcuSyncModule } from '@shared/renderer/modules/lcu-state-sync-new'
 import { setupMainWindow } from '@shared/renderer/modules/main-window'
 import { setupRespawnTimer } from '@shared/renderer/modules/respawn-timer'
 
@@ -27,7 +27,7 @@ export async function setupLeagueAkariFeatures() {
 
   await setupGameData()
 
-  await setupCoreFunctionality()
+  // await setupCoreFunctionality()
 
   await setupMatchHistoryTabs()
 
@@ -45,7 +45,8 @@ export async function setupLeagueAkariFeatures() {
 const manager = new LeagueAkariRendererModuleManager()
 
 export async function setupLeagueAkariRendererModules() {
-  await manager.register(lcuRendererModule)
+  await manager.register(lcuSyncModule)
   await manager.register(autoGameflowRendererModule)
+  await manager.register(coreFunctionalityRendererModule)
   manager.setup()
 }

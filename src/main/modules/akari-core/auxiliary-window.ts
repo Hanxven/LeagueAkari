@@ -1,5 +1,5 @@
 import { is } from '@electron-toolkit/utils'
-import { gameflow } from '@main/modules/lcu-state-sync/gameflow'
+import { lcuSyncModule as lcu } from '@main/modules/lcu-state-sync-new'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { BrowserWindow, Rectangle, screen, shell } from 'electron'
@@ -390,7 +390,7 @@ export async function initAuxiliaryWindow() {
   )
 
   const showPhase = computed(() => {
-    switch (gameflow.phase) {
+    switch (lcu.gameflow.phase) {
       case 'Matchmaking':
       case 'ReadyCheck':
       case 'Lobby':

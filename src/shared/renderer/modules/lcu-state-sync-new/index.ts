@@ -30,7 +30,6 @@ export class LcuSyncRendererModule extends StateSyncModule {
 
   private _syncLcuGameflow() {
     const gameflow = useGameflowStore()
-    console.log('simple!')
     this.simpleSync('lcu/gameflow/phase', (s) => (gameflow.phase = s))
     this.simpleSync('lcu/gameflow/session', (s) => (gameflow.session = s))
   }
@@ -110,4 +109,4 @@ export class LcuSyncRendererModule extends StateSyncModule {
   }
 }
 
-export const lcuRendererModule = new LcuSyncRendererModule()
+export const lcuSyncModule = new LcuSyncRendererModule()

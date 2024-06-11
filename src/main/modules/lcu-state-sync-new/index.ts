@@ -234,7 +234,7 @@ export class LcuSyncModule extends MobxBasedModule {
       { fireImmediately: true }
     )
 
-    lcuEventBus.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (event) => {
+    const d = lcuEventBus.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (event) => {
       if (event.eventType === 'Delete') {
         this.honor.setBallot(null)
         return
@@ -242,6 +242,8 @@ export class LcuSyncModule extends MobxBasedModule {
 
       this.honor.setBallot(event.data)
     })
+
+    this._disposers.add(d)
   }
 
   private _syncLcuChampSelect() {
@@ -387,7 +389,7 @@ export class LcuSyncModule extends MobxBasedModule {
       { fireImmediately: true }
     )
 
-    lcuEventBus.on('/lol-champ-select/v1/session', (event) => {
+    const d1 = lcuEventBus.on('/lol-champ-select/v1/session', (event) => {
       if (event.eventType === 'Delete') {
         this.champSelect.setSession(null)
         this.champSelect.setSelfSummoner(null)
@@ -396,36 +398,54 @@ export class LcuSyncModule extends MobxBasedModule {
       }
     })
 
-    lcuEventBus.on<LcuEvent<number[]>>('/lol-champ-select/v1/pickable-champion-ids', (event) => {
-      if (event.eventType === 'Delete') {
-        this.champSelect.setCurrentPickableChampionArray([])
-      } else {
-        this.champSelect.setCurrentPickableChampionArray(event.data)
+    const d2 = lcuEventBus.on<LcuEvent<number[]>>(
+      '/lol-champ-select/v1/pickable-champion-ids',
+      (event) => {
+        if (event.eventType === 'Delete') {
+          this.champSelect.setCurrentPickableChampionArray([])
+        } else {
+          this.champSelect.setCurrentPickableChampionArray(event.data)
+        }
       }
-    })
+    )
 
-    lcuEventBus.on<LcuEvent<number[]>>('/lol-champ-select/v1/bannable-champion-ids', (event) => {
-      if (event.eventType === 'Delete') {
-        this.champSelect.setCurrentBannableChampionArray([])
-      } else {
-        this.champSelect.setCurrentBannableChampionArray(event.data)
+    const d3 = lcuEventBus.on<LcuEvent<number[]>>(
+      '/lol-champ-select/v1/bannable-champion-ids',
+      (event) => {
+        if (event.eventType === 'Delete') {
+          this.champSelect.setCurrentBannableChampionArray([])
+        } else {
+          this.champSelect.setCurrentBannableChampionArray(event.data)
+        }
       }
-    })
+    )
 
-    lcuEventBus.on<LcuEvent<ChampSelectSummoner>>('/lol-champ-select/v1/summoners/*', (event) => {
-      if (event.data && event.data.isSelf) {
-        isCellSummonerUpdated = true
-        this.champSelect.setSelfSummoner(event.data)
+    const d4 = lcuEventBus.on<LcuEvent<ChampSelectSummoner>>(
+      '/lol-champ-select/v1/summoners/*',
+      (event) => {
+        if (event.data && event.data.isSelf) {
+          isCellSummonerUpdated = true
+          this.champSelect.setSelfSummoner(event.data)
+        }
       }
-    })
+    )
 
-    lcuEventBus.on<LcuEvent<number>>('/lol-champ-select/v1/current-champion', (event) => {
-      if (event.eventType === 'Delete') {
-        this.champSelect.setCurrentChampion(null)
+    const d5 = lcuEventBus.on<LcuEvent<number>>(
+      '/lol-champ-select/v1/current-champion',
+      (event) => {
+        if (event.eventType === 'Delete') {
+          this.champSelect.setCurrentChampion(null)
+        }
+
+        this.champSelect.setCurrentChampion(event.data)
       }
+    )
 
-      this.champSelect.setCurrentChampion(event.data)
-    })
+    this._disposers.add(d1)
+    this._disposers.add(d2)
+    this._disposers.add(d3)
+    this._disposers.add(d4)
+    this._disposers.add(d5)
   }
 
   private _syncLcuChat() {
@@ -437,69 +457,72 @@ export class LcuSyncModule extends MobxBasedModule {
     this.simpleSync('lcu/chat/conversations/post-game', () => this.chat.conversations.postGame)
     this.simpleSync('lcu/chat/conversations/custom-game', () => this.chat.conversations.customGame)
 
-    lcuEventBus.on<LcuEvent<Conversation>>('/lol-chat/v1/conversations/:id', (event, { id }) => {
-      if (event.eventType === 'Delete') {
-        const decodedId = decodeURIComponent(id) // 需要解码
-        if (this.chat.conversations.championSelect?.id === decodedId) {
-          runInAction(() => {
-            this.chat.setConversationChampSelect(null)
-            this.chat.setParticipantsChampSelect(null)
-          })
-        } else if (this.chat.conversations.postGame?.id === decodedId) {
-          runInAction(() => {
-            this.chat.setConversationPostGame(null)
-            this.chat.setParticipantsPostGame(null)
-          })
-        } else if (this.chat.conversations.customGame?.id === decodedId) {
-          runInAction(() => {
-            this.chat.setConversationCustomGame(null)
-            this.chat.setParticipantsPostGame(null)
-          })
+    const d1 = lcuEventBus.on<LcuEvent<Conversation>>(
+      '/lol-chat/v1/conversations/:id',
+      (event, { id }) => {
+        if (event.eventType === 'Delete') {
+          const decodedId = decodeURIComponent(id) // 需要解码
+          if (this.chat.conversations.championSelect?.id === decodedId) {
+            runInAction(() => {
+              this.chat.setConversationChampSelect(null)
+              this.chat.setParticipantsChampSelect(null)
+            })
+          } else if (this.chat.conversations.postGame?.id === decodedId) {
+            runInAction(() => {
+              this.chat.setConversationPostGame(null)
+              this.chat.setParticipantsPostGame(null)
+            })
+          } else if (this.chat.conversations.customGame?.id === decodedId) {
+            runInAction(() => {
+              this.chat.setConversationCustomGame(null)
+              this.chat.setParticipantsPostGame(null)
+            })
+          }
+          return
         }
-        return
-      }
 
-      switch (event.data.type) {
-        case 'championSelect':
-          if (!event.data.id.includes('lol-champ-select')) {
-            return
-          }
+        switch (event.data.type) {
+          case 'championSelect':
+            if (!event.data.id.includes('lol-champ-select')) {
+              return
+            }
 
-          if (event.eventType === 'Create') {
-            runInAction(() => {
+            if (event.eventType === 'Create') {
+              runInAction(() => {
+                this.chat.setConversationChampSelect(event.data)
+                this.chat.setParticipantsChampSelect([])
+              })
+            } else if (event.eventType === 'Update') {
               this.chat.setConversationChampSelect(event.data)
-              this.chat.setParticipantsChampSelect([])
-            })
-          } else if (event.eventType === 'Update') {
-            this.chat.setConversationChampSelect(event.data)
-          }
-          break
-        case 'postGame':
-          if (event.eventType === 'Create') {
-            runInAction(() => {
+            }
+            break
+          case 'postGame':
+            if (event.eventType === 'Create') {
+              runInAction(() => {
+                this.chat.setConversationPostGame(event.data)
+                this.chat.setParticipantsPostGame([])
+              })
+            } else if (event.eventType === 'Update') {
               this.chat.setConversationPostGame(event.data)
-              this.chat.setParticipantsPostGame([])
-            })
-          } else if (event.eventType === 'Update') {
-            this.chat.setConversationPostGame(event.data)
-          }
-          break
+            }
+            break
 
-        case 'customGame':
-          if (event.eventType === 'Create') {
-            runInAction(() => {
+          case 'customGame':
+            if (event.eventType === 'Create') {
+              runInAction(() => {
+                this.chat.setConversationCustomGame(event.data)
+                this.chat.setParticipantsCustomGame([])
+              })
+            } else if (event.eventType === 'Update') {
               this.chat.setConversationCustomGame(event.data)
-              this.chat.setParticipantsCustomGame([])
-            })
-          } else if (event.eventType === 'Update') {
-            this.chat.setConversationCustomGame(event.data)
-          }
-          break
+            }
+            break
+        }
       }
-    })
+    )
 
     // 监测用户进入房间
-    lcuEventBus.on(
+    const d2 = lcuEventBus.on(
       '/lol-chat/v1/conversations/:conversationId/messages/:messageId',
       (event, param) => {
         if (event.data && event.data.type === 'system' && event.data.body === 'joined_room') {
@@ -536,7 +559,7 @@ export class LcuSyncModule extends MobxBasedModule {
       }
     )
 
-    lcuEventBus.on('/lol-chat/v1/me', (event) => {
+    const d3 = lcuEventBus.on('/lol-chat/v1/me', (event) => {
       if (event.eventType === 'Update' || event.eventType === 'Create') {
         this.chat.setMe(event.data)
         return
@@ -615,19 +638,26 @@ export class LcuSyncModule extends MobxBasedModule {
       },
       { fireImmediately: true }
     )
+
+    this._disposers.add(d1)
+    this._disposers.add(d2)
+    this._disposers.add(d3)
   }
 
   private _syncLcuMatchmaking() {
     this.simpleSync('lcu/matchmaking/ready-check', () => this.matchmaking.readyCheck)
     this.simpleSync('lcu/matchmaking/search', () => this.matchmaking.search)
 
-    lcuEventBus.on('/lol-matchmaking/v1/ready-check', (event) => {
+    const d1 = lcuEventBus.on('/lol-matchmaking/v1/ready-check', (event) => {
       this.matchmaking.setReadyCheck(event.data)
     })
 
-    lcuEventBus.on('/lol-matchmaking/v1/search', (event) => {
+    const d2 = lcuEventBus.on('/lol-matchmaking/v1/search', (event) => {
       this.matchmaking.setSearch(event.data)
     })
+
+    this._disposers.add(d1)
+    this._disposers.add(d2)
   }
 
   private _syncGameflow() {
@@ -663,19 +693,22 @@ export class LcuSyncModule extends MobxBasedModule {
       { fireImmediately: true }
     )
 
-    lcuEventBus.on('/lol-gameflow/v1/gameflow-phase', (event) => {
+    const d1 = lcuEventBus.on('/lol-gameflow/v1/gameflow-phase', (event) => {
       this.gameflow.setPhase(event.data)
     })
 
-    lcuEventBus.on('/lol-gameflow/v1/session', (event) => {
+    const d2 = lcuEventBus.on('/lol-gameflow/v1/session', (event) => {
       this.gameflow.setSession(event.data)
     })
+
+    this._disposers.add(d1)
+    this._disposers.add(d2)
   }
 
   private _syncLcuLobby() {
     this.simpleSync('lcu/lobby/lobby', () => this.lobby.lobby)
 
-    lcuEventBus.on('/lol-lobby/v2/lobby', (event) => {
+    const d1 = lcuEventBus.on('/lol-lobby/v2/lobby', (event) => {
       this.lobby.setLobby(event.data)
     })
 
@@ -701,12 +734,14 @@ export class LcuSyncModule extends MobxBasedModule {
       },
       { fireImmediately: true }
     )
+
+    this._disposers.add(d1)
   }
 
   private _syncLcuLogin() {
     this.simpleSync('lcu/login/login-queue-state', () => this.login.loginQueueState)
 
-    lcuEventBus.on('/lol-login/v1/login-queue-state', (event) => {
+    const d1 = lcuEventBus.on('/lol-login/v1/login-queue-state', (event) => {
       this.login.setLoginQueueState(event.data)
     })
 
@@ -742,6 +777,8 @@ export class LcuSyncModule extends MobxBasedModule {
       },
       { fireImmediately: true }
     )
+
+    this._disposers.add(d1)
   }
 
   private _syncLcuSummoner() {
@@ -794,10 +831,12 @@ export class LcuSyncModule extends MobxBasedModule {
       { equals: comparer.structural, fireImmediately: true }
     )
 
-    lcuEventBus.on('/lol-summoner/v1/current-summoner', (event) => {
+    const d1 = lcuEventBus.on('/lol-summoner/v1/current-summoner', (event) => {
       this.summoner.setMe(event.data)
     })
+
+    this._disposers.add(d1)
   }
 }
 
-export const lcuModule = new LcuSyncModule()
+export const lcuSyncModule = new LcuSyncModule()

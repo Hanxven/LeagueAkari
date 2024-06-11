@@ -17,12 +17,19 @@ export class LeagueAkariModule {
     return this._manager
   }
 
-  constructor(private _moduleId: string) {}
+  get dependencies() {
+    return this._deps
+  }
+
+  constructor(
+    private _moduleId: string,
+    private _deps: string[] = []
+  ) {}
 
   /**
    * 参方法由 Manager 管理，不应手动调用
    */
-  setManager(manager: LeagueAkariModuleManager | null) {
+  _setManager(manager: LeagueAkariModuleManager | null) {
     this._manager = manager
   }
 
@@ -50,7 +57,7 @@ export class LeagueAkariModule {
    * 在被 manager 注册时触发
    */
   onRegister(manager: LeagueAkariModuleManager): void | Promise<void> {
-    this.setManager(manager)
+    this._setManager(manager)
   }
 
   /**
@@ -58,6 +65,6 @@ export class LeagueAkariModule {
    */
   onUnregister(): void | Promise<void> {
     this._methodMap.clear()
-    this.setManager(null)
+    this._setManager(null)
   }
 }

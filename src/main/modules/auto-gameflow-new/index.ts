@@ -13,11 +13,11 @@ import { MobxBasedModule } from '@shared/akari/mobx-based-module'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
 
-import { lcuModule } from '../lcu-state-sync-new'
+import { lcuSyncModule as lcu } from '../lcu-state-sync-new'
 import { AutoGameflowState } from './state'
 
 /**
- * 实验中的新模块系统
+ * 自动游戏流相关功能模块
  */
 export class AutoGameflowModule extends MobxBasedModule {
   public state = new AutoGameflowState()
@@ -31,6 +31,7 @@ export class AutoGameflowModule extends MobxBasedModule {
   private _playAgainTask = new TimeoutTask(this._playAgainFn)
 
   static HONOR_CATEGORY = ['COOL', 'SHOTCALLER', 'HEART'] as const
+
   static PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT = 3250
   static PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT = 10000
   static PLAY_AGAIN_BUFFER_TIMEOUT = 750
@@ -42,13 +43,14 @@ export class AutoGameflowModule extends MobxBasedModule {
   override async onRegister(manager: LeagueAkariModuleManager) {
     await super.onRegister(manager)
     this._setupSettingsStateSync()
-    this._setupModuleStateSync()
-    this._setupModuleMethodCall()
+    this._setupStateSync()
+    this._setupMethodCall()
     await this._loadSettings()
     this._handleAutoBallot()
     this._handleAutoAccept()
     this._handleAutoSearchMatch()
     this._handleAutoPlayAgain()
+    
     this._logger.info('初始化完成')
   }
 
@@ -87,7 +89,7 @@ export class AutoGameflowModule extends MobxBasedModule {
     )
   }
 
-  private _setupModuleStateSync() {
+  private _setupStateSync() {
     this.simpleSync('will-accept', () => this.state.willAccept)
     this.simpleSync('will-accept-at', () => this.state.willAcceptAt)
     this.simpleSync('will-search-match', () => this.state.willSearchMatch)
@@ -169,7 +171,7 @@ export class AutoGameflowModule extends MobxBasedModule {
     )
   }
 
-  private _setupModuleMethodCall() {
+  private _setupMethodCall() {
     this.onCall('set-setting/auto-honor-enabled', async (value) => {
       this.state.settings.setAutoHonorEnabled(value)
       await setSetting('auto-gameflow/auto-honor-enabled', value)
@@ -261,31 +263,31 @@ export class AutoGameflowModule extends MobxBasedModule {
   }
 
   private _sendAutoSearchMatchInfoInChat = async (cancel?: string) => {
-    if (lcuModule.chat.conversations.customGame && this.state.willSearchMatch) {
+    if (lcu.chat.conversations.customGame && this.state.willSearchMatch) {
       if (cancel === 'normal') {
         chatSend(
-          lcuModule.chat.conversations.customGame.id,
+          lcu.chat.conversations.customGame.id,
           `[League Akari] 自动匹配已取消`,
           'celebration'
         ).catch()
         return
       } else if (cancel === 'waiting-for-invitee') {
         chatSend(
-          lcuModule.chat.conversations.customGame.id,
+          lcu.chat.conversations.customGame.id,
           `[League Akari] 自动匹配已取消，等待被邀请者`,
           'celebration'
         ).catch()
         return
       } else if (cancel === 'not-the-leader') {
         chatSend(
-          lcuModule.chat.conversations.customGame.id,
+          lcu.chat.conversations.customGame.id,
           `[League Akari] 自动匹配已取消，当前不是房间房主`,
           'celebration'
         ).catch()
         return
       } else if (cancel === 'waiting-for-penalty-time') {
         chatSend(
-          lcuModule.chat.conversations.customGame.id,
+          lcu.chat.conversations.customGame.id,
           `[League Akari] 自动匹配已取消，等待秒退计时器`,
           'celebration'
         ).catch()
@@ -294,7 +296,7 @@ export class AutoGameflowModule extends MobxBasedModule {
 
       const time = (this.state.willSearchMatchAt - Date.now()) / 1e3
       chatSend(
-        lcuModule.chat.conversations.customGame.id,
+        lcu.chat.conversations.customGame.id,
         `[League Akari] 将在 ${Math.abs(time).toFixed()} 秒后自动匹配`,
         'celebration'
       ).catch()
@@ -338,7 +340,7 @@ export class AutoGameflowModule extends MobxBasedModule {
 
   private _handleAutoBallot() {
     this.autoDisposeReaction(
-      () => [lcuModule.honor.ballot, this.state.settings.autoHonorEnabled] as const,
+      () => [lcu.honor.ballot, this.state.settings.autoHonorEnabled] as const,
       async ([b, e]) => {
         if (b) {
           this._playAgainTask.cancel()
@@ -368,7 +370,7 @@ export class AutoGameflowModule extends MobxBasedModule {
                 await Promise.all(
                   lobbyMemberPuuids.map(async (p) => (await getSummonerByPuuid(p)).data)
                 )
-              ).filter((p) => p.summonerId !== lcuModule.summoner.me?.summonerId)
+              ).filter((p) => p.summonerId !== lcu.summoner.me?.summonerId)
 
               const honorableLobbyMembers = lobbyMemberSummoners.filter((p) =>
                 eligiblePlayerIds.has(p.summonerId)
@@ -459,16 +461,16 @@ export class AutoGameflowModule extends MobxBasedModule {
     )
 
     const simplifiedSearchState = computed(() => {
-      if (!lcuModule.matchmaking.search) {
+      if (!lcu.matchmaking.search) {
         return null
       }
 
       return {
-        timeInQueue: lcuModule.matchmaking.search.timeInQueue,
-        estimatedQueueTime: lcuModule.matchmaking.search.estimatedQueueTime,
-        searchState: lcuModule.matchmaking.search.searchState,
-        lowPriorityData: lcuModule.matchmaking.search.lowPriorityData,
-        isCurrentlyInQueue: lcuModule.matchmaking.search.isCurrentlyInQueue
+        timeInQueue: lcu.matchmaking.search.timeInQueue,
+        estimatedQueueTime: lcu.matchmaking.search.estimatedQueueTime,
+        searchState: lcu.matchmaking.search.searchState,
+        lowPriorityData: lcu.matchmaking.search.lowPriorityData,
+        isCurrentlyInQueue: lcu.matchmaking.search.isCurrentlyInQueue
       }
     })
 
@@ -522,7 +524,7 @@ export class AutoGameflowModule extends MobxBasedModule {
 
   private _handleAutoAccept() {
     this.autoDisposeReaction(
-      () => lcuModule.gameflow.phase,
+      () => lcu.gameflow.phase,
       (phase) => {
         if (!this.state.settings.autoAcceptEnabled) {
           return
@@ -575,7 +577,7 @@ export class AutoGameflowModule extends MobxBasedModule {
 
   private _handleAutoPlayAgain() {
     this.autoDisposeReaction(
-      () => [lcuModule.gameflow.phase, this.state.settings.playAgainEnabled] as const,
+      () => [lcu.gameflow.phase, this.state.settings.playAgainEnabled] as const,
       async ([phase, enabled]) => {
         if (
           !enabled ||

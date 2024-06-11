@@ -34,6 +34,7 @@
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
 import { useAppStore } from '@shared/renderer/modules/app/store'
+import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality-new'
 import { SavedPlayerInfo } from '@shared/renderer/modules/core-functionality/store'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { laNotification } from '@shared/renderer/notification'
@@ -104,7 +105,7 @@ const handleSaveTag = async () => {
   }
 
   try {
-    await mainCall('core-functionality/saved-player/save', {
+    await cfm.saveSavedPlayer({
       selfPuuid: summoner.me.puuid,
       puuid: props.puuid,
       region: app.lcuAuth.region,

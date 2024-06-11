@@ -18,7 +18,7 @@ export class LeagueAkariRendererModule {
   /**
    * 参方法由 Manager 管理，不应手动调用
    */
-  setManager(manager: LeagueAkariRendererModuleManager | null) {
+  _setManager(manager: LeagueAkariRendererModuleManager | null) {
     this._manager = manager
   }
 
@@ -50,7 +50,7 @@ export class LeagueAkariRendererModule {
    * 在被 manager 注册时触发
    */
   onRegister(manager: LeagueAkariRendererModuleManager): void | Promise<void> {
-    this.setManager(manager)
+    this._setManager(manager)
   }
 
   /**
@@ -58,6 +58,6 @@ export class LeagueAkariRendererModule {
    */
   onUnregister(): void | Promise<void> {
     this._eventMap.clear()
-    this.setManager(null)
+    this._setManager(null)
   }
 }

@@ -23,7 +23,7 @@ import dayjs from 'dayjs'
 import { comparer, computed, observable, reaction, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
 
-import { lcuModule as lcu } from '../lcu-state-sync-new'
+import { lcuSyncModule as lcu } from '../lcu-state-sync-new'
 import { CoreFunctionalityState } from './state'
 
 export class CoreFunctionalityModule extends MobxBasedModule {
@@ -59,8 +59,8 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     await super.onRegister(manager)
 
     this._setupSettingsStateSync()
-    this._setupModuleStateSync()
-    this._setupModuleMethodCall()
+    this._setupStateSync()
+    this._setupMethodCall()
     await this._loadSettings()
 
     this._playerAnalysisFetchLimiter.concurrency =
@@ -613,7 +613,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
       runInAction(() => (player.summoner = summonerInfo.data))
 
-      this.sendEvent('update/ongoing-player-summoner', puuid, summonerInfo.data)
+      this.sendEvent('update/ongoing-player/summoner', puuid, summonerInfo.data)
 
       const auth = lcuConnectionState.auth
       const me = lcu.summoner.me
@@ -841,21 +841,21 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     )
   }
 
-  private _setupModuleStateSync() {
+  private _setupStateSync() {
     this.simpleSync('is-in-endgame-phase', () => this.state.isInEndgamePhase)
     this.simpleSync('ongoing-game-info', () => this.state.ongoingGameInfo)
     this.simpleSync('query-state', () => this.state.queryState)
     this.simpleSync('ongoing-champion-selections', () => this.state.ongoingChampionSelections)
     this.simpleSync('ongoing-pre-made-teams', () => this.state.ongoingPreMadeTeams)
     this.simpleSync('ongoing-teams', () => this.state.ongoingTeams)
-    this.simpleSync('send-list', () => this.state.sendList)
+    this.simpleSync('send-list', () => toJS(this.state.sendList))
   }
 
-  private _setupModuleMethodCall() {
-    this.onCall('get-ongoing-players', (_) => {
+  private _setupMethodCall() {
+    this.onCall('get/ongoing-players', (_) => {
       return toJS(this.state.ongoingPlayers)
     })
-    this.onCall('update-send-list', (puuid: string, send: boolean) => {
+    this.onCall('update/send-list', (puuid: string, send: boolean) => {
       if (this.state.sendList[puuid] !== undefined) {
         runInAction(() => (this.state.sendList[puuid] = send))
       }
@@ -926,12 +926,12 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       await setSetting('core-functionality/send-kda-in-game-with-pre-made-teams', enabled)
     })
 
-    this.onCall('set-setting/ongoing-analysis-enabled', async (_, enabled) => {
+    this.onCall('set-setting/ongoing-analysis-enabled', async (enabled) => {
       this.state.settings.setOngoingAnalysisEnabled(enabled)
       await setSetting('core-functionality/ongoing-analysis-enabled', enabled)
     })
 
-    this.onCall('set-setting/send-kda-threshold', async (_, threshold) => {
+    this.onCall('set-setting/send-kda-threshold', async (threshold) => {
       if (threshold < 0) {
         threshold = 0
       }
@@ -951,7 +951,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       await setSetting('core-functionality/player-analysis-fetch-concurrency', limit)
     })
 
-    this.onCall('save-saved-player', async (_, player) => {
+    this.onCall('save/saved-player', async (player) => {
       const r = await saveSavedPlayer(player)
 
       if (this.state.ongoingPlayers) {

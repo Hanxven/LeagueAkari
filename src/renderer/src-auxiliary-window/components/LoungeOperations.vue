@@ -3,41 +3,38 @@
     <NFlex align="center" class="control-item">
       <span class="label" style="flex: 1"
         >自动接受 ({{
-          isCustomGame ? '模式不适用' : formatDelayText(ag.settings.autoAcceptDelaySeconds)
+          isCustomGame ? '模式不适用' : formatDelayText(agf.settings.autoAcceptDelaySeconds)
         }})</span
       >
       <NSwitch
         size="small"
-        :value="ag.settings.autoAcceptEnabled"
-        @update:value="(val) => setAutoAcceptEnabled(val)"
+        :value="agf.settings.autoAcceptEnabled"
+        @update:value="(val) => agfm.setAutoAcceptEnabled(val)"
       />
     </NFlex>
     <NFlex align="center" class="control-item">
       <span class="label" style="flex: 1"
         >自动匹配 ({{
-          isCustomGame ? '模式不适用' : formatDelayText(ag.settings.autoSearchMatchDelaySeconds)
+          isCustomGame ? '模式不适用' : formatDelayText(agf.settings.autoSearchMatchDelaySeconds)
         }})</span
       >
       <NSwitch
         size="small"
-        :value="ag.settings.autoSearchMatchEnabled"
-        @update:value="(val) => setAutoSearchMatchEnabled(val)"
+        :value="agf.settings.autoSearchMatchEnabled"
+        @update:value="(val) => agfm.setAutoSearchMatchEnabled(val)"
       />
     </NFlex>
   </NCard>
 </template>
 
 <script setup lang="ts">
-import {
-  setAutoAcceptEnabled,
-  setAutoSearchMatchEnabled
-} from '@shared/renderer/modules/auto-gameflow'
+import { autoGameflowRendererModule as agfm } from '@shared/renderer/modules/auto-gameflow-new'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { NCard, NFlex, NSwitch } from 'naive-ui'
 import { computed } from 'vue'
 
-const ag = useAutoGameflowStore()
+const agf = useAutoGameflowStore()
 const gameflow = useGameflowStore()
 
 const isCustomGame = computed(() => {
