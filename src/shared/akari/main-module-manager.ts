@@ -52,9 +52,9 @@ export class LeagueAkariModuleManager {
     this._modules.delete(moduleId)
   }
 
-  getModule(moduleId: string) {
+  getModule<T = LeagueAkariModule>(moduleId: string) {
     if (this._modules.has(moduleId)) {
-      return this._modules.get(moduleId)!.module
+      return this._modules.get(moduleId)!.module as T
     }
 
     return null

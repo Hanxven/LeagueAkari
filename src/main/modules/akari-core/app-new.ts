@@ -17,7 +17,8 @@ import { makeAutoObservable, observable, runInAction } from 'mobx'
 import { mkdirSync, rmSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { gt, lt } from 'semver'
-import { Logger, createLogger, format, transports } from 'winston'
+import { LeveledLogMethod, Logger, createLogger, format, transports } from 'winston'
+import winston from 'winston/lib/winston/config'
 
 import toolkit from '../native/laToolkitWin32x64.node'
 import { mwNotification } from './main-window'
@@ -112,6 +113,13 @@ export class AppState {
   }
 }
 
+export type AppLogger = {
+  info: (message: any) => Logger
+  warn: (message: any) => Logger
+  error: (message: any) => Logger
+  debug: (message: any) => Logger
+}
+
 export class AppModule extends MobxBasedModule {
   public state = new AppState()
 
@@ -131,7 +139,7 @@ export class AppModule extends MobxBasedModule {
   /**
    * 创建一个日志工具
    */
-  createLogger(domain: string) {
+  createLogger(domain: string): AppLogger {
     const getLogger = () => {
       if (!this._winstonLogger) {
         throw new Error('logger is not initialized')

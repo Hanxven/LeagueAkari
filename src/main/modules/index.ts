@@ -1,10 +1,10 @@
 import { LeagueAkariModuleManager } from '@shared/akari/main-module-manager'
 
+import { appModule } from './akari-core/app-new'
 import { autoGameflowModule } from './auto-gameflow-new'
 import { setupAutoReply } from './auto-reply'
 import { setupAutoSelect } from './auto-select'
 import { coreFunctionalityModule } from './core-functionality-new'
-import { appModule } from './core/app-new'
 import { setupCustomKeyboardSequence } from './custom-keyboard-sequence'
 import { setupDebug } from './debug'
 import { setupExternalDataSource } from './external-data-source'
@@ -31,7 +31,7 @@ export async function setupLeagueAkariFeatures() {
   await setupExternalDataSource()
 }
 
-const manager = new LeagueAkariModuleManager()
+export const manager = new LeagueAkariModuleManager()
 
 export async function setupLeagueAkariModules() {
   await manager.register(appModule)

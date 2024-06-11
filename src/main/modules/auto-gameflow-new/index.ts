@@ -1,6 +1,3 @@
-import { lcuEventBus } from '@main/core-modules/lcu-connection'
-import { createLogger } from '@main/core-modules/log'
-import { mwNotification } from '@main/core-modules/main-window'
 import { chatSend } from '@main/http-api/chat'
 import { honor } from '@main/http-api/honor-v2'
 import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
@@ -13,6 +10,9 @@ import { MobxBasedModule } from '@shared/akari/mobx-based-module'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
 
+import { lcuEventBus } from '../akari-core/lcu-connection'
+import { createLogger } from '../akari-core/log'
+import { mwNotification } from '../akari-core/main-window'
 import { lcuSyncModule as lcu } from '../lcu-state-sync-new'
 import { AutoGameflowState } from './state'
 
@@ -50,7 +50,7 @@ export class AutoGameflowModule extends MobxBasedModule {
     this._handleAutoAccept()
     this._handleAutoSearchMatch()
     this._handleAutoPlayAgain()
-    
+
     this._logger.info('初始化完成')
   }
 

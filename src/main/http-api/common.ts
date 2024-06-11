@@ -1,15 +1,16 @@
+import { manager } from '@main/modules'
+import { LcuConnectionModule } from '@main/modules/akari-core/lcu-connection-new'
 import { logger } from '@main/modules/lcu-state-sync/common'
 import { formatError } from '@shared/utils/errors'
 import { AxiosRequestConfig, isAxiosError } from 'axios'
-
-import { getHttpInstance } from '../core-modules/lcu-connection'
 
 /*
  * request with retries
  */
 export async function request<T = any, D = any>(config: AxiosRequestConfig<D>, maxRetries = 3) {
-  const axiosInstance = getHttpInstance()
-  if (!axiosInstance) {
+  const lcm = manager.getModule<LcuConnectionModule>('lcu-connection')
+
+  if (!lcm || !lcm.lcuHttp) {
     throw new Error('LCU disconnected')
   }
 
@@ -18,7 +19,7 @@ export async function request<T = any, D = any>(config: AxiosRequestConfig<D>, m
 
   while (true) {
     try {
-      const res = await axiosInstance<T>(config)
+      const res = await lcm.lcuHttp<T>(config)
       return res
     } catch (error) {
       lastError = error

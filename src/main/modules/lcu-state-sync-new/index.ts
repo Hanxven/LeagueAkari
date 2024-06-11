@@ -1,6 +1,3 @@
-import { lcuConnectionState, lcuEventBus } from '@main/core-modules/lcu-connection'
-import { createLogger } from '@main/core-modules/log'
-import { mwNotification } from '@main/core-modules/main-window'
 import {
   getBannableChampIds,
   getChampSelectSession,
@@ -34,6 +31,9 @@ import { isAxiosError } from 'axios'
 import { comparer, runInAction } from 'mobx'
 import PQueue from 'p-queue'
 
+import { AppLogger, AppModule } from '../akari-core/app-new'
+import { LcuConnectionModule } from '../akari-core/lcu-connection-new'
+import { mwNotification } from '../akari-core/main-window'
 import { ChampSelectState } from './champ-select'
 import { ChatState } from './chat'
 import { GameDataState } from './game-data'
@@ -57,18 +57,25 @@ export class LcuSyncModule extends MobxBasedModule {
 
   static SUMMONER_FETCH_MAX_RETRIES = 114514
 
-  private _logger = createLogger('lcu-state-sync')
+  private _logger!: AppLogger
+  private _lcuConnectionModule!: LcuConnectionModule
 
   private _gameDataLimiter = new PQueue({
     concurrency: 3
   })
 
   constructor() {
-    super('lcu-state-sync')
+    super('lcu-state-sync', ['app', 'lcu-connection'])
   }
 
   override async onRegister(manager: LeagueAkariModuleManager) {
     await super.onRegister(manager)
+
+    const am = manager.getModule<AppModule>('app')!
+    const lcm = manager.getModule<LcuConnectionModule>('lcu-connection')!
+
+    this._lcuConnectionModule = lcm
+    this._logger = am.createLogger('lcu-state-sync')
 
     this._syncGameflow()
     this._syncLcuChampSelect()
@@ -93,7 +100,7 @@ export class LcuSyncModule extends MobxBasedModule {
     this.simpleSync('lcu/game-data/summoner-spells', () => this.gameData.summonerSpells)
 
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       (state) => {
         if (state === 'connected') {
           this._gameDataLimiter.add(() => this._loadSummonerSpells())
@@ -213,7 +220,7 @@ export class LcuSyncModule extends MobxBasedModule {
     this.simpleSync('lcu/honor/ballot', () => this.honor.ballot)
 
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       async (state) => {
         if (state === 'connected') {
           try {
@@ -234,14 +241,17 @@ export class LcuSyncModule extends MobxBasedModule {
       { fireImmediately: true }
     )
 
-    const d = lcuEventBus.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (event) => {
-      if (event.eventType === 'Delete') {
-        this.honor.setBallot(null)
-        return
-      }
+    const d = this._lcuConnectionModule.lcuEventBus.on<LcuEvent<Ballot>>(
+      '/lol-honor-v2/v1/ballot',
+      async (event) => {
+        if (event.eventType === 'Delete') {
+          this.honor.setBallot(null)
+          return
+        }
 
-      this.honor.setBallot(event.data)
-    })
+        this.honor.setBallot(event.data)
+      }
+    )
 
     this._disposers.add(d)
   }
@@ -262,7 +272,7 @@ export class LcuSyncModule extends MobxBasedModule {
     this.simpleSync('lcu/champ-select/current-champion', () => this.champSelect.currentChampion)
 
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       async (state) => {
         if (state === 'connected') {
           try {
@@ -286,7 +296,7 @@ export class LcuSyncModule extends MobxBasedModule {
 
     // 处理中场进入的情况，主动获取可用英雄列表
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       async (state) => {
         if (state === 'connected') {
           try {
@@ -357,7 +367,7 @@ export class LcuSyncModule extends MobxBasedModule {
     )
 
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       (state) => {
         if (state !== 'connected') {
           this.champSelect.setSelfSummoner(null)
@@ -368,7 +378,7 @@ export class LcuSyncModule extends MobxBasedModule {
     )
 
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       async (state) => {
         if (state === 'connected') {
           try {
@@ -389,7 +399,7 @@ export class LcuSyncModule extends MobxBasedModule {
       { fireImmediately: true }
     )
 
-    const d1 = lcuEventBus.on('/lol-champ-select/v1/session', (event) => {
+    const d1 = this._lcuConnectionModule.lcuEventBus.on('/lol-champ-select/v1/session', (event) => {
       if (event.eventType === 'Delete') {
         this.champSelect.setSession(null)
         this.champSelect.setSelfSummoner(null)
@@ -398,7 +408,7 @@ export class LcuSyncModule extends MobxBasedModule {
       }
     })
 
-    const d2 = lcuEventBus.on<LcuEvent<number[]>>(
+    const d2 = this._lcuConnectionModule.lcuEventBus.on<LcuEvent<number[]>>(
       '/lol-champ-select/v1/pickable-champion-ids',
       (event) => {
         if (event.eventType === 'Delete') {
@@ -409,7 +419,7 @@ export class LcuSyncModule extends MobxBasedModule {
       }
     )
 
-    const d3 = lcuEventBus.on<LcuEvent<number[]>>(
+    const d3 = this._lcuConnectionModule.lcuEventBus.on<LcuEvent<number[]>>(
       '/lol-champ-select/v1/bannable-champion-ids',
       (event) => {
         if (event.eventType === 'Delete') {
@@ -420,7 +430,7 @@ export class LcuSyncModule extends MobxBasedModule {
       }
     )
 
-    const d4 = lcuEventBus.on<LcuEvent<ChampSelectSummoner>>(
+    const d4 = this._lcuConnectionModule.lcuEventBus.on<LcuEvent<ChampSelectSummoner>>(
       '/lol-champ-select/v1/summoners/*',
       (event) => {
         if (event.data && event.data.isSelf) {
@@ -430,7 +440,7 @@ export class LcuSyncModule extends MobxBasedModule {
       }
     )
 
-    const d5 = lcuEventBus.on<LcuEvent<number>>(
+    const d5 = this._lcuConnectionModule.lcuEventBus.on<LcuEvent<number>>(
       '/lol-champ-select/v1/current-champion',
       (event) => {
         if (event.eventType === 'Delete') {
@@ -457,7 +467,7 @@ export class LcuSyncModule extends MobxBasedModule {
     this.simpleSync('lcu/chat/conversations/post-game', () => this.chat.conversations.postGame)
     this.simpleSync('lcu/chat/conversations/custom-game', () => this.chat.conversations.customGame)
 
-    const d1 = lcuEventBus.on<LcuEvent<Conversation>>(
+    const d1 = this._lcuConnectionModule.lcuEventBus.on<LcuEvent<Conversation>>(
       '/lol-chat/v1/conversations/:id',
       (event, { id }) => {
         if (event.eventType === 'Delete') {
@@ -522,7 +532,7 @@ export class LcuSyncModule extends MobxBasedModule {
     )
 
     // 监测用户进入房间
-    const d2 = lcuEventBus.on(
+    const d2 = this._lcuConnectionModule.lcuEventBus.on(
       '/lol-chat/v1/conversations/:conversationId/messages/:messageId',
       (event, param) => {
         if (event.data && event.data.type === 'system' && event.data.body === 'joined_room') {
@@ -559,7 +569,7 @@ export class LcuSyncModule extends MobxBasedModule {
       }
     )
 
-    const d3 = lcuEventBus.on('/lol-chat/v1/me', (event) => {
+    const d3 = this._lcuConnectionModule.lcuEventBus.on('/lol-chat/v1/me', (event) => {
       if (event.eventType === 'Update' || event.eventType === 'Create') {
         this.chat.setMe(event.data)
         return
@@ -569,7 +579,7 @@ export class LcuSyncModule extends MobxBasedModule {
     })
 
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       async (state) => {
         if (state === 'connected') {
           try {
@@ -586,7 +596,7 @@ export class LcuSyncModule extends MobxBasedModule {
     )
 
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       async (state) => {
         if (state === 'connected') {
           try {
@@ -648,11 +658,14 @@ export class LcuSyncModule extends MobxBasedModule {
     this.simpleSync('lcu/matchmaking/ready-check', () => this.matchmaking.readyCheck)
     this.simpleSync('lcu/matchmaking/search', () => this.matchmaking.search)
 
-    const d1 = lcuEventBus.on('/lol-matchmaking/v1/ready-check', (event) => {
-      this.matchmaking.setReadyCheck(event.data)
-    })
+    const d1 = this._lcuConnectionModule.lcuEventBus.on(
+      '/lol-matchmaking/v1/ready-check',
+      (event) => {
+        this.matchmaking.setReadyCheck(event.data)
+      }
+    )
 
-    const d2 = lcuEventBus.on('/lol-matchmaking/v1/search', (event) => {
+    const d2 = this._lcuConnectionModule.lcuEventBus.on('/lol-matchmaking/v1/search', (event) => {
       this.matchmaking.setSearch(event.data)
     })
 
@@ -666,7 +679,7 @@ export class LcuSyncModule extends MobxBasedModule {
 
     // 立即初始化
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       async (state) => {
         if (state === 'connected') {
           this.gameflow.setPhase((await getGameflowPhase()).data)
@@ -678,7 +691,7 @@ export class LcuSyncModule extends MobxBasedModule {
     )
 
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       async (state) => {
         if (state === 'connected') {
           try {
@@ -693,11 +706,14 @@ export class LcuSyncModule extends MobxBasedModule {
       { fireImmediately: true }
     )
 
-    const d1 = lcuEventBus.on('/lol-gameflow/v1/gameflow-phase', (event) => {
-      this.gameflow.setPhase(event.data)
-    })
+    const d1 = this._lcuConnectionModule.lcuEventBus.on(
+      '/lol-gameflow/v1/gameflow-phase',
+      (event) => {
+        this.gameflow.setPhase(event.data)
+      }
+    )
 
-    const d2 = lcuEventBus.on('/lol-gameflow/v1/session', (event) => {
+    const d2 = this._lcuConnectionModule.lcuEventBus.on('/lol-gameflow/v1/session', (event) => {
       this.gameflow.setSession(event.data)
     })
 
@@ -708,12 +724,12 @@ export class LcuSyncModule extends MobxBasedModule {
   private _syncLcuLobby() {
     this.simpleSync('lcu/lobby/lobby', () => this.lobby.lobby)
 
-    const d1 = lcuEventBus.on('/lol-lobby/v2/lobby', (event) => {
+    const d1 = this._lcuConnectionModule.lcuEventBus.on('/lol-lobby/v2/lobby', (event) => {
       this.lobby.setLobby(event.data)
     })
 
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       async (state) => {
         if (state === 'connected') {
           try {
@@ -741,12 +757,15 @@ export class LcuSyncModule extends MobxBasedModule {
   private _syncLcuLogin() {
     this.simpleSync('lcu/login/login-queue-state', () => this.login.loginQueueState)
 
-    const d1 = lcuEventBus.on('/lol-login/v1/login-queue-state', (event) => {
-      this.login.setLoginQueueState(event.data)
-    })
+    const d1 = this._lcuConnectionModule.lcuEventBus.on(
+      '/lol-login/v1/login-queue-state',
+      (event) => {
+        this.login.setLoginQueueState(event.data)
+      }
+    )
 
     this.autoDisposeReaction(
-      () => lcuConnectionState.state,
+      () => this._lcuConnectionModule.state.state,
       async (state) => {
         if (state === 'connected') {
           try {
@@ -815,7 +834,7 @@ export class LcuSyncModule extends MobxBasedModule {
     }
 
     this.autoDisposeReaction(
-      () => [lcuConnectionState.state, this.login.loginQueueState] as const,
+      () => [this._lcuConnectionModule.state.state, this.login.loginQueueState] as const,
       ([state, queue]) => {
         if (state === 'connected' && !queue) {
           retryFetching()
@@ -831,9 +850,12 @@ export class LcuSyncModule extends MobxBasedModule {
       { equals: comparer.structural, fireImmediately: true }
     )
 
-    const d1 = lcuEventBus.on('/lol-summoner/v1/current-summoner', (event) => {
-      this.summoner.setMe(event.data)
-    })
+    const d1 = this._lcuConnectionModule.lcuEventBus.on(
+      '/lol-summoner/v1/current-summoner',
+      (event) => {
+        this.summoner.setMe(event.data)
+      }
+    )
 
     this._disposers.add(d1)
   }
