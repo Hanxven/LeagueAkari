@@ -1,5 +1,5 @@
-import { lcuConnectionState } from '@main/core-modules/lcu-connection'
-import { mwNotification } from '@main/core-modules/main-window'
+import { lcuConnectionState } from '@main/modules/akari-core/lcu-connection'
+import { mwNotification } from '@main/modules/akari-core/main-window'
 import {
   getAugments,
   getChampionSummary,

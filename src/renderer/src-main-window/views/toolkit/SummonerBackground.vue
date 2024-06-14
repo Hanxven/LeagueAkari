@@ -27,12 +27,20 @@
       </div>
       <NSelect
         filterable
-        style="width: 340px"
+        style="width: 340px; margin-bottom: 8px"
         :options="skinOptions"
         :render-option="renderOption"
         v-model:value="currentSkinId"
         size="tiny"
         :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
+      ></NSelect>
+      <NSelect
+        filterable
+        style="width: 340px"
+        v-if="currentAugmentOptions.length >= 1"
+        :options="currentAugmentOptions"
+        v-model:value="currentAugmentId"
+        size="tiny"
       ></NSelect>
     </NModal>
     <ControlItem class="control-item-margin" label="选择" label-description="查找目标英雄或皮肤">
@@ -45,7 +53,10 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { getChampDetails } from '@shared/renderer/http-api/game-data'
-import { setSummonerBackgroundSkin } from '@shared/renderer/http-api/summoner'
+import {
+  setSummonerBackgroundAugments,
+  setSummonerBackgroundSkin
+} from '@shared/renderer/http-api/summoner'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { ChampSkin } from '@shared/types/lcu/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
@@ -54,8 +65,10 @@ import { VNode, computed, h, ref, watch } from 'vue'
 
 const gameData = useGameDataStore()
 
+// TODO TODO TODO TODO 优化啊！！！
 const currentChampionId = ref<number>()
 const currentSkinId = ref<number>()
+const currentAugmentId = ref<string>()
 const championOptions = computed(() => {
   const list = Object.values(gameData.champions).reduce((arr, current) => {
     if (current.id === -1) {
@@ -76,11 +89,78 @@ const championOptions = computed(() => {
 
 const skinList = ref<ChampSkin[]>([])
 const skinOptions = computed(() => {
-  return skinList.value.map((v) => ({
-    label: v.name,
-    value: v.id,
-    url: v.uncenteredSplashPath || v.splashPath
-  }))
+  const arr: any[] = []
+  const skinSet = new Set<number>()
+  skinList.value.forEach((v) => {
+    const aaArr: any[] = []
+    if (v.skinAugments && v.skinAugments.augments) {
+      for (const au of v.skinAugments.augments) {
+        aaArr.push({
+          label: `装饰 ${au.contentId}`,
+          value: au.contentId
+        })
+      }
+    }
+
+    if (aaArr.length) {
+      aaArr.unshift({
+        label: '不设置',
+        value: ''
+      })
+    }
+
+    arr.push({
+      label: v.name,
+      value: v.id,
+      url: v.uncenteredSplashPath || v.splashPath,
+      augments: aaArr
+    })
+
+    skinSet.add(v.id)
+
+    if (v.questSkinInfo && v.questSkinInfo.tiers) {
+      v.questSkinInfo.tiers.forEach((t) => {
+        if (!skinSet.has(t.id)) {
+          const aArr: any[] = []
+          if (t.skinAugments.augments) {
+            for (const au of t.skinAugments.augments) {
+              aArr.push({
+                label: `装饰 ${au.contentId}`,
+                value: au.contentId
+              })
+            }
+          }
+
+          if (aArr.length) {
+            aArr.unshift({
+              label: '不设置',
+              value: ''
+            })
+          }
+
+          arr.push({
+            label: t.name,
+            value: t.id,
+            url: t.uncenteredSplashPath || t.splashPath,
+            augments: aArr
+          })
+          skinSet.add(t.id)
+        }
+      })
+    }
+  })
+
+  return arr
+})
+
+const currentAugmentOptions = computed(() => {
+  if (!currentSkinId.value) {
+    return []
+  }
+
+  const s = skinOptions.value.find((s) => s.value === currentSkinId.value)
+
+  return s.augments || []
 })
 
 const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) => {
@@ -118,6 +198,7 @@ watch(
 
     skinList.value = details.skins
     if (details.skins.length) {
+      currentAugmentId.value = undefined
       currentSkinId.value = details.skins[0].id
     }
   }
@@ -133,9 +214,11 @@ const handleApplyToProfile = async () => {
   }
 
   isProceeding.value = true
-
   try {
     await setSummonerBackgroundSkin(currentSkinId.value)
+    if (currentAugmentId.value !== undefined) {
+      await setSummonerBackgroundAugments(currentAugmentId.value)
+    }
     message.success('成功', { duration: 1000 })
   } catch (error) {
     console.warn(error)

@@ -96,7 +96,7 @@
       </div>
     </div>
     <div class="title-area">
-      <span class="title">League Akari</span>
+      <span class="title">[半开发版本] League Akari</span>
     </div>
     <div class="traffic">
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">

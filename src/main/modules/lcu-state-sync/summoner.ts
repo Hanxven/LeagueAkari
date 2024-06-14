@@ -1,5 +1,5 @@
-import { lcuConnectionState, lcuEventBus } from '@main/core-modules/lcu-connection'
-import { mwNotification } from '@main/core-modules/main-window'
+import { lcuConnectionState, lcuEventBus } from '@main/modules/akari-core/lcu-connection'
+import { mwNotification } from '@main/modules/akari-core/main-window'
 import { getCurrentSummoner } from '@main/http-api/summoner'
 import { ipcStateSync } from '@main/utils/ipc'
 import { SummonerInfo } from '@shared/types/lcu/summoner'

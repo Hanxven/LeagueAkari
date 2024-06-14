@@ -1,4 +1,4 @@
-import { lcuConnectionState } from '@main/core-modules/lcu-connection'
+import { lcuConnectionState } from '@main/modules/akari-core/lcu-connection'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game } from '@shared/types/lcu/match-history'

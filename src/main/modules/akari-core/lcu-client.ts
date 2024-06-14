@@ -3,7 +3,7 @@ import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { makeAutoObservable, observable } from 'mobx'
 
 import { queryLcuAuth, queryLcuAuthNative } from '../../utils/lcu-auth'
-import toolkit from '../native/laToolkitWin32x64.node'
+import toolkit from '../../native/laToolkitWin32x64.node'
 import { appState } from './app'
 import { getHttpInstance } from './lcu-connection'
 import { createLogger } from './log'

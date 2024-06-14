@@ -1,4 +1,4 @@
-import { createLogger } from '@main/core-modules/log'
+import { createLogger } from '@main/modules/akari-core/log'
 
 import { champSelectSync } from './champ-select'
 import { chatSync } from './chat'

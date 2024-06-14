@@ -1,4 +1,4 @@
-import { lcuEventBus } from '@main/core-modules/lcu-connection'
+import { lcuEventBus } from '@main/modules/akari-core/lcu-connection'
 import { ipcStateSync } from '@main/utils/ipc'
 import { GetSearch, ReadyCheck } from '@shared/types/lcu/matchmaking'
 import { makeAutoObservable, observable } from 'mobx'

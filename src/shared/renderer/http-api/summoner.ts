@@ -75,6 +75,13 @@ export function setSummonerBackgroundSkin(skinId: number) {
   })
 }
 
+export function setSummonerBackgroundAugments(contentId: string) {
+  return updateSummonerProfile({
+    key: 'backgroundSkinAugments',
+    value: contentId
+  })
+}
+
 export function getSummonerAliases(nameTagList: { gameName: string; tagLine: string }[]) {
   return request<SummonerInfo[]>({
     url: '/lol-summoner/v1/summoners/aliases',

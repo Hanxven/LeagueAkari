@@ -6,7 +6,7 @@ import { BrowserWindow, Rectangle, screen, shell } from 'electron'
 import { comparer, computed, makeAutoObservable, reaction } from 'mobx'
 import { join } from 'path'
 
-import icon from '../../../resources/LA_ICON.ico?asset'
+import icon from '../../../../resources/LA_ICON.ico?asset'
 import { appState } from './app'
 import { lcuConnectionState } from './lcu-connection'
 import { createLogger } from './log'

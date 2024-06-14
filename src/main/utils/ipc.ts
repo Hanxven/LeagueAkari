@@ -1,4 +1,4 @@
-import { createLogger } from '@main/core-modules/log'
+import { createLogger } from '@main/modules/akari-core/log'
 import { IpcMainDataType } from '@shared/types/ipc'
 import { formatError } from '@shared/utils/errors'
 import { isAxiosError } from 'axios'

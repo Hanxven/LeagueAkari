@@ -1,6 +1,6 @@
-import { lcuEventBus } from '@main/core-modules/lcu-connection'
-import { lcuConnectionState } from '@main/core-modules/lcu-connection'
-import { mwNotification } from '@main/core-modules/main-window'
+import { lcuEventBus } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionState } from '@main/modules/akari-core/lcu-connection'
+import { mwNotification } from '@main/modules/akari-core/main-window'
 import {
   getBannableChampIds,
   getChampSelectSession,

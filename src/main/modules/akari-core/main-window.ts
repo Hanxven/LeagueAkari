@@ -9,7 +9,7 @@ import { BrowserWindow, Event, app, shell } from 'electron'
 import { makeAutoObservable } from 'mobx'
 import { join } from 'node:path'
 
-import icon from '../../../resources/LA_ICON.ico?asset'
+import icon from '../../../../resources/LA_ICON.ico?asset'
 import { appState } from './app'
 import { getAuxiliaryWindow } from './auxiliary-window'
 import { createLogger } from './log'

@@ -1,4 +1,4 @@
-import { lcuConnectionState, lcuEventBus } from '@main/core-modules/lcu-connection'
+import { lcuConnectionState, lcuEventBus } from '@main/modules/akari-core/lcu-connection'
 import { getGameflowPhase, getGameflowSession } from '@main/http-api/gameflow'
 import { ipcStateSync } from '@main/utils/ipc'
 import { GameflowPhase, GameflowSession } from '@shared/types/lcu/gameflow'

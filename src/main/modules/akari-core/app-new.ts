@@ -20,7 +20,7 @@ import { gt, lt } from 'semver'
 import { LeveledLogMethod, Logger, createLogger, format, transports } from 'winston'
 import winston from 'winston/lib/winston/config'
 
-import toolkit from '../native/laToolkitWin32x64.node'
+import toolkit from '../../native/laToolkitWin32x64.node'
 import { mwNotification } from './main-window'
 
 class AppSettings {

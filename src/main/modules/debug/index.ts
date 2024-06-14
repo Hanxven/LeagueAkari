@@ -1,6 +1,6 @@
-import { lcuEventBus, setWebSocketSubscribeAll } from '@main/core-modules/lcu-connection'
-import { createLogger } from '@main/core-modules/log'
-import { getMainWindow } from '@main/core-modules/main-window'
+import { lcuEventBus, setWebSocketSubscribeAll } from '@main/modules/akari-core/lcu-connection'
+import { createLogger } from '@main/modules/akari-core/log'
+import { getMainWindow } from '@main/modules/akari-core/main-window'
 import { ipcStateSync, onRendererCall, sendEventToRenderer } from '@main/utils/ipc'
 
 import { debugState } from './state'

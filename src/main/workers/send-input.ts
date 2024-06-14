@@ -1,6 +1,6 @@
 import { parentPort } from 'node:worker_threads'
 
-import input from '../native/laInputWin32x64.node'
+import input from '@main/native/laInputWin32x64.node'
 
 parentPort!.on(
   'message',

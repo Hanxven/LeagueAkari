@@ -350,6 +350,83 @@ export interface ChampSkin {
   description?: string
   loadScreenVintagePath?: string
   chromas?: ChampChroma[]
+  questSkinInfo?: QuestSkinInfo
+  skinAugments?: SkinAugments
+}
+
+export interface QuestSkinInfo {
+  name: string
+  productType: string
+  collectionDescription: string
+  descriptionInfo: any[]
+  splashPath: string
+  uncenteredSplashPath: string
+  tilePath: string
+  collectionCardPath: string
+  tiers: Tier[]
+}
+
+export interface Tier {
+  id: number
+  name: string
+  stage: number
+  description: string
+  splashPath: string
+  uncenteredSplashPath: string
+  tilePath: string
+  loadScreenPath: string
+  shortName: string
+  splashVideoPath: null | string
+  collectionSplashVideoPath: null | string
+  collectionCardHoverVideoPath: null | string
+  skinAugments: SkinAugments
+}
+
+interface Overlay {
+  centeredLCOverlayPath: string
+  uncenteredLCOverlayPath: string
+  socialCardLCOverlayPath: string
+  tileLCOverlayPath: string
+}
+
+interface Borders {
+  layer0: Layer0[]
+  layer1?: Layer0[]
+}
+
+interface Layer0 {
+  contentId: string
+  layer: number
+  priority: number
+  borderPath: string
+}
+export interface SkinAugments {
+  borders: Borders
+  augments?: Augment2[]
+}
+
+export interface Augment2 {
+  contentId: string
+  overlays: Overlay[]
+}
+
+interface Overlay {
+  centeredLCOverlayPath: string
+  uncenteredLCOverlayPath: string
+  socialCardLCOverlayPath: string
+  tileLCOverlayPath: string
+}
+
+interface Borders {
+  layer0: Layer0[]
+  layer1?: Layer0[]
+}
+
+interface Layer0 {
+  contentId: string
+  layer: number
+  priority: number
+  borderPath: string
 }
 
 export interface ChampChroma {

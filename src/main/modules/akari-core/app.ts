@@ -13,8 +13,8 @@ import { app, shell } from 'electron'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
 import { gt, lt } from 'semver'
 
-import toolkit from '../native/laToolkitWin32x64.node'
-import { ipcStateSync, onRendererCall } from '../utils/ipc'
+import toolkit from '../../native/laToolkitWin32x64.node'
+import { ipcStateSync, onRendererCall } from '../../utils/ipc'
 import { createLogger } from './log'
 import { mwNotification } from './main-window'
 

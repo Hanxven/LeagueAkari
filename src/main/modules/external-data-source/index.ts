@@ -1,4 +1,4 @@
-import { createLogger } from '@main/core-modules/log'
+import { createLogger } from '@main/modules/akari-core/log'
 import { ipcStateSync } from '@main/utils/ipc'
 import { FandomWikiChampBalanceDataSource } from '@shared/external-data-source/fandom/champ-balance'
 import { formatError } from '@shared/utils/errors'

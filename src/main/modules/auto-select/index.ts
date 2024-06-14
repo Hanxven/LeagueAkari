@@ -1,5 +1,5 @@
-import { createLogger } from '@main/core-modules/log'
-import { mwNotification } from '@main/core-modules/main-window'
+import { createLogger } from '@main/modules/akari-core/log'
+import { mwNotification } from '@main/modules/akari-core/main-window'
 import { action, benchSwap, pickOrBan } from '@main/http-api/champ-select'
 import { chatSend } from '@main/http-api/chat'
 import { getSetting, setSetting } from '@main/storage/settings'

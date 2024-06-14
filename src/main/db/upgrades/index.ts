@@ -1,4 +1,4 @@
-import { createLogger } from '@main/core-modules/log'
+import { createLogger } from '@main/modules/akari-core/log'
 import { LEAGUE_AKARI_DB_CURRENT_VERSION } from '@shared/constants/common'
 import dayjs from 'dayjs'
 import { existsSync, renameSync, unlinkSync } from 'node:fs'

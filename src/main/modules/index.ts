@@ -10,6 +10,7 @@ import { setupDebug } from './debug'
 import { setupExternalDataSource } from './external-data-source'
 import { lcuSyncModule } from './lcu-state-sync-new'
 import { setupRespawnTimer } from './respawn-timer'
+import {  lcuConnectionModule } from './akari-core/lcu-connection-new'
 
 export async function setupLeagueAkariFeatures() {
   // await setupLcuStateSync()
@@ -35,6 +36,7 @@ export const manager = new LeagueAkariModuleManager()
 
 export async function setupLeagueAkariModules() {
   await manager.register(appModule)
+  await manager.register(lcuConnectionModule)
   await manager.register(lcuSyncModule)
   await manager.register(autoGameflowModule)
   await manager.register(coreFunctionalityModule)

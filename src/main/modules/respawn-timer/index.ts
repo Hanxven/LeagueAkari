@@ -1,4 +1,4 @@
-import { createLogger } from '@main/core-modules/log'
+import { createLogger } from '@main/modules/akari-core/log'
 import { getPlayerList } from '@main/http-api/game-client'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'

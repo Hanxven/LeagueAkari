@@ -1,5 +1,5 @@
-import { createLogger } from '@main/core-modules/log'
-import { pSendKey, pSendKeys, winPlatformEventBus } from '@main/core-modules/platform'
+import { createLogger } from '@main/modules/akari-core/log'
+import { pSendKey, pSendKeys, winPlatformEventBus } from '@main/modules/akari-core/platform'
 import { getSetting, setSetting } from '@main/storage/settings'
 import { ipcStateSync, onRendererCall } from '@main/utils/ipc'
 import { sleep } from '@shared/utils/sleep'

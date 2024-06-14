@@ -414,3 +414,5 @@ export class LcuConnectionModule extends MobxBasedModule {
     this.simpleSync('connecting-client', () => this.state.connectingClient)
   }
 }
+
+export const lcuConnectionModule = new LcuConnectionModule()

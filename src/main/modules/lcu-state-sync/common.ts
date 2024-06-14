@@ -1,3 +1,3 @@
-import { createLogger } from '@main/core-modules/log'
+import { createLogger } from '@main/modules/akari-core/log'
 
 export const logger = createLogger('lcu-state-sync')
