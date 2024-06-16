@@ -12,7 +12,7 @@ import { getBallot } from '@main/http-api/honor-v2'
 import { ipcStateSync } from '@main/utils/ipc'
 import { ChampSelectSession, ChampSelectSummoner } from '@shared/types/lcu/champ-select'
 import { LcuEvent } from '@shared/types/lcu/event'
-import { Ballot } from '@shared/types/lcu/honorV2'
+import { BallotLegacy } from '@shared/types/lcu/honorV2'
 import { formatError } from '@shared/utils/errors'
 import { isAxiosError } from 'axios'
 import { reaction } from 'mobx'
@@ -21,9 +21,9 @@ import { makeAutoObservable, observable } from 'mobx'
 import { logger } from './common'
 
 class HonorState {
-  ballot: Ballot | null
+  ballot: BallotLegacy | null
 
-  setBallot(b: Ballot | null) {
+  setBallot(b: BallotLegacy | null) {
     this.ballot = b
   }
 
@@ -60,7 +60,7 @@ export function honorSync() {
     }
   )
 
-  lcuEventBus.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (event) => {
+  lcuEventBus.on<LcuEvent<BallotLegacy>>('/lol-honor-v2/v1/ballot', async (event) => {
     if (event.eventType === 'Delete') {
       honorState.setBallot(null)
       return

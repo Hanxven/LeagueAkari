@@ -9,10 +9,20 @@ export class LeagueAkariRendererModule {
   private _eventMap = new Map<string, Set<CallbackFn>>()
   private _manager: LeagueAkariRendererModuleManager | null = null
 
-  constructor(private _moduleId: string) {}
+  constructor(
+    private _moduleId: string,
+    private _rendererOnly = false
+  ) {}
 
   get id() {
     return this._moduleId
+  }
+
+  /**
+   * 是否仅在渲染进程中运行，意味着不会与主进程通信
+   */
+  get rendererOnly() {
+    return this._rendererOnly
   }
 
   /**
@@ -20,6 +30,13 @@ export class LeagueAkariRendererModule {
    */
   _setManager(manager: LeagueAkariRendererModuleManager | null) {
     this._manager = manager
+  }
+
+  get manager() {
+    if (!this._manager) {
+      throw new Error('No Akari manager')
+    }
+    return this._manager
   }
 
   call<T = any>(methodName: string, ...args: any[]) {
@@ -47,16 +64,18 @@ export class LeagueAkariRendererModule {
   }
 
   /**
-   * 在被 manager 注册时触发
+   * 注册于 manager
    */
-  onRegister(manager: LeagueAkariRendererModuleManager): void | Promise<void> {
-    this._setManager(manager)
+  setup(): void | Promise<void> {
+    if (!this._manager) {
+      throw new Error('No Akari manager')
+    }
   }
 
   /**
-   * 在被 manager 取消注册时触发
+   * 取消注册
    */
-  onUnregister(): void | Promise<void> {
+  dismantle(): void | Promise<void> {
     this._eventMap.clear()
     this._setManager(null)
   }

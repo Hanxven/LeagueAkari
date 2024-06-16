@@ -146,7 +146,7 @@ import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules
 import {
   OngoingPlayer,
   useCoreFunctionalityStore
-} from '@shared/renderer/modules/core-functionality/store'
+} from '@shared/renderer/modules/core-functionality-new/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'

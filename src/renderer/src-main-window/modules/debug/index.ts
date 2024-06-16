@@ -1,110 +1,117 @@
 import { RadixEventEmitter } from '@shared/event-emitter'
+import { StateSyncModule } from '@shared/renderer/akari/state-sync-module'
 import { gameClientRequest, request } from '@shared/renderer/http-api/common'
-import { mainCall, onMainEvent } from '@shared/renderer/utils/ipc'
 import { watch } from 'vue'
 
 import { router } from '@main-window/routes'
 
 import { useDebugStore } from './store'
 
-const matcher = new RadixEventEmitter()
+export class DebugRendererModule extends StateSyncModule {
+  private _matcher = new RadixEventEmitter()
 
-// 构建 Debug 相关的功能，仅限本渲染进程，所有数据都是临时
-export async function setupDebug() {
-  const debug = useDebugStore()
+  constructor() {
+    super('debug')
+  }
 
-  // 全局功能
-  // @ts-ignore
-  window.lcuRequest = request
-  // @ts-ignore
-  window.gameClientRequest = gameClientRequest
-  // @ts-ignore
-  window.router = router
-  // @ts-ignore
-  window.mainCall = mainCall
+  override async setup() {
+    await super.setup()
 
-  watch([() => debug.settings.printAllLcuEvents, debug.settings.printRules], ([a, r]) => {
-    if (a || Object.values(r).some((r) => r.enabled)) {
-      mainCall('debug/settings/send-all-native-lcu-events/set', true)
-    } else {
-      mainCall('debug/settings/send-all-native-lcu-events/set', false)
+    // 全局功能
+    // @ts-ignore
+    window.lcuRequest = request
+    // @ts-ignore
+    window.gameClientRequest = gameClientRequest
+    // @ts-ignore
+    window.router = router
+
+    this.onEvent('lcu-event', (data) => {
+      this._matcher.emit(data.uri, data)
+    })
+
+    const store = useDebugStore()
+
+    watch([() => store.settings.printAllLcuEvents, store.settings.printRules], ([a, r]) => {
+      if (a || Object.values(r).some((r) => r.enabled)) {
+        this.call('set-setting/send-all-native-lcu-events', true)
+      } else {
+        this.call('set-setting/send-all-native-lcu-events', false)
+      }
+    })
+
+    this._matcher.on('/**', (data) => {
+      if (store.settings.printAllLcuEvents) {
+        console.log(data.uri, data.eventType, data.data)
+      }
+    })
+  }
+
+  addPrintRule(rule: string) {
+    const store = useDebugStore()
+
+    rule = rule
+      .replace(/\/+$/, '') // 去除结尾的斜杠
+      .replace(/^([^/])/, '/$1') // 补足前面的斜杠
+      .replace(/\/{2,}/g, '/') // 去除连续的斜杠
+
+    if (store.settings.printRules[rule]) {
+      return
     }
-  })
 
-  onMainEvent('debug/native-lcu-event', (_, data) => {
-    matcher.emit(data.uri, data)
-  })
-
-  matcher.on('/**', (data) => {
-    if (debug.settings.printAllLcuEvents) {
-      console.log(data.uri, data.eventType, data.data)
+    store.settings.printRules[rule] = {
+      enabled: true,
+      stopHandle: null
     }
-  })
-}
 
-export function addPrintRule(rule: string) {
-  const settings = useDebugStore()
-
-  rule = rule
-    .replace(/\/+$/, '') // 去除结尾的斜杠
-    .replace(/^([^/])/, '/$1') // 补足前面的斜杠
-    .replace(/\/{2,}/g, '/') // 去除连续的斜杠
-
-  if (settings.settings.printRules[rule]) {
-    return
+    this.enablePrintRule(rule)
   }
 
-  settings.settings.printRules[rule] = {
-    enabled: true,
-    stopHandle: null
-  }
+  enablePrintRule(rule: string) {
+    const store = useDebugStore()
 
-  enablePrintRule(rule)
-}
-
-export function enablePrintRule(rule: string) {
-  const settings = useDebugStore()
-
-  if (!settings.settings.printRules[rule]) {
-    return
-  }
-
-  const ruleObj = settings.settings.printRules[rule]
-
-  if (ruleObj.stopHandle) {
-    ruleObj.stopHandle()
-  }
-
-  ruleObj.enabled = true
-
-  const stop = matcher.on(rule, (data) => {
-    if (!settings.settings.printAllLcuEvents) {
-      console.log(data.uri, data.eventType, data.data)
+    if (!store.settings.printRules[rule]) {
+      return
     }
-  })
 
-  ruleObj.stopHandle = stop
-}
+    const ruleObj = store.settings.printRules[rule]
 
-export function disablePrintRule(rule: string) {
-  const settings = useDebugStore()
+    if (ruleObj.stopHandle) {
+      ruleObj.stopHandle()
+    }
 
-  if (!settings.settings.printRules[rule]) {
-    return
+    ruleObj.enabled = true
+
+    const stop = this._matcher.on(rule, (data) => {
+      if (!store.settings.printAllLcuEvents) {
+        console.log(data.uri, data.eventType, data.data)
+      }
+    })
+
+    ruleObj.stopHandle = stop
   }
 
-  const ruleObj = settings.settings.printRules[rule]
+  disablePrintRule(rule: string) {
+    const store = useDebugStore()
 
-  ruleObj.enabled = false
+    if (!store.settings.printRules[rule]) {
+      return
+    }
 
-  if (ruleObj.stopHandle) {
-    ruleObj.stopHandle()
+    const ruleObj = store.settings.printRules[rule]
+
+    ruleObj.enabled = false
+
+    if (ruleObj.stopHandle) {
+      ruleObj.stopHandle()
+    }
+  }
+
+  removePrintRule(rule: string) {
+    const store = useDebugStore()
+
+    this.disablePrintRule(rule)
+    delete store.settings.printRules[rule]
   }
 }
 
-export function removePrintRule(rule: string) {
-  const settings = useDebugStore()
-
-  disablePrintRule(rule)
-  delete settings.settings.printRules[rule]
-}
+export const debugRendererModule = new DebugRendererModule()

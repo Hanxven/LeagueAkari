@@ -50,7 +50,7 @@
                         p.identity.player.tagLine
                       )
                     }}{{
-                      p.identity.player.puuid === '00000000-0000-0000-0000-000000000000'
+                      p.identity.player.puuid === EMPTY_PUUID
                         ? ' (人机)'
                         : ''
                     }}

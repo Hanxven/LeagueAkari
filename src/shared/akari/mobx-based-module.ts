@@ -47,8 +47,8 @@ export class MobxBasedModule extends LeagueAkariModule {
     }
   }
 
-  override async onUnregister() {
-    await super.onUnregister()
+  override async dismantle() {
+    await super.dismantle()
     this._disposers.forEach((fn) => fn())
     this._disposers.clear()
   }

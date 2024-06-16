@@ -3,7 +3,7 @@ import { MaybeRefOrGetter, toRef } from '@vueuse/core'
 import PQueue from 'p-queue'
 import { getCurrentScope, onScopeDispose, readonly, ref, watch } from 'vue'
 
-import { useAppStore } from '../modules/app/store'
+import { useLcuConnectionStore } from '../modules/lcu-connection-new/store'
 
 // 过快的访问频率概率导致 50x 错误，需要限制
 const globalAssetFetchingLimiter = new PQueue({
@@ -26,7 +26,7 @@ export function useGameDataBlobUrl(
   immediate = true,
   cache = false
 ) {
-  const app = useAppStore()
+  const lc = useLcuConnectionStore()
 
   const url = ref<string>()
   const type = ref<string>()
@@ -73,7 +73,7 @@ export function useGameDataBlobUrl(
     })
 
   watch(
-    [() => unwrappedUrl.value, () => app.lcuConnectionState],
+    [() => unwrappedUrl.value, () => lc.state],
     ([u, s]) => {
       if (u && s === 'connected') {
         load()

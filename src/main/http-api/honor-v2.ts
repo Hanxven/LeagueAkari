@@ -1,4 +1,4 @@
-import { Ballot } from '@shared/types/lcu/honorV2'
+import { BallotLegacy } from '@shared/types/lcu/honorV2'
 
 import { request } from './common'
 
@@ -21,7 +21,7 @@ export function honor(
 }
 
 export function getBallot() {
-  return request<Ballot>({
+  return request<BallotLegacy>({
     url: '/lol-honor-v2/v1/ballot',
     method: 'GET'
   })

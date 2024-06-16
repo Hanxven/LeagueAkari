@@ -1,5 +1,6 @@
-import { ipcMainCallStandardized, mainCall } from '@shared/renderer/utils/ipc'
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
+
+import { lcuConnectionRendererModule as lcm } from '../modules/lcu-connection-new'
 
 // 由于序列化和反序列化的要求，只能传递部分属性
 export type SimpleAxiosResponse<T = any, D = any> = Omit<
@@ -41,7 +42,7 @@ export async function request<T = any, D = any>(
 
   while (true) {
     try {
-      const res = await mainCall('lcu-connection/http-request', config)
+      const res = await lcm.lcuRequest(config)
 
       if (res.status >= 500) {
         lastError = new LcuHttpError(res.statusText, res)
@@ -73,36 +74,14 @@ export async function request<T = any, D = any>(
   }
 }
 
-/*
-错误的 Error 结构大致
-{
-    "status": 503,
-    "statusText": "Service Unavailable",
-    "headers": {
-        "vary": "origin",
-        "cache-control": "no-store",
-        "content-length": "140",
-        "content-type": "application/json",
-        "access-control-allow-origin": "https://127.0.0.1:61985",
-        "access-control-expose-headers": "content-length"
-    },
-    "data": {
-        "errorCode": "RPC_ERROR",
-        "httpStatus": 503,
-        "implementationDetails": {},
-        "message": "Error getting match list for summoner, begin 220, end: 240"
-    }
-}
-*/
-
-export async function gameClientRequest<T = any, D = any>(config: SimpleAxiosRequestConfig) {
-  const res = await ipcMainCallStandardized<SimpleAxiosResponse<T, D>>(
-    'httpRequest:gameClient',
-    config
-  )
+export async function gameClientRequest<T = any, D = any>(
+  config: SimpleAxiosRequestConfig
+): Promise<SimpleAxiosResponse<T, D>> {
+  const res = await lcm.gameClientRequest(config)
 
   if (res.status >= 400) {
     throw new GameClientHttpError(res.statusText, res)
   }
+
   return res
 }

@@ -1,52 +1,37 @@
 import { LeagueAkariRendererModuleManager } from '@shared/renderer/akari/renderer-module-manager'
-import { setupApp } from '@shared/renderer/modules/app'
+import { appRendererModule } from '@shared/renderer/modules/app-new'
 import { autoGameflowRendererModule } from '@shared/renderer/modules/auto-gameflow-new'
-import { setupAutoReply } from '@shared/renderer/modules/auto-reply'
-import { setupAutoSelect } from '@shared/renderer/modules/auto-select'
-import { setupAuxiliaryWindow } from '@shared/renderer/modules/auxiliary-window'
+import { autoReplyRendererModule } from '@shared/renderer/modules/auto-reply-new'
+import { autoSelectRendererModule } from '@shared/renderer/modules/auto-select-new'
+import { auxiliaryWindowRendererModule } from '@shared/renderer/modules/auxiliary-window-new'
 import { coreFunctionalityRendererModule } from '@shared/renderer/modules/core-functionality-new'
-import { setupCustomKeyboardSequence } from '@shared/renderer/modules/custom-keyboard-sequence'
-import { setupGameData } from '@shared/renderer/modules/game-data'
-import { lcuSyncModule } from '@shared/renderer/modules/lcu-state-sync-new'
-import { setupMainWindow } from '@shared/renderer/modules/main-window'
-import { setupRespawnTimer } from '@shared/renderer/modules/respawn-timer'
+import { lcuClientRendererModule } from '@shared/renderer/modules/lcu-client-new'
+import { lcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection-new'
+import { lcuSyncRendererModule } from '@shared/renderer/modules/lcu-state-sync-new'
+import { mainWindowRendererModule } from '@shared/renderer/modules/main-window-new'
+import { respawnTimerRendererModule } from '@shared/renderer/modules/respawn-timer-new'
+import { storageRendererModule } from '@shared/renderer/modules/storage-new'
 
-import { setupDebug } from './debug'
-import { setupMatchHistoryTabs } from './match-history-tabs'
-
-export async function setupLeagueAkariFeatures() {
-  await setupApp()
-
-  await setupMainWindow()
-
-  await setupAuxiliaryWindow()
-
-  // await setupLcuStateSync()
-
-  await setupDebug()
-
-  await setupGameData()
-
-  // await setupCoreFunctionality()
-
-  await setupMatchHistoryTabs()
-
-  await setupAutoReply()
-
-  await setupAutoSelect()
-
-  // await setupAutoGameflow()
-
-  await setupRespawnTimer()
-
-  await setupCustomKeyboardSequence()
-}
+import { debugRendererModule } from './debug'
+import { matchHistoryTabsRendererModule } from './match-history-tabs-new'
 
 const manager = new LeagueAkariRendererModuleManager()
 
 export async function setupLeagueAkariRendererModules() {
-  await manager.register(lcuSyncModule)
-  await manager.register(autoGameflowRendererModule)
-  await manager.register(coreFunctionalityRendererModule)
-  manager.setup()
+  manager.use(appRendererModule)
+  manager.use(lcuSyncRendererModule)
+  manager.use(autoGameflowRendererModule)
+  manager.use(coreFunctionalityRendererModule)
+  manager.use(lcuClientRendererModule)
+  manager.use(matchHistoryTabsRendererModule)
+  manager.use(lcuConnectionRendererModule)
+  manager.use(mainWindowRendererModule)
+  manager.use(respawnTimerRendererModule)
+  manager.use(auxiliaryWindowRendererModule)
+  manager.use(autoSelectRendererModule)
+  manager.use(autoReplyRendererModule)
+  manager.use(storageRendererModule)
+  manager.use(debugRendererModule)
+
+  await manager.setup()
 }

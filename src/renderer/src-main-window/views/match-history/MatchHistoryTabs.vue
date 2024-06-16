@@ -150,8 +150,11 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
-import { fetchTabFullData } from '@main-window/modules/match-history-tabs'
-import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
+import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs-new'
+import {
+  TabState,
+  useMatchHistoryTabsStore
+} from '@main-window/modules/match-history-tabs-new/store'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
 
@@ -174,7 +177,7 @@ const handleTabChange = async (puuid: string) => {
 }
 
 const handleRefresh = async (puuid: string) => {
-  const result = await fetchTabFullData(puuid)
+  const result = await mhm.fetchTabFullData(puuid)
 
   if (typeof result === 'string') {
     laNotification.warn('召唤师信息', `无法拉取用户 ${puuid} 的信息`)
@@ -211,6 +214,7 @@ watch(
         setCurrent: true,
         pin: summoner.me?.puuid === puuid
       })
+      mhm.fetchTabFullData(puuid)
     }
   },
   { immediate: true }

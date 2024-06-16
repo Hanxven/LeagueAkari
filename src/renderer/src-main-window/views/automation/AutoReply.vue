@@ -3,8 +3,8 @@
     <template #header><span class="card-header-title">自动回复</span></template>
     <ControlItem label="开启" class="control-item-margin">
       <NSwitch
-        @update:value="(v) => setAutoReplyEnabled(v)"
-        :value="autoReply.settings.enabled"
+        @update:value="(v) => arm.setEnabled(v)"
+        :value="ar.settings.enabled"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -14,8 +14,8 @@
       label-description="仅在游戏状态为离开时，自动回复才会生效"
     >
       <NSwitch
-        @update:value="(v) => setEnableOnAway(v)"
-        :value="autoReply.settings.enableOnAway"
+        @update:value="(v) => arm.setEnableOnAway(v)"
+        :value="ar.settings.enableOnAway"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -25,12 +25,10 @@
       label-description="将作为自动回复的内容。注意避免敏感词"
     >
       <NInput
-        :status="
-          autoReply.settings.text.length === 0 && autoReply.settings.enabled ? 'warning' : 'success'
-        "
+        :status="ar.settings.text.length === 0 && ar.settings.enabled ? 'warning' : 'success'"
         style="max-width: 360px"
-        :value="autoReply.settings.text"
-        @update:value="(text) => setAutoReplyText(text)"
+        :value="ar.settings.text"
+        @update:value="(text) => arm.setText(text)"
         size="tiny"
       ></NInput>
     </ControlItem>
@@ -39,15 +37,11 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import {
-  setAutoReplyEnabled,
-  setAutoReplyText,
-  setEnableOnAway
-} from '@shared/renderer/modules/auto-reply'
-import { useAutoReplyStore } from '@shared/renderer/modules/auto-reply/store'
+import { autoReplyRendererModule as arm } from '@shared/renderer/modules/auto-reply-new'
+import { useAutoReplyStore } from '@shared/renderer/modules/auto-reply-new/store'
 import { NCard, NInput, NSwitch } from 'naive-ui'
 
-const autoReply = useAutoReplyStore()
+const ar = useAutoReplyStore()
 </script>
 
 <style lang="less" scoped>

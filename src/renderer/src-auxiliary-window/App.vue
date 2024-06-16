@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
 import { watch } from 'vue'
 import { useRouter } from 'vue-router'
 

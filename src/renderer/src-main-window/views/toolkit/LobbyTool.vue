@@ -78,8 +78,8 @@ import {
   createQueueLobby,
   getAvailableBots
 } from '@shared/renderer/http-api/lobby'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync-new/game-data'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
 import { laNotification } from '@shared/renderer/notification'
 import { AvailableBot } from '@shared/types/lcu/lobby'
 import { NButton, NCard, NFlex, NInput, NSelect, useMessage } from 'naive-ui'

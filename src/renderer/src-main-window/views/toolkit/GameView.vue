@@ -22,7 +22,7 @@ import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { NButton, NCard, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'
 
-import StandaloneMatchHistoryCardModal from '@main-window/views/match-history/card/StandaloneMatchHistoryCardModal.vue'
+import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMatchHistoryCardModal.vue'
 
 const gameId = ref<number>()
 const viewingGameId = ref<number>()

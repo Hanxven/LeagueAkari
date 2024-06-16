@@ -15,7 +15,7 @@ class DebugSettings {
   }
 }
 
-class DebugState {
+export class DebugState {
   settings = new DebugSettings()
 
   constructor() {

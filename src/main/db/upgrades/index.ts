@@ -1,7 +1,7 @@
 import { createLogger } from '@main/modules/akari-core/log'
 import { LEAGUE_AKARI_DB_CURRENT_VERSION } from '@shared/constants/common'
 import dayjs from 'dayjs'
-import { existsSync, renameSync, unlinkSync } from 'node:fs'
+import { existsSync, renameSync } from 'node:fs'
 import { join } from 'node:path'
 import { DataSource, QueryRunner } from 'typeorm'
 

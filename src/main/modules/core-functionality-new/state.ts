@@ -1,4 +1,3 @@
-import { lcuConnectionState } from '@main/modules/akari-core/lcu-connection'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game } from '@shared/types/lcu/match-history'
@@ -6,8 +5,8 @@ import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
-import { champSelect } from '../lcu-state-sync/champ-select'
-import { gameflow } from '../lcu-state-sync/gameflow'
+import { lcuConnectionModule as lcm } from '../akari-core/lcu-connection-new'
+import { lcuSyncModule as lcu } from '../lcu-state-sync-new'
 
 class CoreFunctionalitySettings {
   fetchAfterGame: boolean = true
@@ -131,13 +130,13 @@ export class CoreFunctionalityState {
   }[] = []
 
   get ongoingGameInfo() {
-    if (!gameflow.session) {
+    if (!lcu.gameflow.session) {
       return null
     }
 
     return {
-      queueType: gameflow.session.gameData.queue.type,
-      gameId: gameflow.session.gameData.gameId
+      queueType: lcu.gameflow.session.gameData.queue.type,
+      gameId: lcu.gameflow.session.gameData.gameId
     }
   }
 
@@ -146,18 +145,18 @@ export class CoreFunctionalityState {
    */
   get ongoingChampionSelections() {
     if (this.queryState === 'champ-select') {
-      if (!champSelect.session) {
+      if (!lcu.champSelect.session) {
         return null
       }
 
       const selections: Record<string, number> = {}
-      champSelect.session.myTeam.forEach((p) => {
+      lcu.champSelect.session.myTeam.forEach((p) => {
         if (p.puuid) {
           selections[p.puuid] = p.championId || p.championPickIntent
         }
       })
 
-      champSelect.session.theirTeam.forEach((p) => {
+      lcu.champSelect.session.theirTeam.forEach((p) => {
         if (p.puuid) {
           selections[p.puuid] = p.championId || p.championPickIntent
         }
@@ -165,24 +164,24 @@ export class CoreFunctionalityState {
 
       return selections
     } else if (this.queryState === 'in-game') {
-      if (!gameflow.session) {
+      if (!lcu.gameflow.session) {
         return null
       }
 
       const selections: Record<string, number> = {}
-      gameflow.session.gameData.playerChampionSelections.forEach((p) => {
+      lcu.gameflow.session.gameData.playerChampionSelections.forEach((p) => {
         if (p.puuid) {
           selections[p.puuid] = p.championId
         }
       })
 
-      gameflow.session.gameData.teamOne.forEach((p) => {
+      lcu.gameflow.session.gameData.teamOne.forEach((p) => {
         if (p.championId) {
           selections[p.puuid] = p.championId
         }
       })
 
-      gameflow.session.gameData.teamTwo.forEach((p) => {
+      lcu.gameflow.session.gameData.teamTwo.forEach((p) => {
         if (p.championId) {
           selections[p.puuid] = p.championId
         }
@@ -199,13 +198,13 @@ export class CoreFunctionalityState {
    */
   get ongoingTeams() {
     if (this.queryState === 'champ-select') {
-      if (!champSelect.session) {
+      if (!lcu.champSelect.session) {
         return null
       }
 
       const teams: Record<string, string[]> = {}
 
-      champSelect.session.myTeam
+      lcu.champSelect.session.myTeam
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
           const key = p.team ? `our-${p.team}` : 'our'
@@ -215,7 +214,7 @@ export class CoreFunctionalityState {
           teams[key].push(p.puuid)
         })
 
-      champSelect.session.theirTeam
+      lcu.champSelect.session.theirTeam
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
           const key = p.team ? `their-${p.team}` : 'their'
@@ -227,7 +226,7 @@ export class CoreFunctionalityState {
 
       return teams
     } else if (this.queryState === 'in-game') {
-      if (!gameflow.session) {
+      if (!lcu.gameflow.session) {
         return null
       }
 
@@ -236,13 +235,13 @@ export class CoreFunctionalityState {
         200: []
       }
 
-      gameflow.session.gameData.teamOne
+      lcu.gameflow.session.gameData.teamOne
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
           teams['100'].push(p.puuid)
         })
 
-      gameflow.session.gameData.teamTwo
+      lcu.gameflow.session.gameData.teamTwo
         .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
         .forEach((p) => {
           teams['200'].push(p.puuid)
@@ -271,22 +270,22 @@ export class CoreFunctionalityState {
    * in-game - 在游戏中或游戏结算中
    */
   get queryState() {
-    if (lcuConnectionState.state !== 'connected') {
+    if (lcm.state.state !== 'connected') {
       return 'unavailable'
     }
 
-    if (gameflow.phase === 'ChampSelect' && champSelect.session) {
+    if (lcu.gameflow.phase === 'ChampSelect' && lcu.champSelect.session) {
       return 'champ-select'
     }
 
     if (
-      gameflow.session &&
-      (gameflow.phase === 'GameStart' ||
-        gameflow.phase === 'InProgress' ||
-        gameflow.phase === 'WaitingForStats' ||
-        gameflow.phase === 'PreEndOfGame' ||
-        gameflow.phase === 'EndOfGame' ||
-        gameflow.phase === 'Reconnect')
+      lcu.gameflow.session &&
+      (lcu.gameflow.phase === 'GameStart' ||
+        lcu.gameflow.phase === 'InProgress' ||
+        lcu.gameflow.phase === 'WaitingForStats' ||
+        lcu.gameflow.phase === 'PreEndOfGame' ||
+        lcu.gameflow.phase === 'EndOfGame' ||
+        lcu.gameflow.phase === 'Reconnect')
     ) {
       return 'in-game'
     }
@@ -299,9 +298,9 @@ export class CoreFunctionalityState {
    */
   get isInEndgamePhase() {
     return (
-      gameflow.phase === 'WaitingForStats' ||
-      gameflow.phase === 'PreEndOfGame' ||
-      gameflow.phase === 'EndOfGame'
+      lcu.gameflow.phase === 'WaitingForStats' ||
+      lcu.gameflow.phase === 'PreEndOfGame' ||
+      lcu.gameflow.phase === 'EndOfGame'
     )
   }
 

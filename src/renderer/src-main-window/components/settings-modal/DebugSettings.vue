@@ -53,7 +53,7 @@
           应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
           <NPopover>
             <template #trigger>
-              <span style="font-weight: 700; color: #fff; cursor: pointer;">详情</span>
+              <span style="font-weight: 700; color: #fff; cursor: pointer">详情</span>
             </template>
             <div style="font-size: 12px">该目录下：</div>
             <div style="font-size: 12px">LeagueAkari.db - 存储用户设置、已标记的玩家等信息</div>
@@ -94,40 +94,40 @@
     <NCard size="small" style="margin-top: 8px">
       <template #header
         ><span class="card-header-title"
-          >LCU{{ app.lcuConnectionState === 'connected' ? '' : ' (未连接)' }}</span
+          >LCU{{ lc.state === 'connected' ? '' : ' (未连接)' }}</span
         ></template
       >
       <NTable size="small" bordered>
         <tbody>
           <tr>
             <td style="width: 50px">端口</td>
-            <td><CopyableText :text="app.lcuAuth?.port ?? '-'" /></td>
+            <td><CopyableText :text="lc.auth?.port ?? '-'" /></td>
           </tr>
           <tr>
             <td>PID</td>
-            <td><CopyableText :text="app.lcuAuth?.pid ?? '-'" /></td>
+            <td><CopyableText :text="lc.auth?.pid ?? '-'" /></td>
           </tr>
           <tr>
             <td>密钥</td>
-            <td><CopyableText :text="app.lcuAuth?.password ?? '-'" /></td>
+            <td><CopyableText :text="lc.auth?.password ?? '-'" /></td>
           </tr>
           <tr>
             <td>区服</td>
             <td>
-              <CopyableText :text="app.lcuAuth?.rsoPlatformId ?? '-'">{{
-                (app.lcuAuth?.rsoPlatformId
-                  ? rsoPlatformText[app.lcuAuth.rsoPlatformId] || app.lcuAuth.rsoPlatformId
-                  : app.lcuAuth?.rsoPlatformId) || '-'
+              <CopyableText :text="lc.auth?.rsoPlatformId ?? '-'">{{
+                (lc.auth?.rsoPlatformId
+                  ? rsoPlatformText[lc.auth.rsoPlatformId] || lc.auth.rsoPlatformId
+                  : lc.auth?.rsoPlatformId) || '-'
               }}</CopyableText>
             </td>
           </tr>
           <tr>
             <td>地域</td>
             <td>
-              <CopyableText :text="app.lcuAuth?.region ?? '-'">{{
-                app.lcuAuth?.region
-                  ? regionText[app.lcuAuth.region] || app.lcuAuth.region
-                  : app.lcuAuth?.region || '-'
+              <CopyableText :text="lc.auth?.region ?? '-'">{{
+                lc.auth?.region
+                  ? regionText[lc.auth.region] || lc.auth.region
+                  : lc.auth?.region || '-'
               }}</CopyableText>
             </td>
           </tr>
@@ -136,7 +136,7 @@
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">游戏流</span></template>
-      <span class="text" v-if="app.lcuConnectionState === 'connected'"
+      <span class="text" v-if="lc.state === 'connected'"
         >{{ gameflowText[gameflow.phase || 'None'] }} ({{ gameflow.phase }})</span
       >
       <span class="text" v-else>不可用 (未连接)</span>
@@ -152,9 +152,11 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { mainCall } from '@shared/renderer/utils/ipc'
+import { appRendererModule as am } from '@shared/renderer/modules/app-new'
+import { useAppStore } from '@shared/renderer/modules/app-new/store'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
+import { mainWindowRendererModule as mwm } from '@shared/renderer/modules/main-window-new'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import {
@@ -173,12 +175,7 @@ import {
 } from 'naive-ui'
 import { computed, h, nextTick, ref, useCssModule, watch } from 'vue'
 
-import {
-  addPrintRule,
-  disablePrintRule,
-  enablePrintRule,
-  removePrintRule
-} from '@main-window/modules/debug'
+import { debugRendererModule as dm } from '@main-window/modules/debug'
 import { useDebugStore } from '@main-window/modules/debug/store'
 
 import { lcuEndpoints } from './lcu-endpoints'
@@ -186,6 +183,7 @@ import { lcuEndpoints } from './lcu-endpoints'
 const gameflow = useGameflowStore()
 const app = useAppStore()
 const debug = useDebugStore()
+const lc = useLcuConnectionStore()
 
 const gameflowText = {
   Matchmaking: '正在匹配',
@@ -212,9 +210,9 @@ const columns: DataTableColumn<any>[] = [
       return h(NCheckbox, {
         'onUpdate:checked': (val: boolean) => {
           if (val) {
-            enablePrintRule(row.rule)
+            dm.enablePrintRule(row.rule)
           } else {
-            disablePrintRule(row.rule)
+            dm.disablePrintRule(row.rule)
           }
         },
         checked: row.data.enabled,
@@ -319,27 +317,27 @@ const handleAddRule = async () => {
     return
   }
 
-  addPrintRule(editRuleText.value)
+  dm.addPrintRule(editRuleText.value)
 
   editRuleModalShow.value = false
 }
 
 const handleRemoveEditRule = async (rule: string) => {
-  removePrintRule(rule)
+  dm.removePrintRule(rule)
 }
 
 const styles = useCssModule()
 
 const handleToggleDevtools = async () => {
-  await mainCall('main-window/devtools/toggle')
+  await mwm.toggleDevTools()
 }
 
 const handleShowLogsDir = async () => {
-  await mainCall('logs/dir/open')
+  await am.openLogsDirInExplorer()
 }
 
 const handleShowUserDataDir = async () => {
-  await mainCall('app/user-data/open')
+  await am.openUserDataDirInExplorer()
 }
 
 const handleReload = () => {

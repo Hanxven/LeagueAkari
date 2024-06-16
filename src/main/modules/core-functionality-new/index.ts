@@ -1,16 +1,8 @@
-import { lcuConnectionState } from '@main/modules/akari-core/lcu-connection'
-import { createLogger } from '@main/modules/akari-core/log'
-import { mwNotification } from '@main/modules/akari-core/main-window'
-import { pSendKey, pSendKeys, winPlatformEventBus } from '@main/modules/akari-core/platform'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { chatSend } from '@main/http-api/chat'
 import { getGame, getMatchHistory } from '@main/http-api/match-history'
 import { getRankedStats } from '@main/http-api/ranked'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
-import { saveEncounteredGame } from '@main/storage/encountered-games'
-import { querySavedPlayerWithGames, saveSavedPlayer } from '@main/storage/saved-player'
-import { getSetting, setSetting } from '@main/storage/settings'
-import { LeagueAkariModuleManager } from '@shared/akari/main-module-manager'
 import { MobxBasedModule } from '@shared/akari/mobx-based-module'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -20,10 +12,15 @@ import { summonerName } from '@shared/utils/name'
 import { sleep } from '@shared/utils/sleep'
 import { calculateTogetherTimes, removeSubsets } from '@shared/utils/team-up-calc'
 import dayjs from 'dayjs'
-import { comparer, computed, observable, reaction, runInAction, toJS } from 'mobx'
+import { comparer, computed, observable, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
 
-import { lcuSyncModule as lcu } from '../lcu-state-sync-new'
+import { LcuConnectionModule } from '../akari-core/lcu-connection-new'
+import { AppLogger, LogModule } from '../akari-core/log-new'
+import { MainWindowModule } from '../akari-core/main-window-new'
+import { PlatformModule } from '../akari-core/platform-new'
+import { StorageModule } from '../akari-core/storage-new'
+import { LcuSyncModule } from '../lcu-state-sync-new'
 import { CoreFunctionalityState } from './state'
 
 export class CoreFunctionalityModule extends MobxBasedModule {
@@ -39,8 +36,14 @@ export class CoreFunctionalityModule extends MobxBasedModule {
   static SEND_INTERVAL = 65
 
   private _controller: AbortController | null = null
-  private _logger = createLogger('core-functionality')
   private _playerAnalysisFetchLimiter = new PQueue()
+
+  private _logger: AppLogger
+  private _storageModule: StorageModule
+  private _lcm: LcuConnectionModule
+  private _lcu: LcuSyncModule
+  private _pm: PlatformModule
+  private _mwm: MainWindowModule
 
   private _isSimulatingKeyboard = false
 
@@ -55,13 +58,20 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     super('core-functionality')
   }
 
-  override async onRegister(manager: LeagueAkariModuleManager) {
-    await super.onRegister(manager)
+  override async setup() {
+    await super.setup()
 
-    this._setupSettingsStateSync()
+    this._logger = this.manager.getModule<LogModule>('log').createLogger('core-functionality')
+    this._lcu = this.manager.getModule('lcu-state-sync')
+    this._lcm = this.manager.getModule('lcu-connection')
+    this._mwm = this.manager.getModule('main-window')
+    this._pm = this.manager.getModule('win-platform')
+    this._storageModule = this.manager.getModule('storage')
+
+    await this._loadSettings()
+    this._setupSettingsSync()
     this._setupStateSync()
     this._setupMethodCall()
-    await this._loadSettings()
 
     this._playerAnalysisFetchLimiter.concurrency =
       this.state.settings.playerAnalysisFetchConcurrency
@@ -97,7 +107,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
             await this._inGameQuery(this._controller.signal)
           }
         } catch (error) {
-          mwNotification.warn('core-functionality', '对局中', '无法加载对局中信息')
+          this._mwm.notify.warn('core-functionality', '对局中', '无法加载对局中信息')
           this._logger.warn(`加载对局中信息时发生错误:  ${formatError(error)}, in ${state}`)
         }
       },
@@ -138,10 +148,10 @@ export class CoreFunctionalityModule extends MobxBasedModule {
           }
 
           const task = async () => {
-            if (lcu.chat.conversations.championSelect) {
+            if (this._lcu.chat.conversations.championSelect) {
               try {
                 await chatSend(
-                  lcu.chat.conversations.championSelect.id,
+                  this._lcu.chat.conversations.championSelect.id,
                   this._formatTagRemindingText(s, t),
                   'celebration'
                 )
@@ -161,7 +171,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     )
 
     this.autoDisposeReaction(
-      () => lcu.chat.conversations.championSelect,
+      () => this._lcu.chat.conversations.championSelect,
       (c) => {
         if (c) {
           this._tagRemindingQueue.start()
@@ -197,34 +207,36 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
   private _handleSavePlayerInEndgame() {
     const isEndGame = computed(
-      () => lcu.gameflow.phase === 'EndOfGame' || lcu.gameflow.phase === 'PreEndOfGame'
+      () => this._lcu.gameflow.phase === 'EndOfGame' || this._lcu.gameflow.phase === 'PreEndOfGame'
     )
 
     // 在游戏结算时记录所有玩家到数据库
-    reaction(
+    this.autoDisposeReaction(
       () => isEndGame.get(),
       (is) => {
-        if (is && lcu.gameflow.session && lcu.summoner.me && lcuConnectionState.auth) {
-          const t1 = lcu.gameflow.session.gameData.teamOne
-          const t2 = lcu.gameflow.session.gameData.teamTwo
+        if (is && this._lcu.gameflow.session && this._lcu.summoner.me && this._lcm.state.auth) {
+          const t1 = this._lcu.gameflow.session.gameData.teamOne
+          const t2 = this._lcu.gameflow.session.gameData.teamTwo
 
-          const all = [...t1, ...t2].filter((p) => p.puuid && p.puuid !== lcu.summoner.me?.puuid)
+          const all = [...t1, ...t2].filter(
+            (p) => p.puuid && p.puuid !== this._lcu.summoner.me?.puuid
+          )
 
           const tasks = all.map(async (p) => {
-            const task1 = saveSavedPlayer({
+            const task1 = this._storageModule.saveSavedPlayer({
               encountered: true,
-              region: lcuConnectionState.auth!.region,
-              rsoPlatformId: lcuConnectionState.auth!.rsoPlatformId,
-              selfPuuid: lcu.summoner.me!.puuid,
+              region: this._lcm.state.auth!.region,
+              rsoPlatformId: this._lcm.state.auth!.rsoPlatformId,
+              selfPuuid: this._lcu.summoner.me!.puuid,
               puuid: p.puuid
             })
 
-            const task2 = saveEncounteredGame({
-              region: lcuConnectionState.auth!.region,
-              rsoPlatformId: lcuConnectionState.auth!.rsoPlatformId,
-              selfPuuid: lcu.summoner.me!.puuid,
+            const task2 = this._storageModule.saveEncounteredGame({
+              region: this._lcm.state.auth!.region,
+              rsoPlatformId: this._lcm.state.auth!.rsoPlatformId,
+              selfPuuid: this._lcu.summoner.me!.puuid,
               puuid: p.puuid,
-              gameId: lcu.gameflow.session!.gameData.gameId,
+              gameId: this._lcu.gameflow.session!.gameData.gameId,
               queueType: this.state.ongoingGameInfo?.queueType || ''
             })
 
@@ -283,11 +295,11 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       this._sendPlayerStatsInGame('their')
     }
 
-    this._disposers.add(() => winPlatformEventBus.off('windows/global-key/page-up', sendOur))
-    this._disposers.add(() => winPlatformEventBus.off('windows/global-key/page-down', sendTheir))
+    this._disposers.add(() => this._pm.bus.off('windows/global-key/page-up', sendOur))
+    this._disposers.add(() => this._pm.bus.off('windows/global-key/page-down', sendTheir))
 
-    winPlatformEventBus.on('windows/global-key/page-up', sendOur)
-    winPlatformEventBus.on('windows/global-key/page-down', sendTheir)
+    this._pm.bus.on('windows/global-key/page-up', sendOur)
+    this._pm.bus.on('windows/global-key/page-down', sendTheir)
   }
 
   private async _sendPlayerStatsInGame(teamSide: 'our' | 'their') {
@@ -301,9 +313,13 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
     this._isSimulatingKeyboard = true
 
-    if (!lcu.summoner.me || !this.state.ongoingTeams || !this.state.ongoingChampionSelections) {
+    if (
+      !this._lcu.summoner.me ||
+      !this.state.ongoingTeams ||
+      !this.state.ongoingChampionSelections
+    ) {
       this._logger.warn(
-        `信息不足: ${lcu.summoner.me} ${this.state.ongoingTeams} ${this.state.ongoingChampionSelections}`
+        `信息不足: ${this._lcu.summoner.me} ${this.state.ongoingTeams} ${this.state.ongoingChampionSelections}`
       )
       this._isSimulatingKeyboard = false
       return
@@ -313,7 +329,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
     let selfTeam = ''
     for (const [t, players] of Object.entries(this.state.ongoingTeams)) {
-      if (players.includes(lcu.summoner.me.puuid)) {
+      if (players.includes(this._lcu.summoner.me.puuid)) {
         selfTeam = t
         break
       }
@@ -397,7 +413,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
           name = player.summoner?.gameName || player.summoner?.displayName
         } else {
           name =
-            lcu.gameData.champions[playerSelected || 0]?.name ||
+            this._lcu.gameData.champions[playerSelected || 0]?.name ||
             player.summoner?.gameName ||
             player.summoner?.displayName
         }
@@ -437,7 +453,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
         for (let i = 0; i < subTeams.length; i++) {
           const identities = subTeams[i].players.map((p) => {
             return (
-              lcu.gameData.champions[this.state.ongoingChampionSelections![p]]?.name ||
+              this._lcu.gameData.champions[this.state.ongoingChampionSelections![p]]?.name ||
               this.state.ongoingPlayers[p]?.summoner?.gameName ||
               this.state.ongoingPlayers[p]?.summoner?.displayName ||
               p.toString()
@@ -457,9 +473,9 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     }
 
     if (this.state.queryState === 'champ-select') {
-      if (lcu.chat.conversations.championSelect) {
+      if (this._lcu.chat.conversations.championSelect) {
         for (let i = 0; i < texts.length; i++) {
-          tasks.push(() => chatSend(lcu.chat.conversations.championSelect!.id, texts[i]))
+          tasks.push(() => chatSend(this._lcu.chat.conversations.championSelect!.id, texts[i]))
 
           if (i !== texts.length - 1) {
             tasks.push(() => sleep(CoreFunctionalityModule.SEND_INTERVAL))
@@ -469,13 +485,13 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     } else if (this.state.queryState === 'in-game') {
       for (let i = 0; i < texts.length; i++) {
         tasks.push(async () => {
-          pSendKey(13, true)
-          pSendKey(13, false)
+          this._pm.sendKey(13, true)
+          this._pm.sendKey(13, false)
           await sleep(CoreFunctionalityModule.SEND_INTERVAL)
-          pSendKeys(texts[i])
+          this._pm.sendInputString(texts[i])
           await sleep(CoreFunctionalityModule.SEND_INTERVAL)
-          pSendKey(13, true)
-          pSendKey(13, false)
+          this._pm.sendKey(13, true)
+          this._pm.sendKey(13, false)
         })
 
         if (i !== texts.length - 1) {
@@ -615,8 +631,8 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
       this.sendEvent('update/ongoing-player/summoner', puuid, summonerInfo.data)
 
-      const auth = lcuConnectionState.auth
-      const me = lcu.summoner.me
+      const auth = this._lcm.state.auth
+      const me = this._lcu.summoner.me
 
       if (!auth || !me) {
         return
@@ -627,7 +643,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
           return
         }
 
-        const savedInfo = await querySavedPlayerWithGames({
+        const savedInfo = await this._storageModule.querySavedPlayerWithGames({
           region: auth.region,
           rsoPlatformId: auth.rsoPlatformId,
           selfPuuid: me.puuid,
@@ -753,7 +769,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
   }
 
   private async _champSelectQuery(signal: AbortSignal) {
-    const session = lcu.champSelect.session
+    const session = this._lcu.champSelect.session
     if (!session) {
       return
     }
@@ -776,7 +792,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
   }
 
   private async _inGameQuery(signal: AbortSignal) {
-    const session = lcu.gameflow.session
+    const session = this._lcu.gameflow.session
 
     if (!session) {
       return
@@ -806,7 +822,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     return Promise.reject(e)
   }
 
-  private _setupSettingsStateSync() {
+  private _setupSettingsSync() {
     this.simpleSync(
       'settings/auto-route-on-game-start',
       () => this.state.settings.autoRouteOnGameStart
@@ -862,15 +878,15 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     })
     this.onCall('set-setting/auto-route-on-game-start', async (enabled) => {
       this.state.settings.setAutoRouteOnGameStart(enabled)
-      await setSetting('core-functionality/auto-route-on-game-start', enabled)
+      await this._storageModule.setSetting('core-functionality/auto-route-on-game-start', enabled)
     })
     this.onCall('set-setting/fetch-after-game', async (enabled) => {
       this.state.settings.setFetchAfterGame(enabled)
-      await setSetting('core-functionality/fetch-after-game', enabled)
+      await this._storageModule.setSetting('core-functionality/fetch-after-game', enabled)
     })
     this.onCall('set-setting/fetch-detailed-game', async (enabled) => {
       this.state.settings.setFetchDetailedGame(enabled)
-      await setSetting('core-functionality/fetch-detailed-game', enabled)
+      await this._storageModule.setSetting('core-functionality/fetch-detailed-game', enabled)
     })
 
     const setPreMadeTeamThreshold = async (threshold: number) => {
@@ -879,7 +895,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setPreMadeTeamThreshold(threshold)
-      await setSetting('core-functionality/pre-made-team-threshold', threshold)
+      await this._storageModule.setSetting('core-functionality/pre-made-team-threshold', threshold)
     }
 
     const setTeamAnalysisPreloadCount = async (count: number) => {
@@ -888,7 +904,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setTeamAnalysisPreloadCount(count)
-      await setSetting('core-functionality/team-analysis-preload-count', count)
+      await this._storageModule.setSetting('core-functionality/team-analysis-preload-count', count)
     }
 
     this.onCall('set-setting/match-history-load-count', async (count) => {
@@ -905,7 +921,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setMatchHistoryLoadCount(count)
-      await setSetting('core-functionality/match-history-load-count', count)
+      await this._storageModule.setSetting('core-functionality/match-history-load-count', count)
     })
 
     this.onCall('set-setting/pre-made-team-threshold', (threshold) =>
@@ -914,7 +930,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
     this.onCall('set-setting/send-kda-in-game', async (enabled) => {
       this.state.settings.setSendKdaInGame(enabled)
-      await setSetting('core-functionality/send-kda-in-game', enabled)
+      await this._storageModule.setSetting('core-functionality/send-kda-in-game', enabled)
     })
 
     this.onCall('set-setting/team-analysis-preload-count', (count) =>
@@ -923,12 +939,15 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
     this.onCall('set-setting/send-kda-in-game-with-pre-made-teams', async (enabled) => {
       this.state.settings.setSendKdaInGameWithPreMadeTeams(enabled)
-      await setSetting('core-functionality/send-kda-in-game-with-pre-made-teams', enabled)
+      await this._storageModule.setSetting(
+        'core-functionality/send-kda-in-game-with-pre-made-teams',
+        enabled
+      )
     })
 
     this.onCall('set-setting/ongoing-analysis-enabled', async (enabled) => {
       this.state.settings.setOngoingAnalysisEnabled(enabled)
-      await setSetting('core-functionality/ongoing-analysis-enabled', enabled)
+      await this._storageModule.setSetting('core-functionality/ongoing-analysis-enabled', enabled)
     })
 
     this.onCall('set-setting/send-kda-threshold', async (threshold) => {
@@ -937,7 +956,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setSendKdaThreshold(threshold)
-      await setSetting('core-functionality/send-kda-threshold', threshold)
+      await this._storageModule.setSetting('core-functionality/send-kda-threshold', threshold)
     })
 
     this.onCall('set-setting/player-analysis-fetch-concurrency', async (limit) => {
@@ -948,16 +967,19 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       this._playerAnalysisFetchLimiter.concurrency = limit
 
       this.state.settings.setPlayerAnalysisFetchConcurrency(limit)
-      await setSetting('core-functionality/player-analysis-fetch-concurrency', limit)
+      await this._storageModule.setSetting(
+        'core-functionality/player-analysis-fetch-concurrency',
+        limit
+      )
     })
 
     this.onCall('save/saved-player', async (player) => {
-      const r = await saveSavedPlayer(player)
+      const r = await this._storageModule.saveSavedPlayer(player)
 
       if (this.state.ongoingPlayers) {
         const p = this.state.ongoingPlayers.get(player.puuid)
         if (p) {
-          const savedInfo = await querySavedPlayerWithGames({
+          const savedInfo = await this._storageModule.querySavedPlayerWithGames({
             region: player.region,
             rsoPlatformId: player.rsoPlatformId,
             selfPuuid: player.selfPuuid,
@@ -977,71 +999,77 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setAutoRouteOnGameStart(
-      await getSetting(
+      await this._storageModule.getSetting(
         'core-functionality/auto-route-on-game-start',
         this.state.settings.autoRouteOnGameStart
       )
     )
 
     this.state.settings.setFetchDetailedGame(
-      await getSetting(
+      await this._storageModule.getSetting(
         'core-functionality/fetch-detailed-game',
         this.state.settings.fetchDetailedGame
       )
     )
 
     this.state.settings.setMatchHistoryLoadCount(
-      await getSetting(
+      await this._storageModule.getSetting(
         'core-functionality/match-history-load-count',
         this.state.settings.matchHistoryLoadCount
       )
     )
 
     this.state.settings.setPreMadeTeamThreshold(
-      await getSetting(
+      await this._storageModule.getSetting(
         'core-functionality/pre-made-team-threshold',
         this.state.settings.preMadeTeamThreshold
       )
     )
 
     this.state.settings.setSendKdaInGame(
-      await getSetting('core-functionality/send-kda-in-game', this.state.settings.sendKdaInGame)
+      await this._storageModule.getSetting(
+        'core-functionality/send-kda-in-game',
+        this.state.settings.sendKdaInGame
+      )
     )
 
     this.state.settings.setSendKdaInGameWithPreMadeTeams(
-      await getSetting(
+      await this._storageModule.getSetting(
         'core-functionality/send-kda-in-game-with-pre-made-teams',
         this.state.settings.sendKdaInGameWithPreMadeTeams
       )
     )
 
     this.state.settings.setSendKdaThreshold(
-      await getSetting(
+      await this._storageModule.getSetting(
         'core-functionality/send-kda-threshold',
         this.state.settings.sendKdaThreshold
       )
     )
 
     this.state.settings.setTeamAnalysisPreloadCount(
-      await getSetting(
+      await this._storageModule.getSetting(
         'core-functionality/team-analysis-preload-count',
         this.state.settings.teamAnalysisPreloadCount
       )
     )
 
     this.state.settings.setFetchAfterGame(
-      await getSetting('core-functionality/fetch-after-game', this.state.settings.fetchAfterGame)
+      await this._storageModule.getSetting(
+        'core-functionality/fetch-after-game',
+        this.state.settings.fetchAfterGame
+      )
     )
 
     this.state.settings.setPlayerAnalysisFetchConcurrency(
-      await getSetting(
+      await this._storageModule.getSetting(
         'core-functionality/player-analysis-fetch-concurrency',
         this.state.settings.playerAnalysisFetchConcurrency
       )
     )
 
     this.state.settings.setOngoingAnalysisEnabled(
-      await getSetting(
+      await this._storageModule.getSetting(
         'core-functionality/ongoing-analysis-enabled',
         this.state.settings.ongoingAnalysisEnabled
       )

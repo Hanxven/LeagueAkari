@@ -118,13 +118,13 @@
 
 <script setup lang="ts">
 import { useCompleteVisibility } from '@shared/renderer/compositions/useOverflowDetection'
-import { setCloseStrategy } from '@shared/renderer/modules/app'
+import { appRendererModule as am } from '@shared/renderer/modules/app-new'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync/login'
-import { useMainWindowStore } from '@shared/renderer/modules/main-window/store'
+import { mainWindowRendererModule as mwm } from '@shared/renderer/modules/main-window-new'
+import { useMainWindowStore } from '@shared/renderer/modules/main-window-new/store'
 import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
-import { mainCall, onMainEvent } from '@shared/renderer/utils/ipc'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import {
   Carbon as CarbonIcon,
@@ -191,14 +191,14 @@ watch(
 )
 
 const handleMinimize = async () => {
-  await mainCall('main-window/minimize')
+  await mwm.minimize()
 }
 
 const handleMaximize = async () => {
   if (mw.windowState === 'normal') {
-    await mainCall('main-window/maximize')
+    await mwm.maximize()
   } else {
-    await mainCall('main-window/unmaximize')
+    await mwm.unmaximize()
   }
 }
 
@@ -207,19 +207,19 @@ const closeStrategy = ref<MainWindowCloseStrategy>('minimize-to-tray')
 const isRememberCloseStrategy = ref<boolean>(false)
 
 const handleClose = async () => {
-  mainCall('main-window/close')
+  await mwm.close()
 }
 
-onMainEvent('main-window/close-asking', () => {
+mwm.onAskClose(() => {
   isCloseConfirmationModelShow.value = true
 })
 
 const handleReallyClose = async () => {
   if (isRememberCloseStrategy.value) {
-    await setCloseStrategy(closeStrategy.value)
-    await mainCall('main-window/close')
+    await am.setCloseStrategy(closeStrategy.value)
+    await mwm.close()
   } else {
-    await mainCall('main-window/close', closeStrategy.value)
+    await mwm.close(closeStrategy.value)
   }
 
   isCloseConfirmationModelShow.value = false

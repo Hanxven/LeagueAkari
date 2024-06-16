@@ -14,27 +14,33 @@ export class LeagueAkariModule {
   }
 
   get manager() {
+    if (!this._manager) {
+      throw new Error('No Akari manager')
+    }
     return this._manager
   }
 
-  get dependencies() {
-    return this._deps
-  }
-
-  constructor(
-    private _moduleId: string,
-    private _deps: string[] = []
-  ) {}
+  /**
+   *
+   * @param _moduleId 模块唯一标识
+   * @param _rDeps 在提供服务时需要的其他模块
+   */
+  constructor(private _moduleId: string) {}
 
   /**
    * 参方法由 Manager 管理，不应手动调用
    */
-  _setManager(manager: LeagueAkariModuleManager | null) {
+  _setManager(manager: LeagueAkariModuleManager) {
     this._manager = manager
   }
 
   dispatchCall(methodName: string, ...args: any[]) {
-    return this._methodMap.get(methodName)?.(...args)
+    const fn = this._methodMap.get(methodName)
+    if (!fn) {
+      throw new Error(`No method of name ${methodName}`)
+    }
+
+    return fn(...args)
   }
 
   sendEvent(eventName: string, ...args: any[]) {
@@ -54,17 +60,18 @@ export class LeagueAkariModule {
   }
 
   /**
-   * 在被 manager 注册时触发
+   * 启动服务
    */
-  onRegister(manager: LeagueAkariModuleManager): void | Promise<void> {
-    this._setManager(manager)
+  setup(): void | Promise<void> {
+    if (!this._manager) {
+      throw new Error('No Akari manager')
+    }
   }
 
   /**
-   * 在被 manager 取消注册时触发
+   * 停止服务
    */
-  onUnregister(): void | Promise<void> {
+  dismantle(): void | Promise<void> {
     this._methodMap.clear()
-    this._setManager(null)
   }
 }

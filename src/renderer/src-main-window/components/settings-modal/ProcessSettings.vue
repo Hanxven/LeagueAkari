@@ -9,7 +9,7 @@
         :label-width="320"
       >
         <NButton
-          :disabled="app.lcuConnectionState !== 'connected'"
+          :disabled="lc.state !== 'connected'"
           size="tiny"
           secondary
           type="warning"
@@ -24,7 +24,7 @@
         :label-width="320"
       >
         <NButton
-          :disabled="app.lcuConnectionState !== 'connected'"
+          :disabled="lc.state !== 'connected'"
           size="tiny"
           secondary
           type="warning"
@@ -144,11 +144,14 @@ import { quit } from '@shared/renderer/http-api/process-control'
 import { killUx, launchUx, restartUx } from '@shared/renderer/http-api/riotclient'
 import { setFixWindowMethodAOptions } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
+import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection-new'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import { NButton, NCard, NInputNumber, NScrollbar, useDialog } from 'naive-ui'
 import { reactive, ref } from 'vue'
 
 const app = useAppStore()
+const lc = useLcuConnectionStore()
 
 const dialog = useDialog()
 
@@ -169,7 +172,7 @@ const handleQuitClient = async () => {
 }
 
 const handleDisconnect = async () => {
-  await mainCall('lcu-connection/disconnect')
+  await lcm.lcuDisconnect()
 }
 
 const handleRestartUx = async () => {

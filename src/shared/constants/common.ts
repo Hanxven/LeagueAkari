@@ -15,3 +15,5 @@ export const LEAGUE_AKARI_DEFAULT_NOTIFICATION_DURATION = 4000
 export const EMPTY_PUUID = '00000000-0000-0000-0000-000000000000'
 
 export const 联盟阿卡林 = 'League Akari'
+
+export const AKARI_USER_MODEL_ID = 'sugar.cocoa.league-akari'

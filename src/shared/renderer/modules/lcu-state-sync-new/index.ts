@@ -15,8 +15,8 @@ export class LcuSyncRendererModule extends StateSyncModule {
     super('lcu-state-sync')
   }
 
-  override async onRegister(manager: LeagueAkariRendererModuleManager) {
-    await super.onRegister(manager)
+  override async setup() {
+    await super.setup()
 
     this._syncLcuChampSelect()
     this._syncLcuChat()
@@ -109,4 +109,4 @@ export class LcuSyncRendererModule extends StateSyncModule {
   }
 }
 
-export const lcuSyncModule = new LcuSyncRendererModule()
+export const lcuSyncRendererModule = new LcuSyncRendererModule()

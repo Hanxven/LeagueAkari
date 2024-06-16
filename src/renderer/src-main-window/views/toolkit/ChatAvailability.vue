@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
+import { useChatStore } from '@shared/renderer/modules/lcu-state-sync-new/chat'
 import { AvailabilityType, changeAvailability } from '@shared/renderer/http-api/chat'
 import { laNotification } from '@shared/renderer/notification'
 import { NCard, NFlex, NRadio, NRadioGroup } from 'naive-ui'

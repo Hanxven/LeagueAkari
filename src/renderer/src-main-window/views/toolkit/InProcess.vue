@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
 import { earlyExit } from '@shared/renderer/http-api/gameflow'
 import { playAgain } from '@shared/renderer/http-api/lobby'
 import { dodge } from '@shared/renderer/http-api/login'

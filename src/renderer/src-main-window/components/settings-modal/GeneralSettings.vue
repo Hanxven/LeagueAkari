@@ -11,7 +11,7 @@
         <NSwitch
           size="small"
           :value="rt.settings.enabled"
-          @update:value="(val) => setEnableRespawnTimer(val)"
+          @update:value="(val) => rtm.setEnabled(val)"
         />
       </ControlItem>
     </NCard>
@@ -137,7 +137,7 @@
         <NSwitch
           size="small"
           :value="aux.settings.enabled"
-          @update:value="(val) => setAuxiliaryWindowEnabled(val)"
+          @update:value="(val) => awm.setEnabled(val)"
         />
       </ControlItem>
       <ControlItem
@@ -153,7 +153,7 @@
           :max="1"
           :step="0.01"
           :format-tooltip="(v) => `${(v * 100).toFixed()} %`"
-          @update:value="(val) => setAuxiliaryWindowOpacity(val)"
+          @update:value="(val) => awm.setOpacity(val)"
           :value="aux.settings.opacity"
         ></NSlider>
       </ControlItem>
@@ -166,7 +166,7 @@
         <NSwitch
           size="small"
           :value="aux.settings.showSkinSelector"
-          @update:value="(val) => setShowSkinSelector(val)"
+          @update:value="(val) => awm.setShowSkinSelector(val)"
         />
       </ControlItem>
       <ControlItem
@@ -182,7 +182,7 @@
           :max="3"
           step="0.1"
           :value="aux.settings.zoomFactor"
-          @update:value="(val) => setZoomFactor(val || 1.0)"
+          @update:value="(val) => awm.setZoomFactor(val || 1.0)"
         />
       </ControlItem>
       <ControlItem
@@ -191,7 +191,7 @@
         label-description="重新设置辅助窗口的位置，还原到默认主屏幕正中心"
         :label-width="320"
       >
-        <NButton size="tiny" type="warning" secondary @click="() => resetAuxiliaryWindowPosition()"
+        <NButton size="tiny" type="warning" secondary @click="() => awm.resetWindowPosition()"
           >重设</NButton
         >
       </ControlItem>
@@ -292,17 +292,12 @@
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { useAppStore } from '@shared/renderer/modules/app/store'
-import {
-  resetAuxiliaryWindowPosition,
-  setAuxiliaryWindowEnabled,
-  setAuxiliaryWindowOpacity
-} from '@shared/renderer/modules/auxiliary-window'
-import { setShowSkinSelector, setZoomFactor } from '@shared/renderer/modules/auxiliary-window'
-import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
+import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window-new'
+import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window-new/store'
 import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality-new'
-import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
-import { setEnableRespawnTimer } from '@shared/renderer/modules/respawn-timer'
-import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
+import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality-new/store'
+import { respawnTimerRendererModule as rtm } from '@shared/renderer/modules/respawn-timer-new'
+import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer-new/store'
 import { NButton, NCard, NFlex, NInput, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 const rt = useRespawnTimerStore()

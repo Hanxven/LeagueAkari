@@ -40,10 +40,10 @@
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
+import { useAutoSelectStore } from '@shared/renderer/modules/auto-select-new/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
+import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync-new/champ-select'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync-new/summoner'
 import { Action } from '@shared/types/lcu/champ-select'
 import { NCard, NTimeline, NTimelineItem } from 'naive-ui'
 import { computed } from 'vue'

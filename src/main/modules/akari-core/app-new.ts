@@ -1,27 +1,23 @@
+import { optimizer } from '@electron-toolkit/utils'
 import { autoGameflowState } from '@main/modules/auto-gameflow/state'
 import { autoReplyState } from '@main/modules/auto-reply/state'
 import { autoSelectState } from '@main/modules/auto-select/state'
 import { coreFunctionalityState } from '@main/modules/core-functionality/state'
 import { respawnTimerState } from '@main/modules/respawn-timer/state'
-import { getSetting, setSetting } from '@main/storage/settings'
-import { LeagueAkariModuleManager } from '@shared/akari/main-module-manager'
 import { MobxBasedModule } from '@shared/akari/mobx-based-module'
 import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants/common'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { formatError } from '@shared/utils/errors'
 import axios from 'axios'
-import dayjs from 'dayjs'
-import { app, shell } from 'electron'
+import { BrowserWindow, app, shell } from 'electron'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
-import { mkdirSync, rmSync, statSync } from 'node:fs'
-import { join } from 'node:path'
 import { gt, lt } from 'semver'
-import { LeveledLogMethod, Logger, createLogger, format, transports } from 'winston'
-import winston from 'winston/lib/winston/config'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
-import { mwNotification } from './main-window'
+import { AppLogger, LogModule } from './log-new'
+import { MainWindowModule } from './main-window-new'
+import { StorageModule } from './storage-new'
 
 class AppSettings {
   /**
@@ -84,7 +80,6 @@ interface NewUpdates {
 
 export class AppState {
   isAdministrator: boolean = false
-
   ready: boolean = false
 
   updates = observable(
@@ -113,115 +108,32 @@ export class AppState {
   }
 }
 
-export type AppLogger = {
-  info: (message: any) => Logger
-  warn: (message: any) => Logger
-  error: (message: any) => Logger
-  debug: (message: any) => Logger
-}
-
 export class AppModule extends MobxBasedModule {
   public state = new AppState()
 
-  private _logger = this.createLogger('app')
+  private _logModule: LogModule
+  private _storageModule: StorageModule
+  private _logger: AppLogger
+  private _mwm: MainWindowModule
 
   private _quitTasks: (() => Promise<void> | void)[] = []
 
-  private _winstonLogger: Logger | null = null
-
   constructor() {
     super('app')
-
-    this._initializeLogger()
-    this._initializeApp()
   }
 
-  /**
-   * 创建一个日志工具
-   */
-  createLogger(domain: string): AppLogger {
-    const getLogger = () => {
-      if (!this._winstonLogger) {
-        throw new Error('logger is not initialized')
-      }
-      return this._winstonLogger
-    }
+  override async setup() {
+    await super.setup()
 
-    return {
-      info: (message: any) => getLogger().info({ module: domain, message }),
-      warn: (message: any) => getLogger().warn({ module: domain, message }),
-      error: (message: any) => getLogger().error({ module: domain, message }),
-      debug: (message: any) => getLogger().debug({ module: domain, message })
-    }
-  }
+    this._logModule = this.manager.getModule<LogModule>('log')
+    this._logger = this._logModule.createLogger('app')
+    this._storageModule = this.manager.getModule<StorageModule>('storage')
+    this._mwm = this.manager.getModule<MainWindowModule>('main-window')
 
-  private _initializeLogger() {
-    const appDir = join(app.getPath('exe'), '..')
-    const logsDir = join(appDir, 'logs')
-
-    try {
-      const stats = statSync(logsDir)
-
-      if (!stats.isDirectory()) {
-        rmSync(logsDir, { recursive: true, force: true })
-        mkdirSync(logsDir)
-      }
-    } catch (error) {
-      if ((error as any).code === 'ENOENT') {
-        mkdirSync(logsDir)
-      } else {
-        throw error
-      }
-    }
-
-    this._winstonLogger = createLogger({
-      format: format.combine(
-        format.timestamp(),
-        format.printf(({ level, message, module, timestamp }) => {
-          return `[${dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss:SSS')}] [${module}] [${level}] ${message}`
-        })
-      ),
-      transports: [
-        new transports.File({
-          filename: `LeagueAkari_${dayjs().format('YYYYMMDD_HHmmssSSS')}.log`,
-          dirname: logsDir,
-          level: 'info'
-        }),
-        new transports.Console({
-          level: 'warn'
-        })
-      ]
-    })
-
-    this.addQuitTask(
-      () =>
-        new Promise((resolve) => {
-          if (this._winstonLogger) {
-            this._winstonLogger.end(() => {
-              resolve()
-            })
-          } else {
-            resolve()
-          }
-        })
-    )
-
-    this.onCall('open-in-explorer/logs', () => {
-      return shell.openPath(logsDir)
-    })
-  }
-
-  override async onRegister(manager: LeagueAkariModuleManager) {
-    await super.onRegister(manager)
-
+    await this._loadSettings()
     this._setupMethodCall()
     this._setupStateSync()
-    await this._loadSettings()
     await this._initializeApp()
-  }
-
-  override async onUnregister() {
-    throw new Error('App module cannot be unregistered')
   }
 
   /**
@@ -256,6 +168,32 @@ export class AppModule extends MobxBasedModule {
 
         app.quit()
       }
+    })
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        const mw = this.manager?.getModule<MainWindowModule>('main-window')
+        mw?.createWindow()
+      }
+    })
+
+    app.on('second-instance', (_event, commandLine, workingDirectory) => {
+      this._logger.info(`用户尝试启动第二个实例, cmd=${commandLine}, pwd=${workingDirectory}`)
+
+      const mw = this.manager?.getModule<MainWindowModule>('main-window')
+      mw?.restoreAndFocus()
+
+      this.sendEvent('second-instance', commandLine, workingDirectory)
+    })
+
+    app.on('window-all-closed', () => {
+      if (process.platform !== 'darwin') {
+        app.quit()
+      }
+    })
+
+    app.on('browser-window-created', (_, window) => {
+      optimizer.watchWindowShortcuts(window)
     })
   }
 
@@ -300,15 +238,15 @@ export class AppModule extends MobxBasedModule {
           this.state.updates.newUpdates = null
         })
         if (gt(currentVersion, versionString)) {
-          mwNotification.success('app', '检查更新', `该版本高于发布版本 (${currentVersion})`)
+          this._mwm.notify.success('app', '检查更新', `该版本高于发布版本 (${currentVersion})`)
           this._logger.info(`该版本高于发布版本, 当前 ${currentVersion}, Github ${versionString}`)
         } else {
-          mwNotification.success('app', '检查更新', `目前是最新版本 (${currentVersion})`)
+          this._mwm.notify.success('app', '检查更新', `目前是最新版本 (${currentVersion})`)
           this._logger.info(`目前是最新版本, 当前 ${currentVersion}, Github ${versionString}`)
         }
       }
     } catch (error) {
-      mwNotification.warn('app', '检查更新', `当前检查更新失败 ${(error as Error).message}`)
+      this._mwm.notify.warn('app', '检查更新', `当前检查更新失败 ${(error as Error).message}`)
       this._logger.warn(`尝试检查更新失败 ${formatError(error)}`)
     } finally {
       runInAction(() => {
@@ -318,14 +256,14 @@ export class AppModule extends MobxBasedModule {
   }
 
   private _setupStateSync() {
-    this.simpleSync('set-settings/auto-connect', () => this.state.settings.autoConnect)
-    this.simpleSync('set-settings/auto-check-updates', () => this.state.settings.autoCheckUpdates)
+    this.simpleSync('settings/auto-connect', () => this.state.settings.autoConnect)
+    this.simpleSync('settings/auto-check-updates', () => this.state.settings.autoCheckUpdates)
     this.simpleSync(
-      'set-settings/show-free-software-declaration',
+      'settings/show-free-software-declaration',
       () => this.state.settings.showFreeSoftwareDeclaration
     )
-    this.simpleSync('set-settings/close-strategy', () => this.state.settings.closeStrategy)
-    this.simpleSync('set-settings/use-wmic', () => this.state.settings.useWmic)
+    this.simpleSync('settings/close-strategy', () => this.state.settings.closeStrategy)
+    this.simpleSync('settings/use-wmic', () => this.state.settings.useWmic)
 
     this.simpleSync('updates/is-checking-updates', () => this.state.updates.isCheckingUpdates)
     this.simpleSync('updates/new-updates', () => this.state.updates.newUpdates)
@@ -338,33 +276,27 @@ export class AppModule extends MobxBasedModule {
 
     this.onCall('set-setting/auto-connect', async (enabled) => {
       this.state.settings.setAutoConnect(enabled)
-      await setSetting('app/auto-connect', enabled)
+      await this._storageModule.setSetting('app/auto-connect', enabled)
     })
 
     this.onCall('set-setting/auto-check-updates', async (enabled) => {
       this.state.settings.setAutoCheckUpdates(enabled)
-      await setSetting('app/auto-check-updates', enabled)
+      await this._storageModule.setSetting('app/auto-check-updates', enabled)
     })
 
     this.onCall('set-setting/show-free-software-declaration', async (enabled) => {
       this.state.settings.setShowFreeSoftwareDeclaration(enabled)
-      await setSetting('app/show-free-software-declaration', enabled)
+      await this._storageModule.setSetting('app/show-free-software-declaration', enabled)
     })
 
     this.onCall('set-setting/close-strategy', async (s) => {
       this.state.settings.setCloseStrategy(s)
-      await setSetting('app/close-strategy', s)
+      await this._storageModule.setSetting('app/close-strategy', s)
     })
 
     this.onCall('set-setting/use-wmic', async (s) => {
       this.state.settings.setUseWmic(s)
-      await setSetting('app/use-wmic', s)
-    })
-
-    this.onCall('migrate-from-local-storage', (settings) => {
-      if (Object.keys(settings).length === 0) {
-        return
-      }
+      await this._storageModule.setSetting('app/use-wmic', s)
     })
 
     this.onCall('check-update', async () => {
@@ -378,29 +310,38 @@ export class AppModule extends MobxBasedModule {
     this.onCall('open-in-explorer/user-data', () => {
       return shell.openPath(app.getPath('userData'))
     })
+
+    this.onCall('open-in-explorer/logs', () => {
+      return this._logModule.openLogDir()
+    })
   }
 
   private async _loadSettings() {
     this.state.settings.setAutoConnect(
-      await getSetting('app/auto-connect', this.state.settings.autoConnect)
+      await this._storageModule.getSetting('app/auto-connect', this.state.settings.autoConnect)
     )
 
     this.state.settings.setAutoCheckUpdates(
-      await getSetting('app/auto-check-updates', this.state.settings.autoCheckUpdates)
+      await this._storageModule.getSetting(
+        'app/auto-check-updates',
+        this.state.settings.autoCheckUpdates
+      )
     )
 
     this.state.settings.setShowFreeSoftwareDeclaration(
-      await getSetting(
+      await this._storageModule.getSetting(
         'app/show-free-software-declaration',
         this.state.settings.showFreeSoftwareDeclaration
       )
     )
 
     this.state.settings.setCloseStrategy(
-      await getSetting('app/close-strategy', this.state.settings.closeStrategy)
+      await this._storageModule.getSetting('app/close-strategy', this.state.settings.closeStrategy)
     )
 
-    this.state.settings.setUseWmic(await getSetting('app/use-wmic', this.state.settings.useWmic))
+    this.state.settings.setUseWmic(
+      await this._storageModule.getSetting('app/use-wmic', this.state.settings.useWmic)
+    )
   }
 
   private async _migrateSettingsFromLegacyVersion(all: Record<string, string>) {
@@ -414,7 +355,7 @@ export class AppModule extends MobxBasedModule {
       if (originValue !== undefined) {
         try {
           const jsonValue = JSON.parse(originValue)
-          await setSetting(resName, jsonValue)
+          await this._storageModule.setSetting(resName, jsonValue)
           runInAction(() => setter(jsonValue))
           migrated = true
         } catch {}

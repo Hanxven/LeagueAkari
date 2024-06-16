@@ -38,7 +38,7 @@
         <div class="about-para">
           检查更新：<span
             style="color: rgb(131, 193, 204); text-decoration: underline; cursor: pointer"
-            @click="() => checkUpdates()"
+            @click="() => am.checkUpdate()"
             >{{ app.updates.isCheckingUpdates ? '正在检查' : '检查更新' }}</span
           >
         </div>
@@ -64,8 +64,8 @@
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { mainCall } from '@shared/renderer/utils/ipc'
+import { appRendererModule as am } from '@shared/renderer/modules/app-new'
+import { useAppStore } from '@shared/renderer/modules/app-new/store'
 import { NModal, NTabPane, NTabs, useMessage } from 'naive-ui'
 import { h, useCssModule } from 'vue'
 
@@ -77,10 +77,6 @@ import ProcessSettings from './ProcessSettings.vue'
 const app = useAppStore()
 const styles = useCssModule()
 const show = defineModel<boolean>('show', { default: false })
-
-const checkUpdates = async () => {
-  mainCall('app/updates/check')
-}
 
 const message = useMessage()
 

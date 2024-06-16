@@ -12,12 +12,12 @@
 </template>
 
 <script setup lang="ts">
-import { setShowFreeSoftwareDeclaration } from '@shared/renderer/modules/app'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { appRendererModule as am } from '@shared/renderer/modules/app-new'
+import { useAppStore } from '@shared/renderer/modules/app-new/store'
+import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality-new/store'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
 import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
 import { greeting } from '@shared/renderer/utils/greeting'
-import { onMainEvent } from '@shared/renderer/utils/ipc'
 import { useNotification } from 'naive-ui'
 import { ref, watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
@@ -34,17 +34,18 @@ setupNaiveUiNotificationEvents()
 const router = useRouter()
 
 const app = useAppStore()
+const lc = useLcuConnectionStore()
 
 const cf = useCoreFunctionalityStore()
 
 watchEffect(() => {
-  if (app.lcuConnectionState === 'disconnected') {
+  if (lc.state === 'disconnected') {
     router.replace('/connecting')
   }
 })
 
 watch(
-  () => cf.ongoingState,
+  () => cf.queryState,
   (state) => {
     if (!cf.settings.autoRouteOnGameStart || !cf.settings.ongoingAnalysisEnabled) {
       return
@@ -77,17 +78,17 @@ watchEffect(() => {
 })
 
 const handleConfirmation = (notShowAgain: boolean) => {
-  setShowFreeSoftwareDeclaration(notShowAgain)
+  am.setShowFreeSoftwareDeclaration(notShowAgain)
   isShowingFreeSoftwareDeclaration.value = false
 }
 
 const notification = useNotification()
 
-onMainEvent('app/second-instance', () => {
+am.onEvent('second-instance', () => {
   notification.info({
     title: 'League Akari',
     content: '因为 Akari 是独一无二的，所以同一时间只能有一个 Akari',
-    duration: 6000
+    duration: 10000
   })
 })
 </script>

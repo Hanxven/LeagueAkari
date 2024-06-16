@@ -1,10 +1,10 @@
-import { Ballot } from '@shared/types/lcu/honorV2'
+import { BallotLegacy } from '@shared/types/lcu/honorV2'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class HonorState {
-  ballot: Ballot | null
+  ballot: BallotLegacy | null
 
-  setBallot(b: Ballot | null) {
+  setBallot(b: BallotLegacy | null) {
     this.ballot = b
   }
 

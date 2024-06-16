@@ -172,7 +172,7 @@ import {
   fetchTabMatchHistory,
   querySavedInfo
 } from '@main-window/modules/match-history-tabs'
-import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
+import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs-new/store'
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import RankedSpan from './widgets/RankedSpan.vue'

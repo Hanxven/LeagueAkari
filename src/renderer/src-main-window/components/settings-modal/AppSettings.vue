@@ -11,7 +11,7 @@
         <NSwitch
           size="small"
           :value="app.settings.autoCheckUpdates"
-          @update:value="(val: boolean) => setAutoCheckUpdates(val)"
+          @update:value="(val: boolean) => am.setAutoCheckUpdates(val)"
         />
       </ControlItem>
       <ControlItem
@@ -22,8 +22,8 @@
       >
         <NSwitch
           size="small"
-          :value="app.settings.autoConnect"
-          @update:value="(val: boolean) => setAutoConnect(val)"
+          :value="lc.settings.autoConnect"
+          @update:value="(val: boolean) => lcm.setAutoConnect(val)"
         />
       </ControlItem>
       <ControlItem
@@ -36,7 +36,7 @@
           style="width: 160px"
           size="tiny"
           :value="app.settings.closeStrategy"
-          @update:value="(val) => setCloseStrategy(val)"
+          @update:value="(val) => am.setCloseStrategy(val)"
           :options="closeStrategies"
         />
       </ControlItem>
@@ -49,7 +49,7 @@
         <NSwitch
           size="small"
           :value="app.settings.useWmic"
-          @update:value="(val: boolean) => setUseWmic(val)"
+          @update:value="(val: boolean) => am.setUseWmic(val)"
         />
       </ControlItem>
     </NCard>
@@ -58,16 +58,14 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import {
-  setAutoCheckUpdates,
-  setAutoConnect,
-  setCloseStrategy,
-  setUseWmic
-} from '@shared/renderer/modules/app'
-import { useAppStore } from '@shared/renderer/modules/app/store'
+import { appRendererModule as am } from '@shared/renderer/modules/app-new'
+import { useAppStore } from '@shared/renderer/modules/app-new/store'
+import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection-new'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
 import { NCard, NScrollbar, NSelect, NSwitch } from 'naive-ui'
 
 const app = useAppStore()
+const lc = useLcuConnectionStore()
 
 const closeStrategies = [
   { label: '最小化到托盘区', value: 'minimize-to-tray' },

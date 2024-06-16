@@ -1,5 +1,4 @@
 import { LcuAuth } from '@main/utils/lcu-auth'
-import { LeagueAkariModuleManager } from '@shared/akari/main-module-manager'
 import { MobxBasedModule } from '@shared/akari/mobx-based-module'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
@@ -10,14 +9,29 @@ import https from 'https'
 import { comparer, computed, makeAutoObservable, observable } from 'mobx'
 import { WebSocket } from 'ws'
 
-import { appState } from './app'
-import { AppLogger, AppModule } from './app-new'
+import { AppModule } from './app-new'
 import { getLaunchedClients } from './lcu-client'
-import { mwNotification } from './main-window'
+import { AppLogger, LogModule } from './log-new'
+import { MainWindowModule } from './main-window-new'
+import { StorageModule } from './storage-new'
 
 export type LcuConnectionStateType = 'connecting' | 'connected' | 'disconnected'
 
+class LcuConnectionSettings {
+  autoConnect = true
+
+  constructor() {
+    makeAutoObservable(this)
+  }
+
+  setAutoConnect(s: boolean) {
+    this.autoConnect = s
+  }
+}
+
 class LcuConnectionState {
+  settings = new LcuConnectionSettings()
+
   state: LcuConnectionStateType = 'disconnected'
 
   auth: LcuAuth | null = null
@@ -58,11 +72,17 @@ class LcuConnectionState {
   }
 }
 
+/**
+ * 与 LCU 客户端的连接模块，特例模块
+ */
 export class LcuConnectionModule extends MobxBasedModule {
   public state = new LcuConnectionState()
 
-  private _logger!: AppLogger
-  private _appModule!: AppModule
+  private _logger: AppLogger
+  private _logModule: LogModule
+  private _appModule: AppModule
+  private _storageModule: StorageModule
+  private _mwm: MainWindowModule
 
   static GAME_CLIENT_BASE_URL = 'https://127.0.0.1:2999'
   static INTERVAL_TIMEOUT = 12500
@@ -96,24 +116,27 @@ export class LcuConnectionModule extends MobxBasedModule {
   }
 
   constructor() {
-    super('lcu-connection', ['app'])
+    super('lcu-connection')
   }
 
-  override async onRegister(manager: LeagueAkariModuleManager) {
-    await super.onRegister(manager)
+  override async setup() {
+    await super.setup()
 
-    const appModule = manager.getModule<AppModule>('app')!
-    this._appModule = appModule
-    this._logger = appModule.createLogger('lcu-connection')
+    this._logModule = this.manager.getModule<LogModule>('log')
+    this._appModule = this.manager.getModule<AppModule>('app')
+    this._logger = this._logModule.createLogger('lcu-connection')
+    this._storageModule = this.manager.getModule<StorageModule>('storage')
+    this._mwm = this.manager.getModule<MainWindowModule>('main-window')
 
+    await this._loadSettings()
     this._setupStateSync()
     this._setupMethodCall()
-    this._handleAutoConnect()
+    this._handleConnect()
 
     this._logger.info('初始化完成')
   }
 
-  private async _handleAutoConnect() {
+  private async _handleConnect() {
     const pollTiming = computed(() => {
       if (this.state.state === 'connected') {
         return 'stop-it!'
@@ -139,7 +162,7 @@ export class LcuConnectionModule extends MobxBasedModule {
           try {
             this.state.setLaunchedClients(await getLaunchedClients())
           } catch (error) {
-            mwNotification.error('lcu-connection', '进程轮询', '在获取客户端进程信息时发生错误')
+            this._mwm.notify.error('lcu-connection', '进程轮询', '在获取客户端进程信息时发生错误')
             this._logger.error(`获取客户端信息时失败 ${formatError(error)}`)
           }
         }
@@ -163,7 +186,7 @@ export class LcuConnectionModule extends MobxBasedModule {
 
     // 自动连接 - 当客户端唯一时，自动连接到 LCU 客户端
     this.autoDisposeReaction(
-      () => [appState.settings.autoConnect, this.state.launchedClients] as const,
+      () => [this.state.settings.autoConnect, this.state.launchedClients] as const,
       async ([s, c]) => {
         if (s) {
           if (c.length === 1) {
@@ -186,6 +209,12 @@ export class LcuConnectionModule extends MobxBasedModule {
         }
       },
       { equals: comparer.shallow }
+    )
+  }
+
+  private async _loadSettings() {
+    this.state.settings.setAutoConnect(
+      await this._storageModule.getSetting('lcu-connection/auto-connect', true)
     )
   }
 
@@ -324,7 +353,7 @@ export class LcuConnectionModule extends MobxBasedModule {
         break
       } catch (error) {
         if ((error as any).code !== 'ECONNREFUSED') {
-          mwNotification.error(
+          this._mwm.notify.error(
             'lcu-connection',
             '连接错误',
             `尝试连接到 LCU 时发生错误：${(error as any)?.message}`
@@ -405,9 +434,15 @@ export class LcuConnectionModule extends MobxBasedModule {
 
       this.state.setDisconnected()
     })
+
+    this.onCall('set-setting/auto-connect', async (value: boolean) => {
+      this.state.settings.setAutoConnect(value)
+      await this._storageModule.setSetting('lcu-connection/auto-connect', value)
+    })
   }
 
   private _setupStateSync() {
+    this.simpleSync('settings/auto-connect', () => this.state.settings.autoConnect)
     this.simpleSync('state', () => this.state.state)
     this.simpleSync('auth', () => this.state.auth)
     this.simpleSync('launched-clients', () => this.state.launchedClients)

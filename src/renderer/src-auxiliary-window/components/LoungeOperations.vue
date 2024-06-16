@@ -29,8 +29,8 @@
 
 <script setup lang="ts">
 import { autoGameflowRendererModule as agfm } from '@shared/renderer/modules/auto-gameflow-new'
-import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow-new/store'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
 import { NCard, NFlex, NSwitch } from 'naive-ui'
 import { computed } from 'vue'
 

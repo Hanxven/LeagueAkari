@@ -1,44 +1,41 @@
 import { LeagueAkariModuleManager } from '@shared/akari/main-module-manager'
 
 import { appModule } from './akari-core/app-new'
+import { auxWindowModule } from './akari-core/auxiliary-window-new'
+import { lcuClientModule } from './akari-core/lcu-client-new'
+import { lcuConnectionModule } from './akari-core/lcu-connection-new'
+import { logModule } from './akari-core/log-new'
+import { mainWindowModule } from './akari-core/main-window-new'
+import { winPlatformModule } from './akari-core/platform-new'
+import { storageModule } from './akari-core/storage-new'
 import { autoGameflowModule } from './auto-gameflow-new'
-import { setupAutoReply } from './auto-reply'
-import { setupAutoSelect } from './auto-select'
+import { autoReplyModule } from './auto-reply-new'
+import { autoSelectModule } from './auto-select-new'
 import { coreFunctionalityModule } from './core-functionality-new'
-import { setupCustomKeyboardSequence } from './custom-keyboard-sequence'
-import { setupDebug } from './debug'
-import { setupExternalDataSource } from './external-data-source'
+import { customKeyboardSequenceModule } from './custom-keyboard-sequence-new'
+import { debugModule } from './debug-new'
 import { lcuSyncModule } from './lcu-state-sync-new'
-import { setupRespawnTimer } from './respawn-timer'
-import {  lcuConnectionModule } from './akari-core/lcu-connection-new'
-
-export async function setupLeagueAkariFeatures() {
-  // await setupLcuStateSync()
-
-  await setupDebug()
-
-  // await setupCoreFunctionality()
-
-  await setupAutoReply()
-
-  // await setupAutoGameflow()
-
-  await setupAutoSelect()
-
-  await setupRespawnTimer()
-
-  await setupCustomKeyboardSequence()
-
-  await setupExternalDataSource()
-}
+import { respawnTimerModule } from './respawn-timer-new'
 
 export const manager = new LeagueAkariModuleManager()
 
 export async function setupLeagueAkariModules() {
-  await manager.register(appModule)
-  await manager.register(lcuConnectionModule)
-  await manager.register(lcuSyncModule)
-  await manager.register(autoGameflowModule)
-  await manager.register(coreFunctionalityModule)
-  manager.setup()
+  manager.use(logModule)
+  manager.use(storageModule)
+  manager.use(appModule)
+  manager.use(winPlatformModule)
+  manager.use(mainWindowModule)
+  manager.use(auxWindowModule)
+  manager.use(lcuConnectionModule)
+  manager.use(lcuSyncModule)
+  manager.use(autoSelectModule)
+  manager.use(autoGameflowModule)
+  manager.use(coreFunctionalityModule)
+  manager.use(respawnTimerModule)
+  manager.use(autoReplyModule)
+  manager.use(customKeyboardSequenceModule)
+  manager.use(lcuClientModule)
+  manager.use(debugModule)
+
+  await manager.setup()
 }

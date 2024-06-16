@@ -65,7 +65,7 @@ import {
   getSummonerByName,
   getSummonerByPuuid
 } from '@shared/renderer/http-api/summoner'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync-new/summoner'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { inferType, resolveSummonerName } from '@shared/utils/identity'
 import { AutoCompleteOption, NAutoComplete, NButton } from 'naive-ui'

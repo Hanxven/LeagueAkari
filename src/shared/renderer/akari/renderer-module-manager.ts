@@ -6,31 +6,52 @@ import { LeagueAkariRendererIpc } from './renderer-ipc'
  */
 export class LeagueAkariRendererModuleManager {
   private _modules = new Map<string, LeagueAkariRendererModule>()
+  private _offHandle: Function | null = null
 
-  async register(module: LeagueAkariRendererModule) {
+  use(module: LeagueAkariRendererModule) {
     if (this._modules.has(module.id)) {
-      throw new Error(`Module of Id '${module.id}' was already registered`)
+      throw new Error(`Module of Id '${module.id}' was already added`)
     }
 
-    await module.onRegister(this)
-    await LeagueAkariRendererIpc.call('module-manager/renderer-register', module.id)
+    module._setManager(this)
     this._modules.set(module.id, module)
   }
 
-  async unregister(moduleId: string) {
-    if (!this._modules.has(moduleId)) {
-      throw new Error(`Module of ID '${moduleId}' is not found`)
+  getModule<T = LeagueAkariRendererModule>(moduleId: string) {
+    if (this._modules.has(moduleId)) {
+      return this._modules.get(moduleId)! as T
     }
 
-    await this._modules.get(moduleId)!.onUnregister()
-    await LeagueAkariRendererIpc.call('module-manager/renderer-register', moduleId)
-    this._modules.delete(moduleId)
+    throw new Error(`No module of ID ${moduleId}`)
   }
 
-  setup() {
-    LeagueAkariRendererIpc.onEvent('module-manager/event', (_, moduleId, eventName, ...args) => {
-      this._modules.get(moduleId)?.dispatchEvent(eventName, ...args)
-    })
+  hasModule(moduleId: string) {
+    return this._modules.has(moduleId)
+  }
+
+  async setup() {
+    this._offHandle = LeagueAkariRendererIpc.onEvent(
+      'module-manager/event',
+      (_, moduleId, eventName, ...args) => {
+        this._modules.get(moduleId)?.dispatchEvent(eventName, ...args)
+      }
+    )
+
+    for (const [_, m] of this._modules) {
+      if (!m.rendererOnly) {
+        try {
+          await LeagueAkariRendererIpc.call('module-manager/renderer-register', m.id)
+        } catch (error) {
+          await LeagueAkariRendererIpc.call('module-manager/renderer-unregister', m.id)
+          throw error
+        }
+      }
+      await m.setup()
+    }
+  }
+
+  dismantle() {
+    this._offHandle?.()
   }
 
   call<T = any>(moduleId: string, methodName: string, ...args: any[]) {

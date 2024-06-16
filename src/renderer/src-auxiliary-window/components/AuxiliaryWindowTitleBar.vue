@@ -19,8 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
-import { mainCall } from '@shared/renderer/utils/ipc'
+import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window-new'
+import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window-new/store'
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
@@ -28,11 +28,11 @@ import { NIcon } from 'naive-ui'
 const aw = useAuxiliaryWindowStore()
 
 const handleClose = () => {
-  return mainCall('auxiliary-window/hide')
+  return awm.hide()
 }
 
 const handlePin = (b: boolean) => {
-  return mainCall('auxiliary-window/set-always-on-top', b)
+  return awm.setAlwaysOnTop(b)
 }
 </script>
 

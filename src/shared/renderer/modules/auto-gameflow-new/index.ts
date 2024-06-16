@@ -8,8 +8,8 @@ export class AutoGameflowRendererModule extends StateSyncModule {
     super('auto-gameflow')
   }
 
-  override async onRegister(manager: LeagueAkariRendererModuleManager) {
-    await super.onRegister(manager)
+  override async setup() {
+    await super.setup()
     this._syncMainState()
   }
 
@@ -61,7 +61,7 @@ export class AutoGameflowRendererModule extends StateSyncModule {
   }
 
   async setAutoHonorStrategy(value: string) {
-    return this.call('set-settings/auto-honor-strategy', value)
+    return this.call('set-setting/auto-honor-strategy', value)
   }
 
   async setPlayAgainEnabled(value: boolean) {

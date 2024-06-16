@@ -65,7 +65,6 @@ import { VNode, computed, h, ref, watch } from 'vue'
 
 const gameData = useGameDataStore()
 
-// TODO TODO TODO TODO 优化啊！！！
 const currentChampionId = ref<number>()
 const currentSkinId = ref<number>()
 const currentAugmentId = ref<string>()
@@ -89,60 +88,61 @@ const championOptions = computed(() => {
 
 const skinList = ref<ChampSkin[]>([])
 const skinOptions = computed(() => {
-  const arr: any[] = []
+  const arr: {
+    label: string
+    value: number
+    url: string
+    augments?: { label: string; value: string }[]
+  }[] = []
+
   const skinSet = new Set<number>()
   skinList.value.forEach((v) => {
-    const aaArr: any[] = []
+    const augOptions1: any[] = []
     if (v.skinAugments && v.skinAugments.augments) {
       for (const au of v.skinAugments.augments) {
-        aaArr.push({
+        augOptions1.push({
           label: `装饰 ${au.contentId}`,
           value: au.contentId
         })
       }
     }
 
-    if (aaArr.length) {
-      aaArr.unshift({
-        label: '不设置',
-        value: ''
-      })
+    if (augOptions1.length) {
+      augOptions1.unshift({ label: '不设置', value: '' })
     }
 
     arr.push({
       label: v.name,
       value: v.id,
       url: v.uncenteredSplashPath || v.splashPath,
-      augments: aaArr
+      augments: augOptions1
     })
 
     skinSet.add(v.id)
 
+    // 收集任务皮肤特殊挂件
     if (v.questSkinInfo && v.questSkinInfo.tiers) {
       v.questSkinInfo.tiers.forEach((t) => {
         if (!skinSet.has(t.id)) {
-          const aArr: any[] = []
-          if (t.skinAugments.augments) {
+          const augOptions2: any[] = []
+          if (t.skinAugments && t.skinAugments.augments) {
             for (const au of t.skinAugments.augments) {
-              aArr.push({
+              augOptions2.push({
                 label: `装饰 ${au.contentId}`,
                 value: au.contentId
               })
             }
           }
 
-          if (aArr.length) {
-            aArr.unshift({
-              label: '不设置',
-              value: ''
-            })
+          if (augOptions2.length) {
+            augOptions2.unshift({ label: '不设置', value: '' })
           }
 
           arr.push({
             label: t.name,
             value: t.id,
             url: t.uncenteredSplashPath || t.splashPath,
-            augments: aArr
+            augments: augOptions2
           })
           skinSet.add(t.id)
         }
@@ -160,7 +160,7 @@ const currentAugmentOptions = computed(() => {
 
   const s = skinOptions.value.find((s) => s.value === currentSkinId.value)
 
-  return s.augments || []
+  return s?.augments || []
 })
 
 const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) => {

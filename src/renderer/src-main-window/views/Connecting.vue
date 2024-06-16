@@ -4,18 +4,18 @@
     <div class="inner-content">
       <LeagueAkariSpan class="akari-text" bold />
       <template
-        v-if="app.lcuConnectionState === 'disconnected' || app.lcuConnectionState === 'connecting'"
+        v-if="lc.state === 'disconnected' || lc.state === 'connecting'"
       >
-        <div v-if="app.launchedClients.length" class="text-line-1">
+        <div v-if="lc.launchedClients.length" class="text-line-1">
           <div class="servers-available">已启动的客户端</div>
           <NScrollbar style="max-height: 45vh" trigger="none">
             <div
-              v-for="a of app.launchedClients"
+              v-for="a of lc.launchedClients"
               :key="a.pid"
               class="client"
               :style="{
                 cursor:
-                  app.connectingClient && app.connectingClient.pid !== a.pid
+                  lc.connectingClient && lc.connectingClient.pid !== a.pid
                     ? 'not-allowed'
                     : 'cursor'
               }"
@@ -23,7 +23,7 @@
             >
               <span class="region" title="地区"
                 ><NSpin
-                  v-if="app.connectingClient?.pid === a.pid"
+                  v-if="lc.connectingClient?.pid === a.pid"
                   :size="12"
                   class="left-widget"
                 /><NIcon v-else class="left-widget" style="vertical-align: text-bottom"
@@ -52,7 +52,8 @@
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { LcuAuth, useAppStore } from '@shared/renderer/modules/app/store'
+import { useAppStore } from '@shared/renderer/modules/app-new/store'
+import { LcuAuth, useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import { CubeSharp } from '@vicons/ionicons5'
@@ -63,9 +64,10 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const app = useAppStore()
+const lc = useLcuConnectionStore()
 
 watch(
-  () => app.lcuConnectionState,
+  () => lc.state,
   (s) => {
     if (s === 'connected') {
       router.replace(`/match-history`)

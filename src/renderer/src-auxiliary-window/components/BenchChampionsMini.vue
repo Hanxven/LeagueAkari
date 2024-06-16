@@ -115,12 +115,11 @@ import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { benchSwap, reroll } from '@shared/renderer/http-api/champ-select'
 import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { nativeNotification } from '@shared/renderer/notification'
+import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync-new/champ-select'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
-import { NButton, NCard, NDivider, NIcon, NTooltip } from 'naive-ui'
+import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 const cs = useChampSelectStore()
@@ -355,6 +354,8 @@ const selfChampionWithBalance = computed(() => {
   return null
 })
 
+const message = useMessage()
+
 const isRerolling = ref(false)
 const isSwapping = ref(false)
 
@@ -371,11 +372,7 @@ const handleBenchSwap = async (championId: number) => {
   try {
     await benchSwap(championId)
   } catch (error) {
-    nativeNotification({
-      title: 'League Akari',
-      body: '尝试交换英雄失败',
-      timeoutType: 'default'
-    })
+    message.warning('尝试交换英雄失败')
   } finally {
     isSwapping.value = false
   }
@@ -401,11 +398,7 @@ const handleReroll = async (grabBack = false) => {
       }, 25)
     }
   } catch (error) {
-    nativeNotification({
-      title: 'League Akari',
-      body: '尝试重新随机失败',
-      timeoutType: 'default'
-    })
+    message.warning('尝试重新随机英雄失败')
   } finally {
     isRerolling.value = false
   }

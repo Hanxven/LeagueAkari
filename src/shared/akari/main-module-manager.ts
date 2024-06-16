@@ -16,51 +16,39 @@ export class LeagueAkariModuleManager {
   private _modules = new Map<string, ModuleInfo>()
   private _ipcMainDisposers = new Set<Function>()
 
-  async register(module: LeagueAkariModule) {
+  /**
+   * 将一个模块注册到 manager 中
+   */
+  use(module: LeagueAkariModule) {
     if (this._modules.has(module.id)) {
-      throw new Error(`Module of Id '${module.id}' was already registered`)
+      throw new Error(`Module of Id '${module.id}' was already added`)
     }
 
-    const moduleDeps = module.dependencies
-    for (const dep of moduleDeps) {
-      if (!this._modules.has(dep)) {
-        throw new Error(`Dependency module of ID ${dep} for ${module.id} is not satisfied`)
-      }
-    }
-
-    await module.onRegister(this)
-    this._modules.set(module.id, {
-      id: module.id,
-      module,
-      subscribers: new Set()
-    })
+    module._setManager(this)
+    this._modules.set(module.id, { id: module.id, module, subscribers: new Set() })
   }
 
-  async unregister(moduleId: string) {
-    if (!this._modules.has(moduleId)) {
-      throw new Error(`Module of ID '${moduleId}' is not registered`)
-    }
-
-    for (const [_, m] of this._modules) {
-      const dependent = m.module.dependencies.find((md) => md === moduleId)
-      if (dependent) {
-        throw new Error(`Module of ${dependent} rely on ${moduleId}`)
-      }
-    }
-
-    await this._modules.get(moduleId)!.module.onUnregister()
-    this._modules.delete(moduleId)
-  }
-
+  /**
+   * 获取指定 ID 的模块，不存在则抛出异常
+   * @param moduleId 模块 ID
+   * @returns
+   */
   getModule<T = LeagueAkariModule>(moduleId: string) {
     if (this._modules.has(moduleId)) {
       return this._modules.get(moduleId)!.module as T
     }
 
-    return null
+    throw new Error(`No module of ID ${moduleId}`)
   }
 
-  setup() {
+  hasModule(moduleId: string) {
+    return this._modules.has(moduleId)
+  }
+
+  /**
+   * 按照注册顺序依次启动模块
+   */
+  async setup() {
     const d1 = LeagueAkariIpc.onCall(
       'module-manager/renderer-register',
       (event, moduleId: string) => {
@@ -101,11 +89,15 @@ export class LeagueAkariModuleManager {
     this._ipcMainDisposers.add(d1)
     this._ipcMainDisposers.add(d2)
     this._ipcMainDisposers.add(d3)
+
+    for (const [_, m] of this._modules) {
+      await m.module.setup()
+    }
   }
 
-  async unload() {
+  async dismantle() {
     for (const [_, m] of this._modules) {
-      await m.module.onUnregister()
+      await m.module.dismantle()
     }
 
     this._ipcMainDisposers.forEach((fn) => fn())

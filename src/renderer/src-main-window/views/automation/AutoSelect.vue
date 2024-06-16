@@ -7,8 +7,8 @@
       label-description="在常规的模式中启用。如匹配模式，排位模式等任何非随机英雄的模式"
     >
       <NSwitch
-        @update:value="(v) => setNormalModeAutoSelectEnabled(v)"
-        :value="autoSelect.settings.normalModeEnabled"
+        @update:value="(v) => asm.setNormalModeEnabled(v)"
+        :value="as.settings.normalModeEnabled"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -18,8 +18,8 @@
       label-description="仅当模式是同步自选模式时生效。这些模式通常需要所有玩家同时选择英雄"
     >
       <NSwitch
-        @update:value="(v) => setOnlySimulMode(v)"
-        :value="autoSelect.settings.onlySimulMode"
+        @update:value="(v) => asm.setOnlySimulMode(v)"
+        :value="as.settings.onlySimulMode"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -29,8 +29,8 @@
       label-description="开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突"
     >
       <NSwitch
-        @update:value="(v) => setSelectTeammateIntendedChampion(v)"
-        :value="autoSelect.settings.selectTeammateIntendedChampion"
+        @update:value="(v) => asm.setSelectTeammateIntendedChampion(v)"
+        :value="as.settings.selectTeammateIntendedChampion"
         size="small"
       />
     </ControlItem>
@@ -42,8 +42,8 @@
       <NSwitch
         type="pick"
         size="small"
-        :value="autoSelect.settings.showIntent"
-        @update:value="(val) => setShowIntent(val)"
+        :value="as.settings.showIntent"
+        @update:value="(val) => asm.setShowIntent(val)"
       />
     </ControlItem>
     <ControlItem
@@ -52,8 +52,8 @@
       label-description="立即锁定或只是亮出"
     >
       <NSwitch
-        @update:value="(v) => setAutoSelectCompleted(v)"
-        :value="autoSelect.settings.completed"
+        @update:value="(v) => asm.setCompleted(v)"
+        :value="as.settings.completed"
         size="small"
         :rail-style="completeStrategy"
       >
@@ -64,8 +64,8 @@
     <ControlItem class="control-item-margin" label="意向英雄">
       <OrderedChampionList
         type="pick"
-        :value="autoSelect.settings.expectedChampions"
-        @update:value="(list) => setNormalModeExpectedChampions(list)"
+        :value="as.settings.expectedChampions"
+        @update:value="(list) => asm.setExpectedChampions(list)"
       />
     </ControlItem>
     <div class="divider"></div>
@@ -75,8 +75,8 @@
       label-description="随机分配英雄的模式，如极地大乱斗"
     >
       <NSwitch
-        @update:value="(v) => setBenchModeAutoSelectEnabled(v)"
-        :value="autoSelect.settings.benchModeEnabled"
+        @update:value="(v) => asm.setBenchModeEnabled(v)"
+        :value="as.settings.benchModeEnabled"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -97,15 +97,15 @@
         placeholder="秒"
         :min="0"
         size="tiny"
-        :value="autoSelect.settings.grabDelaySeconds"
-        @update:value="(v) => setGrabDelaySeconds(v || 0)"
+        :value="as.settings.grabDelaySeconds"
+        @update:value="(v) => asm.setGrabDelaySeconds(v || 0)"
       />
     </ControlItem>
     <ControlItem class="control-item-margin" label="期望英雄">
       <OrderedChampionList
         type="pick"
-        :value="autoSelect.settings.benchExpectedChampions"
-        @update:value="(list) => setBenchModeExpectedChampions(list)"
+        :value="as.settings.benchExpectedChampions"
+        @update:value="(list) => asm.setBenchExpectedChampions(list)"
       />
     </ControlItem>
     <div class="divider"></div>
@@ -115,8 +115,8 @@
       label-description="自动执行英雄的禁用操作"
     >
       <NSwitch
-        @update:value="(v) => setAutoBanEnabled(v)"
-        :value="autoSelect.settings.banEnabled"
+        @update:value="(v) => asm.setBanEnabled(v)"
+        :value="as.settings.banEnabled"
         size="small"
       ></NSwitch>
     </ControlItem>
@@ -126,17 +126,17 @@
       label-description="开启后将不会考虑队友的预选英雄"
     >
       <NSwitch
-        @update:value="(v) => setBanTeammateIntendedChampion(v)"
-        :value="autoSelect.settings.banTeammateIntendedChampion"
+        @update:value="(v) => asm.setBanTeammateIntendedChampion(v)"
+        :value="as.settings.banTeammateIntendedChampion"
         size="small"
       ></NSwitch>
     </ControlItem>
     <ControlItem class="control-item-margin" label="意向英雄">
       <OrderedChampionList
-        :value="autoSelect.settings.bannedChampions"
+        :value="as.settings.bannedChampions"
         allow-empty
         type="ban"
-        @update:value="(list) => setNormalModeBannedChampions(list)"
+        @update:value="(list) => asm.setBannedChampions(list)"
       />
     </ControlItem>
   </NCard>
@@ -144,28 +144,13 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import {
-  setAutoBanEnabled,
-  setAutoSelectCompleted,
-  setBanTeammateIntendedChampion,
-  setBenchModeAutoSelectEnabled,
-  setBenchModeExpectedChampions,
-  setGrabDelaySeconds,
-  setNormalModeAutoSelectEnabled,
-  setNormalModeBannedChampions,
-  setNormalModeExpectedChampions,
-  setOnlySimulMode,
-  setSelectTeammateIntendedChampion,
-  setShowIntent
-} from '@shared/renderer/modules/auto-select'
-import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
+import { autoSelectRendererModule as asm } from '@shared/renderer/modules/auto-select-new'
+import { useAutoSelectStore } from '@shared/renderer/modules/auto-select-new/store'
 import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
 
 import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
 
-// const id = 'view:toolkit:auto-select'
-
-const autoSelect = useAutoSelectStore()
+const as = useAutoSelectStore()
 
 const completeStrategy = ({ checked }: { checked: boolean }) => {
   if (checked) {

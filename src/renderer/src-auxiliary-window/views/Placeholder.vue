@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow';
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow';
 
 const gameflow = useGameflowStore()
 </script>

@@ -1,4 +1,3 @@
-import { LeagueAkariRendererModuleManager } from '@shared/renderer/akari/renderer-module-manager'
 import { StateSyncModule } from '@shared/renderer/akari/state-sync-module'
 import { Game } from '@shared/types/lcu/match-history'
 import { markRaw } from 'vue'
@@ -10,8 +9,8 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
     super('core-functionality')
   }
 
-  override async onRegister(manager: LeagueAkariRendererModuleManager) {
-    await super.onRegister(manager)
+  override async setup() {
+    await super.setup()
 
     this._syncMainState()
     this._syncOngoingInfo()

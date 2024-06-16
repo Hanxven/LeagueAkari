@@ -30,7 +30,7 @@
           :key="c.championId"
           class="champion-image"
           :class="{
-            'champion-image-invalid': !champSelect.currentPickableChampions.has(c.championId)
+            'champion-image-invalid': !cs.currentPickableChampions.has(c.championId)
           }"
           :src="championIcon(c.championId)"
           @click="() => handleBenchSwap(c.championId)"
@@ -50,40 +50,40 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { championIcon } from '@shared/renderer/modules/game-data'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync-new/champ-select'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
 import { benchSwap, reroll } from '@shared/renderer/http-api/champ-select'
 import { laNotification } from '@shared/renderer/notification'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { NButton, NCard, NDivider } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-const champSelect = useChampSelectStore()
+const cs = useChampSelectStore()
 const gameflow = useGameflowStore()
 
 const benchChampions = computed(() => {
-  if (!isBenchEnabledSession(champSelect.session)) {
+  if (!isBenchEnabledSession(cs.session)) {
     return null
   }
 
-  return champSelect.session.benchChampions
+  return cs.session.benchChampions
 })
 
 const rerollsRemaining = computed(() => {
-  if (!isBenchEnabledSession(champSelect.session)) {
+  if (!isBenchEnabledSession(cs.session)) {
     return 0
   }
 
-  return champSelect.session.rerollsRemaining
+  return cs.session.rerollsRemaining
 })
 
 const selfChampionId = computed(() => {
-  if (!champSelect.session) {
+  if (!cs.session) {
     return null
   }
 
-  const c = champSelect.session.myTeam.find(
-    (t) => t.cellId == champSelect.session?.localPlayerCellId
+  const c = cs.session.myTeam.find(
+    (t) => t.cellId == cs.session?.localPlayerCellId
   )
 
   if (c) {
@@ -101,7 +101,7 @@ const handleBenchSwap = async (championId: number) => {
     return
   }
 
-  if (!champSelect.currentPickableChampions.has(championId)) {
+  if (!cs.currentPickableChampions.has(championId)) {
     return
   }
 
