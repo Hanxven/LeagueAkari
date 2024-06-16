@@ -82,6 +82,8 @@ export class StorageModule extends MobxBasedModule {
 
     await this._initDatabase()
     this._setupMethodCall()
+
+    this._logger.info('初始化完成')
   }
 
   async queryEncounteredGames(query: EncounteredGameQueryDto) {

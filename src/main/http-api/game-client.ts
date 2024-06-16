@@ -1,8 +1,8 @@
-import { gameClientHttpRequest } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionModule } from '@main/modules/akari-core/lcu-connection-new'
 import { PlayerList } from '@shared/types/game-client'
 
 export function getPlayerList() {
-  return gameClientHttpRequest<PlayerList[]>({
+  return lcuConnectionModule.gcHttp<PlayerList[]>({
     url: '/liveclientdata/playerlist',
     method: 'GET'
   })

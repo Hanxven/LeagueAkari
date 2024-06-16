@@ -298,8 +298,8 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     this._disposers.add(() => this._pm.bus.off('windows/global-key/page-up', sendOur))
     this._disposers.add(() => this._pm.bus.off('windows/global-key/page-down', sendTheir))
 
-    this._pm.bus.on('windows/global-key/page-up', sendOur)
-    this._pm.bus.on('windows/global-key/page-down', sendTheir)
+    this._pm.bus.on('global-shortcut/page-up', sendOur)
+    this._pm.bus.on('global-shortcut/page-down', sendTheir)
   }
 
   private async _sendPlayerStatsInGame(teamSide: 'our' | 'their') {

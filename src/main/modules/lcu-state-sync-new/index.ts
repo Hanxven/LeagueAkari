@@ -32,7 +32,7 @@ import PQueue from 'p-queue'
 
 import { LcuConnectionModule } from '../akari-core/lcu-connection-new'
 import { AppLogger, LogModule } from '../akari-core/log-new'
-import { mwNotification } from '../akari-core/main-window'
+import { MainWindowModule } from '../akari-core/main-window-new'
 import { ChampSelectState } from './champ-select'
 import { ChatState } from './chat'
 import { GameDataState } from './game-data'
@@ -59,7 +59,8 @@ export class LcuSyncModule extends MobxBasedModule {
   static SUMMONER_FETCH_MAX_RETRIES = 114514
 
   private _logger: AppLogger
-  private _lcm!: LcuConnectionModule
+  private _lcm: LcuConnectionModule
+  private _mwm: MainWindowModule
 
   private _gameDataLimiter = new PQueue({
     concurrency: 3
@@ -73,9 +74,8 @@ export class LcuSyncModule extends MobxBasedModule {
     await super.setup()
 
     this._logModule = this.manager.getModule<LogModule>('log')
-    const lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
-
-    this._lcm = lcm
+    this._lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
+    this._mwm = this.manager.getModule<MainWindowModule>('main-window')
     this._logger = this._logModule.createLogger('lcu-state-sync')
 
     this._syncGameflow()
@@ -127,7 +127,7 @@ export class LcuSyncModule extends MobxBasedModule {
         }, {})
       )
     } catch (error) {
-      mwNotification.warn('lcu-state-sync', '状态同步', '获取英雄列表失败')
+      this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取英雄列表失败')
       this._logger.warn(`获取英雄列表失败 ${formatError(error)}`)
     }
   }
@@ -142,7 +142,7 @@ export class LcuSyncModule extends MobxBasedModule {
         }, {})
       )
     } catch (error) {
-      mwNotification.warn('lcu-state-sync', '状态同步', '获取 augments 失败')
+      this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取 augments 失败')
       this._logger.warn(`获取 augments 失败 ${formatError(error)}`)
     }
   }
@@ -157,7 +157,7 @@ export class LcuSyncModule extends MobxBasedModule {
         }, {})
       )
     } catch (error) {
-      mwNotification.warn('lcu-state-sync', '状态同步', '获取 perkstyles 失败')
+      this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取 perkstyles 失败')
       this._logger.warn(`获取 perkstyles 失败 ${formatError(error)}`)
     }
   }
@@ -172,7 +172,7 @@ export class LcuSyncModule extends MobxBasedModule {
         }, {})
       )
     } catch (error) {
-      mwNotification.warn('lcu-state-sync', '状态同步', '获取 perks 失败')
+      this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取 perks 失败')
       this._logger.warn(`获取 perks 失败 ${formatError(error)}`)
     }
   }
@@ -182,7 +182,7 @@ export class LcuSyncModule extends MobxBasedModule {
       const queues = (await getQueues()).data
       this.gameData.setQueues(queues)
     } catch (error) {
-      mwNotification.warn('lcu-state-sync', '状态同步', '获取可用队列失败')
+      this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取可用队列失败')
       this._logger.warn(`获取可用队列失败 ${formatError(error)}`)
     }
   }
@@ -197,7 +197,7 @@ export class LcuSyncModule extends MobxBasedModule {
         }, {})
       )
     } catch (error) {
-      mwNotification.warn('lcu-state-sync', '状态同步', '获取装备列表失败')
+      this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取装备列表失败')
       this._logger.warn(`获取装备列表失败 ${formatError(error)}`)
     }
   }
@@ -212,7 +212,7 @@ export class LcuSyncModule extends MobxBasedModule {
         }, {})
       )
     } catch (error) {
-      mwNotification.warn('lcu-state-sync', '状态同步', '获取召唤师技能失败')
+      this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取召唤师技能失败')
       this._logger.warn(`获取召唤师技能失败 ${formatError(error)}`)
     }
   }
@@ -232,7 +232,7 @@ export class LcuSyncModule extends MobxBasedModule {
               return
             }
 
-            mwNotification.warn('lcu-state-sync', '状态同步', '获取 honor ballot 失败')
+            this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取 honor ballot 失败')
             this._logger.warn(`获取 honor ballot 失败 ${formatError(error)}`)
           }
         } else {
@@ -285,7 +285,7 @@ export class LcuSyncModule extends MobxBasedModule {
               return
             }
 
-            mwNotification.warn('lcu-state-sync', '状态同步', '获取 champ-select 会话失败')
+            this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取 champ-select 会话失败')
             this._logger.warn(`获取 champ-select 会话失败 ${formatError(error)}`)
           }
         } else {
@@ -331,7 +331,7 @@ export class LcuSyncModule extends MobxBasedModule {
 
             await Promise.all([a, b])
           } catch (error) {
-            mwNotification.warn('lcu-state-sync', '状态同步', '获取可选英雄/可禁用英雄失败')
+            this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取可选英雄/可禁用英雄失败')
             this._logger.warn(`获取可选英雄/可禁用英雄失败 ${formatError(error)}`)
           }
         } else {
@@ -358,7 +358,7 @@ export class LcuSyncModule extends MobxBasedModule {
                 isCellSummonerUpdated = true
               }
             } catch (error) {
-              mwNotification.warn('lcu-state-sync', '状态同步', '获取当前英雄选择召唤师状态失败')
+              this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取当前英雄选择召唤师状态失败')
               this._logger.warn(`获取当前英雄选择召唤师状态失败 ${formatError(error)}`)
             }
           }
@@ -586,7 +586,7 @@ export class LcuSyncModule extends MobxBasedModule {
           try {
             this.chat.setMe((await getMe()).data)
           } catch (error) {
-            mwNotification.warn('lcu-state-sync', '状态同步', '获取聊天状态失败')
+            this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取聊天状态失败')
             this._logger.warn(`获取聊天状态失败 ${formatError(error)}`)
           }
         } else {
@@ -633,7 +633,7 @@ export class LcuSyncModule extends MobxBasedModule {
             Promise.allSettled(t)
           } catch (error) {
             if ((error as any)?.response?.data?.message !== 'not connected to RC chat yet') {
-              mwNotification.warn('lcu-state-sync', '状态同步', '获取现有对话失败')
+              this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取现有对话失败')
               this._logger.warn(`无法获取当前的对话 ${formatError(error)}`)
             }
           }
@@ -736,7 +736,7 @@ export class LcuSyncModule extends MobxBasedModule {
               return
             }
 
-            mwNotification.warn('lcu-state-sync', '状态同步', '获取房间信息失败')
+            this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取房间信息失败')
             this._logger.warn(`获取房间信息失败 ${formatError(error)}`)
           }
         } else {
@@ -769,7 +769,7 @@ export class LcuSyncModule extends MobxBasedModule {
               return
             }
 
-            mwNotification.warn('lcu-state-sync', '状态同步', '获取登录队列信息失败')
+            this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取登录队列信息失败')
             this._logger.warn(`获取登录队列信息失败 ${formatError(error)}`)
           }
         } else {
@@ -820,7 +820,7 @@ export class LcuSyncModule extends MobxBasedModule {
           timerId = null
         }
 
-        mwNotification.warn('lcu-state-sync', '状态同步', '获取召唤师信息失败')
+        this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取召唤师信息失败')
         this._logger.warn(`获取召唤师信息失败 ${formatError(error)}`)
       }
     }

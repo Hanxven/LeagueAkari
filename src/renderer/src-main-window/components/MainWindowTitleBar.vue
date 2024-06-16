@@ -96,7 +96,7 @@
       </div>
     </div>
     <div class="title-area">
-      <span class="title">[半开发版本] League Akari</span>
+      <span class="title">League Akari</span>
     </div>
     <div class="traffic">
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
@@ -119,12 +119,12 @@
 <script setup lang="ts">
 import { useCompleteVisibility } from '@shared/renderer/compositions/useOverflowDetection'
 import { appRendererModule as am } from '@shared/renderer/modules/app-new'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
-import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync/login'
+import { useAppStore } from '@shared/renderer/modules/app-new/store'
+import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow-new/store'
+import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync-new/login'
 import { mainWindowRendererModule as mwm } from '@shared/renderer/modules/main-window-new'
 import { useMainWindowStore } from '@shared/renderer/modules/main-window-new/store'
-import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
+import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer-new/store'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import {
   Carbon as CarbonIcon,

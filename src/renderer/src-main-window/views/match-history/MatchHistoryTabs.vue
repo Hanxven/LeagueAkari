@@ -138,9 +138,9 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality-new/store'
 import { championIcon, profileIcon } from '@shared/renderer/modules/game-data'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync-new/summoner'
 import { laNotification } from '@shared/renderer/notification'
 import { summonerName } from '@shared/utils/name'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'

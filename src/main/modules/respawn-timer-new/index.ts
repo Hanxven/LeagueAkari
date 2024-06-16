@@ -50,6 +50,8 @@ export class RespawnTimerModule extends MobxBasedModule {
         }
       }
     )
+
+    this._logger.info('初始化完成')
   }
 
   private async _loadSettings() {

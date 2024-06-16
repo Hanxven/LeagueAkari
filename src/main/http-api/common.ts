@@ -1,6 +1,4 @@
 import { lcuConnectionModule } from '@main/modules/akari-core/lcu-connection-new'
-import { logger } from '@main/modules/lcu-state-sync/common'
-import { formatError } from '@shared/utils/errors'
 import { AxiosRequestConfig, isAxiosError } from 'axios'
 
 /*
@@ -38,7 +36,6 @@ export async function request<T = any, D = any>(config: AxiosRequestConfig<D>, m
     }
 
     if (retries >= maxRetries) {
-      logger.warn(`LCU max retires exceeded ${formatError(lastError)}`)
       throw lastError || new Error('max retries exceeded')
     }
   }

@@ -47,12 +47,18 @@ app.whenReady().then(async () => {
 })
 
 process.on('uncaughtException', (e) => {
-  logger.error(`uncaughtException ${formatError(e)}`)
+  if (!appModule.state.isQuitting) {
+    logger.error(`uncaughtException ${formatError(e)}`)
+  }
+
   dialog.showErrorBox('未捕获的异常', e.message)
   app.quit()
 })
 
 process.on('unhandledRejection', (e) => {
-  logger.error(`unhandledRejection ${formatError(e)}`)
+  if (!appModule.state.isQuitting) {
+    logger.error(`unhandledRejection ${formatError(e)}`)
+  }
+  
   console.error(e)
 })

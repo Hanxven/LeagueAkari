@@ -132,7 +132,7 @@
         <MatchHistoryCard
           class="match-history-card-item"
           @set-show-detailed-game="handleToggleShowDetailedGame"
-          @load-detailed-game="(gameId) => fetchTabDetailedGame(tab.puuid, gameId)"
+          @load-detailed-game="(gameId) => mhm.fetchTabDetailedGame(tab.puuid, gameId)"
           :self-puuid="tab.puuid"
           :is-detailed="g.isDetailed"
           :is-loading="g.isLoading"
@@ -167,12 +167,11 @@ import { NButton, NCard, NIcon, NInputNumber, NSelect, NSkeleton } from 'naive-u
 import { nextTick, onActivated, ref, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
+import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs-new'
 import {
-  fetchTabDetailedGame,
-  fetchTabMatchHistory,
-  querySavedInfo
-} from '@main-window/modules/match-history-tabs'
-import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs-new/store'
+  TabState,
+  useMatchHistoryTabsStore
+} from '@main-window/modules/match-history-tabs-new/store'
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import RankedSpan from './widgets/RankedSpan.vue'
@@ -197,7 +196,7 @@ const props = withDefaults(
 const mh = useMatchHistoryTabsStore()
 
 const handleLoadPage = async (page: number) => {
-  const r = await fetchTabMatchHistory(props.tab.puuid, page, props.tab.matchHistory.pageSize)
+  const r = await mhm.fetchTabMatchHistory(props.tab.puuid, page, props.tab.matchHistory.pageSize)
   scrollToTop()
   return r
 }
@@ -247,7 +246,7 @@ whenever(Ctrl_Right, () => {
 })
 
 const handleChangePageSize = async (pageSize: number) => {
-  const r = await fetchTabMatchHistory(props.tab.puuid, props.tab.matchHistory.page, pageSize)
+  const r = await mhm.fetchTabMatchHistory(props.tab.puuid, props.tab.matchHistory.page, pageSize)
   scrollToTop()
   return r
 }
@@ -288,7 +287,7 @@ const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
 }
 
 const handleTagEdited = (puuid: string) => {
-  querySavedInfo(puuid)
+  mhm.querySavedInfo(puuid)
 }
 
 const scrollToTop = () => {

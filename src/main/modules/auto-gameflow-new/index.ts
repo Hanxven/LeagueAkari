@@ -10,7 +10,7 @@ import { comparer, computed } from 'mobx'
 
 import { LcuConnectionModule } from '../akari-core/lcu-connection-new'
 import { AppLogger, LogModule } from '../akari-core/log-new'
-import { mwNotification } from '../akari-core/main-window'
+import { MainWindowModule } from '../akari-core/main-window-new'
 import { StorageModule } from '../akari-core/storage-new'
 import { LcuSyncModule } from '../lcu-state-sync-new'
 import { AutoGameflowState } from './state'
@@ -25,6 +25,7 @@ export class AutoGameflowModule extends MobxBasedModule {
   private _storageModule: StorageModule
   private _lcm: LcuConnectionModule
   private _lcu: LcuSyncModule
+  private _mwm: MainWindowModule
 
   private _autoAcceptTimerId: NodeJS.Timeout | null = null
   private _autoSearchMatchTimerId: NodeJS.Timeout | null = null
@@ -49,6 +50,7 @@ export class AutoGameflowModule extends MobxBasedModule {
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._lcm = this.manager.getModule('lcu-connection')
     this._storageModule = this.manager.getModule('storage')
+    this._mwm = this.manager.getModule('main-window')
 
     await this._loadSettings()
 
@@ -337,7 +339,7 @@ export class AutoGameflowModule extends MobxBasedModule {
     try {
       await accept()
     } catch (error) {
-      mwNotification.warn('auto-gameflow', '自动接受', '尝试接受对局时出现问题')
+      this._mwm.notify.warn('auto-gameflow', '自动接受', '尝试接受对局时出现问题')
       this._logger.warn(`无法接受对局 ${formatError(error)}`)
     }
     this.state.clearAutoAccept()
@@ -354,7 +356,7 @@ export class AutoGameflowModule extends MobxBasedModule {
       this._autoSearchMatchTimerId = null
       await searchMatch()
     } catch (error) {
-      mwNotification.warn('auto-gameflow', '自动匹配', '尝试开始匹配时出现问题')
+      this._mwm.notify.warn('auto-gameflow', '自动匹配', '尝试开始匹配时出现问题')
       this._logger.warn(`无法开始匹配 ${formatError(error)}`)
     }
   }
@@ -433,7 +435,7 @@ export class AutoGameflowModule extends MobxBasedModule {
               this._logger.info('跳过点赞阶段')
             }
           } catch (error) {
-            mwNotification.warn('auto-gameflow', '自动点赞', '尝试自动点赞出现问题')
+            this._mwm.notify.warn('auto-gameflow', '自动点赞', '尝试自动点赞出现问题')
             this._logger.warn(`无法给玩家点赞 ${formatError(error)}`)
           }
         }

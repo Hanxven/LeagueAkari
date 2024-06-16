@@ -36,6 +36,10 @@ export class AutoSelectModule extends MobxBasedModule {
     this._setupStateSync()
     this._setupSettingsSync()
     this._setupMethodCall()
+    this._handleAutoPickBan()
+    this._handleBenchMode()
+
+    this._logger.info('初始化完成')
   }
 
   private _handleAutoPickBan() {

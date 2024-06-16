@@ -3,26 +3,14 @@
     <NCard size="small">
       <template #header><span class="card-header-title">存储</span></template>
       <div class="control-line">
-        <div class="label" title="在检测到客户端进程时，尝试自动连接">尝试自动连接</div>
-        <div class="control">
-          <NSwitch
-            size="small"
-            :value="app.settings.autoConnect"
-            @update:value="(val: boolean) => setAutoConnect(val)"
-          />
-        </div>
+        <div class="label" title="占位">占位</div>
+        <div class="control"></div>
       </div>
     </NCard>
   </NScrollbar>
 </template>
 
-<script setup lang="ts">
-import { setAutoConnect } from '@shared/renderer/modules/app'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { NCard, NScrollbar, NSwitch } from 'naive-ui'
-
-const app = useAppStore()
-</script>
+<script setup lang="ts"></script>
 
 <style lang="less" scoped>
 .card-header-title {

@@ -1,20 +1,20 @@
 import { optimizer } from '@electron-toolkit/utils'
-import { autoGameflowState } from '@main/modules/auto-gameflow/state'
-import { autoReplyState } from '@main/modules/auto-reply/state'
-import { autoSelectState } from '@main/modules/auto-select/state'
-import { coreFunctionalityState } from '@main/modules/core-functionality/state'
-import { respawnTimerState } from '@main/modules/respawn-timer/state'
 import { MobxBasedModule } from '@shared/akari/mobx-based-module'
 import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants/common'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { formatError } from '@shared/utils/errors'
 import axios from 'axios'
-import { BrowserWindow, app, shell } from 'electron'
+import { BrowserWindow, app, dialog, shell } from 'electron'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
 import { gt, lt } from 'semver'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
+import { AutoGameflowModule } from '../auto-gameflow-new'
+import { AutoReplyModule } from '../auto-reply-new'
+import { AutoSelectModule } from '../auto-select-new'
+import { CoreFunctionalityModule } from '../core-functionality-new'
+import { RespawnTimerModule } from '../respawn-timer-new'
 import { AppLogger, LogModule } from './log-new'
 import { MainWindowModule } from './main-window-new'
 import { StorageModule } from './storage-new'
@@ -81,6 +81,7 @@ interface NewUpdates {
 export class AppState {
   isAdministrator: boolean = false
   ready: boolean = false
+  isQuitting = false
 
   updates = observable(
     {
@@ -106,6 +107,10 @@ export class AppState {
   setReady(b: boolean) {
     this.ready = b
   }
+
+  setQuitting(b: boolean) {
+    this.isQuitting = b
+  }
 }
 
 export class AppModule extends MobxBasedModule {
@@ -115,6 +120,11 @@ export class AppModule extends MobxBasedModule {
   private _storageModule: StorageModule
   private _logger: AppLogger
   private _mwm: MainWindowModule
+  private _afgm: AutoGameflowModule
+  private _arm: AutoReplyModule
+  private _cfm: CoreFunctionalityModule
+  private _asm: AutoSelectModule
+  private _rtm: RespawnTimerModule
 
   private _quitTasks: (() => Promise<void> | void)[] = []
 
@@ -129,11 +139,18 @@ export class AppModule extends MobxBasedModule {
     this._logger = this._logModule.createLogger('app')
     this._storageModule = this.manager.getModule<StorageModule>('storage')
     this._mwm = this.manager.getModule<MainWindowModule>('main-window')
+    this._afgm = this.manager.getModule<AutoGameflowModule>('auto-gameflow')
+    this._arm = this.manager.getModule<AutoReplyModule>('auto-reply')
+    this._cfm = this.manager.getModule<CoreFunctionalityModule>('core-functionality')
+    this._asm = this.manager.getModule<AutoSelectModule>('auto-select')
+    this._rtm = this.manager.getModule<RespawnTimerModule>('respawn-timer')
 
     await this._loadSettings()
     this._setupMethodCall()
     this._setupStateSync()
     await this._initializeApp()
+
+    this._logger.info('初始化完成')
   }
 
   /**
@@ -159,6 +176,8 @@ export class AppModule extends MobxBasedModule {
       if (this._quitTasks.length) {
         e.preventDefault()
 
+        this.state.setQuitting(true)
+
         while (this._quitTasks.length) {
           const fn = this._quitTasks.shift()
           try {
@@ -172,16 +191,16 @@ export class AppModule extends MobxBasedModule {
 
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) {
-        const mw = this.manager?.getModule<MainWindowModule>('main-window')
-        mw?.createWindow()
+        const mw = this.manager.getModule<MainWindowModule>('main-window')
+        mw.createWindow()
       }
     })
 
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
       this._logger.info(`用户尝试启动第二个实例, cmd=${commandLine}, pwd=${workingDirectory}`)
 
-      const mw = this.manager?.getModule<MainWindowModule>('main-window')
-      mw?.restoreAndFocus()
+      const mw = this.manager.getModule<MainWindowModule>('main-window')
+      mw.restoreAndFocus()
 
       this.sendEvent('second-instance', commandLine, workingDirectory)
     })
@@ -380,147 +399,147 @@ export class AppModule extends MobxBasedModule {
     await _toNewSettings(
       'autoAccept.enabled',
       'auto-gameflow/auto-accept-enabled',
-      (s) => (autoGameflowState.settings.autoAcceptEnabled = s)
+      (s) => (this._afgm.state.settings.autoAcceptEnabled = s)
     )
     await _toNewSettings(
       'autoAccept.delaySeconds',
       'auto-gameflow/auto-accept-delay-seconds',
-      (s) => (autoGameflowState.settings.autoAcceptDelaySeconds = s)
+      (s) => (this._afgm.state.settings.autoAcceptDelaySeconds = s)
     )
     await _toNewSettings(
       'autoHonor.enabled',
       'auto-gameflow/auto-honor-enabled',
-      (s) => (autoGameflowState.settings.autoHonorEnabled = s)
+      (s) => (this._afgm.state.settings.autoHonorEnabled = s)
     )
     await _toNewSettings(
       'autoHonor.strategy',
       'auto-gameflow/auto-honor-strategy',
-      (s) => (autoGameflowState.settings.autoHonorStrategy = s)
+      (s) => (this._afgm.state.settings.autoHonorStrategy = s)
     )
     await _toNewSettings(
       'autoReply.enabled',
       'auto-reply/enabled',
-      (s) => (autoReplyState.settings.enabled = s)
+      (s) => (this._arm.state.settings.enabled = s)
     )
     await _toNewSettings(
       'autoReply.enableOnAway',
       'auto-reply/enable-on-away',
-      (s) => (autoReplyState.settings.enableOnAway = s)
+      (s) => (this._arm.state.settings.enableOnAway = s)
     )
     await _toNewSettings(
       'autoReply.text',
       'auto-reply/text',
-      (s) => (autoReplyState.settings.text = s)
+      (s) => (this._arm.state.settings.text = s)
     )
     await _toNewSettings(
       'autoSelect.normalModeEnabled',
       'auto-select/normal-mode-enabled',
-      (s) => (autoSelectState.settings.normalModeEnabled = s)
+      (s) => (this._asm.state.settings.normalModeEnabled = s)
     )
     await _toNewSettings(
       'autoSelect.benchModeEnabled',
       'auto-select/bench-mode-enabled',
-      (s) => (autoSelectState.settings.benchModeEnabled = s)
+      (s) => (this._asm.state.settings.benchModeEnabled = s)
     )
     await _toNewSettings(
       'autoSelect.benchExpectedChampions',
       'auto-select/bench-expected-champions',
-      (s) => (autoSelectState.settings.benchExpectedChampions = s)
+      (s) => (this._asm.state.settings.benchExpectedChampions = s)
     )
     await _toNewSettings(
       'autoSelect.expectedChampions',
       'auto-select/expected-champions',
-      (s) => (autoSelectState.settings.expectedChampions = s)
+      (s) => (this._asm.state.settings.expectedChampions = s)
     )
     await _toNewSettings(
       'autoSelect.bannedChampions',
       'auto-select/banned-champions',
-      (s) => (autoSelectState.settings.bannedChampions = s)
+      (s) => (this._asm.state.settings.bannedChampions = s)
     )
     await _toNewSettings(
       'autoSelect.banEnabled',
       'auto-select/ban-enabled',
-      (s) => (autoSelectState.settings.banEnabled = s)
+      (s) => (this._asm.state.settings.banEnabled = s)
     )
     await _toNewSettings(
       'autoSelect.completed',
       'auto-select/completed',
-      (s) => (autoSelectState.settings.completed = s)
+      (s) => (this._asm.state.settings.completed = s)
     )
     await _toNewSettings(
       'autoSelect.onlySimulMode',
       'auto-select/only-simul-mode',
-      (s) => (autoSelectState.settings.onlySimulMode = s)
+      (s) => (this._asm.state.settings.onlySimulMode = s)
     )
     await _toNewSettings(
       'autoSelect.grabDelay',
       'auto-select/grab-delay-seconds',
-      (s) => (autoSelectState.settings.grabDelaySeconds = s)
+      (s) => (this._asm.state.settings.grabDelaySeconds = s)
     )
     await _toNewSettings(
       'autoSelect.banTeammateIntendedChampion',
       'auto-select/ban-teammate-intended-champion',
-      (s) => (autoSelectState.settings.banTeammateIntendedChampion = s)
+      (s) => (this._asm.state.settings.banTeammateIntendedChampion = s)
     )
     await _toNewSettings(
       'autoSelect.selectTeammateIntendedChampion',
       'auto-select/select-teammate-intended-champion',
-      (s) => (autoSelectState.settings.selectTeammateIntendedChampion = s)
+      (s) => (this._asm.state.settings.selectTeammateIntendedChampion = s)
     )
     await _toNewSettings(
       'autoSelect.showIntent',
       'auto-select/show-intent',
-      (s) => (autoSelectState.settings.showIntent = s)
+      (s) => (this._asm.state.settings.showIntent = s)
     )
     await _toNewSettings(
       'matchHistory.fetchAfterGame',
       'core-functionality/fetch-after-game',
-      (s) => (coreFunctionalityState.settings.fetchAfterGame = s)
+      (s) => (this._cfm.state.settings.fetchAfterGame = s)
     )
     await _toNewSettings(
       'matchHistory.autoRouteOnGameStart',
       'core-functionality/auto-route-on-game-start',
-      (s) => (coreFunctionalityState.settings.autoRouteOnGameStart = s)
+      (s) => (this._cfm.state.settings.autoRouteOnGameStart = s)
     )
     await _toNewSettings(
       'matchHistory.preMadeTeamThreshold',
       'core-functionality/pre-made-team-threshold',
-      (s) => (coreFunctionalityState.settings.preMadeTeamThreshold = s)
+      (s) => (this._cfm.state.settings.preMadeTeamThreshold = s)
     )
     await _toNewSettings(
       'matchHistory.teamAnalysisPreloadCount',
       'core-functionality/team-analysis-preload-count',
-      (s) => (coreFunctionalityState.settings.teamAnalysisPreloadCount = s)
+      (s) => (this._cfm.state.settings.teamAnalysisPreloadCount = s)
     )
     await _toNewSettings(
       'matchHistory.matchHistoryLoadCount',
       'core-functionality/match-history-load-count',
-      (s) => (coreFunctionalityState.settings.matchHistoryLoadCount = s)
+      (s) => (this._cfm.state.settings.matchHistoryLoadCount = s)
     )
     await _toNewSettings(
       'matchHistory.fetchDetailedGame',
       'core-functionality/fetch-detailed-game',
-      (s) => (coreFunctionalityState.settings.fetchDetailedGame = s)
+      (s) => (this._cfm.state.settings.fetchDetailedGame = s)
     )
     await _toNewSettings(
       'matchHistory.sendKdaInGame',
       'core-functionality/send-kda-in-game',
-      (s) => (coreFunctionalityState.settings.sendKdaInGame = s)
+      (s) => (this._cfm.state.settings.sendKdaInGame = s)
     )
     await _toNewSettings(
       'matchHistory.sendKdaThreshold',
       'core-functionality/send-kda-threshold',
-      (s) => (coreFunctionalityState.settings.sendKdaThreshold = s)
+      (s) => (this._cfm.state.settings.sendKdaThreshold = s)
     )
     await _toNewSettings(
       'matchHistory.sendKdaInGameWithPreMadeTeams',
       'core-functionality/send-kda-in-game-with-pre-made-teams',
-      (s) => (coreFunctionalityState.settings.sendKdaInGameWithPreMadeTeams = s)
+      (s) => (this._cfm.state.settings.sendKdaInGameWithPreMadeTeams = s)
     )
     await _toNewSettings(
       'respawnTimer.enabled',
       'respawn-timer/enabled',
-      (s) => (respawnTimerState.settings.enabled = s)
+      (s) => (this._rtm.state.settings.enabled = s)
     )
 
     if (migrated) {

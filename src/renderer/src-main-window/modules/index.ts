@@ -5,6 +5,7 @@ import { autoReplyRendererModule } from '@shared/renderer/modules/auto-reply-new
 import { autoSelectRendererModule } from '@shared/renderer/modules/auto-select-new'
 import { auxiliaryWindowRendererModule } from '@shared/renderer/modules/auxiliary-window-new'
 import { coreFunctionalityRendererModule } from '@shared/renderer/modules/core-functionality-new'
+import { customKeyboardSequenceRendererModule } from '@shared/renderer/modules/custom-keyboard-sequence-new'
 import { lcuClientRendererModule } from '@shared/renderer/modules/lcu-client-new'
 import { lcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection-new'
 import { lcuSyncRendererModule } from '@shared/renderer/modules/lcu-state-sync-new'
@@ -32,6 +33,7 @@ export async function setupLeagueAkariRendererModules() {
   manager.use(autoReplyRendererModule)
   manager.use(storageRendererModule)
   manager.use(debugRendererModule)
+  manager.use(customKeyboardSequenceRendererModule)
 
   await manager.setup()
 }

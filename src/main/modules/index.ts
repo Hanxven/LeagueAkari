@@ -24,6 +24,7 @@ export async function setupLeagueAkariModules() {
   manager.use(storageModule)
   manager.use(appModule)
   manager.use(winPlatformModule)
+  manager.use(lcuClientModule)
   manager.use(mainWindowModule)
   manager.use(auxWindowModule)
   manager.use(lcuConnectionModule)
@@ -34,7 +35,6 @@ export async function setupLeagueAkariModules() {
   manager.use(respawnTimerModule)
   manager.use(autoReplyModule)
   manager.use(customKeyboardSequenceModule)
-  manager.use(lcuClientModule)
   manager.use(debugModule)
 
   await manager.setup()

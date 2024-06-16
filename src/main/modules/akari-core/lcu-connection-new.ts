@@ -10,7 +10,7 @@ import { comparer, computed, makeAutoObservable, observable } from 'mobx'
 import { WebSocket } from 'ws'
 
 import { AppModule } from './app-new'
-import { getLaunchedClients } from './lcu-client'
+import { LcuClientModule } from './lcu-client-new'
 import { AppLogger, LogModule } from './log-new'
 import { MainWindowModule } from './main-window-new'
 import { StorageModule } from './storage-new'
@@ -83,6 +83,7 @@ export class LcuConnectionModule extends MobxBasedModule {
   private _appModule: AppModule
   private _storageModule: StorageModule
   private _mwm: MainWindowModule
+  private _lcm: LcuClientModule
 
   static GAME_CLIENT_BASE_URL = 'https://127.0.0.1:2999'
   static INTERVAL_TIMEOUT = 12500
@@ -127,6 +128,7 @@ export class LcuConnectionModule extends MobxBasedModule {
     this._logger = this._logModule.createLogger('lcu-connection')
     this._storageModule = this.manager.getModule<StorageModule>('storage')
     this._mwm = this.manager.getModule<MainWindowModule>('main-window')
+    this._lcm = this.manager.getModule<LcuClientModule>('lcu-client')
 
     await this._loadSettings()
     this._setupStateSync()
@@ -134,6 +136,15 @@ export class LcuConnectionModule extends MobxBasedModule {
     this._handleConnect()
 
     this._logger.info('初始化完成')
+  }
+
+  private async _poll() {
+    try {
+      this.state.setLaunchedClients(await this._lcm.getLaunchedClients())
+    } catch (error) {
+      this._mwm.notify.error('lcu-connection', '进程轮询', '在获取客户端进程信息时发生错误')
+      this._logger.error(`获取客户端信息时失败 ${formatError(error)}`)
+    }
   }
 
   private async _handleConnect() {
@@ -149,6 +160,7 @@ export class LcuConnectionModule extends MobxBasedModule {
       return 'do-polling！'
     })
 
+
     this.autoDisposeReaction(
       () => pollTiming.get(),
       (state) => {
@@ -158,17 +170,8 @@ export class LcuConnectionModule extends MobxBasedModule {
           return
         }
 
-        const _pollFn = async () => {
-          try {
-            this.state.setLaunchedClients(await getLaunchedClients())
-          } catch (error) {
-            this._mwm.notify.error('lcu-connection', '进程轮询', '在获取客户端进程信息时发生错误')
-            this._logger.error(`获取客户端信息时失败 ${formatError(error)}`)
-          }
-        }
-
-        _pollFn()
-        this._clientPollTimerId = setInterval(_pollFn, LcuConnectionModule.CLIENT_CMD_POLL_INTERVAL)
+        this._poll()
+        this._clientPollTimerId = setInterval(() => this._poll(), LcuConnectionModule.CLIENT_CMD_POLL_INTERVAL)
       },
       { fireImmediately: true }
     )

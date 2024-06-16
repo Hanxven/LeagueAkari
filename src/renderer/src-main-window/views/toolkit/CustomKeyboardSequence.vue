@@ -13,7 +13,7 @@
     >
       <NSwitch
         :disabled="!app.isAdministrator"
-        @update:value="(v) => setCksEnabled(v)"
+        @update:value="(v) => cksm.setEnabled(v)"
         :value="cks.settings.enabled"
         size="small"
       ></NSwitch>
@@ -31,21 +31,18 @@
         :value="cks.settings.text"
         :autosize="{ maxRows: 4, minRows: 3 }"
         placeholder="提供文本行"
-        @update:value="(text) => setCksText(text)"
+        @update:value="(text) => cksm.setText(text)"
         size="tiny"
       ></NInput>
     </ControlItem>
-    <span v-if="app.isAdministrator" style="font-size: 12px; display: block; font-style: italic"
-      >仅在游戏中生效
-    </span>
   </NCard>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { setCksEnabled, setCksText } from '@shared/renderer/modules/custom-keyboard-sequence'
-import { useCustomKeyboardSequenceStore } from '@shared/renderer/modules/custom-keyboard-sequence/store'
+import { useAppStore } from '@shared/renderer/modules/app-new/store'
+import { customKeyboardSequenceRendererModule as cksm } from '@shared/renderer/modules/custom-keyboard-sequence-new'
+import { useCustomKeyboardSequenceStore } from '@shared/renderer/modules/custom-keyboard-sequence-new/store'
 import { NCard, NInput, NSwitch } from 'naive-ui'
 
 const cks = useCustomKeyboardSequenceStore()

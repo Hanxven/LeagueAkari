@@ -1,29 +1,13 @@
-import { optimizer } from '@electron-toolkit/utils'
-import { autoGameflowState } from '@main/modules/auto-gameflow/state'
-import { autoReplyState } from '@main/modules/auto-reply/state'
-import { autoSelectState } from '@main/modules/auto-select/state'
-import { coreFunctionalityState } from '@main/modules/core-functionality/state'
-import { respawnTimerState } from '@main/modules/respawn-timer/state'
-import { getSetting, setSetting } from '@main/storage/settings'
 import { LeagueAkariModule } from '@shared/akari/akari-module'
-import { MobxBasedModule } from '@shared/akari/mobx-based-module'
-import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants/common'
-import { GithubApiLatestRelease } from '@shared/types/github'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
-import { formatError } from '@shared/utils/errors'
-import axios from 'axios'
 import dayjs from 'dayjs'
-import { BrowserWindow, app, shell } from 'electron'
-import { makeAutoObservable, observable, runInAction } from 'mobx'
+import { app, shell } from 'electron'
+import { makeAutoObservable, observable } from 'mobx'
 import { mkdirSync, rmSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { gt, lt } from 'semver'
 import { Logger, createLogger, format, transports } from 'winston'
 
-import toolkit from '../../native/laToolkitWin32x64.node'
 import { AppModule } from './app-new'
-import { mwNotification } from './main-window'
-import { MainWindowModule } from './main-window-new'
 
 class AppSettings {
   /**
@@ -122,6 +106,9 @@ export type AppLogger = {
   debug: (message: any) => Logger
 }
 
+/**
+ * 日志模块在构造时就初始化
+ */
 export class LogModule extends LeagueAkariModule {
   private _appModule: AppModule
   private _winstonLogger: Logger | null = null
@@ -147,6 +134,7 @@ export class LogModule extends LeagueAkariModule {
           if (this._winstonLogger) {
             this._winstonLogger.end(() => {
               resolve()
+              this._winstonLogger = null
             })
           } else {
             resolve()
@@ -171,6 +159,7 @@ export class LogModule extends LeagueAkariModule {
       if (!this._winstonLogger) {
         throw new Error('logger is not initialized')
       }
+
       return this._winstonLogger
     }
 

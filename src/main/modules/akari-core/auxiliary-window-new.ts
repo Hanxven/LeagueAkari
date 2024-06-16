@@ -1,11 +1,11 @@
 import { is } from '@electron-toolkit/utils'
 import { MobxBasedModule } from '@shared/akari/mobx-based-module'
-import { BrowserWindow, Rectangle, screen, shell } from 'electron'
-import { comparer, makeAutoObservable } from 'mobx'
+import { BrowserWindow, Rectangle, app, screen, shell } from 'electron'
+import { comparer, computed, makeAutoObservable } from 'mobx'
 import { join } from 'path'
 
 import icon from '../../../../resources/LA_ICON.ico?asset'
-import { appState } from './app'
+import { LcuSyncModule } from '../lcu-state-sync-new'
 import { AppModule } from './app-new'
 import { LcuConnectionModule } from './lcu-connection-new'
 import { AppLogger, LogModule } from './log-new'
@@ -88,10 +88,11 @@ class AuxiliaryWindowState {
 export class AuxWindowModule extends MobxBasedModule {
   public state = new AuxiliaryWindowState()
   private _lcm: LcuConnectionModule
+  private _lcu: LcuSyncModule
   private _logModule: LogModule
   private _storageModule: StorageModule
   private _logger: AppLogger
-  private _app: AppModule
+  private _appModule: AppModule
 
   private _w: BrowserWindow | null = null
 
@@ -109,7 +110,8 @@ export class AuxWindowModule extends MobxBasedModule {
     this._logModule = this.manager.getModule<LogModule>('log')
     this._storageModule = this.manager.getModule<StorageModule>('storage')
     this._lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
-    this._app = this.manager.getModule<AppModule>('app')
+    this._lcu = this.manager.getModule<LcuSyncModule>('lcu-state-sync')
+    this._appModule = this.manager.getModule<AppModule>('app')
     this._logger = this._logModule.createLogger('auxiliary-window')
 
     await this._loadSetting()
@@ -117,9 +119,34 @@ export class AuxWindowModule extends MobxBasedModule {
     this._setupMethodCall()
 
     this._handleObservations()
+
+    this._logger.info('初始化完成')
   }
 
   private _handleObservations() {
+    const auxWindowShowTiming = computed(() => {
+      switch (this._lcu.gameflow.phase) {
+        case 'ChampSelect':
+        case 'Lobby':
+        case 'Matchmaking':
+        case 'ReadyCheck':
+          return 'show'
+      }
+
+      return 'hide'
+    })
+
+    this.autoDisposeReaction(
+      () => auxWindowShowTiming.get(),
+      (timing) => {
+        if (timing === 'show') {
+          this.showWindow()
+        } else {
+          this.hideWindow()
+        }
+      }
+    )
+
     this.autoDisposeReaction(
       () => this.state.bounds,
       (bounds) => {
@@ -139,7 +166,7 @@ export class AuxWindowModule extends MobxBasedModule {
     )
 
     this.autoDisposeReaction(
-      () => [this.state.settings.enabled, this._app.state.ready] as const,
+      () => [this.state.settings.enabled, this._appModule.state.ready] as const,
       ([enabled, ready]) => {
         if (!ready) {
           return
@@ -262,7 +289,10 @@ export class AuxWindowModule extends MobxBasedModule {
     if (this._w) {
       this._w.close()
       this._w = null
-      this._logger.info('Auxiliary Window 关闭')
+
+      if (!this._appModule.state.isQuitting) {
+        this._logger.info('辅助窗口关闭')
+      }
     }
   }
 
@@ -397,6 +427,8 @@ export class AuxWindowModule extends MobxBasedModule {
     } else {
       this._w.loadFile(join(__dirname, '../renderer/auxiliary-window.html'))
     }
+
+    this._logger.info('辅助窗口创建')
   }
 
   private async _loadSetting() {

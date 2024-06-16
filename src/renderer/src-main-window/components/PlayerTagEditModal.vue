@@ -33,10 +33,12 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
-import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useAppStore } from '@shared/renderer/modules/app-new/store'
 import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality-new'
-import { SavedPlayerInfo } from '@shared/renderer/modules/core-functionality/store'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
+import { SavedPlayerInfo } from '@shared/renderer/modules/core-functionality-new/store'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync-new/summoner'
+import { storageRendererModule as sm } from '@shared/renderer/modules/storage-new'
 import { laNotification } from '@shared/renderer/notification'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -49,6 +51,8 @@ const show = defineModel<boolean>('show', { default: false })
 const summonerInfo = shallowRef<SummonerInfo | null>(null)
 const savedInfo = shallowRef<SavedPlayerInfo | null>(null)
 
+const lc = useLcuConnectionStore()
+
 const el = ref()
 
 const emits = defineEmits<{
@@ -60,7 +64,7 @@ const props = defineProps<{
 }>()
 
 watch([() => show.value, () => props.puuid], async ([sh, puuid]) => {
-  if (!puuid || !app.lcuAuth || !summoner.me) {
+  if (!puuid || !lc.auth || !summoner.me) {
     summonerInfo.value = null
     return
   }
@@ -70,11 +74,11 @@ watch([() => show.value, () => props.puuid], async ([sh, puuid]) => {
       const s = (await getSummonerByPuuid(puuid)).data
       summonerInfo.value = s
 
-      const p = await mainCall('storage/saved-player-with-games/query', {
+      const p = await sm.querySavedPlayerWithGames({
         selfPuuid: summoner.me.puuid,
         puuid: props.puuid,
-        region: app.lcuAuth.region,
-        rsoPlatformId: app.lcuAuth.rsoPlatformId
+        region: lc.auth.region,
+        rsoPlatformId: lc.auth.rsoPlatformId
       })
 
       if (p) {
@@ -95,12 +99,11 @@ watch([() => show.value, () => summonerInfo.value], ([s, u]) => {
   }
 })
 
-const app = useAppStore()
 const summoner = useSummonerStore()
 const text = ref('')
 
 const handleSaveTag = async () => {
-  if (!app.lcuAuth || !summoner.me || !props.puuid) {
+  if (!lc.auth || !summoner.me || !props.puuid) {
     return
   }
 
@@ -108,8 +111,8 @@ const handleSaveTag = async () => {
     await cfm.saveSavedPlayer({
       selfPuuid: summoner.me.puuid,
       puuid: props.puuid,
-      region: app.lcuAuth.region,
-      rsoPlatformId: app.lcuAuth.rsoPlatformId,
+      region: lc.auth.region,
+      rsoPlatformId: lc.auth.rsoPlatformId,
       tag: text.value || null
     })
 

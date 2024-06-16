@@ -1,16 +1,15 @@
-import { logger } from '@main/modules/lcu-state-sync/common'
 import { StatsSendExportedClass } from '@shared/external-data-source/normalized/stats-send'
 import { formatError } from '@shared/utils/errors'
 import { app } from 'electron'
 import { join } from 'node:path'
 import { NodeVM } from 'vm2'
 
-import { getHttpInstance } from './lcu-connection'
+import { lcuConnectionModule as lcm } from './lcu-connection-new'
 
 const modulePath = join(app.getPath('exe'), '..', 'scripts')
 
 const leagueAkariApi = {
-  getLcuAxiosInstance: getHttpInstance
+  getLcuAxiosInstance: () => lcm.lcuHttp
 }
 
 const akariVm = new NodeVM({
@@ -30,9 +29,7 @@ const akariVm = new NodeVM({
 export function runCodeInAkariContext(code: string) {
   try {
     return akariVm.run(code)
-  } catch (error) {
-    logger.warn(`VM 环境出现错误 ${formatError(error)}`)
-  }
+  } catch (error) {}
 }
 
 export function runCustomSendStatsScript(code: string, settings: Record<string, any>) {

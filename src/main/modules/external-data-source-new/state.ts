@@ -59,7 +59,7 @@ class ChampBuildDataSource {
   }
 }
 
-class ExternalDataSourceState {
+export class ExternalDataSourceState {
   settings = new ExternalDataSourceSettings()
 
   balance = new ChampBalanceDataSource()
@@ -73,5 +73,3 @@ class ExternalDataSourceState {
     })
   }
 }
-
-export const externalDataSourceState = new ExternalDataSourceState()

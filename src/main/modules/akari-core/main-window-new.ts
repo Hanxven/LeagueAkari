@@ -104,6 +104,10 @@ export class MainWindowModule extends MobxBasedModule {
     } else {
       this._willClose = true
       this._w?.close()
+
+      if (!this._appModule.state.isQuitting) {
+        this._logger.info('主窗口关闭')
+      }
     }
 
     this._nextCloseAction = null
@@ -208,7 +212,7 @@ export class MainWindowModule extends MobxBasedModule {
       this._w.loadFile(join(__dirname, '../renderer/main-window.html'))
     }
 
-    this._logger.info('创建窗口')
+    this._logger.info('创建主窗口')
   }
 
   private _setupStateSync() {

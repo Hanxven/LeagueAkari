@@ -56,6 +56,8 @@ export class LcuClientModule extends MobxBasedModule {
     await this._loadSettings()
     this._setupStateSync()
     this._setupMethodCall()
+
+    this._logger.info('初始化完成')
   }
 
   private async _loadSettings() {

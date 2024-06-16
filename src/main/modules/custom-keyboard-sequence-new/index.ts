@@ -34,6 +34,8 @@ export class CustomKeyboardSequenceModule extends MobxBasedModule {
     this._setupMethodCall()
 
     this._handleCks()
+
+    this._logger.info('初始化完成')
   }
 
   private async _sendCustomSequence() {
@@ -80,8 +82,8 @@ export class CustomKeyboardSequenceModule extends MobxBasedModule {
   }
 
   private _handleCks() {
-    this._pm.bus.on('windows/global-key/delete', () => {
-      if (this.state.settings.enabled && this._lcu.gameflow.phase === 'InProgress') {
+    this._pm.bus.on('global-shortcut/delete', () => {
+      if (this.state.settings.enabled) {
         if (this._isSending) {
           this._isSending = false
         } else {

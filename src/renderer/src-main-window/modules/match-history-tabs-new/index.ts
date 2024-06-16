@@ -168,7 +168,6 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
   }
 
   async querySavedInfo(puuid: string) {
-    const app = useAppStore()
     const summoner = useSummonerStore()
     const mh = useMatchHistoryTabsStore()
     const lc = useLcuConnectionStore()

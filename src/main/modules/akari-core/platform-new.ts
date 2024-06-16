@@ -100,15 +100,15 @@ export class PlatformModule extends MobxBasedModule {
       if (event.state === 'UP') {
         if (event.name === 'PAGE UP' && pageUpShortcut) {
           pageUpShortcut = false
-          this._bus.emit('page-up')
+          this._bus.emit('global-shortcut/delete')
           this.sendEvent('key', 'page-up')
         } else if (event.name === 'PAGE DOWN' && pageDownShortcut) {
           pageDownShortcut = false
-          this._bus.emit('page-down')
+          this._bus.emit('global-shortcut/delete')
           this.sendEvent('key', 'page-down')
         } else if (event.name === 'DELETE' && deleteShortcut) {
           deleteShortcut = false
-          this._bus.emit('delete')
+          this._bus.emit('global-shortcut/delete')
           this.sendEvent('key', 'delete')
         }
       }

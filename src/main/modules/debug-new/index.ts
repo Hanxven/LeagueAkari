@@ -29,6 +29,8 @@ export class DebugModule extends MobxBasedModule {
         this.sendEvent('lcu-event', data)
       }
     })
+
+    this._logger.info('初始化完成')
   }
 
   private _setupStateSync() {

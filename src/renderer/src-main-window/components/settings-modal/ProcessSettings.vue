@@ -46,12 +46,12 @@
           <NInputNumber
             style="width: 80px"
             size="tiny"
-            :disabled="!app.isAdministrator || app.lcuConnectionState !== 'connected'"
+            :disabled="!app.isAdministrator || lc.state !== 'connected'"
             :show-button="false"
             :min="1"
             @update:value="
               (v) =>
-                setFixWindowMethodAOptions({
+                lcm2.setFixWindowMethodAOptions({
                   baseWidth: v || 1,
                   baseHeight: app.settings.fixWindowMethodAOptions.baseHeight
                 })
@@ -64,13 +64,13 @@
           <NInputNumber
             ref="fixWindowInputButton2"
             style="width: 80px"
-            :disabled="!app.isAdministrator || app.lcuConnectionState !== 'connected'"
+            :disabled="!app.isAdministrator || lc.state !== 'connected'"
             size="tiny"
             :show-button="false"
             :min="1"
             @update:value="
               (v) =>
-                setFixWindowMethodAOptions({
+                lcm2.setFixWindowMethodAOptions({
                   baseWidth: app.settings.fixWindowMethodAOptions.baseWidth || 1,
                   baseHeight: v || 1
                 })
@@ -80,7 +80,7 @@
             ><template #prefix>H</template>
           </NInputNumber>
           <NButton
-            :disabled="!app.isAdministrator || app.lcuConnectionState !== 'connected'"
+            :disabled="!app.isAdministrator || lc.state !== 'connected'"
             size="tiny"
             secondary
             type="warning"
@@ -96,7 +96,7 @@
         :label-width="320"
       >
         <NButton
-          :disabled="app.lcuConnectionState !== 'connected'"
+          :disabled="lc.state !== 'connected'"
           size="tiny"
           secondary
           type="warning"
@@ -111,7 +111,7 @@
         :label-width="320"
       >
         <NButton
-          :disabled="app.lcuConnectionState !== 'connected'"
+          :disabled="lc.state !== 'connected'"
           type="warning"
           secondary
           size="tiny"
@@ -126,7 +126,7 @@
         :label-width="320"
       >
         <NButton
-          :disabled="app.lcuConnectionState !== 'connected'"
+          :disabled="lc.state !== 'connected'"
           type="warning"
           secondary
           size="tiny"
@@ -142,8 +142,8 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { quit } from '@shared/renderer/http-api/process-control'
 import { killUx, launchUx, restartUx } from '@shared/renderer/http-api/riotclient'
-import { setFixWindowMethodAOptions } from '@shared/renderer/modules/app'
-import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useAppStore } from '@shared/renderer/modules/app-new/store'
+import { lcuClientRendererModule as lcm2 } from '@shared/renderer/modules/lcu-client-new'
 import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection-new'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
 import { mainCall } from '@shared/renderer/utils/ipc'

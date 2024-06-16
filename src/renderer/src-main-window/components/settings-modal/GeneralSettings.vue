@@ -291,7 +291,7 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useAppStore } from '@shared/renderer/modules/app-new/store'
 import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window-new'
 import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window-new/store'
 import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality-new'

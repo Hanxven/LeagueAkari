@@ -1,9 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 
-import { gameflow } from '../lcu-state-sync/gameflow'
-import { lobby } from '../lcu-state-sync/lobby'
-import { matchmaking } from '../lcu-state-sync/matchmaking'
-import { summoner } from '../lcu-state-sync/summoner'
+import { lcuSyncModule as lcu } from '../lcu-state-sync-new'
 
 export type AutoHonorStrategy =
   | 'prefer-lobby-member' // 随机优先组队时房间内成员
@@ -100,15 +97,15 @@ export class AutoGameflowState {
   willSearchMatchAt: number = -1
 
   get activityStartStatus() {
-    if (!lobby.lobby) {
+    if (!lcu.lobby.lobby) {
       return 'unavailable'
     }
 
-    if (gameflow.session?.gameData.isCustomGame) {
+    if (lcu.gameflow.session?.gameData.isCustomGame) {
       return 'unavailable'
     }
 
-    const self = lobby.lobby.members.find((m) => m.puuid === summoner.me?.puuid)
+    const self = lcu.lobby.lobby.members.find((m) => m.puuid === lcu.summoner.me?.puuid)
 
     if (self) {
       if (!self.isLeader) {
@@ -118,8 +115,8 @@ export class AutoGameflowState {
       return 'unavailable'
     }
 
-    if (matchmaking.search) {
-      const errors = matchmaking.search.errors
+    if (lcu.matchmaking.search) {
+      const errors = lcu.matchmaking.search.errors
       const maxPenaltyTime = errors.reduce(
         (prev, cur) => Math.max(cur.penaltyTimeRemaining, prev),
         -Infinity
@@ -131,17 +128,17 @@ export class AutoGameflowState {
     }
 
     if (this.settings.autoSearchMatchWaitForInvitees) {
-      const hasPendingInvitation = lobby.lobby.invitations.some((i) => i.state === 'Pending')
+      const hasPendingInvitation = lcu.lobby.lobby.invitations.some((i) => i.state === 'Pending')
       if (hasPendingInvitation) {
         return 'waiting-for-invitees'
       }
     }
 
-    if (lobby.lobby.members.length < this.settings.autoSearchMatchMinimumMembers) {
+    if (lcu.lobby.lobby.members.length < this.settings.autoSearchMatchMinimumMembers) {
       return 'insufficient-members'
     }
 
-    if (lobby.lobby.canStartActivity) {
+    if (lcu.lobby.lobby.canStartActivity) {
       return 'can-start-activity'
     } else {
       return 'cannot-start-activity'
