@@ -1,16 +1,15 @@
+import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
 import { LootCraftResponse, LootMap } from '@shared/types/lcu/loot'
 
-import { request } from './common'
-
 export function getLootMap() {
-  return request<LootMap>({
+  return lcm.request<LootMap>({
     url: '/lol-loot/v1/player-loot-map',
     method: 'GET'
   })
 }
 
 export function craftLoot(loot: string, repeat = 1) {
-  return request<LootCraftResponse>({
+  return lcm.request<LootCraftResponse>({
     url: `/lol-loot/v1/recipes/${loot}/craft?repeat=${repeat}`,
     method: 'POST'
   })

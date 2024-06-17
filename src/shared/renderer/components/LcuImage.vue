@@ -4,23 +4,24 @@
 </template>
 
 <script lang="ts" setup>
-import { useGameDataBlobUrl } from '../compositions/useGameDataBlobUrl'
+import { ref, watchEffect } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    src?: string
-    cache?: boolean
-  }>(),
-  {
-    cache: true
+import { useLcuConnectionStore } from '../modules/lcu-connection/store'
+import { addLeadingSlash } from '@shared/utils/uri'
+
+const props = defineProps<{
+  src?: string
+}>()
+
+const url = ref<string | null>(null)
+const lc = useLcuConnectionStore()
+
+watchEffect(() => {
+  if (lc.state === 'connected') {
+    url.value = `akari://lcu${addLeadingSlash(props.src)}`
+  } else {
+    url.value = null
   }
-)
-
-// 直接在 beforeCreate 的时候就加载
-const { url, load } = useGameDataBlobUrl(() => props.src, true, props.cache)
-
-defineExpose({
-  load
 })
 </script>
 

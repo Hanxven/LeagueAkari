@@ -1,6 +1,6 @@
 {
   "name": "league-akari",
-  "version": "1.2.2-waste.2",
+  "version": "1.2.2-rabi.9",
   "author": {
     "name": "Hanxven",
     "email": "hanxven@gmail.com"
@@ -23,7 +23,7 @@
     "@electron-toolkit/utils": "^3.0.0",
     "@types/luaparse": "^0.2.12",
     "@vicons/material": "^0.12.0",
-    "axios": "^1.6.8",
+    "axios": "^1.7.2",
     "dayjs": "^1.11.11",
     "lodash": "^4.17.21",
     "luaparse": "^0.3.1",

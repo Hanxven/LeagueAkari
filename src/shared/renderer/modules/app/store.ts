@@ -32,10 +32,6 @@ export const useAppStore = defineStore('core:app', () => {
     useWmic: false,
     autoCheckUpdates: false,
     showFreeSoftwareDeclaration: false,
-    fixWindowMethodAOptions: {
-      baseWidth: 1280,
-      baseHeight: 720
-    },
     closeStrategy: 'unset' as MainWindowCloseStrategy
   })
 

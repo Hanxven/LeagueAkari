@@ -3,9 +3,7 @@
     <div class="border"></div>
     <div class="inner-content">
       <LeagueAkariSpan class="akari-text" bold />
-      <template
-        v-if="lc.state === 'disconnected' || lc.state === 'connecting'"
-      >
+      <template v-if="lc.state === 'disconnected' || lc.state === 'connecting'">
         <div v-if="lc.launchedClients.length" class="text-line-1">
           <div class="servers-available">已启动的客户端</div>
           <NScrollbar style="max-height: 45vh" trigger="none">
@@ -53,8 +51,8 @@
 <script setup lang="ts">
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useAppStore } from '@shared/renderer/modules/app/store'
+import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
 import { LcuAuth, useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { mainCall } from '@shared/renderer/utils/ipc'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import { CubeSharp } from '@vicons/ionicons5'
 import { NIcon, NScrollbar, NSpin } from 'naive-ui'
@@ -77,7 +75,7 @@ watch(
 )
 
 const handleConnect = (auth: LcuAuth) => {
-  mainCall('lcu-connection/connect', auth)
+  lcm.lcuConnect(auth)
 }
 </script>
 

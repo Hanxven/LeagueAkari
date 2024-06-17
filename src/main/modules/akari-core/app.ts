@@ -4,9 +4,12 @@ import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants/common'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { formatError } from '@shared/utils/errors'
-import axios from 'axios'
-import { BrowserWindow, app, shell } from 'electron'
+import axios, { AxiosRequestConfig } from 'axios'
+import { BrowserWindow, app, protocol, session, shell } from 'electron'
+import { createReadStream, createWriteStream } from 'fs'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
+import { Readable } from 'node:stream'
+import PQueue from 'p-queue'
 import { gt, lt } from 'semver'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
@@ -15,6 +18,8 @@ import { AutoReplyModule } from '../auto-reply'
 import { AutoSelectModule } from '../auto-select'
 import { CoreFunctionalityModule } from '../core-functionality'
 import { RespawnTimerModule } from '../respawn-timer'
+import { AuxWindowModule } from './auxiliary-window'
+import { LcuConnectionModule } from './lcu-connection'
 import { AppLogger, LogModule } from './log'
 import { MainWindowModule } from './main-window'
 import { StorageModule } from './storage'
@@ -125,8 +130,11 @@ export class AppModule extends MobxBasedModule {
   private _cfm: CoreFunctionalityModule
   private _asm: AutoSelectModule
   private _rtm: RespawnTimerModule
+  private _lcm: LcuConnectionModule
 
   private _quitTasks: (() => Promise<void> | void)[] = []
+
+  static AKARI_PROTOCOL = 'akari'
 
   constructor() {
     super('app')
@@ -144,8 +152,10 @@ export class AppModule extends MobxBasedModule {
     this._cfm = this.manager.getModule<CoreFunctionalityModule>('core-functionality')
     this._asm = this.manager.getModule<AutoSelectModule>('auto-select')
     this._rtm = this.manager.getModule<RespawnTimerModule>('respawn-timer')
+    this._lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
 
     await this._loadSettings()
+    this._setupAkariProtocol()
     this._setupMethodCall()
     this._setupStateSync()
     await this._initializeApp()
@@ -361,6 +371,95 @@ export class AppModule extends MobxBasedModule {
     this.state.settings.setUseWmic(
       await this._storageModule.getSetting('app/use-wmic', this.state.settings.useWmic)
     )
+  }
+
+  private _setupAkariProtocol() {
+    this._handlePartitionAkariProtocol(MainWindowModule.PARTITION)
+    this._handlePartitionAkariProtocol(AuxWindowModule.PARTITION)
+  }
+
+  private _handlePartitionAkariProtocol(partition: string) {
+    session.fromPartition(partition).protocol.handle(AppModule.AKARI_PROTOCOL, async (req) => {
+      const path = req.url.slice(`${AppModule.AKARI_PROTOCOL}://`.length)
+      const index = path.indexOf('/')
+      const domain = path.slice(0, index)
+      const uri = path.slice(index + 1)
+
+      const reqHeaders: Record<string, string> = {}
+      req.headers.forEach((value, key) => {
+        reqHeaders[key] = value
+      })
+
+      switch (domain) {
+        case 'lcu':
+          try {
+            const res = await this._lcm.request({
+              method: req.method,
+              url: uri,
+              data: req.body ? this._convertWebStreamToNodeStream(req.body) : undefined,
+              validateStatus: () => true,
+              responseType: 'stream',
+              headers: reqHeaders
+            })
+
+            const resHeaders = Object.fromEntries(
+              Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')
+            )
+
+            return new Response(res.status === 204 ? null : res.data, {
+              statusText: res.statusText,
+              headers: resHeaders,
+              status: res.status
+            })
+          } catch (error) {
+            console.error(error)
+            return new Response((error as Error).message, {
+              headers: { 'Content-Type': 'text/plain' },
+              status: 500
+            })
+          }
+        default:
+          return new Response(`Unknown akari zone: ${domain}`, {
+            statusText: 'Not Found',
+            headers: {
+              'Content-Type': 'text/plain'
+            },
+            status: 404
+          })
+      }
+    })
+  }
+
+  private _convertWebStreamToNodeStream(readableStream: ReadableStream) {
+    const reader = readableStream.getReader()
+
+    const nodeStream = Readable.from({
+      async *[Symbol.asyncIterator]() {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          yield value
+        }
+      }
+    })
+
+    return nodeStream
+  }
+
+  registerAkariProtocolAsPrivileged() {
+    protocol.registerSchemesAsPrivileged([
+      {
+        scheme: AppModule.AKARI_PROTOCOL,
+        privileges: {
+          standard: true,
+          secure: true,
+          supportFetchAPI: true,
+          corsEnabled: true,
+          stream: true,
+          bypassCSP: true
+        }
+      }
+    ])
   }
 
   private async _migrateSettingsFromLegacyVersion(all: Record<string, string>) {

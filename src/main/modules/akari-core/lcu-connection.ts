@@ -4,9 +4,10 @@ import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpo
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
-import axios, { AxiosInstance, isAxiosError } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import https from 'https'
 import { comparer, computed, makeAutoObservable, observable } from 'mobx'
+import PQueue from 'p-queue'
 import { WebSocket } from 'ws'
 
 import { AppModule } from './app'
@@ -104,6 +105,8 @@ export class LcuConnectionModule extends MobxBasedModule {
 
   private _lcuEventBus = new RadixEventEmitter()
 
+  private _assetLimiter = new PQueue({ concurrency: 8 })
+
   get lcuHttp() {
     return this._lcuHttp
   }
@@ -160,7 +163,6 @@ export class LcuConnectionModule extends MobxBasedModule {
       return 'do-polling！'
     })
 
-
     this.autoDisposeReaction(
       () => pollTiming.get(),
       (state) => {
@@ -171,7 +173,10 @@ export class LcuConnectionModule extends MobxBasedModule {
         }
 
         this._poll()
-        this._clientPollTimerId = setInterval(() => this._poll(), LcuConnectionModule.CLIENT_CMD_POLL_INTERVAL)
+        this._clientPollTimerId = setInterval(
+          () => this._poll(),
+          LcuConnectionModule.CLIENT_CMD_POLL_INTERVAL
+        )
       },
       { fireImmediately: true }
     )
@@ -366,6 +371,70 @@ export class LcuConnectionModule extends MobxBasedModule {
       }
 
       await sleep(LcuConnectionModule.CONNECT_TO_LCU_RETRY_INTERVAL)
+    }
+  }
+
+  async request<T = any, D = any>(config: AxiosRequestConfig<D>, maxRetries = 3) {
+    if (!this._lcuHttp) {
+      throw new Error('LCU disconnected')
+    }
+
+    if (config.url && config.url.startsWith('lol-game-data/assets')) {
+      return this._requestWithLimiter<T, D>(config, this._assetLimiter, maxRetries)
+    } else {
+      return this._requestWithRetries<T, D>(config, maxRetries)
+    }
+  }
+
+  /**
+   * 有并发限制的请求，适合请求资源
+   */
+  private async _requestWithLimiter<T = any, D = any>(
+    config: AxiosRequestConfig<D>,
+    limiter: PQueue,
+    maxRetries = 3
+  ) {
+    const res = await limiter.add(() => this._requestWithRetries<T>(config, maxRetries))
+
+    if (!res) {
+      throw new Error('asset request failed')
+    }
+
+    return res
+  }
+
+  async _requestWithRetries<T = any, D = any>(config: AxiosRequestConfig<D>, maxRetries = 3) {
+    if (!this._lcuHttp) {
+      throw new Error('LCU disconnected')
+    }
+
+    let retries = 0
+    let lastError: any = null
+
+    while (true) {
+      try {
+        const res = await this._lcuHttp<T>(config)
+        return res
+      } catch (error) {
+        lastError = error
+
+        if (isAxiosError(error)) {
+          if (
+            error.code === 'ECONNABORTED' ||
+            (error.response?.status && error.response.status >= 500)
+          ) {
+            retries++
+          } else {
+            throw error
+          }
+        } else {
+          throw error
+        }
+      }
+
+      if (retries >= maxRetries) {
+        throw lastError || new Error('max retries exceeded')
+      }
     }
   }
 

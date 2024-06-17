@@ -18,16 +18,16 @@ export class LeagueClientRendererModule extends StateSyncModule {
 
     this.simpleSync(
       'settings/fix-window-method-a-options',
-      () => store.settings.fixWindowMethodAOptions
+      (s) => (store.settings.fixWindowMethodAOptions = s)
     )
   }
 
   fixWindowMethodA() {
-    this.call('fix-window-method-a')
+    return this.call('fix-window-method-a')
   }
 
   setFixWindowMethodAOptions(option: { baseWidth: number; baseHeight: number }) {
-    this.call('set-setting/fix-window-method-a-options', option)
+    return this.call('set-setting/fix-window-method-a-options', option)
   }
 
   queryLcuAuth() {

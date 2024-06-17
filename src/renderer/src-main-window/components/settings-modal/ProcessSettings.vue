@@ -53,10 +53,10 @@
               (v) =>
                 lcm2.setFixWindowMethodAOptions({
                   baseWidth: v || 1,
-                  baseHeight: app.settings.fixWindowMethodAOptions.baseHeight
+                  baseHeight: lc2.settings.fixWindowMethodAOptions.baseHeight
                 })
             "
-            :value="app.settings.fixWindowMethodAOptions.baseWidth"
+            :value="lc2.settings.fixWindowMethodAOptions.baseWidth"
             @keyup.enter="() => fixWindowInputButton2?.focus()"
           >
             <template #prefix>W</template>
@@ -71,11 +71,11 @@
             @update:value="
               (v) =>
                 lcm2.setFixWindowMethodAOptions({
-                  baseWidth: app.settings.fixWindowMethodAOptions.baseWidth || 1,
+                  baseWidth: lc2.settings.fixWindowMethodAOptions.baseWidth || 1,
                   baseHeight: v || 1
                 })
             "
-            :value="app.settings.fixWindowMethodAOptions.baseHeight"
+            :value="lc2.settings.fixWindowMethodAOptions.baseHeight"
             @keyup.enter="() => handleFixWindowMethodA()"
             ><template #prefix>H</template>
           </NInputNumber>
@@ -144,14 +144,15 @@ import { quit } from '@shared/renderer/http-api/process-control'
 import { killUx, launchUx, restartUx } from '@shared/renderer/http-api/riotclient'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { lcuClientRendererModule as lcm2 } from '@shared/renderer/modules/lcu-client'
+import { useLeagueClientStore } from '@shared/renderer/modules/lcu-client/store'
 import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { mainCall } from '@shared/renderer/utils/ipc'
 import { NButton, NCard, NInputNumber, NScrollbar, useDialog } from 'naive-ui'
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 
 const app = useAppStore()
 const lc = useLcuConnectionStore()
+const lc2 = useLeagueClientStore()
 
 const dialog = useDialog()
 
@@ -226,11 +227,6 @@ const handleLaunchUx = async () => {
 
 const fixWindowInputButton2 = ref()
 
-const fixWindowMethodAOptions = reactive({
-  baseWidth: 1600,
-  baseHeight: 900
-})
-
 const handleFixWindowMethodA = async () => {
   dialog.warning({
     title: '修复客户端窗口',
@@ -239,7 +235,7 @@ const handleFixWindowMethodA = async () => {
     negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        await mainCall('league-client-ux/fix-window-method-a', { ...fixWindowMethodAOptions })
+        await lcm2.fixWindowMethodA()
       } catch (error) {
         console.error(error)
       }
@@ -279,4 +275,3 @@ const handleFixWindowMethodA = async () => {
   }
 }
 </style>
-@shared/renderer/modules/app/store@shared/renderer/modules/lcu-client@shared/renderer/modules/lcu-connection@shared/renderer/modules/lcu-connection/store

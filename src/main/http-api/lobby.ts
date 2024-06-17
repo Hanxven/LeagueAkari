@@ -1,6 +1,5 @@
+import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
 import { AvailableBot, EogStatus, Lobby, LobbyMember } from '@shared/types/lcu/lobby'
-
-import { request } from './common'
 
 export function createCustomLobby(
   mode: string,
@@ -10,7 +9,7 @@ export function createCustomLobby(
   lobbyPassword: string | null,
   isCustom: boolean
 ) {
-  return request<Lobby>({
+  return lcm.request<Lobby>({
     method: 'POST',
     url: '/lol-lobby/v2/lobby',
     data: {
@@ -33,7 +32,7 @@ export function createCustomLobby(
 }
 
 export function createQueueLobby(queueId: number) {
-  return request({
+  return lcm.request({
     url: '/lol-lobby/v2/lobby',
     method: 'POST',
     data: { queueId }
@@ -49,7 +48,7 @@ export function createPractice5x5(name = 'League Stalker Room', password = '') {
  * @param summonerId 目标召唤师 ID
  */
 export function promote(summonerId: string | number) {
-  return request<number>({
+  return lcm.request<number>({
     url: `/lol-lobby/v2/lobby/members/${summonerId}/promote`,
     method: 'POST'
   })
@@ -60,21 +59,21 @@ export function promote(summonerId: string | number) {
  * @param summonerId 目标召唤师 ID
  */
 export function kick(summonerId: string | number) {
-  return request<number>({
+  return lcm.request<number>({
     url: `/lol-lobby/v2/lobby/members/${summonerId}/kick`,
     method: 'POST'
   })
 }
 
 export function getMembers() {
-  return request<LobbyMember[]>({
+  return lcm.request<LobbyMember[]>({
     url: '/lol-lobby/v2/lobby/members',
     method: 'GET'
   })
 }
 
 export function getLobby() {
-  return request<Lobby>({
+  return lcm.request<Lobby>({
     url: '/lol-lobby/v2/lobby',
     method: 'GET'
   })
@@ -84,7 +83,7 @@ export function getLobby() {
  * 可以选择的人机种类
  */
 export function getAvailableBots() {
-  return request<AvailableBot[]>({
+  return lcm.request<AvailableBot[]>({
     url: '/lol-lobby/v2/lobby/custom/available-bots',
     method: 'GET'
   })
@@ -94,14 +93,14 @@ export function getAvailableBots() {
  * 是否可以添加人机
  */
 export function isBotEnabled() {
-  return request<boolean>({
+  return lcm.request<boolean>({
     url: '/lol-lobby/v2/lobby/custom/bots-enabled',
     method: 'GET'
   })
 }
 
 export function addBot(botDifficulty: string, champId: number, teamId: '100' | '200') {
-  return request({
+  return lcm.request({
     url: '/lol-lobby/v1/lobby/custom/bots',
     method: 'POST',
     data: {
@@ -113,28 +112,28 @@ export function addBot(botDifficulty: string, champId: number, teamId: '100' | '
 }
 
 export function searchMatch() {
-  return request({
+  return lcm.request({
     url: '/lol-lobby/v2/lobby/matchmaking/search',
     method: 'POST'
   })
 }
 
 export function deleteSearchMatch() {
-  return request({
+  return lcm.request({
     url: '/lol-lobby/v2/lobby/matchmaking/search',
     method: 'DELETE'
   })
 }
 
 export function playAgain() {
-  return request({
+  return lcm.request({
     url: '/lol-lobby/v2/play-again',
     method: 'POST'
   })
 }
 
 export function getEogStatus() {
-  return request<EogStatus>({
+  return lcm.request<EogStatus>({
     url: '/lol-lobby/v2/party/eog-status',
     method: 'GET'
   })

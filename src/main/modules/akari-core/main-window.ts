@@ -53,6 +53,7 @@ export class MainWindowModule extends MobxBasedModule {
   private _willClose = false
 
   static INITIAL_SHOW = false
+  static PARTITION = 'persist:main-window'
 
   constructor() {
     super('main-window')
@@ -136,7 +137,7 @@ export class MainWindowModule extends MobxBasedModule {
         sandbox: false,
         spellcheck: false,
         backgroundThrottling: false,
-        partition: 'persist:main-window'
+        partition: MainWindowModule.PARTITION
       }
     })
 

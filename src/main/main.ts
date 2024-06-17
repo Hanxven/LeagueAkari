@@ -32,6 +32,8 @@ if (!gotTheLock) {
   app.quit()
 }
 
+appModule.registerAkariProtocolAsPrivileged()
+
 app.whenReady().then(async () => {
   electronApp.setAppUserModelId(AKARI_USER_MODEL_ID)
   appModule.state.setReady(true)
@@ -59,6 +61,6 @@ process.on('unhandledRejection', (e) => {
   if (!appModule.state.isQuitting) {
     logger.error(`unhandledRejection ${formatError(e)}`)
   }
-  
+
   console.error(e)
 })

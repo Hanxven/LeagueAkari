@@ -1,9 +1,8 @@
+import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
 import { ChatMessage, ChatPerson, Conversation, Friend } from '@shared/types/lcu/chat'
 
-import { request } from './common'
-
 export function getFriends() {
-  return request<Friend[]>({
+  return lcm.request<Friend[]>({
     method: 'GET',
     url: '/lol-chat/v1/friends'
   })
@@ -12,28 +11,28 @@ export function getFriends() {
 export type AvailabilityType = 'chat' | 'mobile' | 'dnd' | 'away' | 'offline'
 
 export function getMe() {
-  return request<ChatPerson>({
+  return lcm.request<ChatPerson>({
     method: 'GET',
     url: '/lol-chat/v1/me'
   })
 }
 
 export function getConversations() {
-  return request<Conversation[]>({
+  return lcm.request<Conversation[]>({
     method: 'GET',
     url: '/lol-chat/v1/conversations'
   })
 }
 
 export function getParticipants(id: string) {
-  return request<ChatPerson[]>({
+  return lcm.request<ChatPerson[]>({
     method: 'GET',
     url: `/lol-chat/v1/conversations/${id}/participants`
   })
 }
 
 export function changeAvailability(availability: AvailabilityType) {
-  return request({
+  return lcm.request({
     method: 'PUT',
     url: '/lol-chat/v1/me',
     data: {
@@ -54,7 +53,7 @@ export function chatSend(
   isHistorical: boolean = false,
   summonerId?: number
 ) {
-  return request<ChatMessage>({
+  return lcm.request<ChatMessage>({
     method: 'POST',
     url: `/lol-chat/v1/conversations/${targetId}/messages`,
     data: {
@@ -71,7 +70,7 @@ export function chatSend(
 }
 
 export function chatParticipants(chatRoomId: string) {
-  return request({
+  return lcm.request({
     method: 'GET',
     url: `/lol-chat/v1/conversations/${chatRoomId}/participants`
   })
@@ -82,7 +81,7 @@ export function changeRanked(
   rankedLeagueTier: string,
   rankedLeagueDivision?: string
 ) {
-  return request<ChatPerson>({
+  return lcm.request<ChatPerson>({
     method: 'PUT',
     url: '/lol-chat/v1/me',
     data: {
@@ -97,7 +96,7 @@ export function changeRanked(
 
 // 新 ID 系统的寻找方式
 export function friendRequests(gameName: string, tagLine: string) {
-  return request({
+  return lcm.request({
     method: 'POST',
     url: '/lol-chat/v2/friend-requests',
     data: {

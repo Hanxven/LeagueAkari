@@ -70,7 +70,7 @@ export class StorageModule extends MobxBasedModule {
   override async setup() {
     await super.setup()
 
-    this._logModule = this.manager.getModule<LogModule>('log')
+    this._logModule = this.manager.getModule('log')
     this._logger = this._logModule.createLogger('storage')
 
     this._ds = new DataSource({

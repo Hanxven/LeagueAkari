@@ -100,6 +100,8 @@ export class AuxWindowModule extends MobxBasedModule {
   static WINDOW_BASE_WIDTH = 300
   static WINDOW_BASE_HEIGHT = 350
 
+  static PARTITION = 'persist:auxiliary-window'
+
   constructor() {
     super('auxiliary-window')
   }
@@ -335,7 +337,7 @@ export class AuxWindowModule extends MobxBasedModule {
         sandbox: false,
         spellcheck: false,
         backgroundThrottling: false,
-        partition: 'persist:auxiliary-window'
+        partition: AuxWindowModule.PARTITION
       }
     })
 
@@ -459,6 +461,16 @@ export class AuxWindowModule extends MobxBasedModule {
     if (this._w) {
       this._w.webContents.setZoomFactor(this.state.settings.zoomFactor)
 
+      if (!x || !y) {
+        ;[x, y] = this._w.getPosition()
+      }
+
+      this._w.setBounds({
+        x,
+        y,
+        width: Math.ceil(AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor),
+        height: Math.ceil(AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor)
+      })
       this._w.setMinimumSize(
         Math.ceil(AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor),
         Math.ceil(AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor)
@@ -467,12 +479,6 @@ export class AuxWindowModule extends MobxBasedModule {
         Math.ceil(AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor),
         Math.ceil(AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor)
       )
-      this._w.setBounds({
-        x,
-        y,
-        width: Math.ceil(AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor),
-        height: Math.ceil(AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor)
-      })
 
       this._saveWindowBounds(this._w.getBounds())
     }

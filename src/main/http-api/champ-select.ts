@@ -1,9 +1,13 @@
-import { CarouselSkins, ChampSelectSession, ChampSelectSummoner, GridChamp } from '@shared/types/lcu/champ-select'
-
-import { request } from './common'
+import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
+import {
+  CarouselSkins,
+  ChampSelectSession,
+  ChampSelectSummoner,
+  GridChamp
+} from '@shared/types/lcu/champ-select'
 
 export function getChampSelectSession() {
-  return request<ChampSelectSession>({
+  return lcm.request<ChampSelectSession>({
     method: 'GET',
     url: '/lol-champ-select/v1/session'
   })
@@ -11,7 +15,7 @@ export function getChampSelectSession() {
 
 // 当前存在的英雄列表
 export function getAllGridChamps() {
-  return request<GridChamp[]>({
+  return lcm.request<GridChamp[]>({
     method: 'GET',
     url: '/lol-champ-select/v1/all-grid-champions'
   })
@@ -19,7 +23,7 @@ export function getAllGridChamps() {
 
 // 操作部分
 export function action(actionId: string | number, data: any) {
-  return request({
+  return lcm.request({
     method: 'PATCH',
     url: `/lol-champ-select/v1/session/actions/${actionId}`,
     data
@@ -40,63 +44,63 @@ export function intentChampion(actionId: number, championId: number) {
 }
 
 export function getSession() {
-  return request<ChampSelectSession>({
+  return lcm.request<ChampSelectSession>({
     method: 'GET',
     url: '/lol-champ-select/v1/session'
   })
 }
 
 export function benchSwap(champId: string | number) {
-  return request<void>({
+  return lcm.request<void>({
     url: `/lol-champ-select/v1/session/bench/swap/${champId}`,
     method: 'POST'
   })
 }
 
 export function declineTrade(tradeId: string | number) {
-  return request({
+  return lcm.request({
     url: `/lol-champ-select/v1/session/trades/${tradeId}/decline`,
     method: 'POST'
   })
 }
 
 export function getPickableChampIds() {
-  return request<number[]>({
+  return lcm.request<number[]>({
     url: '/lol-champ-select/v1/pickable-champion-ids',
     method: 'GET'
   })
 }
 
 export function getBannableChampIds() {
-  return request<number[]>({
+  return lcm.request<number[]>({
     url: '/lol-champ-select/v1/bannable-champion-ids',
     method: 'GET'
   })
 }
 
 export function reroll() {
-  return request({
+  return lcm.request({
     url: '/lol-champ-select/v1/session/my-selection/reroll',
     method: 'POST'
   })
 }
 
 export function getCurrentChamp() {
-  return request<number>({
+  return lcm.request<number>({
     url: '/lol-champ-select/v1/current-champion',
     method: 'GET'
   })
 }
 
 export function getChampSelectSummoner(cellId: number) {
-  return request<ChampSelectSummoner>({
+  return lcm.request<ChampSelectSummoner>({
     url: `/lol-champ-select/v1/summoners/${cellId}`,
     method: 'GET'
   })
 }
 
 export function setSkin(skinId: number) {
-  return request({
+  return lcm.request({
     url: '/lol-champ-select/v1/session/my-selection',
     method: 'PATCH',
     data: {
@@ -106,7 +110,7 @@ export function setSkin(skinId: number) {
 }
 
 export function getCarouselSkins() {
-  return request<CarouselSkins[]>({
+  return lcm.request<CarouselSkins[]>({
     url: '/lol-champ-select/v1/skin-carousel-skins'
   })
 }

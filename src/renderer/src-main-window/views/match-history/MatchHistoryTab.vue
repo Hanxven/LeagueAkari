@@ -168,10 +168,7 @@ import { nextTick, onActivated, ref, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
-import {
-  TabState,
-  useMatchHistoryTabsStore
-} from '@main-window/modules/match-history-tabs/store'
+import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import RankedSpan from './widgets/RankedSpan.vue'

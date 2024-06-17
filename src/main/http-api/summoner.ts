@@ -1,44 +1,43 @@
+import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 
-import { request } from './common'
-
 export function getCurrentSummoner() {
-  return request<SummonerInfo>({
+  return lcm.request<SummonerInfo>({
     method: 'GET',
     url: '/lol-summoner/v1/current-summoner'
   })
 }
 
 export function getSummoner(id: number) {
-  return request<SummonerInfo>({
+  return lcm.request<SummonerInfo>({
     method: 'GET',
     url: `/lol-summoner/v1/summoners/${id}`
   })
 }
 
 export function getSummonerByPuuid(puuid: string) {
-  return request<SummonerInfo>({
+  return lcm.request<SummonerInfo>({
     method: 'GET',
     url: `/lol-summoner/v2/summoners/puuid/${puuid}`
   })
 }
 
 export function getSummonerByName(name: string) {
-  return request<SummonerInfo>({
+  return lcm.request<SummonerInfo>({
     method: 'GET',
     url: `/lol-summoner/v1/summoners?name=${name}`
   })
 }
 
 export function checkAvailability(name: string) {
-  return request<boolean>({
+  return lcm.request<boolean>({
     method: 'GET',
     url: `/lol-summoner/v1/check-name-availability-new-summoners/${name}`
   })
 }
 
 export function updateSummonerProfile(data: { inventory?: string; key: string; value: any }) {
-  return request({
+  return lcm.request({
     url: '/lol-summoner/v1/current-summoner/summoner-profile',
     method: 'POST',
     data
@@ -46,7 +45,7 @@ export function updateSummonerProfile(data: { inventory?: string; key: string; v
 }
 
 export function updateSummonerName(name: string) {
-  return request({
+  return lcm.request({
     url: '/lol-summoner/v1/current-summoner/name',
     method: 'POST',
     data: name
@@ -55,7 +54,7 @@ export function updateSummonerName(name: string) {
 
 // 用于新的召唤师创建时，可以设置较长的名称
 export function newSummonerName(name: string) {
-  return request({
+  return lcm.request({
     url: '/lol-summoner/v1/summoners',
     method: 'POST',
     data: { name }
@@ -76,7 +75,7 @@ export function setSummonerBackgroundSkin(skinId: number) {
 }
 
 export function getSummonerAliases(nameTagList: { gameName: string; tagLine: string }[]) {
-  return request<SummonerInfo[]>({
+  return lcm.request<SummonerInfo[]>({
     url: '/lol-summoner/v1/summoners/aliases',
     method: 'POST',
     data: nameTagList

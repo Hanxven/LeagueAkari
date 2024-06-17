@@ -151,20 +151,39 @@ const availableBotOptions = computed(() => {
 
 const difficultyOptions = [
   {
-    value: 'EASY',
+    value: 'RSINTRO',
     label: '新手'
   },
   {
-    value: 'MEDIUM',
+    value: 'RSBEGINNER',
     label: '中等'
   },
   {
-    value: 'HARD',
+    value: 'RSINTERMEDIATE',
     label: '一般'
+  }
+]
+
+const positionOptions = [
+  {
+    value: 'TOP',
+    label: '上单'
   },
   {
-    value: 'INTRO',
-    label: '末日'
+    value: 'JUNGLE',
+    label: '打野'
+  },
+  {
+    value: 'MIDDLE',
+    label: '中单'
+  },
+  {
+    value: 'BOTTOM',
+    label: '下路'
+  },
+  {
+    value: 'UTILITY',
+    label: '辅助'
   }
 ]
 
@@ -180,7 +199,7 @@ const teamOptions = [
 ]
 
 const botSettings = reactive({
-  difficulty: 'MEDIUM',
+  difficulty: 'RSINTERMEDIATE',
   team: '100' as '100' | '200',
   championId: null
 })
