@@ -1,10 +1,9 @@
 import { StatsSendExportedClass } from '@shared/external-data-source/normalized/stats-send'
-import { formatError } from '@shared/utils/errors'
 import { app } from 'electron'
 import { join } from 'node:path'
 import { NodeVM } from 'vm2'
 
-import { lcuConnectionModule as lcm } from './lcu-connection-new'
+import { lcuConnectionModule as lcm } from './lcu-connection'
 
 const modulePath = join(app.getPath('exe'), '..', 'scripts')
 

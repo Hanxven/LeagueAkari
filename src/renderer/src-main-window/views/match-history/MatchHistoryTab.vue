@@ -167,11 +167,11 @@ import { NButton, NCard, NIcon, NInputNumber, NSelect, NSkeleton } from 'naive-u
 import { nextTick, onActivated, ref, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
-import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs-new'
+import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
 import {
   TabState,
   useMatchHistoryTabsStore
-} from '@main-window/modules/match-history-tabs-new/store'
+} from '@main-window/modules/match-history-tabs/store'
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import RankedSpan from './widgets/RankedSpan.vue'

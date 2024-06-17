@@ -144,8 +144,8 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { autoSelectRendererModule as asm } from '@shared/renderer/modules/auto-select-new'
-import { useAutoSelectStore } from '@shared/renderer/modules/auto-select-new/store'
+import { autoSelectRendererModule as asm } from '@shared/renderer/modules/auto-select'
+import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
 import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
 
 import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
@@ -180,3 +180,4 @@ const completeStrategy = ({ checked }: { checked: boolean }) => {
   font-size: 18px;
 }
 </style>
+@shared/renderer/modules/auto-select@shared/renderer/modules/auto-select/store

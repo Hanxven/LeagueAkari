@@ -1,11 +1,11 @@
 import { LeagueAkariRendererModuleManager } from '@shared/renderer/akari/renderer-module-manager'
-import { appRendererModule } from '@shared/renderer/modules/app-new'
-import { autoGameflowRendererModule } from '@shared/renderer/modules/auto-gameflow-new'
-import { autoSelectRendererModule } from '@shared/renderer/modules/auto-select-new'
-import { auxiliaryWindowRendererModule } from '@shared/renderer/modules/auxiliary-window-new'
-import { externalDataSourceRendererModule } from '@shared/renderer/modules/external-data-source-new'
-import { lcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection-new'
-import { lcuSyncRendererModule } from '@shared/renderer/modules/lcu-state-sync-new'
+import { appRendererModule } from '@shared/renderer/modules/app'
+import { autoGameflowRendererModule } from '@shared/renderer/modules/auto-gameflow'
+import { autoSelectRendererModule } from '@shared/renderer/modules/auto-select'
+import { auxiliaryWindowRendererModule } from '@shared/renderer/modules/auxiliary-window'
+import { externalDataSourceRendererModule } from '@shared/renderer/modules/external-data-source'
+import { lcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection'
+import { lcuSyncRendererModule } from '@shared/renderer/modules/lcu-state-sync'
 
 const manager = new LeagueAkariRendererModuleManager()
 

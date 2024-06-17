@@ -33,14 +33,12 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
-import { useAppStore } from '@shared/renderer/modules/app-new/store'
-import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality-new'
-import { SavedPlayerInfo } from '@shared/renderer/modules/core-functionality-new/store'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync-new/summoner'
-import { storageRendererModule as sm } from '@shared/renderer/modules/storage-new'
+import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality'
+import { SavedPlayerInfo } from '@shared/renderer/modules/core-functionality/store'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
+import { storageRendererModule as sm } from '@shared/renderer/modules/storage'
 import { laNotification } from '@shared/renderer/notification'
-import { mainCall } from '@shared/renderer/utils/ipc'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NButton, NInput, NModal } from 'naive-ui'
@@ -157,3 +155,4 @@ const handleSaveTag = async () => {
   }
 }
 </style>
+@shared/renderer/modules/app/store@shared/renderer/modules/core-functionality@shared/renderer/modules/core-functionality/store@shared/renderer/modules/lcu-connection/store@shared/renderer/modules/lcu-state-sync/summoner@shared/renderer/modules/storage

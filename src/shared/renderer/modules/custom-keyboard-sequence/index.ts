@@ -1,18 +1,32 @@
-import { mainCall, mainStateSync } from '@shared/renderer/utils/ipc'
+import { StateSyncModule } from '@shared/renderer/akari/state-sync-module'
 
 import { useCustomKeyboardSequenceStore } from './store'
 
-export async function setupCustomKeyboardSequence() {
-  const cks = useCustomKeyboardSequenceStore()
+export class CustomKeyboardSequenceRendererModule extends StateSyncModule {
+  constructor() {
+    super('custom-keyboard-sequence')
+  }
 
-  mainStateSync('custom-keyboard-sequence/settings/enabled', (s) => (cks.settings.enabled = s))
-  mainStateSync('custom-keyboard-sequence/settings/text', (s) => (cks.settings.text = s))
+  override async setup() {
+    await super.setup()
+
+    this._syncMainState()
+  }
+
+  private _syncMainState() {
+    const store = useCustomKeyboardSequenceStore()
+
+    this.simpleSync('settings/enabled', (s) => (store.settings.enabled = s))
+    this.simpleSync('settings/text', (s) => (store.settings.text = s))
+  }
+
+  setEnabled(enabled: boolean) {
+    return this.call('set-setting/enabled', enabled)
+  }
+
+  setText(text: string) {
+    return this.call('set-setting/text', text)
+  }
 }
 
-export function setCksEnabled(enabled: boolean) {
-  return mainCall('custom-keyboard-sequence/settings/enabled/set', enabled)
-}
-
-export function setCksText(text: string) {
-  return mainCall('custom-keyboard-sequence/settings/text/set', text)
-}
+export const customKeyboardSequenceRendererModule = new CustomKeyboardSequenceRendererModule()

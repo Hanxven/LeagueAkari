@@ -141,15 +141,15 @@ import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
-import { useAppStore } from '@shared/renderer/modules/app-new/store'
-import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality-new'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality'
 import {
   OngoingPlayer,
   useCoreFunctionalityStore
-} from '@shared/renderer/modules/core-functionality-new/store'
+} from '@shared/renderer/modules/core-functionality/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync-new/summoner'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { NCard, NCheckbox } from 'naive-ui'
@@ -376,3 +376,4 @@ useKeepAliveScrollPositionMemo(el)
 }
 </style>
 @shared/constants/common
+@shared/renderer/modules/app/store@shared/renderer/modules/core-functionality@shared/renderer/modules/core-functionality/store@shared/renderer/modules/lcu-state-sync/gameflow@shared/renderer/modules/lcu-state-sync/summoner

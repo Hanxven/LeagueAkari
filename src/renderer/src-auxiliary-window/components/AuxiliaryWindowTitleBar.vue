@@ -19,8 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window-new'
-import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window-new/store'
+import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
+import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
@@ -101,3 +101,4 @@ const handlePin = (b: boolean) => {
   }
 }
 </style>
+@shared/renderer/modules/auxiliary-window@shared/renderer/modules/auxiliary-window/store

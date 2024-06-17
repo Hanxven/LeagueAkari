@@ -227,9 +227,9 @@ import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import {
   MatchHistoryWithState,
   SavedPlayerInfo
-} from '@shared/renderer/modules/core-functionality-new/store'
+} from '@shared/renderer/modules/core-functionality/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync-new/game-data'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { winRateTeamText } from '@shared/renderer/utils/sarcasms'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -609,3 +609,4 @@ const { list, containerProps, wrapperProps } = useVirtualList(matchHistoryList, 
   }
 }
 </style>
+@shared/renderer/modules/core-functionality/store@shared/renderer/modules/lcu-state-sync/game-data

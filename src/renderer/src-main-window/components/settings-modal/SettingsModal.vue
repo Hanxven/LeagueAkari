@@ -64,8 +64,8 @@
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { appRendererModule as am } from '@shared/renderer/modules/app-new'
-import { useAppStore } from '@shared/renderer/modules/app-new/store'
+import { appRendererModule as am } from '@shared/renderer/modules/app'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import { NModal, NTabPane, NTabs, useMessage } from 'naive-ui'
 import { h, useCssModule } from 'vue'
 
@@ -124,3 +124,4 @@ const handleDoubleClick = () => {
   max-width: 768px;
 }
 </style>
+@shared/renderer/modules/app@shared/renderer/modules/app/store

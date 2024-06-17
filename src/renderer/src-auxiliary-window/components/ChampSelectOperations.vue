@@ -35,10 +35,10 @@
 
 <script setup lang="ts">
 import { dodge } from '@shared/renderer/http-api/login'
-import { autoSelectRendererModule as asm } from '@shared/renderer/modules/auto-select-new'
-import { useAutoSelectStore } from '@shared/renderer/modules/auto-select-new/store'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync-new/champ-select'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
+import { autoSelectRendererModule as asm } from '@shared/renderer/modules/auto-select'
+import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
+import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { NButton, NCard, NFlex, NSwitch } from 'naive-ui'
 import { computed } from 'vue'
@@ -78,3 +78,4 @@ const handleDodge = async () => {
   }
 }
 </style>
+@shared/renderer/modules/auto-select@shared/renderer/modules/auto-select/store@shared/renderer/modules/lcu-state-sync/champ-select@shared/renderer/modules/lcu-state-sync/gameflow

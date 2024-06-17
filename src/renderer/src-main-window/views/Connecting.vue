@@ -52,8 +52,8 @@
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useAppStore } from '@shared/renderer/modules/app-new/store'
-import { LcuAuth, useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { LcuAuth, useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import { CubeSharp } from '@vicons/ionicons5'
@@ -203,3 +203,4 @@ const handleConnect = (auth: LcuAuth) => {
   text-align: center;
 }
 </style>
+@shared/renderer/modules/app/store@shared/renderer/modules/lcu-connection/store

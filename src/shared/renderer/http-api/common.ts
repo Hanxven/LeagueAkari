@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 
-import { lcuConnectionRendererModule as lcm } from '../modules/lcu-connection-new'
+import { lcuConnectionRendererModule as lcm } from '../modules/lcu-connection'
 
 // 由于序列化和反序列化的要求，只能传递部分属性
 export type SimpleAxiosResponse<T = any, D = any> = Omit<

@@ -37,8 +37,8 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { autoReplyRendererModule as arm } from '@shared/renderer/modules/auto-reply-new'
-import { useAutoReplyStore } from '@shared/renderer/modules/auto-reply-new/store'
+import { autoReplyRendererModule as arm } from '@shared/renderer/modules/auto-reply'
+import { useAutoReplyStore } from '@shared/renderer/modules/auto-reply/store'
 import { NCard, NInput, NSwitch } from 'naive-ui'
 
 const ar = useAutoReplyStore()
@@ -56,3 +56,4 @@ const ar = useAutoReplyStore()
   font-size: 18px;
 }
 </style>
+@shared/renderer/modules/auto-reply@shared/renderer/modules/auto-reply/store

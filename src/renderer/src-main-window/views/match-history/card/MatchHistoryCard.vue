@@ -213,7 +213,7 @@ import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@shared/renderer/modules/game-data'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync-new/game-data'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import {
@@ -779,4 +779,4 @@ const handleToSummoner = (puuid: string) => {
   font-size: 12px;
 }
 </style>
-@shared/constants/common
+@shared/constants/common@shared/renderer/modules/lcu-state-sync/game-data

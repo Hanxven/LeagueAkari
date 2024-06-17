@@ -101,9 +101,9 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { championIcon } from '@shared/renderer/modules/game-data'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync-new/champ-select'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync-new/game-data'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
+import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NPopover, NSelect } from 'naive-ui'
 import { computed, nextTick, ref, watch } from 'vue'
@@ -380,3 +380,4 @@ const handleRemove = () => {
   filter: brightness(0.5);
 }
 </style>
+@shared/renderer/modules/lcu-state-sync/champ-select@shared/renderer/modules/lcu-state-sync/game-data@shared/renderer/modules/lcu-state-sync/gameflow

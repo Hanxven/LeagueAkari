@@ -142,10 +142,10 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { quit } from '@shared/renderer/http-api/process-control'
 import { killUx, launchUx, restartUx } from '@shared/renderer/http-api/riotclient'
-import { useAppStore } from '@shared/renderer/modules/app-new/store'
-import { lcuClientRendererModule as lcm2 } from '@shared/renderer/modules/lcu-client-new'
-import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection-new'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { lcuClientRendererModule as lcm2 } from '@shared/renderer/modules/lcu-client'
+import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { mainCall } from '@shared/renderer/utils/ipc'
 import { NButton, NCard, NInputNumber, NScrollbar, useDialog } from 'naive-ui'
 import { reactive, ref } from 'vue'
@@ -279,3 +279,4 @@ const handleFixWindowMethodA = async () => {
   }
 }
 </style>
+@shared/renderer/modules/app/store@shared/renderer/modules/lcu-client@shared/renderer/modules/lcu-connection@shared/renderer/modules/lcu-connection/store

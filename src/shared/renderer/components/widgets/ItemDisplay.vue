@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync-new/game-data'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
@@ -162,3 +162,4 @@ const gameData = useGameDataStore()
 }
 </style>
 @main-window/modules/lcu-state-sync/game-data
+@shared/renderer/modules/lcu-state-sync/game-data

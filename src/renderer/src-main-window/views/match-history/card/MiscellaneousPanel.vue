@@ -39,7 +39,7 @@ import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
 import { championIcon } from '@shared/renderer/modules/game-data'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync-new/game-data'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { Game, Participant, Player } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { rsoPlatformText } from '@shared/utils/rso-platforms'
@@ -411,3 +411,4 @@ const tableData = computed(() => {
   margin-right: 12px;
 }
 </style>
+@shared/renderer/modules/lcu-state-sync/game-data

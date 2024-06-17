@@ -152,11 +152,11 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { appRendererModule as am } from '@shared/renderer/modules/app-new'
-import { useAppStore } from '@shared/renderer/modules/app-new/store'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
-import { mainWindowRendererModule as mwm } from '@shared/renderer/modules/main-window-new'
+import { appRendererModule as am } from '@shared/renderer/modules/app'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { mainWindowRendererModule as mwm } from '@shared/renderer/modules/main-window'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import {
@@ -383,3 +383,4 @@ const handleReload = () => {
   --n-empty-padding: 12px;
 }
 </style>
+@shared/renderer/modules/app@shared/renderer/modules/app/store@shared/renderer/modules/lcu-connection/store@shared/renderer/modules/lcu-state-sync/gameflow@shared/renderer/modules/main-window

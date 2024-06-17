@@ -3,7 +3,7 @@ import { MaybeRefOrGetter, toRef } from '@vueuse/core'
 import PQueue from 'p-queue'
 import { getCurrentScope, onScopeDispose, readonly, ref, watch } from 'vue'
 
-import { useLcuConnectionStore } from '../modules/lcu-connection-new/store'
+import { useLcuConnectionStore } from '../modules/lcu-connection/store'
 
 // 过快的访问频率概率导致 50x 错误，需要限制
 const globalAssetFetchingLimiter = new PQueue({

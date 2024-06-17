@@ -58,10 +58,10 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { appRendererModule as am } from '@shared/renderer/modules/app-new'
-import { useAppStore } from '@shared/renderer/modules/app-new/store'
-import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection-new'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
+import { appRendererModule as am } from '@shared/renderer/modules/app'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { NCard, NScrollbar, NSelect, NSwitch } from 'naive-ui'
 
 const app = useAppStore()
@@ -86,3 +86,4 @@ const closeStrategies = [
   font-size: 18px;
 }
 </style>
+@shared/renderer/modules/app@shared/renderer/modules/app/store@shared/renderer/modules/lcu-connection@shared/renderer/modules/lcu-connection/store

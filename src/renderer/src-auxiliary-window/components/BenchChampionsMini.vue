@@ -113,10 +113,10 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { benchSwap, reroll } from '@shared/renderer/http-api/champ-select'
-import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source-new/store'
+import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync-new/champ-select'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
+import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
 import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
@@ -507,3 +507,4 @@ const handleReroll = async (grabBack = false) => {
   color: rgb(145, 145, 145);
 }
 </style>
+@shared/renderer/modules/external-data-source/store@shared/renderer/modules/lcu-state-sync/champ-select@shared/renderer/modules/lcu-state-sync/gameflow

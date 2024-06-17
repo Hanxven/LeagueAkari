@@ -1,4 +1,4 @@
-import { lcuConnectionModule } from '@main/modules/akari-core/lcu-connection-new'
+import { lcuConnectionModule } from '@main/modules/akari-core/lcu-connection'
 import { AxiosRequestConfig, isAxiosError } from 'axios'
 
 /*

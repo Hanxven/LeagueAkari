@@ -42,8 +42,8 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync-new/gameflow'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync-new/summoner'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { getFriends } from '@shared/renderer/http-api/chat'
 import { LcuHttpError } from '@shared/renderer/http-api/common'
 import { launchSpectator } from '@shared/renderer/http-api/spectator'
@@ -161,3 +161,4 @@ const handleLoadFriends = async () => {
   font-size: 18px;
 }
 </style>
+@shared/renderer/modules/lcu-state-sync/gameflow@shared/renderer/modules/lcu-state-sync/summoner

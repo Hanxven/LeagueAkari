@@ -118,13 +118,13 @@
 
 <script setup lang="ts">
 import { useCompleteVisibility } from '@shared/renderer/compositions/useOverflowDetection'
-import { appRendererModule as am } from '@shared/renderer/modules/app-new'
-import { useAppStore } from '@shared/renderer/modules/app-new/store'
-import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow-new/store'
-import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync-new/login'
-import { mainWindowRendererModule as mwm } from '@shared/renderer/modules/main-window-new'
-import { useMainWindowStore } from '@shared/renderer/modules/main-window-new/store'
-import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer-new/store'
+import { appRendererModule as am } from '@shared/renderer/modules/app'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
+import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync/login'
+import { mainWindowRendererModule as mwm } from '@shared/renderer/modules/main-window'
+import { useMainWindowStore } from '@shared/renderer/modules/main-window/store'
+import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import {
   Carbon as CarbonIcon,
@@ -422,3 +422,4 @@ const emits = defineEmits<{
   font-size: 16px;
 }
 </style>
+@shared/renderer/modules/app@shared/renderer/modules/app/store@shared/renderer/modules/auto-gameflow/store@shared/renderer/modules/lcu-state-sync/login@shared/renderer/modules/main-window@shared/renderer/modules/main-window/store@shared/renderer/modules/respawn-timer/store

@@ -57,7 +57,7 @@ import {
   setSummonerBackgroundAugments,
   setSummonerBackgroundSkin
 } from '@shared/renderer/http-api/summoner'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync-new/game-data'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { ChampSkin } from '@shared/types/lcu/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
@@ -241,3 +241,4 @@ const handleApplyToProfile = async () => {
   font-size: 18px;
 }
 </style>
+@shared/renderer/modules/lcu-state-sync/game-data

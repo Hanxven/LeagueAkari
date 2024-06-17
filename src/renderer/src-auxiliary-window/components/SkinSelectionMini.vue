@@ -24,8 +24,8 @@
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { getCarouselSkins, setSkin } from '@shared/renderer/http-api/champ-select'
 import { getChampDetails } from '@shared/renderer/http-api/game-data'
-import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window-new/store'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync-new/champ-select'
+import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
+import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { CarouselSkins } from '@shared/types/lcu/champ-select'
 import { ChampDetails } from '@shared/types/lcu/game-data'
 import {
@@ -248,3 +248,4 @@ const handleSetSkin = async () => {
   font-size: 18px;
 }
 </style>
+@shared/renderer/modules/auxiliary-window/store@shared/renderer/modules/lcu-state-sync/champ-select

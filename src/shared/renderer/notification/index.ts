@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { useNotification } from 'naive-ui'
 import { VNodeChild } from 'vue'
 
-import { mainWindowRendererModule as mwm } from '../modules/main-window-new'
+import { mainWindowRendererModule as mwm } from '../modules/main-window'
 
 interface LeagueAkariNotificationEvent {
   type: 'success' | 'error' | 'warning' | 'info'

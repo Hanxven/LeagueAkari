@@ -12,10 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import { appRendererModule as am } from '@shared/renderer/modules/app-new'
-import { useAppStore } from '@shared/renderer/modules/app-new/store'
-import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality-new/store'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection-new/store'
+import { appRendererModule as am } from '@shared/renderer/modules/app'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
 import { greeting } from '@shared/renderer/utils/greeting'
 import { useNotification } from 'naive-ui'
@@ -108,3 +108,4 @@ am.onEvent('second-instance', () => {
   }
 }
 </style>
+@shared/renderer/modules/app@shared/renderer/modules/app/store@shared/renderer/modules/core-functionality/store@shared/renderer/modules/lcu-connection/store

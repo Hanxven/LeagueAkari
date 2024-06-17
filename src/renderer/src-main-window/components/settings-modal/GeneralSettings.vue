@@ -291,13 +291,13 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useAppStore } from '@shared/renderer/modules/app-new/store'
-import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window-new'
-import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window-new/store'
-import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality-new'
-import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality-new/store'
-import { respawnTimerRendererModule as rtm } from '@shared/renderer/modules/respawn-timer-new'
-import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer-new/store'
+import { useAppStore } from '@shared/renderer/modules/app/store'
+import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
+import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
+import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality'
+import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { respawnTimerRendererModule as rtm } from '@shared/renderer/modules/respawn-timer'
+import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
 import { NButton, NCard, NFlex, NInput, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 const rt = useRespawnTimerStore()
@@ -322,3 +322,4 @@ const app = useAppStore()
   color: rgb(97, 97, 97);
 }
 </style>
+@shared/renderer/modules/app/store@shared/renderer/modules/auxiliary-window@shared/renderer/modules/auxiliary-window/store@shared/renderer/modules/core-functionality@shared/renderer/modules/core-functionality/store@shared/renderer/modules/respawn-timer@shared/renderer/modules/respawn-timer/store
