@@ -474,13 +474,13 @@ export class AutoGameflowModule extends MobxBasedModule {
             Date.now() + this.state.settings.autoSearchMatchDelaySeconds * 1e3
           )
           this._autoSearchMatchTimerId = setTimeout(
-            this._startMatchmaking,
+            () => this._startMatchmaking(),
             this.state.settings.autoSearchMatchDelaySeconds * 1e3
           )
 
           this._sendAutoSearchMatchInfoInChat()
           this._autoSearchMatchCountdownTimerId = setInterval(
-            this._sendAutoSearchMatchInfoInChat,
+            () => this._sendAutoSearchMatchInfoInChat(),
             1000
           )
         } else if (s === 'unavailable' || s === 'cannot-start-activity') {
@@ -565,7 +565,7 @@ export class AutoGameflowModule extends MobxBasedModule {
         if (phase === 'ReadyCheck') {
           this.state.setAcceptAt(Date.now() + this.state.settings.autoAcceptDelaySeconds * 1e3)
           this._autoAcceptTimerId = setTimeout(
-            this._acceptMatch,
+            () => this._acceptMatch(),
             this.state.settings.autoAcceptDelaySeconds * 1e3
           )
 

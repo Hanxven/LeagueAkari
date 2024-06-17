@@ -290,7 +290,6 @@ const emits = defineEmits<{
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
     transition: all 0.3s ease;
     flex-shrink: 0;
     -webkit-app-region: no-drag;
