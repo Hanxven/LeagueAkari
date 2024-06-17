@@ -14,6 +14,7 @@ import { autoSelectModule } from './auto-select'
 import { coreFunctionalityModule } from './core-functionality'
 import { customKeyboardSequenceModule } from './custom-keyboard-sequence'
 import { debugModule } from './debug'
+import { externalDataSourceModule } from './external-data-source'
 import { lcuSyncModule } from './lcu-state-sync'
 import { respawnTimerModule } from './respawn-timer'
 
@@ -36,6 +37,7 @@ export async function setupLeagueAkariModules() {
   manager.use(autoReplyModule)
   manager.use(customKeyboardSequenceModule)
   manager.use(debugModule)
+  manager.use(externalDataSourceModule)
 
   await manager.setup()
 }

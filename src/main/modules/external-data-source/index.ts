@@ -100,3 +100,5 @@ export class ExternalDataSourceModule extends MobxBasedModule {
     }
   }
 }
+
+export const externalDataSourceModule = new ExternalDataSourceModule()

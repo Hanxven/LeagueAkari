@@ -44,7 +44,7 @@
       ></NSelect>
     </NModal>
     <ControlItem class="control-item-margin" label="选择" label-description="查找目标英雄或皮肤">
-      <NButton size="tiny" @click="isModalShow = true">选择</NButton>
+      <NButton size="tiny" type="primary" @click="isModalShow = true">选择</NButton>
     </ControlItem>
   </NCard>
 </template>

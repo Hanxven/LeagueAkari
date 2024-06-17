@@ -2,9 +2,18 @@
   <NCard v-if="isCustomGame !== null" size="small">
     <NFlex align="center" v-if="!isCustomGame" class="control-item">
       <span class="label" style="flex: 1">退出英雄选择</span>
-      <NButton size="tiny" type="warning" secondary @click="handleDodge" style="font-size: 10px"
-        >秒退</NButton
+      <NPopconfirm
+        @positive-click="handleDodge"
+        :positive-button-props="{ type: 'error', size: 'tiny' }"
+        :negative-button-props="{ size: 'tiny' }"
+        negative-text="取消"
+        positive-text="退出"
       >
+        <template #trigger>
+          <NButton size="tiny" type="warning" secondary style="font-size: 10px">秒退</NButton>
+        </template>
+        <span style="font-size: 12px">这将退出英雄选择阶段</span>
+      </NPopconfirm>
     </NFlex>
     <NFlex align="center" v-if="!isBenchMode" class="control-item">
       <span class="label" style="flex: 1">自动选择</span>
@@ -40,7 +49,7 @@ import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
-import { NButton, NCard, NFlex, NSwitch } from 'naive-ui'
+import { NButton, NCard, NFlex, NPopconfirm, NSwitch } from 'naive-ui'
 import { computed } from 'vue'
 
 const gameflow = useGameflowStore()
