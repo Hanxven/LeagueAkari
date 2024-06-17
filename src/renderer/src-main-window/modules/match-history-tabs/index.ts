@@ -1,5 +1,4 @@
 import { LeagueAkariRendererModule } from '@shared/renderer/akari/renderer-akari-module'
-import { LcuHttpError } from '@shared/renderer/http-api/common'
 import { getGame, getMatchHistory } from '@shared/renderer/http-api/match-history'
 import { getRankedStats } from '@shared/renderer/http-api/ranked'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
@@ -10,6 +9,7 @@ import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gamefl
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { StorageRendererModule } from '@shared/renderer/modules/storage'
 import { laNotification } from '@shared/renderer/notification'
+import { AxiosError } from 'axios'
 import { computed, markRaw, watch } from 'vue'
 
 import { MatchHistoryGameTabCard, SummonerTabMatchHistory, useMatchHistoryTabsStore } from './store'
@@ -329,12 +329,12 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
       } catch (error) {
         tab.data.matchHistory.hasError = true
         if (
-          (error as LcuHttpError)?.response?.status === 500 ||
-          (error as LcuHttpError)?.response?.status === 503
+          (error as AxiosError)?.response?.status === 500 ||
+          (error as AxiosError)?.response?.status === 503
         ) {
           laNotification.warn(
             '加载失败',
-            `拉取战绩失败，服务器异常。远程服务器返回内部错误 ${(error as LcuHttpError)?.response?.status}${lc.auth?.rsoPlatformId === 'HN1' ? '，当前服务器为艾欧尼亚，由于服务器原因，特定时间段内无法访问战绩接口。' : ''}`,
+            `拉取战绩失败，服务器异常。远程服务器返回内部错误 ${(error as AxiosError)?.response?.status}${lc.auth?.rsoPlatformId === 'HN1' ? '，当前服务器为艾欧尼亚，由于服务器原因，特定时间段内无法访问战绩接口。' : ''}`,
             error
           )
         } else {

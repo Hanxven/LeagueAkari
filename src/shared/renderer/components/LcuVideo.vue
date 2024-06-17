@@ -4,24 +4,24 @@
 </template>
 
 <script lang="ts" setup>
-import { useGameDataBlobUrl } from '../compositions/useGameDataBlobUrl'
+import { addLeadingSlash } from '@shared/utils/uri'
+import { ref, watchEffect } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    src?: string
-    cache?: boolean
-  }>(),
-  {
-    cache: true
+import { useLcuConnectionStore } from '../modules/lcu-connection/store'
+
+const props = defineProps<{
+  src?: string
+}>()
+
+const url = ref<string | null>(null)
+const lc = useLcuConnectionStore()
+
+watchEffect(() => {
+  if (lc.state === 'connected') {
+    url.value = `akari://lcu${addLeadingSlash(props.src)}`
+  } else {
+    url.value = null
   }
-)
-
-const { url, load } = useGameDataBlobUrl(() => props.src, false, props.cache)
-
-load()
-
-defineExpose({
-  load
 })
 </script>
 

@@ -42,15 +42,15 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { getFriends } from '@shared/renderer/http-api/chat'
-import { LcuHttpError } from '@shared/renderer/http-api/common'
 import { launchSpectator } from '@shared/renderer/http-api/spectator'
 import { getSummonerAlias, getSummonerByName } from '@shared/renderer/http-api/summoner'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { laNotification } from '@shared/renderer/notification'
 import { Friend } from '@shared/types/lcu/chat'
 import { resolveSummonerName } from '@shared/utils/identity'
+import { AxiosError } from 'axios'
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
 
@@ -101,7 +101,7 @@ const handleSpectate = async () => {
 
     laNotification.success('观战', '已拉起观战')
   } catch (error) {
-    if ((error as LcuHttpError).response?.status === 404) {
+    if ((error as AxiosError).response?.status === 404) {
       laNotification.warn('观战', '尝试观战失败，玩家不存在', error)
     } else {
       laNotification.warn('观战', '尝试观战失败，该玩家可能不在对局中或目标模式不可观战', error)
