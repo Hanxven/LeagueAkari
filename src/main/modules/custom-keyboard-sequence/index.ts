@@ -1,4 +1,4 @@
-import { MobxBasedModule } from '@shared/akari/mobx-based-module'
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { sleep } from '@shared/utils/sleep'
 
 import { AppLogger, LogModule } from '../akari-core/log'

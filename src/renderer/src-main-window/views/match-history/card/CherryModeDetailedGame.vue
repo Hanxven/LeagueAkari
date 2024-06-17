@@ -451,4 +451,3 @@ table {
   margin: 4px 0px;
 }
 </style>
-@shared/constants/common

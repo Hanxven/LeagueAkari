@@ -1,5 +1,5 @@
 import { getPlayerList } from '@main/http-api/game-client'
-import { MobxBasedModule } from '@shared/akari/mobx-based-module'
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { runInAction } from 'mobx'
 
 import { AppLogger, LogModule } from '../akari-core/log'

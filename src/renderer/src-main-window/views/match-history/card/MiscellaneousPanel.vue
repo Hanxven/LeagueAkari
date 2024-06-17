@@ -411,4 +411,3 @@ const tableData = computed(() => {
   margin-right: 12px;
 }
 </style>
-@shared/renderer/modules/lcu-state-sync/game-data

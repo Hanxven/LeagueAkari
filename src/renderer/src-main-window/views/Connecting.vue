@@ -201,4 +201,3 @@ const handleConnect = (auth: LcuAuth) => {
   text-align: center;
 }
 </style>
-@shared/renderer/modules/app/store@shared/renderer/modules/lcu-connection/store

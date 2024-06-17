@@ -380,4 +380,3 @@ const handleRemove = () => {
   filter: brightness(0.5);
 }
 </style>
-@shared/renderer/modules/lcu-state-sync/champ-select@shared/renderer/modules/lcu-state-sync/game-data@shared/renderer/modules/lcu-state-sync/gameflow

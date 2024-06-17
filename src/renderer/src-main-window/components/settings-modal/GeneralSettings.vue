@@ -322,4 +322,3 @@ const app = useAppStore()
   color: rgb(97, 97, 97);
 }
 </style>
-@shared/renderer/modules/app/store@shared/renderer/modules/auxiliary-window@shared/renderer/modules/auxiliary-window/store@shared/renderer/modules/core-functionality@shared/renderer/modules/core-functionality/store@shared/renderer/modules/respawn-timer@shared/renderer/modules/respawn-timer/store

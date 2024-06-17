@@ -1,4 +1,4 @@
-import { StateSyncModule } from '@shared/renderer/akari/state-sync-module'
+import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
 
 export class StorageRendererModule extends StateSyncModule {
   constructor() {

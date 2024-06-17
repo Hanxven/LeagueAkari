@@ -46,15 +46,16 @@ const gameData = useGameDataStore()
 <style lang="less" scoped>
 .perkstyle,
 .empty {
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .info {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
+  
   .image {
-    border-radius: 4px;
+    border-radius: 2px;
     height: 28px;
   }
 
@@ -69,5 +70,3 @@ const gameData = useGameDataStore()
   background-color: rgb(34, 34, 34);
 }
 </style>
-@main-window/modules/lcu-state-sync/game-data
-@shared/renderer/modules/lcu-state-sync/game-data

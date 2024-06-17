@@ -1,5 +1,5 @@
 import { LcuAuth } from '@main/utils/lcu-auth'
-import { MobxBasedModule } from '@shared/akari/mobx-based-module'
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { formatError } from '@shared/utils/errors'

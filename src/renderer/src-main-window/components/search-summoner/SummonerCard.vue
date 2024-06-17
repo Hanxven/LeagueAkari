@@ -143,4 +143,3 @@ const handleToSummoner = () => {
   white-space: nowrap;
 }
 </style>
-@shared/constants/common

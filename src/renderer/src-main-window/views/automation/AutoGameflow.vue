@@ -194,4 +194,3 @@ const agf = useAutoGameflowStore()
   background-color: rgba(255, 255, 255, 0.084);
 }
 </style>
-@shared/renderer/modules/auto-gameflow@shared/renderer/modules/auto-gameflow/store

@@ -421,4 +421,3 @@ const emits = defineEmits<{
   font-size: 16px;
 }
 </style>
-@shared/renderer/modules/app@shared/renderer/modules/app/store@shared/renderer/modules/auto-gameflow/store@shared/renderer/modules/lcu-state-sync/login@shared/renderer/modules/main-window@shared/renderer/modules/main-window/store@shared/renderer/modules/respawn-timer/store

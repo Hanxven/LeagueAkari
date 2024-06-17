@@ -1,4 +1,4 @@
-import { LeagueAkariModule } from '@shared/akari/akari-module'
+import { LeagueAkariModule } from './akari-module'
 import { IReactionOptions, IReactionPublic, reaction } from 'mobx'
 
 /**

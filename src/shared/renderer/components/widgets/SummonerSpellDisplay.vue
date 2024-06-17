@@ -65,13 +65,11 @@ const gameData = useGameDataStore()
 }
 
 .spell {
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .empty {
-  border-radius: 4px;
+  border-radius: 2px;
   background-color: rgb(34, 34, 34);
 }
 </style>
-@main-window/modules/lcu-state-sync/game-data
-@shared/renderer/modules/lcu-state-sync/game-data

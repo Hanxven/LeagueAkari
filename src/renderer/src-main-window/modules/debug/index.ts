@@ -1,5 +1,5 @@
 import { RadixEventEmitter } from '@shared/event-emitter'
-import { StateSyncModule } from '@shared/renderer/akari/state-sync-module'
+import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
 import { gameClientRequest, request } from '@shared/renderer/http-api/common'
 import { watch } from 'vue'
 

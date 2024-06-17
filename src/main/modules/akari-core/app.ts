@@ -1,5 +1,5 @@
 import { optimizer } from '@electron-toolkit/utils'
-import { MobxBasedModule } from '@shared/akari/mobx-based-module'
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants/common'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'

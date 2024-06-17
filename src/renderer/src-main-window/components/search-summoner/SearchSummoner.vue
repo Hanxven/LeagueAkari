@@ -274,4 +274,3 @@ onMounted(() => {
   transition: all 0.3s ease;
 }
 </style>
-@shared/renderer/modules/lcu-state-sync/summoner

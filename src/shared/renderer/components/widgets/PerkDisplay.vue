@@ -44,15 +44,16 @@ const gameData = useGameDataStore()
 <style lang="less" scoped>
 .perk,
 .empty {
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .info {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
+
   .image {
-    border-radius: 4px;
+    border-radius: 2px;
     height: 28px;
   }
 

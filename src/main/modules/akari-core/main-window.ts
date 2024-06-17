@@ -1,5 +1,5 @@
 import { is } from '@electron-toolkit/utils'
-import { MobxBasedModule } from '@shared/akari/mobx-based-module'
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { BrowserWindow, Event, app, shell } from 'electron'
 import { makeAutoObservable } from 'mobx'
 import { join } from 'node:path'

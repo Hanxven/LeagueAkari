@@ -1,4 +1,4 @@
-import { LeagueAkariModule } from '@shared/akari/akari-module'
+import { LeagueAkariModule } from '@main/akari-ipc/akari-module'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import dayjs from 'dayjs'
 import { app, shell } from 'electron'

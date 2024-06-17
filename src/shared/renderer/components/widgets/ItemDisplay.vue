@@ -89,7 +89,7 @@ const gameData = useGameDataStore()
   .image {
     width: 28px;
     height: 28px;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   .right-side {
@@ -136,7 +136,7 @@ const gameData = useGameDataStore()
   .image {
     width: 20px;
     height: 20px;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   &::before {
@@ -154,11 +154,10 @@ const gameData = useGameDataStore()
 
 .item,
 .item.empty {
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .empty {
   background-color: rgb(34, 34, 34);
 }
 </style>
-@main-window/modules/lcu-state-sync/game-data @shared/renderer/modules/lcu-state-sync/game-data

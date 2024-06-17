@@ -1,4 +1,4 @@
-import { LeagueAkariRendererModuleManager } from '@shared/renderer/akari/renderer-module-manager'
+import { LeagueAkariRendererModuleManager } from '@shared/renderer/akari-ipc/renderer-module-manager'
 import { appRendererModule } from '@shared/renderer/modules/app'
 import { autoGameflowRendererModule } from '@shared/renderer/modules/auto-gameflow'
 import { autoReplyRendererModule } from '@shared/renderer/modules/auto-reply'

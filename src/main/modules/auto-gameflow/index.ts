@@ -4,7 +4,7 @@ import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/h
 import { accept } from '@main/http-api/matchmaking'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { TimeoutTask } from '@main/utils/timer'
-import { MobxBasedModule } from '@shared/akari/mobx-based-module'
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
 

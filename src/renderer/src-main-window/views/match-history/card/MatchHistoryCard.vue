@@ -793,4 +793,3 @@ const handleToSummoner = (puuid: string) => {
   font-size: 12px;
 }
 </style>
-@shared/constants/common@shared/renderer/modules/lcu-state-sync/game-data

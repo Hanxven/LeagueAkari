@@ -139,5 +139,3 @@ const formatRarity = (r: string) => {
   background-image: linear-gradient(135deg, #f6d7ff, #b453cf);
 }
 </style>
-@main-window/modules/lcu-state-sync/game-data
-@shared/renderer/modules/lcu-state-sync/game-data

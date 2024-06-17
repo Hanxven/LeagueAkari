@@ -155,4 +155,3 @@ const handleSaveTag = async () => {
   }
 }
 </style>
-@shared/renderer/modules/app/store@shared/renderer/modules/core-functionality@shared/renderer/modules/core-functionality/store@shared/renderer/modules/lcu-connection/store@shared/renderer/modules/lcu-state-sync/summoner@shared/renderer/modules/storage

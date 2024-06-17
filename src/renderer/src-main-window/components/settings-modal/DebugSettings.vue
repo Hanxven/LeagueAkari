@@ -383,4 +383,3 @@ const handleReload = () => {
   --n-empty-padding: 12px;
 }
 </style>
-@shared/renderer/modules/app@shared/renderer/modules/app/store@shared/renderer/modules/lcu-connection/store@shared/renderer/modules/lcu-state-sync/gameflow@shared/renderer/modules/main-window

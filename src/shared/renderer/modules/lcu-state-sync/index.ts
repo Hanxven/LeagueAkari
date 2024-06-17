@@ -1,5 +1,5 @@
-import { LeagueAkariRendererModuleManager } from '@shared/renderer/akari/renderer-module-manager'
-import { StateSyncModule } from '@shared/renderer/akari/state-sync-module'
+import { LeagueAkariRendererModuleManager } from '@shared/renderer/akari-ipc/renderer-module-manager'
+import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
 
 import { useChampSelectStore } from './champ-select'
 import { useChatStore } from './chat'

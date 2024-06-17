@@ -1,6 +1,6 @@
 import { action, benchSwap, pickOrBan } from '@main/http-api/champ-select'
 import { chatSend } from '@main/http-api/chat'
-import { MobxBasedModule } from '@shared/akari/mobx-based-module'
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
 

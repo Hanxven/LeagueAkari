@@ -124,4 +124,3 @@ const handleDoubleClick = () => {
   max-width: 768px;
 }
 </style>
-@shared/renderer/modules/app@shared/renderer/modules/app/store

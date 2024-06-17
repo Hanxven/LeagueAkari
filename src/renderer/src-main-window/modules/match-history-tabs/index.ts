@@ -1,4 +1,4 @@
-import { LeagueAkariRendererModule } from '@shared/renderer/akari/renderer-akari-module'
+import { LeagueAkariRendererModule } from '@shared/renderer/akari-ipc/renderer-akari-module'
 import { getGame, getMatchHistory } from '@shared/renderer/http-api/match-history'
 import { getRankedStats } from '@shared/renderer/http-api/ranked'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'

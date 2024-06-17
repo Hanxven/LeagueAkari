@@ -56,4 +56,3 @@ const ar = useAutoReplyStore()
   font-size: 18px;
 }
 </style>
-@shared/renderer/modules/auto-reply@shared/renderer/modules/auto-reply/store

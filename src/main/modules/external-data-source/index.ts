@@ -1,4 +1,4 @@
-import { MobxBasedModule } from '@shared/akari/mobx-based-module'
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { formatError } from '@shared/utils/errors'
 import { computed } from 'mobx'
 

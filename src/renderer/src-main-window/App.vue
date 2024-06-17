@@ -108,4 +108,3 @@ am.onEvent('second-instance', () => {
   }
 }
 </style>
-@shared/renderer/modules/app@shared/renderer/modules/app/store@shared/renderer/modules/core-functionality/store@shared/renderer/modules/lcu-connection/store

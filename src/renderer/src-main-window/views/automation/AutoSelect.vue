@@ -180,4 +180,3 @@ const completeStrategy = ({ checked }: { checked: boolean }) => {
   font-size: 18px;
 }
 </style>
-@shared/renderer/modules/auto-select@shared/renderer/modules/auto-select/store

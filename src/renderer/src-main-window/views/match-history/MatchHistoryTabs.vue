@@ -454,4 +454,3 @@ const handleBackToTop = () => {
   }
 }
 </style>
-@shared/renderer/modules/core-functionality/store@shared/renderer/modules/lcu-state-sync/summoner

@@ -1,4 +1,4 @@
-import { LeagueAkariModuleManager } from '@shared/akari/main-module-manager'
+import { LeagueAkariModuleManager } from '@main/akari-ipc/main-module-manager'
 
 import { appModule } from './akari-core/app'
 import { auxWindowModule } from './akari-core/auxiliary-window'

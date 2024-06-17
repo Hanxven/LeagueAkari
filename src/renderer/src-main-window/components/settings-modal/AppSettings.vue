@@ -86,4 +86,3 @@ const closeStrategies = [
   font-size: 18px;
 }
 </style>
-@shared/renderer/modules/app@shared/renderer/modules/app/store@shared/renderer/modules/lcu-connection@shared/renderer/modules/lcu-connection/store

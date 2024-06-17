@@ -1,5 +1,5 @@
 import { chatSend } from '@main/http-api/chat'
-import { MobxBasedModule } from '@shared/akari/mobx-based-module'
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { ChatMessage } from '@shared/types/lcu/chat'
 import { LcuEvent } from '@shared/types/lcu/event'
 import { formatError } from '@shared/utils/errors'
