@@ -75,18 +75,31 @@
             ></LcuImage>
             <div class="champion-level">{{ self.participant.stats.champLevel }}</div>
           </div>
-          <div class="summoner-spells">
-            <SummonerSpellDisplay :spell-id="self.participant.spell1Id" :size="24" />
-            <SummonerSpellDisplay :spell-id="self.participant.spell2Id" :size="24" />
-          </div>
-          <div
-            class="perks"
-            v-if="self.participant.stats.perkPrimaryStyle && self.participant.stats.perkSubStyle"
-          >
-            <PerkDisplay :perk-id="self.participant.stats.perk0" :size="24" />
-            <!-- It should be 'perkstyle', but I still use class name 'perk' here. -->
-            <PerkstyleDisplay :size="24" :perkstyle-id="self.participant.stats.perkSubStyle" />
-          </div>
+          <template v-if="game.gameMode === 'CHERRY'">
+            <div class="summoner-spells">
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment1" :size="24" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment2" :size="24" />
+            </div>
+            <div class="summoner-spells">
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment3" :size="24" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment4" :size="24" />
+            </div>
+          </template>
+          <template v-else>
+            <div class="summoner-spells">
+              <SummonerSpellDisplay :spell-id="self.participant.spell1Id" :size="24" />
+              <SummonerSpellDisplay :spell-id="self.participant.spell2Id" :size="24" />
+            </div>
+            <div
+              class="perks"
+              v-if="self.participant.stats.perkPrimaryStyle && self.participant.stats.perkSubStyle"
+            >
+              <PerkDisplay :perk-id="self.participant.stats.perk0" :size="24" />
+              <!-- It should be 'perkstyle', but I still use class name 'perk' here. -->
+              <PerkstyleDisplay :size="24" :perkstyle-id="self.participant.stats.perkSubStyle" />
+            </div>
+          </template>
+
           <div class="kda-info">
             <div class="kda">
               <span class="k">{{ self.participant.stats.kills }}</span
@@ -208,6 +221,7 @@
 <script setup lang="ts">
 import { EMPTY_PUUID } from '@shared/constants/common'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import AugmentDisplay from '@shared/renderer/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'

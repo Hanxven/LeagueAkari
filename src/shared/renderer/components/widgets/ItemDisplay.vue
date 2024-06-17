@@ -161,5 +161,4 @@ const gameData = useGameDataStore()
   background-color: rgb(34, 34, 34);
 }
 </style>
-@main-window/modules/lcu-state-sync/game-data
-@shared/renderer/modules/lcu-state-sync/game-data
+@main-window/modules/lcu-state-sync/game-data @shared/renderer/modules/lcu-state-sync/game-data

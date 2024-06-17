@@ -16,8 +16,8 @@ class LcuClientSettings {
     baseWidth: number
     baseHeight: number
   } = {
-    baseWidth: 1280,
-    baseHeight: 720
+    baseWidth: 1600,
+    baseHeight: 900
   }
 
   setFixWindowMethodsAOptions(option: { baseWidth: number; baseHeight: number }) {
@@ -82,7 +82,7 @@ export class LcuClientModule extends MobxBasedModule {
         throw new Error('insufficient permissions')
       }
 
-      const instance = this._lcm.gcHttp
+      const instance = this._lcm.lcuHttp
       if (!instance) {
         throw new Error('LCU not connected')
       }

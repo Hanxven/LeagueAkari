@@ -1,29 +1,12 @@
 <template>
   <NPopover :delay="300">
     <template #trigger>
-      <div style="display: flex; align-items: center">
-        <svg :width="width" :height="height">
-          <rect x="0" y="0" :width="width" :height="height" class="bg" />
-          <rect
-            v-for="dmg of ordered"
-            :x="dmg.x"
-            y="0"
-            :height="height"
-            :width="dmg.width"
-            :class="{
-              'magic-damage': dmg.type === 'magic',
-              'physical-damage': dmg.type === 'physical',
-              'true-damage': dmg.type === 'true'
-            }"
-          />
-        </svg>
-        <div
-          :class="{ best: baselineDamage && totalDamage === baselineDamage }"
-          style="margin-left: 6px; width: 40px; text-align: right; font-size: 11px"
-        >
-          {{ ((totalDamage / baselineDamage) * 100).toFixed(0) }} %
-        </div>
-      </div>
+      <span :class="{ best: baselineDamage && totalDamage === baselineDamage }">
+        {{ totalDamage.toLocaleString() }} ({{
+          ((totalDamage / baselineDamage || 1) * 100).toFixed(2)
+        }}
+        %)</span
+      >
     </template>
     <div class="details">
       <div style="display: flex; align-items: center">
@@ -74,8 +57,8 @@ const props = withDefaults(
     physicalDamage: 1,
     totalDamage: 1,
     trueDamage: 1,
-    width: 52,
-    height: 6
+    width: 80,
+    height: 8
   }
 )
 
@@ -117,7 +100,7 @@ const ordered = computed(() => {
 }
 
 .details {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .divider {
