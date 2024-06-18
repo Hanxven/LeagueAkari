@@ -91,7 +91,7 @@ export class ExternalDataSourceModule extends MobxBasedModule {
     if (ExternalDataSourceModule.BALANCE_MODES.has(gameMode)) {
       try {
         this._logger.info(
-          `更新英雄平衡性数据，数据源 ${this.state.balance.fandom.name}  ${this.state.balance.fandom.id} ${this.state.balance.fandom.version}`
+          `尝试更新英雄平衡性数据，数据源 ${this.state.balance.fandom.name}  ${this.state.balance.fandom.id} ${this.state.balance.fandom.version}`
         )
         await this.state.balance.updateData()
       } catch (error) {

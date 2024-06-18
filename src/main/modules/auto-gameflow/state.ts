@@ -7,6 +7,7 @@ export type AutoHonorStrategy =
   | 'only-lobby-member' // 随机仅限组队时房间内成员
   | 'all-member' // 随机所有可点赞玩家
   | 'opt-out' // 直接跳过
+  | 'all-member-including-opponent' // 随机所有可点赞玩家，包括对手
 
 export type AutoSearchRematchStrategy = 'never' | 'fixed-duration' | 'estimated-duration'
 

@@ -55,7 +55,10 @@
             >优先预组队成员</NRadio
           >
           <NRadio value="only-lobby-member" title="只选择房间内的人员">仅预组队成员</NRadio>
-          <NRadio value="all-member" title="考虑任何人">所有成员</NRadio>
+          <NRadio value="all-member" title="考虑所有队友">所有队友</NRadio>
+          <NRadio value="all-member-including-opponent" title="考虑本局游戏所有玩家 (包括对手)"
+            >所有玩家</NRadio
+          >
           <NRadio value="opt-out" title="将直接跳过此阶段">永远跳过</NRadio>
         </NFlex>
       </NRadioGroup>

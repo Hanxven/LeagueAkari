@@ -1,10 +1,10 @@
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { chatSend } from '@main/http-api/chat'
 import { honor } from '@main/http-api/honor-v2'
 import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
 import { accept } from '@main/http-api/matchmaking'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { TimeoutTask } from '@main/utils/timer'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
 
@@ -31,7 +31,7 @@ export class AutoGameflowModule extends MobxBasedModule {
   private _autoSearchMatchTimerId: NodeJS.Timeout | null = null
   private _autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
 
-  private _playAgainTask = new TimeoutTask(this._playAgainFn)
+  private _playAgainTask = new TimeoutTask(() => this._playAgainFn())
 
   static HONOR_CATEGORY = ['COOL', 'SHOTCALLER', 'HEART'] as const
 
@@ -386,10 +386,14 @@ export class AutoGameflowModule extends MobxBasedModule {
             }
 
             const eligibleAllies = b.eligibleAllies
+            const eligibleOpponents = b.eligibleOpponents
             const honorablePlayerIds: number[] = []
 
             if (this.state.settings.autoHonorStrategy === 'all-member') {
               honorablePlayerIds.push(...eligibleAllies.map((p) => p.summonerId))
+            } else if (this.state.settings.autoHonorStrategy === 'all-member-including-opponent') {
+              honorablePlayerIds.push(...eligibleAllies.map((p) => p.summonerId))
+              honorablePlayerIds.push(...eligibleOpponents.map((p) => p.summonerId))
             } else {
               const eligiblePlayerIds = new Set(eligibleAllies.map((p) => p.summonerId))
               const eogStatus = (await getEogStatus()).data
