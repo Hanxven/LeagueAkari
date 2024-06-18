@@ -20,6 +20,8 @@ class AuxiliaryWindowSettings {
 
   zoomFactor: number = 1.0
 
+  taskbarIcon: boolean = false
+
   setOpacity(opacity: number) {
     this.opacity = opacity
   }
@@ -34,6 +36,10 @@ class AuxiliaryWindowSettings {
 
   setZoomFactor(f: number) {
     this.zoomFactor = f
+  }
+
+  setTaskbarIcon(b: boolean) {
+    this.taskbarIcon = b
   }
 
   constructor() {
@@ -90,7 +96,7 @@ export class AuxWindowModule extends MobxBasedModule {
   private _lcm: LcuConnectionModule
   private _lcu: LcuSyncModule
   private _logModule: LogModule
-  private _storageModule: StorageModule
+  private _sm: StorageModule
   private _logger: AppLogger
   private _appModule: AppModule
 
@@ -110,7 +116,7 @@ export class AuxWindowModule extends MobxBasedModule {
     await super.setup()
 
     this._logModule = this.manager.getModule<LogModule>('log')
-    this._storageModule = this.manager.getModule<StorageModule>('storage')
+    this._sm = this.manager.getModule<StorageModule>('storage')
     this._lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
     this._lcu = this.manager.getModule<LcuSyncModule>('lcu-state-sync')
     this._appModule = this.manager.getModule<AppModule>('app')
@@ -198,6 +204,18 @@ export class AuxWindowModule extends MobxBasedModule {
         this._adjustWindowSize()
       }
     )
+
+    this.autoDisposeReaction(
+      () => this.state.settings.taskbarIcon,
+      (b) => {
+        this._w?.setSkipTaskbar(!b)
+        this._w?.setMinimizable(b)
+
+        if (!b) {
+          this._w?.show()
+        }
+      }
+    )
   }
 
   private _setupStateSync() {
@@ -209,6 +227,7 @@ export class AuxWindowModule extends MobxBasedModule {
     this.simpleSync('settings/enabled', () => this.state.settings.enabled)
     this.simpleSync('settings/show-skin-selector', () => this.state.settings.showSkinSelector)
     this.simpleSync('settings/zoom-factor', () => this.state.settings.zoomFactor)
+    this.simpleSync('settings/taskbar-icon', () => this.state.settings.taskbarIcon)
   }
 
   private _setupMethodCall() {
@@ -254,7 +273,7 @@ export class AuxWindowModule extends MobxBasedModule {
 
     this.onCall('set-setting/opacity', async (opacity) => {
       this.state.settings.setOpacity(opacity)
-      await this._storageModule.setSetting('auxiliary-window/opacity', opacity)
+      await this._sm.setSetting('auxiliary-window/opacity', opacity)
     })
 
     this.onCall('set-always-on-top', (flag, level, relativeLevel) => {
@@ -267,17 +286,22 @@ export class AuxWindowModule extends MobxBasedModule {
 
     this.onCall('set-setting/enabled', async (enabled) => {
       this.state.settings.setEnabled(enabled)
-      await this._storageModule.setSetting('auxiliary-window/enabled', enabled)
+      await this._sm.setSetting('auxiliary-window/enabled', enabled)
     })
 
     this.onCall('set-setting/show-skin-selector', async (s) => {
       this.state.settings.setShowSkinSelector(s)
-      await this._storageModule.setSetting('auxiliary-window/show-skin-selector', s)
+      await this._sm.setSetting('auxiliary-window/show-skin-selector', s)
     })
 
     this.onCall('set-setting/zoom-factor', async (f) => {
       this.state.settings.setZoomFactor(f)
-      await this._storageModule.setSetting('auxiliary-window/zoom-factor', f)
+      await this._sm.setSetting('auxiliary-window/zoom-factor', f)
+    })
+
+    this.onCall('set-setting/taskbar-icon', async (b) => {
+      this.state.settings.setTaskbarIcon(b)
+      await this._sm.setSetting('auxiliary-window/taskbar-icon', b)
     })
   }
 
@@ -350,6 +374,9 @@ export class AuxWindowModule extends MobxBasedModule {
     this.state.setShow(AuxWindowModule.INITIAL_SHOW)
 
     this._w.setOpacity(this.state.settings.opacity)
+
+    this._w.setSkipTaskbar(!this.state.settings.taskbarIcon)
+    this._w.setMinimizable(this.state.settings.taskbarIcon)
 
     this._w.webContents.on('did-finish-load', () => {
       this._w?.webContents.setZoomFactor(this.state.settings.zoomFactor)
@@ -435,25 +462,26 @@ export class AuxWindowModule extends MobxBasedModule {
 
   private async _loadSetting() {
     this.state.settings.setOpacity(
-      await this._storageModule.getSetting('auxiliary-window/opacity', this.state.settings.opacity)
+      await this._sm.getSetting('auxiliary-window/opacity', this.state.settings.opacity)
     )
 
     this.state.settings.setEnabled(
-      await this._storageModule.getSetting('auxiliary-window/enabled', this.state.settings.enabled)
+      await this._sm.getSetting('auxiliary-window/enabled', this.state.settings.enabled)
     )
 
     this.state.settings.setShowSkinSelector(
-      await this._storageModule.getSetting(
+      await this._sm.getSetting(
         'auxiliary-window/show-skin-selector',
         this.state.settings.showSkinSelector
       )
     )
 
     this.state.settings.setZoomFactor(
-      await this._storageModule.getSetting(
-        'auxiliary-window/zoom-factor',
-        this.state.settings.zoomFactor
-      )
+      await this._sm.getSetting('auxiliary-window/zoom-factor', this.state.settings.zoomFactor)
+    )
+
+    this.state.settings.setTaskbarIcon(
+      await this._sm.getSetting('auxiliary-window/taskbar-icon', this.state.settings.taskbarIcon)
     )
   }
 
@@ -487,11 +515,11 @@ export class AuxWindowModule extends MobxBasedModule {
   private _saveWindowBounds(bounds: Rectangle) {
     bounds.width = AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor
     bounds.height = AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor
-    return this._storageModule.setSetting('auxiliary-window/bounds', bounds)
+    return this._sm.setSetting('auxiliary-window/bounds', bounds)
   }
 
   private async _getLastWindowBounds() {
-    return this._storageModule.getSetting<Rectangle | null>('auxiliary-window/bounds', null)
+    return this._sm.getSetting<Rectangle | null>('auxiliary-window/bounds', null)
   }
 
   private _getCenteredRectangle(width: number, height: number) {

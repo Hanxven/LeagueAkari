@@ -11,7 +11,8 @@ export const useAuxiliaryWindowStore = defineStore('module:auxiliary-window', ()
     opacity: 1,
     enabled: true,
     showSkinSelector: true,
-    zoomFactor: 1.0
+    zoomFactor: 1.0,
+    taskbarIcon: false
   })
 
   return {

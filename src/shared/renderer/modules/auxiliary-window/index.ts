@@ -24,6 +24,7 @@ export class AuxWindowRendererModule extends StateSyncModule {
     this.simpleSync('settings/enabled', (s) => (store.settings.enabled = s))
     this.simpleSync('settings/show-skin-selector', (s) => (store.settings.showSkinSelector = s))
     this.simpleSync('settings/zoom-factor', (s) => (store.settings.zoomFactor = s))
+    this.simpleSync('settings/taskbar-icon', (s) => (store.settings.taskbarIcon = s))
   }
 
   setSize(width: number, height: number) {
@@ -68,6 +69,10 @@ export class AuxWindowRendererModule extends StateSyncModule {
 
   setZoomFactor(f: number) {
     return this.call('set-setting/zoom-factor', f)
+  }
+
+  setTaskbarIcon(b: boolean) {
+    return this.call('set-setting/taskbar-icon', b)
   }
 }
 
