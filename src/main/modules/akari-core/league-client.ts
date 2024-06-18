@@ -42,13 +42,13 @@ export class LcuClientModule extends MobxBasedModule {
   static LEAGUE_CLIENT_UX_PROCESS_NAME = 'LeagueClientUx.exe'
 
   constructor() {
-    super('lcu-client')
+    super('league-client')
   }
 
   override async setup() {
     await super.setup()
 
-    this._logger = this.manager.getModule<LogModule>('log').createLogger('lcu-client')
+    this._logger = this.manager.getModule<LogModule>('log').createLogger('league-client')
     this._storageModule = this.manager.getModule('storage')
     this._appModule = this.manager.getModule('app')
     this._lcm = this.manager.getModule('lcu-connection')
@@ -104,7 +104,7 @@ export class LcuClientModule extends MobxBasedModule {
       await this._storageModule.setSetting('league-client-ux/fix-window-method-a-options', option)
     })
 
-    this.onCall('query-lcu-auth', async () => {
+    this.onCall('get-launched-clients', async () => {
       return this.getLaunchedClients()
     })
   }
@@ -122,4 +122,4 @@ export class LcuClientModule extends MobxBasedModule {
   }
 }
 
-export const lcuClientModule = new LcuClientModule()
+export const leagueClientModule = new LcuClientModule()

@@ -6,7 +6,7 @@ import { autoSelectRendererModule } from '@shared/renderer/modules/auto-select'
 import { auxiliaryWindowRendererModule } from '@shared/renderer/modules/auxiliary-window'
 import { coreFunctionalityRendererModule } from '@shared/renderer/modules/core-functionality'
 import { customKeyboardSequenceRendererModule } from '@shared/renderer/modules/custom-keyboard-sequence'
-import { lcuClientRendererModule } from '@shared/renderer/modules/lcu-client'
+import { leagueClientRendererModule } from '@shared/renderer/modules/league-client'
 import { lcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection'
 import { lcuSyncRendererModule } from '@shared/renderer/modules/lcu-state-sync'
 import { mainWindowRendererModule } from '@shared/renderer/modules/main-window'
@@ -23,7 +23,7 @@ export async function setupLeagueAkariRendererModules() {
   manager.use(lcuSyncRendererModule)
   manager.use(autoGameflowRendererModule)
   manager.use(coreFunctionalityRendererModule)
-  manager.use(lcuClientRendererModule)
+  manager.use(leagueClientRendererModule)
   manager.use(matchHistoryTabsRendererModule)
   manager.use(lcuConnectionRendererModule)
   manager.use(mainWindowRendererModule)

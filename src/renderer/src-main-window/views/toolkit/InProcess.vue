@@ -83,4 +83,3 @@ const handlePlayAgain = async () => {
   font-size: 18px;
 }
 </style>
-@shared/renderer/modules/lcu-state-sync/gameflow

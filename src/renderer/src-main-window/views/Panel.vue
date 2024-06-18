@@ -7,6 +7,50 @@
         :value="currentMenu"
         @update:value="handleMenuChange"
       ></NMenu>
+      <div class="bottom-operations">
+        <NPopover
+          trigger="click"
+          placement="right"
+          v-model:show="isClientsPreviewShow"
+          scrollable
+          style="max-height: 240px"
+        >
+          <template #trigger>
+            <div class="operation">
+              <NIcon class="icon"><ApplicationIcon /></NIcon>
+              <span class="label">客户端</span>
+            </div>
+          </template>
+          <div
+            v-for="c of clientsToConnect"
+            :key="c.pid"
+            class="client"
+            :class="{ connected: c.connected }"
+            :style="{
+              cursor: c.disabled ? 'not-allowed' : 'cursor'
+            }"
+            @click="() => handleConnectToLcu(c)"
+          >
+            <span class="region" title="地区"
+              ><NSpin v-if="c.loading" :size="12" class="left-widget" /><NIcon
+                v-else
+                class="left-widget"
+                style="vertical-align: text-bottom"
+                ><CubeSharpIcon
+              /></NIcon>
+              {{ regionText[c.region] || c.region }}</span
+            >
+            <span class="rso" title="区服">{{
+              rsoPlatformText[c.rsoPlatformId] || c.rsoPlatformId
+            }}</span>
+            <span class="pid" title="Process ID">{{ c.pid }}</span>
+          </div>
+        </NPopover>
+        <div class="operation" @click="handleOpenSettingsModal">
+          <NIcon class="icon"><SettingsIcon /></NIcon>
+          <span class="label">设置</span>
+        </div>
+      </div>
     </div>
     <div class="right-side-content">
       <RouterView v-slot="{ Component }">
@@ -19,14 +63,31 @@
 </template>
 
 <script setup lang="ts">
+import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
+import { LcuAuth, useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
+import { leagueClientRendererModule as lcm2 } from '@shared/renderer/modules/league-client'
+import { useLeagueClientStore } from '@shared/renderer/modules/league-client/store'
+import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import {
   AiStatus as AiStatusIcon,
   AppSwitcher as AppSwitcherIcon,
   Layers as LayersIcon,
   Template as TemplateIcon
 } from '@vicons/carbon'
-import { MenuOption, NIcon, NMenu } from 'naive-ui'
-import { Component as ComponentC, h, ref, watchEffect } from 'vue'
+import { Application as ApplicationIcon, Settings as SettingsIcon } from '@vicons/carbon'
+import { CubeSharp as CubeSharpIcon } from '@vicons/ionicons5'
+import { useIntervalFn } from '@vueuse/core'
+import { MenuOption, NIcon, NMenu, NPopover, NSpin } from 'naive-ui'
+import {
+  Component as ComponentC,
+  computed,
+  h,
+  inject,
+  ref,
+  shallowRef,
+  watch,
+  watchEffect
+} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const renderIcon = (icon: ComponentC) => {
@@ -72,6 +133,77 @@ const handleMenuChange = async (val: string) => {
     console.error('routing', error)
   }
 }
+
+const appInject = inject('app') as any
+
+const handleOpenSettingsModal = () => {
+  appInject.openSettingsModal()
+}
+
+const lc = useLcuConnectionStore()
+const lc2 = useLeagueClientStore()
+const isClientsPreviewShow = ref(false)
+const launchedClients = shallowRef<LcuAuth[]>([])
+const updateCurrentLaunchedClients = async () => {
+  launchedClients.value = await lcm2.getLaunchedClients()
+}
+
+const clientsToConnect = computed(() => {
+  if (lc.state === 'connected') {
+    return launchedClients.value.map((m) => {
+      return {
+        ...m,
+        connected: lc.auth?.pid === m.pid,
+        disabled: lc.auth?.pid === m.pid,
+        loading: lc.connectingClient?.pid === m.pid
+      }
+    })
+  } else {
+    return lc.launchedClients.map((m) => {
+      return {
+        ...m,
+        connected: lc.auth?.pid === m.pid,
+        disabled: lc.connectingClient?.pid === m.pid,
+        loading: lc.connectingClient?.pid === m.pid
+      }
+    })
+  }
+})
+
+const { pause, resume } = useIntervalFn(updateCurrentLaunchedClients, 1000, {
+  immediate: false,
+  immediateCallback: true
+})
+
+watch(
+  () => isClientsPreviewShow.value,
+  (show) => {
+    if (show) {
+      resume()
+    } else {
+      pause()
+    }
+  }
+)
+
+// 善意的提醒，以防用户一直在等
+watchEffect(() => {
+  if (lc.state === 'disconnected' && lc.launchedClients.length > 1) {
+    isClientsPreviewShow.value = true
+  }
+})
+
+const handleConnectToLcu = (auth: LcuAuth) => {
+  if (lc.state === 'connected' && lc.auth?.pid === auth.pid) {
+    return
+  }
+
+  lcm.lcuConnect(auth)
+}
+
+const emits = defineEmits<{
+  (e: 'openSettings'): void
+}>()
 </script>
 
 <style lang="less" scoped>
@@ -81,6 +213,9 @@ const handleMenuChange = async (val: string) => {
   height: 100%;
 
   .sider {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     flex-shrink: 0;
     box-sizing: border-box;
     border-right: 1px solid rgb(43, 43, 43);
@@ -97,11 +232,107 @@ const handleMenuChange = async (val: string) => {
         padding-left: 12px !important;
       }
     }
+
+    .bottom-operations {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+
+      .operation {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 4px 8px;
+        cursor: pointer;
+        border-radius: 4px;
+
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: rgb(67, 67, 67);
+        }
+
+        &:active {
+          background-color: rgb(55, 55, 55);
+        }
+      }
+
+      .icon {
+        font-size: 16px;
+      }
+
+      .label {
+        width: 36px;
+        font-size: 12px;
+        text-align: left;
+      }
+    }
   }
 
   .right-side-content {
     flex: 1;
     width: 0;
+  }
+}
+
+.client {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 24px;
+  transition: 0.3s all ease;
+  cursor: pointer;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.03);
+  width: 160px;
+
+  &:hover:not(.connected) {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  &:active:not(.connected) {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
+
+  .region {
+    font-size: 14px;
+    color: #fff;
+  }
+
+  .rso {
+    font-size: 14px;
+    font-weight: 700;
+    margin-left: 8px;
+  }
+
+  .pid {
+    position: absolute;
+    bottom: 0px;
+    right: 6px;
+    font-size: 12px;
+    color: #5d5c5c;
+    margin-left: 8px;
+  }
+
+  .left-widget {
+    margin-right: 6px;
+    font-size: 16px;
+  }
+
+  &.connected {
+    :is(.rso, .region) {
+      color: #696969;
+    }
+
+    .pid {
+      color: #4a4a4a;
+    }
   }
 }
 </style>

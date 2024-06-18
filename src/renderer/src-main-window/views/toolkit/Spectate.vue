@@ -161,4 +161,3 @@ const handleLoadFriends = async () => {
   font-size: 18px;
 }
 </style>
-@shared/renderer/modules/lcu-state-sync/gameflow@shared/renderer/modules/lcu-state-sync/summoner

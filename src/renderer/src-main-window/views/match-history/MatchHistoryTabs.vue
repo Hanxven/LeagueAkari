@@ -129,7 +129,15 @@
         />
       </template>
       <div v-else class="tabs-placeholder">
-        <LeagueAkariSpan bold class="placeholder-text" />
+        <div class="centered">
+          <LeagueAkariSpan bold class="akari-text" />
+          <div
+            v-if="lc.state !== 'connected'"
+            style="font-size: 14px; font-weight: normal; color: #666"
+          >
+            未连接到客户端
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -140,6 +148,7 @@ import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { championIcon, profileIcon } from '@shared/renderer/modules/game-data'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { laNotification } from '@shared/renderer/notification'
 import { summonerName } from '@shared/utils/name'
@@ -151,14 +160,12 @@ import { useRoute, useRouter } from 'vue-router'
 
 import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
-import {
-  TabState,
-  useMatchHistoryTabsStore
-} from '@main-window/modules/match-history-tabs/store'
+import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
 
 const mh = useMatchHistoryTabsStore()
+const lc = useLcuConnectionStore()
 
 const route = useRoute()
 const router = useRouter()
@@ -188,16 +195,6 @@ const handleRefresh = async (puuid: string) => {
     )
   }
 }
-
-watch(
-  () => mh.currentTab,
-  (c) => {
-    if (c) {
-      router.replace(`/match-history/${c.id}`)
-    }
-  },
-  { immediate: true }
-)
 
 watch(
   () => route.params.puuid,
@@ -318,8 +315,8 @@ const handleBackToTop = () => {
 .tabs-header {
   display: flex;
   max-width: 100%;
-  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.4);
   z-index: 5;
+  border-bottom: 1px solid #2b2b2b;
 
   :deep(.n-tabs-tab) {
     --n-tab-padding: 4px 8px;
@@ -338,6 +335,10 @@ const handleBackToTop = () => {
 
   :deep(.n-tabs .n-tabs-nav.n-tabs-nav--card-type .n-tabs-tab.tab-outer) {
     height: 26px;
+  }
+
+  :deep(.n-tabs .n-tabs-nav.n-tabs-nav--top.n-tabs-nav--card-type .n-tabs-pad) {
+    border-bottom: none;
   }
 
   .tabs {
@@ -445,12 +446,19 @@ const handleBackToTop = () => {
   height: 100%;
   display: flex;
   position: relative;
-  top: calc(var(--title-bar-height) * -0.5);
-  justify-content: center;
-  align-items: center;
 
-  .placeholder-text {
+  .akari-text {
     font-size: 22px;
   }
+}
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>

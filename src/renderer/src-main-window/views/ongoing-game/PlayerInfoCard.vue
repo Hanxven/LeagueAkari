@@ -609,4 +609,3 @@ const { list, containerProps, wrapperProps } = useVirtualList(matchHistoryList, 
   }
 }
 </style>
-@shared/renderer/modules/core-functionality/store@shared/renderer/modules/lcu-state-sync/game-data

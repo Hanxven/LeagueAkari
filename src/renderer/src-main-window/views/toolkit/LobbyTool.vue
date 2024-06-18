@@ -255,4 +255,3 @@ const handleLoadAvailableBots = async (show: boolean) => {
   font-size: 18px;
 }
 </style>
-@shared/renderer/modules/lcu-state-sync/game-data@shared/renderer/modules/lcu-state-sync/gameflow

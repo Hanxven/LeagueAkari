@@ -6,7 +6,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'root',
-      redirect: '/connecting'
+      redirect: { name: 'match-history' }
     },
     {
       name: 'panel',

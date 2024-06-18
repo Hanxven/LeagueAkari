@@ -143,8 +143,8 @@ import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { quit } from '@shared/renderer/http-api/process-control'
 import { killUx, launchUx, restartUx } from '@shared/renderer/http-api/riotclient'
 import { useAppStore } from '@shared/renderer/modules/app/store'
-import { lcuClientRendererModule as lcm2 } from '@shared/renderer/modules/lcu-client'
-import { useLeagueClientStore } from '@shared/renderer/modules/lcu-client/store'
+import { leagueClientRendererModule as lcm2 } from '@shared/renderer/modules/league-client'
+import { useLeagueClientStore } from '@shared/renderer/modules/league-client/store'
 import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { NButton, NCard, NInputNumber, NScrollbar, useDialog } from 'naive-ui'
@@ -275,3 +275,4 @@ const handleFixWindowMethodA = async () => {
   }
 }
 </style>
+@shared/renderer/modules/league-client@shared/renderer/modules/league-client/store

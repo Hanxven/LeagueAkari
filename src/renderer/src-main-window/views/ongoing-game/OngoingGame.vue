@@ -123,14 +123,16 @@
       </NCard>
     </div>
     <div v-else class="no-ongoing-game">
-      <LeagueAkariSpan bold class="akari-text" />
-      <div
-        v-if="cf.settings.ongoingAnalysisEnabled"
-        style="font-size: 14px; font-weight: normal; color: #666"
-      >
-        没有正在进行中的游戏
+      <div class="centered">
+        <LeagueAkariSpan bold class="akari-text" />
+        <div
+          v-if="cf.settings.ongoingAnalysisEnabled"
+          style="font-size: 14px; font-weight: normal; color: #666"
+        >
+          {{ lc.state !== 'connected' ? '未连接到客户端' : '没有正在进行中的游戏' }}
+        </div>
+        <div v-else style="font-size: 14px; font-weight: normal; color: #666">对局分析已禁用</div>
       </div>
-      <div v-else style="font-size: 14px; font-weight: normal; color: #666">对局分析已禁用</div>
     </div>
   </div>
 </template>
@@ -148,6 +150,7 @@ import {
   useCoreFunctionalityStore
 } from '@shared/renderer/modules/core-functionality/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { summonerName } from '@shared/utils/name'
@@ -175,13 +178,16 @@ const handleToSummoner = (puuid: string) => {
   return router.replace(`/match-history/${puuid}`)
 }
 
+const lc = useLcuConnectionStore()
+
 const isIdle = computed(() => {
   return (
     gameflow.phase === 'Lobby' ||
     gameflow.phase === 'None' ||
     gameflow.phase === 'Matchmaking' ||
     gameflow.phase === 'ReadyCheck' ||
-    gameflow.phase === 'WatchInProgress'
+    gameflow.phase === 'WatchInProgress' ||
+    lc.state !== 'connected'
   )
 })
 
@@ -294,9 +300,6 @@ useKeepAliveScrollPositionMemo(el)
   display: flex;
   position: relative;
   top: calc(var(--title-bar-height) * -0.5);
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 
   .akari-text {
     font-size: 22px;
@@ -374,6 +377,14 @@ useKeepAliveScrollPositionMemo(el)
     }
   }
 }
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 </style>
-@shared/constants/common
-@shared/renderer/modules/app/store@shared/renderer/modules/core-functionality@shared/renderer/modules/core-functionality/store@shared/renderer/modules/lcu-state-sync/gameflow@shared/renderer/modules/lcu-state-sync/summoner

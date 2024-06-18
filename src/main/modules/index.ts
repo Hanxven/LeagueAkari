@@ -2,7 +2,7 @@ import { LeagueAkariModuleManager } from '@main/akari-ipc/main-module-manager'
 
 import { appModule } from './akari-core/app'
 import { auxWindowModule } from './akari-core/auxiliary-window'
-import { lcuClientModule } from './akari-core/lcu-client'
+import { leagueClientModule } from './akari-core/league-client'
 import { lcuConnectionModule } from './akari-core/lcu-connection'
 import { logModule } from './akari-core/log'
 import { mainWindowModule } from './akari-core/main-window'
@@ -25,7 +25,7 @@ export async function setupLeagueAkariModules() {
   manager.use(storageModule)
   manager.use(appModule)
   manager.use(winPlatformModule)
-  manager.use(lcuClientModule)
+  manager.use(leagueClientModule)
   manager.use(mainWindowModule)
   manager.use(auxWindowModule)
   manager.use(lcuConnectionModule)

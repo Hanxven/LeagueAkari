@@ -43,6 +43,7 @@ import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { customKeyboardSequenceRendererModule as cksm } from '@shared/renderer/modules/custom-keyboard-sequence'
 import { useCustomKeyboardSequenceStore } from '@shared/renderer/modules/custom-keyboard-sequence/store'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { NCard, NInput, NSwitch } from 'naive-ui'
 
 const cks = useCustomKeyboardSequenceStore()
@@ -65,4 +66,3 @@ const app = useAppStore()
   color: rgb(97, 97, 97);
 }
 </style>
-@shared/renderer/modules/app/store@shared/renderer/modules/custom-keyboard-sequence@shared/renderer/modules/custom-keyboard-sequence/store

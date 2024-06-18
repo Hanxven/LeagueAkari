@@ -36,10 +36,6 @@
       </NFlex>
     </NModal>
     <div class="title-bar-items" ref="titleBarItemsContainer">
-      <div class="title-bar-item operation" @click="emits('openSettings')" title="通用设置">
-        <NIcon class="icon"><SettingsIcon /></NIcon>
-        <span class="text">设置</span>
-      </div>
       <div
         v-if="respawnTimer.isDead"
         class="title-bar-item task-item respawn-timer relative"
@@ -96,7 +92,9 @@
       </div>
     </div>
     <div class="title-area">
-      <span class="title">League Akari</span>
+      <span class="title" v-if="lc.state === 'connected'">League Akari</span>
+      <span class="title" v-else-if="lc.state === 'connecting'">League Akari [连接中]</span>
+      <span class="title" v-else>League Akari [未连接]</span>
     </div>
     <div class="traffic">
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
@@ -121,6 +119,7 @@ import { useCompleteVisibility } from '@shared/renderer/compositions/useOverflow
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync/login'
 import { mainWindowRendererModule as mwm } from '@shared/renderer/modules/main-window'
 import { useMainWindowStore } from '@shared/renderer/modules/main-window/store'
@@ -132,7 +131,6 @@ import {
   Maximize as MaximizeIcon,
   Minimize as MinimizeIcon,
   Queued as QueuedIcon,
-  Settings as SettingsIcon,
   Time as TimeIcon
 } from '@vicons/carbon'
 import { Close as CloseIcon } from '@vicons/ionicons5'
@@ -145,6 +143,7 @@ const mw = useMainWindowStore()
 const respawnTimer = useRespawnTimerStore()
 const autoGameflow = useAutoGameflowStore()
 const login = useLoginStore()
+const lc = useLcuConnectionStore()
 
 const willAcceptIn = ref(0)
 const { pause: pauseAC, resume: resumeAC } = useIntervalFn(
@@ -250,10 +249,6 @@ const respawnTimerTaskShow = useCompleteVisibility(respawnTimerTaskEl, titleBarI
 const autoAcceptTaskShow = useCompleteVisibility(autoAcceptTaskEl, titleBarItemsContainer)
 const autoSearchMatchTaskShow = useCompleteVisibility(autoSearchMatchTaskEl, titleBarItemsContainer)
 const queueTaskShow = useCompleteVisibility(queueTaskEl, titleBarItemsContainer)
-
-const emits = defineEmits<{
-  (e: 'openSettings'): void
-}>()
 </script>
 
 <style lang="less" scoped>
@@ -267,7 +262,7 @@ const emits = defineEmits<{
   -webkit-app-region: drag;
 }
 
-.blurred :is(.title-bar-item, .title, .traffic) {
+.blurred :is(.title, .traffic) {
   filter: brightness(0.6);
 }
 

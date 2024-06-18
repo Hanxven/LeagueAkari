@@ -56,23 +56,12 @@ import { LcuAuth, useLcuConnectionStore } from '@shared/renderer/modules/lcu-con
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import { CubeSharp } from '@vicons/ionicons5'
 import { NIcon, NScrollbar, NSpin } from 'naive-ui'
-import { watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 const app = useAppStore()
 const lc = useLcuConnectionStore()
-
-watch(
-  () => lc.state,
-  (s) => {
-    if (s === 'connected') {
-      router.replace(`/match-history`)
-    }
-  },
-  { immediate: true }
-)
 
 const handleConnect = (auth: LcuAuth) => {
   lcm.lcuConnect(auth)

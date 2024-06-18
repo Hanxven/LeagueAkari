@@ -183,4 +183,3 @@ const handleReroll = async (grabBack = false) => {
   font-size: 18px;
 }
 </style>
-@shared/renderer/modules/lcu-state-sync/champ-select@shared/renderer/modules/lcu-state-sync/gameflow

@@ -6,7 +6,13 @@
       label="立即使生效"
       label-description="立即修改聊天卡片状态，在下一次客户端启动前有效"
     >
-      <NButton size="tiny" type="primary" @click="() => handleSet()">修改</NButton>
+      <NButton
+        size="tiny"
+        type="primary"
+        :disabled="lc.state !== 'connected'"
+        @click="() => handleSet()"
+        >修改</NButton
+      >
     </ControlItem>
     <ControlItem class="control-item-margin" label="队列">
       <NSelect
@@ -41,9 +47,12 @@
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { changeRanked } from '@shared/renderer/http-api/chat'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { laNotification } from '@shared/renderer/notification'
 import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
 import { reactive } from 'vue'
+
+const lc = useLcuConnectionStore()
 
 const state = reactive({
   queue: 'RANKED_SOLO_5x5',

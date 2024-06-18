@@ -45,13 +45,14 @@
           v-model:value="newName"
         ></NInput>
         <NPopconfirm
+          :disabled="lc.state !== 'connected'"
           v-model:show="popconfirmShow"
           @positive-click="handleCreateNewSummonerWithName"
           :negative-button-props="{ size: 'tiny' }"
           :positive-button-props="{ size: 'tiny' }"
         >
           <template #trigger>
-            <NButton size="tiny">提交</NButton>
+            <NButton :disabled="lc.state !== 'connected'" size="tiny">提交</NButton>
           </template>
           <div style="font-size: 13px">
             该功能仅可在召唤师尚未创建 (即在初始玩家名称选择阶段) 时生效。<br />名称的长度仍然存在长度限制，通常为
@@ -67,9 +68,12 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { quit } from '@shared/renderer/http-api/process-control'
 import { checkAvailability, newSummonerName } from '@shared/renderer/http-api/summoner'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { laNotification } from '@shared/renderer/notification'
 import { NButton, NCard, NInput, NPopconfirm, useMessage } from 'naive-ui'
 import { h, reactive, ref, watch } from 'vue'
+
+const lc = useLcuConnectionStore()
 
 const availability = reactive({
   summonerName: '',

@@ -6,7 +6,7 @@
       v-model:show="isShowingFreeSoftwareDeclaration"
       @confirm="handleConfirmation"
     />
-    <MainWindowTitleBar @open-settings="isShowingSettingModal = true" />
+    <MainWindowTitleBar />
     <div class="content"><RouterView /></div>
   </div>
 </template>
@@ -15,11 +15,10 @@
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
 import { greeting } from '@shared/renderer/utils/greeting'
 import { useNotification } from 'naive-ui'
-import { ref, watch, watchEffect } from 'vue'
+import { provide, ref, watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 import DeclarationModal from './components/DeclarationModal.vue'
@@ -34,13 +33,12 @@ setupNaiveUiNotificationEvents()
 const router = useRouter()
 
 const app = useAppStore()
-const lc = useLcuConnectionStore()
 
 const cf = useCoreFunctionalityStore()
 
-watchEffect(() => {
-  if (lc.state === 'disconnected') {
-    router.replace('/connecting')
+provide('app', {
+  openSettingsModal: () => {
+    isShowingSettingModal.value = true
   }
 })
 

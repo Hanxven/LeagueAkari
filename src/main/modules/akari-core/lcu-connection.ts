@@ -1,5 +1,5 @@
-import { LcuAuth } from '@main/utils/lcu-auth'
 import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { LcuAuth } from '@main/utils/lcu-auth'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { formatError } from '@shared/utils/errors'
@@ -11,7 +11,7 @@ import PQueue from 'p-queue'
 import { WebSocket } from 'ws'
 
 import { AppModule } from './app'
-import { LcuClientModule } from './lcu-client'
+import { LcuClientModule } from './league-client'
 import { AppLogger, LogModule } from './log'
 import { MainWindowModule } from './main-window'
 import { StorageModule } from './storage'
@@ -131,7 +131,7 @@ export class LcuConnectionModule extends MobxBasedModule {
     this._logger = this._logModule.createLogger('lcu-connection')
     this._storageModule = this.manager.getModule<StorageModule>('storage')
     this._mwm = this.manager.getModule<MainWindowModule>('main-window')
-    this._lcm = this.manager.getModule<LcuClientModule>('lcu-client')
+    this._lcm = this.manager.getModule<LcuClientModule>('league-client')
 
     await this._loadSettings()
     this._setupStateSync()
@@ -491,26 +491,35 @@ export class LcuConnectionModule extends MobxBasedModule {
     })
 
     this.onCall('lcu-connect', async (auth: LcuAuth) => {
+      if (this.state.state === 'connected') {
+        this._disconnect()
+      }
+
+      this.state.setLaunchedClients(await this._lcm.getLaunchedClients())
       this.state.setConnectingClient(auth)
     })
 
     this.onCall('lcu-disconnect', async () => {
-      if (this._lcuWs) {
-        this._lcuWs.close()
-        this._lcuWs = null
-      }
-
-      if (this._lcuHttp) {
-        this._lcuHttp = null
-      }
-
-      this.state.setDisconnected()
+      this._disconnect()
     })
 
     this.onCall('set-setting/auto-connect', async (value: boolean) => {
       this.state.settings.setAutoConnect(value)
       await this._storageModule.setSetting('lcu-connection/auto-connect', value)
     })
+  }
+
+  private _disconnect() {
+    if (this._lcuWs) {
+      this._lcuWs.close()
+      this._lcuWs = null
+    }
+
+    if (this._lcuHttp) {
+      this._lcuHttp = null
+    }
+
+    this.state.setDisconnected()
   }
 
   private _setupStateSync() {

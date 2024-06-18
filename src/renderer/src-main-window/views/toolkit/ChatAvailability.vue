@@ -67,4 +67,3 @@ const handleChangeAvailability = async (availability: string) => {
   font-size: 18px;
 }
 </style>
-@shared/renderer/modules/lcu-state-sync/chat

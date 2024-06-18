@@ -1,10 +1,11 @@
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
 
 import { useLeagueClientStore } from './store'
+import { LcuAuth } from '../lcu-connection/store'
 
 export class LeagueClientRendererModule extends StateSyncModule {
   constructor() {
-    super('lcu-client')
+    super('league-client')
   }
 
   override async setup() {
@@ -30,9 +31,9 @@ export class LeagueClientRendererModule extends StateSyncModule {
     return this.call('set-setting/fix-window-method-a-options', option)
   }
 
-  queryLcuAuth() {
-    return this.call('query-lcu-auth')
+  getLaunchedClients(): Promise<LcuAuth[]> {
+    return this.call('get-launched-clients')
   }
 }
 
-export const lcuClientRendererModule = new LeagueClientRendererModule()
+export const leagueClientRendererModule = new LeagueClientRendererModule()

@@ -241,4 +241,3 @@ const handleApplyToProfile = async () => {
   font-size: 18px;
 }
 </style>
-@shared/renderer/modules/lcu-state-sync/game-data

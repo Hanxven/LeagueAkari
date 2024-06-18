@@ -2,7 +2,14 @@
   <NCard size="small">
     <template #header><span class="card-header-title">聊天签名</span></template>
     <ControlItem label="设置聊天签名" class="control-item-margin">
-      <NButton :loading="isSetting" @click="handleSetChatStatusMessage" type="primary" size="tiny">设置</NButton>
+      <NButton
+        :loading="isSetting"
+        @click="handleSetChatStatusMessage"
+        type="primary"
+        size="tiny"
+        :disabled="lc.state !== 'connected'"
+        >设置</NButton
+      >
     </ControlItem>
     <ControlItem
       label="文本行"
@@ -24,8 +31,11 @@
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { setChatStatusMessage } from '@shared/renderer/http-api/chat'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { NButton, NCard, NInput, useMessage } from 'naive-ui'
 import { ref } from 'vue'
+
+const lc = useLcuConnectionStore()
 
 const text = ref('')
 const isSetting = ref(false)
