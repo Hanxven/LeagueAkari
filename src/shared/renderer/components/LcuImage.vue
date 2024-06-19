@@ -1,13 +1,20 @@
 <template>
-  <img @dragstart.prevent v-bind="$attrs" v-if="url" :src="url" class="lcu-image" />
+  <img
+    @dragstart.prevent
+    v-bind="$attrs"
+    v-if="url"
+    :src="url"
+    class="lcu-image"
+    @error="handleError"
+  />
   <div ref="placeholderEl" v-else class="lcu-image-placeholder"></div>
 </template>
 
 <script lang="ts" setup>
+import { addLeadingSlash } from '@shared/utils/uri'
 import { ref, watchEffect } from 'vue'
 
 import { useLcuConnectionStore } from '../modules/lcu-connection/store'
-import { addLeadingSlash } from '@shared/utils/uri'
 
 const props = defineProps<{
   src?: string
@@ -23,6 +30,10 @@ watchEffect(() => {
     url.value = null
   }
 })
+
+const handleError = () => {
+  url.value = null
+}
 </script>
 
 <style lang="less" scoped>

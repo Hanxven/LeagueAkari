@@ -3,12 +3,13 @@
     <div class="search-inner">
       <div class="search-input-area">
         <NAutoComplete
-          :get-show="() => false"
+          :get-show="() => true"
           :options="autoCompleteOptions"
-          @focus="generateCompleteOptions"
+          @focus="() => generateCompleteOptions()"
           ref="inputEl"
           class="search-input"
           placeholder="精确搜索"
+          :render-label="renderLabel"
           :status="isTagNeeded ? 'warning' : 'success'"
           v-model:value="inputText"
           @keyup.enter="handleSearch"
@@ -65,11 +66,15 @@ import {
   getSummonerByName,
   getSummonerByPuuid
 } from '@shared/renderer/http-api/summoner'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { inferType, resolveSummonerName } from '@shared/utils/identity'
-import { AutoCompleteOption, NAutoComplete, NButton } from 'naive-ui'
-import { computed, onMounted, ref } from 'vue'
+import { Close as CloseIcon } from '@vicons/carbon'
+import { AutoCompleteOption, NAutoComplete, NButton, NFlex, NIcon, SelectOption } from 'naive-ui'
+import { VNodeChild, computed, h, onMounted, ref } from 'vue'
+
+import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
 
 import SummonerCard from './SummonerCard.vue'
 
@@ -194,18 +199,53 @@ const handleSearch = async () => {
   isSearching.value = false
 }
 
+const lc = useLcuConnectionStore()
+
+const updateSearchHistory = async () => {
+  if (!lc.auth || !summoner.me) {
+    return
+  }
+
+  autoCompleteOptions.value = mhm
+    .getSearchHistory(lc.auth.region, lc.auth.rsoPlatformId, summoner.me.puuid)
+    .map((m) => ({
+      label: m.playerName,
+      value: m.puuid
+    }))
+}
+
 const autoCompleteOptions = ref<AutoCompleteOption[]>([])
 const generateCompleteOptions = async () => {
-  try {
-    const text = await navigator.clipboard.readText()
+  window.setTimeout(() => updateSearchHistory(), 200)
+}
 
-    if (!text) {
-      autoCompleteOptions.value = []
-      return
-    }
+const renderLabel = (option: SelectOption): VNodeChild => {
+  return h(NFlex, { justify: 'space-between', style: { width: '286px' } }, () => [
+    option.label,
+    h(
+      NButton,
+      {
+        quaternary: true,
+        size: 'tiny',
+        circle: true,
+        onClick: (e) => {
+          e.stopPropagation()
+          if (!lc.auth || !summoner.me) {
+            return
+          }
 
-    autoCompleteOptions.value = [{ label: text, value: text }]
-  } catch {}
+          mhm.deleteSearchHistoryItem(
+            lc.auth.region,
+            lc.auth.rsoPlatformId,
+            summoner.me.puuid,
+            option.value as string
+          )
+          updateSearchHistory()
+        }
+      },
+      { icon: () => h(NIcon, () => h(CloseIcon)) }
+    )
+  ])
 }
 
 onMounted(() => {

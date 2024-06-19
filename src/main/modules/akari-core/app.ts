@@ -4,12 +4,10 @@ import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants/common'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { formatError } from '@shared/utils/errors'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { BrowserWindow, app, protocol, session, shell } from 'electron'
-import { createReadStream, createWriteStream } from 'fs'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
 import { Readable } from 'node:stream'
-import PQueue from 'p-queue'
 import { gt, lt } from 'semver'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
@@ -406,7 +404,7 @@ export class AppModule extends MobxBasedModule {
               Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')
             )
 
-            return new Response(res.status === 204 ? null : res.data, {
+            return new Response(res.status === 204 || res.status === 304 ? null : res.data, {
               statusText: res.statusText,
               headers: resHeaders,
               status: res.status

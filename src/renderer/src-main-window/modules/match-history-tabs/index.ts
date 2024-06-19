@@ -2,13 +2,14 @@ import { LeagueAkariRendererModule } from '@shared/renderer/akari-ipc/renderer-a
 import { getGame, getMatchHistory } from '@shared/renderer/http-api/match-history'
 import { getRankedStats } from '@shared/renderer/http-api/ranked'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
-import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { LcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { StorageRendererModule } from '@shared/renderer/modules/storage'
 import { laNotification } from '@shared/renderer/notification'
+import { summonerName } from '@shared/utils/name'
 import { AxiosError } from 'axios'
 import { computed, markRaw, watch } from 'vue'
 
@@ -96,6 +97,8 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
   }
 
   async fetchTabFullData(puuid: string) {
+    const lc = useLcuConnectionStore()
+    const s = useSummonerStore()
     const summoner = await this.fetchTabSummoner(puuid)
 
     if (!summoner) {
@@ -123,6 +126,16 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
 
     if (failed) {
       return puuid
+    }
+
+    if (lc.auth && s.me) {
+      this.saveSearchHistory(
+        summonerName(summoner.gameName, summoner.tagLine),
+        summoner.puuid,
+        lc.auth.region,
+        lc.auth.rsoPlatformId,
+        s.me.puuid
+      )
     }
 
     return summoner
@@ -345,6 +358,74 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     }
 
     return null
+  }
+
+  /**
+   * 基于本地存储
+   */
+  saveSearchHistory(
+    playerName: string,
+    puuid: string,
+    region: string,
+    rsoPlatformId: string,
+    selfPuuid: string
+  ) {
+    const lc = useLcuConnectionStore()
+    const s = useSummonerStore()
+
+    if (!lc.auth) {
+      return
+    }
+
+    if (s.me?.puuid === puuid) {
+      return
+    }
+
+    const key = `search-history-${selfPuuid}-${region}-${rsoPlatformId || '_'}`
+    const str = localStorage.getItem(key) || '[]'
+
+    try {
+      const arr = JSON.parse(str)
+      const index = arr.findIndex((item: any) => item.puuid === puuid)
+      if (index !== -1) {
+        arr.splice(index, 1)
+      }
+      arr.unshift({ playerName, puuid })
+      const newArr = arr.slice(0, 10)
+      localStorage.setItem(key, JSON.stringify(newArr))
+    } catch {
+      localStorage.setItem(key, '[]')
+    }
+  }
+
+  getSearchHistory(
+    region: string,
+    rsoPlatformId: string,
+    selfPuuid: string
+  ): { playerName: string; puuid: string }[] {
+    const key = `search-history-${selfPuuid}-${region}-${rsoPlatformId || '_'}`
+    const str = localStorage.getItem(key) || '[]'
+
+    try {
+      return JSON.parse(str)
+    } catch {
+      return []
+    }
+  }
+
+  deleteSearchHistoryItem(region: string, rsoPlatformId: string, selfPuuid: string, puuid: string) {
+    const key = `search-history-${selfPuuid}-${region}-${rsoPlatformId || '_'}`
+    const str = localStorage.getItem(key) || '[]'
+    try {
+      const arr = JSON.parse(str)
+      const index = arr.findIndex((item: any) => item.puuid === puuid)
+      if (index !== -1) {
+        arr.splice(index, 1)
+        localStorage.setItem(key, JSON.stringify(arr))
+      }
+    } catch {
+      localStorage.setItem(key, '[]')
+    }
   }
 }
 

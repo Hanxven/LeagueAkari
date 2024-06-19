@@ -13,12 +13,18 @@
           placement="right"
           v-model:show="isClientsPreviewShow"
           scrollable
+          :disabled="lc.state !== 'connected' && lc.launchedClients.length === 0"
           style="max-height: 240px"
         >
           <template #trigger>
-            <div class="operation">
+            <div
+              title="当前正在运行的英雄联盟客户端"
+              class="operation"
+              :class="{ disabled: lc.state !== 'connected' && lc.launchedClients.length === 0 }"
+            >
               <NIcon class="icon"><ApplicationIcon /></NIcon>
-              <span class="label">客户端</span>
+              <div class="label" v-if="lc.auth">{{ lc.auth.region }}</div>
+              <div class="label" v-else>客户端</div>
             </div>
           </template>
           <div
@@ -44,9 +50,10 @@
               rsoPlatformText[c.rsoPlatformId] || c.rsoPlatformId
             }}</span>
             <span class="pid" title="Process ID">{{ c.pid }}</span>
+            <span class="connected-label" v-if="c.connected">已连接</span>
           </div>
         </NPopover>
-        <div class="operation" @click="handleOpenSettingsModal">
+        <div class="operation" title="设置" @click="handleOpenSettingsModal">
           <NIcon class="icon"><SettingsIcon /></NIcon>
           <span class="label">设置</span>
         </div>
@@ -246,16 +253,20 @@ const emits = defineEmits<{
         padding: 4px 8px;
         cursor: pointer;
         border-radius: 4px;
-
         transition: all 0.3s ease;
 
-        &:hover {
+        &:hover:not(.disabled) {
           background-color: rgb(67, 67, 67);
         }
 
-        &:active {
+        &:active:not(.disabled) {
           background-color: rgb(55, 55, 55);
         }
+      }
+
+      .disabled {
+        cursor: not-allowed;
+        color: #5d5c5c;
       }
 
       .icon {
@@ -266,6 +277,9 @@ const emits = defineEmits<{
         width: 36px;
         font-size: 12px;
         text-align: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
     }
   }
@@ -316,7 +330,16 @@ const emits = defineEmits<{
     bottom: 0px;
     right: 6px;
     font-size: 12px;
-    color: #5d5c5c;
+    color: #6a6a6ae3;
+    margin-left: 8px;
+  }
+
+  .connected-label {
+    position: absolute;
+    top: 0px;
+    right: 6px;
+    font-size: 12px;
+    color: #8aa08ee7;
     margin-left: 8px;
   }
 
@@ -328,10 +351,6 @@ const emits = defineEmits<{
   &.connected {
     :is(.rso, .region) {
       color: #696969;
-    }
-
-    .pid {
-      color: #4a4a4a;
     }
   }
 }
