@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import { useKeyboardCombo } from '@shared/renderer/compositions/useKeyboardCombo'
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
@@ -88,6 +89,23 @@ am.onEvent('second-instance', () => {
     content: '因为 Akari 是独一无二的，所以同一时间只能有一个 Akari',
     duration: 10000
   })
+})
+
+useKeyboardCombo('akari', {
+  onFinish: () => {
+    if (app.isInSecretAkariMode) {
+      return
+    }
+
+    app.isInSecretAkariMode = true
+
+    notification.info({
+      title: 'League Akari 测试模式',
+      content: 'Akari~',
+      duration: 6000
+    })
+  },
+  requireSameEl: true
 })
 </script>
 

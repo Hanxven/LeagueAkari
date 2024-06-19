@@ -37,11 +37,14 @@ export const useAppStore = defineStore('core:app', () => {
 
   const titleBarTasks = ref<TitleBarTask[]>([])
 
+  const isInSecretAkariMode = ref(false)
+
   return {
     isAdministrator,
     version,
     updates,
     settings,
-    titleBarTasks
+    titleBarTasks,
+    isInSecretAkariMode
   }
 })

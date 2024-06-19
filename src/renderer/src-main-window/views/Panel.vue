@@ -157,7 +157,7 @@ const updateCurrentLaunchedClients = async () => {
 
 const clientsToConnect = computed(() => {
   if (lc.state === 'connected') {
-    return launchedClients.value.map((m) => {
+    const c = launchedClients.value.map((m) => {
       return {
         ...m,
         connected: lc.auth?.pid === m.pid,
@@ -165,6 +165,17 @@ const clientsToConnect = computed(() => {
         loading: lc.connectingClient?.pid === m.pid
       }
     })
+
+    if (c.length === 0) {
+      c.push({
+        ...lc.auth!,
+        loading: false,
+        connected: true,
+        disabled: true
+      })
+    }
+
+    return c
   } else {
     return lc.launchedClients.map((m) => {
       return {

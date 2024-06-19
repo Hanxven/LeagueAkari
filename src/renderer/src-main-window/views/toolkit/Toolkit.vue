@@ -18,6 +18,7 @@
           <ChatStatusMessage class="tool" />
           <GameView class="tool" />
           <CustomKeyboardSequence class="tool" />
+          <ChallengePlayerPreferences v-if="app.isInSecretAkariMode" class="tool" />
         </NTabPane>
       </NTabs>
     </div>
@@ -26,10 +27,12 @@
 
 <script setup lang="ts">
 import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import { NTabPane, NTabs } from 'naive-ui'
 import { ref } from 'vue'
 
 import AvailabilityCheck from './AvailabilityCheck.vue'
+import ChallengePlayerPreferences from './ChallengePlayerPreferences.vue'
 import ChampionBench from './ChampionBench.vue'
 import ChatAvailability from './ChatAvailability.vue'
 import ChatStatusMessage from './ChatStatusMessage.vue'
@@ -40,6 +43,8 @@ import InProcess from './InProcess.vue'
 import LobbyTool from './LobbyTool.vue'
 import Spectate from './Spectate.vue'
 import SummonerBackground from './SummonerBackground.vue'
+
+const app = useAppStore()
 
 const el = ref()
 useKeepAliveScrollPositionMemo(el)
