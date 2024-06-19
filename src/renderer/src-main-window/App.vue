@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
 import { useKeyboardCombo } from '@shared/renderer/compositions/useKeyboardCombo'
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
@@ -91,21 +92,23 @@ am.onEvent('second-instance', () => {
   })
 })
 
-useKeyboardCombo('akari', {
+useKeyboardCombo(KYOKO_MODE_KEY_SEQUENCE, {
   onFinish: () => {
-    if (app.isInSecretAkariMode) {
+    if (app.isInKyokoMode) {
       return
     }
 
-    app.isInSecretAkariMode = true
+    app.isInKyokoMode = true
 
-    notification.info({
+    notification.success({
       title: 'League Akari 测试模式',
-      content: 'Akari~',
+      content: 'Kyoko Mode, on!',
       duration: 6000
     })
   },
-  requireSameEl: true
+  requireSameEl: true,
+  caseSensitive: false,
+  maxInterval: 500
 })
 </script>
 

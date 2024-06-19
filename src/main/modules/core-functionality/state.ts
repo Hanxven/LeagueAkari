@@ -26,6 +26,8 @@ class CoreFunctionalitySettings {
 
   playerAnalysisFetchConcurrency: number = 3
 
+  delaySecondsBeforeLoading: number = 1000
+
   constructor() {
     makeAutoObservable(this)
   }
@@ -76,6 +78,10 @@ class CoreFunctionalitySettings {
 
   setPlayerAnalysisFetchConcurrency(limit: number) {
     this.playerAnalysisFetchConcurrency = limit
+  }
+
+  setDelaySecondsBeforeLoading(value: number) {
+    this.delaySecondsBeforeLoading = value
   }
 }
 

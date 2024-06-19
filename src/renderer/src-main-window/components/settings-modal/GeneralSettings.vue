@@ -58,6 +58,22 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        label="加载延迟"
+        label-description="对局分析前的加载延迟时间"
+        :label-width="320"
+        v-if="app.isInKyokoMode"
+      >
+        <NInputNumber
+          :min="0"
+          size="tiny"
+          style="width: 100px"
+          :max="60"
+          :value="cf.settings.delaySecondsBeforeLoading"
+          @update:value="(val) => cfm.setDelaySecondsBeforeLoading(val || 0)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         label="自动切换到对局页面"
         label-description="在进入英雄选择或其他游戏状态时，自动切换到“对局”页面"
         :label-width="320"

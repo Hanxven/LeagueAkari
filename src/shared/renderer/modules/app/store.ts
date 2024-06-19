@@ -37,7 +37,7 @@ export const useAppStore = defineStore('core:app', () => {
 
   const titleBarTasks = ref<TitleBarTask[]>([])
 
-  const isInSecretAkariMode = ref(false)
+  const isInKyokoMode = ref(false)
 
   return {
     isAdministrator,
@@ -45,6 +45,6 @@ export const useAppStore = defineStore('core:app', () => {
     updates,
     settings,
     titleBarTasks,
-    isInSecretAkariMode
+    isInKyokoMode
   }
 })

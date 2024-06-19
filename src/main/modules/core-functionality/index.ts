@@ -1,15 +1,15 @@
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { chatSend } from '@main/http-api/chat'
 import { getGame, getMatchHistory } from '@main/http-api/match-history'
 import { getRankedStats } from '@main/http-api/ranked'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
 import { formatError } from '@shared/utils/errors'
 import { summonerName } from '@shared/utils/name'
-import { sleep } from '@shared/utils/sleep'
+import { cancellableSleep, sleep } from '@shared/utils/sleep'
 import { calculateTogetherTimes, removeSubsets } from '@shared/utils/team-up-calc'
 import dayjs from 'dayjs'
 import { comparer, computed, observable, runInAction, toJS } from 'mobx'
@@ -98,6 +98,15 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
         if (!this._controller) {
           this._controller = new AbortController()
+        }
+
+        try {
+          await cancellableSleep(
+            this.state.settings.delaySecondsBeforeLoading * 1e3,
+            this._controller.signal
+          )
+        } catch {
+          /* the error type can only be AbortError */
         }
 
         try {
@@ -855,6 +864,10 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       'settings/team-analysis-preload-count',
       () => this.state.settings.teamAnalysisPreloadCount
     )
+    this.simpleSync(
+      'settings/delay-seconds-before-loading',
+      () => this.state.settings.delaySecondsBeforeLoading
+    )
   }
 
   private _setupStateSync() {
@@ -995,6 +1008,10 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
       return r
     })
+
+    this.onCall('set-setting/delay-seconds-before-loading', async (delay) => {
+      await this._storageModule.setSetting('core-functionality/delay-seconds-before-loading', delay)
+    })
   }
 
   private async _loadSettings() {
@@ -1073,6 +1090,10 @@ export class CoreFunctionalityModule extends MobxBasedModule {
         'core-functionality/ongoing-analysis-enabled',
         this.state.settings.ongoingAnalysisEnabled
       )
+    )
+
+    this.state.settings.setDelaySecondsBeforeLoading(
+      await this._storageModule.getSetting('core-functionality/delay-seconds-before-loading', 0)
     )
   }
 }

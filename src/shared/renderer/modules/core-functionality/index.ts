@@ -59,6 +59,10 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
       'settings/team-analysis-preload-count',
       (s) => (store.settings.teamAnalysisPreloadCount = s)
     )
+    this.simpleSync(
+      'settings/delay-seconds-before-loading',
+      (s) => (store.settings.delaySecondsBeforeLoading = s)
+    )
   }
 
   /**
@@ -172,6 +176,10 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
 
   saveSavedPlayer(player: object) {
     return this.call('save/saved-player', player)
+  }
+
+  setDelaySecondsBeforeLoading(value: number) {
+    return this.call('set-setting/delay-seconds-before-loading', value)
   }
 }
 

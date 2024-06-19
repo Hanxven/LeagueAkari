@@ -145,6 +145,22 @@
       <template #header><LeagueAkariSpan class="card-header-title" /></template>
       <span class="text">League Akari 运行在管理员权限，仅用于实现特定的客户端功能</span>
     </NCard>
+    <NCard v-if="app.isInKyokoMode" size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">调试</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="Kyoko Mode"
+        label-description="部分功能仅用于调试用途"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          v-if="app.isInKyokoMode"
+          :value="app.isInKyokoMode"
+          @update:value="(val: boolean) => (app.isInKyokoMode = val)"
+        />
+      </ControlItem>
+    </NCard>
   </NScrollbar>
 </template>
 
@@ -171,6 +187,7 @@ import {
   NModal,
   NPopover,
   NScrollbar,
+  NSwitch,
   NTable
 } from 'naive-ui'
 import { computed, h, nextTick, ref, useCssModule, watch } from 'vue'
