@@ -71,17 +71,17 @@ export class AutoReplyModule extends MobxBasedModule {
   private _setupMethodCall() {
     this.onCall('set-setting/enabled', async (enabled) => {
       this.state.settings.setEnabled(enabled)
-      await this._storageModule.setSetting('auto-reply/enabled', enabled)
+      await this._storageModule.settings.set('auto-reply/enabled', enabled)
     })
 
     this.onCall('set-setting/enable-on-away', async (enabled) => {
       this.state.settings.setEnableOnAway(enabled)
-      await this._storageModule.setSetting('auto-reply/enable-on-away', enabled)
+      await this._storageModule.settings.set('auto-reply/enable-on-away', enabled)
     })
 
     this.onCall('set-setting/text', async (text) => {
       this.state.settings.setText(text)
-      await this._storageModule.setSetting('auto-reply/text', text)
+      await this._storageModule.settings.set('auto-reply/text', text)
     })
   }
 
@@ -93,18 +93,18 @@ export class AutoReplyModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setEnabled(
-      await this._storageModule.getSetting('auto-reply/enabled', this.state.settings.enabled)
+      await this._storageModule.settings.get('auto-reply/enabled', this.state.settings.enabled)
     )
 
     this.state.settings.setEnableOnAway(
-      await this._storageModule.getSetting(
+      await this._storageModule.settings.get(
         'auto-reply/enable-on-away',
         this.state.settings.enableOnAway
       )
     )
 
     this.state.settings.setText(
-      await this._storageModule.getSetting('auto-reply/text', this.state.settings.text)
+      await this._storageModule.settings.get('auto-reply/text', this.state.settings.text)
     )
   }
 }

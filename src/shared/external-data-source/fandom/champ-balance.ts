@@ -119,6 +119,11 @@ export class FandomWikiChampBalanceDataSource implements ChampBalanceDataSourceV
     for (const obj of all.fields) {
       const fields = obj.value.fields
       const stats = this._getValue(fields, 'stats')
+
+      if (!stats) {
+        continue
+      }
+
       const balance = {} as any
       for (const m of GAME_MODES) {
         const fields = this._getValue(stats.fields, m)?.fields

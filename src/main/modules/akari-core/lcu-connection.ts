@@ -222,7 +222,7 @@ export class LcuConnectionModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setAutoConnect(
-      await this._storageModule.getSetting('lcu-connection/auto-connect', true)
+      await this._storageModule.settings.get('lcu-connection/auto-connect', true)
     )
   }
 
@@ -505,7 +505,7 @@ export class LcuConnectionModule extends MobxBasedModule {
 
     this.onCall('set-setting/auto-connect', async (value: boolean) => {
       this.state.settings.setAutoConnect(value)
-      await this._storageModule.setSetting('lcu-connection/auto-connect', value)
+      await this._storageModule.settings.set('lcu-connection/auto-connect', value)
     })
   }
 

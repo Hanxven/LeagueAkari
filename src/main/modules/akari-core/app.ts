@@ -303,27 +303,27 @@ export class AppModule extends MobxBasedModule {
 
     this.onCall('set-setting/auto-connect', async (enabled) => {
       this.state.settings.setAutoConnect(enabled)
-      await this._storageModule.setSetting('app/auto-connect', enabled)
+      await this._storageModule.settings.set('app/auto-connect', enabled)
     })
 
     this.onCall('set-setting/auto-check-updates', async (enabled) => {
       this.state.settings.setAutoCheckUpdates(enabled)
-      await this._storageModule.setSetting('app/auto-check-updates', enabled)
+      await this._storageModule.settings.set('app/auto-check-updates', enabled)
     })
 
     this.onCall('set-setting/show-free-software-declaration', async (enabled) => {
       this.state.settings.setShowFreeSoftwareDeclaration(enabled)
-      await this._storageModule.setSetting('app/show-free-software-declaration', enabled)
+      await this._storageModule.settings.set('app/show-free-software-declaration', enabled)
     })
 
     this.onCall('set-setting/close-strategy', async (s) => {
       this.state.settings.setCloseStrategy(s)
-      await this._storageModule.setSetting('app/close-strategy', s)
+      await this._storageModule.settings.set('app/close-strategy', s)
     })
 
     this.onCall('set-setting/use-wmic', async (s) => {
       this.state.settings.setUseWmic(s)
-      await this._storageModule.setSetting('app/use-wmic', s)
+      await this._storageModule.settings.set('app/use-wmic', s)
     })
 
     this.onCall('check-update', async () => {
@@ -345,29 +345,32 @@ export class AppModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setAutoConnect(
-      await this._storageModule.getSetting('app/auto-connect', this.state.settings.autoConnect)
+      await this._storageModule.settings.get('app/auto-connect', this.state.settings.autoConnect)
     )
 
     this.state.settings.setAutoCheckUpdates(
-      await this._storageModule.getSetting(
+      await this._storageModule.settings.get(
         'app/auto-check-updates',
         this.state.settings.autoCheckUpdates
       )
     )
 
     this.state.settings.setShowFreeSoftwareDeclaration(
-      await this._storageModule.getSetting(
+      await this._storageModule.settings.get(
         'app/show-free-software-declaration',
         this.state.settings.showFreeSoftwareDeclaration
       )
     )
 
     this.state.settings.setCloseStrategy(
-      await this._storageModule.getSetting('app/close-strategy', this.state.settings.closeStrategy)
+      await this._storageModule.settings.get(
+        'app/close-strategy',
+        this.state.settings.closeStrategy
+      )
     )
 
     this.state.settings.setUseWmic(
-      await this._storageModule.getSetting('app/use-wmic', this.state.settings.useWmic)
+      await this._storageModule.settings.get('app/use-wmic', this.state.settings.useWmic)
     )
   }
 
@@ -471,7 +474,7 @@ export class AppModule extends MobxBasedModule {
       if (originValue !== undefined) {
         try {
           const jsonValue = JSON.parse(originValue)
-          await this._storageModule.setSetting(resName, jsonValue)
+          await this._storageModule.settings.set(resName, jsonValue)
           runInAction(() => setter(jsonValue))
           migrated = true
         } catch {}

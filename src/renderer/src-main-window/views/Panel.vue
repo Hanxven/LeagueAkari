@@ -23,7 +23,7 @@
               :class="{ disabled: lc.state !== 'connected' && lc.launchedClients.length === 0 }"
             >
               <NIcon class="icon"><ApplicationIcon /></NIcon>
-              <div class="label" v-if="lc.auth">{{ lc.auth.region }}</div>
+              <div class="label" v-if="lc.auth">{{ regionText[lc.auth.region] }}</div>
               <div class="label" v-else>客户端</div>
             </div>
           </template>

@@ -83,7 +83,8 @@ export class ExternalDataSourceModule extends MobxBasedModule {
         }
 
         this._updateBalanceData(info.gameMode, info.queueType)
-      }
+      },
+      { fireImmediately: true }
     )
   }
 

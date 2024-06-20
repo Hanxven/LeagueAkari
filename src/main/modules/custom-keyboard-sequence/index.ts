@@ -96,25 +96,25 @@ export class CustomKeyboardSequenceModule extends MobxBasedModule {
   private _setupMethodCall() {
     this.onCall('set-setting/enabled', async (enabled) => {
       this.state.settings.setEnabled(enabled)
-      await this._storageModule.setSetting('custom-keyboard-sequence/enabled', enabled)
+      await this._storageModule.settings.set('custom-keyboard-sequence/enabled', enabled)
     })
 
     this.onCall('set-setting/text', async (text) => {
       this.state.settings.setText(text)
-      await this._storageModule.setSetting('custom-keyboard-sequence/text', text)
+      await this._storageModule.settings.set('custom-keyboard-sequence/text', text)
     })
   }
 
   private async _loadSettings() {
     this.state.settings.setEnabled(
-      await this._storageModule.getSetting(
+      await this._storageModule.settings.get(
         'custom-keyboard-sequence/enabled',
         this.state.settings.enabled
       )
     )
 
     this.state.settings.setText(
-      await this._storageModule.getSetting(
+      await this._storageModule.settings.get(
         'custom-keyboard-sequence/text',
         this.state.settings.text
       )

@@ -56,7 +56,7 @@ export class RespawnTimerModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setEnabled(
-      await this._storageModule.getSetting('respawn-timer/enabled', this.state.settings.enabled)
+      await this._storageModule.settings.get('respawn-timer/enabled', this.state.settings.enabled)
     )
   }
 
@@ -145,7 +145,7 @@ export class RespawnTimerModule extends MobxBasedModule {
       }
 
       this.state.settings.setEnabled(enabled)
-      await this._storageModule.setSetting('respawn-timer/enabled', enabled)
+      await this._storageModule.settings.set('respawn-timer/enabled', enabled)
     })
   }
 }

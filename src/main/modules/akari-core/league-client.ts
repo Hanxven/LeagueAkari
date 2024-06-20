@@ -62,7 +62,7 @@ export class LcuClientModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.settings.setFixWindowMethodsAOptions(
-      await this._storageModule.getSetting(
+      await this._storageModule.settings.get(
         'league-client-ux/fix-window-method-a-options',
         this.settings.fixWindowMethodAOptions
       )
@@ -101,7 +101,7 @@ export class LcuClientModule extends MobxBasedModule {
 
     this.onCall('set-setting/fix-window-method-a-options', async (option) => {
       this.settings.setFixWindowMethodsAOptions(option)
-      await this._storageModule.setSetting('league-client-ux/fix-window-method-a-options', option)
+      await this._storageModule.settings.set('league-client-ux/fix-window-method-a-options', option)
     })
 
     this.onCall('get-launched-clients', async () => {

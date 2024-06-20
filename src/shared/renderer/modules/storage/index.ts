@@ -10,27 +10,27 @@ export class StorageRendererModule extends StateSyncModule {
   }
 
   queryEncounteredGames(query: object) {
-    return this.call('query/encountered-games', query)
+    return this.call('query/players/encountered-games', query)
   }
 
   saveEncounteredGame(dto: object) {
-    return this.call('save/encountered-game', dto)
+    return this.call('save/players/encountered-game', dto)
   }
 
   saveSavedPlayer(query: object) {
-    return this.call('save/saved-player', query)
+    return this.call('save/players/saved-player', query)
   }
 
   deleteSavedPlayer(query: object) {
-    return this.call('delete/saved-player', query)
+    return this.call('delete/players/saved-player', query)
   }
 
   querySavedPlayer(query: object) {
-    return this.call('query/saved-player', query)
+    return this.call('query/players/saved-player', query)
   }
 
   querySavedPlayerWithGames(query: object) {
-    return this.call('query/saved-player-with-games', query)
+    return this.call('query/players/saved-player-with-games-with-games', query)
   }
 }
 

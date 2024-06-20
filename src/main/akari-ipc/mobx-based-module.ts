@@ -1,5 +1,6 @@
-import { LeagueAkariModule } from './akari-module'
 import { IReactionOptions, IReactionPublic, reaction } from 'mobx'
+
+import { LeagueAkariModule } from './akari-module'
 
 /**
  * 对于简单的状态，通常是 ref 或者 structural 状态量

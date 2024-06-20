@@ -1,10 +1,10 @@
+import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 import { Metadata } from '@main/db/entities/Metadata'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { Setting } from '@main/db/entities/Settings'
 import { v10_LA1_2_0initializationUpgrade } from '@main/db/upgrades/version-10'
 import { v15_LA1_2_2Upgrade } from '@main/db/upgrades/version-15'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { LEAGUE_AKARI_DB_CURRENT_VERSION, LEAGUE_AKARI_DB_FILENAME } from '@shared/constants/common'
 import dayjs from 'dayjs'
 import { app } from 'electron'
@@ -50,40 +50,39 @@ interface SavedPlayerSaveDto extends SavedPlayerQueryDto {
   encountered: boolean // 在遇到时更新
 }
 
-export class StorageModule extends MobxBasedModule {
-  private _ds: DataSource
-  private _logModule: LogModule
-  private _logger: AppLogger
+export class SavedPlayerService {
+  constructor(private _storageModule: StorageModule) {}
 
-  static ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = 40
+  async setup() {
+    this._storageModule.onCall(
+      'query/players/encountered-games',
+      async (query: EncounteredGameQueryDto) => {
+        return this.queryEncounteredGames(query)
+      }
+    )
 
-  constructor() {
-    super('storage')
-  }
-
-  private _upgrades = {
-    // 10 is the first version starting with League Akari 1.2.0
-    10: v10_LA1_2_0initializationUpgrade,
-    15: v15_LA1_2_2Upgrade
-  }
-
-  override async setup() {
-    await super.setup()
-
-    this._logModule = this.manager.getModule('log')
-    this._logger = this._logModule.createLogger('storage')
-
-    this._ds = new DataSource({
-      type: 'sqlite',
-      database: join(app.getPath('userData'), LEAGUE_AKARI_DB_FILENAME),
-      synchronize: false,
-      entities: [Metadata, SavedPlayer, Setting, EncounteredGame]
+    this._storageModule.onCall('save/players/encountered-game', (dto: EncounteredGameSaveDto) => {
+      return this.saveEncounteredGame(dto)
     })
 
-    await this._initDatabase()
-    this._setupMethodCall()
+    this._storageModule.onCall('save/players/saved-player', (player: SavedPlayerSaveDto) => {
+      return this.saveSavedPlayer(player)
+    })
 
-    this._logger.info('初始化完成')
+    this._storageModule.onCall('delete/players/saved-player', (query: SavedPlayerQueryDto) => {
+      return this.deleteSavedPlayer(query)
+    })
+
+    this._storageModule.onCall('query/players/saved-player', (query: SavedPlayerQueryDto) => {
+      return this.querySavedPlayer(query)
+    })
+
+    this._storageModule.onCall(
+      'query/players/saved-player-with-games-with-games',
+      (query: SavedPlayerQueryDto & WithEncounteredGamesQueryDto) => {
+        return this.querySavedPlayerWithGames(query)
+      }
+    )
   }
 
   async queryEncounteredGames(query: EncounteredGameQueryDto) {
@@ -93,7 +92,7 @@ export class StorageModule extends MobxBasedModule {
     const take = pageSize
     const skip = (page - 1) * pageSize
 
-    const encounteredGames = await this._ds.manager.find(EncounteredGame, {
+    const encounteredGames = await this._storageModule.dataSource.manager.find(EncounteredGame, {
       where: {
         selfPuuid: Equal(query.selfPuuid),
         puuid: Equal(query.puuid),
@@ -118,7 +117,7 @@ export class StorageModule extends MobxBasedModule {
     g.puuid = dto.puuid
     g.queueType = dto.queueType || ''
     g.updateAt = new Date()
-    return this._ds.manager.save(g)
+    return this._storageModule.dataSource.manager.save(g)
   }
 
   async querySavedPlayer(query: SavedPlayerQueryDto) {
@@ -126,7 +125,7 @@ export class StorageModule extends MobxBasedModule {
       throw new Error('puuid, selfPuuid or region cannot be empty')
     }
 
-    return this._ds.manager.findOneBy(SavedPlayer, {
+    return this._storageModule.dataSource.manager.findOneBy(SavedPlayer, {
       puuid: Equal(query.puuid),
       selfPuuid: Equal(query.selfPuuid),
       region: Equal(query.region),
@@ -139,7 +138,7 @@ export class StorageModule extends MobxBasedModule {
       throw new Error('puuid, selfPuuid or region cannot be empty')
     }
 
-    const savedPlayer = await this._ds.manager.findOneBy(SavedPlayer, {
+    const savedPlayer = await this._storageModule.dataSource.manager.findOneBy(SavedPlayer, {
       puuid: Equal(query.puuid),
       selfPuuid: Equal(query.selfPuuid),
       region: Equal(query.region),
@@ -166,7 +165,7 @@ export class StorageModule extends MobxBasedModule {
       throw new Error('puuid, selfPuuid or region cannot be empty')
     }
 
-    return this._ds.manager.delete(SavedPlayer, query)
+    return this._storageModule.dataSource.manager.delete(SavedPlayer, query)
   }
 
   async saveSavedPlayer(player: SavedPlayerSaveDto) {
@@ -191,11 +190,25 @@ export class StorageModule extends MobxBasedModule {
       savedPlayer.lastMetAt = date
     }
 
-    return this._ds.manager.save(savedPlayer)
+    return this._storageModule.dataSource.manager.save(savedPlayer)
+  }
+}
+
+export class SettingService {
+  constructor(
+    private _storageModule: StorageModule,
+    public domain?: string
+  ) {}
+
+  async setup() {}
+
+  with(domain: string) {
+    return new SettingService(this._storageModule, domain)
   }
 
-  async getSetting<T = any>(key: string, defaultValue: T) {
-    const v = await this._ds.manager.findOneBy(Setting, { key })
+  async get<T = any>(key: string, defaultValue: T) {
+    const key2 = this.domain ? `${this.domain}/${key}` : key
+    const v = await this._storageModule.dataSource.manager.findOneBy(Setting, { key: key2 })
     if (!v) {
       if (defaultValue !== undefined) {
         return defaultValue
@@ -206,50 +219,70 @@ export class StorageModule extends MobxBasedModule {
     return v.value as T
   }
 
-  async setSetting(key: string, value: any) {
-    if (!key || value === undefined) {
+  async set(key: string, value: any) {
+    const key2 = this.domain ? `${this.domain}/${key}` : key
+    if (!key2 || value === undefined) {
       throw new Error('key or value cannot be empty')
     }
 
-    await this._ds.manager.save(Setting.create(key, value))
+    await this._storageModule.dataSource.manager.save(Setting.create(key2, value))
   }
 
-  async removeSetting(key: string) {
-    if (!key) {
+  async remove(key: string) {
+    const key2 = this.domain ? `${this.domain}/${key}` : key
+    if (!key2) {
       throw new Error('key is required')
     }
 
-    await this._ds.manager.delete(Setting, { key })
+    await this._storageModule.dataSource.manager.delete(Setting, { key: key2 })
+  }
+}
+
+export class StorageModule extends MobxBasedModule {
+  private _ds: DataSource
+  private _logModule: LogModule
+  private _logger: AppLogger
+
+  static ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = 40
+
+  players = new SavedPlayerService(this)
+  settings = new SettingService(this)
+
+  get dataSource() {
+    return this._ds
   }
 
-  private _setupMethodCall() {
-    this.onCall('query/encountered-games', async (query: EncounteredGameQueryDto) => {
-      return this.queryEncounteredGames(query)
-    })
-
-    this.onCall('save/encountered-game', (dto: EncounteredGameSaveDto) => {
-      return this.saveEncounteredGame(dto)
-    })
-
-    this.onCall('save/saved-player', (player: SavedPlayerSaveDto) => {
-      return this.saveSavedPlayer(player)
-    })
-
-    this.onCall('delete/saved-player', (query: SavedPlayerQueryDto) => {
-      return this.deleteSavedPlayer(query)
-    })
-
-    this.onCall('query/saved-player', (query: SavedPlayerQueryDto) => {
-      return this.querySavedPlayer(query)
-    })
-
-    this.onCall(
-      'query/saved-player-with-games',
-      (query: SavedPlayerQueryDto & WithEncounteredGamesQueryDto) => {
-        return this.querySavedPlayerWithGames(query)
-      }
-    )
+  constructor() {
+    super('storage')
   }
+
+  private _upgrades = {
+    // 10 is the first version starting with League Akari 1.2.0
+    10: v10_LA1_2_0initializationUpgrade,
+    15: v15_LA1_2_2Upgrade
+  }
+
+  override async setup() {
+    await super.setup()
+
+    this._logModule = this.manager.getModule('log')
+    this._logger = this._logModule.createLogger('storage')
+
+    this._ds = new DataSource({
+      type: 'sqlite',
+      database: join(app.getPath('userData'), LEAGUE_AKARI_DB_FILENAME),
+      synchronize: false,
+      entities: [Metadata, SavedPlayer, Setting, EncounteredGame]
+    })
+
+    await this._initDatabase()
+    this._setupMethodCall()
+    await this.players.setup()
+
+    this._logger.info('初始化完成')
+  }
+
+  private _setupMethodCall() {}
 
   /**
    * 处理 League Akari 的数据库的升级
