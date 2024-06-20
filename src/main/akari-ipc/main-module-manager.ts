@@ -33,7 +33,7 @@ export class LeagueAkariModuleManager {
    * @param moduleId 模块 ID
    * @returns
    */
-  getModule<T = LeagueAkariModule>(moduleId: string) {
+  getModule<T extends LeagueAkariModule>(moduleId: string) {
     if (this._modules.has(moduleId)) {
       return this._modules.get(moduleId)!.module as T
     }

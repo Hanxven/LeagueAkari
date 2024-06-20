@@ -166,19 +166,32 @@ const currentAugmentOptions = computed(() => {
 const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) => {
   return h(
     NTooltip,
-    { placement: 'right', delay: 300, animated: false },
+    { placement: 'right', delay: 300, animated: true, raw: true,  },
     {
       trigger: () => node,
       default: () =>
-        h(LcuImage, {
-          src: option.url as string,
-          cache: false,
-          style: {
-            height: '160px',
-            minWidth: '280px',
-            objectFit: 'contain'
-          }
-        })
+        h(
+          'div',
+          {
+            style: {
+              height: '160px',
+              overflow: 'hidden',
+              borderRadius: '4px',
+              boxShadow: '0 0 4px rgba(0, 0, 0, 0.1)',
+              backgroundColor: 'rgba(0, 0, 0, 0.3)'
+            }
+          },
+          h(LcuImage, {
+            src: option.url as string,
+            cache: false,
+            style: {
+              height: '100%',
+              minWidth: '280px',
+              objectFit: 'cover',
+              overflow: 'hidden'
+            }
+          })
+        )
     }
   )
 }

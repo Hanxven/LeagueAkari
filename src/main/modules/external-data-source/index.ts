@@ -95,6 +95,9 @@ export class ExternalDataSourceModule extends MobxBasedModule {
           `尝试更新英雄平衡性数据，数据源 ${this.state.balance.fandom.name}  ${this.state.balance.fandom.id} ${this.state.balance.fandom.version}`
         )
         await this.state.balance.updateData()
+        this._logger.info(
+          `英雄平衡性数据更新完成 ${this.state.balance.fandom.name}  ${this.state.balance.fandom.id} ${this.state.balance.fandom.version}`
+        )
       } catch (error) {
         this._logger.warn(`获取英雄平衡性数据源时发生错误 ${formatError(error)}`)
       }

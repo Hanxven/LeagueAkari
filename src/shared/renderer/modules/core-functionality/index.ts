@@ -63,6 +63,7 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
       'settings/delay-seconds-before-loading',
       (s) => (store.settings.delaySecondsBeforeLoading = s)
     )
+    this.simpleSync('is-waiting-for-delay', (s) => (store.isWaitingForDelay = s))
   }
 
   /**

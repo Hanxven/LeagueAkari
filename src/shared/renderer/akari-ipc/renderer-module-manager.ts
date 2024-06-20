@@ -17,7 +17,7 @@ export class LeagueAkariRendererModuleManager {
     this._modules.set(module.id, module)
   }
 
-  getModule<T = LeagueAkariRendererModule>(moduleId: string) {
+  getModule<T extends LeagueAkariRendererModule>(moduleId: string) {
     if (this._modules.has(moduleId)) {
       return this._modules.get(moduleId)! as T
     }

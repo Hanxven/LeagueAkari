@@ -85,6 +85,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
   const ongoingTeams = shallowRef<Record<string, number[]> | null>(null)
   const isInEndgamePhase = ref(false)
   const ongoingChampionSelections = shallowRef<Record<string | number, number> | null>(null)
+  const isWaitingForDelay = ref(false)
 
   // 战绩加载功能
   const settings = reactive({
@@ -129,6 +130,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     queryState: ongoingState,
     isInEndgamePhase,
     ongoingChampionSelections,
+    isWaitingForDelay,
 
     settings,
 

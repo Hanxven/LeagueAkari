@@ -50,6 +50,7 @@ import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summon
 import { laNotification } from '@shared/renderer/notification'
 import { Friend } from '@shared/types/lcu/chat'
 import { resolveSummonerName } from '@shared/utils/identity'
+import { summonerName } from '@shared/utils/name'
 import { AxiosError } from 'axios'
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
@@ -136,7 +137,7 @@ const watchableFriendOptions = computed(() => {
     .filter((f) => f.lol.gameStatus === 'inGame')
     .map((v) => ({
       key: v.puuid,
-      label: v.name
+      label: summonerName(v.gameName, v.gameTag)
     }))
 })
 

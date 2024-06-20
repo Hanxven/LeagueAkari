@@ -101,12 +101,18 @@ export class CoreFunctionalityModule extends MobxBasedModule {
         }
 
         try {
-          await cancellableSleep(
-            this.state.settings.delaySecondsBeforeLoading * 1e3,
-            this._controller.signal
-          )
+          // 15 毫秒的阈值
+          if (this.state.settings.delaySecondsBeforeLoading > 0.015) {
+            this.state.setWaitingForDelay(true)
+            await cancellableSleep(
+              this.state.settings.delaySecondsBeforeLoading * 1e3,
+              this._controller.signal
+            )
+          }
         } catch {
           /* the error type can only be AbortError */
+        } finally {
+          this.state.setWaitingForDelay(false)
         }
 
         try {
@@ -878,6 +884,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     this.simpleSync('ongoing-pre-made-teams', () => this.state.ongoingPreMadeTeams)
     this.simpleSync('ongoing-teams', () => this.state.ongoingTeams)
     this.simpleSync('send-list', () => toJS(this.state.sendList))
+    this.simpleSync('is-waiting-for-delay', () => this.state.isWaitingForDelay)
   }
 
   private _setupMethodCall() {
@@ -908,7 +915,10 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setPreMadeTeamThreshold(threshold)
-      await this._storageModule.settings.set('core-functionality/pre-made-team-threshold', threshold)
+      await this._storageModule.settings.set(
+        'core-functionality/pre-made-team-threshold',
+        threshold
+      )
     }
 
     const setTeamAnalysisPreloadCount = async (count: number) => {
@@ -917,7 +927,10 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setTeamAnalysisPreloadCount(count)
-      await this._storageModule.settings.set('core-functionality/team-analysis-preload-count', count)
+      await this._storageModule.settings.set(
+        'core-functionality/team-analysis-preload-count',
+        count
+      )
     }
 
     this.onCall('set-setting/match-history-load-count', async (count) => {
@@ -987,7 +1000,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     })
 
     this.onCall('save/saved-player', async (player) => {
-      const r = await this._storageModule.saveSavedPlayer(player)
+      const r = await this._storageModule.players.saveSavedPlayer(player)
 
       if (this.state.ongoingPlayers) {
         const p = this.state.ongoingPlayers.get(player.puuid)
@@ -1010,7 +1023,15 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     })
 
     this.onCall('set-setting/delay-seconds-before-loading', async (delay) => {
-      await this._storageModule.settings.set('core-functionality/delay-seconds-before-loading', delay)
+      if (delay < 0) {
+        delay = 0
+      }
+
+      this.state.settings.setDelaySecondsBeforeLoading(delay)
+      await this._storageModule.settings.set(
+        'core-functionality/delay-seconds-before-loading',
+        delay
+      )
     })
   }
 

@@ -125,6 +125,8 @@ export class CoreFunctionalityState {
    */
   ongoingPlayers = observable(new Map<string, OngoingPlayer>(), { deep: false })
 
+  isWaitingForDelay = false
+
   // 用于临时对局分析的游戏详情图
   tempDetailedGames = observable(new Map<number, Game>(), { deep: false })
 
@@ -264,6 +266,11 @@ export class CoreFunctionalityState {
     this.tempDetailedGames.clear()
     this.ongoingPreMadeTeams = []
     this.sendList = {}
+    this.isWaitingForDelay = false
+  }
+
+  setWaitingForDelay(value: boolean) {
+    this.isWaitingForDelay = value
   }
 
   /**

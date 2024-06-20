@@ -7,7 +7,10 @@
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
     <PlayerTagEditModal v-model:show="isPlayerTagEditModalShow" :puuid="tagEditingSummonerPuuid" />
-    <div v-if="!isIdle && cf.settings.ongoingAnalysisEnabled" class="ongoing-game-inner">
+    <div
+      v-if="!isIdle && !cf.isWaitingForDelay && cf.settings.ongoingAnalysisEnabled"
+      class="ongoing-game-inner"
+    >
       <!-- 蓝队 -->
       <DefineOngoingTeam v-slot="{ participants, team }">
         <div class="team">
@@ -122,6 +125,15 @@
         </ControlItem>
       </NCard>
     </div>
+    <div v-else-if="cf.isWaitingForDelay" class="no-ongoing-game">
+      <div class="centered">
+        <LeagueAkariSpan bold class="akari-text" />
+        <NFlex align="center">
+          <NSpin :size="14" />
+          <div style="font-size: 14px; font-weight: normal; color: #888">等待加载延时...</div>
+        </NFlex>
+      </div>
+    </div>
     <div v-else class="no-ongoing-game">
       <div class="centered">
         <LeagueAkariSpan bold class="akari-text" />
@@ -155,7 +167,7 @@ import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gamefl
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
-import { NCard, NCheckbox } from 'naive-ui'
+import { NCard, NCheckbox, NFlex, NSpin } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
