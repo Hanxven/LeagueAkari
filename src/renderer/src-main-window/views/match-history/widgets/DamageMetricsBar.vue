@@ -47,6 +47,7 @@
         </div>
       </div>
       <div class="divider"></div>
+      <div class="">总共: {{ totalDamage.toLocaleString() }}</div>
       <div class="">物理: {{ physicalDamage.toLocaleString() }}</div>
       <div class="">魔法: {{ magicDamage.toLocaleString() }}</div>
       <div class="">真实: {{ trueDamage.toLocaleString() }}</div>

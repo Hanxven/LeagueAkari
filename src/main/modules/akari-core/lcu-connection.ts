@@ -5,8 +5,9 @@ import { RadixEventEmitter } from '@shared/event-emitter'
 import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
-import https from 'https'
 import { comparer, computed, makeAutoObservable, observable } from 'mobx'
+import http from 'node:http'
+import https from 'node:https'
 import PQueue from 'p-queue'
 import { WebSocket } from 'ws'
 
@@ -95,7 +96,12 @@ export class LcuConnectionModule extends MobxBasedModule {
 
   private _gcHttp = axios.create({
     baseURL: LcuConnectionModule.GAME_CLIENT_BASE_URL,
-    httpsAgent: new https.Agent({ rejectUnauthorized: false, keepAlive: true })
+    httpsAgent: new https.Agent({
+      rejectUnauthorized: false,
+      keepAlive: true,
+      maxFreeSockets: 1024,
+      maxCachedSessions: 2048
+    })
   })
 
   private _clientPollTimerId: NodeJS.Timeout
@@ -244,7 +250,13 @@ export class LcuConnectionModule extends MobxBasedModule {
       },
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,
-        keepAlive: true
+        keepAlive: true,
+        maxCachedSessions: 2048,
+        maxFreeSockets: 1024
+      }),
+      httpAgent: new http.Agent({
+        keepAlive: true,
+        maxFreeSockets: 1024
       }),
       timeout: LcuConnectionModule.REQUEST_TIMEOUT_MS,
       proxy: false
@@ -414,7 +426,7 @@ export class LcuConnectionModule extends MobxBasedModule {
 
     while (true) {
       try {
-        const res = await this._lcuHttp<T>(config)
+        const res = await this._lcuHttp.request<T>(config)
         return res
       } catch (error) {
         lastError = error

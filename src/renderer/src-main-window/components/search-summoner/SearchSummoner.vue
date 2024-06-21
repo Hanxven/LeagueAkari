@@ -9,6 +9,7 @@
           ref="inputEl"
           class="search-input"
           placeholder="精确搜索"
+          @select="handleApplyAutoCompletion"
           :render-label="renderLabel"
           :status="isTagNeeded ? 'warning' : 'success'"
           v-model:value="inputText"
@@ -72,7 +73,7 @@ import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { inferType, resolveSummonerName } from '@shared/utils/identity'
 import { Close as CloseIcon } from '@vicons/carbon'
 import { AutoCompleteOption, NAutoComplete, NButton, NFlex, NIcon, SelectOption } from 'naive-ui'
-import { VNodeChild, computed, h, onMounted, ref } from 'vue'
+import { VNodeChild, computed, h, nextTick, onMounted, ref } from 'vue'
 
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
 
@@ -246,6 +247,10 @@ const renderLabel = (option: SelectOption): VNodeChild => {
       { icon: () => h(NIcon, () => h(CloseIcon)) }
     )
   ])
+}
+
+const handleApplyAutoCompletion = (_: string) => {
+  nextTick(() => handleSearch())
 }
 
 onMounted(() => {
