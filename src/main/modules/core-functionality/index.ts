@@ -101,22 +101,22 @@ export class CoreFunctionalityModule extends MobxBasedModule {
         }
 
         try {
-          // 15 毫秒的阈值
-          if (this.state.settings.delaySecondsBeforeLoading > 0.015) {
-            this.state.setWaitingForDelay(true)
-            await cancellableSleep(
-              this.state.settings.delaySecondsBeforeLoading * 1e3,
-              this._controller.signal
-            )
-          }
-        } catch {
-          /* the error type can only be AbortError */
-        } finally {
-          this.state.setWaitingForDelay(false)
-        }
-
-        try {
           if (state === 'champ-select') {
+            try {
+              // 15 毫秒的阈值
+              if (this.state.settings.delaySecondsBeforeLoading > 0.015) {
+                this.state.setWaitingForDelay(true)
+                await cancellableSleep(
+                  this.state.settings.delaySecondsBeforeLoading * 1e3,
+                  this._controller.signal
+                )
+              }
+            } catch {
+              /* the error type can only be AbortError */
+              return
+            } finally {
+              this.state.setWaitingForDelay(false)
+            }
             await this._champSelectQuery(this._controller.signal)
           } else if (state === 'in-game') {
             await this._inGameQuery(this._controller.signal)

@@ -5,21 +5,20 @@ export const useAuxiliaryWindowStore = defineStore('module:auxiliary-window', ()
   const windowState = 'normal'
   const focusState = 'focused'
   const isShow = ref(false)
-  const isPinned = ref(false)
 
   const settings = reactive({
     opacity: 1,
     enabled: true,
     showSkinSelector: true,
     zoomFactor: 1.0,
-    taskbarIcon: false
+    taskbarIcon: false,
+    isPinned: true
   })
 
   return {
     windowState,
     focusState,
     isShow,
-    isPinned,
     settings
   }
 })

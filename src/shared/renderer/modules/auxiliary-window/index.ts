@@ -19,7 +19,7 @@ export class AuxWindowRendererModule extends StateSyncModule {
     this.simpleSync('state', (s) => (store.windowState = s))
     this.simpleSync('focus', (s) => (store.focusState = s))
     this.simpleSync('is-show', (s) => (store.isShow = s))
-    this.simpleSync('is-pinned', (s) => (store.isPinned = s))
+    this.simpleSync('settings/is-pinned', (s) => (store.settings.isPinned = s))
     this.simpleSync('settings/opacity', (s) => (store.settings.opacity = s))
     this.simpleSync('settings/enabled', (s) => (store.settings.enabled = s))
     this.simpleSync('settings/show-skin-selector', (s) => (store.settings.showSkinSelector = s))

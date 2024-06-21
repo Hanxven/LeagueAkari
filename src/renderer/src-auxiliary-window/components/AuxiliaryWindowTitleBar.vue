@@ -4,10 +4,10 @@
     <div class="title">League Akari</div>
     <div class="traffic">
       <div
-        :title="aw.isPinned ? `取消置顶` : `置顶`"
+        :title="aw.settings.isPinned ? `取消置顶` : `置顶`"
         class="traffic-button pin"
-        :class="{ pinned: aw.isPinned }"
-        @click="() => handlePin(!aw.isPinned)"
+        :class="{ pinned: aw.settings.isPinned }"
+        @click="() => handlePin(!aw.settings.isPinned)"
       >
         <NIcon><PinFilledIcon /></NIcon>
       </div>

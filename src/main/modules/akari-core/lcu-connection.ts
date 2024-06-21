@@ -95,7 +95,7 @@ export class LcuConnectionModule extends MobxBasedModule {
 
   private _gcHttp = axios.create({
     baseURL: LcuConnectionModule.GAME_CLIENT_BASE_URL,
-    httpsAgent: new https.Agent({ rejectUnauthorized: false })
+    httpsAgent: new https.Agent({ rejectUnauthorized: false, keepAlive: true })
   })
 
   private _clientPollTimerId: NodeJS.Timeout
@@ -243,7 +243,8 @@ export class LcuConnectionModule extends MobxBasedModule {
         Authorization: `Basic ${Buffer.from(`riot:${auth.password}`).toString('base64')}`
       },
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        keepAlive: true
       }),
       timeout: LcuConnectionModule.REQUEST_TIMEOUT_MS,
       proxy: false

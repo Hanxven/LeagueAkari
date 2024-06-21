@@ -18,7 +18,11 @@
         >
           <template #trigger>
             <div
-              title="当前正在运行的英雄联盟客户端"
+              :title="
+                lc.launchedClients.length === 0
+                  ? '没有检测到已运行的客户端'
+                  : '当前正在运行的英雄联盟客户端'
+              "
               class="operation"
               :class="{ disabled: lc.state !== 'connected' && lc.launchedClients.length === 0 }"
             >

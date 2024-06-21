@@ -8,7 +8,7 @@ export function honor(
   puuid?: string
 ) {
   return lcm.request({
-    url: '/lol-honor-v2/v1/honor-player',
+    url: '/lol-honor-v2/v1/honor-player/',
     method: 'POST',
     data: {
       gameId,
@@ -21,7 +21,7 @@ export function honor(
 
 export function getBallot() {
   return lcm.request<BallotLegacy>({
-    url: '/lol-honor-v2/v1/ballot',
+    url: '/lol-honor-v2/v1/ballot/',
     method: 'GET'
   })
 }

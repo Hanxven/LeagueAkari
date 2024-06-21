@@ -20,7 +20,9 @@ class AuxiliaryWindowSettings {
 
   zoomFactor: number = 1.0
 
-  taskbarIcon: boolean = false
+  taskbarIcon: boolean = true
+
+  isPinned = true
 
   setOpacity(opacity: number) {
     this.opacity = opacity
@@ -45,6 +47,10 @@ class AuxiliaryWindowSettings {
   constructor() {
     makeAutoObservable(this)
   }
+
+  setPinned(pinned: boolean) {
+    this.isPinned = pinned
+  }
 }
 
 class AuxiliaryWindowState {
@@ -53,8 +59,6 @@ class AuxiliaryWindowState {
   focus: 'focused' | 'blurred' = 'focused'
 
   isShow: boolean = true
-
-  isPinned: boolean = false
 
   isReady: boolean = false
 
@@ -76,10 +80,6 @@ class AuxiliaryWindowState {
 
   setShow(show: boolean) {
     this.isShow = show
-  }
-
-  setPinned(pinned: boolean) {
-    this.isPinned = pinned
   }
 
   setReady(ready: boolean) {
@@ -222,7 +222,7 @@ export class AuxWindowModule extends MobxBasedModule {
     this.simpleSync('state', () => this.state.state)
     this.simpleSync('focus', () => this.state.focus)
     this.simpleSync('is-show', () => this.state.isShow)
-    this.simpleSync('is-pinned', () => this.state.isPinned)
+    this.simpleSync('settings/is-pinned', () => this.state.settings.isPinned)
     this.simpleSync('settings/opacity', () => this.state.settings.opacity)
     this.simpleSync('settings/enabled', () => this.state.settings.enabled)
     this.simpleSync('settings/show-skin-selector', () => this.state.settings.showSkinSelector)
@@ -355,7 +355,7 @@ export class AuxWindowModule extends MobxBasedModule {
       icon,
       fullscreenable: false,
       skipTaskbar: true,
-      alwaysOnTop: true,
+      alwaysOnTop: this.state.settings.isPinned,
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         sandbox: false,
@@ -425,10 +425,9 @@ export class AuxWindowModule extends MobxBasedModule {
       this.state.setShow(false)
     })
 
-    this.state.setPinned(this._w.isAlwaysOnTop())
-
     this._w.on('always-on-top-changed', (_, b) => {
-      this.state.setPinned(b)
+      this._sm.settings.set('auxiliary-window/is-pinned', b)
+      this.state.settings.setPinned(b)
     })
 
     this._w.on('closed', () => {
@@ -467,6 +466,10 @@ export class AuxWindowModule extends MobxBasedModule {
 
     this.state.settings.setEnabled(
       await this._sm.settings.get('auxiliary-window/enabled', this.state.settings.enabled)
+    )
+
+    this.state.settings.setPinned(
+      await this._sm.settings.get('auxiliary-window/is-pinned', this.state.settings.isPinned)
     )
 
     this.state.settings.setShowSkinSelector(
