@@ -32,19 +32,17 @@ export const useAppStore = defineStore('core:app', () => {
     useWmic: false,
     autoCheckUpdates: false,
     showFreeSoftwareDeclaration: false,
-    closeStrategy: 'unset' as MainWindowCloseStrategy
+    closeStrategy: 'unset' as MainWindowCloseStrategy,
+    isInKyokoMode: false
   })
 
   const titleBarTasks = ref<TitleBarTask[]>([])
-
-  const isInKyokoMode = ref(false)
 
   return {
     isAdministrator,
     version,
     updates,
     settings,
-    titleBarTasks,
-    isInKyokoMode
+    titleBarTasks
   }
 })

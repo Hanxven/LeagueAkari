@@ -23,7 +23,9 @@
               :class="{ disabled: lc.state !== 'connected' && lc.launchedClients.length === 0 }"
             >
               <NIcon class="icon"><ApplicationIcon /></NIcon>
-              <div class="label" v-if="lc.auth">{{ regionText[lc.auth.region] }}</div>
+              <div class="label" v-if="lc.auth">
+                {{ regionText[lc.auth.region] || lc.auth.region }}
+              </div>
               <div class="label" v-else>客户端</div>
             </div>
           </template>
@@ -73,7 +75,6 @@
 import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
 import { LcuAuth, useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { leagueClientRendererModule as lcm2 } from '@shared/renderer/modules/league-client'
-import { useLeagueClientStore } from '@shared/renderer/modules/league-client/store'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import {
   AiStatus as AiStatusIcon,
@@ -148,7 +149,6 @@ const handleOpenSettingsModal = () => {
 }
 
 const lc = useLcuConnectionStore()
-const lc2 = useLeagueClientStore()
 const isClientsPreviewShow = ref(false)
 const launchedClients = shallowRef<LcuAuth[]>([])
 const updateCurrentLaunchedClients = async () => {

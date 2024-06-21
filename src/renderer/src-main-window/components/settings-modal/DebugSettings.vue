@@ -145,7 +145,7 @@
       <template #header><LeagueAkariSpan class="card-header-title" /></template>
       <span class="text">League Akari 运行在管理员权限，仅用于实现特定的客户端功能</span>
     </NCard>
-    <NCard v-if="app.isInKyokoMode" size="small" style="margin-top: 8px">
+    <NCard v-if="app.settings.isInKyokoMode" size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">调试</span></template>
       <ControlItem
         class="control-item-margin"
@@ -155,9 +155,9 @@
       >
         <NSwitch
           size="small"
-          v-if="app.isInKyokoMode"
-          :value="app.isInKyokoMode"
-          @update:value="(val: boolean) => (app.isInKyokoMode = val)"
+          v-if="app.settings.isInKyokoMode"
+          :value="app.settings.isInKyokoMode"
+          @update:value="(val: boolean) => am.setInKyokoMode(val)"
         />
       </ControlItem>
     </NCard>

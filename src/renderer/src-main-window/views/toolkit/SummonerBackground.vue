@@ -44,7 +44,13 @@
       ></NSelect>
     </NModal>
     <ControlItem class="control-item-margin" label="选择" label-description="查找目标英雄或皮肤">
-      <NButton size="tiny" type="primary" @click="isModalShow = true">选择</NButton>
+      <NButton
+        size="tiny"
+        type="primary"
+        @click="isModalShow = true"
+        :disabled="lc.state !== 'connected'"
+        >选择</NButton
+      >
     </ControlItem>
   </NCard>
 </template>
@@ -57,6 +63,7 @@ import {
   setSummonerBackgroundAugments,
   setSummonerBackgroundSkin
 } from '@shared/renderer/http-api/summoner'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { ChampSkin } from '@shared/types/lcu/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
@@ -64,6 +71,7 @@ import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } f
 import { VNode, computed, h, ref, watch } from 'vue'
 
 const gameData = useGameDataStore()
+const lc = useLcuConnectionStore()
 
 const currentChampionId = ref<number>()
 const currentSkinId = ref<number>()
@@ -166,7 +174,7 @@ const currentAugmentOptions = computed(() => {
 const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) => {
   return h(
     NTooltip,
-    { placement: 'right', delay: 300, animated: true, raw: true,  },
+    { placement: 'right', delay: 300, animated: true, raw: true },
     {
       trigger: () => node,
       default: () =>

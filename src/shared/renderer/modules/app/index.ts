@@ -25,6 +25,7 @@ export class AppRendererModule extends StateSyncModule {
     )
     this.simpleSync('settings/close-strategy', (s) => (store.settings.closeStrategy = s))
     this.simpleSync('settings/use-wmic', (s) => (store.settings.useWmic = s))
+    this.simpleSync('settings/is-in-kyoko-mode', (s) => (store.settings.isInKyokoMode = s))
     this.simpleSync('updates/is-checking-updates', (s) => (store.updates.isCheckingUpdates = s))
     this.simpleSync('updates/new-updates', (s) => (store.updates.newUpdates = s))
     this.simpleSync('updates/last-check-at', (s) => (store.updates.lastCheckAt = s))
@@ -51,6 +52,10 @@ export class AppRendererModule extends StateSyncModule {
 
   setUseWmic(value: boolean) {
     return this.call('set-setting/use-wmic', value)
+  }
+
+  setInKyokoMode(value: boolean) {
+    return this.call('set-setting/is-in-kyoko-mode', value)
   }
 
   private async _migrateFromLocalStorage() {

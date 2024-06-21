@@ -39,6 +39,11 @@ class AppSettings {
   autoCheckUpdates: boolean = true
 
   /**
+   * 自动下载更新
+   */
+  autoDownloadUpdates: boolean = false
+
+  /**
    * 输出前置声明
    */
   showFreeSoftwareDeclaration: boolean = true
@@ -47,6 +52,11 @@ class AppSettings {
    * 关闭应用的默认行为
    */
   closeStrategy: MainWindowCloseStrategy = 'unset'
+
+  /**
+   * 是否位于调试模式，更多不稳定功能将被启用
+   */
+  isInKyokoMode: boolean = false
 
   setAutoConnect(enabled: boolean) {
     this.autoConnect = enabled
@@ -60,12 +70,20 @@ class AppSettings {
     this.autoCheckUpdates = enabled
   }
 
+  setAutoDownloadUpdates(enabled: boolean) {
+    this.autoDownloadUpdates = enabled
+  }
+
   setShowFreeSoftwareDeclaration(enabled: boolean) {
     this.showFreeSoftwareDeclaration = enabled
   }
 
   setCloseStrategy(s: MainWindowCloseStrategy) {
     this.closeStrategy = s
+  }
+
+  setInKyokoMode(b: boolean) {
+    this.isInKyokoMode = b
   }
 
   constructor() {
@@ -81,7 +99,22 @@ interface NewUpdates {
   description: string
 }
 
+interface DownloadStatus {
+  total: number
+  downloaded: number
+  progress: number
+  speed: number
+  timeLeft: number
+  timeElapsed: number
+  isPaused: boolean
+  isDone: boolean
+  isCancelled: boolean
+  isDownloading: boolean
+}
+
 export class AppState {
+  settings = new AppSettings()
+
   isAdministrator: boolean = false
   ready: boolean = false
   isQuitting = false
@@ -97,10 +130,13 @@ export class AppState {
     }
   )
 
-  settings = new AppSettings()
+  // 自动更新包下载进度
+  updateDownloadStatus: DownloadStatus | null = null
 
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      updateDownloadStatus: observable.ref
+    })
   }
 
   setElevated(b: boolean) {
@@ -171,14 +207,6 @@ export class AppModule extends MobxBasedModule {
 
   private async _initializeApp() {
     this.state.setElevated(toolkit.isElevated())
-
-    if (this.state.settings.autoCheckUpdates) {
-      try {
-        await this._checkUpdates()
-      } catch (error) {
-        this._logger.warn(`检查更新失败 ${formatError(error)}`)
-      }
-    }
 
     app.on('before-quit', async (e) => {
       if (this._quitTasks.length) {
@@ -285,17 +313,19 @@ export class AppModule extends MobxBasedModule {
   private _setupStateSync() {
     this.simpleSync('settings/auto-connect', () => this.state.settings.autoConnect)
     this.simpleSync('settings/auto-check-updates', () => this.state.settings.autoCheckUpdates)
+    this.simpleSync('settings/auto-download-update', () => this.state.settings.autoDownloadUpdates)
     this.simpleSync(
       'settings/show-free-software-declaration',
       () => this.state.settings.showFreeSoftwareDeclaration
     )
     this.simpleSync('settings/close-strategy', () => this.state.settings.closeStrategy)
     this.simpleSync('settings/use-wmic', () => this.state.settings.useWmic)
-
+    this.simpleSync('settings/is-in-kyoko-mode', () => this.state.settings.isInKyokoMode)
     this.simpleSync('updates/is-checking-updates', () => this.state.updates.isCheckingUpdates)
     this.simpleSync('updates/new-updates', () => this.state.updates.newUpdates)
     this.simpleSync('updates/last-check-at', () => this.state.updates.lastCheckAt)
     this.simpleSync('is-administrator', () => this.state.isAdministrator)
+    this.simpleSync('update-download-status', () => this.state.updateDownloadStatus)
   }
 
   private _setupMethodCall() {
@@ -311,6 +341,11 @@ export class AppModule extends MobxBasedModule {
       await this._storageModule.settings.set('app/auto-check-updates', enabled)
     })
 
+    this.onCall('set-setting/auto-download-update', async (enabled) => {
+      this.state.settings.autoDownloadUpdates = enabled
+      await this._storageModule.settings.set('app/auto-download-update', enabled)
+    })
+
     this.onCall('set-setting/show-free-software-declaration', async (enabled) => {
       this.state.settings.setShowFreeSoftwareDeclaration(enabled)
       await this._storageModule.settings.set('app/show-free-software-declaration', enabled)
@@ -324,6 +359,11 @@ export class AppModule extends MobxBasedModule {
     this.onCall('set-setting/use-wmic', async (s) => {
       this.state.settings.setUseWmic(s)
       await this._storageModule.settings.set('app/use-wmic', s)
+    })
+
+    this.onCall('set-setting/is-in-kyoko-mode', async (b) => {
+      this.state.settings.setInKyokoMode(b)
+      await this._storageModule.settings.set('app/is-in-kyoko-mode', b)
     })
 
     this.onCall('check-update', async () => {
@@ -355,6 +395,13 @@ export class AppModule extends MobxBasedModule {
       )
     )
 
+    this.state.settings.setAutoDownloadUpdates(
+      await this._storageModule.settings.get(
+        'app/auto-download-update',
+        this.state.settings.autoDownloadUpdates
+      )
+    )
+
     this.state.settings.setShowFreeSoftwareDeclaration(
       await this._storageModule.settings.get(
         'app/show-free-software-declaration',
@@ -371,6 +418,13 @@ export class AppModule extends MobxBasedModule {
 
     this.state.settings.setUseWmic(
       await this._storageModule.settings.get('app/use-wmic', this.state.settings.useWmic)
+    )
+
+    this.state.settings.setInKyokoMode(
+      await this._storageModule.settings.get(
+        'app/is-in-kyoko-mode',
+        this.state.settings.isInKyokoMode
+      )
     )
   }
 
@@ -445,6 +499,16 @@ export class AppModule extends MobxBasedModule {
     })
 
     return nodeStream
+  }
+
+  private async _handleAutoUpdateCheck() {
+    if (this.state.settings.autoCheckUpdates) {
+      try {
+        await this._checkUpdates()
+      } catch (error) {
+        this._logger.warn(`检查更新失败 ${formatError(error)}`)
+      }
+    }
   }
 
   registerAkariProtocolAsPrivileged() {

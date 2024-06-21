@@ -61,7 +61,7 @@
         label="加载延迟"
         label-description="对局分析前的加载延迟时间"
         :label-width="320"
-        v-if="app.isInKyokoMode"
+        v-if="app.settings.isInKyokoMode"
       >
         <NInputNumber
           :min="0"

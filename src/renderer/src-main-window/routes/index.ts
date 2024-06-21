@@ -34,10 +34,6 @@ const router = createRouter({
           component: () => import('@main-window/views/automation/Automation.vue')
         }
       ]
-    },
-    {
-      path: '/connecting',
-      component: () => import('@main-window/views/Connecting.vue')
     }
   ]
 })

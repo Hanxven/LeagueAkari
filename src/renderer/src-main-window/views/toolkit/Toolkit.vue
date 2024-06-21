@@ -18,7 +18,7 @@
           <ChatStatusMessage class="tool" />
           <GameView class="tool" />
           <CustomKeyboardSequence class="tool" />
-          <ChallengePlayerPreferences v-if="app.isInKyokoMode" class="tool" />
+          <ChallengePlayerPreferences v-if="app.settings.isInKyokoMode" class="tool" />
         </NTabPane>
       </NTabs>
     </div>

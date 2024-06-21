@@ -94,11 +94,11 @@ am.onEvent('second-instance', () => {
 
 useKeyboardCombo(KYOKO_MODE_KEY_SEQUENCE, {
   onFinish: () => {
-    if (app.isInKyokoMode) {
+    if (app.settings.isInKyokoMode) {
       return
     }
 
-    app.isInKyokoMode = true
+    am.setInKyokoMode(true)
 
     notification.success({
       title: 'League Akari 测试模式',

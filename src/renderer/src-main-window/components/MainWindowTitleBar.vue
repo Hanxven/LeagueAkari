@@ -93,8 +93,10 @@
     </div>
     <div class="title-area">
       <span class="title" v-if="lc.state === 'connected'">League Akari</span>
-      <span class="title" v-else-if="lc.state === 'connecting'">League Akari [连接中]</span>
-      <span class="title" v-else>League Akari [未连接]</span>
+      <span class="title" v-else-if="lc.state === 'connecting'"
+        >League Akari <span class="connecting">连接中</span></span
+      >
+      <span class="title" v-else>League Akari <span class="disconnected">[未连接]</span></span>
     </div>
     <div class="traffic">
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
@@ -356,6 +358,14 @@ const queueTaskShow = useCompleteVisibility(queueTaskEl, titleBarItemsContainer)
   height: 100%;
   justify-content: center;
   align-items: center;
+
+  .disconnected {
+    color: rgb(114, 114, 114);
+  }
+
+  .connecting {
+    color: rgb(255, 255, 255);
+  }
 }
 
 .title {
