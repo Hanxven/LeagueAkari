@@ -14,7 +14,6 @@
 <script setup lang="ts">
 import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
 import { useKeyboardCombo } from '@shared/renderer/compositions/useKeyboardCombo'
-import { getGame } from '@shared/renderer/http-api/match-history'
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
@@ -36,7 +35,6 @@ setupNaiveUiNotificationEvents()
 const router = useRouter()
 
 const app = useAppStore()
-
 const cf = useCoreFunctionalityStore()
 
 provide('app', {

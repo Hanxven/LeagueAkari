@@ -261,7 +261,12 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     return null
   }
 
-  async fetchTabMatchHistory(puuid: string, page: number = 1, pageSize: number = 20) {
+  async fetchTabMatchHistory(
+    puuid: string,
+    page: number = 1,
+    pageSize: number = 20,
+    queueFilter = -1
+  ) {
     const cf = useCoreFunctionalityStore()
     const mh = useMatchHistoryTabsStore()
     const tab = mh.getTab(puuid)
@@ -292,7 +297,8 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           page,
           pageSize,
           lastUpdate: Date.now(),
-          isEmpty: matchHistory.games.games.length === 0
+          isEmpty: matchHistory.games.games.length === 0,
+          queueFilter
         } as SummonerTabMatchHistory
 
         // 用于快速查找

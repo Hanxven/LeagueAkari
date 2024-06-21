@@ -51,6 +51,8 @@ export interface SummonerTabMatchHistory {
 
   /** 每页战绩的数量 */
   pageSize: number
+
+  queueFilter: number
 }
 
 export interface TabState {
@@ -139,7 +141,8 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
         pageSize: 20,
         isEmpty: false,
         hasError: false,
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
+        queueFilter: -1
       },
       detailedGamesCache: markRaw(new Map()),
       loading: {
@@ -178,8 +181,6 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
     if (tab) {
       const match = tab.data.matchHistory.gamesMap[gameId]
       if (match) {
-        // 出于性能考量，时刻保证只有一个元素展开
-        // 目前同屏渲染压力太大了
         if (expand) {
           Object.entries(tab.data.matchHistory.gamesMap).forEach(([_, m]) => {
             if (m.isExpanded) {
@@ -190,6 +191,13 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
 
         match.isExpanded = expand
       }
+    }
+  }
+
+  const setQueueFilter = (puuid: string, queue: number) => {
+    const tab = get(puuid)
+    if (tab) {
+      tab.data.matchHistory.queueFilter = queue
     }
   }
 
@@ -209,6 +217,7 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
     closeOtherTabs: closeOther,
     closeAllTemporaryTabs: closeAllTemporary,
     closeAllTabs: closeAll,
+    setQueueFilter,
 
     isLoading: isLoadingTab,
     setMatchHistoryExpand,

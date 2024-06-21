@@ -24,20 +24,31 @@
               >
             </div>
             <div class="pagination">
+              <NSelect
+                placeholder="队列"
+                size="small"
+                class="type-select"
+                :disabled="tab.loading.isLoadingMatchHistory"
+                :options="queueOptions"
+                :value="tab.matchHistory.queueFilter"
+                @update:value="(val: number) => mh.setQueueFilter(tab.puuid, val)"
+              />
               <NButton
                 size="small"
                 title="切换到上一页 (Ctrl+Left)"
                 @click="handleLoadPage(tab.matchHistory.page - 1)"
-                :disabled="tab.matchHistory.page <= 1"
+                :disabled="tab.matchHistory.page <= 1 || tab.loading.isLoadingMatchHistory"
                 secondary
                 >上</NButton
               >
               <NInputNumber
                 size="small"
                 placeholder=""
+                style="flex-shrink: 0"
                 v-model:value="inputtingText"
                 @blur="handleInputBlur"
                 @keyup.enter="() => handleLoadPage(inputtingText || 1)"
+                :disabled="tab.loading.isLoadingMatchHistory"
                 class="page"
                 :min="1"
                 :show-button="false"
@@ -46,13 +57,15 @@
                 title="切换到下一页 (Ctrl+Right)"
                 size="small"
                 @click="() => handleLoadPage(tab.matchHistory.page + 1)"
+                :disabled="tab.loading.isLoadingMatchHistory"
                 secondary
                 >下</NButton
               >
               <NSelect
                 :value="tab.matchHistory.pageSize"
                 @update:value="handleChangePageSize"
-                class="select"
+                :disabled="tab.loading.isLoadingMatchHistory"
+                class="page-select"
                 size="small"
                 :options="pageSizeOptions"
               ></NSelect>
@@ -128,7 +141,7 @@
         </div>
       </div>
       <PageMeta position="top" />
-      <div v-if="tab.matchHistory.games.length !== 0" class="match-history-list">
+      <div v-show="filteredGameCount !== 0" class="match-history-list">
         <MatchHistoryCard
           class="match-history-card-item"
           @set-show-detailed-game="handleToggleShowDetailedGame"
@@ -139,16 +152,22 @@
           :is-expanded="g.isExpanded"
           :game="g.game"
           v-for="g of tab.matchHistory.games"
+          v-show="
+            g.game.queueId === tab.matchHistory.queueFilter || tab.matchHistory.queueFilter === -1
+          "
           :key="g.game.gameId"
         />
       </div>
-      <div v-else-if="tab.loading.isLoadingMatchHistory" class="match-history-empty">
+      <div v-if="tab.loading.isLoadingMatchHistory" class="match-history-empty">
         <NCard size="small">加载中</NCard>
       </div>
       <div v-else-if="tab.matchHistory.isEmpty" class="match-history-empty">
-        <NCard size="small">暂无战绩</NCard>
+        <NCard size="small">本页暂无战绩</NCard>
       </div>
-      <PageMeta v-if="tab.matchHistory.games.length >= 5" position="bottom" />
+      <div v-else-if="filteredGameCount === 0" class="match-history-empty">
+        <NCard size="small">本页没有符合筛选条件的目标</NCard>
+      </div>
+      <PageMeta v-if="filteredGameCount >= 5" position="bottom" />
     </div>
   </div>
 </template>
@@ -164,7 +183,7 @@ import { createReusableTemplate, useDebounce, useScroll } from '@vueuse/core'
 import { useMagicKeys, whenever } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NButton, NCard, NIcon, NInputNumber, NSelect, NSkeleton } from 'naive-ui'
-import { nextTick, onActivated, ref, watch } from 'vue'
+import { computed, nextTick, onActivated, ref, watch, watchEffect } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
@@ -193,7 +212,12 @@ const props = withDefaults(
 const mh = useMatchHistoryTabsStore()
 
 const handleLoadPage = async (page: number) => {
-  const r = await mhm.fetchTabMatchHistory(props.tab.puuid, page, props.tab.matchHistory.pageSize)
+  const r = await mhm.fetchTabMatchHistory(
+    props.tab.puuid,
+    page,
+    props.tab.matchHistory.pageSize,
+    props.tab.matchHistory.queueFilter
+  )
   scrollToTop()
   return r
 }
@@ -230,6 +254,58 @@ const pageSizeOptions = [
   }
 ]
 
+const queueOptions = [
+  {
+    label: '所有',
+    value: -1
+  },
+  {
+    label: '自定义',
+    value: 0
+  },
+  {
+    label: '单排 / 双排',
+    value: 420
+  },
+  {
+    label: '灵活排位',
+    value: 440
+  },
+  {
+    label: '极地大乱斗',
+    value: 450
+  },
+
+  {
+    label: '斗魂竞技场',
+    value: 1700
+  },
+  {
+    label: 'Quickplay',
+    value: 490
+  },
+  {
+    label: '无限火力',
+    value: 1900
+  },
+  {
+    label: '无限乱斗',
+    value: 900
+  }
+]
+
+const filteredGameCount = computed(() => {
+  return props.tab.matchHistory.games.filter(
+    (g) =>
+      g.game.queueId === props.tab.matchHistory.queueFilter ||
+      props.tab.matchHistory.queueFilter === -1
+  ).length
+})
+
+watchEffect(() => {
+  console.log(props.tab.matchHistory.games.map((g) => g.game))
+})
+
 const { Ctrl_Left, Ctrl_Right } = useMagicKeys()
 
 whenever(Ctrl_Left, () => {
@@ -243,7 +319,12 @@ whenever(Ctrl_Right, () => {
 })
 
 const handleChangePageSize = async (pageSize: number) => {
-  const r = await mhm.fetchTabMatchHistory(props.tab.puuid, props.tab.matchHistory.page, pageSize)
+  const r = await mhm.fetchTabMatchHistory(
+    props.tab.puuid,
+    props.tab.matchHistory.page,
+    pageSize,
+    props.tab.matchHistory.queueFilter
+  )
   scrollToTop()
   return r
 }
@@ -465,10 +546,6 @@ defineExpose({
   font-size: 12px;
 }
 
-// .match-history-list {
-//   margin-top: 16px;
-// }
-
 .pagination {
   display: flex;
   align-items: center;
@@ -476,11 +553,15 @@ defineExpose({
   margin-left: auto;
 
   .page {
-    width: 48px;
+    width: 42px;
   }
 
-  .select {
+  .page-select {
     width: 120px;
+  }
+
+  .type-select {
+    width: 128px;
   }
 }
 
