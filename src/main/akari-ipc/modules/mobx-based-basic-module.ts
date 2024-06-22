@@ -1,0 +1,113 @@
+import { SettingService, StorageModule } from '@main/modules/akari-core/storage'
+import { IReactionOptions, IReactionPublic, reaction } from 'mobx'
+
+import { LeagueAkariModule } from '../akari-module'
+
+/**
+ * 对于简单的状态，通常是 ref 或者 structural 状态量
+ */
+type SimpleStateGetter = () => any
+
+/**
+ * 返回值用于接管默认的更新方式，设置为 true 将不会自动更新设置
+ */
+type SimpleStateSetter = (value: any, s: SettingService) => boolean | void | undefined
+
+/**
+ * 实现了一些基于 Mobx 的简单状态管理封装
+ *
+ * 以及常用的功能集成
+ */
+export class MobxBasedBasicModule extends LeagueAkariModule {
+  protected _disposers = new Set<Function>()
+  protected _sm: StorageModule
+  protected _ss: SettingService
+  protected _settingsToSync: Promise<void>[] = []
+
+  /**
+   * an alias for this._sm
+   */
+  get _storageModule() {
+    return this._sm
+  }
+
+  /**
+   * an alias for this._ss
+   */
+  get _settingService() {
+    return this._ss
+  }
+
+  override async setup() {
+    await super.setup()
+
+    try {
+      this._sm = this.manager.getModule('storage')
+      this._ss = this._sm.settings.with(this.id)
+    } catch (error) {
+      throw new Error('MobxBasedModule requires StorageModule')
+    }
+
+    await Promise.all(this._settingsToSync)
+    this._settingsToSync = []
+  }
+
+  /**
+   * 使用 mobx 监听一个简单资源的变化，并在变化时推送更新
+   * @param resName 资源名称
+   * @param getter 资源 getter
+   */
+  simpleSync(resName: string, getter: SimpleStateGetter) {
+    this.autoDisposeReaction(getter, (newValue) => {
+      this.sendEvent(`state-update/${resName}`, newValue)
+    })
+    this.onCall(`state-get/${resName}`, () => getter())
+  }
+
+  /**
+   * 简易的设置状态同步。默认值为 getter()，并在设置时推送更新
+   * @param settingName 该模块的设置项目
+   * @param getter 设置状态量的 getter
+   * @param setter 设置状态量的 setter
+   */
+  simpleSettingSync(settingName: string, getter: SimpleStateGetter, setter: SimpleStateSetter) {
+    const _wrappedSetter = async (value: any) => {
+      if (!setter(value, this._ss)) {
+        await this._ss.set(settingName, value)
+      }
+    }
+    const _readSettingFirst = async () => _wrappedSetter(await this._ss.get(settingName, getter()))
+    this._settingsToSync.push(_readSettingFirst())
+    this.simpleSync(`settings/${settingName}`, getter)
+    this.onCall(`set-setting/${settingName}`, (value) => _wrappedSetter(value))
+  }
+
+  /**
+   * mobx `reaction` 封装，会在 unregister 时自动清除
+   */
+  autoDisposeReaction<T, FireImmediately extends boolean = false>(
+    expression: (r: IReactionPublic) => T,
+    effect: (
+      arg: T,
+      prev: FireImmediately extends true ? T | undefined : T,
+      r: IReactionPublic
+    ) => void,
+    opts?: IReactionOptions<T, FireImmediately>
+  ) {
+    const fn = reaction(expression, effect, opts)
+    this._disposers.add(fn)
+
+    return () => {
+      if (this._disposers.has(fn)) {
+        fn()
+        this._disposers.delete(fn)
+      }
+    }
+  }
+
+  override async dismantle() {
+    await super.dismantle()
+    this._disposers.forEach((fn) => fn())
+    this._disposers.clear()
+  }
+}

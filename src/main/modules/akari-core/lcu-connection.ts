@@ -1,4 +1,4 @@
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { LcuAuth } from '@main/utils/lcu-auth'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
@@ -15,7 +15,6 @@ import { AppModule } from './app'
 import { LcuClientModule } from './league-client'
 import { AppLogger, LogModule } from './log'
 import { MainWindowModule } from './main-window'
-import { StorageModule } from './storage'
 
 export type LcuConnectionStateType = 'connecting' | 'connected' | 'disconnected'
 
@@ -77,13 +76,12 @@ class LcuConnectionState {
 /**
  * 与 LCU 客户端的连接模块，特例模块
  */
-export class LcuConnectionModule extends MobxBasedModule {
+export class LcuConnectionModule extends MobxBasedBasicModule {
   public state = new LcuConnectionState()
 
   private _logger: AppLogger
   private _logModule: LogModule
   private _appModule: AppModule
-  private _storageModule: StorageModule
   private _mwm: MainWindowModule
   private _lcm: LcuClientModule
 
@@ -135,10 +133,10 @@ export class LcuConnectionModule extends MobxBasedModule {
     this._logModule = this.manager.getModule<LogModule>('log')
     this._appModule = this.manager.getModule<AppModule>('app')
     this._logger = this._logModule.createLogger('lcu-connection')
-    this._storageModule = this.manager.getModule<StorageModule>('storage')
     this._mwm = this.manager.getModule<MainWindowModule>('main-window')
     this._lcm = this.manager.getModule<LcuClientModule>('league-client')
 
+    await this._migrateSettings()
     await this._loadSettings()
     this._setupStateSync()
     this._setupMethodCall()
@@ -228,7 +226,7 @@ export class LcuConnectionModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setAutoConnect(
-      await this._storageModule.settings.get('lcu-connection/auto-connect', true)
+      await this._sm.settings.get('lcu-connection/auto-connect', true)
     )
   }
 
@@ -270,6 +268,16 @@ export class LcuConnectionModule extends MobxBasedModule {
 
         throw new Error('http initialization PING failed')
       }
+    }
+  }
+
+  private async _migrateSettings() {
+    if (await this._sm.settings.has('app/auto-connect')) {
+      this._sm.settings.set(
+        'lcu-connection/auto-connect',
+        await this._sm.settings.get('app/auto-connect', true)
+      )
+      this._sm.settings.remove('app/auto-connect')
     }
   }
 
@@ -518,7 +526,7 @@ export class LcuConnectionModule extends MobxBasedModule {
 
     this.onCall('set-setting/auto-connect', async (value: boolean) => {
       this.state.settings.setAutoConnect(value)
-      await this._storageModule.settings.set('lcu-connection/auto-connect', value)
+      await this._sm.settings.set('lcu-connection/auto-connect', value)
     })
   }
 

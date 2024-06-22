@@ -1,4 +1,4 @@
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { chatSend } from '@main/http-api/chat'
 import { honor } from '@main/http-api/honor-v2'
 import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
@@ -11,18 +11,16 @@ import { comparer, computed } from 'mobx'
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
 import { AppLogger, LogModule } from '../akari-core/log'
 import { MainWindowModule } from '../akari-core/main-window'
-import { StorageModule } from '../akari-core/storage'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { AutoGameflowState } from './state'
 
 /**
  * 自动游戏流相关功能模块
  */
-export class AutoGameflowModule extends MobxBasedModule {
+export class AutoGameflowModule extends MobxBasedBasicModule {
   public state = new AutoGameflowState()
 
   private _logger: AppLogger
-  private _storageModule: StorageModule
   private _lcm: LcuConnectionModule
   private _lcu: LcuSyncModule
   private _mwm: MainWindowModule
@@ -49,7 +47,6 @@ export class AutoGameflowModule extends MobxBasedModule {
     this._logger = this.manager.getModule<LogModule>('log').createLogger('auto-gameflow')
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._lcm = this.manager.getModule('lcu-connection')
-    this._storageModule = this.manager.getModule('storage')
     this._mwm = this.manager.getModule('main-window')
 
     await this._loadSettings()
@@ -110,84 +107,84 @@ export class AutoGameflowModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setAutoHonorEnabled(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-honor-enabled',
         this.state.settings.autoHonorEnabled
       )
     )
 
     this.state.settings.setAutoHonorStrategy(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-honor-strategy',
         this.state.settings.autoHonorStrategy
       )
     )
 
     this.state.settings.setPlayAgainEnabled(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/play-again-enabled',
         this.state.settings.playAgainEnabled
       )
     )
 
     this.state.settings.setAutoAcceptEnabled(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-accept-enabled',
         this.state.settings.autoAcceptEnabled
       )
     )
 
     this.state.settings.setAutoAcceptDelaySeconds(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-accept-delay-seconds',
         this.state.settings.autoAcceptDelaySeconds
       )
     )
 
     this.state.settings.setAutoAcceptDelaySeconds(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-accept-delay-seconds',
         this.state.settings.autoAcceptDelaySeconds
       )
     )
 
     this.state.settings.setAutoSearchMatchEnabled(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-search-match-enabled',
         this.state.settings.autoSearchMatchEnabled
       )
     )
 
     this.state.settings.setAutoSearchMatchDelaySeconds(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-search-match-delay-seconds',
         this.state.settings.autoSearchMatchDelaySeconds
       )
     )
 
     this.state.settings.setAutoSearchMatchMinimumMembers(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-search-minimum-members',
         this.state.settings.autoSearchMatchMinimumMembers
       )
     )
 
     this.state.settings.setAutoSearchMatchWaitForInvitees(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-search-wait-for-invitees',
         this.state.settings.autoSearchMatchWaitForInvitees
       )
     )
 
     this.state.settings.setAutoSearchMatchRematchStrategy(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-search-match-rematch-strategy',
         this.state.settings.autoSearchMatchRematchStrategy
       )
     )
 
     this.state.settings.setAutoSearchMatchRematchFixedDuration(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-gameflow/auto-search-match-rematch-fixed-duration',
         this.state.settings.autoSearchMatchRematchFixedDuration
       )
@@ -197,15 +194,15 @@ export class AutoGameflowModule extends MobxBasedModule {
   private _setupMethodCall() {
     this.onCall('set-setting/auto-honor-enabled', async (value) => {
       this.state.settings.setAutoHonorEnabled(value)
-      await this._storageModule.settings.set('auto-gameflow/auto-honor-enabled', value)
+      await this._sm.settings.set('auto-gameflow/auto-honor-enabled', value)
     })
     this.onCall('set-setting/auto-honor-strategy', async (value) => {
       this.state.settings.setAutoHonorStrategy(value)
-      await this._storageModule.settings.set('auto-gameflow/auto-honor-strategy', value)
+      await this._sm.settings.set('auto-gameflow/auto-honor-strategy', value)
     })
     this.onCall('set-setting/play-again-enabled', async (value) => {
       this.state.settings.setPlayAgainEnabled(value)
-      await this._storageModule.settings.set('auto-gameflow/play-again-enabled', value)
+      await this._sm.settings.set('auto-gameflow/play-again-enabled', value)
     })
     this.onCall('set-setting/auto-accept-enabled', async (value) => {
       if (!value) {
@@ -213,44 +210,35 @@ export class AutoGameflowModule extends MobxBasedModule {
       }
 
       this.state.settings.setAutoAcceptEnabled(value)
-      await this._storageModule.settings.set('auto-gameflow/auto-accept-enabled', value)
+      await this._sm.settings.set('auto-gameflow/auto-accept-enabled', value)
     })
     this.onCall('set-setting/auto-accept-delay-seconds', async (value) => {
       this.state.settings.setAutoAcceptDelaySeconds(value)
-      await this._storageModule.settings.set('auto-gameflow/auto-accept-delay-seconds', value)
+      await this._sm.settings.set('auto-gameflow/auto-accept-delay-seconds', value)
     })
     this.onCall('set-setting/auto-search-match-enabled', async (value) => {
       this.state.settings.setAutoSearchMatchEnabled(value)
-      await this._storageModule.settings.set('auto-gameflow/auto-search-match-enabled', value)
+      await this._sm.settings.set('auto-gameflow/auto-search-match-enabled', value)
     })
     this.onCall('set-setting/auto-search-match-delay-seconds', async (value) => {
       this.state.settings.setAutoSearchMatchDelaySeconds(value)
-      await this._storageModule.settings.set('auto-gameflow/auto-search-match-delay-seconds', value)
+      await this._sm.settings.set('auto-gameflow/auto-search-match-delay-seconds', value)
     })
     this.onCall('set-setting/auto-search-match-minimum-members', async (value) => {
       this.state.settings.setAutoSearchMatchMinimumMembers(value)
-      await this._storageModule.settings.set('auto-gameflow/auto-search-minimum-members', value)
+      await this._sm.settings.set('auto-gameflow/auto-search-minimum-members', value)
     })
     this.onCall('set-setting/auto-search-match-wait-for-invitees', async (value) => {
       this.state.settings.setAutoSearchMatchWaitForInvitees(value)
-      await this._storageModule.settings.set(
-        'auto-gameflow/auto-search-match-wait-for-invitees',
-        value
-      )
+      await this._sm.settings.set('auto-gameflow/auto-search-match-wait-for-invitees', value)
     })
     this.onCall('set-setting/auto-search-match-rematch-strategy', async (value) => {
       this.state.settings.setAutoSearchMatchRematchStrategy(value)
-      await this._storageModule.settings.set(
-        'auto-gameflow/auto-search-match-rematch-strategy',
-        value
-      )
+      await this._sm.settings.set('auto-gameflow/auto-search-match-rematch-strategy', value)
     })
     this.onCall('set-setting/auto-search-match-rematch-fixed-duration', async (value) => {
       this.state.settings.setAutoSearchMatchRematchFixedDuration(value)
-      await this._storageModule.settings.set(
-        'auto-gameflow/auto-search-match-rematch-fixed-duration',
-        value
-      )
+      await this._sm.settings.set('auto-gameflow/auto-search-match-rematch-fixed-duration', value)
     })
     this.onCall('cancel-auto-accept', () => {
       this.cancelAutoAccept('normal')

@@ -1,4 +1,4 @@
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 import { Metadata } from '@main/db/entities/Metadata'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
@@ -206,6 +206,11 @@ export class SettingService {
     return new SettingService(this._storageModule, domain)
   }
 
+  async has(key: string) {
+    const key2 = this.domain ? `${this.domain}/${key}` : key
+    return await this._storageModule.dataSource.manager.existsBy(Setting, { key: key2 })
+  }
+
   async get<T = any>(key: string, defaultValue: T) {
     const key2 = this.domain ? `${this.domain}/${key}` : key
     const v = await this._storageModule.dataSource.manager.findOneBy(Setting, { key: key2 })
@@ -238,7 +243,7 @@ export class SettingService {
   }
 }
 
-export class StorageModule extends MobxBasedModule {
+export class StorageModule extends MobxBasedBasicModule {
   private _ds: DataSource
   private _logModule: LogModule
   private _logger: AppLogger

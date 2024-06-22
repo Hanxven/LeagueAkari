@@ -18,7 +18,6 @@ export class AppRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAppStore()
 
-    this.simpleSync('settings/auto-check-updates', (s) => (store.settings.autoCheckUpdates = s))
     this.simpleSync(
       'settings/show-free-software-declaration',
       (s) => (store.settings.showFreeSoftwareDeclaration = s)
@@ -26,9 +25,6 @@ export class AppRendererModule extends StateSyncModule {
     this.simpleSync('settings/close-strategy', (s) => (store.settings.closeStrategy = s))
     this.simpleSync('settings/use-wmic', (s) => (store.settings.useWmic = s))
     this.simpleSync('settings/is-in-kyoko-mode', (s) => (store.settings.isInKyokoMode = s))
-    this.simpleSync('updates/is-checking-updates', (s) => (store.updates.isCheckingUpdates = s))
-    this.simpleSync('updates/new-updates', (s) => (store.updates.newUpdates = s))
-    this.simpleSync('updates/last-check-at', (s) => (store.updates.lastCheckAt = s))
     this.simpleSync('is-administrator', (s) => (store.isAdministrator = s))
 
     this.getAppVersion().then((v) => (store.version = v))
@@ -36,10 +32,6 @@ export class AppRendererModule extends StateSyncModule {
 
   getAppVersion() {
     return this.call('get-app-version')
-  }
-
-  setAutoCheckUpdates(value: boolean) {
-    return this.call('set-setting/auto-check-updates', value)
   }
 
   setShowFreeSoftwareDeclaration(value: boolean) {
@@ -81,10 +73,6 @@ export class AppRendererModule extends StateSyncModule {
         localStorage.clear()
       }
     } catch {}
-  }
-
-  checkUpdate() {
-    return this.call('check-update')
   }
 
   openUserDataDirInExplorer() {

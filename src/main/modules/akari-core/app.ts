@@ -1,5 +1,5 @@
 import { optimizer } from '@electron-toolkit/utils'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants/common'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
@@ -16,11 +16,11 @@ import { AutoReplyModule } from '../auto-reply'
 import { AutoSelectModule } from '../auto-select'
 import { CoreFunctionalityModule } from '../core-functionality'
 import { RespawnTimerModule } from '../respawn-timer'
+import { AutoUpdateModule } from './auto-update'
 import { AuxWindowModule } from './auxiliary-window'
 import { LcuConnectionModule } from './lcu-connection'
 import { AppLogger, LogModule } from './log'
 import { MainWindowModule } from './main-window'
-import { StorageModule } from './storage'
 
 class AppSettings {
   /**
@@ -32,11 +32,6 @@ class AppSettings {
    * 使用 WMIC 查询命令行，而不是默认的 NtQueryInformationProcess
    */
   useWmic: boolean = false
-
-  /**
-   * 从 Github 拉取更新信息
-   */
-  autoCheckUpdates: boolean = true
 
   /**
    * 自动下载更新
@@ -64,10 +59,6 @@ class AppSettings {
 
   setUseWmic(enabled: boolean) {
     this.useWmic = enabled
-  }
-
-  setAutoCheckUpdates(enabled: boolean) {
-    this.autoCheckUpdates = enabled
   }
 
   setAutoDownloadUpdates(enabled: boolean) {
@@ -152,11 +143,10 @@ export class AppState {
   }
 }
 
-export class AppModule extends MobxBasedModule {
+export class AppModule extends MobxBasedBasicModule {
   public state = new AppState()
 
   private _logModule: LogModule
-  private _storageModule: StorageModule
   private _logger: AppLogger
   private _mwm: MainWindowModule
   private _afgm: AutoGameflowModule
@@ -165,6 +155,7 @@ export class AppModule extends MobxBasedModule {
   private _asm: AutoSelectModule
   private _rtm: RespawnTimerModule
   private _lcm: LcuConnectionModule
+  private _aum: AutoUpdateModule
 
   private _quitTasks: (() => Promise<void> | void)[] = []
 
@@ -179,7 +170,6 @@ export class AppModule extends MobxBasedModule {
 
     this._logModule = this.manager.getModule<LogModule>('log')
     this._logger = this._logModule.createLogger('app')
-    this._storageModule = this.manager.getModule<StorageModule>('storage')
     this._mwm = this.manager.getModule<MainWindowModule>('main-window')
     this._afgm = this.manager.getModule<AutoGameflowModule>('auto-gameflow')
     this._arm = this.manager.getModule<AutoReplyModule>('auto-reply')
@@ -187,6 +177,7 @@ export class AppModule extends MobxBasedModule {
     this._asm = this.manager.getModule<AutoSelectModule>('auto-select')
     this._rtm = this.manager.getModule<RespawnTimerModule>('respawn-timer')
     this._lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
+    this._aum = this.manager.getModule<AutoUpdateModule>('auto-update')
 
     await this._loadSettings()
     this._setupAkariProtocol()
@@ -312,7 +303,6 @@ export class AppModule extends MobxBasedModule {
 
   private _setupStateSync() {
     this.simpleSync('settings/auto-connect', () => this.state.settings.autoConnect)
-    this.simpleSync('settings/auto-check-updates', () => this.state.settings.autoCheckUpdates)
     this.simpleSync('settings/auto-download-update', () => this.state.settings.autoDownloadUpdates)
     this.simpleSync(
       'settings/show-free-software-declaration',
@@ -333,37 +323,32 @@ export class AppModule extends MobxBasedModule {
 
     this.onCall('set-setting/auto-connect', async (enabled) => {
       this.state.settings.setAutoConnect(enabled)
-      await this._storageModule.settings.set('app/auto-connect', enabled)
-    })
-
-    this.onCall('set-setting/auto-check-updates', async (enabled) => {
-      this.state.settings.setAutoCheckUpdates(enabled)
-      await this._storageModule.settings.set('app/auto-check-updates', enabled)
+      await this._sm.settings.set('app/auto-connect', enabled)
     })
 
     this.onCall('set-setting/auto-download-update', async (enabled) => {
       this.state.settings.autoDownloadUpdates = enabled
-      await this._storageModule.settings.set('app/auto-download-update', enabled)
+      await this._sm.settings.set('app/auto-download-update', enabled)
     })
 
     this.onCall('set-setting/show-free-software-declaration', async (enabled) => {
       this.state.settings.setShowFreeSoftwareDeclaration(enabled)
-      await this._storageModule.settings.set('app/show-free-software-declaration', enabled)
+      await this._sm.settings.set('app/show-free-software-declaration', enabled)
     })
 
     this.onCall('set-setting/close-strategy', async (s) => {
       this.state.settings.setCloseStrategy(s)
-      await this._storageModule.settings.set('app/close-strategy', s)
+      await this._sm.settings.set('app/close-strategy', s)
     })
 
     this.onCall('set-setting/use-wmic', async (s) => {
       this.state.settings.setUseWmic(s)
-      await this._storageModule.settings.set('app/use-wmic', s)
+      await this._sm.settings.set('app/use-wmic', s)
     })
 
     this.onCall('set-setting/is-in-kyoko-mode', async (b) => {
       this.state.settings.setInKyokoMode(b)
-      await this._storageModule.settings.set('app/is-in-kyoko-mode', b)
+      await this._sm.settings.set('app/is-in-kyoko-mode', b)
     })
 
     this.onCall('check-update', async () => {
@@ -385,46 +370,33 @@ export class AppModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setAutoConnect(
-      await this._storageModule.settings.get('app/auto-connect', this.state.settings.autoConnect)
-    )
-
-    this.state.settings.setAutoCheckUpdates(
-      await this._storageModule.settings.get(
-        'app/auto-check-updates',
-        this.state.settings.autoCheckUpdates
-      )
+      await this._sm.settings.get('app/auto-connect', this.state.settings.autoConnect)
     )
 
     this.state.settings.setAutoDownloadUpdates(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'app/auto-download-update',
         this.state.settings.autoDownloadUpdates
       )
     )
 
     this.state.settings.setShowFreeSoftwareDeclaration(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'app/show-free-software-declaration',
         this.state.settings.showFreeSoftwareDeclaration
       )
     )
 
     this.state.settings.setCloseStrategy(
-      await this._storageModule.settings.get(
-        'app/close-strategy',
-        this.state.settings.closeStrategy
-      )
+      await this._sm.settings.get('app/close-strategy', this.state.settings.closeStrategy)
     )
 
     this.state.settings.setUseWmic(
-      await this._storageModule.settings.get('app/use-wmic', this.state.settings.useWmic)
+      await this._sm.settings.get('app/use-wmic', this.state.settings.useWmic)
     )
 
     this.state.settings.setInKyokoMode(
-      await this._storageModule.settings.get(
-        'app/is-in-kyoko-mode',
-        this.state.settings.isInKyokoMode
-      )
+      await this._sm.settings.get('app/is-in-kyoko-mode', this.state.settings.isInKyokoMode)
     )
   }
 
@@ -501,15 +473,17 @@ export class AppModule extends MobxBasedModule {
     return nodeStream
   }
 
-  private async _handleAutoUpdateCheck() {
-    if (this.state.settings.autoCheckUpdates) {
-      try {
-        await this._checkUpdates()
-      } catch (error) {
-        this._logger.warn(`检查更新失败 ${formatError(error)}`)
-      }
-    }
-  }
+  // private async _handleAutoUpdateCheck() {
+  //   if (!this.state.settings.autoCheckUpdates) {
+  //     return
+  //   }
+
+  //   try {
+  //     await this._checkUpdates()
+  //   } catch (error) {
+  //     this._logger.warn(`检查更新失败 ${formatError(error)}`)
+  //   }
+  // }
 
   registerAkariProtocolAsPrivileged() {
     protocol.registerSchemesAsPrivileged([
@@ -538,7 +512,7 @@ export class AppModule extends MobxBasedModule {
       if (originValue !== undefined) {
         try {
           const jsonValue = JSON.parse(originValue)
-          await this._storageModule.settings.set(resName, jsonValue)
+          await this._sm.settings.set(resName, jsonValue)
           runInAction(() => setter(jsonValue))
           migrated = true
         } catch {}
@@ -547,13 +521,13 @@ export class AppModule extends MobxBasedModule {
 
     await _toNewSettings(
       'app.autoConnect',
-      'app/auto-connect',
-      (s) => (this.state.settings.autoConnect = s)
+      'lcu-connection/auto-connect',
+      (s) => (this._lcm.state.settings.autoConnect = s)
     )
     await _toNewSettings(
       'app.autoCheckUpdates',
-      'app/auto-check-updates',
-      (s) => (this.state.settings.autoCheckUpdates = s)
+      'auto-update/auto-check-updates',
+      (s) => (this._aum.state.settings.autoCheckUpdates = s)
     )
     await _toNewSettings(
       'app.showFreeSoftwareDeclaration',

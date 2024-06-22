@@ -1,5 +1,5 @@
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { chatSend } from '@main/http-api/chat'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { ChatMessage } from '@shared/types/lcu/chat'
 import { LcuEvent } from '@shared/types/lcu/event'
 import { formatError } from '@shared/utils/errors'
@@ -7,14 +7,12 @@ import { formatError } from '@shared/utils/errors'
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
 import { AppLogger, LogModule } from '../akari-core/log'
 import { MainWindowModule } from '../akari-core/main-window'
-import { StorageModule } from '../akari-core/storage'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { AutoReplyState } from './state'
 
-export class AutoReplyModule extends MobxBasedModule {
+export class AutoReplyModule extends MobxBasedBasicModule {
   public state = new AutoReplyState()
 
-  private _storageModule: StorageModule
   private _logger: AppLogger
   private _mwm: MainWindowModule
   private _lcu: LcuSyncModule
@@ -27,7 +25,6 @@ export class AutoReplyModule extends MobxBasedModule {
   override async setup() {
     await super.setup()
 
-    this._storageModule = this.manager.getModule('storage')
     this._mwm = this.manager.getModule('main-window')
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._lcm = this.manager.getModule('lcu-connection')
@@ -71,17 +68,17 @@ export class AutoReplyModule extends MobxBasedModule {
   private _setupMethodCall() {
     this.onCall('set-setting/enabled', async (enabled) => {
       this.state.settings.setEnabled(enabled)
-      await this._storageModule.settings.set('auto-reply/enabled', enabled)
+      await this._sm.settings.set('auto-reply/enabled', enabled)
     })
 
     this.onCall('set-setting/enable-on-away', async (enabled) => {
       this.state.settings.setEnableOnAway(enabled)
-      await this._storageModule.settings.set('auto-reply/enable-on-away', enabled)
+      await this._sm.settings.set('auto-reply/enable-on-away', enabled)
     })
 
     this.onCall('set-setting/text', async (text) => {
       this.state.settings.setText(text)
-      await this._storageModule.settings.set('auto-reply/text', text)
+      await this._sm.settings.set('auto-reply/text', text)
     })
   }
 
@@ -93,18 +90,15 @@ export class AutoReplyModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setEnabled(
-      await this._storageModule.settings.get('auto-reply/enabled', this.state.settings.enabled)
+      await this._sm.settings.get('auto-reply/enabled', this.state.settings.enabled)
     )
 
     this.state.settings.setEnableOnAway(
-      await this._storageModule.settings.get(
-        'auto-reply/enable-on-away',
-        this.state.settings.enableOnAway
-      )
+      await this._sm.settings.get('auto-reply/enable-on-away', this.state.settings.enableOnAway)
     )
 
     this.state.settings.setText(
-      await this._storageModule.settings.get('auto-reply/text', this.state.settings.text)
+      await this._sm.settings.get('auto-reply/text', this.state.settings.text)
     )
   }
 }

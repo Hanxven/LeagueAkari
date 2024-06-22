@@ -1,4 +1,4 @@
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { chatSend } from '@main/http-api/chat'
 import { getGame, getMatchHistory } from '@main/http-api/match-history'
@@ -19,11 +19,10 @@ import { LcuConnectionModule } from '../akari-core/lcu-connection'
 import { AppLogger, LogModule } from '../akari-core/log'
 import { MainWindowModule } from '../akari-core/main-window'
 import { PlatformModule } from '../akari-core/platform'
-import { StorageModule } from '../akari-core/storage'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { CoreFunctionalityState } from './state'
 
-export class CoreFunctionalityModule extends MobxBasedModule {
+export class CoreFunctionalityModule extends MobxBasedBasicModule {
   public state = new CoreFunctionalityState()
 
   static FETCH_PRIORITY = {
@@ -39,7 +38,6 @@ export class CoreFunctionalityModule extends MobxBasedModule {
   private _playerAnalysisFetchLimiter = new PQueue()
 
   private _logger: AppLogger
-  private _storageModule: StorageModule
   private _lcm: LcuConnectionModule
   private _lcu: LcuSyncModule
   private _pm: PlatformModule
@@ -66,7 +64,6 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     this._lcm = this.manager.getModule('lcu-connection')
     this._mwm = this.manager.getModule('main-window')
     this._pm = this.manager.getModule('win-platform')
-    this._storageModule = this.manager.getModule('storage')
 
     await this._loadSettings()
     this._setupSettingsSync()
@@ -238,7 +235,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
           )
 
           const tasks = all.map(async (p) => {
-            const task1 = this._storageModule.players.saveSavedPlayer({
+            const task1 = this._sm.players.saveSavedPlayer({
               encountered: true,
               region: this._lcm.state.auth!.region,
               rsoPlatformId: this._lcm.state.auth!.rsoPlatformId,
@@ -246,7 +243,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
               puuid: p.puuid
             })
 
-            const task2 = this._storageModule.players.saveEncounteredGame({
+            const task2 = this._sm.players.saveEncounteredGame({
               region: this._lcm.state.auth!.region,
               rsoPlatformId: this._lcm.state.auth!.rsoPlatformId,
               selfPuuid: this._lcu.summoner.me!.puuid,
@@ -658,7 +655,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
           return
         }
 
-        const savedInfo = await this._storageModule.players.querySavedPlayerWithGames({
+        const savedInfo = await this._sm.players.querySavedPlayerWithGames({
           region: auth.region,
           rsoPlatformId: auth.rsoPlatformId,
           selfPuuid: me.puuid,
@@ -898,15 +895,15 @@ export class CoreFunctionalityModule extends MobxBasedModule {
     })
     this.onCall('set-setting/auto-route-on-game-start', async (enabled) => {
       this.state.settings.setAutoRouteOnGameStart(enabled)
-      await this._storageModule.settings.set('core-functionality/auto-route-on-game-start', enabled)
+      await this._sm.settings.set('core-functionality/auto-route-on-game-start', enabled)
     })
     this.onCall('set-setting/fetch-after-game', async (enabled) => {
       this.state.settings.setFetchAfterGame(enabled)
-      await this._storageModule.settings.set('core-functionality/fetch-after-game', enabled)
+      await this._sm.settings.set('core-functionality/fetch-after-game', enabled)
     })
     this.onCall('set-setting/fetch-detailed-game', async (enabled) => {
       this.state.settings.setFetchDetailedGame(enabled)
-      await this._storageModule.settings.set('core-functionality/fetch-detailed-game', enabled)
+      await this._sm.settings.set('core-functionality/fetch-detailed-game', enabled)
     })
 
     const setPreMadeTeamThreshold = async (threshold: number) => {
@@ -915,7 +912,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setPreMadeTeamThreshold(threshold)
-      await this._storageModule.settings.set(
+      await this._sm.settings.set(
         'core-functionality/pre-made-team-threshold',
         threshold
       )
@@ -927,7 +924,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setTeamAnalysisPreloadCount(count)
-      await this._storageModule.settings.set(
+      await this._sm.settings.set(
         'core-functionality/team-analysis-preload-count',
         count
       )
@@ -947,7 +944,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setMatchHistoryLoadCount(count)
-      await this._storageModule.settings.set('core-functionality/match-history-load-count', count)
+      await this._sm.settings.set('core-functionality/match-history-load-count', count)
     })
 
     this.onCall('set-setting/pre-made-team-threshold', (threshold) =>
@@ -956,7 +953,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
     this.onCall('set-setting/send-kda-in-game', async (enabled) => {
       this.state.settings.setSendKdaInGame(enabled)
-      await this._storageModule.settings.set('core-functionality/send-kda-in-game', enabled)
+      await this._sm.settings.set('core-functionality/send-kda-in-game', enabled)
     })
 
     this.onCall('set-setting/team-analysis-preload-count', (count) =>
@@ -965,7 +962,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
     this.onCall('set-setting/send-kda-in-game-with-pre-made-teams', async (enabled) => {
       this.state.settings.setSendKdaInGameWithPreMadeTeams(enabled)
-      await this._storageModule.settings.set(
+      await this._sm.settings.set(
         'core-functionality/send-kda-in-game-with-pre-made-teams',
         enabled
       )
@@ -973,7 +970,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
     this.onCall('set-setting/ongoing-analysis-enabled', async (enabled) => {
       this.state.settings.setOngoingAnalysisEnabled(enabled)
-      await this._storageModule.settings.set('core-functionality/ongoing-analysis-enabled', enabled)
+      await this._sm.settings.set('core-functionality/ongoing-analysis-enabled', enabled)
     })
 
     this.onCall('set-setting/send-kda-threshold', async (threshold) => {
@@ -982,7 +979,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setSendKdaThreshold(threshold)
-      await this._storageModule.settings.set('core-functionality/send-kda-threshold', threshold)
+      await this._sm.settings.set('core-functionality/send-kda-threshold', threshold)
     })
 
     this.onCall('set-setting/player-analysis-fetch-concurrency', async (limit) => {
@@ -993,19 +990,19 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       this._playerAnalysisFetchLimiter.concurrency = limit
 
       this.state.settings.setPlayerAnalysisFetchConcurrency(limit)
-      await this._storageModule.settings.set(
+      await this._sm.settings.set(
         'core-functionality/player-analysis-fetch-concurrency',
         limit
       )
     })
 
     this.onCall('save/saved-player', async (player) => {
-      const r = await this._storageModule.players.saveSavedPlayer(player)
+      const r = await this._sm.players.saveSavedPlayer(player)
 
       if (this.state.ongoingPlayers) {
         const p = this.state.ongoingPlayers.get(player.puuid)
         if (p) {
-          const savedInfo = await this._storageModule.players.querySavedPlayerWithGames({
+          const savedInfo = await this._sm.players.querySavedPlayerWithGames({
             region: player.region,
             rsoPlatformId: player.rsoPlatformId,
             selfPuuid: player.selfPuuid,
@@ -1028,7 +1025,7 @@ export class CoreFunctionalityModule extends MobxBasedModule {
       }
 
       this.state.settings.setDelaySecondsBeforeLoading(delay)
-      await this._storageModule.settings.set(
+      await this._sm.settings.set(
         'core-functionality/delay-seconds-before-loading',
         delay
       )
@@ -1037,84 +1034,84 @@ export class CoreFunctionalityModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setAutoRouteOnGameStart(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/auto-route-on-game-start',
         this.state.settings.autoRouteOnGameStart
       )
     )
 
     this.state.settings.setFetchDetailedGame(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/fetch-detailed-game',
         this.state.settings.fetchDetailedGame
       )
     )
 
     this.state.settings.setMatchHistoryLoadCount(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/match-history-load-count',
         this.state.settings.matchHistoryLoadCount
       )
     )
 
     this.state.settings.setPreMadeTeamThreshold(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/pre-made-team-threshold',
         this.state.settings.preMadeTeamThreshold
       )
     )
 
     this.state.settings.setSendKdaInGame(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/send-kda-in-game',
         this.state.settings.sendKdaInGame
       )
     )
 
     this.state.settings.setSendKdaInGameWithPreMadeTeams(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/send-kda-in-game-with-pre-made-teams',
         this.state.settings.sendKdaInGameWithPreMadeTeams
       )
     )
 
     this.state.settings.setSendKdaThreshold(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/send-kda-threshold',
         this.state.settings.sendKdaThreshold
       )
     )
 
     this.state.settings.setTeamAnalysisPreloadCount(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/team-analysis-preload-count',
         this.state.settings.teamAnalysisPreloadCount
       )
     )
 
     this.state.settings.setFetchAfterGame(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/fetch-after-game',
         this.state.settings.fetchAfterGame
       )
     )
 
     this.state.settings.setPlayerAnalysisFetchConcurrency(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/player-analysis-fetch-concurrency',
         this.state.settings.playerAnalysisFetchConcurrency
       )
     )
 
     this.state.settings.setOngoingAnalysisEnabled(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'core-functionality/ongoing-analysis-enabled',
         this.state.settings.ongoingAnalysisEnabled
       )
     )
 
     this.state.settings.setDelaySecondsBeforeLoading(
-      await this._storageModule.settings.get('core-functionality/delay-seconds-before-loading', 0)
+      await this._sm.settings.get('core-functionality/delay-seconds-before-loading', 0)
     )
   }
 }

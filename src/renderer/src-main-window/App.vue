@@ -16,6 +16,7 @@ import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
 import { useKeyboardCombo } from '@shared/renderer/compositions/useKeyboardCombo'
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
 import { greeting } from '@shared/renderer/utils/greeting'
@@ -36,6 +37,7 @@ const router = useRouter()
 
 const app = useAppStore()
 const cf = useCoreFunctionalityStore()
+const au = useAutoUpdateStore()
 
 provide('app', {
   openSettingsModal: () => {
@@ -69,7 +71,7 @@ watchEffect(() => {
 })
 
 watchEffect(() => {
-  if (app.updates.newUpdates) {
+  if (au.newUpdates) {
     isShowingNewUpdateModal.value = true
   } else {
     isShowingNewUpdateModal.value = false

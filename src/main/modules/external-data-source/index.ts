@@ -1,4 +1,4 @@
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { formatError } from '@shared/utils/errors'
 import { computed } from 'mobx'
 
@@ -29,7 +29,7 @@ const _MODES = [
   'URF' // 无限火力
 ]
 
-export class ExternalDataSourceModule extends MobxBasedModule {
+export class ExternalDataSourceModule extends MobxBasedBasicModule {
   public state = new ExternalDataSourceState()
 
   private _lcu: LcuSyncModule

@@ -1,5 +1,5 @@
 import { is } from '@electron-toolkit/utils'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { BrowserWindow, Rectangle, screen, shell } from 'electron'
 import { comparer, computed, makeAutoObservable } from 'mobx'
 import { join } from 'path'
@@ -9,7 +9,6 @@ import { LcuSyncModule } from '../lcu-state-sync'
 import { AppModule } from './app'
 import { LcuConnectionModule } from './lcu-connection'
 import { AppLogger, LogModule } from './log'
-import { StorageModule } from './storage'
 
 class AuxiliaryWindowSettings {
   opacity: number = 0.9
@@ -91,12 +90,11 @@ class AuxiliaryWindowState {
   }
 }
 
-export class AuxWindowModule extends MobxBasedModule {
+export class AuxWindowModule extends MobxBasedBasicModule {
   public state = new AuxiliaryWindowState()
   private _lcm: LcuConnectionModule
   private _lcu: LcuSyncModule
   private _logModule: LogModule
-  private _sm: StorageModule
   private _logger: AppLogger
   private _appModule: AppModule
 
@@ -116,7 +114,6 @@ export class AuxWindowModule extends MobxBasedModule {
     await super.setup()
 
     this._logModule = this.manager.getModule<LogModule>('log')
-    this._sm = this.manager.getModule<StorageModule>('storage')
     this._lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
     this._lcu = this.manager.getModule<LcuSyncModule>('lcu-state-sync')
     this._appModule = this.manager.getModule<AppModule>('app')

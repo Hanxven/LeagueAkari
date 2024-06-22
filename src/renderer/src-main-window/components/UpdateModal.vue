@@ -7,22 +7,18 @@
     :class="styles['settings-modal']"
   >
     <template #header><span class="card-header-title">发现更新</span></template>
-    <div v-if="app.updates.newUpdates">
+    <div v-if="au.newUpdates">
       <div class="para">
-        新版本可用：{{ app.updates.newUpdates.version }} (当前版本：{{
-          app.updates.newUpdates.currentVersion
-        }})
+        新版本可用：{{ au.newUpdates.version }} (当前版本：{{ au.newUpdates.currentVersion }})
       </div>
       <div>
-        <a class="small-link" target="_blank" :href="app.updates.newUpdates.pageUrl"
-          >Github 发布页面</a
-        >
+        <a class="small-link" target="_blank" :href="au.newUpdates.pageUrl">Github 发布页面</a>
         <a
-          v-if="app.updates.newUpdates.downloadUrl"
+          v-if="au.newUpdates.downloadUrl"
           class="small-link"
           style="margin-left: 8px"
           target="_blank"
-          :href="app.updates.newUpdates.downloadUrl"
+          :href="au.newUpdates.downloadUrl"
           >Github 下载</a
         >
       </div>
@@ -40,17 +36,17 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { markdownIt } from '@shared/renderer/utils/markdown'
 import { NModal, NScrollbar } from 'naive-ui'
 import { computed, useCssModule } from 'vue'
 
-const app = useAppStore()
+const au = useAutoUpdateStore()
 
 const styles = useCssModule()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(app.updates.newUpdates?.description || '无内容')
+  return markdownIt.render(au.newUpdates?.description || '无内容')
 })
 
 const show = defineModel<boolean>('show', { default: false })

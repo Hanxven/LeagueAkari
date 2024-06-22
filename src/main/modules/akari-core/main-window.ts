@@ -1,5 +1,5 @@
 import { is } from '@electron-toolkit/utils'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { BrowserWindow, Event, app, shell } from 'electron'
 import { makeAutoObservable } from 'mobx'
 import { join } from 'node:path'
@@ -39,7 +39,7 @@ class MainWindowState {
   }
 }
 
-export class MainWindowModule extends MobxBasedModule {
+export class MainWindowModule extends MobxBasedBasicModule {
   private state = new MainWindowState()
 
   private _w: BrowserWindow | null = null

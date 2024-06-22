@@ -1,18 +1,16 @@
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { getPlayerList } from '@main/http-api/game-client'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
 import { runInAction } from 'mobx'
 
 import { AppLogger, LogModule } from '../akari-core/log'
-import { StorageModule } from '../akari-core/storage'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { RespawnTimerState } from './state'
 
-export class RespawnTimerModule extends MobxBasedModule {
+export class RespawnTimerModule extends MobxBasedBasicModule {
   public state = new RespawnTimerState()
 
   private _lcu: LcuSyncModule
   private _logger: AppLogger
-  private _storageModule: StorageModule
 
   private _timer: NodeJS.Timeout
   private _isStarted = false
@@ -28,7 +26,6 @@ export class RespawnTimerModule extends MobxBasedModule {
 
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._logger = this.manager.getModule<LogModule>('log').createLogger('respawn-timer')
-    this._storageModule = this.manager.getModule('storage')
 
     await this._loadSettings()
     this._setupStateSync()
@@ -56,7 +53,7 @@ export class RespawnTimerModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.state.settings.setEnabled(
-      await this._storageModule.settings.get('respawn-timer/enabled', this.state.settings.enabled)
+      await this._sm.settings.get('respawn-timer/enabled', this.state.settings.enabled)
     )
   }
 
@@ -145,7 +142,7 @@ export class RespawnTimerModule extends MobxBasedModule {
       }
 
       this.state.settings.setEnabled(enabled)
-      await this._storageModule.settings.set('respawn-timer/enabled', enabled)
+      await this._sm.settings.set('respawn-timer/enabled', enabled)
     })
   }
 }

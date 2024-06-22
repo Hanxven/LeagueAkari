@@ -10,8 +10,8 @@
       >
         <NSwitch
           size="small"
-          :value="app.settings.autoCheckUpdates"
-          @update:value="(val: boolean) => am.setAutoCheckUpdates(val)"
+          :value="au.settings.autoCheckUpdates"
+          @update:value="(val: boolean) => aum.setAutoCheckUpdates(val)"
         />
       </ControlItem>
       <ControlItem
@@ -60,12 +60,15 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
+import { autoUpdateRendererModule as aum } from '@shared/renderer/modules/auto-update'
+import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { NCard, NScrollbar, NSelect, NSwitch } from 'naive-ui'
 
 const app = useAppStore()
 const lc = useLcuConnectionStore()
+const au = useAutoUpdateStore()
 
 const closeStrategies = [
   { label: '最小化到托盘区', value: 'minimize-to-tray' },

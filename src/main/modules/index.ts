@@ -1,6 +1,7 @@
 import { LeagueAkariModuleManager } from '@main/akari-ipc/main-module-manager'
 
 import { appModule } from './akari-core/app'
+import { autoUpdateModule } from './akari-core/auto-update'
 import { auxWindowModule } from './akari-core/auxiliary-window'
 import { lcuConnectionModule } from './akari-core/lcu-connection'
 import { leagueClientModule } from './akari-core/league-client'
@@ -21,14 +22,18 @@ import { respawnTimerModule } from './respawn-timer'
 export const manager = new LeagueAkariModuleManager()
 
 export async function setupLeagueAkariModules() {
+  // core modules, must be registered first
   manager.use(logModule)
   manager.use(storageModule)
   manager.use(appModule)
   manager.use(winPlatformModule)
+  manager.use(autoUpdateModule)
   manager.use(leagueClientModule)
   manager.use(mainWindowModule)
   manager.use(auxWindowModule)
   manager.use(lcuConnectionModule)
+
+  // functionality modules
   manager.use(lcuSyncModule)
   manager.use(autoSelectModule)
   manager.use(autoGameflowModule)

@@ -7,8 +7,11 @@
     "src/renderer/src-auxiliary-window/**/*",
     "src/renderer/src-auxiliary-window/**/*.vue",
     "src/preload/*.d.ts",
-    "src/shared/**/*"
-, "src/shared/external-data-source/normalized/champ-builds.ts", "src/shared/external-data-source/normalized/champ-balance.ts", "src/main/akari-ipc"  ],
+    "src/shared/**/*",
+    "src/shared/external-data-source/normalized/champ-builds.ts",
+    "src/shared/external-data-source/normalized/champ-balance.ts",
+    "examples/ayano"
+  ],
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],

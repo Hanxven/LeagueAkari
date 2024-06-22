@@ -1,5 +1,5 @@
 import SendInputWorker from '@main/workers/send-input?nodeWorker'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { Menu, MenuItem, Notification, Tray, app } from 'electron'
 import { GlobalKeyboardListener } from 'node-global-key-listener'
 import { randomUUID } from 'node:crypto'
@@ -12,7 +12,7 @@ import { AuxWindowModule } from './auxiliary-window'
 import { AppLogger, LogModule } from './log'
 import { MainWindowModule } from './main-window'
 
-export class PlatformModule extends MobxBasedModule {
+export class PlatformModule extends MobxBasedBasicModule {
   private _worker: null | Worker = null
   private _gkl: GlobalKeyboardListener | null = null
 

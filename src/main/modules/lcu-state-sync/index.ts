@@ -20,7 +20,7 @@ import { getBallot } from '@main/http-api/honor-v2'
 import { getLobby } from '@main/http-api/lobby'
 import { getLoginQueueState } from '@main/http-api/login'
 import { getCurrentSummoner } from '@main/http-api/summoner'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { ChampSelectSummoner } from '@shared/types/lcu/champ-select'
 import { Conversation } from '@shared/types/lcu/chat'
 import { LcuEvent } from '@shared/types/lcu/event'
@@ -43,7 +43,7 @@ import { LoginState } from './login'
 import { MatchmakingState } from './matchmaking'
 import { SummonerState } from './summoner'
 
-export class LcuSyncModule extends MobxBasedModule {
+export class LcuSyncModule extends MobxBasedBasicModule {
   public gameflow = new GameflowState()
   public chat = new ChatState()
   public honor = new HonorState()

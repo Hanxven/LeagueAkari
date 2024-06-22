@@ -27,6 +27,7 @@
               <NSelect
                 placeholder="队列"
                 size="small"
+                :render-label="renderLabel"
                 class="type-select"
                 :disabled="tab.loading.isLoadingMatchHistory"
                 :options="queueOptions"
@@ -158,7 +159,10 @@
           :key="g.game.gameId"
         />
       </div>
-      <div v-if="tab.loading.isLoadingMatchHistory" class="match-history-empty">
+      <div
+        v-if="filteredGameCount === 0 && tab.loading.isLoadingMatchHistory"
+        class="match-history-empty"
+      >
         <NCard size="small">加载中</NCard>
       </div>
       <div v-else-if="tab.matchHistory.isEmpty" class="match-history-empty">
@@ -182,8 +186,8 @@ import { Dice as DiceIcon } from '@vicons/ionicons5'
 import { createReusableTemplate, useDebounce, useScroll } from '@vueuse/core'
 import { useMagicKeys, whenever } from '@vueuse/core'
 import dayjs from 'dayjs'
-import { NButton, NCard, NIcon, NInputNumber, NSelect, NSkeleton } from 'naive-ui'
-import { computed, nextTick, onActivated, ref, watch, watchEffect } from 'vue'
+import { NButton, NCard, NIcon, NInputNumber, NSelect, NSkeleton, SelectOption } from 'naive-ui'
+import { VNodeChild, computed, h, nextTick, onActivated, ref, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
@@ -294,16 +298,33 @@ const queueOptions = [
   }
 ]
 
+const currentPageGameTypes = computed(() => {
+  const types = new Set<number>()
+  types.add(-1)
+  for (const g of props.tab.matchHistory.games) {
+    types.add(g.game.queueId)
+  }
+  return types
+})
+
+const renderLabel = (option: SelectOption): VNodeChild => {
+  if (currentPageGameTypes.value.has(option.value as number)) {
+    return option.label as string
+  } else {
+    return h(
+      'span',
+      { style: 'color: #999', title: `本页无 ${option.label} 对局` },
+      option.label as string
+    )
+  }
+}
+
 const filteredGameCount = computed(() => {
   return props.tab.matchHistory.games.filter(
     (g) =>
       g.game.queueId === props.tab.matchHistory.queueFilter ||
       props.tab.matchHistory.queueFilter === -1
   ).length
-})
-
-watchEffect(() => {
-  console.log(props.tab.matchHistory.games.map((g) => g.game))
 })
 
 const { Ctrl_Left, Ctrl_Right } = useMagicKeys()

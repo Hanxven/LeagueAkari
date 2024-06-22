@@ -1,4 +1,4 @@
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { makeAutoObservable, observable } from 'mobx'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
@@ -6,7 +6,6 @@ import { queryLcuAuth, queryLcuAuthNative } from '../../utils/lcu-auth'
 import { AppModule } from './app'
 import { LcuConnectionModule } from './lcu-connection'
 import { AppLogger, LogModule } from './log'
-import { StorageModule } from './storage'
 
 class LcuClientSettings {
   /**
@@ -31,11 +30,10 @@ class LcuClientSettings {
   }
 }
 
-export class LcuClientModule extends MobxBasedModule {
+export class LcuClientModule extends MobxBasedBasicModule {
   public settings = new LcuClientSettings()
 
   private _logger: AppLogger
-  private _storageModule: StorageModule
   private _appModule: AppModule
   private _lcm: LcuConnectionModule
 
@@ -49,7 +47,6 @@ export class LcuClientModule extends MobxBasedModule {
     await super.setup()
 
     this._logger = this.manager.getModule<LogModule>('log').createLogger('league-client')
-    this._storageModule = this.manager.getModule('storage')
     this._appModule = this.manager.getModule('app')
     this._lcm = this.manager.getModule('lcu-connection')
 
@@ -62,7 +59,7 @@ export class LcuClientModule extends MobxBasedModule {
 
   private async _loadSettings() {
     this.settings.setFixWindowMethodsAOptions(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'league-client-ux/fix-window-method-a-options',
         this.settings.fixWindowMethodAOptions
       )
@@ -101,7 +98,7 @@ export class LcuClientModule extends MobxBasedModule {
 
     this.onCall('set-setting/fix-window-method-a-options', async (option) => {
       this.settings.setFixWindowMethodsAOptions(option)
-      await this._storageModule.settings.set('league-client-ux/fix-window-method-a-options', option)
+      await this._sm.settings.set('league-client-ux/fix-window-method-a-options', option)
     })
 
     this.onCall('get-launched-clients', async () => {

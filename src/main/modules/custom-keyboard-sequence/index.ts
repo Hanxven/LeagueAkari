@@ -1,19 +1,17 @@
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { sleep } from '@shared/utils/sleep'
 
 import { AppLogger, LogModule } from '../akari-core/log'
 import { PlatformModule } from '../akari-core/platform'
-import { StorageModule } from '../akari-core/storage'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { CustomKeyboardSequenceState } from './state'
 
-export class CustomKeyboardSequenceModule extends MobxBasedModule {
+export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
   public state = new CustomKeyboardSequenceState()
 
   private _isSending = false
 
   private _logger: AppLogger
-  private _storageModule: StorageModule
   private _pm: PlatformModule
   private _lcu: LcuSyncModule
 
@@ -25,7 +23,6 @@ export class CustomKeyboardSequenceModule extends MobxBasedModule {
     await super.setup()
 
     this._logger = this.manager.getModule<LogModule>('log').createLogger('log')
-    this._storageModule = this.manager.getModule('storage')
     this._pm = this.manager.getModule('win-platform')
     this._lcu = this.manager.getModule('lcu-state-sync')
 
@@ -96,28 +93,22 @@ export class CustomKeyboardSequenceModule extends MobxBasedModule {
   private _setupMethodCall() {
     this.onCall('set-setting/enabled', async (enabled) => {
       this.state.settings.setEnabled(enabled)
-      await this._storageModule.settings.set('custom-keyboard-sequence/enabled', enabled)
+      await this._sm.settings.set('custom-keyboard-sequence/enabled', enabled)
     })
 
     this.onCall('set-setting/text', async (text) => {
       this.state.settings.setText(text)
-      await this._storageModule.settings.set('custom-keyboard-sequence/text', text)
+      await this._sm.settings.set('custom-keyboard-sequence/text', text)
     })
   }
 
   private async _loadSettings() {
     this.state.settings.setEnabled(
-      await this._storageModule.settings.get(
-        'custom-keyboard-sequence/enabled',
-        this.state.settings.enabled
-      )
+      await this._sm.settings.get('custom-keyboard-sequence/enabled', this.state.settings.enabled)
     )
 
     this.state.settings.setText(
-      await this._storageModule.settings.get(
-        'custom-keyboard-sequence/text',
-        this.state.settings.text
-      )
+      await this._sm.settings.get('custom-keyboard-sequence/text', this.state.settings.text)
     )
   }
 }

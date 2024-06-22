@@ -1,10 +1,10 @@
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
 import { AppLogger, LogModule } from '../akari-core/log'
 import { DebugState } from './state'
 
-export class DebugModule extends MobxBasedModule {
+export class DebugModule extends MobxBasedBasicModule {
   public state = new DebugState()
 
   private _logger: AppLogger

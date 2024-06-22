@@ -1,22 +1,20 @@
 import { action, benchSwap, pickOrBan } from '@main/http-api/champ-select'
 import { chatSend } from '@main/http-api/chat'
-import { MobxBasedModule } from '@main/akari-ipc/mobx-based-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
 
 import { AppLogger, LogModule } from '../akari-core/log'
 import { MainWindowModule } from '../akari-core/main-window'
-import { StorageModule } from '../akari-core/storage'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { AutoSelectState } from './state'
 
-export class AutoSelectModule extends MobxBasedModule {
+export class AutoSelectModule extends MobxBasedBasicModule {
   public state = new AutoSelectState()
 
   private _grabTimerId: NodeJS.Timeout | null = null
 
   private _logger: AppLogger
-  private _storageModule: StorageModule
   private _lcu: LcuSyncModule
   private _mwm: MainWindowModule
 
@@ -28,7 +26,6 @@ export class AutoSelectModule extends MobxBasedModule {
     await super.setup()
 
     this._logger = this.manager.getModule<LogModule>('log').createLogger('auto-select')
-    this._storageModule = this.manager.getModule('storage')
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._mwm = this.manager.getModule('main-window')
 
@@ -383,142 +380,142 @@ export class AutoSelectModule extends MobxBasedModule {
   private _setupMethodCall() {
     this.onCall('set-setting/normal-mode-enabled', async (enabled) => {
       this.state.settings.setNormalModeEnabled(enabled)
-      await this._storageModule.settings.set('auto-select/normal-mode-enabled', enabled)
+      await this._sm.settings.set('auto-select/normal-mode-enabled', enabled)
     })
 
     this.onCall('set-setting/only-simul-mode', async (enabled) => {
       this.state.settings.setOnlySimulMode(enabled)
-      await this._storageModule.settings.set('auto-select/only-simul-mode', enabled)
+      await this._sm.settings.set('auto-select/only-simul-mode', enabled)
     })
 
     this.onCall('set-setting/expected-champions', async (champions) => {
       this.state.settings.setExpectedChampions(champions)
-      await this._storageModule.settings.set('auto-select/expected-champions', champions)
+      await this._sm.settings.set('auto-select/expected-champions', champions)
     })
 
     this.onCall('set-setting/select-teammate-intended-champion', async (enabled) => {
       this.state.settings.setSelectTeammateIntendedChampion(enabled)
-      await this._storageModule.settings.set('auto-select/select-teammate-intended-champion', enabled)
+      await this._sm.settings.set('auto-select/select-teammate-intended-champion', enabled)
     })
 
     this.onCall('set-setting/show-intent', async (enabled) => {
       this.state.settings.setShowIntent(enabled)
-      await this._storageModule.settings.set('auto-select/show-intent', enabled)
+      await this._sm.settings.set('auto-select/show-intent', enabled)
     })
 
     this.onCall('set-setting/completed', async (enabled) => {
       this.state.settings.setCompleted(enabled)
-      await this._storageModule.settings.set('auto-select/completed', enabled)
+      await this._sm.settings.set('auto-select/completed', enabled)
     })
 
     this.onCall('set-setting/bench-mode-enabled', async (enabled) => {
       this.state.settings.setBenchModeEnabled(enabled)
-      await this._storageModule.settings.set('auto-select/bench-mode-enabled', enabled)
+      await this._sm.settings.set('auto-select/bench-mode-enabled', enabled)
     })
 
     this.onCall('set-setting/bench-expected-champions', async (champions) => {
       this.state.settings.setBenchExpectedChampions(champions)
-      await this._storageModule.settings.set('auto-select/bench-expected-champions', champions)
+      await this._sm.settings.set('auto-select/bench-expected-champions', champions)
     })
 
     this.onCall('set-setting/grab-delay-seconds', async (seconds) => {
       this.state.settings.setGrabDelaySeconds(seconds)
-      await this._storageModule.settings.set('auto-select/grab-delay-seconds', seconds)
+      await this._sm.settings.set('auto-select/grab-delay-seconds', seconds)
     })
 
     this.onCall('set-setting/ban-enabled', async (enabled) => {
       this.state.settings.setBanEnabled(enabled)
-      await this._storageModule.settings.set('auto-select/ban-enabled', enabled)
+      await this._sm.settings.set('auto-select/ban-enabled', enabled)
     })
 
     this.onCall('set-setting/banned-champions', async (champions) => {
       this.state.settings.setBannedChampions(champions)
-      await this._storageModule.settings.set('auto-select/banned-champions', champions)
+      await this._sm.settings.set('auto-select/banned-champions', champions)
     })
 
     this.onCall('set-setting/ban-teammate-intended-champion', async (enabled) => {
       this.state.settings.setBanTeammateIntendedChampion(enabled)
-      await this._storageModule.settings.set('auto-select/ban-teammate-intended-champion', enabled)
+      await this._sm.settings.set('auto-select/ban-teammate-intended-champion', enabled)
     })
   }
 
   private async _loadSettings() {
     this.state.settings.setNormalModeEnabled(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/normal-mode-enabled',
         this.state.settings.normalModeEnabled
       )
     )
 
     this.state.settings.setOnlySimulMode(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/only-simul-mode',
         this.state.settings.onlySimulMode
       )
     )
 
     this.state.settings.setExpectedChampions(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/expected-champions',
         this.state.settings.expectedChampions
       )
     )
 
     this.state.settings.setSelectTeammateIntendedChampion(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/select-teammate-intended-champion',
         this.state.settings.selectTeammateIntendedChampion
       )
     )
 
     this.state.settings.setShowIntent(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/show-intent',
         this.state.settings.showIntent
       )
     )
 
     this.state.settings.setCompleted(
-      await this._storageModule.settings.get('auto-select/completed', this.state.settings.completed)
+      await this._sm.settings.get('auto-select/completed', this.state.settings.completed)
     )
 
     this.state.settings.setBenchModeEnabled(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/bench-mode-enabled',
         this.state.settings.benchModeEnabled
       )
     )
 
     this.state.settings.setBenchExpectedChampions(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/bench-expected-champions',
         this.state.settings.benchExpectedChampions
       )
     )
 
     this.state.settings.setGrabDelaySeconds(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/grab-delay-seconds',
         this.state.settings.grabDelaySeconds
       )
     )
 
     this.state.settings.setBanEnabled(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/ban-enabled',
         this.state.settings.banEnabled
       )
     )
 
     this.state.settings.setBannedChampions(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/banned-champions',
         this.state.settings.bannedChampions
       )
     )
 
     this.state.settings.setBanTeammateIntendedChampion(
-      await this._storageModule.settings.get(
+      await this._sm.settings.get(
         'auto-select/ban-teammate-intended-champion',
         this.state.settings.banTeammateIntendedChampion
       )

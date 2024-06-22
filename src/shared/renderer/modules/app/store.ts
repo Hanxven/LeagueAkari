@@ -22,15 +22,8 @@ export interface TitleBarTask {
 export const useAppStore = defineStore('core:app', () => {
   const isAdministrator = ref(false)
   const version = ref('0.0.0')
-  const updates = ref({
-    isCheckingUpdates: false,
-    lastCheckAt: null as Date | null,
-    newUpdates: null as NewUpdates | null
-  })
-
   const settings = reactive({
     useWmic: false,
-    autoCheckUpdates: false,
     showFreeSoftwareDeclaration: false,
     closeStrategy: 'unset' as MainWindowCloseStrategy,
     isInKyokoMode: false
@@ -41,7 +34,6 @@ export const useAppStore = defineStore('core:app', () => {
   return {
     isAdministrator,
     version,
-    updates,
     settings,
     titleBarTasks
   }

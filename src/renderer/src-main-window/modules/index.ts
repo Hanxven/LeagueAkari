@@ -3,12 +3,13 @@ import { appRendererModule } from '@shared/renderer/modules/app'
 import { autoGameflowRendererModule } from '@shared/renderer/modules/auto-gameflow'
 import { autoReplyRendererModule } from '@shared/renderer/modules/auto-reply'
 import { autoSelectRendererModule } from '@shared/renderer/modules/auto-select'
+import { autoUpdateRendererModule } from '@shared/renderer/modules/auto-update'
 import { auxiliaryWindowRendererModule } from '@shared/renderer/modules/auxiliary-window'
 import { coreFunctionalityRendererModule } from '@shared/renderer/modules/core-functionality'
 import { customKeyboardSequenceRendererModule } from '@shared/renderer/modules/custom-keyboard-sequence'
-import { leagueClientRendererModule } from '@shared/renderer/modules/league-client'
 import { lcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection'
 import { lcuSyncRendererModule } from '@shared/renderer/modules/lcu-state-sync'
+import { leagueClientRendererModule } from '@shared/renderer/modules/league-client'
 import { mainWindowRendererModule } from '@shared/renderer/modules/main-window'
 import { respawnTimerRendererModule } from '@shared/renderer/modules/respawn-timer'
 import { storageRendererModule } from '@shared/renderer/modules/storage'
@@ -20,6 +21,7 @@ const manager = new LeagueAkariRendererModuleManager()
 
 export async function setupLeagueAkariRendererModules() {
   manager.use(appRendererModule)
+  manager.use(autoUpdateRendererModule)
   manager.use(lcuSyncRendererModule)
   manager.use(autoGameflowRendererModule)
   manager.use(coreFunctionalityRendererModule)
