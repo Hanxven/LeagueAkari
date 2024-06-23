@@ -6,7 +6,7 @@
     v-model:show="show"
     :class="styles['settings-modal']"
   >
-    <template #header><span class="card-header-title">发现更新</span></template>
+    <template #header><span class="card-header-title">新版本</span></template>
     <div v-if="au.newUpdates">
       <div class="para">
         新版本可用：{{ au.newUpdates.version }} (当前版本：{{ au.newUpdates.currentVersion }})

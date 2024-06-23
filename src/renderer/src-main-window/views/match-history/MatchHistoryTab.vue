@@ -272,6 +272,10 @@ const queueOptions = [
     value: 420
   },
   {
+    label: '匹配',
+    value: 430
+  },
+  {
     label: '灵活排位',
     value: 440
   },

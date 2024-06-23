@@ -16,6 +16,7 @@ import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
 import { useKeyboardCombo } from '@shared/renderer/compositions/useKeyboardCombo'
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
+import { autoUpdateRendererModule as aum } from '@shared/renderer/modules/auto-update'
 import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
@@ -105,6 +106,22 @@ useKeyboardCombo(KYOKO_MODE_KEY_SEQUENCE, {
       title: 'League Akari 测试模式',
       content: 'Kyoko Mode, on!',
       duration: 6000
+    })
+  },
+  requireSameEl: true,
+  caseSensitive: false,
+  maxInterval: 500
+})
+
+// 仅用于测试自动更新相关模块
+useKeyboardCombo('AYANO', {
+  onFinish: () => {
+    aum.test()
+
+    notification.info({
+      title: 'League Akari 测试模式',
+      content: '手动开启了一次更新测试',
+      duration: 4000
     })
   },
   requireSameEl: true,

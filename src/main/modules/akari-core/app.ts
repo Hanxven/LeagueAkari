@@ -196,6 +196,13 @@ export class AppModule extends MobxBasedBasicModule {
     this._quitTasks.push(fn)
   }
 
+  removeQuitTask(fn: () => Promise<void> | void) {
+    const index = this._quitTasks.indexOf(fn)
+    if (index !== -1) {
+      this._quitTasks.splice(index, 1)
+    }
+  }
+
   private async _initializeApp() {
     this.state.setElevated(toolkit.isElevated())
 
@@ -241,64 +248,6 @@ export class AppModule extends MobxBasedBasicModule {
     app.on('browser-window-created', (_, window) => {
       optimizer.watchWindowShortcuts(window)
     })
-  }
-
-  private async _checkUpdates() {
-    if (this.state.updates.isCheckingUpdates) {
-      return
-    }
-
-    runInAction(() => {
-      this.state.updates.isCheckingUpdates = true
-      this.state.updates.lastCheckAt = new Date()
-    })
-
-    try {
-      const { data } = await axios.get<GithubApiLatestRelease>(
-        LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL
-      )
-      const currentVersion = app.getVersion()
-      const versionString = data.tag_name
-
-      // new version found
-      if (lt(currentVersion, versionString)) {
-        const archiveFile = data.assets.find((a) => {
-          return a.content_type === 'application/x-compressed'
-        })
-
-        runInAction(() => {
-          this.state.updates.newUpdates = {
-            currentVersion,
-            description: data.body,
-            downloadUrl: archiveFile ? archiveFile.browser_download_url : '',
-            version: versionString,
-            pageUrl: data.html_url
-          }
-        })
-
-        this._logger.info(
-          `检查到更新版本, 当前 ${currentVersion}, Github ${versionString}, 归档包 ${JSON.stringify(archiveFile)}`
-        )
-      } else {
-        runInAction(() => {
-          this.state.updates.newUpdates = null
-        })
-        if (gt(currentVersion, versionString)) {
-          this._mwm.notify.success('app', '检查更新', `该版本高于发布版本 (${currentVersion})`)
-          this._logger.info(`该版本高于发布版本, 当前 ${currentVersion}, Github ${versionString}`)
-        } else {
-          this._mwm.notify.success('app', '检查更新', `目前是最新版本 (${currentVersion})`)
-          this._logger.info(`目前是最新版本, 当前 ${currentVersion}, Github ${versionString}`)
-        }
-      }
-    } catch (error) {
-      this._mwm.notify.warn('app', '检查更新', `当前检查更新失败 ${(error as Error).message}`)
-      this._logger.warn(`尝试检查更新失败 ${formatError(error)}`)
-    } finally {
-      runInAction(() => {
-        this.state.updates.isCheckingUpdates = false
-      })
-    }
   }
 
   private _setupStateSync() {
@@ -349,10 +298,6 @@ export class AppModule extends MobxBasedBasicModule {
     this.onCall('set-setting/is-in-kyoko-mode', async (b) => {
       this.state.settings.setInKyokoMode(b)
       await this._sm.settings.set('app/is-in-kyoko-mode', b)
-    })
-
-    this.onCall('check-update', async () => {
-      await this._checkUpdates()
     })
 
     this.onCall('migrate-settings-from-legacy-version', async (all: Record<string, string>) => {

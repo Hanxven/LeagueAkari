@@ -16,6 +16,20 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        label="更新源"
+        label-description="检查更新或下载更新时所使用的源"
+        :label-width="320"
+      >
+        <NSelect
+          style="width: 160px"
+          size="tiny"
+          :value="au.settings.downloadSource"
+          @update:value="(val) => aum.setDownloadSource(val)"
+          :options="updateDownloadSource"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         label="自动连接"
         label-description="存在唯一的客户端时，则自动连接该客户端"
         :label-width="320"
@@ -74,6 +88,11 @@ const closeStrategies = [
   { label: '最小化到托盘区', value: 'minimize-to-tray' },
   { label: '退出程序', value: 'quit' },
   { label: '每次询问', value: 'unset' }
+]
+
+const updateDownloadSource = [
+  { label: 'Gitee', value: 'gitee' },
+  { label: 'Github', value: 'github' }
 ]
 </script>
 

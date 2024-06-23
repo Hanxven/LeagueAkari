@@ -16,7 +16,6 @@ export class LcuConnectionRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useLcuConnectionStore()
 
-    // TODO MIGRATE
     this.simpleSync('settings/auto-connect', (s) => (store.settings.autoConnect = s))
     this.simpleSync('state', (s) => (store.state = s))
     this.simpleSync('auth', (a) => (store.auth = a))

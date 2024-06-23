@@ -1390,6 +1390,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node-7z@npm:^2.1.8":
+  version: 2.1.8
+  resolution: "@types/node-7z@npm:2.1.8"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/a0e62d55aac8379954c35d25aac25a5229ba8fe1aa6642006a70537e45a41f648fde010d5687a480009b8e79fba8ebd9c19edf1884222d6f131dfd6841a77470
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*, @types/node@npm:^20.9.0":
   version: 20.12.4
   resolution: "@types/node@npm:20.12.4"
@@ -2590,6 +2599,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"debug@npm:^4.3.2":
+  version: 4.3.5
+  resolution: "debug@npm:4.3.5"
+  dependencies:
+    ms: "npm:2.1.2"
+  peerDependenciesMeta:
+    supports-color:
+      optional: true
+  checksum: 10c0/082c375a2bdc4f4469c99f325ff458adad62a3fc2c482d59923c260cb08152f34e2659f72b3767db8bb2f21ca81a60a42d1019605a412132d7b9f59363a005cc
+  languageName: node
+  linkType: hard
+
 "decompress-response@npm:^6.0.0":
   version: 6.0.0
   resolution: "decompress-response@npm:6.0.0"
@@ -2792,7 +2813,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-vite@npm:2.2.0":
+"electron-vite@npm:^2.2.0":
   version: 2.2.0
   resolution: "electron-vite@npm:2.2.0"
   dependencies:
@@ -2814,16 +2835,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^30.0.6":
-  version: 30.0.6
-  resolution: "electron@npm:30.0.6"
+"electron@npm:^31.0.2":
+  version: 31.0.2
+  resolution: "electron@npm:31.0.2"
   dependencies:
     "@electron/get": "npm:^2.0.0"
     "@types/node": "npm:^20.9.0"
     extract-zip: "npm:^2.0.1"
   bin:
     electron: cli.js
-  checksum: 10c0/92cc9a5013774f3b69c44fc964096e5de4217e297cd5d16cfd1654690d725c6d5acb1111d5637216ee3e12ee814336808208acbc24460d6bd2ac160be41443d1
+  checksum: 10c0/fb488dd160036771d44c452e63c43d2199597c5e4fa45c7a9a7864f381acf86246c37a865b1cf7a1ce428b738e794dc70aea5d864efde621055b5e2d00ca7157
   languageName: node
   linkType: hard
 
@@ -3961,6 +3982,7 @@ __metadata:
     "@types/luaparse": "npm:^0.2.12"
     "@types/markdown-it": "npm:^14.1.1"
     "@types/node": "npm:^20.12.12"
+    "@types/node-7z": "npm:^2.1.8"
     "@types/semver": "npm:^7.5.8"
     "@types/ws": "npm:^8.5.10"
     "@vicons/carbon": "npm:^0.12.0"
@@ -3972,15 +3994,16 @@ __metadata:
     axios: "npm:^1.7.2"
     dayjs: "npm:^1.11.11"
     deep-eql: "npm:^5.0.1"
-    electron: "npm:^30.0.6"
+    electron: "npm:^31.0.2"
     electron-builder: "npm:^24.13.3"
-    electron-vite: "npm:2.2.0"
+    electron-vite: "npm:^2.2.0"
     less: "npm:^4.2.0"
     lodash: "npm:^4.17.21"
     luaparse: "npm:^0.3.1"
     markdown-it: "npm:^14.1.0"
     mobx: "npm:^6.12.3"
     naive-ui: "npm:^2.38.2"
+    node-7z: "npm:^3.0.0"
     node-global-key-listener: "npm:0.1.1"
     p-queue: "npm:^8.0.1"
     pinia: "npm:^2.1.7"
@@ -4049,6 +4072,41 @@ __metadata:
   version: 4.17.21
   resolution: "lodash-es@npm:4.17.21"
   checksum: 10c0/fb407355f7e6cd523a9383e76e6b455321f0f153a6c9625e21a8827d10c54c2a2341bd2ae8d034358b60e07325e1330c14c224ff582d04612a46a4f0479ff2f2
+  languageName: node
+  linkType: hard
+
+"lodash.defaultsdeep@npm:^4.6.1":
+  version: 4.6.1
+  resolution: "lodash.defaultsdeep@npm:4.6.1"
+  checksum: 10c0/0031ca3055d5482fc2e9b55d0ee174a3e956039996fac52dbe94ca67eb50bb72ffc75d0eb86bcc782fefc597ebbc1798df941f27382bec23138e53180427700b
+  languageName: node
+  linkType: hard
+
+"lodash.defaultto@npm:^4.14.0":
+  version: 4.14.0
+  resolution: "lodash.defaultto@npm:4.14.0"
+  checksum: 10c0/80aef37f264081b7c669db289641bfcf12c0ec91140615169753ec5bb128c452a7cc34671ace28d9b477c0822b16e07fbe3eb572a1c2d8a7848058642f7ea02f
+  languageName: node
+  linkType: hard
+
+"lodash.flattendeep@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "lodash.flattendeep@npm:4.4.0"
+  checksum: 10c0/83cb80754b921fb4ed2c222b91a82b2524f3bdc60c3ae91e00688bd4bf1bcc28b8a2cc250e11fdc1b6da3a2de09e57008e13f15a209cafdd4f9163d047f97544
+  languageName: node
+  linkType: hard
+
+"lodash.isempty@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "lodash.isempty@npm:4.4.0"
+  checksum: 10c0/6c7eaa0802398736809b9e8aed8b8ac1abca9be71788fd719ba9d7f5b4c23e8dc63b7f049df4131713dda30a2fdedc2f655268e9deb8cd5a985dfc934afca194
+  languageName: node
+  linkType: hard
+
+"lodash.negate@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "lodash.negate@npm:3.0.2"
+  checksum: 10c0/f66cc83bf38dfcc427b246c12d79d506881ab1e3c812ff60af13c3c2d4d9bcff612b34cf7db54c4fd5ab1791c86d50ec8ab642d3d55ba5895ab0626e62eafb01
   languageName: node
   linkType: hard
 
@@ -4530,6 +4588,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-7z@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "node-7z@npm:3.0.0"
+  dependencies:
+    debug: "npm:^4.3.2"
+    lodash.defaultsdeep: "npm:^4.6.1"
+    lodash.defaultto: "npm:^4.14.0"
+    lodash.flattendeep: "npm:^4.4.0"
+    lodash.isempty: "npm:^4.4.0"
+    lodash.negate: "npm:^3.0.2"
+    normalize-path: "npm:^3.0.0"
+  checksum: 10c0/70c741ddca3cc7af32842b03dcf546cc89843e38c33686e0e8a25ba817b8e0ba80a6d8dddd5bdeb07468bf5c543c00ddb534871700e23306bbfeeb0e8e95d8ee
+  languageName: node
+  linkType: hard
+
 "node-addon-api@npm:^1.6.3":
   version: 1.7.2
   resolution: "node-addon-api@npm:1.7.2"
@@ -4637,6 +4710,13 @@ __metadata:
   bin:
     nopt: bin/nopt.js
   checksum: 10c0/9bd7198df6f16eb29ff16892c77bcf7f0cc41f9fb5c26280ac0def2cf8cf319f3b821b3af83eba0e74c85807cc430a16efe0db58fe6ae1f41e69519f585b6aff
+  languageName: node
+  linkType: hard
+
+"normalize-path@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "normalize-path@npm:3.0.0"
+  checksum: 10c0/e008c8142bcc335b5e38cf0d63cfd39d6cf2d97480af9abdbe9a439221fd4d749763bab492a8ee708ce7a194bb00c9da6d0a115018672310850489137b3da046
   languageName: node
   linkType: hard
 
