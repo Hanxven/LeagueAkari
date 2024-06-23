@@ -22,7 +22,7 @@
     <ControlItem
       label="回复内容"
       class="control-item-margin"
-      label-description="将作为自动回复的内容。注意避免敏感词"
+      label-description="将作为自动回复的内容词"
     >
       <NInput
         :status="ar.settings.text.length === 0 && ar.settings.enabled ? 'warning' : 'success'"

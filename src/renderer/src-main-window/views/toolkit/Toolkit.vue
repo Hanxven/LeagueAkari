@@ -10,15 +10,14 @@
           <LobbyTool class="tool" />
         </NTabPane>
         <NTabPane tab="杂项" name="miscellaneous">
-          <AvailabilityCheck class="tool" />
-          <SummonerBackground class="tool" />
+          <AvailabilityCheck class="tool" v-if="app.settings.isInKyokoMode" />
+          <SummonerProfile class="tool" />
           <Spectate class="tool" />
           <ChatAvailability class="tool" />
           <FakeRanked class="tool" />
           <ChatStatusMessage class="tool" />
           <GameView class="tool" />
           <CustomKeyboardSequence class="tool" />
-          <ChallengePlayerPreferences v-if="app.settings.isInKyokoMode" class="tool" />
         </NTabPane>
       </NTabs>
     </div>
@@ -32,7 +31,6 @@ import { NTabPane, NTabs } from 'naive-ui'
 import { ref } from 'vue'
 
 import AvailabilityCheck from './AvailabilityCheck.vue'
-import ChallengePlayerPreferences from './ChallengePlayerPreferences.vue'
 import ChampionBench from './ChampionBench.vue'
 import ChatAvailability from './ChatAvailability.vue'
 import ChatStatusMessage from './ChatStatusMessage.vue'
@@ -42,7 +40,7 @@ import GameView from './GameView.vue'
 import InProcess from './InProcess.vue'
 import LobbyTool from './LobbyTool.vue'
 import Spectate from './Spectate.vue'
-import SummonerBackground from './SummonerBackground.vue'
+import SummonerProfile from './SummonerProfile.vue'
 
 const app = useAppStore()
 

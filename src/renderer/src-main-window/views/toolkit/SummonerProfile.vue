@@ -1,6 +1,6 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">生涯背景替换</span></template>
+    <template #header><span class="card-header-title">召唤师 Profile</span></template>
     <NModal
       style="max-width: 560px"
       preset="card"
@@ -52,19 +52,62 @@
         >选择</NButton
       >
     </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="切换为上赛季旗帜"
+      label-description="锁定为上赛季旗帜"
+    >
+      <NButton
+        :disabled="lc.state !== 'connected'"
+        @click="handleUpdatePr"
+        :loading="isUpdating"
+        size="tiny"
+        >执行</NButton
+      >
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      :label-description="
+        summoner.me && summoner.me?.summonerLevel <= MINIMUM_SUMMONER_LEVEL_FOR_PRESTIGE_CREST
+          ? '卸下头像框 (召唤师等级需大于等于 525)'
+          : '卸下头像框'
+      "
+      label="卸下头像框"
+    >
+      <NButton
+        :disabled="lc.state !== 'connected'"
+        @click="handleRemovePrestigeCrest"
+        :loading="isRemovingPrestigeCrest"
+        size="tiny"
+        >执行</NButton
+      >
+    </ControlItem>
+    <ControlItem class="control-item-margin" label-description="卸下所有勋章" label="卸下所有勋章">
+      <NButton
+        :disabled="lc.state !== 'connected'"
+        @click="handleRemoveTokens"
+        :loading="isRemovingTokens"
+        size="tiny"
+        >执行</NButton
+      >
+    </ControlItem>
   </NCard>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { updatePlayerPreferences } from '@shared/renderer/http-api/challenges'
+import { getMe } from '@shared/renderer/http-api/chat'
 import { getChampDetails } from '@shared/renderer/http-api/game-data'
+import { getRegalia, updateRegalia } from '@shared/renderer/http-api/regalia'
 import {
   setSummonerBackgroundAugments,
   setSummonerBackgroundSkin
 } from '@shared/renderer/http-api/summoner'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { ChampSkin } from '@shared/types/lcu/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
@@ -246,6 +289,76 @@ const handleApplyToProfile = async () => {
     message.warning('无法设置', { duration: 1000 })
   } finally {
     isProceeding.value = false
+  }
+}
+
+const BANNER_ACCENT_A = '2'
+
+const isUpdating = ref(false)
+const handleUpdatePr = async () => {
+  if (isUpdating.value) {
+    return
+  }
+
+  try {
+    isUpdating.value = true
+    await updatePlayerPreferences({ bannerAccent: BANNER_ACCENT_A })
+    message.success('请求成功')
+  } catch (error) {
+    message.warning('无法执行')
+    console.warn(error)
+  } finally {
+    isUpdating.value = false
+  }
+}
+
+const FIXED_PRESTIGE_CREST = 22
+const MINIMUM_SUMMONER_LEVEL_FOR_PRESTIGE_CREST = 525
+const isRemovingPrestigeCrest = ref(false)
+// Copied from Seraphine: https://github.com/Zzaphkiel/Seraphine
+const handleRemovePrestigeCrest = async () => {
+  if (isRemovingPrestigeCrest.value) {
+    return
+  }
+
+  try {
+    isRemovingPrestigeCrest.value = true
+    const current = await getRegalia()
+    await updateRegalia({
+      preferredCrestType: 'prestige',
+      preferredBannerType: current.data.bannerType,
+      selectedPrestigeCrest: FIXED_PRESTIGE_CREST
+    })
+    message.success('请求成功')
+  } catch (error) {
+    message.warning('无法执行')
+    console.warn(error)
+  } finally {
+    isRemovingPrestigeCrest.value = false
+  }
+}
+
+const summoner = useSummonerStore()
+
+const isRemovingTokens = ref(false)
+// Copied from Seraphine: https://github.com/Zzaphkiel/Seraphine
+const handleRemoveTokens = async () => {
+  if (isRemovingTokens.value) {
+    return
+  }
+
+  try {
+    isRemovingTokens.value = true
+    await updatePlayerPreferences({
+      challengeIds: [],
+      bannerAccent: (await getMe()).data.lol?.bannerIdSelected
+    })
+    message.success('请求成功')
+  } catch (error) {
+    message.warning('无法执行')
+    console.warn(error)
+  } finally {
+    isRemovingTokens.value = false
   }
 }
 </script>

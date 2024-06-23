@@ -19,7 +19,7 @@
           <template #trigger>
             <div
               :title="
-                lc.launchedClients.length === 0
+                lc.launchedClients.length === 0 && lc.state === 'disconnected'
                   ? '没有检测到已运行的客户端'
                   : '当前正在运行的英雄联盟客户端'
               "

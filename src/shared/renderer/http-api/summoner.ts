@@ -54,11 +54,11 @@ export function updateSummonerName(name: string) {
 }
 
 // 用于新的召唤师创建时，可以设置较长的名称
-export function newSummonerName(name: string) {
+export function newSummonerName(gameName: string, tagLine: string) {
   return request({
     url: '/lol-summoner/v1/summoners',
     method: 'POST',
-    data: { name }
+    data: { gameName, tagLine }
   })
 }
 

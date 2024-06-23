@@ -54,8 +54,8 @@
           ></div>
           <NIcon class="icon"><UpgradeFilledIcon /></NIcon>
           <span class="text"
-            >下载更新 {{ (au.updateProgressInfo.downloadingProgress * 100).toFixed() }} %</span
-          >
+            >下载更新 {{ (au.updateProgressInfo.downloadingProgress * 100).toFixed() }} %
+          </span>
         </template>
         <template v-else-if="au.updateProgressInfo.phase === 'unpacking'">
           <div

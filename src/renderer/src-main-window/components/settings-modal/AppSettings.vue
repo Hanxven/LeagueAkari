@@ -4,6 +4,23 @@
       <template #header><span class="card-header-title">基础</span></template>
       <ControlItem
         class="control-item-margin"
+        label="窗口关闭策略"
+        label-description="当关闭主窗口时所执行的行为"
+        :label-width="320"
+      >
+        <NSelect
+          style="width: 160px"
+          size="tiny"
+          :value="app.settings.closeStrategy"
+          @update:value="(val) => am.setCloseStrategy(val)"
+          :options="closeStrategies"
+        />
+      </ControlItem>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">应用更新</span></template>
+      <ControlItem
+        class="control-item-margin"
         label="自动检查更新"
         label-description="在应用启动时，自动从 Github 拉取最新版本信息"
         :label-width="320"
@@ -20,14 +37,30 @@
         label-description="检查更新或下载更新时所使用的源"
         :label-width="320"
       >
-        <NSelect
-          style="width: 160px"
-          size="tiny"
-          :value="au.settings.downloadSource"
-          @update:value="(val) => aum.setDownloadSource(val)"
-          :options="updateDownloadSource"
-        />
+        <NFlex align="center">
+          <NSelect
+            style="width: 160px"
+            size="tiny"
+            :value="au.settings.downloadSource"
+            @update:value="(val) => aum.setDownloadSource(val)"
+            :options="updateDownloadSource"
+          />
+          <NTooltip>
+            <template #trigger><div class="hover-text">如何选择?</div></template>
+            <div style="font-size: 12px">
+              <span style="display: inline-block; width: 44px; font-weight: bold">Gitee</span>
+              - 在中国大陆内拥有较好的响应速度
+            </div>
+            <div style="font-size: 12px">
+              <span style="display: inline-block; width: 44px; font-weight: bold">Github</span>
+              - 在中国大陆外拥有较好的响应速度
+            </div>
+          </NTooltip>
+        </NFlex>
       </ControlItem>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">LCU 连接</span></template>
       <ControlItem
         class="control-item-margin"
         label="自动连接"
@@ -38,20 +71,6 @@
           size="small"
           :value="lc.settings.autoConnect"
           @update:value="(val: boolean) => lcm.setAutoConnect(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        label="窗口关闭策略"
-        label-description="当关闭主窗口时所执行的行为"
-        :label-width="320"
-      >
-        <NSelect
-          style="width: 160px"
-          size="tiny"
-          :value="app.settings.closeStrategy"
-          @update:value="(val) => am.setCloseStrategy(val)"
-          :options="closeStrategies"
         />
       </ControlItem>
       <ControlItem
@@ -78,7 +97,7 @@ import { autoUpdateRendererModule as aum } from '@shared/renderer/modules/auto-u
 import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { NCard, NScrollbar, NSelect, NSwitch } from 'naive-ui'
+import { NButton, NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip } from 'naive-ui'
 
 const app = useAppStore()
 const lc = useLcuConnectionStore()
@@ -106,5 +125,16 @@ const updateDownloadSource = [
 .card-header-title {
   font-weight: bold;
   font-size: 18px;
+}
+
+.hover-text {
+  font-size: 12px;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #fff;
+  }
 }
 </style>

@@ -112,7 +112,7 @@ const newName = ref('')
 const popconfirmShow = ref(false)
 const handleCreateNewSummonerWithName = async () => {
   try {
-    await newSummonerName(newName.value)
+    await newSummonerName(newName.value, '')
     const messageInstance = message.success(
       () =>
         h('div', { style: { display: 'flex', gap: '4px', 'align-items': 'center' } }, [

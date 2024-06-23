@@ -5,7 +5,7 @@ import {
 } from '@shared/constants/common'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
-import axios from 'axios'
+import axios, { Axios, AxiosResponse } from 'axios'
 import { app } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
 import { extractFull } from 'node-7z'
@@ -169,7 +169,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
    * @param silent 静默检查更新，不会弹出通知
    * @returns
    */
-  private async _checkForUpdatesGiteeOrGithub(silent = true, debug = false) {
+  private async _checkForUpdatesGiteeOrGithub(silent = false, debug = false) {
     if (this.state.isCheckingUpdate) {
       return
     }
@@ -204,7 +204,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
         })
 
         this._logger.info(
-          `检查到更新版本, 当前 ${currentVersion}, Github ${versionString}, 归档包 ${JSON.stringify(archiveFile)}`
+          `检查到更新版本, 当前 ${currentVersion}, ${this.state.settings.downloadSource} ${versionString}, 归档包 ${JSON.stringify(archiveFile)}`
         )
 
         return archiveFile
@@ -215,12 +215,16 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
           if (!silent) {
             this._mwm.notify.success('app', '检查更新', `该版本高于发布版本 (${currentVersion})`)
           }
-          this._logger.info(`该版本高于发布版本, 当前 ${currentVersion}, Github ${versionString}`)
+          this._logger.info(
+            `该版本高于发布版本, 当前 ${currentVersion}, ${this.state.settings.downloadSource} ${versionString}`
+          )
         } else {
           if (!silent) {
             this._mwm.notify.success('app', '检查更新', `目前是最新版本 (${currentVersion})`)
           }
-          this._logger.info(`目前是最新版本, 当前 ${currentVersion}, Github ${versionString}`)
+          this._logger.info(
+            `目前是最新版本, 当前 ${currentVersion}, ${this.state.settings.downloadSource} ${versionString}`
+          )
         }
       }
     } catch (error) {
@@ -245,9 +249,17 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
       unpackingProgress: 0
     })
 
-    const resp = await this._http.get<Readable>(downloadUrl, {
-      responseType: 'stream'
-    })
+    let resp: AxiosResponse<Readable>
+    try {
+      resp = await this._http.get<Readable>(downloadUrl, {
+        responseType: 'stream'
+      })
+    } catch (error) {
+      this.state.setUpdateProgressInfo(null)
+      this._logger.warn(`下载更新包失败 ${formatError(error)}`)
+      this._mwm.notify.warn('app', '自动更新', '拉取更新包信息时发生错误')
+      throw error
+    }
 
     const totalLength = Number(resp.headers['content-length']) || -1
 
@@ -280,6 +292,10 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
         error.name = 'Canceled'
         resp.data.destroy(error)
         writer.close()
+
+        if (fs.existsSync(downloadPath)) {
+          fs.rmSync(downloadPath)
+        }
       }
 
       const _updateProgress = (nowTime: number) => {
@@ -318,13 +334,13 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
             this._mwm.notify.info('app', '更新', '取消下载更新包')
             this._logger.info(`取消下载更新包 ${downloadPath}`)
           } else {
-            this._mwm.notify.error('app', '更新', '下载或写入更新包文件失败')
-            this._logger.error(`下载或写入更新包文件失败 ${formatError(error)}`)
+            this._mwm.notify.warn('app', '更新', '下载或写入更新包文件失败')
+            this._logger.warn(`下载或写入更新包文件失败 ${formatError(error)}`)
           }
 
           reject(error)
         } else {
-          this._logger.error(`完成下载并写入：${downloadPath}`)
+          this._logger.info(`完成下载并写入：${downloadPath}`)
           resolve(downloadPath)
         }
 
@@ -521,6 +537,17 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
       fileSize: 0,
       unpackingProgress: 1
     })
+
+    this._currentUpdateTaskDisposer = () => {
+      if (fs.existsSync(scriptPath)) {
+        fs.rmSync(scriptPath)
+      }
+
+      this._am.removeQuitTask(_quitTask)
+      this._currentUpdateTaskDisposer = null
+      this._lastQuitTask = null
+      this.state.setUpdateProgressInfo(null)
+    }
   }
 
   private async _startUpdateProcess(archiveFileUrl: string, filename: string) {
@@ -532,6 +559,7 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
     try {
       downloadPath = await this._downloadUpdate(archiveFileUrl, filename)
     } catch (error) {
+      console.log('error1', error)
       return
     }
 
@@ -539,6 +567,7 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
     try {
       unpackedPath = await this._unpackDownloadedUpdate(downloadPath)
     } catch (error) {
+      console.log('error2', error)
       return
     }
 
@@ -598,7 +627,7 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
     })
 
     this.onCall('test-update', async () => {
-      const newVer = await this._checkForUpdatesGiteeOrGithub(true, true)
+      const newVer = await this._checkForUpdatesGiteeOrGithub(false, true)
       if (newVer) {
         await this._startUpdateProcess(newVer.browser_download_url, newVer.name)
       }
