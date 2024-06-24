@@ -129,8 +129,6 @@ export class AutoUpdateState {
 export class AutoUpdateModule extends MobxBasedBasicModule {
   public state = new AutoUpdateState()
 
-  private _http = axios.create()
-
   private _mwm: MainWindowModule
   private _am: AppModule
   private _logger: AppLogger
@@ -141,6 +139,14 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
   static DOWNLOAD_DIR_NAME = 'NewUpdates'
   static UPDATE_SCRIPT_NAME = 'LeagueAkariUpdate.ps1'
   static UPDATE_PROGRESS_UPDATE_INTERVAL = 200
+  static FAKE_USER_AGENT =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0'
+
+  private _http = axios.create({
+    headers: {
+      'User-Agent': AutoUpdateModule.FAKE_USER_AGENT
+    }
+  })
 
   static UPDATE_SOURCE = {
     gitee: LEAGUE_AKARI_GITEE_CHECK_UPDATES_URL,
@@ -254,6 +260,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
       resp = await this._http.get<Readable>(downloadUrl, {
         responseType: 'stream'
       })
+      this._logger.info(`已连接，正在下载更新包 from: ${downloadUrl}`)
     } catch (error) {
       this.state.setUpdateProgressInfo(null)
       this._logger.warn(`下载更新包失败 ${formatError(error)}`)
@@ -447,7 +454,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
     const appExePath = app.getPath('exe')
     const appDir = path.dirname(appExePath)
     const appDirParent = path.join(appDir, '..')
-    const newUpdateDirParent = path.basename(newUpdateDir)
+    const newUpdateDirParent = path.join(newUpdateDir, '..')
     const appDirName = path.basename(appDir)
 
     /**
@@ -475,7 +482,7 @@ function Get-RandomValidDirectoryName {
         [string]$targetDir
     )
     do {
-        $randomDirName = "D" + -join ((65..90) + (97..122) + (48..57) | Get-Random -Count 8 | % {[char]$_})
+        $randomDirName = "NEW_AKARI_" + -join ((65..90) + (97..122) + (48..57) | Get-Random -Count 8 | % {[char]$_})
         $newDirPath = Join-Path -Path $targetDir -ChildPath $randomDirName
     } while (Test-Path -Path $newDirPath)
     return $randomDirName
@@ -499,7 +506,7 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
 `
 
     this._logger.info(
-      `generatedPowershellScript=${generatedPowershellScript}, appDirName=${appDirName}, appDirParent=${appDirParent}, =newUpdateDir${newUpdateDir}, shouldStartNewApp=${shouldStartNewApp}, appExePath=${appExePath}, appDir=${appDir}, newUpdateDirParent=${newUpdateDirParent}`
+      `generatedPowershellScript=${generatedPowershellScript}, appDirName=${appDirName}, appDirParent=${appDirParent}, newUpdateDir=${newUpdateDir}, shouldStartNewApp=${shouldStartNewApp}, appExePath=${appExePath}, appDir=${appDir}, newUpdateDirParent=${newUpdateDirParent}`
     )
 
     const scriptPath = path.join(app.getPath('temp'), AutoUpdateModule.UPDATE_SCRIPT_NAME)
@@ -512,7 +519,7 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
       this._am.removeQuitTask(this._lastQuitTask)
     }
 
-    this._logger.info(`添加退出任务，执行更新脚本 ${scriptPath}`)
+    this._logger.info(`添加退出任务: 更新脚本 ${scriptPath}`)
 
     const _quitTask = () => {
       const c = cp.spawn(`powershell.exe`, ['-ExecutionPolicy', 'Bypass', '-File', scriptPath], {

@@ -39,6 +39,7 @@ app.whenReady().then(async () => {
   appModule.state.setReady(true)
 
   try {
+    logger.info(`League Akari ${app.getVersion()}`)
     await setupLeagueAkariModules()
     mainWindowModule.createWindow()
   } catch (e) {

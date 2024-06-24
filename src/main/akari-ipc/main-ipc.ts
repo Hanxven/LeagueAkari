@@ -13,6 +13,9 @@ export interface IpcMainErrorDataType<T = any> {
 
 export type IpcMainDataType<T = any> = IpcMainSuccessDataType<T> | IpcMainErrorDataType<T>
 
+/**
+ * 静态类，用于处理主进程与渲染进程之间的 IPC 通信数据格式
+ */
 export class LeagueAkariIpc {
   static sendEvent(webContent: WebContents, eventName: string, ...args: any[]) {
     webContent.send(`event:${eventName}`, ...args)

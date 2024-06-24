@@ -17,7 +17,7 @@ export class LeagueAkariModuleManager {
   private _ipcMainDisposers = new Set<Function>()
 
   /**
-   * 将一个模块注册到 manager 中
+   * 将一个模块注册到 manager 中，模块则可通过 manager 获取其他模块
    */
   use(module: LeagueAkariModule) {
     if (this._modules.has(module.id)) {
@@ -41,6 +41,11 @@ export class LeagueAkariModuleManager {
     throw new Error(`No module of ID ${moduleId}`)
   }
 
+  /**
+   * 检查是否存在指定 ID 的模块
+   * @param moduleId 模块 ID
+   * @returns
+   */
   hasModule(moduleId: string) {
     return this._modules.has(moduleId)
   }
@@ -104,6 +109,12 @@ export class LeagueAkariModuleManager {
     this._ipcMainDisposers.clear()
   }
 
+  /**
+   * 向指定模块发送事件
+   * @param moduleId 模块 ID
+   * @param eventName 事件名
+   * @param args 事件参数
+   */
   sendEvent(moduleId: string, eventName: string, ...args: any[]) {
     this._modules
       .get(moduleId)

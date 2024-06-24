@@ -9,14 +9,12 @@ import { LeagueAkariModule } from '../akari-module'
 type SimpleStateGetter = () => any
 
 /**
- * 返回值用于接管默认的更新方式，设置为 true 将不会自动更新设置
+ * 返回值用于接管默认的更新方式，设置为 truthy 将不会自动更新设置
  */
 type SimpleStateSetter = (value: any, s: SettingService) => boolean | void | undefined
 
 /**
- * 实现了一些基于 Mobx 的简单状态管理封装
- *
- * 以及常用的功能集成
+ * 实现了一些基于 Mobx 的简单状态管理封装，该模块依赖于 `storage` 模块。
  */
 export class MobxBasedBasicModule extends LeagueAkariModule {
   protected _disposers = new Set<Function>()
@@ -53,7 +51,7 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
   }
 
   /**
-   * 使用 mobx 监听一个简单资源的变化，并在变化时推送更新
+   * 使用 mobx 监听一个简单资源的变化，并在变化时推送更新，要求这个资源是一个可序列化的对象。
    * @param resName 资源名称
    * @param getter 资源 getter
    */
@@ -65,10 +63,10 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
   }
 
   /**
-   * 简易的设置状态同步。默认值为 getter()，并在设置时推送更新
+   * 简易的设置状态同步。默认值为 getter()，并在设置时推送更新。会在被 setup 时从存储模块中读取设置。
    * @param settingName 该模块的设置项目
    * @param getter 设置状态量的 getter
-   * @param setter 设置状态量的 setter
+   * @param setter 设置状态量的 setter，默认会将值设置到 SettingService 中，如果 setter 返回 true，则不会设置到 SettingService，可以用于自定义设置行为
    */
   simpleSettingSync(settingName: string, getter: SimpleStateGetter, setter: SimpleStateSetter) {
     const _wrappedSetter = async (value: any) => {

@@ -19,7 +19,7 @@ export class LeagueAkariRendererModule {
   }
 
   /**
-   * 是否仅在渲染进程中运行，意味着不会与主进程通信
+   * 是否仅在渲染进程中运行，意味着不会与主进程通信，适用于纯渲染进程的功能
    */
   get rendererOnly() {
     return this._rendererOnly
