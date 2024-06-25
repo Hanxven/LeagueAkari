@@ -1,17 +1,20 @@
 import { defineStore } from 'pinia'
 import { reactive, ref, shallowRef } from 'vue'
 
+// copied from main module
 interface NewUpdates {
+  source: 'gitee' | 'github'
   currentVersion: string
-  version: string
-  pageUrl: string
+  releaseVersion: string
+  releaseNotesUrl: string
   downloadUrl: string
-  description: string
+  releaseNotes: string
+  filename: string
 }
 
 // copied from main module
 interface UpdateProgressInfo {
-  phase: 'downloading' | 'unpacking' | 'waiting-for-restart'
+  phase: 'downloading' | 'unpacking' | 'waiting-for-restart' | 'download-failed' | 'unpack-failed'
 
   downloadingProgress: number
 
@@ -40,7 +43,7 @@ export const useAutoUpdateStore = defineStore('module:auto-update', () => {
     settings,
     newUpdates,
     isCheckingUpdates,
-    lastCheckAt,
-    updateProgressInfo
+    updateProgressInfo,
+    lastCheckAt
   }
 })

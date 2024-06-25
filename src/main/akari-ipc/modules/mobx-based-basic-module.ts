@@ -45,7 +45,12 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
     } catch (error) {
       throw new Error('MobxBasedModule requires StorageModule')
     }
+  }
 
+  /**
+   * 统一加载设置
+   */
+  protected async loadSettings() {
     await Promise.all(this._settingsToSync)
     this._settingsToSync = []
   }

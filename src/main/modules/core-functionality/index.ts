@@ -912,10 +912,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       }
 
       this.state.settings.setPreMadeTeamThreshold(threshold)
-      await this._sm.settings.set(
-        'core-functionality/pre-made-team-threshold',
-        threshold
-      )
+      await this._sm.settings.set('core-functionality/pre-made-team-threshold', threshold)
     }
 
     const setTeamAnalysisPreloadCount = async (count: number) => {
@@ -924,10 +921,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       }
 
       this.state.settings.setTeamAnalysisPreloadCount(count)
-      await this._sm.settings.set(
-        'core-functionality/team-analysis-preload-count',
-        count
-      )
+      await this._sm.settings.set('core-functionality/team-analysis-preload-count', count)
     }
 
     this.onCall('set-setting/match-history-load-count', async (count) => {
@@ -990,10 +984,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       this._playerAnalysisFetchLimiter.concurrency = limit
 
       this.state.settings.setPlayerAnalysisFetchConcurrency(limit)
-      await this._sm.settings.set(
-        'core-functionality/player-analysis-fetch-concurrency',
-        limit
-      )
+      await this._sm.settings.set('core-functionality/player-analysis-fetch-concurrency', limit)
     })
 
     this.onCall('save/saved-player', async (player) => {
@@ -1025,10 +1016,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       }
 
       this.state.settings.setDelaySecondsBeforeLoading(delay)
-      await this._sm.settings.set(
-        'core-functionality/delay-seconds-before-loading',
-        delay
-      )
+      await this._sm.settings.set('core-functionality/delay-seconds-before-loading', delay)
     })
   }
 
@@ -1111,7 +1099,10 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     )
 
     this.state.settings.setDelaySecondsBeforeLoading(
-      await this._sm.settings.get('core-functionality/delay-seconds-before-loading', 0)
+      await this._sm.settings.get(
+        'core-functionality/delay-seconds-before-loading',
+        this.state.settings.delaySecondsBeforeLoading
+      )
     )
   }
 }

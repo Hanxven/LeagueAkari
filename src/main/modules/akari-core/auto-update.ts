@@ -5,9 +5,9 @@ import {
 } from '@shared/constants/common'
 import { GithubApiLatestRelease } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
-import axios, { Axios, AxiosResponse } from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { app } from 'electron'
-import { makeAutoObservable, observable } from 'mobx'
+import { comparer, makeAutoObservable, observable, toJS } from 'mobx'
 import { extractFull } from 'node-7z'
 import cp from 'node:child_process'
 import fs from 'node:original-fs'
@@ -21,11 +21,13 @@ import { AppLogger, LogModule } from './log'
 import { MainWindowModule } from './main-window'
 
 interface NewUpdates {
+  source: 'gitee' | 'github'
   currentVersion: string
-  version: string
-  pageUrl: string
+  releaseVersion: string
+  releaseNotesUrl: string
   downloadUrl: string
-  description: string
+  filename: string
+  releaseNotes: string
 }
 
 export class AutoUpdateSettings {
@@ -65,7 +67,7 @@ interface UpdateProgressInfo {
   /**
    * 当前更新阶段
    */
-  phase: 'downloading' | 'unpacking' | 'waiting-for-restart'
+  phase: 'downloading' | 'unpacking' | 'waiting-for-restart' | 'download-failed' | 'unpack-failed'
 
   /**
    * 当前下载进度，0 到 1
@@ -98,13 +100,24 @@ export class AutoUpdateState {
 
   isCheckingUpdate: boolean = false
   lastCheckAt: Date | null = null
-  newUpdates: NewUpdates | null = null
+  newUpdates = observable.box<NewUpdates | null>(null, {
+    equals: (a, b) => {
+      if (a === null && b === null) {
+        return true
+      }
+
+      if (a === null || b === null) {
+        return false
+      }
+
+      return a.currentVersion === b.currentVersion && a.releaseVersion === b.releaseVersion
+    }
+  })
 
   updateProgressInfo: UpdateProgressInfo | null = null
 
   constructor() {
     makeAutoObservable(this, {
-      newUpdates: observable.ref,
       updateProgressInfo: observable.ref
     })
   }
@@ -113,16 +126,16 @@ export class AutoUpdateState {
     this.isCheckingUpdate = isCheckingUpdates
   }
 
-  setLastCheckAt(date: Date) {
-    this.lastCheckAt = date
-  }
-
   setNewUpdates(updates: NewUpdates | null) {
-    this.newUpdates = updates
+    this.newUpdates.set(updates)
   }
 
   setUpdateProgressInfo(info: UpdateProgressInfo | null) {
     this.updateProgressInfo = info
+  }
+
+  setLastCheckAt(date: Date) {
+    this.lastCheckAt = date
   }
 }
 
@@ -133,14 +146,16 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
   private _am: AppModule
   private _logger: AppLogger
 
-  private _lastQuitTask: (() => void) | null = null
-  private _currentUpdateTaskDisposer: (() => void) | null = null
+  private _checkUpdateTimerId: NodeJS.Timeout | null = null
 
+  private _lastQuitTask: (() => void) | null = null
+  private _currentUpdateTaskCanceler: (() => void) | null = null
+
+  static UPDATES_CHECK_INTERVAL = 7.2e6
   static DOWNLOAD_DIR_NAME = 'NewUpdates'
   static UPDATE_SCRIPT_NAME = 'LeagueAkariUpdate.ps1'
   static UPDATE_PROGRESS_UPDATE_INTERVAL = 200
-  static FAKE_USER_AGENT =
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0'
+  static FAKE_USER_AGENT = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 LeagueAkari/${app.getVersion()} `
 
   private _http = axios.create({
     headers: {
@@ -165,84 +180,118 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
     this._logger = this.manager.getModule<LogModule>('log').createLogger('auto-update')
 
     await this._migrateSettings()
-    this._setupSettingsSync()
+    await this._setupSettingsSync()
     this._setupMethodCall()
     this._setupStateSync()
+    this._handlePeriodicCheck()
+  }
+
+  private _handlePeriodicCheck() {
+    this.autoDisposeReaction(
+      () => this.state.settings.autoCheckUpdates,
+      (sure) => {
+        if (sure) {
+          this._updateReleaseUpdatesInfo()
+          this._checkUpdateTimerId = setInterval(() => {
+            this._updateReleaseUpdatesInfo()
+          }, AutoUpdateModule.UPDATES_CHECK_INTERVAL)
+        } else {
+          if (this._checkUpdateTimerId) {
+            clearInterval(this._checkUpdateTimerId)
+            this._checkUpdateTimerId = null
+          }
+        }
+      },
+      { fireImmediately: true, delay: 3500 }
+    )
+
+    this.autoDisposeReaction(
+      () => [this.state.settings.autoDownloadUpdates, this.state.newUpdates.get()] as const,
+      ([yes, newUpdates]) => {
+        if (yes && newUpdates) {
+          this._startUpdateProcess(newUpdates.downloadUrl, newUpdates.releaseVersion)
+        }
+      },
+      { equals: comparer.shallow }
+    )
+  }
+
+  private async _fetchLatestReleaseInfo(gitLikeUrl: string) {
+    const { data } = await this._http.get<GithubApiLatestRelease>(gitLikeUrl)
+    const currentVersion = app.getVersion()
+    const versionString = data.tag_name
+
+    if (lt(currentVersion, versionString)) {
+      let archiveFile = data.assets.find((a) => {
+        return a.content_type === 'application/x-compressed'
+      })
+
+      if (archiveFile) {
+        return { ...data, archiveFile }
+      }
+
+      archiveFile = data.assets.find((a) => {
+        // 你要知道 Gitee 现在没有 content_type 字段
+        return (
+          a.browser_download_url.endsWith('win.7z') || a.browser_download_url.endsWith('win.zip')
+        )
+      })
+
+      if (archiveFile) {
+        return { ...data, archiveFile }
+      }
+
+      return null
+    }
+
+    return null
   }
 
   /**
-   * 检查更新并返回
-   * @param silent 静默检查更新，不会弹出通知
-   * @returns
+   * 尝试加载更新信息
    */
-  private async _checkForUpdatesGiteeOrGithub(silent = false, debug = false) {
+  private async _updateReleaseUpdatesInfo() {
     if (this.state.isCheckingUpdate) {
-      return
+      return 'is-checking-updates'
     }
 
     this.state.setCheckingUpdates(true)
 
+    const sourceUrl = AutoUpdateModule.UPDATE_SOURCE[this.state.settings.downloadSource]
+
     try {
-      const { data } = await this._http.get<GithubApiLatestRelease>(
-        AutoUpdateModule.UPDATE_SOURCE[this.state.settings.downloadSource]
-      )
-      const currentVersion = app.getVersion()
-      const versionString = data.tag_name
+      const release = await this._fetchLatestReleaseInfo(sourceUrl)
+      if (!release) {
+        return 'no-updates'
+      }
 
-      if (debug || lt(currentVersion, versionString)) {
-        let archiveFile = data.assets.find((a) => {
-          return a.content_type === 'application/x-compressed'
-        })
+      this.state.setNewUpdates({
+        source: this.state.settings.downloadSource,
+        currentVersion: app.getVersion(),
+        releaseNotes: release.body,
+        downloadUrl: release.archiveFile.browser_download_url,
+        releaseVersion: release.tag_name,
+        releaseNotesUrl: release.html_url,
+        filename: release.archiveFile.name
+      })
+      this.state.setLastCheckAt(new Date())
 
-        if (!archiveFile) {
-          archiveFile = data.assets.find((a) => {
-            // 你要知道 Gitee 现在没有 content_type 字段
-            return a.browser_download_url.endsWith('win.7z')
-          })
-        }
+      this._logger.info(`检查到新版本 ${release.tag_name}`)
 
-        this.state.setNewUpdates({
-          currentVersion,
-          description: data.body,
-          downloadUrl: archiveFile ? archiveFile.browser_download_url : '',
-          version: versionString,
-          pageUrl: data.html_url
-        })
-
-        this._logger.info(
-          `检查到更新版本, 当前 ${currentVersion}, ${this.state.settings.downloadSource} ${versionString}, 归档包 ${JSON.stringify(archiveFile)}`
-        )
-
-        return archiveFile
-      } else {
-        this.state.setNewUpdates(null)
-
-        if (gt(currentVersion, versionString)) {
-          if (!silent) {
-            this._mwm.notify.success('app', '检查更新', `该版本高于发布版本 (${currentVersion})`)
-          }
-          this._logger.info(
-            `该版本高于发布版本, 当前 ${currentVersion}, ${this.state.settings.downloadSource} ${versionString}`
-          )
-        } else {
-          if (!silent) {
-            this._mwm.notify.success('app', '检查更新', `目前是最新版本 (${currentVersion})`)
-          }
-          this._logger.info(
-            `目前是最新版本, 当前 ${currentVersion}, ${this.state.settings.downloadSource} ${versionString}`
-          )
-        }
+      if (this._checkUpdateTimerId) {
+        clearInterval(this._checkUpdateTimerId)
+        this._checkUpdateTimerId = setInterval(() => {
+          this._updateReleaseUpdatesInfo()
+        }, AutoUpdateModule.UPDATES_CHECK_INTERVAL)
       }
     } catch (error) {
-      if (!silent) {
-        this._mwm.notify.warn('app', '检查更新', `当前检查更新失败 ${(error as Error).message}`)
-      }
-      this._logger.warn(`尝试检查更新失败 ${formatError(error)}`)
+      this._logger.warn(`尝试检查时更新失败 ${formatError(error)}`)
+      return 'failed'
     } finally {
       this.state.setCheckingUpdates(false)
     }
 
-    return null
+    return 'new-updates'
   }
 
   private async _downloadUpdate(downloadUrl: string, filename: string) {
@@ -294,15 +343,11 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
     const asyncTask = new Promise<string>((resolve, reject) => {
       const writer = fs.createWriteStream(downloadPath)
 
-      this._currentUpdateTaskDisposer = () => {
+      this._currentUpdateTaskCanceler = () => {
         const error = new Error('Download canceled')
         error.name = 'Canceled'
         resp.data.destroy(error)
         writer.close()
-
-        if (fs.existsSync(downloadPath)) {
-          fs.rmSync(downloadPath)
-        }
       }
 
       const _updateProgress = (nowTime: number) => {
@@ -335,14 +380,25 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
 
       pipeline(resp.data, writer, (error) => {
         if (error) {
-          this.state.setUpdateProgressInfo(null)
-
           if (error.name === 'Canceled') {
+            this.state.setUpdateProgressInfo(null)
             this._mwm.notify.info('app', '更新', '取消下载更新包')
             this._logger.info(`取消下载更新包 ${downloadPath}`)
           } else {
+            this.state.setUpdateProgressInfo({
+              phase: 'download-failed',
+              downloadingProgress: 0,
+              averageDownloadSpeed: 0,
+              downloadTimeLeft: -1,
+              fileSize: totalLength,
+              unpackingProgress: 0
+            })
             this._mwm.notify.warn('app', '更新', '下载或写入更新包文件失败')
             this._logger.warn(`下载或写入更新包文件失败 ${formatError(error)}`)
+          }
+
+          if (fs.existsSync(downloadPath)) {
+            fs.rmSync(downloadPath, { force: true })
           }
 
           reject(error)
@@ -351,7 +407,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
           resolve(downloadPath)
         }
 
-        this._currentUpdateTaskDisposer = null
+        this._currentUpdateTaskCanceler = null
       })
     })
 
@@ -360,6 +416,14 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
 
   private async _unpackDownloadedUpdate(filepath: string) {
     if (!fs.existsSync(filepath)) {
+      this.state.setUpdateProgressInfo({
+        phase: 'unpack-failed',
+        downloadingProgress: 1,
+        averageDownloadSpeed: 0,
+        downloadTimeLeft: 0,
+        fileSize: 0,
+        unpackingProgress: 0
+      })
       this._logger.error(`更新包不存在 ${filepath}`)
       throw new Error(`No such file ${filepath}`)
     }
@@ -386,15 +450,15 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
       fs.rmSync(dirPath, { recursive: true, force: true })
     }
 
-    this._logger.info(`开始解压更新包 ${filepath} 到 ${dirPath}, 使用 ${sevenBinPath}`)
-
     const asyncTask = new Promise<string>((resolve, reject) => {
+      this._logger.info(`开始解压更新包 ${filepath} 到 ${dirPath}, 使用 ${sevenBinPath}`)
+
       const seven = extractFull(path.join(filepath), dirPath, {
         $bin: sevenBinPath.replace('app.asar', 'app.asar.unpacked'),
         $progress: true
       })
 
-      this._currentUpdateTaskDisposer = () => {
+      this._currentUpdateTaskCanceler = () => {
         const error = new Error('Unpacking canceled')
         error.name = 'Canceled'
         seven.destroy(error)
@@ -412,7 +476,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
       })
 
       seven.on('end', () => {
-        this._currentUpdateTaskDisposer = null
+        this._currentUpdateTaskCanceler = null
 
         this.state.setUpdateProgressInfo({
           phase: 'unpacking',
@@ -427,15 +491,27 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
       })
 
       seven.on('error', (error) => {
-        this.state.setUpdateProgressInfo(null)
-        this._currentUpdateTaskDisposer = null
+        this._currentUpdateTaskCanceler = null
 
         if (error.name === 'Canceled') {
+          this.state.setUpdateProgressInfo(null)
           this._mwm.notify.info('app', '更新', '取消解压更新包')
           this._logger.info(`取消解压更新包 ${filepath}`)
         } else {
+          this.state.setUpdateProgressInfo({
+            phase: 'unpack-failed',
+            downloadingProgress: 1,
+            averageDownloadSpeed: 0,
+            downloadTimeLeft: 0,
+            fileSize: 0,
+            unpackingProgress: 0
+          })
           this._mwm.notify.error('app', '更新', '解压更新包失败')
           this._logger.error(`解压更新包失败 ${formatError(error)}`)
+        }
+
+        if (fs.existsSync(filepath)) {
+          fs.rmSync(filepath, { force: true })
         }
 
         reject(error)
@@ -447,6 +523,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
 
   private _applyUpdatesOnNextStartup(newUpdateDir: string, shouldStartNewApp: boolean = false) {
     if (!fs.existsSync(newUpdateDir)) {
+      this.state.setUpdateProgressInfo(null)
       this._logger.error(`更新目录不存在 ${newUpdateDir}`)
       throw new Error(`No such directory ${newUpdateDir}`)
     }
@@ -545,49 +622,54 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
       unpackingProgress: 1
     })
 
-    this._currentUpdateTaskDisposer = () => {
+    this._currentUpdateTaskCanceler = () => {
       if (fs.existsSync(scriptPath)) {
         fs.rmSync(scriptPath)
       }
 
+      if (fs.existsSync(newUpdateDirParent)) {
+        fs.rmSync(newUpdateDirParent, { recursive: true, force: true })
+      }
+
       this._am.removeQuitTask(_quitTask)
-      this._currentUpdateTaskDisposer = null
+      this._currentUpdateTaskCanceler = null
       this._lastQuitTask = null
       this.state.setUpdateProgressInfo(null)
     }
   }
 
   private async _startUpdateProcess(archiveFileUrl: string, filename: string) {
-    if (this.state.updateProgressInfo) {
+    if (
+      this.state.updateProgressInfo &&
+      (this.state.updateProgressInfo.phase === 'downloading' ||
+        this.state.updateProgressInfo.phase === 'unpacking' ||
+        this.state.updateProgressInfo.phase === 'waiting-for-restart')
+    ) {
       return
     }
 
     let downloadPath: string
     try {
       downloadPath = await this._downloadUpdate(archiveFileUrl, filename)
-    } catch (error) {
-      console.log('error1', error)
+    } catch {
       return
     }
 
     let unpackedPath: string
     try {
       unpackedPath = await this._unpackDownloadedUpdate(downloadPath)
-    } catch (error) {
-      console.log('error2', error)
+    } catch {
       return
     }
 
     try {
       this._applyUpdatesOnNextStartup(unpackedPath, true)
-    } catch (error) {
-      this._logger.error(`尝试添加退出任务失败 ${formatError(error)}`)
-    }
+    } catch {}
   }
 
   private _cancelUpdateProcess() {
-    if (this._currentUpdateTaskDisposer) {
-      this._currentUpdateTaskDisposer()
+    if (this._currentUpdateTaskCanceler) {
+      this._currentUpdateTaskCanceler()
     }
   }
 
@@ -602,7 +684,7 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
     }
   }
 
-  private _setupSettingsSync() {
+  private async _setupSettingsSync() {
     this.simpleSettingSync(
       'auto-check-updates',
       () => this.state.settings.autoCheckUpdates,
@@ -620,32 +702,41 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
       () => this.state.settings.downloadSource,
       (s) => this.state.settings.setDownloadSource(s)
     )
+
+    await this.loadSettings()
   }
 
   private _setupMethodCall() {
-    this.onCall('check-updates', async () => {
-      await this._checkForUpdatesGiteeOrGithub()
+    this.onCall('check-updates', () => {
+      return this._updateReleaseUpdatesInfo()
     })
 
-    this.onCall('start-update', async () => {})
+    this.onCall('start-update', async () => {
+      if (this.state.newUpdates.get()) {
+        await this._startUpdateProcess(
+          this.state.newUpdates.get()!.downloadUrl,
+          this.state.newUpdates.get()!.filename
+        )
+      }
+    })
 
     this.onCall('cancel-update', () => {
       this._cancelUpdateProcess()
     })
 
-    this.onCall('test-update', async () => {
-      const newVer = await this._checkForUpdatesGiteeOrGithub(false, true)
-      if (newVer) {
-        await this._startUpdateProcess(newVer.browser_download_url, newVer.name)
+    this.onCall('test-update', async (url: string) => {
+      if (!url) {
+        return
       }
+      await this._startUpdateProcess(url, 'test.7z')
     })
   }
 
   private _setupStateSync() {
     this.simpleSync('is-checking-updates', () => this.state.isCheckingUpdate)
-    this.simpleSync('new-updates', () => this.state.newUpdates)
-    this.simpleSync('last-check-at', () => this.state.lastCheckAt)
+    this.simpleSync('new-updates', () => toJS(this.state.newUpdates.get()))
     this.simpleSync('update-progress-info', () => this.state.updateProgressInfo)
+    this.simpleSync('last-check-at', () => this.state.lastCheckAt)
   }
 }
 

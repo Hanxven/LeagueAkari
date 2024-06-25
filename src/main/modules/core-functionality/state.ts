@@ -26,7 +26,7 @@ class CoreFunctionalitySettings {
 
   playerAnalysisFetchConcurrency: number = 3
 
-  delaySecondsBeforeLoading: number = 1000
+  delaySecondsBeforeLoading: number = 1
 
   constructor() {
     makeAutoObservable(this)

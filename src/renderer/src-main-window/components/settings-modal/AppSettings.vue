@@ -33,6 +33,18 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        label="自动安装更新"
+        label-description="检测到更新后，尝试下载并安装更新"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="au.settings.autoDownloadUpdates"
+          @update:value="(val: boolean) => aum.setAutoDownloadUpdates(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         label="更新源"
         label-description="检查更新或下载更新时所使用的源"
         :label-width="320"
@@ -97,7 +109,7 @@ import { autoUpdateRendererModule as aum } from '@shared/renderer/modules/auto-u
 import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { NButton, NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip } from 'naive-ui'
+import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip } from 'naive-ui'
 
 const app = useAppStore()
 const lc = useLcuConnectionStore()

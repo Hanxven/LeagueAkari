@@ -43,7 +43,11 @@
         size="tiny"
       ></NSelect>
     </NModal>
-    <ControlItem class="control-item-margin" label="选择" label-description="查找目标英雄或皮肤">
+    <ControlItem
+      class="control-item-margin"
+      label="选择召唤师背景"
+      label-description="查找目标英雄或皮肤"
+    >
       <NButton
         size="tiny"
         type="primary"

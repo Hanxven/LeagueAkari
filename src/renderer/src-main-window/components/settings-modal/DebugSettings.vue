@@ -57,6 +57,7 @@
             </template>
             <div style="font-size: 12px">该目录下：</div>
             <div style="font-size: 12px">LeagueAkari.db - 存储用户设置、已标记的玩家等信息</div>
+            <div style="font-size: 12px">NewUpdates/ - 即将进行的自动更新临时文件</div>
           </NPopover>
         </template>
         <NButton size="tiny" secondary type="primary" @click="() => handleShowUserDataDir()"

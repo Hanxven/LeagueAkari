@@ -1,103 +1,11 @@
 import { LeagueAkariModule } from '@main/akari-ipc/akari-module'
-import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import dayjs from 'dayjs'
 import { app, shell } from 'electron'
-import { makeAutoObservable, observable } from 'mobx'
 import { mkdirSync, rmSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { Logger, createLogger, format, transports } from 'winston'
 
 import { AppModule } from './app'
-
-class AppSettings {
-  /**
-   * 在客户端启动时且只有唯一的客户端，尝试自动连接
-   */
-  autoConnect: boolean = true
-
-  /**
-   * 使用 WMIC 查询命令行，而不是默认的 NtQueryInformationProcess
-   */
-  useWmic: boolean = false
-
-  /**
-   * 从 Github 拉取更新信息
-   */
-  autoCheckUpdates: boolean = true
-
-  /**
-   * 输出前置声明
-   */
-  showFreeSoftwareDeclaration: boolean = true
-
-  /**
-   * 关闭应用的默认行为
-   */
-  closeStrategy: MainWindowCloseStrategy = 'unset'
-
-  setAutoConnect(enabled: boolean) {
-    this.autoConnect = enabled
-  }
-
-  setUseWmic(enabled: boolean) {
-    this.useWmic = enabled
-  }
-
-  setAutoCheckUpdates(enabled: boolean) {
-    this.autoCheckUpdates = enabled
-  }
-
-  setShowFreeSoftwareDeclaration(enabled: boolean) {
-    this.showFreeSoftwareDeclaration = enabled
-  }
-
-  setCloseStrategy(s: MainWindowCloseStrategy) {
-    this.closeStrategy = s
-  }
-
-  constructor() {
-    makeAutoObservable(this)
-  }
-}
-
-interface NewUpdates {
-  currentVersion: string
-  version: string
-  pageUrl: string
-  downloadUrl: string
-  description: string
-}
-
-export class AppState {
-  isAdministrator: boolean = false
-
-  ready: boolean = false
-
-  updates = observable(
-    {
-      isCheckingUpdates: false,
-      lastCheckAt: null as Date | null,
-      newUpdates: null as NewUpdates | null
-    },
-    {
-      newUpdates: observable.ref
-    }
-  )
-
-  settings = new AppSettings()
-
-  constructor() {
-    makeAutoObservable(this)
-  }
-
-  setElevated(b: boolean) {
-    this.isAdministrator = b
-  }
-
-  setReady(b: boolean) {
-    this.ready = b
-  }
-}
 
 export type AppLogger = {
   info: (message: any) => Logger

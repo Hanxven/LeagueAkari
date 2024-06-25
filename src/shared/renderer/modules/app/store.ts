@@ -2,14 +2,6 @@ import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { defineStore } from 'pinia'
 import { VNode, reactive, ref } from 'vue'
 
-interface NewUpdates {
-  currentVersion: string
-  version: string
-  pageUrl: string
-  downloadUrl: string
-  description: string
-}
-
 export interface TitleBarTask {
   id: string // module id
   progress?: number // from 0 ~ 1

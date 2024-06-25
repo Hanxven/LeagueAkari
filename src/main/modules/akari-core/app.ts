@@ -1,14 +1,9 @@
 import { optimizer } from '@electron-toolkit/utils'
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
-import { LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL } from '@shared/constants/common'
-import { GithubApiLatestRelease } from '@shared/types/github'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
-import { formatError } from '@shared/utils/errors'
-import axios from 'axios'
 import { BrowserWindow, app, protocol, session, shell } from 'electron'
-import { makeAutoObservable, observable, runInAction } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import { Readable } from 'node:stream'
-import { gt, lt } from 'semver'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
 import { AutoGameflowModule } from '../auto-gameflow'
@@ -24,19 +19,9 @@ import { MainWindowModule } from './main-window'
 
 class AppSettings {
   /**
-   * 在客户端启动时且只有唯一的客户端，尝试自动连接
-   */
-  autoConnect: boolean = true
-
-  /**
    * 使用 WMIC 查询命令行，而不是默认的 NtQueryInformationProcess
    */
   useWmic: boolean = false
-
-  /**
-   * 自动下载更新
-   */
-  autoDownloadUpdates: boolean = false
 
   /**
    * 输出前置声明
@@ -53,16 +38,8 @@ class AppSettings {
    */
   isInKyokoMode: boolean = false
 
-  setAutoConnect(enabled: boolean) {
-    this.autoConnect = enabled
-  }
-
   setUseWmic(enabled: boolean) {
     this.useWmic = enabled
-  }
-
-  setAutoDownloadUpdates(enabled: boolean) {
-    this.autoDownloadUpdates = enabled
   }
 
   setShowFreeSoftwareDeclaration(enabled: boolean) {
@@ -82,27 +59,6 @@ class AppSettings {
   }
 }
 
-interface NewUpdates {
-  currentVersion: string
-  version: string
-  pageUrl: string
-  downloadUrl: string
-  description: string
-}
-
-interface DownloadStatus {
-  total: number
-  downloaded: number
-  progress: number
-  speed: number
-  timeLeft: number
-  timeElapsed: number
-  isPaused: boolean
-  isDone: boolean
-  isCancelled: boolean
-  isDownloading: boolean
-}
-
 export class AppState {
   settings = new AppSettings()
 
@@ -110,24 +66,8 @@ export class AppState {
   ready: boolean = false
   isQuitting = false
 
-  updates = observable(
-    {
-      isCheckingUpdates: false,
-      lastCheckAt: null as Date | null,
-      newUpdates: null as NewUpdates | null
-    },
-    {
-      newUpdates: observable.ref
-    }
-  )
-
-  // 自动更新包下载进度
-  updateDownloadStatus: DownloadStatus | null = null
-
   constructor() {
-    makeAutoObservable(this, {
-      updateDownloadStatus: observable.ref
-    })
+    makeAutoObservable(this, {})
   }
 
   setElevated(b: boolean) {
@@ -251,8 +191,6 @@ export class AppModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.simpleSync('settings/auto-connect', () => this.state.settings.autoConnect)
-    this.simpleSync('settings/auto-download-update', () => this.state.settings.autoDownloadUpdates)
     this.simpleSync(
       'settings/show-free-software-declaration',
       () => this.state.settings.showFreeSoftwareDeclaration
@@ -260,25 +198,11 @@ export class AppModule extends MobxBasedBasicModule {
     this.simpleSync('settings/close-strategy', () => this.state.settings.closeStrategy)
     this.simpleSync('settings/use-wmic', () => this.state.settings.useWmic)
     this.simpleSync('settings/is-in-kyoko-mode', () => this.state.settings.isInKyokoMode)
-    this.simpleSync('updates/is-checking-updates', () => this.state.updates.isCheckingUpdates)
-    this.simpleSync('updates/new-updates', () => this.state.updates.newUpdates)
-    this.simpleSync('updates/last-check-at', () => this.state.updates.lastCheckAt)
     this.simpleSync('is-administrator', () => this.state.isAdministrator)
-    this.simpleSync('update-download-status', () => this.state.updateDownloadStatus)
   }
 
   private _setupMethodCall() {
     this.onCall('get-app-version', () => app.getVersion())
-
-    this.onCall('set-setting/auto-connect', async (enabled) => {
-      this.state.settings.setAutoConnect(enabled)
-      await this._sm.settings.set('app/auto-connect', enabled)
-    })
-
-    this.onCall('set-setting/auto-download-update', async (enabled) => {
-      this.state.settings.autoDownloadUpdates = enabled
-      await this._sm.settings.set('app/auto-download-update', enabled)
-    })
 
     this.onCall('set-setting/show-free-software-declaration', async (enabled) => {
       this.state.settings.setShowFreeSoftwareDeclaration(enabled)
@@ -314,17 +238,6 @@ export class AppModule extends MobxBasedBasicModule {
   }
 
   private async _loadSettings() {
-    this.state.settings.setAutoConnect(
-      await this._sm.settings.get('app/auto-connect', this.state.settings.autoConnect)
-    )
-
-    this.state.settings.setAutoDownloadUpdates(
-      await this._sm.settings.get(
-        'app/auto-download-update',
-        this.state.settings.autoDownloadUpdates
-      )
-    )
-
     this.state.settings.setShowFreeSoftwareDeclaration(
       await this._sm.settings.get(
         'app/show-free-software-declaration',
@@ -417,18 +330,6 @@ export class AppModule extends MobxBasedBasicModule {
 
     return nodeStream
   }
-
-  // private async _handleAutoUpdateCheck() {
-  //   if (!this.state.settings.autoCheckUpdates) {
-  //     return
-  //   }
-
-  //   try {
-  //     await this._checkUpdates()
-  //   } catch (error) {
-  //     this._logger.warn(`检查更新失败 ${formatError(error)}`)
-  //   }
-  // }
 
   registerAkariProtocolAsPrivileged() {
     protocol.registerSchemesAsPrivileged([

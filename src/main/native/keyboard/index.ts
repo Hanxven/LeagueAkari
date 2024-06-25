@@ -179,6 +179,7 @@ const keyMap = {
 
 export const globalKeyListener = new EventEmitter()
 
+// unused yet
 export function installKeyboardListener() {
   input.install()
   input.setOnKeyUpDown(({ keyCode, isKeyDown }) => {

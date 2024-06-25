@@ -24,8 +24,8 @@ export class AutoUpdateRendererModule extends StateSyncModule {
     this.simpleSync('settings/download-source', (s) => (store.settings.downloadSource = s))
     this.simpleSync('is-checking-updates', (s) => (store.isCheckingUpdates = s))
     this.simpleSync('new-updates', (s) => (store.newUpdates = s))
-    this.simpleSync('last-check-at', (s) => (store.lastCheckAt = s))
     this.simpleSync('update-progress-info', (s) => (store.updateProgressInfo = s))
+    this.simpleSync('last-check-at', (s) => (store.lastCheckAt = s))
   }
 
   checkUpdates() {
@@ -44,7 +44,11 @@ export class AutoUpdateRendererModule extends StateSyncModule {
     return this.call('set-setting/download-source', source)
   }
 
-  test() {
+  /**
+   * 开启一次测试的
+   * @returns 
+   */
+  testUpdate() {
     return this.call('test-update')
   }
 }

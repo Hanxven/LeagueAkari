@@ -1,7 +1,7 @@
 <template>
   <div id="app-frame">
-    <SettingsModal v-model:show="isShowingSettingModal" />
-    <UpdateModal v-model:show="isShowingNewUpdateModal" />
+    <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
+    <UpdateModal v-model:show="isShowingNewUpdateModal" :showing-new-update="isShowingNewUpdate" />
     <DeclarationModal
       v-model:show="isShowingFreeSoftwareDeclaration"
       @confirm="handleConfirmation"
@@ -41,8 +41,19 @@ const cf = useCoreFunctionalityStore()
 const au = useAutoUpdateStore()
 
 provide('app', {
-  openSettingsModal: () => {
+  openSettingsModal: (tabName?: string) => {
     isShowingSettingModal.value = true
+    if (tabName) {
+      settingModelTab.value = tabName
+    }
+  },
+  openUpdateModal: () => {
+    isShowingNewUpdateModal.value = true
+    if (au.newUpdates) {
+      isShowingNewUpdate.value = true
+    } else {
+      isShowingNewUpdate.value = false
+    }
   }
 })
 
@@ -62,7 +73,9 @@ watch(
 )
 
 const isShowingSettingModal = ref(false)
+const settingModelTab = ref('basic')
 const isShowingNewUpdateModal = ref(false)
+const isShowingNewUpdate = ref(false)
 const isShowingFreeSoftwareDeclaration = ref(false)
 
 watchEffect(() => {
@@ -74,8 +87,10 @@ watchEffect(() => {
 watchEffect(() => {
   if (au.newUpdates) {
     isShowingNewUpdateModal.value = true
+    isShowingNewUpdate.value = true
   } else {
     isShowingNewUpdateModal.value = false
+    isShowingNewUpdate.value = false
   }
 })
 
@@ -116,7 +131,7 @@ useKeyboardCombo(KYOKO_MODE_KEY_SEQUENCE, {
 // 仅用于测试自动更新相关模块
 useKeyboardCombo('AYANO', {
   onFinish: () => {
-    aum.test()
+    aum.testUpdate()
 
     notification.info({
       title: 'League Akari 测试模式',

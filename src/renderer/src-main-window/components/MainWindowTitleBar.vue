@@ -45,6 +45,7 @@
             ? '在程序关闭后执行更新流程'
             : '正在准备更新中'
         "
+        @click="() => handleShowAboutSettings()"
         ref="autoUpdateTaskEl"
       >
         <template v-if="au.updateProgressInfo.phase === 'downloading'">
@@ -176,7 +177,13 @@ import { Close as CloseIcon } from '@vicons/ionicons5'
 import { UpgradeFilled as UpgradeFilledIcon } from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
-import { ref, watch } from 'vue'
+import { inject, ref, watch } from 'vue'
+
+const appInject = inject('app') as any
+
+const handleShowAboutSettings = async () => {
+  appInject.openSettingsModal('about')
+}
 
 const app = useAppStore()
 const mw = useMainWindowStore()
@@ -350,6 +357,7 @@ const autoUpdateTaskShow = useCompleteVisibility(autoUpdateTaskEl, titleBarItems
   .auto-update {
     width: 116px;
     background-color: rgb(74, 82, 136);
+    cursor: pointer;
   }
 
   .respawn-timer {

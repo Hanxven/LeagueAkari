@@ -58,7 +58,9 @@
     </ControlItem>
     <ControlItem class="control-item-margin" label="创建 5v5 训练房间">
       <NFlex>
-        <NButton @click="handleCreatePractice5v5" size="tiny">创建</NButton>
+        <NButton @click="handleCreatePractice5v5" size="tiny" :disabled="lc.state !== 'connected'"
+          >创建</NButton
+        >
         <NInput
           :status="practice5v5LobbyName.length ? 'success' : 'warning'"
           v-model:value="practice5v5LobbyName"
@@ -78,6 +80,7 @@ import {
   createQueueLobby,
   getAvailableBots
 } from '@shared/renderer/http-api/lobby'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { laNotification } from '@shared/renderer/notification'
@@ -87,6 +90,7 @@ import { computed, reactive, ref, shallowRef } from 'vue'
 
 const gameflow = useGameflowStore()
 const gameData = useGameDataStore()
+const lc = useLcuConnectionStore()
 
 const getRandomLobbyName = () => {
   return `AKARI_${(Date.now() % 10000000) + 10000000}`

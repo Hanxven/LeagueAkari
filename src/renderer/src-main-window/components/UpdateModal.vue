@@ -6,31 +6,38 @@
     v-model:show="show"
     :class="styles['settings-modal']"
   >
-    <template #header><span class="card-header-title">新版本</span></template>
+    <template #header
+      ><span class="card-header-title">{{
+        showingNewUpdate ? '新版本' : '版本特性'
+      }}</span></template
+    >
     <div v-if="au.newUpdates">
-      <div class="para">
-        新版本可用：{{ au.newUpdates.version }} (当前版本：{{ au.newUpdates.currentVersion }})
+      <div v-if="showingNewUpdate" class="para">
+        新版本可用：{{ au.newUpdates.releaseVersion }} (当前版本：{{
+          au.newUpdates.currentVersion
+        }})
       </div>
+      <div v-else class="para">当前版本：{{ au.newUpdates.currentVersion }}</div>
       <div>
-        <a class="small-link" target="_blank" :href="au.newUpdates.pageUrl">Github 发布页面</a>
+        <a class="small-link" target="_blank" :href="au.newUpdates.releaseNotesUrl"
+          >{{ au.newUpdates.source === 'github' ? 'Github' : 'Gitee' }} 发布页面</a
+        >
         <a
           v-if="au.newUpdates.downloadUrl"
           class="small-link"
           style="margin-left: 8px"
           target="_blank"
           :href="au.newUpdates.downloadUrl"
-          >Github 下载</a
+          >{{ au.newUpdates.source === 'github' ? 'Github' : 'Gitee' }} 下载</a
         >
       </div>
-      <NScrollbar style="max-height: 50vh" :class="styles['markdown-text-scroll-wrapper']">
+      <NScrollbar
+        style="max-height: 50vh"
+        :class="styles['markdown-text-scroll-wrapper']"
+        trigger="none"
+      >
         <div class="markdown-text" v-html="markdownHtmlText"></div>
       </NScrollbar>
-      <div class="para" style="font-style: italic">
-        可以在：[设置 -> 应用 -> 基础 -> 自动检查更新] 关闭自动检查
-      </div>
-      <div class="para" style="font-style: italic">
-        可以在：[设置 -> 关于 -> 检查更新] 中手动检查更新
-      </div>
     </div>
   </NModal>
 </template>
@@ -46,10 +53,13 @@ const au = useAutoUpdateStore()
 const styles = useCssModule()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(au.newUpdates?.description || '无内容')
+  return markdownIt.render(au.newUpdates?.releaseNotes || '无内容')
 })
 
 const show = defineModel<boolean>('show', { default: false })
+const props = defineProps<{
+  showingNewUpdate?: boolean
+}>()
 </script>
 
 <style lang="less" scoped>
@@ -66,7 +76,7 @@ const show = defineModel<boolean>('show', { default: false })
 :deep(.markdown-text) {
   font-size: 13px;
   user-select: text;
-  padding: 12px;
+  padding: 4px;
 
   h1,
   h2,
@@ -83,23 +93,29 @@ const show = defineModel<boolean>('show', { default: false })
 
   h1 {
     font-size: 20px;
+    margin-top: 8px;
+    margin-bottom: 12px;
   }
 
   h2 {
     font-size: 18px;
+    margin-top: 8px;
+    margin-bottom: 8px;
   }
 
   h3 {
     font-size: 16px;
+    margin-top: 4px;
+    margin-bottom: 4px;
   }
 
-  ul {
-    margin-left: 24px;
-  }
+  // ul {
+  //   margin-left: 24px;
+  // }
 
   li::before {
     display: inline;
-    content: '🔧';
+    content: '•';
   }
 
   li p {
@@ -108,8 +124,9 @@ const show = defineModel<boolean>('show', { default: false })
 
   code {
     font-family: inherit;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(32, 32, 32, 1);
     border-radius: 2px;
+    padding: 2px 4px;
   }
 
   table {
@@ -149,8 +166,6 @@ const show = defineModel<boolean>('show', { default: false })
 }
 
 .markdown-text-scroll-wrapper {
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
   margin-top: 12px;
   margin-bottom: 12px;
 }
