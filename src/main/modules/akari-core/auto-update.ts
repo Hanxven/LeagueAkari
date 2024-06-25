@@ -261,7 +261,11 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
 
     try {
       const release = await this._fetchLatestReleaseInfo(sourceUrl)
+
+      this.state.setLastCheckAt(new Date())
+
       if (!release) {
+        this._logger.info(`没有检查到新版本, 当前版本 ${app.getVersion()}, 从 ${sourceUrl} 检查`)
         return 'no-updates'
       }
 
@@ -274,7 +278,6 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
         releaseNotesUrl: release.html_url,
         filename: release.archiveFile.name
       })
-      this.state.setLastCheckAt(new Date())
 
       this._logger.info(`检查到新版本 ${release.tag_name}`)
 
