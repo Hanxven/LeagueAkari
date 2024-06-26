@@ -29,6 +29,57 @@ const _MODES = [
   'URF' // 无限火力
 ]
 
+export class BalanceEds {
+  private _lcu: LcuSyncModule
+
+  constructor(private _edsm: ExternalDataSourceModule) {}
+
+  async setup() {
+    this._lcu = this._edsm.manager.getModule('lcu-state-sync')
+  }
+
+  // private _handleUpdateBalanceData() {
+  //   const gameInfo = computed(() => {
+  //     if (!this._lcu.gameflow.session) {
+  //       return null
+  //     }
+
+  //     return {
+  //       gameMode: this._lcu.gameflow.session.map.gameMode,
+  //       queueType: this._lcu.gameflow.session.gameData.queue.type
+  //     }
+  //   })
+
+  //   this._edsm.autoDisposeReaction(
+  //     () => gameInfo.get(),
+  //     async (info) => {
+  //       if (!info) {
+  //         return
+  //       }
+
+  //       this._updateBalanceData(info.gameMode, info.queueType)
+  //     },
+  //     { fireImmediately: true }
+  //   )
+  // }
+
+  // private async _updateBalanceData(gameMode: string, _queueType: string) {
+  //   if (ExternalDataSourceModule.BALANCE_MODES.has(gameMode)) {
+  //     try {
+  //       this._edsm.logger.info(
+  //         `尝试更新英雄平衡性数据，数据源 ${this.state.balance.fandom.name}  ${this.state.balance.fandom.id} ${this.state.balance.fandom.version}`
+  //       )
+  //       await this.state.balance.updateData()
+  //       this._edsm.logger.info(
+  //         `英雄平衡性数据更新完成 ${this.state.balance.fandom.name}  ${this.state.balance.fandom.id} ${this.state.balance.fandom.version}`
+  //       )
+  //     } catch (error) {
+  //       this._edsm.logger.warn(`获取英雄平衡性数据源时发生错误 ${formatError(error)}`)
+  //     }
+  //   }
+  // }
+}
+
 export class ExternalDataSourceModule extends MobxBasedBasicModule {
   public state = new ExternalDataSourceState()
 
@@ -42,6 +93,10 @@ export class ExternalDataSourceModule extends MobxBasedBasicModule {
     ['CHERRY', 'ar'],
     ['ULTBOOK', 'usb']
   ])
+
+  get logger() {
+    return this._logger
+  }
 
   constructor() {
     super('external-data-source')

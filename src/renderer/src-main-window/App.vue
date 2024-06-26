@@ -128,20 +128,17 @@ useKeyboardCombo(KYOKO_MODE_KEY_SEQUENCE, {
   maxInterval: 500
 })
 
-// 仅用于测试自动更新相关模块
-useKeyboardCombo('AYANO', {
+useKeyboardCombo('LEAGUEAKARI', {
   onFinish: () => {
-    aum.testUpdate()
-
-    notification.info({
-      title: 'League Akari 测试模式',
-      content: '手动开启了一次更新测试',
-      duration: 4000
+    notification.success({
+      title: 'League Akari',
+      content: 'League Akari!',
+      duration: 6000
     })
   },
   requireSameEl: true,
   caseSensitive: false,
-  maxInterval: 500
+  maxInterval: 250
 })
 </script>
 

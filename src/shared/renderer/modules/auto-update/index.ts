@@ -43,14 +43,6 @@ export class AutoUpdateRendererModule extends StateSyncModule {
   setDownloadSource(source: string) {
     return this.call('set-setting/download-source', source)
   }
-
-  /**
-   * 开启一次测试的
-   * @returns 
-   */
-  testUpdate() {
-    return this.call('test-update')
-  }
 }
 
 export const autoUpdateRendererModule = new AutoUpdateRendererModule()

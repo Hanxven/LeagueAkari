@@ -726,13 +726,6 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
     this.onCall('cancel-update', () => {
       this._cancelUpdateProcess()
     })
-
-    this.onCall('test-update', async (url: string) => {
-      if (!url) {
-        return
-      }
-      await this._startUpdateProcess(url, 'test.7z')
-    })
   }
 
   private _setupStateSync() {

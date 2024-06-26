@@ -114,11 +114,11 @@
                   class="cs-count"
                   :class="{
                     best:
-                      match.recordStats.maxTotalMinionsKilled &&
-                      p.stats.totalMinionsKilled === match.recordStats.maxTotalMinionsKilled
+                      match.recordStats.maxCsOverall &&
+                      p.csOverall === match.recordStats.maxCsOverall
                   }"
                 >
-                  {{ p.stats.totalMinionsKilled }}
+                  {{ p.csOverall }}
                 </div>
                 <div>
                   每分钟
@@ -220,10 +220,12 @@ const match = computed(() => {
     maxTotalDamageDealtToChampions: 0,
     maxTotalDamageTaken: 0,
     maxGoldEarned: 0,
-    maxTotalMinionsKilled: 0
+    maxCsOverall: 0
   }
 
-  all.forEach((p) => {
+  const withExtra = all.map((v) => ({ ...v, csOverall: 0 }))
+
+  withExtra.forEach((p) => {
     let teamKey: string
     if (p.teamId === 100) {
       teamKey = 'team1'
@@ -238,6 +240,8 @@ const match = computed(() => {
     teamStats[teamKey].totalDamageDealtToChampions += p.stats.totalDamageDealtToChampions
     teamStats[teamKey].totalDamageTaken += p.stats.totalDamageTaken
 
+    p.csOverall = p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled
+
     recordStats.maxTotalDamageDealtToChampions = Math.max(
       recordStats.maxTotalDamageDealtToChampions,
       p.stats.totalDamageDealtToChampions
@@ -247,16 +251,13 @@ const match = computed(() => {
       p.stats.totalDamageTaken
     )
     recordStats.maxGoldEarned = Math.max(recordStats.maxGoldEarned, p.stats.goldEarned)
-    recordStats.maxTotalMinionsKilled = Math.max(
-      recordStats.maxTotalMinionsKilled,
-      p.stats.totalMinionsKilled
-    )
+    recordStats.maxCsOverall = Math.max(recordStats.maxCsOverall, p.csOverall)
   })
 
   return {
     teams: {
-      team1: all.filter((p) => p.teamId === 100),
-      team2: all.filter((p) => p.teamId === 200)
+      team1: withExtra.filter((p) => p.teamId === 100),
+      team2: withExtra.filter((p) => p.teamId === 200)
     },
     aggregateStats: teamStats,
     recordStats: recordStats

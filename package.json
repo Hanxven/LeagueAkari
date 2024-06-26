@@ -1,6 +1,6 @@
 {
   "name": "league-akari",
-  "version": "1.2.2-rabi.10",
+  "version": "1.2.2",
   "author": {
     "name": "Hanxven",
     "email": "hanxven@gmail.com"
@@ -25,7 +25,6 @@
     "@vicons/material": "^0.12.0",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
-    "electron": "^31.0.2",
     "lodash": "^4.17.21",
     "luaparse": "^0.3.1",
     "node-7z": "^3.0.0",
@@ -56,6 +55,7 @@
     "@vueuse/components": "^10.11.0",
     "@vueuse/core": "^10.11.0",
     "deep-eql": "^5.0.2",
+    "electron": "^31.0.2",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
     "less": "^4.2.0",
