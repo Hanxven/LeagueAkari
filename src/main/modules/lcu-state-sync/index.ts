@@ -1,3 +1,4 @@
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import {
   getBannableChampIds,
   getChampSelectSession,
@@ -20,7 +21,6 @@ import { getBallot } from '@main/http-api/honor-v2'
 import { getLobby } from '@main/http-api/lobby'
 import { getLoginQueueState } from '@main/http-api/login'
 import { getCurrentSummoner } from '@main/http-api/summoner'
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { ChampSelectSummoner } from '@shared/types/lcu/champ-select'
 import { Conversation } from '@shared/types/lcu/chat'
 import { LcuEvent } from '@shared/types/lcu/event'
@@ -180,7 +180,15 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   private async _loadQueues() {
     try {
       const queues = (await getQueues()).data
-      this.gameData.setQueues(queues)
+      if (Array.isArray(queues)) {
+        const obj = queues.reduce((prev, cur) => {
+          prev[cur.id] = cur
+          return prev
+        }, {})
+        this.gameData.setQueues(obj)
+      } else {
+        this.gameData.setQueues(queues as any)
+      }
     } catch (error) {
       this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取可用队列失败')
       this._logger.warn(`获取可用队列失败 ${formatError(error)}`)

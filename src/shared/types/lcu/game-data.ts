@@ -502,11 +502,22 @@ export function isBotQueue(queueId: number) {
   )
 }
 
-export interface Queue {
+export interface QueueLegacy {
   name: string
   shortName: string
   description: string
   detailedDescription: string
+}
+
+export interface Queue {
+  id: number
+  name: string
+  shortName: string
+  description: string
+  detailedDescription: string
+  gameSelectModeGroup: string
+  gameSelectCategory: string
+  gameSelectPriority: number
 }
 
 export const enum PickMode {

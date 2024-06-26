@@ -308,7 +308,7 @@ const formatModeText = (queueId: number, isPracticeTool: boolean = false) => {
     return '训练模式'
   }
 
-  return gameData.queues[queueId].name ?? queueId
+  return gameData.queues[queueId]?.name ?? queueId
 }
 
 const formattedRelativeTime = ref('')

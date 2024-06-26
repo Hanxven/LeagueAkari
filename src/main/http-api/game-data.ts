@@ -55,7 +55,7 @@ export function getPerks() {
 }
 
 export function getQueues() {
-  return lcm.request<Record<number, Queue>>({
+  return lcm.request<Queue[]>({
     url: '/lol-game-data/assets/v1/queues.json',
     method: 'GET'
   })
