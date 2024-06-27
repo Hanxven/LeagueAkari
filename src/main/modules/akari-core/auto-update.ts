@@ -710,8 +710,15 @@ Remove-Item -Path $MyInvocation.MyCommand.Path -Force
   }
 
   private _setupMethodCall() {
-    this.onCall('check-updates', () => {
-      return this._updateReleaseUpdatesInfo()
+    this.onCall('check-updates', async () => {
+      const updateType = this._updateReleaseUpdatesInfo()
+      if (this.state.newUpdates.get() && this.state.settings.autoDownloadUpdates) {
+        await this._startUpdateProcess(
+          this.state.newUpdates.get()!.downloadUrl,
+          this.state.newUpdates.get()!.filename
+        )
+      }
+      return updateType
     })
 
     this.onCall('start-update', async () => {
