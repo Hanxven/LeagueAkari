@@ -10,6 +10,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { app, dialog } from 'electron'
 import { configure } from 'mobx'
 import EventEmitter from 'node:events'
+import path from 'node:path'
 
 import { setupLeagueAkariModules } from './modules'
 import { appModule } from './modules/akari-core/app'

@@ -614,7 +614,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
         // 如果停留在结算页面时间过长，将考虑返回
         if (phase === 'WaitingForStats' && enabled) {
           this._logger.info(
-            `位于 WaitingForStats 的自动返回房间超时计时 ${AutoGameflowModule.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT} ms`
+            `位于 WaitingForStats，等待 ${AutoGameflowModule.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT} ms`
           )
           this._playAgainTask.start(AutoGameflowModule.PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT)
           return

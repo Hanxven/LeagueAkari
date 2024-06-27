@@ -532,10 +532,11 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
     }
 
     const appExePath = app.getPath('exe')
+
     const appDir = path.dirname(appExePath)
-    const appDirParent = path.join(appDir, '..')
-    const newUpdateDirParent = path.join(newUpdateDir, '..')
-    const appDirName = path.basename(appDir)
+    const appDirParent = path.dirname(appDir)
+    const newUpdateDirParent = path.dirname(newUpdateDir)
+    const appOriginalBasename = path.basename(appDir)
 
     /**
      * 1. 等待退出 League Akari 主进程
@@ -554,7 +555,7 @@ Wait-Process -Name $processName -ErrorAction SilentlyContinue
 $sourceDir = "${newUpdateDir}"
 $targetDir = "${appDirParent}"
 $updateDir = "${newUpdateDirParent}"
-$originalDirName = "${appDirName}"
+$originalDirName = "${appOriginalBasename}"
 $shouldStartProcess = $${shouldStartNewApp}
 
 function Get-RandomValidDirectoryName {
@@ -570,23 +571,61 @@ function Get-RandomValidDirectoryName {
 
 $randomDirName = Get-RandomValidDirectoryName -targetDir $targetDir
 
-Write-Output "Copying..."
-Copy-Item -Path $sourceDir -Destination "$targetDir\\$randomDirName" -Recurse -Force
-
-Remove-Item -Path "$targetDir\\$originalDirName" -Recurse -Force
-Rename-Item -Path "$targetDir\\$randomDirName" -NewName $originalDirName
-Remove-Item -Path "$updateDir" -Recurse -Force
-
-if ($shouldStartProcess -eq $true) {
-  Write-Output "Starting: LeagueAkari.exe - Akari~"
-  Start-Process -FilePath "$targetDir\\$originalDirName\\$processName"
+Write-Output "Copying files from $sourceDir to $targetDir\\$randomDirName..."
+Try {
+    Copy-Item -Path $sourceDir -Destination "$targetDir\\$randomDirName" -Recurse -Force
+} Catch {
+    Write-Output "Error copying files: $_"
+    Exit
 }
 
-Remove-Item -Path $MyInvocation.MyCommand.Path -Force
+Write-Output "Removing original directory $targetDir\\$originalDirName..."
+Try {
+    Remove-Item -Path "$targetDir\\$originalDirName" -Recurse -Force
+} Catch {
+    Write-Output "Error removing original directory: $_"
+    Exit
+}
+
+Write-Output "Renaming $targetDir\\$randomDirName to $originalDirName..."
+Try {
+    Rename-Item -Path "$targetDir\\$randomDirName" -NewName $originalDirName
+} Catch {
+    Write-Output "Error renaming directory: $_"
+    Exit
+}
+
+
+Write-Output "Removing update directory $updateDir..."
+Try {
+    Remove-Item -Path "$updateDir" -Recurse -Force
+} Catch {
+    Write-Output "Error removing update directory: $_"
+    Exit
+}
+
+
+if ($shouldStartProcess -eq $true) {
+    Write-Output "Starting: LeagueAkari.exe - Akari~"
+    Try {
+        Start-Process -FilePath "$targetDir\\$originalDirName\\$processName"
+    } Catch {
+        Write-Output "Error starting process: $_"
+        Exit
+    }
+}
+
+Write-Output "Cleaning up script..."
+Try {
+    Remove-Item -Path $MyInvocation.MyCommand.Path -Force
+} Catch {
+    Write-Output "Error cleaning up script: $_"
+    Exit
+}
 `
 
     this._logger.info(
-      `generatedPowershellScript=${generatedPowershellScript}, appDirName=${appDirName}, appDirParent=${appDirParent}, newUpdateDir=${newUpdateDir}, shouldStartNewApp=${shouldStartNewApp}, appExePath=${appExePath}, appDir=${appDir}, newUpdateDirParent=${newUpdateDirParent}`
+      `generatedPowershellScript=${generatedPowershellScript}, appDirName=${appOriginalBasename}, appDirParent=${appDirParent}, newUpdateDir=${newUpdateDir}, shouldStartNewApp=${shouldStartNewApp}, appExePath=${appExePath}, appDir=${appDir}, newUpdateDirParent=${newUpdateDirParent}`
     )
 
     const scriptPath = path.join(app.getPath('temp'), AutoUpdateModule.UPDATE_SCRIPT_NAME)
