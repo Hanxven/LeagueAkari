@@ -21,7 +21,7 @@
           :class="{ best: baselineDamage && totalDamage === baselineDamage }"
           style="margin-left: 6px; width: 40px; text-align: right; font-size: 11px"
         >
-          {{ ((totalDamage / baselineDamage) * 100).toFixed(0) }} %
+          {{ ((totalDamage / (baselineDamage || 1)) * 100).toFixed(0) }} %
         </div>
       </div>
     </template>
@@ -43,7 +43,7 @@
           />
         </svg>
         <div style="margin-left: 8px">
-          {{ ((totalDamage / baselineDamage) * 100).toFixed(2) }} %
+          {{ ((totalDamage / (baselineDamage || 1)) * 100).toFixed(2) }} %
         </div>
       </div>
       <div class="divider"></div>
@@ -82,9 +82,13 @@ const props = withDefaults(
 
 const ordered = computed(() => {
   const list = [
-    { type: 'physical', x: 0, width: (props.physicalDamage / props.baselineDamage) * props.width },
-    { type: 'magic', x: 0, width: (props.magicDamage / props.baselineDamage) * props.width },
-    { type: 'true', x: 0, width: (props.trueDamage / props.baselineDamage) * props.width }
+    {
+      type: 'physical',
+      x: 0,
+      width: (props.physicalDamage / (props.baselineDamage || 1)) * props.width
+    },
+    { type: 'magic', x: 0, width: (props.magicDamage / (props.baselineDamage || 1)) * props.width },
+    { type: 'true', x: 0, width: (props.trueDamage / (props.baselineDamage || 1)) * props.width }
   ].sort((d1, d2) => d2.width - d1.width)
 
   for (let i = 1; i < list.length; i++) {
