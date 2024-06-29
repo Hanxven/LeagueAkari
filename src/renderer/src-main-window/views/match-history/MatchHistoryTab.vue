@@ -171,7 +171,7 @@
         />
       </div>
       <div
-        v-if="filteredGameCount === 0 && tab.loading.isLoadingMatchHistory"
+        v-if="filteredGameInfo.filteredCount === 0 && tab.loading.isLoadingMatchHistory"
         class="match-history-empty"
       >
         <NCard size="small">加载中</NCard>
@@ -179,10 +179,10 @@
       <div v-else-if="tab.matchHistory.isEmpty" class="match-history-empty">
         <NCard size="small">本页暂无战绩</NCard>
       </div>
-      <div v-else-if="filteredGameCount === 0" class="match-history-empty">
+      <div v-else-if="filteredGameInfo.filteredCount === 0" class="match-history-empty">
         <NCard size="small">本页没有符合筛选条件的目标</NCard>
       </div>
-      <PageMeta v-if="filteredGameCount >= 5" position="bottom" />
+      <PageMeta v-if="filteredGameInfo.filteredCount >= 5" position="bottom" />
     </div>
   </div>
 </template>
@@ -344,14 +344,6 @@ const renderLabel = (option: SelectOption): VNodeChild => {
     option.label as string
   )
 }
-
-const filteredGameCount = computed(() => {
-  return props.tab.matchHistory.games.filter(
-    (g) =>
-      g.game.queueId === props.tab.matchHistory.queueFilter ||
-      props.tab.matchHistory.queueFilter === -1
-  ).length
-})
 
 const filteredGameInfo = computed(() => {
   const all = props.tab.matchHistory.games.map((g) => {

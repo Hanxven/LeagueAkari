@@ -2,7 +2,9 @@
   <NCard size="small">
     <template #header
       ><span class="card-header-title"
-        >观战{{ gameflow.phase === 'Lobby' ? ' (需要先退出当前房间)' : '' }}</span
+        >观战<span v-if="gameflow.phase === 'Lobby'" style="color: yellow; font-size: 14px">
+          (需要先退出当前房间)</span
+        ></span
       ></template
     >
     <ControlItem
