@@ -10,6 +10,8 @@
 
 利用 League Client Update (LCU) API 实现的工具集，功能很多。
 
+[![Star History Chart](https://api.star-history.com/svg?repos=Hanxven/LeagueAkari&type=Date)](https://star-history.com/#Hanxven/LeagueAkari&Date)
+
 ## 1.1 使用方法
 
 在右侧 Release 中寻找最新的构建版本压缩包，解压后即可运行。
@@ -197,33 +199,7 @@ League Akari 的实现参考了许多现有的优秀开源项目，这些项目�
 
 # 9. FAQ
 
-1. Q: 打开时提示：“由于找不到 ffmpeg.dll，无法继续执行代码.重新安装程序可能会解决此问题。”
-
-   A: 在使用之前，需要先解压压缩包。
-
-2. Q: 我下载了，但没有找到主程序 LeagueAkari.exe，应该怎么运行？
-
-   A: 请确认下载的内容不是**源代码**。如果里面有一个文件夹是 `src`，那么九成是源代码。你应该从右侧的 Releases 中下载最新版本。
-
-3. Q: 打开时提示：“不是有效的 Win32 应用程序”
-
-   A: League Akari 所支持的最低系统需求是 Window 10 以及 64 位系统。
-
-4. Q: 会封号吗？
-
-   A: League Akari 实现基于 Riot 公开的 LCU API，但仍**不能保证**是否会因此被封号。已有人由于 “修改游戏客户端” 为由被封禁 1 小时。
-
-5. Q: 进入英雄选择界面后闪退，重连之后无法选择英雄和符文。
-
-   A: 已知问题，原因不明。
-
-6. Q: 无法获取战绩 / 战绩不更新。
-
-   A: League Akari 的大部分功能实现基于 LCU API。所有数据皆从接口请求而来。由于服务器问题，其数据可能会在某些时间出现无法访问（返回 503）或不更新（缺战绩）的情况，尤其是艾欧尼亚大区（HN1）。
-
-7. Q: 我还有其他问题。
-
-   A: 请速速进群交流，或创建 issue。
+[参见 FAQ.md](https://github.com/Hanxven/LeagueAkari/blob/main/FAQ.md "FAQ")
 
 # 10. 免责声明
 

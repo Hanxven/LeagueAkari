@@ -134,11 +134,26 @@
         </div>
       </div>
       <div class="user-status" v-if="tab.summoner">
-        <div v-if="!isSelfTab && tab.summoner.privacy === 'PRIVATE'" class="privacy-private-alert">
+        <div
+          v-if="!isSelfTab && tab.summoner.privacy === 'PRIVATE'"
+          class="statistics-block privacy-private-alert"
+        >
           <div class="title">生涯隐藏</div>
           <div class="content">
             {{ hideMatchHistoryText(tab.summoner.summonerId) }}
           </div>
+        </div>
+      </div>
+      <div class="statistics-block tag-text" v-if="false">
+        <div class="title">已标记的玩家</div>
+        <div class="content">
+          标记的，标记的内容。
+        </div>
+      </div>
+      <div class="statistics-block statistics" v-if="false">
+        <div class="title">对局历史</div>
+        <div class="content">
+          本页遇到过 xx 次，历史遇到过 xx 次。 作为队友 x 次。W - L 作为对手 x 次。W - L
         </div>
       </div>
       <PageMeta position="top" />
@@ -617,9 +632,8 @@ defineExpose({
   overflow-y: scroll;
 }
 
-.privacy-private-alert {
+.statistics-block {
   border-radius: 4px;
-  background-color: rgba(100, 14, 14, 0.6);
   padding: 8px 16px;
   color: rgb(255, 255, 255);
 
@@ -632,5 +646,9 @@ defineExpose({
     margin-top: 4px;
     font-size: 12px;
   }
+}
+
+.privacy-private-alert {
+  background-color: rgba(100, 14, 14, 0.6);
 }
 </style>
