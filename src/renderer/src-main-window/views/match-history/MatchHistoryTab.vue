@@ -146,9 +146,7 @@
       </div>
       <div class="statistics-block tag-text" v-if="false">
         <div class="title">已标记的玩家</div>
-        <div class="content">
-          标记的，标记的内容。
-        </div>
+        <div class="content">标记的，标记的内容。</div>
       </div>
       <div class="statistics-block statistics" v-if="false">
         <div class="title">对局历史</div>
@@ -157,7 +155,7 @@
         </div>
       </div>
       <PageMeta position="top" />
-      <div v-show="filteredGameCount !== 0" class="match-history-list">
+      <div v-show="filteredGameInfo.filteredCount" class="match-history-list">
         <MatchHistoryCard
           class="match-history-card-item"
           @set-show-detailed-game="handleToggleShowDetailedGame"
@@ -167,10 +165,8 @@
           :is-loading="g.isLoading"
           :is-expanded="g.isExpanded"
           :game="g.game"
-          v-for="g of tab.matchHistory.games"
-          v-show="
-            g.game.queueId === tab.matchHistory.queueFilter || tab.matchHistory.queueFilter === -1
-          "
+          v-for="g of filteredGameInfo.all"
+          v-show="g.show"
           :key="g.game.gameId"
         />
       </div>
@@ -314,6 +310,10 @@ const queueOptions = [
   {
     label: '无限乱斗',
     value: 900
+  },
+  {
+    label: 'Swarm',
+    value: '1810,1820,1830,1840,1850,1860,1870,1880,1890'
   }
 ]
 
@@ -327,15 +327,22 @@ const currentPageGameTypes = computed(() => {
 })
 
 const renderLabel = (option: SelectOption): VNodeChild => {
-  if (currentPageGameTypes.value.has(option.value as number)) {
-    return option.label as string
-  } else {
-    return h(
-      'span',
-      { style: 'color: #999', title: `本页无 ${option.label} 对局` },
-      option.label as string
-    )
+  if (typeof option.value === 'string') {
+    const ids = option.value.split(',').map(Number)
+    if (ids.some((id) => currentPageGameTypes.value.has(id))) {
+      return option.label as string
+    }
   }
+
+  if (typeof option.value === 'number' && currentPageGameTypes.value.has(option.value as number)) {
+    return option.label as string
+  }
+
+  return h(
+    'span',
+    { style: 'color: #999', title: `本页无 ${option.label} 对局` },
+    option.label as string
+  )
 }
 
 const filteredGameCount = computed(() => {
@@ -344,6 +351,26 @@ const filteredGameCount = computed(() => {
       g.game.queueId === props.tab.matchHistory.queueFilter ||
       props.tab.matchHistory.queueFilter === -1
   ).length
+})
+
+const filteredGameInfo = computed(() => {
+  const all = props.tab.matchHistory.games.map((g) => {
+    if (props.tab.matchHistory.queueFilter === -1) {
+      return { ...g, show: true }
+    }
+
+    const filter = props.tab.matchHistory.queueFilter
+    if (typeof filter === 'string') {
+      return { ...g, show: filter.split(',').map(Number).includes(g.game.queueId) }
+    } else {
+      return { ...g, show: g.game.queueId === filter }
+    }
+  })
+
+  return {
+    all,
+    filteredCount: all.filter((g) => g.show).length
+  }
 })
 
 const { Ctrl_Left, Ctrl_Right } = useMagicKeys()

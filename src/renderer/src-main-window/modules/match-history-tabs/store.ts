@@ -52,7 +52,7 @@ export interface SummonerTabMatchHistory {
   /** 每页战绩的数量 */
   pageSize: number
 
-  queueFilter: number
+  queueFilter: number | string
 }
 
 export interface TabState {
@@ -181,14 +181,6 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
     if (tab) {
       const match = tab.data.matchHistory.gamesMap[gameId]
       if (match) {
-        if (expand) {
-          Object.entries(tab.data.matchHistory.gamesMap).forEach(([_, m]) => {
-            if (m.isExpanded) {
-              m.isExpanded = false
-            }
-          })
-        }
-
         match.isExpanded = expand
       }
     }

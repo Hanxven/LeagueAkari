@@ -265,7 +265,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     puuid: string,
     page: number = 1,
     pageSize: number = 20,
-    queueFilter = -1
+    queueFilter: number | string = -1
   ) {
     const cf = useCoreFunctionalityStore()
     const mh = useMatchHistoryTabsStore()

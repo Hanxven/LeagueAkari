@@ -6,7 +6,11 @@
     <DefineSubTeam v-slot="{ participants, mode }">
       <div class="sub-team">
         <div class="player" v-for="p of participants" :key="p.participantId">
-          <LcuImage class="image" :src="championIcon(p.championId)" />
+          <LcuImage
+            class="image"
+            :src="championIcon(p.championId)"
+            :title="gameData.champions[p.championId]?.name"
+          />
           <div
             :title="
               summonerName(
@@ -72,10 +76,11 @@
             <LcuImage
               class="champion-icon"
               :src="championIcon(self.participant.championId)"
+              :title="gameData.champions[self.participant.championId]?.name"
             ></LcuImage>
             <div class="champion-level">{{ self.participant.stats.champLevel }}</div>
           </div>
-          <template v-if="game.gameMode === 'CHERRY'">
+          <template v-if="game.gameMode === 'CHERRY' || game.gameMode === 'STRAWBERRY'">
             <div class="summoner-spells">
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment1" :size="24" />
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment2" :size="24" />
@@ -83,6 +88,10 @@
             <div class="summoner-spells">
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment3" :size="24" />
               <AugmentDisplay :augment-id="self.participant.stats.playerAugment4" :size="24" />
+            </div>
+            <div class="summoner-spells" v-if="game.gameMode === 'STRAWBERRY'">
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment5" :size="24" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment6" :size="24" />
             </div>
           </template>
           <template v-else>
@@ -137,7 +146,7 @@
           <ItemDisplay :size="24" is-trinket :item-id="self.participant.stats.item6" />
         </div>
       </div>
-      <div class="summary" v-if="self.summary">
+      <div class="summary" v-if="self.summary && game.gameMode !== 'STRAWBERRY'">
         <div class="kpr" title="在队伍中参与了击杀的程度">
           {{ (self.summary.kpr * 100).toFixed(1) }} % 击杀
         </div>
@@ -210,6 +219,12 @@
           :self-puuid="selfPuuid"
           v-if="game.gameMode === 'CHERRY'"
         />
+        <StrawberryModeDetailedGame
+          class="detailed-game"
+          :game="game"
+          :self-puuid="selfPuuid"
+          v-else-if="game.gameMode === 'STRAWBERRY'"
+        />
         <NormalNodeDetailedGame class="detailed-game" v-else :game="game" :self-puuid="selfPuuid" />
       </template>
       <div v-else-if="isLoading" class="loading">加载中...</div>
@@ -245,6 +260,7 @@ import '../lol-view.less'
 import CherryModeDetailedGame from './CherryModeDetailedGame.vue'
 import MiscellaneousPanel from './MiscellaneousPanel.vue'
 import NormalNodeDetailedGame from './NormalModeDetailedGame.vue'
+import StrawberryModeDetailedGame from './StrawberryModeDetailedGame.vue'
 
 const props = defineProps<{
   selfPuuid?: string
@@ -494,7 +510,7 @@ const handleToSummoner = (puuid: string) => {
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  width: 208px;
+  width: 240px;
 
   .stats {
     display: flex;

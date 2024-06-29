@@ -9,7 +9,8 @@
         :class="{
           prismatic: gameData.augments[augmentId].rarity === 'kPrismatic',
           gold: gameData.augments[augmentId].rarity === 'kGold',
-          silver: gameData.augments[augmentId].rarity === 'kSilver'
+          silver: gameData.augments[augmentId].rarity === 'kSilver',
+          bronze: gameData.augments[augmentId].rarity === 'kBronze'
         }"
       />
     </template>
@@ -22,7 +23,8 @@
         :class="{
           prismatic: gameData.augments[augmentId].rarity === 'kPrismatic',
           gold: gameData.augments[augmentId].rarity === 'kGold',
-          silver: gameData.augments[augmentId].rarity === 'kSilver'
+          silver: gameData.augments[augmentId].rarity === 'kSilver',
+          bronze: gameData.augments[augmentId].rarity === 'kBronze'
         }"
         class="rarity-indicator"
       ></span>
@@ -98,6 +100,11 @@ const formatRarity = (r: string) => {
   background-color: rgb(35, 35, 34);
 }
 
+.augment.bronze {
+  border: 1px solid rgb(139, 69, 19);
+  background-color: rgb(35, 35, 34);
+}
+
 .info {
   display: flex;
   align-items: center;
@@ -137,5 +144,9 @@ const formatRarity = (r: string) => {
 
 .rarity-indicator.prismatic {
   background-image: linear-gradient(135deg, #f6d7ff, #b453cf);
+}
+
+.rarity-indicator.bronze {
+  background-color: rgb(139, 69, 19);
 }
 </style>

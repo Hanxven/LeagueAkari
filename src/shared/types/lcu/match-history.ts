@@ -113,6 +113,8 @@ export interface Stats {
   playerAugment2: number
   playerAugment3: number
   playerAugment4: number
+  playerAugment5: number
+  playerAugment6: number
   killingSprees: number
   kills: number
   largestCriticalStrike: number
