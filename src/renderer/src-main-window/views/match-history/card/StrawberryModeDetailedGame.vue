@@ -8,7 +8,7 @@
               {{ participants[0].stats.win ? '胜利' : '失败' }}
             </th>
             <th class="header-augments">强化</th>
-            <th class="header-damage">伤害 / 承受</th>
+            <th class="header-damage">伤害 & 承受</th>
             <th class="header-gold">金币</th>
             <th class="header-items">物品</th>
           </tr>
@@ -57,7 +57,7 @@
                 <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment6" />
               </div>
             </td>
-            <td style="width: 140px">
+            <td style="width: 160px">
               <div class="damage">
                 <DamageMetricsBar
                   :baseline-damage="match.recordStats.maxTotalDamageDealt"
@@ -258,7 +258,6 @@ table {
 }
 
 .kda,
-.damage,
 .cs,
 .wards {
   display: flex;
@@ -342,6 +341,9 @@ table {
 }
 
 .damage {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
   color: rgb(214, 214, 214);
   font-size: 11px;
 }

@@ -6,7 +6,7 @@
           <tr>
             <th class="header-info">
               {{ `第${chineseNumber[participants[0]?.stats.subteamPlacement - 1] ?? ' ? '}名` }} ({{
-                participants[0].stats.subteamPlacement <= (match.maxPlacement / 2) ? '胜利' : '失败'
+                participants[0].stats.subteamPlacement <= match.maxPlacement / 2 ? '胜利' : '失败'
               }})
             </th>
             <th class="header-augments">强化符文</th>
@@ -49,11 +49,7 @@
                         p.identity.player.gameName || p.identity.player.summonerName,
                         p.identity.player.tagLine
                       )
-                    }}{{
-                      p.identity.player.puuid === EMPTY_PUUID
-                        ? ' (人机)'
-                        : ''
-                    }}
+                    }}{{ p.identity.player.puuid === EMPTY_PUUID ? ' (人机)' : '' }}
                   </div>
                   <!-- <div class="rank">-</div> -->
                 </div>
@@ -344,7 +340,6 @@ table {
 }
 
 .kda,
-.damage,
 .cs,
 .wards {
   display: flex;
@@ -428,6 +423,9 @@ table {
 }
 
 .damage {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
   color: rgb(214, 214, 214);
   font-size: 11px;
 }

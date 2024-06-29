@@ -35,7 +35,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
 
   static PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT = 3250
   static PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT = 10000
-  static PLAY_AGAIN_BUFFER_TIMEOUT = 750
+  static PLAY_AGAIN_BUFFER_TIMEOUT = 1575
 
   constructor() {
     super('auto-gameflow')

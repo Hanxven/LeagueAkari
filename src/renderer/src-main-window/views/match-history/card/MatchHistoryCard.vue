@@ -755,7 +755,7 @@ const handleToSummoner = (puuid: string) => {
 }
 
 .lose {
-  border-left: 6px solid rgb(203, 61, 0);
+  border-left: 6px solid rgb(158, 48, 1);
 
   .game {
     .mode {
@@ -768,7 +768,7 @@ const handleToSummoner = (puuid: string) => {
   }
 
   .show-more {
-    background-color: rgb(202, 73, 17);
+    background-color: rgb(158, 48, 1);
   }
 }
 

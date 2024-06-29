@@ -365,7 +365,6 @@ table {
 }
 
 .kda,
-.damage,
 .cs,
 .wards {
   display: flex;
@@ -418,6 +417,9 @@ table {
 }
 
 .damage {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
   color: rgb(214, 214, 214);
   font-size: 11px;
 }
