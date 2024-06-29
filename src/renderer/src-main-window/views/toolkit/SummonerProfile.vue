@@ -72,8 +72,8 @@
     <ControlItem
       class="control-item-margin"
       :label-description="
-        summoner.me && summoner.me?.summonerLevel <= MINIMUM_SUMMONER_LEVEL_FOR_PRESTIGE_CREST
-          ? '卸下头像框 (召唤师等级需大于等于 525)'
+        summoner.me && summoner.me.summonerLevel <= MINIMUM_SUMMONER_LEVEL_FOR_PRESTIGE_CREST
+          ? `卸下头像框 (召唤师等级需大于等于 525, 当前 ${summoner.me.summonerLevel})`
           : '卸下头像框'
       "
       label="卸下头像框"

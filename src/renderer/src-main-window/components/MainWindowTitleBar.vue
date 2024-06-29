@@ -133,7 +133,7 @@
       <span class="title" v-else-if="lc.state === 'connecting'"
         >League Akari <span class="connecting">连接中</span></span
       >
-      <span class="title" v-else>League Akari <span class="disconnected">[未连接]</span></span>
+      <span class="title" v-else>{{ titleText }} <span class="disconnected">[未连接]</span></span>
     </div>
     <div class="traffic">
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
@@ -177,7 +177,17 @@ import { Close as CloseIcon } from '@vicons/ionicons5'
 import { UpgradeFilled as UpgradeFilledIcon } from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
-import { inject, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
+
+const app = useAppStore()
+
+const titleText = computed(() => {
+  if (app.version.includes('rabi')) {
+    return `League Akari ${app.version}`
+  } else {
+    return `League Akari`
+  }
+})
 
 const appInject = inject('app') as any
 
@@ -185,7 +195,6 @@ const handleShowAboutSettings = async () => {
   appInject.openSettingsModal('about')
 }
 
-const app = useAppStore()
 const mw = useMainWindowStore()
 const respawnTimer = useRespawnTimerStore()
 const autoGameflow = useAutoGameflowStore()
