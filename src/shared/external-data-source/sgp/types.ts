@@ -1,13 +1,13 @@
 export interface SgpMatchHistoryLol {
-  games: SgpGameLol[]
+  games: SgpGameSummaryLol[]
 }
 
-export interface SgpGameLol {
+export interface SgpGameSummaryLol {
   metadata: SgpGameMetadataLol
-  json: SgpGameJsonLol
+  json: SgpGameSummaryJsonLol
 }
 
-export interface SgpGameJsonLol {
+export interface SgpGameSummaryJsonLol {
   endOfGameResult: string
   gameCreation: number
   gameDuration: number
@@ -495,4 +495,143 @@ interface Companion {
   item_ID: number
   skin_ID: number
   species: string
+}
+
+export interface SgpGameDetailsLol {
+  metadata: SgpGameMetadataLol
+  json: SgpGameJsonDetailsLol
+}
+
+interface SgpGameJsonDetailsLol {
+  endOfGameResult: string
+  frameInterval: number
+  frames: Frame[]
+  gameId: number
+  participants: Participant[]
+}
+
+interface Participant {
+  participantId: number
+  puuid: string
+}
+
+interface Frame {
+  events: Event[]
+  participantFrames: ParticipantFrames
+  timestamp: number
+}
+
+interface ParticipantFrames {
+  [key: string]: ParticipantFrame
+}
+
+interface ParticipantFrame {
+  championStats: ChampionStats
+  currentGold: number
+  damageStats: DamageStats
+  goldPerSecond: number
+  jungleMinionsKilled: number
+  level: number
+  minionsKilled: number
+  participantId: number
+  position: Position
+  timeEnemySpentControlled: number
+  totalGold: number
+  xp: number
+}
+
+interface DamageStats {
+  magicDamageDone: number
+  magicDamageDoneToChampions: number
+  magicDamageTaken: number
+  physicalDamageDone: number
+  physicalDamageDoneToChampions: number
+  physicalDamageTaken: number
+  totalDamageDone: number
+  totalDamageDoneToChampions: number
+  totalDamageTaken: number
+  trueDamageDone: number
+  trueDamageDoneToChampions: number
+  trueDamageTaken: number
+}
+
+interface ChampionStats {
+  abilityHaste: number
+  abilityPower: number
+  armor: number
+  armorPen: number
+  armorPenPercent: number
+  attackDamage: number
+  attackSpeed: number
+  bonusArmorPenPercent: number
+  bonusMagicPenPercent: number
+  ccReduction: number
+  cooldownReduction: number
+  health: number
+  healthMax: number
+  healthRegen: number
+  lifesteal: number
+  magicPen: number
+  magicPenPercent: number
+  magicResist: number
+  movementSpeed: number
+  omnivamp: number
+  physicalVamp: number
+  power: number
+  powerMax: number
+  powerRegen: number
+  spellVamp: number
+}
+
+interface Event {
+  realTimestamp?: number
+  timestamp: number
+  type: string
+  levelUpType?: string
+  participantId?: number
+  skillSlot?: number
+  itemId?: number
+  creatorId?: number
+  wardType?: string
+  level?: number
+  bounty?: number
+  killStreakLength?: number
+  killerId?: number
+  position?: Position
+  shutdownBounty?: number
+  victimDamageReceived?: VictimDamageReceived[]
+  victimId?: number
+  killType?: string
+  afterId?: number
+  beforeId?: number
+  goldGain?: number
+  laneType?: string
+  teamId?: number
+  victimDamageDealt?: VictimDamageReceived[]
+  assistingParticipantIds?: number[]
+  killerTeamId?: number
+  monsterType?: string
+  monsterSubType?: string
+  multiKillLength?: number
+  buildingType?: string
+  towerType?: string
+  gameId?: number
+  winningTeam?: number
+}
+
+interface VictimDamageReceived {
+  basic: boolean
+  magicDamage: number
+  name: string
+  participantId: number
+  physicalDamage: number
+  spellName: string
+  spellSlot: number
+  trueDamage: number
+  type: string
+}
+
+interface Position {
+  x: number
+  y: number
 }
