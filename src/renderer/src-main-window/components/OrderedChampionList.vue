@@ -14,7 +14,11 @@
             placeholder="英雄"
             filterable
             ref="select"
-            :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
+            :filter="
+              (a, b) =>
+                isChampionNameMatch(a, b.label as string) ||
+                Boolean(b.value?.toString().includes(a))
+            "
           ></NSelect>
           <NButton
             class="button"

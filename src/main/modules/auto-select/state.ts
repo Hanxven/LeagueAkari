@@ -1,6 +1,7 @@
 import { Action } from '@shared/types/lcu/champ-select'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
+import { appModule } from '../akari-core/app'
 import { lcuSyncModule as lcu } from '../lcu-state-sync'
 
 class AutoSelectSettings {
@@ -198,8 +199,11 @@ export class AutoSelectState {
     )
 
     // 现在可选的英雄，排除不可选的和服务器当前允许选择的 (受制于热禁用等)
+    // DEBUG PBE 模式整活，仅限 Kyoko 模式
     const pickables = this.settings.expectedChampions.filter(
-      (c) => !unpickables.has(c) && a.currentPickables.has(c)
+      (c) =>
+        !unpickables.has(c) &&
+        ((appModule.state.settings.isInKyokoMode && c >= 3000) || a.currentPickables.has(c))
     )
 
     if (!pickables.length) {
