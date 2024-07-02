@@ -19,6 +19,7 @@ import { LcuConnectionModule } from '../akari-core/lcu-connection'
 import { AppLogger, LogModule } from '../akari-core/log'
 import { MainWindowModule } from '../akari-core/main-window'
 import { PlatformModule } from '../akari-core/platform'
+import { SettingService } from '../akari-core/storage'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { CoreFunctionalityState } from './state'
 
@@ -65,8 +66,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this._mwm = this.manager.getModule('main-window')
     this._pm = this.manager.getModule('win-platform')
 
-    await this._loadSettings()
-    this._setupSettingsSync()
+    await this._setupSettingsSync()
     this._setupStateSync()
     this._setupMethodCall()
 
@@ -77,8 +77,25 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this._handleSendInGame()
     this._handleSavePlayerInEndgame()
     this._handleTaggedPlayerReminder()
+    this._handleLogging()
 
     this._logger.info('初始化完成')
+  }
+
+  private _handleLogging() {
+    this.autoDisposeReaction(
+      () => this.state.ongoingGameInfo,
+      () => {
+        this._logger.info(`当前游戏信息: ${toJS(this.state.ongoingGameInfo)}`)
+      }
+    )
+
+    this.autoDisposeReaction(
+      () => this.state.queryState,
+      (s) => {
+        this._logger.info(`当前对局分析查询阶段: ${s}`)
+      }
+    )
   }
 
   private _handleOngoingAnalyzing() {
@@ -711,25 +728,26 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
             return
           }
 
-          runInAction(() => {
-            player.matchHistory = matchHistory.data.games.games.map((g) => ({
-              game: g,
-              isDetailed: false
-            }))
+          const withDetailedFields = matchHistory.data.games.games.map((g) => ({
+            game: g,
+            isDetailed: false
+          }))
+
+          withDetailedFields.forEach((g) => {
+            if (g.isDetailed) {
+              this.state.tempDetailedGames.set(g.game.gameId, g.game)
+            }
           })
 
-          this.sendEvent(
-            'update/ongoing-player/match-history',
-            puuid,
-            matchHistory.data.games.games
-          )
+          runInAction(() => {
+            player.matchHistory = withDetailedFields
+          })
+
+          this.sendEvent('update/ongoing-player/match-history', puuid, withDetailedFields)
 
           const loadGameTasks: Promise<void>[] = []
-          const loadCount = Math.min(
-            player.matchHistory!.length,
-            this.state.settings.teamAnalysisPreloadCount
-          )
-          for (let i = 0; i < loadCount; i++) {
+
+          for (let i = 0; i < this.state.settings.matchHistoryLoadCount; i++) {
             const game = player.matchHistory![i]
 
             const _loadGame = async () => {
@@ -834,45 +852,6 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     return Promise.reject(e)
   }
 
-  private _setupSettingsSync() {
-    this.simpleSync(
-      'settings/auto-route-on-game-start',
-      () => this.state.settings.autoRouteOnGameStart
-    )
-    this.simpleSync(
-      'settings/ongoing-analysis-enabled',
-      () => this.state.settings.ongoingAnalysisEnabled
-    )
-    this.simpleSync('settings/fetch-after-game', () => this.state.settings.fetchAfterGame)
-    this.simpleSync('settings/fetch-detailed-game', () => this.state.settings.fetchDetailedGame)
-    this.simpleSync(
-      'settings/match-history-load-count',
-      () => this.state.settings.matchHistoryLoadCount
-    )
-    this.simpleSync(
-      'settings/pre-made-team-threshold',
-      () => this.state.settings.preMadeTeamThreshold
-    )
-    this.simpleSync('settings/send-kda-in-game', () => this.state.settings.sendKdaInGame)
-    this.simpleSync(
-      'settings/send-kda-in-game-with-pre-made-teams',
-      () => this.state.settings.sendKdaInGameWithPreMadeTeams
-    )
-    this.simpleSync('settings/send-kda-threshold', () => this.state.settings.sendKdaThreshold)
-    this.simpleSync(
-      'settings/player-analysis-fetch-concurrency',
-      () => this.state.settings.playerAnalysisFetchConcurrency
-    )
-    this.simpleSync(
-      'settings/team-analysis-preload-count',
-      () => this.state.settings.teamAnalysisPreloadCount
-    )
-    this.simpleSync(
-      'settings/delay-seconds-before-loading',
-      () => this.state.settings.delaySecondsBeforeLoading
-    )
-  }
-
   private _setupStateSync() {
     this.simpleSync('is-in-endgame-phase', () => this.state.isInEndgamePhase)
     this.simpleSync('ongoing-game-info', () => this.state.ongoingGameInfo)
@@ -888,103 +867,11 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this.onCall('get/ongoing-players', (_) => {
       return toJS(this.state.ongoingPlayers)
     })
+
     this.onCall('update/send-list', (puuid: string, send: boolean) => {
       if (this.state.sendList[puuid] !== undefined) {
         runInAction(() => (this.state.sendList[puuid] = send))
       }
-    })
-    this.onCall('set-setting/auto-route-on-game-start', async (enabled) => {
-      this.state.settings.setAutoRouteOnGameStart(enabled)
-      await this._sm.settings.set('core-functionality/auto-route-on-game-start', enabled)
-    })
-    this.onCall('set-setting/fetch-after-game', async (enabled) => {
-      this.state.settings.setFetchAfterGame(enabled)
-      await this._sm.settings.set('core-functionality/fetch-after-game', enabled)
-    })
-    this.onCall('set-setting/fetch-detailed-game', async (enabled) => {
-      this.state.settings.setFetchDetailedGame(enabled)
-      await this._sm.settings.set('core-functionality/fetch-detailed-game', enabled)
-    })
-
-    const setPreMadeTeamThreshold = async (threshold: number) => {
-      if (threshold <= 1 || threshold > this.state.settings.teamAnalysisPreloadCount) {
-        return
-      }
-
-      this.state.settings.setPreMadeTeamThreshold(threshold)
-      await this._sm.settings.set('core-functionality/pre-made-team-threshold', threshold)
-    }
-
-    const setTeamAnalysisPreloadCount = async (count: number) => {
-      if (count <= 1 || count < this.state.settings.preMadeTeamThreshold) {
-        return
-      }
-
-      this.state.settings.setTeamAnalysisPreloadCount(count)
-      await this._sm.settings.set('core-functionality/team-analysis-preload-count', count)
-    }
-
-    this.onCall('set-setting/match-history-load-count', async (count) => {
-      if (count <= 1 || count > 200) {
-        return
-      }
-
-      if (count < this.state.settings.preMadeTeamThreshold) {
-        await setPreMadeTeamThreshold(count)
-      }
-
-      if (count < this.state.settings.teamAnalysisPreloadCount) {
-        await setTeamAnalysisPreloadCount(count)
-      }
-
-      this.state.settings.setMatchHistoryLoadCount(count)
-      await this._sm.settings.set('core-functionality/match-history-load-count', count)
-    })
-
-    this.onCall('set-setting/pre-made-team-threshold', (threshold) =>
-      setPreMadeTeamThreshold(threshold)
-    )
-
-    this.onCall('set-setting/send-kda-in-game', async (enabled) => {
-      this.state.settings.setSendKdaInGame(enabled)
-      await this._sm.settings.set('core-functionality/send-kda-in-game', enabled)
-    })
-
-    this.onCall('set-setting/team-analysis-preload-count', (count) =>
-      setTeamAnalysisPreloadCount(count)
-    )
-
-    this.onCall('set-setting/send-kda-in-game-with-pre-made-teams', async (enabled) => {
-      this.state.settings.setSendKdaInGameWithPreMadeTeams(enabled)
-      await this._sm.settings.set(
-        'core-functionality/send-kda-in-game-with-pre-made-teams',
-        enabled
-      )
-    })
-
-    this.onCall('set-setting/ongoing-analysis-enabled', async (enabled) => {
-      this.state.settings.setOngoingAnalysisEnabled(enabled)
-      await this._sm.settings.set('core-functionality/ongoing-analysis-enabled', enabled)
-    })
-
-    this.onCall('set-setting/send-kda-threshold', async (threshold) => {
-      if (threshold < 0) {
-        threshold = 0
-      }
-
-      this.state.settings.setSendKdaThreshold(threshold)
-      await this._sm.settings.set('core-functionality/send-kda-threshold', threshold)
-    })
-
-    this.onCall('set-setting/player-analysis-fetch-concurrency', async (limit) => {
-      if (limit < 0) {
-        limit = 1
-      }
-
-      this._playerAnalysisFetchLimiter.concurrency = limit
-
-      this.state.settings.setPlayerAnalysisFetchConcurrency(limit)
-      await this._sm.settings.set('core-functionality/player-analysis-fetch-concurrency', limit)
     })
 
     this.onCall('save/saved-player', async (player) => {
@@ -1009,101 +896,128 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
       return r
     })
-
-    this.onCall('set-setting/delay-seconds-before-loading', async (delay) => {
-      if (delay < 0) {
-        delay = 0
-      }
-
-      this.state.settings.setDelaySecondsBeforeLoading(delay)
-      await this._sm.settings.set('core-functionality/delay-seconds-before-loading', delay)
-    })
   }
 
-  private async _loadSettings() {
-    this.state.settings.setAutoRouteOnGameStart(
-      await this._sm.settings.get(
-        'core-functionality/auto-route-on-game-start',
-        this.state.settings.autoRouteOnGameStart
-      )
+  private async _setupSettingsSync() {
+    this.simpleSettingSync(
+      'auto-route-on-game-start',
+      () => this.state.settings.autoRouteOnGameStart,
+      (s) => this.state.settings.setAutoRouteOnGameStart(s)
     )
 
-    this.state.settings.setFetchDetailedGame(
-      await this._sm.settings.get(
-        'core-functionality/fetch-detailed-game',
-        this.state.settings.fetchDetailedGame
-      )
+    this.simpleSettingSync(
+      'fetch-detailed-game',
+      () => this.state.settings.fetchDetailedGame,
+      (s) => this.state.settings.setFetchDetailedGame(s)
     )
 
-    this.state.settings.setMatchHistoryLoadCount(
-      await this._sm.settings.get(
-        'core-functionality/match-history-load-count',
-        this.state.settings.matchHistoryLoadCount
-      )
+    this.simpleSettingSync(
+      'send-kda-in-game',
+      () => this.state.settings.sendKdaInGame,
+      (s) => this.state.settings.setSendKdaInGame(s)
     )
 
-    this.state.settings.setPreMadeTeamThreshold(
-      await this._sm.settings.get(
-        'core-functionality/pre-made-team-threshold',
-        this.state.settings.preMadeTeamThreshold
-      )
+    this.simpleSettingSync(
+      'send-kda-in-game-with-pre-made-teams',
+      () => this.state.settings.sendKdaInGameWithPreMadeTeams,
+      (s) => this.state.settings.setSendKdaInGameWithPreMadeTeams(s)
     )
 
-    this.state.settings.setSendKdaInGame(
-      await this._sm.settings.get(
-        'core-functionality/send-kda-in-game',
-        this.state.settings.sendKdaInGame
-      )
+    this.simpleSettingSync(
+      'send-kda-threshold',
+      () => this.state.settings.sendKdaThreshold,
+      (s, ss) => {
+        if (s < 0) {
+          s = 0
+        }
+
+        this.state.settings.setSendKdaThreshold(s)
+        ss.set('send-kda-threshold', s)
+        return true
+      }
     )
 
-    this.state.settings.setSendKdaInGameWithPreMadeTeams(
-      await this._sm.settings.get(
-        'core-functionality/send-kda-in-game-with-pre-made-teams',
-        this.state.settings.sendKdaInGameWithPreMadeTeams
-      )
+    this.simpleSettingSync(
+      'fetch-after-game',
+      () => this.state.settings.fetchAfterGame,
+      (s) => this.state.settings.setFetchAfterGame(s)
     )
 
-    this.state.settings.setSendKdaThreshold(
-      await this._sm.settings.get(
-        'core-functionality/send-kda-threshold',
-        this.state.settings.sendKdaThreshold
-      )
+    this.simpleSettingSync(
+      'player-analysis-fetch-concurrency',
+      () => this.state.settings.playerAnalysisFetchConcurrency,
+      async (s, ss) => {
+        if (s < 1) {
+          s = 1
+        }
+
+        this._playerAnalysisFetchLimiter.concurrency = s
+
+        this.state.settings.setPlayerAnalysisFetchConcurrency(s)
+        await ss.set('player-analysis-fetch-concurrency', s)
+
+        return true
+      }
     )
 
-    this.state.settings.setTeamAnalysisPreloadCount(
-      await this._sm.settings.get(
-        'core-functionality/team-analysis-preload-count',
-        this.state.settings.teamAnalysisPreloadCount
-      )
+    this.simpleSettingSync(
+      'ongoing-analysis-enabled',
+      () => this.state.settings.ongoingAnalysisEnabled,
+      (s) => this.state.settings.setOngoingAnalysisEnabled(s)
     )
 
-    this.state.settings.setFetchAfterGame(
-      await this._sm.settings.get(
-        'core-functionality/fetch-after-game',
-        this.state.settings.fetchAfterGame
-      )
+    this.simpleSettingSync(
+      'delay-seconds-before-loading',
+      () => this.state.settings.delaySecondsBeforeLoading,
+      async (s, ss) => {
+        if (s < 0) {
+          s = 0
+        }
+
+        this.state.settings.setDelaySecondsBeforeLoading(s)
+        await ss.set('delay-seconds-before-loading', s)
+        return true
+      }
     )
 
-    this.state.settings.setPlayerAnalysisFetchConcurrency(
-      await this._sm.settings.get(
-        'core-functionality/player-analysis-fetch-concurrency',
-        this.state.settings.playerAnalysisFetchConcurrency
-      )
+    const setPreMadeTeamThreshold = async (threshold: number, ss: SettingService) => {
+      if (threshold <= 1) {
+        return
+      }
+
+      this.state.settings.setPreMadeTeamThreshold(threshold)
+      await ss.set('pre-made-team-threshold', threshold)
+    }
+
+    this.simpleSettingSync(
+      'match-history-load-count',
+      () => this.state.settings.matchHistoryLoadCount,
+      async (count, ss) => {
+        if (count <= 1 || count > 200) {
+          return
+        }
+
+        if (count < this.state.settings.preMadeTeamThreshold) {
+          await setPreMadeTeamThreshold(count, ss)
+        }
+
+        this.state.settings.setMatchHistoryLoadCount(count)
+        await ss.set('match-history-load-count', count)
+
+        return true
+      }
     )
 
-    this.state.settings.setOngoingAnalysisEnabled(
-      await this._sm.settings.get(
-        'core-functionality/ongoing-analysis-enabled',
-        this.state.settings.ongoingAnalysisEnabled
-      )
+    this.simpleSettingSync(
+      'pre-made-team-threshold',
+      () => this.state.settings.preMadeTeamThreshold,
+      async (threshold, ss) => {
+        await setPreMadeTeamThreshold(threshold, ss)
+        return true
+      }
     )
 
-    this.state.settings.setDelaySecondsBeforeLoading(
-      await this._sm.settings.get(
-        'core-functionality/delay-seconds-before-loading',
-        this.state.settings.delaySecondsBeforeLoading
-      )
-    )
+    await this.loadSettings()
   }
 }
 

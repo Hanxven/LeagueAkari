@@ -3,8 +3,8 @@
     <div class="wrapper" @click.self="handleHideModal">
       <MatchHistoryCard
         class="card"
-        v-if="game"
-        :game="game"
+        v-if="uncontrolledGame"
+        :game="uncontrolledGame"
         :self-puuid="selfPuuid"
         :is-detailed="true"
         :is-loading="isLoading"
@@ -40,12 +40,13 @@ import MatchHistoryCard from './MatchHistoryCard.vue'
 
 const props = defineProps<{
   gameId?: number
+  game?: Game
   selfPuuid?: string
 }>()
 
 const show = defineModel<boolean>('show', { default: false })
 
-const game = shallowRef<Game | null>(null)
+const uncontrolledGame = shallowRef<Game | null>(null)
 const isExpanded = ref(true)
 const isLoading = ref(false)
 const isFailedToLoad = ref(false)
@@ -62,7 +63,7 @@ const fetchGame = async (gameId: number) => {
   try {
     const g = (await getGame(gameId)).data
     if (g.gameId === props.gameId) {
-      game.value = g
+      uncontrolledGame.value = g
     }
   } catch (error) {
     isFailedToLoad.value = true
@@ -93,7 +94,7 @@ const handleReload = async () => {
 watch(
   [() => props.gameId, () => props.selfPuuid],
   ([gameId, _selfId]) => {
-    game.value = null
+    uncontrolledGame.value = null
 
     if (gameId) {
       fetchGame(gameId)

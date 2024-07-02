@@ -58,6 +58,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     this._handleAutoAccept()
     this._handleAutoSearchMatch()
     this._handleAutoPlayAgain()
+    this._handleLogging()
 
     this._logger.info('初始化完成')
   }
@@ -246,6 +247,16 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     this.onCall('cancel-auto-search-match', () => {
       this.cancelAutoSearchMatch('normal')
     })
+  }
+
+  private _handleLogging() {
+    // 监听 gameflow
+    this.autoDisposeReaction(
+      () => this._lcu.gameflow.phase,
+      (phase) => {
+        this._logger.info(`游戏流阶段变化: ${phase}`)
+      }
+    )
   }
 
   cancelAutoAccept(reason?: string) {

@@ -114,20 +114,6 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="预组队分析样本局数"
-        label-description="为了分析预组队情况而进行的详细对局拉取数量，不能小于预组队判定阈值"
-        :label-width="320"
-      >
-        <NInputNumber
-          style="width: 100px"
-          size="tiny"
-          :min="2"
-          :value="cf.settings.teamAnalysisPreloadCount"
-          @update:value="(val) => cfm.setTeamAnalysisPreloadCount(val || 4)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
         label="对局中请求并发数"
         label-description="在对局分析中，所进行的所有网络请求总并发数限制。它并不会限制其他模块的请求并发数"
         :label-width="320"

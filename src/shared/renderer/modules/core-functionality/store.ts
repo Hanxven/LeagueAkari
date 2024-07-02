@@ -98,9 +98,6 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     // 用于判断预组队的阈值
     preMadeTeamThreshold: 3,
 
-    // 为了判断预组队而进行的每名玩家提前加载的数量
-    teamAnalysisPreloadCount: 4,
-
     // 是否拉取页面的所有详细对局
     fetchDetailedGame: false,
 
@@ -119,6 +116,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     // 对局中战绩获取的最大并发限制
     playerAnalysisFetchConcurrency: 5,
 
+    // 延迟加载时间
     delaySecondsBeforeLoading: 0
   })
 

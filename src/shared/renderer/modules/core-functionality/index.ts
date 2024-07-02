@@ -56,10 +56,6 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
       (s) => (store.settings.playerAnalysisFetchConcurrency = s)
     )
     this.simpleSync(
-      'settings/team-analysis-preload-count',
-      (s) => (store.settings.teamAnalysisPreloadCount = s)
-    )
-    this.simpleSync(
       'settings/delay-seconds-before-loading',
       (s) => (store.settings.delaySecondsBeforeLoading = s)
     )
@@ -94,14 +90,17 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
       }
     })
 
-    this.onEvent('update/ongoing-player/match-history', (puuid, history: Game[]) => {
-      if (store.ongoingPlayers[puuid]) {
-        store.ongoingPlayers[puuid].matchHistory = history.map((g) => ({
-          isDetailed: false,
-          game: markRaw(g)
-        }))
+    this.onEvent(
+      'update/ongoing-player/match-history',
+      (puuid, history: { idDetailed: boolean; game: Game }[]) => {
+        if (store.ongoingPlayers[puuid]) {
+          store.ongoingPlayers[puuid].matchHistory = history.map((g) => ({
+            isDetailed: g.idDetailed,
+            game: markRaw(g.game)
+          }))
+        }
       }
-    })
+    )
 
     this.onEvent('update/ongoing-player/match-history/detailed-game', (puuid, game) => {
       if (store.ongoingPlayers[puuid]) {
@@ -153,10 +152,6 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
 
   setSendKdaInGame(value: boolean) {
     return this.call('set-setting/send-kda-in-game', value)
-  }
-
-  setTeamAnalysisPreloadCount(value: number) {
-    return this.call('set-setting/team-analysis-preload-count', value)
   }
 
   setSendKdaInGameWithPreMadeTeams(value: boolean) {

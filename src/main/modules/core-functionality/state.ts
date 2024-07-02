@@ -15,7 +15,6 @@ class CoreFunctionalitySettings {
 
   autoRouteOnGameStart: boolean = true
   preMadeTeamThreshold: number = 3
-  teamAnalysisPreloadCount: number = 4
   fetchDetailedGame: boolean = true
   matchHistoryLoadCount: number = 20
   sendKdaInGame: boolean = false
@@ -27,6 +26,8 @@ class CoreFunctionalitySettings {
   playerAnalysisFetchConcurrency: number = 3
 
   delaySecondsBeforeLoading: number = 1
+
+  matchHistorySource: 'lcu' | 'sgp' = 'lcu'
 
   constructor() {
     makeAutoObservable(this)
@@ -46,10 +47,6 @@ class CoreFunctionalitySettings {
 
   setPreMadeTeamThreshold(value: number) {
     this.preMadeTeamThreshold = value
-  }
-
-  setTeamAnalysisPreloadCount(value: number) {
-    this.teamAnalysisPreloadCount = value
   }
 
   setFetchDetailedGame(value: boolean) {
@@ -82,6 +79,10 @@ class CoreFunctionalitySettings {
 
   setDelaySecondsBeforeLoading(value: number) {
     this.delaySecondsBeforeLoading = value
+  }
+
+  setMatchHistorySource(value: 'lcu' | 'sgp') {
+    this.matchHistorySource = value
   }
 }
 

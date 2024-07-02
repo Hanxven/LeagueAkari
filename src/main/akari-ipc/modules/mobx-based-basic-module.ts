@@ -11,7 +11,10 @@ type SimpleStateGetter = () => any
 /**
  * 返回值用于接管默认的更新方式，设置为 truthy 将不会自动更新设置
  */
-type SimpleStateSetter = (value: any, s: SettingService) => boolean | void | undefined
+type SimpleStateSetter = (
+  value: any,
+  s: SettingService
+) => boolean | void | undefined | Promise<boolean | void | undefined>
 
 /**
  * 实现了一些基于 Mobx 的简单状态管理封装，该模块依赖于 `storage` 模块。
@@ -75,7 +78,7 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
    */
   simpleSettingSync(settingName: string, getter: SimpleStateGetter, setter: SimpleStateSetter) {
     const _wrappedSetter = async (value: any) => {
-      if (!setter(value, this._ss)) {
+      if (!(await setter(value, this._ss))) {
         await this._ss.set(settingName, value)
       }
     }

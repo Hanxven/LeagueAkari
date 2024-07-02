@@ -333,6 +333,7 @@ table {
 .kda {
   color: rgb(214, 214, 214);
   font-size: 11px;
+  text-align: center;
 }
 
 .damage {
