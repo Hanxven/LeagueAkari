@@ -1,6 +1,6 @@
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { formatError } from '@shared/utils/errors'
-import { computed } from 'mobx'
+import { comparer, computed } from 'mobx'
 
 import { AppLogger, LogModule } from '../akari-core/log'
 import { LcuSyncModule } from '../lcu-state-sync'
@@ -119,16 +119,19 @@ export class ExternalDataSourceModule extends MobxBasedBasicModule {
   }
 
   private _handleUpdateBalanceData() {
-    const gameInfo = computed(() => {
-      if (!this._lcu.gameflow.session) {
-        return null
-      }
+    const gameInfo = computed(
+      () => {
+        if (!this._lcu.gameflow.session) {
+          return null
+        }
 
-      return {
-        gameMode: this._lcu.gameflow.session.map.gameMode,
-        queueType: this._lcu.gameflow.session.gameData.queue.type
-      }
-    })
+        return {
+          gameMode: this._lcu.gameflow.session.map.gameMode,
+          queueType: this._lcu.gameflow.session.gameData.queue.type
+        }
+      },
+      { equals: comparer.structural }
+    )
 
     this.autoDisposeReaction(
       () => gameInfo.get(),
