@@ -9,7 +9,21 @@ import { AppModule } from './app'
 import { AuxWindowModule } from './auxiliary-window'
 import { AppLogger, LogModule } from './log'
 
+class MainWindowSettings {
+  windowSize: [number, number] = [1000, 700]
+
+  constructor() {
+    makeAutoObservable(this)
+  }
+
+  setWindowSize(size: [number, number]) {
+    this.windowSize = size
+  }
+}
+
 class MainWindowState {
+  settings = new MainWindowSettings()
+
   state: 'normal' | 'maximized' | 'minimized' = 'normal'
 
   focus: 'focused' | 'blurred' = 'focused'
@@ -54,6 +68,8 @@ export class MainWindowModule extends MobxBasedBasicModule {
 
   static INITIAL_SHOW = false
   static PARTITION = 'persist:main-window'
+  static WINDOW_DEFAULT_SIZE = [1000, 700] as [number, number]
+  static WINDOW_MIN_SIZE = [800, 520] as [number, number]
 
   constructor() {
     super('main-window')
@@ -73,14 +89,39 @@ export class MainWindowModule extends MobxBasedBasicModule {
     this._awm = this.manager.getModule<AuxWindowModule>('auxiliary-window')
     this._logger = this._logModule.createLogger('main-window')
 
+    await this._loadSettings()
     this._setupStateSync()
     this._setupMethodCall()
+    this._handleChores()
 
     app.on('before-quit', () => {
       this._nextCloseAction = 'quit'
     })
 
     this._logger.info('初始化完成')
+  }
+
+  /**
+   * 一些杂项监听
+   */
+  private async _handleChores() {
+    // 保存窗口大小，一秒内只保存一次
+    this.autoDisposeReaction(
+      () => this.state.settings.windowSize,
+      (size) => {
+        size[0] = Math.max(size[0], MainWindowModule.WINDOW_MIN_SIZE[0])
+        size[1] = Math.max(size[1], MainWindowModule.WINDOW_MIN_SIZE[1])
+        this._ss.set('window-size', size)
+      },
+      { delay: 1000 }
+    )
+  }
+
+  private async _loadSettings() {
+    this.state.settings.windowSize = await this._ss.get(
+      'window-size',
+      MainWindowModule.WINDOW_DEFAULT_SIZE
+    )
   }
 
   private _handleCloseMainWindow(event: Event) {
@@ -121,11 +162,14 @@ export class MainWindowModule extends MobxBasedBasicModule {
   }
 
   private _createWindow() {
+    const [w, h] = this.state.settings.windowSize
+    const [minW, minH] = MainWindowModule.WINDOW_MIN_SIZE
+
     this._w = new BrowserWindow({
-      width: 1000,
-      height: 700,
-      minWidth: 800,
-      minHeight: 520,
+      width: w,
+      height: h,
+      minWidth: minW,
+      minHeight: minH,
       frame: false,
       show: MainWindowModule.INITIAL_SHOW,
       title: 'League Akari',
@@ -146,6 +190,13 @@ export class MainWindowModule extends MobxBasedBasicModule {
     this._w.on('ready-to-show', () => {
       this.state.setReady(true)
       this._w?.show()
+    })
+
+    this._w.on('resize', () => {
+      const size = this._w?.getSize()
+      if (size) {
+        this.state.settings.setWindowSize(size as [number, number])
+      }
     })
 
     this._w.on('show', () => {
