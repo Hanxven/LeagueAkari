@@ -48,7 +48,9 @@
         ></NSelect>
         <NButton
           :disabled="
-            queueLobbySettings.queueId === null || Number.isNaN(Number(queueLobbySettings.queueId))
+            lc.state !== 'connected' ||
+            queueLobbySettings.queueId === null ||
+            Number.isNaN(Number(queueLobbySettings.queueId))
           "
           @click="handleCreateQueueLobby"
           size="tiny"

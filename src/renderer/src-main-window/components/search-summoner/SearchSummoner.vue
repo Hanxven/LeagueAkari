@@ -3,7 +3,7 @@
     <div class="search-inner">
       <div class="search-input-area">
         <NAutoComplete
-          :get-show="() => true"
+          :get-show="() => inputText.length === 0"
           :options="autoCompleteOptions"
           @focus="() => generateCompleteOptions()"
           ref="inputEl"
