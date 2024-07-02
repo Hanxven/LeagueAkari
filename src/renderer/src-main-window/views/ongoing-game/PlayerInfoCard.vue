@@ -39,7 +39,7 @@
                   >相关对局：<span
                     class="encountered-game"
                     v-for="g of savedInfo.encounteredGames.slice(0, 10)"
-                    @click="() => emits('showGame', g, puuid)"
+                    @click="() => emits('showGameById', g, puuid)"
                     >{{ g }}</span
                   ></span
                 >
@@ -178,7 +178,12 @@
               marginBottom: `${matchHistoryItemMargin}px`
             }"
             v-for="m of list"
-            @click="() => emits('showGame', m.data.game.gameId, puuid)"
+            @click="
+              (_) =>
+                m.data.isDetailed
+                  ? emits('showGame', m.data.game, puuid)
+                  : emits('showGameById', m.data.game.gameId, puuid)
+            "
             :key="m.data.game.gameId"
           >
             <LcuImage class="image" :src="championIcon(m.data.selfParticipant.championId)" />
@@ -231,6 +236,7 @@ import {
 import { championIcon } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { winRateTeamText } from '@shared/renderer/utils/sarcasms'
+import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
@@ -244,7 +250,8 @@ import RankedSpan from '../match-history/widgets/RankedSpan.vue'
 
 const emits = defineEmits<{
   (e: 'toSummoner', puuid: string): void
-  (e: 'showGame', gameId: number, selfPuuid: string): void
+  (e: 'showGame', game: Game, selfPuuid: string): void
+  (e: 'showGameById', gameId: number, selfPuuid: string): void
   (e: 'showSavedInfo', puuid: string): void
 }>()
 

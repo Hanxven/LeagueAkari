@@ -280,7 +280,9 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
       tab.data.loading.isLoadingMatchHistory = true
 
       try {
-        const previousExpanded = new Set(tab.data.matchHistory.games.filter((g) => g.isExpanded).map((g) => g.game.gameId))
+        const previousExpanded = new Set(
+          tab.data.matchHistory.games.filter((g) => g.isExpanded).map((g) => g.game.gameId)
+        )
 
         const matchHistory = (
           await getMatchHistory(tab.data.summoner.puuid, (page - 1) * pageSize, page * pageSize - 1)

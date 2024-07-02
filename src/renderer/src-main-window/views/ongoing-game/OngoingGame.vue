@@ -2,8 +2,8 @@
   <div class="ongoing-game-wrapper" ref="el">
     <!-- 提供一个简单的历史对局查看工具 -->
     <StandaloneMatchHistoryCardModal
-      :game-id="showingGame.id"
-      :self-puuid="showingGame.puuid"
+      :game="showingGame.game"
+      :self-puuid="showingGame.selfPuuid"
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
     <PlayerTagEditModal v-model:show="isPlayerTagEditModalShow" :puuid="tagEditingSummonerPuuid" />
@@ -26,7 +26,8 @@
             :team="team"
             :queue-type="cf.ongoingGameInfo?.queueType"
             :saved-info="p.savedInfo"
-            @show-game="(id, selfId) => handleShowGame(id, selfId)"
+            @show-game-by-id="(id, selfId) => handleShowGameById(id, selfId)"
+            @show-game="(game, puuid) => handleShowGame(game, puuid)"
             @to-summoner="(id) => handleToSummoner(id)"
             @show-saved-info="(id) => handleTagEditing(id)"
           />
@@ -59,8 +60,7 @@
             }"
           >
             <div class="team-side">
-              {{ formatTeamText(g.team) }} ({{ g.times
-              }}{{ g.times >= cf.settings.teamAnalysisPreloadCount ? '+' : '' }}
+              {{ formatTeamText(g.team) }} ({{ g.times }}
               场对局)
             </div>
             <div class="players">
@@ -165,6 +165,7 @@ import { championIcon } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
+import { Game } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { NCard, NCheckbox, NFlex, NSpin } from 'naive-ui'
@@ -264,15 +265,28 @@ const formatTeamText = (team: string) => {
   }
 }
 
-const showingGame = reactive({
-  id: 0,
-  puuid: ''
+const showingGame = reactive<{
+  gameId: number
+  game: Game | null
+  selfPuuid: string
+}>({
+  gameId: 0,
+  game: null,
+  selfPuuid: ''
 })
 
 const isStandaloneMatchHistoryCardShow = ref(false)
-const handleShowGame = (gameId: number, puuid: string) => {
-  showingGame.id = gameId
-  showingGame.puuid = puuid
+const handleShowGame = (game: Game, puuid: string) => {
+  showingGame.gameId = 0
+  showingGame.game = game
+  showingGame.selfPuuid = puuid
+  isStandaloneMatchHistoryCardShow.value = true
+}
+
+const handleShowGameById = (id: number, selfId: string) => {
+  showingGame.gameId = id
+  showingGame.game = null
+  showingGame.selfPuuid = selfId
   isStandaloneMatchHistoryCardShow.value = true
 }
 

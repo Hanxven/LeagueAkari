@@ -3,11 +3,11 @@
     <div class="wrapper" @click.self="handleHideModal">
       <MatchHistoryCard
         class="card"
-        v-if="uncontrolledGame"
-        :game="uncontrolledGame"
+        v-if="showingGame"
+        :game="showingGame"
         :self-puuid="selfPuuid"
         :is-detailed="true"
-        :is-loading="isLoading"
+        :is-loading="!game && isLoading"
         :is-expanded="selfPuuid ? isExpanded : true"
         @set-show-detailed-game="(_, expand) => (isExpanded = expand)"
       />
@@ -34,13 +34,13 @@ import { laNotification } from '@shared/renderer/notification'
 import { Game } from '@shared/types/lcu/match-history'
 import { AxiosError } from 'axios'
 import { NButton, NModal } from 'naive-ui'
-import { ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 
 import MatchHistoryCard from './MatchHistoryCard.vue'
 
 const props = defineProps<{
+  game?: Game | null
   gameId?: number
-  game?: Game
   selfPuuid?: string
 }>()
 
@@ -51,6 +51,10 @@ const isExpanded = ref(true)
 const isLoading = ref(false)
 const isFailedToLoad = ref(false)
 const isNotFound = ref(false)
+
+const showingGame = computed(() => {
+  return props.game || uncontrolledGame.value || null
+})
 
 const fetchGame = async (gameId: number) => {
   if (isLoading.value) {
@@ -85,15 +89,19 @@ const handleHideModal = () => {
 }
 
 const handleReload = async () => {
-  if (!props.gameId) {
+  if (!props.gameId || props.game) {
     return
   }
   await fetchGame(props.gameId)
 }
 
 watch(
-  [() => props.gameId, () => props.selfPuuid],
-  ([gameId, _selfId]) => {
+  [() => props.game, () => props.gameId, () => props.selfPuuid],
+  ([game, gameId, _selfId]) => {
+    if (game) {
+      return
+    }
+
     uncontrolledGame.value = null
 
     if (gameId) {
