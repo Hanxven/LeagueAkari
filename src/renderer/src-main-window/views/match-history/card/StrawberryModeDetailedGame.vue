@@ -7,6 +7,7 @@
             <th class="header-info">
               {{ participants[0].stats.win ? '胜利' : '失败' }}
             </th>
+            <th class="header-kda">KDA</th>
             <th class="header-augments">强化</th>
             <th class="header-damage">伤害 & 承受</th>
             <th class="header-gold">金币</th>
@@ -46,6 +47,9 @@
                   </div>
                 </div>
               </div>
+            </td>
+            <td style="width: 64px">
+              <div class="kda">{{ p.stats.kills }}/{{ p.stats.deaths }}/{{ p.stats.assists }}</div>
             </td>
             <td style="width: 180px">
               <div class="augments">
@@ -257,7 +261,6 @@ table {
   gap: 2px;
 }
 
-.kda,
 .cs,
 .wards {
   display: flex;
@@ -329,15 +332,7 @@ table {
 
 .kda {
   color: rgb(214, 214, 214);
-
-  .kda-text {
-    font-size: 11px;
-  }
-
-  .kda-ratio {
-    font-size: 11px;
-    font-weight: 700;
-  }
+  font-size: 11px;
 }
 
 .damage {
