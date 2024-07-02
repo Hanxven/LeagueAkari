@@ -6,7 +6,7 @@ import {
 import { GithubApiLatestRelease } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosResponse } from 'axios'
-import { app } from 'electron'
+import { app, shell } from 'electron'
 import { comparer, makeAutoObservable, observable, toJS } from 'mobx'
 import { extractFull } from 'node-7z'
 import cp from 'node:child_process'
@@ -771,6 +771,11 @@ Try {
 
     this.onCall('cancel-update', () => {
       this._cancelUpdateProcess()
+    })
+
+    this.onCall('open-in-explorer/new-updates', () => {
+      const p = path.join(app.getPath('userData'), AutoUpdateModule.DOWNLOAD_DIR_NAME)
+      return shell.openPath(p)
     })
   }
 

@@ -109,6 +109,18 @@
             </NStep>
           </NSteps>
         </ControlItem>
+        <ControlItem
+          class="control-item-margin"
+          label="更新文件夹"
+          label-description="当前更新已下载的位置，若无法只能自动僧更新流程，将需要手动更新"
+          :label-width="180"
+          v-if="
+            processStatus.current >= 2 ||
+            (processStatus.current === 1 && processStatus.status !== 'error')
+          "
+        >
+          <NButton size="tiny" secondary @click="() => aum.openDownloadDir()">打开目录</NButton>
+        </ControlItem>
       </NCard>
       <div class="about-para copyright">© 2024 Hanxven. 本软件是开源软件，遵循 MIT 许可证。</div>
     </div>

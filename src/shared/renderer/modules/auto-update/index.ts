@@ -43,6 +43,10 @@ export class AutoUpdateRendererModule extends StateSyncModule {
   setDownloadSource(source: string) {
     return this.call('set-setting/download-source', source)
   }
+
+  openDownloadDir() {
+    return this.call('open-in-explorer/new-updates')
+  }
 }
 
 export const autoUpdateRendererModule = new AutoUpdateRendererModule()
