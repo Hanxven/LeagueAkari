@@ -12,7 +12,7 @@ export function useKeepAliveScrollPositionMemo(el: MaybeRefOrGetter) {
   const { x, y } = useScroll(el)
 
   onActivated(() => {
-    x.value = lastTop
+    x.value = lastLeft
     y.value = lastTop
   })
 

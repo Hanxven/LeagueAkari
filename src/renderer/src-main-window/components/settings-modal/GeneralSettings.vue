@@ -43,6 +43,23 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">战绩获取</span></template>
+      <ControlItem class="control-item-margin" label="战绩源" :label-width="320">
+        <template #labelDescription>
+          <div>将从指定的战绩源拉取玩家战绩信息</div>
+          <div><span style="font-weight: 700">SGP: </span>直接请求远程服务器，将绕过 LCU 客户端</div>
+          <div><span style="font-weight: 700">LCU: </span>通过 LCU 客户端获取</div>
+        </template>
+        <NSelect
+          style="width: 160px"
+          size="tiny"
+          :value="cf.settings.matchHistorySource"
+          @update:value="(val) => cfm.setMatchHistorySource(val)"
+          :options="matchHistorySourceOptions"
+        />
+      </ControlItem>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">对局分析</span></template>
       <ControlItem
         class="control-item-margin"
@@ -73,7 +90,7 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="自动切换到对局页面"
+        label="自动切换至对局页面"
         label-description="在进入英雄选择或其他游戏状态时，自动切换到“对局”页面"
         :label-width="320"
       >
@@ -311,12 +328,27 @@ import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { respawnTimerRendererModule as rtm } from '@shared/renderer/modules/respawn-timer'
 import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
-import { NButton, NCard, NFlex, NInput, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
+import {
+  NButton,
+  NCard,
+  NFlex,
+  NInput,
+  NInputNumber,
+  NScrollbar,
+  NSelect,
+  NSlider,
+  NSwitch
+} from 'naive-ui'
 
 const rt = useRespawnTimerStore()
 const cf = useCoreFunctionalityStore()
 const aux = useAuxiliaryWindowStore()
 const app = useAppStore()
+
+const matchHistorySourceOptions = [
+  { label: 'SGP', value: 'sgp' },
+  { label: 'LCU', value: 'lcu' }
+]
 </script>
 
 <style lang="less" scoped>

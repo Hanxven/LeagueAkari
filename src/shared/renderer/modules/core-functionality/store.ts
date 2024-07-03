@@ -81,7 +81,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
 
   const sendList = ref<Record<string | number, boolean>>({})
 
-  const ongoingState = ref<'unavailable' | 'in-game' | 'champ-select'>('unavailable')
+  const queryState = ref<'unavailable' | 'in-game' | 'champ-select'>('unavailable')
   const ongoingTeams = shallowRef<Record<string, number[]> | null>(null)
   const isInEndgamePhase = ref(false)
   const ongoingChampionSelections = shallowRef<Record<string | number, number> | null>(null)
@@ -117,7 +117,10 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     playerAnalysisFetchConcurrency: 5,
 
     // 延迟加载时间
-    delaySecondsBeforeLoading: 0
+    delaySecondsBeforeLoading: 0,
+
+    // 对局来源
+    matchHistorySource: 'lcu'
   })
 
   return {
@@ -125,7 +128,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     ongoingGameInfo,
     ongoingTeams,
     ongoingPreMadeTeams,
-    queryState: ongoingState,
+    queryState,
     isInEndgamePhase,
     ongoingChampionSelections,
     isWaitingForDelay,

@@ -1017,6 +1017,12 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       }
     )
 
+    this.simpleSettingSync(
+      'match-history-source',
+      () => this.state.settings.matchHistorySource,
+      (s) => this.state.settings.setMatchHistorySource(s)
+    )
+
     await this.loadSettings()
   }
 }

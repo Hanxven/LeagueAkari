@@ -1,4 +1,5 @@
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { SgpApi } from '@shared/external-data-source/sgp/match-history'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
 
@@ -37,47 +38,25 @@ export class BalanceEds {
   async setup() {
     this._lcu = this._edsm.manager.getModule('lcu-state-sync')
   }
+}
 
-  // private _handleUpdateBalanceData() {
-  //   const gameInfo = computed(() => {
-  //     if (!this._lcu.gameflow.session) {
-  //       return null
-  //     }
+export class SgpEds {
+  private _lcu: LcuSyncModule
+  private _sgp = new SgpApi()
 
-  //     return {
-  //       gameMode: this._lcu.gameflow.session.map.gameMode,
-  //       queueType: this._lcu.gameflow.session.gameData.queue.type
-  //     }
-  //   })
+  constructor(private _edsm: ExternalDataSourceModule) {}
 
-  //   this._edsm.autoDisposeReaction(
-  //     () => gameInfo.get(),
-  //     async (info) => {
-  //       if (!info) {
-  //         return
-  //       }
+  async setup() {
+    this._lcu = this._edsm.manager.getModule('lcu-state-sync')
 
-  //       this._updateBalanceData(info.gameMode, info.queueType)
-  //     },
-  //     { fireImmediately: true }
-  //   )
-  // }
+    this._setupMethodCall()
+  }
 
-  // private async _updateBalanceData(gameMode: string, _queueType: string) {
-  //   if (ExternalDataSourceModule.BALANCE_MODES.has(gameMode)) {
-  //     try {
-  //       this._edsm.logger.info(
-  //         `尝试更新英雄平衡性数据，数据源 ${this.state.balance.fandom.name}  ${this.state.balance.fandom.id} ${this.state.balance.fandom.version}`
-  //       )
-  //       await this.state.balance.updateData()
-  //       this._edsm.logger.info(
-  //         `英雄平衡性数据更新完成 ${this.state.balance.fandom.name}  ${this.state.balance.fandom.id} ${this.state.balance.fandom.version}`
-  //       )
-  //     } catch (error) {
-  //       this._edsm.logger.warn(`获取英雄平衡性数据源时发生错误 ${formatError(error)}`)
-  //     }
-  //   }
-  // }
+  private _setupMethodCall() {
+    this._edsm.onCall('supported-sgp-servers', () => {
+      return this._sgp.supportedPlatforms()
+    })
+  }
 }
 
 export class ExternalDataSourceModule extends MobxBasedBasicModule {

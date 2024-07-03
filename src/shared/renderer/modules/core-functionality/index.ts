@@ -55,6 +55,7 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
       'settings/player-analysis-fetch-concurrency',
       (s) => (store.settings.playerAnalysisFetchConcurrency = s)
     )
+    this.simpleSync('settings/match-history-source', (s) => (store.settings.matchHistorySource = s))
     this.simpleSync(
       'settings/delay-seconds-before-loading',
       (s) => (store.settings.delaySecondsBeforeLoading = s)
@@ -176,6 +177,10 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
 
   setDelaySecondsBeforeLoading(value: number) {
     return this.call('set-setting/delay-seconds-before-loading', value)
+  }
+
+  setMatchHistorySource(value: string) {
+    return this.call('set-setting/match-history-source', value)
   }
 }
 

@@ -29,6 +29,10 @@ export class SgpApi {
     return SgpApi.SGP_SERVERS[platformId.toUpperCase()] !== undefined
   }
 
+  supportedPlatforms() {
+    return Object.keys(SgpApi.SGP_SERVERS)
+  }
+
   hasJwtToken() {
     return this._jwtToken !== null
   }
