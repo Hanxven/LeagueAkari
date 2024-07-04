@@ -3,13 +3,13 @@ import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 
 export const useExternalDataSourceStore = defineStore('module:external-data-source', () => {
-  const balance = shallowRef<{
+  const balanceData = shallowRef<{
     name: string
     map: ChampBalanceMapV1
     updateAt: Date
   } | null>(null)
 
   return {
-    balance
+    balanceData
   }
 })

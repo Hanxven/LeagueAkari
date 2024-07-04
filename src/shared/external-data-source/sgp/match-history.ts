@@ -7,8 +7,8 @@ export class SgpApi {
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
 
   static SGP_SERVERS = {
-    HN1: 'https://hn1-k8s-sgp.lol.qq.com:21019', // 艾欧尼亚
-    HN10: 'https://hn10-k8s-sgp.lol.qq.com:21019', // 黑色玫瑰
+    HN1: 'https://hn1-cloud-sgp.lol.qq.com:21019', // 艾欧尼亚
+    HN10: 'https://hn10-cloud-sgp.lol.qq.com:21019', // 黑色玫瑰
     TJ100: 'https://tj100-sgp.lol.qq.com:21019', // 天津
     TJ101: 'https://tj101-sgp.lol.qq.com:21019', // 天津
     NJ100: 'https://nj100-sgp.lol.qq.com:21019', // 南京
@@ -18,6 +18,9 @@ export class SgpApi {
     SG2: 'https://apse1-red.pp.sgp.pvp.net/' // 新加坡
   } as const
 
+  /**
+   * SGP API 需要用户登录的 Session
+   */
   private _jwtToken: string | null = null
   private _http = axios.create({
     headers: {

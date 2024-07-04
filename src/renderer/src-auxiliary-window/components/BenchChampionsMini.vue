@@ -34,7 +34,7 @@
                 >{{ formatBalanceValue(b.value, b.meta.type === 'percentage') }}</span
               >
             </div>
-            <div class="balance-data-source-name">{{ eds.balance?.name }}</div>
+            <div class="balance-data-source-name">{{ eds.balanceData?.name }}</div>
           </div>
         </NTooltip>
         <div class="btns">
@@ -98,7 +98,7 @@
                 >{{ formatBalanceValue(b.value, b.meta.type === 'percentage') }}</span
               >
             </div>
-            <div class="balance-data-source-name">{{ eds.balance?.name }}</div>
+            <div class="balance-data-source-name">{{ eds.balanceData?.name }}</div>
           </div>
         </NTooltip>
         <div
@@ -136,11 +136,11 @@ const gameMode = computed(() => {
 })
 
 const getBalanceData = (id: number) => {
-  if (!eds.balance || !gameMode.value) {
+  if (!eds.balanceData || !gameMode.value) {
     return null
   }
 
-  return eds.balance.map[id]?.balance['aram'] || null
+  return eds.balanceData.map[id]?.balance['aram'] || null
 }
 
 const BALANCE_TYPES: Record<

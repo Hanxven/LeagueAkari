@@ -47,8 +47,11 @@
       <ControlItem class="control-item-margin" label="战绩源" :label-width="320">
         <template #labelDescription>
           <div>将从指定的战绩源拉取玩家战绩信息</div>
-          <div><span style="font-weight: 700">SGP: </span>直接请求远程服务器，将绕过 LCU 客户端</div>
-          <div><span style="font-weight: 700">LCU: </span>通过 LCU 客户端获取</div>
+          <div>
+            <span style="font-weight: 700">SGP: </span
+            >直接请求远程服务器。若当前区域不受支持，则使用 LCU API
+          </div>
+          <div><span style="font-weight: 700">LCU: </span>通过 LCU API 获取</div>
         </template>
         <NSelect
           style="width: 160px"
@@ -299,13 +302,13 @@
         v-if="false"
         :disabled="!app.isAdministrator"
         class="control-item-margin"
-        label="使用自定义脚本"
-        label-description="使用自定义脚本生成发送的文本内容"
+        label="使用自定义 JavaScript 脚本"
+        label-description="使用自定义脚本生成发送的文本内容。须注意自定义脚本的安全性，应仅从可信来源获取脚本"
         :label-width="320"
       >
         <NFlex>
           <NInput
-            placeholder="提供路径"
+            placeholder="JavaScript 脚本路径"
             style="max-width: 240px"
             :disabled="!app.isAdministrator"
             size="tiny"

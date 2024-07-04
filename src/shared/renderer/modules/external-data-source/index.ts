@@ -16,7 +16,7 @@ export class ExternalDataSourceRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useExternalDataSourceStore()
 
-    this.simpleSync('balance', (s) => (store.balance = s))
+    this.simpleSync('balance/data', (s) => (store.balanceData = s))
   }
 }
 
