@@ -22,6 +22,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "@types/luaparse": "^0.2.12",
+    "@vicons/fluent": "^0.12.0",
     "@vicons/material": "^0.12.0",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
@@ -73,5 +74,5 @@
     "vue-router": "^4.4.0",
     "vue-tsc": "^2.0.24"
   },
-  "packageManager": "yarn@4.1.1"
+  "packageManager": "yarn@4.3.1"
 }

@@ -309,6 +309,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
             await this._initHttpInstance(auth)
             clearTimeout(timeoutTimer)
           } catch (error) {
+            this._lcuWs?.close()
             reject(error)
           }
 
@@ -388,6 +389,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
             `尝试连接到 LCU 时发生错误：${(error as any)?.message}`
           )
           this._logger.error(`尝试连接到 LCU 客户端时发生错误 ${formatError(error)}`)
+          break
         }
       }
 

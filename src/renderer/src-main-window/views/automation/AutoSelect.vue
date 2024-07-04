@@ -83,7 +83,7 @@
           size="small"
         ></NSwitch>
       </ControlItem>
-      <ControlItem class="control-item-margin" label="选用延迟 (s)">
+      <ControlItem class="control-item-margin" label="选用最低累积时间 (s)">
         <template #labelDescription>
           目标英雄出现在英雄选择台上的累计时间需达到此值才会执行交换操作，单位为秒
           <NTooltip>
@@ -91,7 +91,7 @@
               ><span style="text-decoration: underline; font-weight: 700">(?)</span></template
             >
             <div style="font-size: 12px; max-width: 300px">
-              当英雄出现在英雄选择台上时，会针对该英雄进行计时。只有其在英雄选择台上的累计时间满足设定值时，则执行自动选择，这可以避免“秒抢”的发生。
+              当英雄出现在英雄选择台上时，会针对该英雄进行计时。仅当其在英雄选择台上的累计时间满足设定值时，自动交换才会执行，避免过早选择英雄，即 “秒抢”
             </div>
           </NTooltip>
         </template>

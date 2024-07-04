@@ -491,11 +491,6 @@ export class AppModule extends MobxBasedBasicModule {
       (s) => (this._cfm.state.settings.preMadeTeamThreshold = s)
     )
     await _toNewSettings(
-      'matchHistory.teamAnalysisPreloadCount',
-      'core-functionality/team-analysis-preload-count',
-      (s) => (this._cfm.state.settings.teamAnalysisPreloadCount = s)
-    )
-    await _toNewSettings(
       'matchHistory.matchHistoryLoadCount',
       'core-functionality/match-history-load-count',
       (s) => (this._cfm.state.settings.matchHistoryLoadCount = s)

@@ -129,25 +129,27 @@
       </div>
     </div>
     <div class="title-area">
-      <span class="title" v-if="lc.state === 'connected'">League Akari</span>
+      <span class="title" v-if="lc.state === 'connected'">{{ titleText }} </span>
       <span class="title" v-else-if="lc.state === 'connecting'"
-        >League Akari <span class="connecting">连接中</span></span
+        >{{ titleText }} <span class="connecting">连接中</span></span
       >
       <span class="title" v-else>{{ titleText }} <span class="disconnected">[未连接]</span></span>
     </div>
     <div class="traffic">
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
-        <NIcon><MinimizeIcon /></NIcon>
+        <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
       </div>
       <div
         :title="mw.windowState === 'normal' ? '最大化' : '还原'"
         class="traffic-button maximize"
         @click="handleMaximize"
       >
-        <NIcon><MaximizeIcon v-if="mw.windowState === 'normal'" /><CarbonIcon v-else /> </NIcon>
+        <NIcon
+          ><Maximize20RegularIcon v-if="mw.windowState === 'normal'" /><CarbonIcon v-else />
+        </NIcon>
       </div>
       <div title="关闭" class="traffic-button close" @click="handleClose">
-        <NIcon><CloseIcon /></NIcon>
+        <NIcon><CloseOutlinedIcon /></NIcon>
       </div>
     </div>
   </div>
@@ -168,13 +170,18 @@ import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import {
   Carbon as CarbonIcon,
   Hourglass as HourglassIcon,
-  Maximize as MaximizeIcon,
-  Minimize as MinimizeIcon,
   Queued as QueuedIcon,
   Time as TimeIcon
 } from '@vicons/carbon'
-import { Close as CloseIcon } from '@vicons/ionicons5'
-import { UpgradeFilled as UpgradeFilledIcon } from '@vicons/material'
+import {
+  DividerShort20Regular as DividerShort20RegularIcon,
+  Maximize20Regular as Maximize20RegularIcon
+} from '@vicons/fluent'
+import {
+  CloseOutlined as CloseOutlinedIcon,
+  MinimizeFilled as MinimizeFilledIcon,
+  UpgradeFilled as UpgradeFilledIcon
+} from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
 import { computed, inject, ref, watch } from 'vue'
@@ -183,7 +190,7 @@ const app = useAppStore()
 
 const titleText = computed(() => {
   if (app.version.includes('rabi')) {
-    return `League Akari ${app.version}`
+    return `League Rabi [${app.version.split('-')[1]}]`
   } else {
     return `League Akari`
   }
@@ -452,7 +459,7 @@ const autoUpdateTaskShow = useCompleteVisibility(autoUpdateTaskEl, titleBarItems
     justify-content: center;
     height: 100%;
     width: 45px;
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
     transition: all 0.3s;
     -webkit-app-region: no-drag;

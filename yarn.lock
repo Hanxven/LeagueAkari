@@ -1454,6 +1454,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vicons/fluent@npm:^0.12.0":
+  version: 0.12.0
+  resolution: "@vicons/fluent@npm:0.12.0"
+  checksum: 10c0/a306fa48cac7c9fbc8ba19895b4e41c3de12d86c1cd315f432d671ceef9799853126babc165d96bb1ffbc5ba4af26fd45b173bf462ce596be4e8cc9ea52c88e9
+  languageName: node
+  linkType: hard
+
 "@vicons/ionicons5@npm:^0.12.0":
   version: 0.12.0
   resolution: "@vicons/ionicons5@npm:0.12.0"
@@ -3873,6 +3880,7 @@ __metadata:
     "@types/semver": "npm:^7.5.8"
     "@types/ws": "npm:^8.5.10"
     "@vicons/carbon": "npm:^0.12.0"
+    "@vicons/fluent": "npm:^0.12.0"
     "@vicons/ionicons5": "npm:^0.12.0"
     "@vicons/material": "npm:^0.12.0"
     "@vitejs/plugin-vue": "npm:^5.0.5"

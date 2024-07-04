@@ -630,25 +630,25 @@ const handleToSummoner = (puuid: string) => {
   gap: 2px;
 
   .kpr {
-    border-color: rgba(211, 211, 211, 1);
+    border-color: rgba(211, 211, 211, 0.4);
     background-color: rgba(211, 211, 211, 0.1);
     color: rgb(228, 228, 228);
   }
 
   .ddr {
-    border-color: rgba(209, 134, 81, 1);
+    border-color: rgba(209, 134, 81, 0.4);
     background-color: rgba(209, 134, 81, 0.1);
     color: rgb(235, 161, 108);
   }
 
   .dtr {
-    border-color: rgba(88, 184, 84, 1);
+    border-color: rgba(88, 184, 84, 0.4);
     background-color: rgba(88, 184, 84, 0.1);
     color: rgb(119, 224, 115);
   }
 
   .gr {
-    border-color: rgba(206, 164, 109, 1);
+    border-color: rgba(206, 164, 109, 0.4);
     background-color: rgba(206, 164, 109, 0.1);
     color: rgb(226, 185, 133);
   }
