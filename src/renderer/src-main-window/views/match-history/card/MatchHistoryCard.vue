@@ -147,17 +147,26 @@
         </div>
       </div>
       <div class="summary" v-if="self.summary && game.gameMode !== 'STRAWBERRY'">
-        <div class="kpr" title="在队伍中参与了击杀的程度">
-          {{ (self.summary.kpr * 100).toFixed(1) }} % 击杀
+        <div
+          class="tag kpr"
+          :title="`在队伍中参与了击杀的程度 ${(self.summary.kpr * 100).toFixed(3)} %`"
+        >
+          {{ (self.summary.kpr * 100).toFixed() }} % 击杀
         </div>
-        <div class="ddr" title="在队伍中对英雄造成的伤害占比">
-          {{ (self.summary.ddr * 100).toFixed(1) }} % 伤害
+        <div
+          class="tag ddr"
+          :title="`在队伍中对英雄造成的伤害占比 ${(self.summary.ddr * 100).toFixed(3)} %`"
+        >
+          {{ (self.summary.ddr * 100).toFixed() }} % 伤害
         </div>
-        <div class="dtr" title="在队伍中的承受所有伤害占比">
-          {{ (self.summary.dtr * 100).toFixed(1) }} % 承受
+        <div
+          class="tag dtr"
+          :title="`在队伍中的承受所有伤害占比 ${(self.summary.dtr * 100).toFixed(3)} %`"
+        >
+          {{ (self.summary.dtr * 100).toFixed() }} % 承受
         </div>
-        <div class="gr" title="在队伍中的金币占比">
-          {{ (self.summary.gr * 100).toFixed(1) }} % 金币
+        <div class="tag gr" :title="`在队伍中的金币占比 ${(self.summary.gr * 100).toFixed(3)} %`">
+          {{ (self.summary.gr * 100).toFixed() }} % 金币
         </div>
       </div>
       <div class="players">
@@ -617,21 +626,41 @@ const handleToSummoner = (puuid: string) => {
   width: 126px;
   font-size: 10px;
   line-height: 14px;
+  align-items: flex-start;
+  gap: 2px;
 
   .kpr {
-    color: rgb(211, 211, 211);
+    border-color: rgba(211, 211, 211, 1);
+    background-color: rgba(211, 211, 211, 0.1);
+    color: rgb(228, 228, 228);
   }
 
   .ddr {
-    color: rgb(209, 134, 81);
+    border-color: rgba(209, 134, 81, 1);
+    background-color: rgba(209, 134, 81, 0.1);
+    color: rgb(235, 161, 108);
   }
 
   .dtr {
-    color: rgb(88, 184, 84);
+    border-color: rgba(88, 184, 84, 1);
+    background-color: rgba(88, 184, 84, 0.1);
+    color: rgb(119, 224, 115);
   }
 
   .gr {
-    color: rgb(206, 164, 109);
+    border-color: rgba(206, 164, 109, 1);
+    background-color: rgba(206, 164, 109, 0.1);
+    color: rgb(226, 185, 133);
+  }
+
+  .tag {
+    padding: 0px 8px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    border-width: 1px;
+    border-style: solid;
+    width: 80px;
+    text-align: center;
   }
 }
 
