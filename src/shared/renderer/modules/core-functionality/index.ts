@@ -93,10 +93,11 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
 
     this.onEvent(
       'update/ongoing-player/match-history',
-      (puuid, history: { idDetailed: boolean; game: Game }[]) => {
+      (puuid, history: { isDetailed: boolean; game: Game }[]) => {
+        console.log('update/ongoing-player/match-history', puuid, history)
         if (store.ongoingPlayers[puuid]) {
           store.ongoingPlayers[puuid].matchHistory = history.map((g) => ({
-            isDetailed: g.idDetailed,
+            isDetailed: g.isDetailed,
             game: markRaw(g.game)
           }))
         }

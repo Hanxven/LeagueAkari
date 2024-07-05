@@ -20,6 +20,7 @@ import { AppLogger, LogModule } from '../akari-core/log'
 import { MainWindowModule } from '../akari-core/main-window'
 import { PlatformModule } from '../akari-core/platform'
 import { SettingService } from '../akari-core/storage'
+import { ExternalDataSourceModule } from '../external-data-source'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { CoreFunctionalityState } from './state'
 
@@ -43,6 +44,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
   private _lcu: LcuSyncModule
   private _pm: PlatformModule
   private _mwm: MainWindowModule
+  private _edsm: ExternalDataSourceModule
 
   private _isSimulatingKeyboard = false
 
@@ -65,6 +67,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this._lcm = this.manager.getModule('lcu-connection')
     this._mwm = this.manager.getModule('main-window')
     this._pm = this.manager.getModule('win-platform')
+    this._edsm = this.manager.getModule('external-data-source')
 
     await this._setupSettingsSync()
     this._setupStateSync()
@@ -710,16 +713,31 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           return
         }
 
+        const useSgpApi =
+          this.state.settings.matchHistorySource === 'sgp' &&
+          this._edsm.sgp.state.availability.currentRegionSupported
+
         try {
           const matchHistory = await this._playerAnalysisFetchLimiter
             .add(
-              () =>
-                getMatchHistory(
-                  summonerInfo.data.puuid,
-                  0,
-                  this.state.settings.matchHistoryLoadCount - 1,
-                  retries
-                ),
+              async () => {
+                if (useSgpApi) {
+                  return await this._edsm.sgp.getMatchHistoryLcuFormat(
+                    puuid,
+                    0,
+                    this.state.settings.matchHistoryLoadCount
+                  )
+                } else {
+                  return (
+                    await getMatchHistory(
+                      summonerInfo.data.puuid,
+                      0,
+                      this.state.settings.matchHistoryLoadCount - 1,
+                      retries
+                    )
+                  ).data
+                }
+              },
               { signal, priority: CoreFunctionalityModule.FETCH_PRIORITY.MATCH_HISTORY }
             )
             .catch((error) => this._handleAbortError(error))
@@ -728,14 +746,16 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
             return
           }
 
-          const withDetailedFields = matchHistory.data.games.games.map((g) => ({
+          const withDetailedFields = matchHistory.games.games.map((g) => ({
             game: g,
-            isDetailed: false
+            isDetailed: useSgpApi
           }))
 
           withDetailedFields.forEach((g) => {
             if (g.isDetailed) {
-              this.state.tempDetailedGames.set(g.game.gameId, g.game)
+              runInAction(() => {
+                this.state.tempDetailedGames.set(g.game.gameId, g.game)
+              })
             }
           })
 
@@ -745,10 +765,15 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
           this.sendEvent('update/ongoing-player/match-history', puuid, withDetailedFields)
 
+          // 将详细信息加载到每个对局中，因为 LCU 需要多请求一步
           const loadGameTasks: Promise<void>[] = []
 
           for (let i = 0; i < this.state.settings.matchHistoryLoadCount; i++) {
             const game = player.matchHistory![i]
+
+            if (game.isDetailed) {
+              return
+            }
 
             const _loadGame = async () => {
               if (this.state.tempDetailedGames.has(game.game.gameId)) {

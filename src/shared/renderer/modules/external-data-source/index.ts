@@ -18,7 +18,6 @@ class SgpEdsRenderer {
     count: number,
     sgpServerId?: string
   ): Promise<MatchHistory> {
-    console.log('sgp api')
     return this._edsm.call('get-match-history-lcu-format', playerPuuid, start, count, sgpServerId)
   }
 }

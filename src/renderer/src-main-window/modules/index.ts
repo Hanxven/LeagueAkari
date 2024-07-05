@@ -7,6 +7,7 @@ import { autoUpdateRendererModule } from '@shared/renderer/modules/auto-update'
 import { auxiliaryWindowRendererModule } from '@shared/renderer/modules/auxiliary-window'
 import { coreFunctionalityRendererModule } from '@shared/renderer/modules/core-functionality'
 import { customKeyboardSequenceRendererModule } from '@shared/renderer/modules/custom-keyboard-sequence'
+import { externalDataSourceRendererModule } from '@shared/renderer/modules/external-data-source'
 import { lcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection'
 import { lcuSyncRendererModule } from '@shared/renderer/modules/lcu-state-sync'
 import { leagueClientRendererModule } from '@shared/renderer/modules/league-client'
@@ -16,7 +17,6 @@ import { storageRendererModule } from '@shared/renderer/modules/storage'
 
 import { debugRendererModule } from './debug'
 import { matchHistoryTabsRendererModule } from './match-history-tabs'
-import { externalDataSourceRendererModule } from '@shared/renderer/modules/external-data-source'
 
 const manager = new LeagueAkariRendererModuleManager()
 
@@ -27,7 +27,6 @@ export async function setupLeagueAkariRendererModules() {
   manager.use(autoGameflowRendererModule)
   manager.use(coreFunctionalityRendererModule)
   manager.use(leagueClientRendererModule)
-  manager.use(matchHistoryTabsRendererModule)
   manager.use(lcuConnectionRendererModule)
   manager.use(mainWindowRendererModule)
   manager.use(respawnTimerRendererModule)
@@ -38,6 +37,7 @@ export async function setupLeagueAkariRendererModules() {
   manager.use(debugRendererModule)
   manager.use(customKeyboardSequenceRendererModule)
   manager.use(externalDataSourceRendererModule)
+  manager.use(matchHistoryTabsRendererModule)
 
   await manager.setup()
 }

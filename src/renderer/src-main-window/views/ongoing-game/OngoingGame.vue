@@ -3,6 +3,7 @@
     <!-- 提供一个简单的历史对局查看工具 -->
     <StandaloneMatchHistoryCardModal
       :game="showingGame.game"
+      :game-id="showingGame.gameId"
       :self-puuid="showingGame.selfPuuid"
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
@@ -284,8 +285,8 @@ const handleShowGame = (game: Game, puuid: string) => {
 }
 
 const handleShowGameById = (id: number, selfId: string) => {
-  showingGame.gameId = id
   showingGame.game = null
+  showingGame.gameId = id
   showingGame.selfPuuid = selfId
   isStandaloneMatchHistoryCardShow.value = true
 }

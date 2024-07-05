@@ -272,9 +272,10 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
   ) {
     const cf = useCoreFunctionalityStore()
     const mh = useMatchHistoryTabsStore()
-    const tab = mh.getTab(puuid)
     const lc = useLcuConnectionStore()
     const eds = useExternalDataSourceStore()
+
+    const tab = mh.getTab(puuid)
 
     if (tab && tab.data.summoner) {
       if (tab.data.loading.isLoadingMatchHistory) {
