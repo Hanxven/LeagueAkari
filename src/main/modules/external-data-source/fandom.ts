@@ -93,6 +93,7 @@ export class BalanceEds {
     this._lcu = this._edsm.manager.getModule('lcu-state-sync')
 
     this._setupStateSync()
+    this._handleUpdateBalanceData()
   }
 
   private _setupStateSync() {

@@ -190,6 +190,7 @@
 <script setup lang="ts">
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { hideMatchHistoryText } from '@shared/renderer/utils/sarcasms'
 import { summonerName } from '@shared/utils/name'
 import { Tag as TagIcon } from '@vicons/carbon'
@@ -225,6 +226,7 @@ const props = withDefaults(
 )
 
 const mh = useMatchHistoryTabsStore()
+const gameData = useGameDataStore()
 
 const handleLoadPage = async (page: number) => {
   const r = await mhm.fetchTabMatchHistory(
@@ -269,53 +271,55 @@ const pageSizeOptions = [
   }
 ]
 
-const queueOptions = [
-  {
-    label: '所有',
-    value: -1
-  },
-  {
-    label: '自定义',
-    value: 0
-  },
-  {
-    label: '单排 / 双排',
-    value: 420
-  },
-  {
-    label: '匹配',
-    value: 430
-  },
-  {
-    label: '灵活排位',
-    value: 440
-  },
-  {
-    label: '极地大乱斗',
-    value: 450
-  },
+const queueOptions = computed(() => {
+  return [
+    {
+      label: '所有',
+      value: -1
+    },
+    {
+      label: gameData.queues[0]?.name || 'Custom',
+      value: 0
+    },
+    {
+      label: gameData.queues[420]?.name || 'Ranked Solo/Duo',
+      value: 420
+    },
+    {
+      label: gameData.queues[430]?.name || 'Normal',
+      value: 430
+    },
+    {
+      label: gameData.queues[440]?.name || 'Ranked Flex',
+      value: 440
+    },
+    {
+      label: gameData.queues[450]?.name || 'ARAM',
+      value: 450
+    },
 
-  {
-    label: '斗魂竞技场',
-    value: 1700
-  },
-  {
-    label: 'Quickplay',
-    value: 490
-  },
-  {
-    label: '无限火力',
-    value: 1900
-  },
-  {
-    label: '无限乱斗',
-    value: 900
-  },
-  {
-    label: 'Swarm',
-    value: '1810,1820,1830,1840,1850,1860,1870,1880,1890'
-  }
-]
+    {
+      label: gameData.queues[1700]?.name || 'ARENA',
+      value: 1700
+    },
+    {
+      label: gameData.queues[490]?.name || 'Quickplay',
+      value: 490
+    },
+    {
+      label: gameData.queues[1900]?.name || 'URF',
+      value: 1900
+    },
+    {
+      label: gameData.queues[900]?.name || 'ARURF',
+      value: 900
+    },
+    {
+      label: gameData.queues[1810]?.name || 'Swarm',
+      value: '1810,1820,1830,1840,1850,1860,1870,1880,1890'
+    }
+  ]
+})
 
 const currentPageGameTypes = computed(() => {
   const types = new Set<number>()

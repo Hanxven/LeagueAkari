@@ -7,6 +7,7 @@ import {
   getPickableChampIds
 } from '@main/http-api/champ-select'
 import { getConversations, getMe, getParticipants } from '@main/http-api/chat'
+import { getEntitlementsToken } from '@main/http-api/entitlements'
 import {
   getAugments,
   getChampionSummary,
@@ -35,6 +36,7 @@ import { AppLogger, LogModule } from '../akari-core/log'
 import { MainWindowModule } from '../akari-core/main-window'
 import { ChampSelectState } from './champ-select'
 import { ChatState } from './chat'
+import { EntitlementsState } from './entitlements'
 import { GameDataState } from './game-data'
 import { GameflowState } from './gameflow'
 import { HonorState } from './honor'
@@ -53,6 +55,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   public summoner = new SummonerState()
   public matchmaking = new MatchmakingState()
   public gameData = new GameDataState()
+  public entitlements = new EntitlementsState()
 
   private _logModule: LogModule
 
@@ -78,7 +81,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
     this._mwm = this.manager.getModule<MainWindowModule>('main-window')
     this._logger = this._logModule.createLogger('lcu-state-sync')
 
-    this._syncGameflow()
+    this._syncLcuGameflow()
     this._syncLcuChampSelect()
     this._syncLcuChat()
     this._syncLcuGameData()
@@ -87,6 +90,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
     this._syncLcuLogin()
     this._syncLcuMatchmaking()
     this._syncLcuSummoner()
+    this._syncLcuEntitlements()
 
     this._logger.info('初始化完成')
   }
@@ -182,6 +186,11 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       const queues = (await getQueues()).data
       if (Array.isArray(queues)) {
         const obj = queues.reduce((prev, cur) => {
+          // 有多个队列 ID 为 0，忽略除第一个外的其他队列，第一个是自定义队列
+          if (cur.id === 0 && prev[0]) {
+            return prev
+          }
+
           prev[cur.id] = cur
           return prev
         }, {})
@@ -679,7 +688,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
     this._disposers.add(d2)
   }
 
-  private _syncGameflow() {
+  private _syncLcuGameflow() {
     this.simpleSync('lcu/gameflow/phase', () => this.gameflow.phase)
     this.simpleSync('lcu/gameflow/session', () => this.gameflow.session)
 
@@ -852,6 +861,39 @@ export class LcuSyncModule extends MobxBasedBasicModule {
 
     const d1 = this._lcm.lcuEventBus.on('/lol-summoner/v1/current-summoner', (event) => {
       this.summoner.setMe(event.data)
+    })
+
+    this._disposers.add(d1)
+  }
+
+  private _syncLcuEntitlements() {
+    this.simpleSync('lcu/entitlements/token', () => this.entitlements.token)
+
+    this.autoDisposeReaction(
+      () => this._lcm.state.state,
+      async (state) => {
+        if (state === 'connected') {
+          try {
+            const t = (await getEntitlementsToken()).data
+            this.entitlements.setToken(t)
+          } catch (error) {
+            if (isAxiosError(error) && error.response?.status === 404) {
+              this.entitlements.setToken(null)
+              return
+            }
+
+            this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取 entitlements token 失败')
+            this._logger.warn(`获取 entitlements token 失败 ${formatError(error)}`)
+          }
+        } else {
+          this.entitlements.setToken(null)
+        }
+      },
+      { fireImmediately: true }
+    )
+
+    const d1 = this._lcm.lcuEventBus.on('/entitlements/v1/token', (event) => {
+      this.entitlements.setToken(event.data)
     })
 
     this._disposers.add(d1)

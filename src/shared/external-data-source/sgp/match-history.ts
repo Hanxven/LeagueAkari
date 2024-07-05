@@ -40,19 +40,19 @@ export class SgpApi {
     return this._jwtToken !== null
   }
 
-  setJwtToken(token: string) {
+  setJwtToken(token: string | null) {
     this._jwtToken = token
     this._http.defaults.headers.Authorization = `Bearer ${this._jwtToken}`
   }
 
-  getMatchHistory(platformId: string, playerPuuid: string, start: number, count: number) {
+  getMatchHistory(sgpServerId: string, playerPuuid: string, start: number, count: number) {
     if (!this._jwtToken) {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = SgpApi.SGP_SERVERS[platformId.toUpperCase()]
+    const platformSgpServer = SgpApi.SGP_SERVERS[sgpServerId.toUpperCase()]
     if (!platformSgpServer) {
-      throw new Error(`unknown platformId: ${platformId}`)
+      throw new Error(`unknown sgpServerId: ${sgpServerId}`)
     }
 
     return this._http.get<SgpMatchHistoryLol>(
