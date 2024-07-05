@@ -16,6 +16,7 @@ import { storageRendererModule } from '@shared/renderer/modules/storage'
 
 import { debugRendererModule } from './debug'
 import { matchHistoryTabsRendererModule } from './match-history-tabs'
+import { externalDataSourceRendererModule } from '@shared/renderer/modules/external-data-source'
 
 const manager = new LeagueAkariRendererModuleManager()
 
@@ -36,6 +37,7 @@ export async function setupLeagueAkariRendererModules() {
   manager.use(storageRendererModule)
   manager.use(debugRendererModule)
   manager.use(customKeyboardSequenceRendererModule)
+  manager.use(externalDataSourceRendererModule)
 
   await manager.setup()
 }

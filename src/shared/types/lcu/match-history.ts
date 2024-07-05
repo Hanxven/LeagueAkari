@@ -37,7 +37,7 @@ export interface Team {
   dragonKills: number
   firstBaron: boolean
   firstBlood: boolean
-  firstDargon: boolean
+  firstDargon: boolean // LCU 接口中就是如此拼写，不知道是不是笔误
   firstInhibitor: boolean
   firstTower: boolean
   inhibitorKills: number
@@ -55,7 +55,7 @@ export interface Participant {
   spell1Id: number
   spell2Id: number
   stats: Stats
-  teamId: 100 | 200 | 0
+  teamId: number
   timeline: Timeline
 }
 

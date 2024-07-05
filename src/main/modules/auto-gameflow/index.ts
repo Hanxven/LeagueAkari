@@ -373,11 +373,12 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     this.autoDisposeReaction(
       () => [this._lcu.honor.ballot, this.state.settings.autoHonorEnabled] as const,
       async ([b, e]) => {
-        if (b) {
+        // 新接口 GameId 可能是 0
+        if (b && b.gameId) {
           this._playAgainTask.cancel()
         }
 
-        if (b && e) {
+        if (b && b.gameId && e) {
           try {
             if (this.state.settings.autoHonorStrategy === 'opt-out') {
               await honor(b.gameId, 'OPT_OUT', 0)
@@ -444,7 +445,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
         }
       },
       {
-        equals: comparer.shallow /* ballot 不会 Update，只会 Create 和 Delete */,
+        equals: comparer.structural,
         fireImmediately: true
       }
     )

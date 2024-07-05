@@ -9,7 +9,14 @@ export const useExternalDataSourceStore = defineStore('module:external-data-sour
     updateAt: Date
   } | null>(null)
 
+  const sgpAvailability = shallowRef({
+    currentRegion: '',
+    currentRegionSupported: false,
+    regionsSupported: [] as string[]
+  })
+
   return {
-    balanceData
+    balanceData,
+    sgpAvailability
   }
 })

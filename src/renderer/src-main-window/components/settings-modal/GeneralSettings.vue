@@ -52,6 +52,15 @@
             >直接请求远程服务器。若当前区域不受支持，则使用 LCU API
           </div>
           <div><span style="font-weight: 700">LCU: </span>通过 LCU API 获取</div>
+          <div
+            v-if="
+              !eds.sgpAvailability.currentRegionSupported &&
+              cf.settings.matchHistorySource === 'sgp'
+            "
+            style="color: rgb(209, 170, 124); font-weight: 700"
+          >
+            暂不支持当前服务器使用 SGP 接口：{{ eds.sgpAvailability.currentRegion }}
+          </div>
         </template>
         <NSelect
           style="width: 160px"
@@ -329,6 +338,7 @@ import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/a
 import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
 import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { respawnTimerRendererModule as rtm } from '@shared/renderer/modules/respawn-timer'
 import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
 import {
@@ -347,6 +357,7 @@ const rt = useRespawnTimerStore()
 const cf = useCoreFunctionalityStore()
 const aux = useAuxiliaryWindowStore()
 const app = useAppStore()
+const eds = useExternalDataSourceStore()
 
 const matchHistorySourceOptions = [
   { label: 'SGP', value: 'sgp' },

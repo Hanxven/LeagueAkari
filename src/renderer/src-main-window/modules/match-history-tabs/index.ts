@@ -3,12 +3,15 @@ import { getGame, getMatchHistory } from '@shared/renderer/http-api/match-histor
 import { getRankedStats } from '@shared/renderer/http-api/ranked'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { externalDataSourceRendererModule as edsm } from '@shared/renderer/modules/external-data-source'
+import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { LcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { StorageRendererModule } from '@shared/renderer/modules/storage'
 import { laNotification } from '@shared/renderer/notification'
+import { MatchHistory } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { AxiosError } from 'axios'
 import { computed, markRaw, watch } from 'vue'
@@ -271,6 +274,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     const mh = useMatchHistoryTabsStore()
     const tab = mh.getTab(puuid)
     const lc = useLcuConnectionStore()
+    const eds = useExternalDataSourceStore()
 
     if (tab && tab.data.summoner) {
       if (tab.data.loading.isLoadingMatchHistory) {
@@ -284,9 +288,28 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           tab.data.matchHistory.games.filter((g) => g.isExpanded).map((g) => g.game.gameId)
         )
 
-        const matchHistory = (
-          await getMatchHistory(tab.data.summoner.puuid, (page - 1) * pageSize, page * pageSize - 1)
-        ).data
+        let matchHistory: MatchHistory
+        if (
+          cf.settings.matchHistorySource === 'sgp' &&
+          eds.sgpAvailability.currentRegionSupported
+        ) {
+          matchHistory = await edsm.sgp.getMatchHistoryLcuFormat(
+            puuid,
+            (page - 1) * pageSize,
+            pageSize
+          )
+          matchHistory.games.games.forEach((g) => {
+            tab.data.detailedGamesCache.set(g.gameId, markRaw(g))
+          })
+        } else {
+          matchHistory = (
+            await getMatchHistory(
+              tab.data.summoner.puuid,
+              (page - 1) * pageSize,
+              page * pageSize - 1
+            )
+          ).data
+        }
 
         tab.data.matchHistory.hasError = false
 

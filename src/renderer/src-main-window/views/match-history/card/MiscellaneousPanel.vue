@@ -3,7 +3,10 @@
     <div class="meta">
       <CopyableText :text="game.gameId">对局 ID: {{ game.gameId }}</CopyableText>
       <span>对局时间: {{ dayjs(game.gameCreation).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      <span>区服: {{ rsoPlatformText[game.platformId] || game.platformId }}</span>
+      <span
+        >区服:
+        {{ `${rsoPlatformText[game.platformId]} (${game.platformId})` || game.platformId }}</span
+      >
     </div>
     <div v-if="hasBan" class="bans">
       <span style="margin-right: 12px; font-weight: 700; columns: #fff">禁用：</span>
@@ -295,6 +298,7 @@ const columns = computed(() => {
       },
       render: (data) => {
         const propKey = data.propKey as string
+
         const renderer =
           statsConfigMap[propKey]?.render ||
           ((content: any) => {
@@ -302,8 +306,11 @@ const columns = computed(() => {
               return content ? '是' : '否'
             } else if (typeof content === 'number') {
               return content.toLocaleString()
+            } else if (typeof content === 'string') {
+              return content
             }
-            return content
+
+            return 'N/A'
           })
         return renderer(data[p.participantId], participantStatsMap.value[p.participantId])
       }
@@ -359,6 +366,7 @@ const tableData = computed(() => {
 
   statsNames.forEach((n) => {
     const row: RowData = {}
+
     row['propName'] = statsConfigMap[n]?.name || n
     row['propKey'] = n
 

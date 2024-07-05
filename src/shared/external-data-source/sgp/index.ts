@@ -6,6 +6,9 @@ export class SgpApi {
   static USER_AGENT =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
 
+  /**
+   * KEY: REGION (OR RSO_PLATFORM_ID), VALUE: SERVER_URL
+   */
   static SGP_SERVERS = {
     HN1: 'https://hn1-cloud-sgp.lol.qq.com:21019', // 艾欧尼亚
     HN10: 'https://hn10-cloud-sgp.lol.qq.com:21019', // 黑色玫瑰
@@ -15,7 +18,7 @@ export class SgpApi {
     GZ100: 'https://gz100-sgp.lol.qq.com:21019', // 广州
     CQ100: 'https://cq100-sgp.lol.qq.com:21019', // 重庆
     BGP2: 'https://bgp2-sgp.lol.qq.com:21019', // 峡谷之巅
-    SG2: 'https://apse1-red.pp.sgp.pvp.net/' // 新加坡
+    SG2: 'https://apse1-red.pp.sgp.pvp.net' // 新加坡
   } as const
 
   /**
@@ -27,6 +30,16 @@ export class SgpApi {
       'User-Agent': SgpApi.USER_AGENT
     }
   })
+
+  constructor() {
+    this._http.interceptors.request.use((req) => {
+      if (!req.headers.Authorization) {
+        req.headers.Authorization = `Bearer ${this._jwtToken}`
+      }
+
+      return req
+    })
+  }
 
   supportsPlatform(platformId: string) {
     return SgpApi.SGP_SERVERS[platformId.toUpperCase()] !== undefined

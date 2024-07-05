@@ -1,11 +1,26 @@
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
+import { MatchHistory } from '@shared/types/lcu/match-history'
 
 import { useExternalDataSourceStore } from './store'
 
 class SgpEdsRenderer {
   constructor(private _edsm: ExternalDataSourceRendererModule) {}
 
-  async setup() {}
+  async setup() {
+    const store = useExternalDataSourceStore()
+
+    this._edsm.simpleSync('sgp/availability', (s) => (store.sgpAvailability = s))
+  }
+
+  getMatchHistoryLcuFormat(
+    playerPuuid: string,
+    start: number,
+    count: number,
+    sgpServerId?: string
+  ): Promise<MatchHistory> {
+    console.log('sgp api')
+    return this._edsm.call('get-match-history-lcu-format', playerPuuid, start, count, sgpServerId)
+  }
 }
 
 class BalanceEdsRenderer {
@@ -31,6 +46,10 @@ export class ExternalDataSourceRendererModule extends StateSyncModule {
 
     await this.sgp.setup()
     await this.balance.setup()
+
+    // FOR DEBUGGING
+    // @ts-ignore
+    window.eds = this
   }
 }
 
