@@ -37,8 +37,12 @@ export const rsoPlatformText = {
   WT1_NEW: '比尔吉沃特',
   WT3_NEW: '弗雷尔卓德',
   WT2_NEW: '德玛西亚',
-  WT4_NEW: '无畏先锋',
+  WT4_NEW: '无畏先锋'
+} as const
 
+export const regionText = {
+  TENCENT: '腾讯',
+  PBE: 'PBE',
   BR1: '巴西',
   EUN1: '北欧 & 东欧',
   EUW1: '西欧',
@@ -60,12 +64,7 @@ export const rsoPlatformText = {
   TH1: '泰国',
   TH2: '泰国',
   VN1: '越南',
-  VN2: '越南',
-  PBE: 'PBE'
-} as const
-
-export const regionText = {
-  TENCENT: '腾讯'
+  VN2: '越南'
 } as const
 
 /**

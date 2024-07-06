@@ -644,6 +644,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       this.sendEvent('create/ongoing-player', puuid)
     }
 
+    this._logger.info(`对局分析: ${puuid}`)
+
     const player = this.state.ongoingPlayers.get(puuid)!
 
     try {
@@ -716,6 +718,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         const useSgpApi =
           this.state.settings.matchHistorySource === 'sgp' &&
           this._edsm.sgp.state.availability.currentRegionSupported
+
+        this._logger.info(`API: ${useSgpApi ? 'SGP' : 'LCU'}, 拉取玩家战绩: ${puuid}`)
 
         try {
           const matchHistory = await this._playerAnalysisFetchLimiter

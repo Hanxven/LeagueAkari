@@ -34,5 +34,9 @@
   "SG2": {
     "name": "新加坡",
     "server": "https://apse1-red.pp.sgp.pvp.net"
+  },
+  "PBE": {
+    "name": "PBE",
+    "server": "https://usw2-red.pp.sgp.pvp.net"
   }
 }

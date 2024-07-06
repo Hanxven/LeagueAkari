@@ -6,7 +6,7 @@ import { makeAutoObservable, observable } from 'mobx'
 import fs from 'node:fs'
 
 import { ExternalDataSourceModule } from '.'
-import builtinSgpServersJson from '../../../../resources/builtin-config/external-data-source/supported-sgp-servers.json?commonjs-external&asset'
+import builtinSgpServersJson from '../../../../resources/builtin-config/external-data-source/mh-sgp-servers.json?commonjs-external&asset'
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
 import { LcuSyncModule } from '../lcu-state-sync'
 
@@ -42,7 +42,7 @@ export class SgpEds {
   private _sgp = new SgpApi()
 
   static TENCENT_REGION = 'TENCENT'
-  static SGP_SERVERS_JSON = 'supported-sgp-servers_v1.json'
+  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v1.json'
 
   constructor(private _edsm: ExternalDataSourceModule) {}
 
@@ -58,18 +58,35 @@ export class SgpEds {
 
   private async _loadAvailableServersFromLocalFile() {
     try {
-      if (!(await this._edsm.ss.jsonConfigExists(SgpEds.SGP_SERVERS_JSON))) {
+      if (!(await this._edsm.ss.jsonConfigExists(SgpEds.MH_SGP_SERVERS_JSON))) {
         if (fs.existsSync(builtinSgpServersJson)) {
-          // 拷贝到目标目录下
+          this._edsm.logger.info('配置文件目录不存在，将使用内置的 SGP 服务器配置文件')
           const data = await fs.promises.readFile(builtinSgpServersJson, 'utf-8')
-          await this._edsm.ss.writeToJsonConfig(SgpEds.SGP_SERVERS_JSON, JSON.parse(data))
+          await this._edsm.ss.writeToJsonConfig(SgpEds.MH_SGP_SERVERS_JSON, JSON.parse(data))
         } else {
           this._edsm.logger.warn('未找到内置的 SGP 服务器配置文件')
           return
         }
       }
 
-      const json = await this._edsm.ss.readFromJsonConfig(SgpEds.SGP_SERVERS_JSON)
+      this._edsm.logger.info('加载到本地 SGP 服务器配置文件')
+      const json = await this._edsm.ss.readFromJsonConfig(SgpEds.MH_SGP_SERVERS_JSON)
+
+      // 检测是否是 Record<string, AvailableServersMap> 类型
+      if (typeof json !== 'object') {
+        throw new Error('配置文件格式错误')
+      }
+
+      for (const key in json) {
+        if (typeof json[key] !== 'object') {
+          throw new Error('配置文件格式错误')
+        }
+
+        if (typeof json[key].name !== 'string' || typeof json[key].server !== 'string') {
+          throw new Error('配置文件格式错误')
+        }
+      }
+
       this._sgp.setAvailableSgpServers(json)
       this.state.setAvailability('', false, json)
     } catch (error) {

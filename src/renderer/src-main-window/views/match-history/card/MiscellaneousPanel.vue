@@ -5,7 +5,13 @@
       <span>对局时间: {{ dayjs(game.gameCreation).format('YYYY-MM-DD HH:mm:ss') }}</span>
       <span
         >区服:
-        {{ `${rsoPlatformText[game.platformId]} (${game.platformId})` || game.platformId }}</span
+        {{
+          rsoPlatformText[game.platformId]
+            ? `${rsoPlatformText[game.platformId]} (${game.platformId})`
+            : regionText[game.platformId]
+              ? `${regionText[game.platformId]} (${game.platformId})`
+              : game.platformId
+        }}</span
       >
     </div>
     <div v-if="hasBan" class="bans">
@@ -45,7 +51,7 @@ import { championIcon } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { Game, Participant, Player } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
-import { rsoPlatformText } from '@shared/utils/rso-platforms'
+import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import dayjs from 'dayjs'
 import { DataTableColumns, NDataTable } from 'naive-ui'
 import { RowData } from 'naive-ui/es/data-table/src/interface'
@@ -186,10 +192,12 @@ const statsConfigMap = {
   physicalDamageDealt: { name: '造成的物理伤害' },
   physicalDamageDealtToChampions: { name: '对英雄造成的物理伤害' },
   physicalDamageTaken: { name: '承受的物理伤害' },
-  playerAugment1: { name: '强化符文1', render: augmentDisplay },
-  playerAugment2: { name: '强化符文2', render: augmentDisplay },
-  playerAugment3: { name: '强化符文3', render: augmentDisplay },
-  playerAugment4: { name: '强化符文4', render: augmentDisplay },
+  playerAugment1: { name: '强化1', render: augmentDisplay },
+  playerAugment2: { name: '强化2', render: augmentDisplay },
+  playerAugment3: { name: '强化3', render: augmentDisplay },
+  playerAugment4: { name: '强化4', render: augmentDisplay },
+  playerAugment5: { name: '强化5', render: augmentDisplay },
+  playerAugment6: { name: '强化6', render: augmentDisplay },
   playerScore0: { name: '玩家得分0' },
   playerScore1: { name: '玩家得分1' },
   playerScore2: { name: '玩家得分2' },
