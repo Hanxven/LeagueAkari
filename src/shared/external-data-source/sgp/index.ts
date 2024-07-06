@@ -2,24 +2,18 @@ import axios from 'axios'
 
 import { SgpGameDetailsLol, SgpGameSummaryLol, SgpMatchHistoryLol } from './types'
 
+export interface AvailableServersMap {
+  [region: string]: {
+    name: string
+    server: string
+  }
+}
+
 export class SgpApi {
   static USER_AGENT =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
 
-  /**
-   * KEY: REGION (OR RSO_PLATFORM_ID), VALUE: SERVER_URL
-   */
-  static SGP_SERVERS = {
-    HN1: 'https://hn1-cloud-sgp.lol.qq.com:21019', // 艾欧尼亚
-    HN10: 'https://hn10-cloud-sgp.lol.qq.com:21019', // 黑色玫瑰
-    TJ100: 'https://tj100-sgp.lol.qq.com:21019', // 天津
-    TJ101: 'https://tj101-sgp.lol.qq.com:21019', // 天津
-    NJ100: 'https://nj100-sgp.lol.qq.com:21019', // 南京
-    GZ100: 'https://gz100-sgp.lol.qq.com:21019', // 广州
-    CQ100: 'https://cq100-sgp.lol.qq.com:21019', // 重庆
-    BGP2: 'https://bgp2-sgp.lol.qq.com:21019', // 峡谷之巅
-    SG2: 'https://apse1-red.pp.sgp.pvp.net' // 新加坡
-  } as const
+  private _availableSgpServers: AvailableServersMap = {}
 
   /**
    * SGP API 需要用户登录的 Session
@@ -41,12 +35,16 @@ export class SgpApi {
     })
   }
 
+  setAvailableSgpServers(servers: AvailableServersMap) {
+    this._availableSgpServers = servers
+  }
+
   supportsPlatform(platformId: string) {
-    return SgpApi.SGP_SERVERS[platformId.toUpperCase()] !== undefined
+    return this._availableSgpServers[platformId.toUpperCase()] !== undefined
   }
 
   supportedPlatforms() {
-    return Object.keys(SgpApi.SGP_SERVERS)
+    return this._availableSgpServers
   }
 
   hasJwtToken() {
@@ -63,14 +61,14 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = SgpApi.SGP_SERVERS[sgpServerId.toUpperCase()]
+    const platformSgpServer = this._availableSgpServers[sgpServerId.toUpperCase()]
     if (!platformSgpServer) {
       throw new Error(`unknown sgpServerId: ${sgpServerId}`)
     }
 
     return this._http.get<SgpMatchHistoryLol>(
       `/match-history-query/v1/products/lol/player/${playerPuuid}/SUMMARY?startIndex=${start}&count=${count}`,
-      { baseURL: platformSgpServer }
+      { baseURL: platformSgpServer.server }
     )
   }
 
@@ -79,14 +77,14 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = SgpApi.SGP_SERVERS[platformId.toUpperCase()]
+    const platformSgpServer = this._availableSgpServers[platformId.toUpperCase()]
     if (!platformSgpServer) {
       throw new Error(`unknown platformId: ${platformId}`)
     }
 
     return this._http.get<SgpGameSummaryLol>(
       `/match-history-query/v1/products/lol/${platformId.toUpperCase()}_${gameId}/SUMMARY`,
-      { baseURL: platformSgpServer }
+      { baseURL: platformSgpServer.server }
     )
   }
 
@@ -95,14 +93,14 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = SgpApi.SGP_SERVERS[platformId.toUpperCase()]
+    const platformSgpServer = this._availableSgpServers[platformId.toUpperCase()]
     if (!platformSgpServer) {
       throw new Error(`unknown platformId: ${platformId}`)
     }
 
     return this._http.get<SgpGameDetailsLol>(
       `/match-history-query/v1/products/lol/${platformId.toUpperCase()}_${gameId}/DETAILS`,
-      { baseURL: platformSgpServer }
+      { baseURL: platformSgpServer.server }
     )
   }
 

@@ -28,14 +28,14 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
   /**
    * an alias for this._sm
    */
-  get _storageModule() {
+  protected get _storageModule() {
     return this._sm
   }
 
   /**
    * an alias for this._ss
    */
-  get _settingService() {
+  protected get _settingService() {
     return this._ss
   }
 

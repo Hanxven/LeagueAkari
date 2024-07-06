@@ -8,8 +8,8 @@ import { v15_LA1_2_2Upgrade } from '@main/db/upgrades/version-15'
 import { LEAGUE_AKARI_DB_CURRENT_VERSION, LEAGUE_AKARI_DB_FILENAME } from '@shared/constants/common'
 import dayjs from 'dayjs'
 import { app } from 'electron'
-import { existsSync, renameSync } from 'node:fs'
-import { join } from 'node:path'
+import fs from 'node:fs'
+import path from 'node:path'
 import { DataSource, Equal, QueryRunner } from 'typeorm'
 
 import { AppLogger, LogModule } from './log'
@@ -53,6 +53,8 @@ interface SavedPlayerSaveDto extends SavedPlayerQueryDto {
 export class SavedPlayerService {
   constructor(private _storageModule: StorageModule) {}
 
+  static ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = 40
+
   async setup() {
     this._storageModule.onCall(
       'query/players/encountered-games',
@@ -86,7 +88,7 @@ export class SavedPlayerService {
   }
 
   async queryEncounteredGames(query: EncounteredGameQueryDto) {
-    const pageSize = query.pageSize || StorageModule.ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE
+    const pageSize = query.pageSize || SavedPlayerService.ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE
     const page = query.page || 1
 
     const take = pageSize
@@ -200,6 +202,8 @@ export class SettingService {
     public domain?: string
   ) {}
 
+  static CONFIG_DIR_NAME = 'AkariConfig'
+
   async setup() {}
 
   with(domain: string) {
@@ -241,14 +245,73 @@ export class SettingService {
 
     await this._storageModule.dataSource.manager.delete(Setting, { key: key2 })
   }
+
+  /**
+   * 从应用目录读取某个 JSON 文件，提供一个文件名
+   */
+  async readFromJsonConfig<T = any>(filename: string): Promise<T> {
+    if (!this.domain) {
+      throw new Error('domain is required')
+    }
+
+    const jsonPath = path.join(
+      app.getPath('userData'),
+      SettingService.CONFIG_DIR_NAME,
+      this.domain,
+      filename
+    )
+
+    if (!fs.existsSync(jsonPath)) {
+      throw new Error(`config file ${filename} does not exist`)
+    }
+
+    // 读取 UTF-8 格式的 JSON 文件
+    const content = await fs.promises.readFile(jsonPath, 'utf-8')
+    return JSON.parse(content)
+  }
+
+  /**
+   * 将某个东西写入到 JSON 文件中，提供一个文件名
+   */
+  async writeToJsonConfig(filename: string, data: any) {
+    if (!this.domain) {
+      throw new Error('domain is required')
+    }
+
+    const jsonPath = path.join(
+      app.getPath('userData'),
+      SettingService.CONFIG_DIR_NAME,
+      this.domain,
+      filename
+    )
+
+    await fs.promises.mkdir(path.dirname(jsonPath), { recursive: true })
+    await fs.promises.writeFile(jsonPath, JSON.stringify(data, null, 2), 'utf-8')
+  }
+
+  /**
+   * 检查某个 json 配置文件是否存在
+   */
+  async jsonConfigExists(filename: string) {
+    if (!this.domain) {
+      throw new Error('domain is required')
+    }
+
+    const jsonPath = path.join(
+      app.getPath('userData'),
+      SettingService.CONFIG_DIR_NAME,
+      this.domain,
+      filename
+    )
+
+    return fs.existsSync(jsonPath)
+  }
 }
 
 export class StorageModule extends MobxBasedBasicModule {
   private _ds: DataSource
   private _logModule: LogModule
   private _logger: AppLogger
-
-  static ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = 40
 
   players = new SavedPlayerService(this)
   settings = new SettingService(this)
@@ -275,7 +338,7 @@ export class StorageModule extends MobxBasedBasicModule {
 
     this._ds = new DataSource({
       type: 'sqlite',
-      database: join(app.getPath('userData'), LEAGUE_AKARI_DB_FILENAME),
+      database: path.join(app.getPath('userData'), LEAGUE_AKARI_DB_FILENAME),
       synchronize: false,
       entities: [Metadata, SavedPlayer, Setting, EncounteredGame]
     })
@@ -362,10 +425,10 @@ export class StorageModule extends MobxBasedBasicModule {
   private async _recreateDatabase(dataSource: DataSource, dbPath: string) {
     await dataSource.destroy()
 
-    if (existsSync(dbPath)) {
-      const backupPath = join(dbPath, `../${dayjs().format('YYYYMMDDHHmmssSSS')}_bk.db`)
+    if (fs.existsSync(dbPath)) {
+      const backupPath = path.join(dbPath, `../${dayjs().format('YYYYMMDDHHmmssSSS')}_bk.db`)
 
-      renameSync(dbPath, backupPath)
+      fs.renameSync(dbPath, backupPath)
       this._logger.info(`原数据库已放置于 ${backupPath}`)
     }
 

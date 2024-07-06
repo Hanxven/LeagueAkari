@@ -1,4 +1,5 @@
 import { ChampBalanceMapV1 } from '@shared/external-data-source/normalized/champ-balance'
+import { AvailableServersMap } from '@shared/external-data-source/sgp'
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 
@@ -12,7 +13,7 @@ export const useExternalDataSourceStore = defineStore('module:external-data-sour
   const sgpAvailability = shallowRef({
     currentRegion: '',
     currentRegionSupported: false,
-    regionsSupported: [] as string[]
+    supportedServers: {} as AvailableServersMap
   })
 
   return {

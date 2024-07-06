@@ -13,7 +13,7 @@ import cp from 'node:child_process'
 import fs from 'node:original-fs'
 import path from 'node:path'
 import { Readable, pipeline } from 'node:stream'
-import { gt, lt } from 'semver'
+import { lt } from 'semver'
 
 import sevenBinPath from '../../../../resources/7za.exe?asset'
 import { AppModule } from './app'
@@ -718,7 +718,7 @@ Try {
   private async _migrateSettings() {
     // 迁移 app/auto-check-updates 到 auto-update/auto-check-updates
     if (await this._sm.settings.has('app/auto-check-updates')) {
-      this._sm.settings.set(
+      await this._sm.settings.set(
         'auto-update/auto-check-updates',
         await this._sm.settings.get('app/auto-check-updates', true)
       )

@@ -1,10 +1,12 @@
-import { SgpApi } from '@shared/external-data-source/sgp'
+import { AvailableServersMap, SgpApi } from '@shared/external-data-source/sgp'
 import { SgpMatchHistoryLol } from '@shared/external-data-source/sgp/types'
 import { MatchHistory } from '@shared/types/lcu/match-history'
 import { formatError } from '@shared/utils/errors'
 import { makeAutoObservable, observable } from 'mobx'
+import fs from 'node:fs'
 
 import { ExternalDataSourceModule } from '.'
+import builtinSgpServersJson from '../../../../resources/builtin-config/external-data-source/supported-sgp-servers.json?commonjs-external&asset'
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
 import { LcuSyncModule } from '../lcu-state-sync'
 
@@ -12,7 +14,7 @@ export class SgpEdsState {
   availability = {
     currentRegion: '',
     currentRegionSupported: false,
-    regionsSupported: [] as string[]
+    supportedServers: {} as AvailableServersMap
   }
 
   constructor() {
@@ -24,11 +26,11 @@ export class SgpEdsState {
   setAvailability(
     currentRegion: string,
     currentRegionSupported: boolean,
-    regionsSupported: string[]
+    supportedServers: AvailableServersMap
   ) {
     this.availability.currentRegion = currentRegion
     this.availability.currentRegionSupported = currentRegionSupported
-    this.availability.regionsSupported = regionsSupported
+    this.availability.supportedServers = supportedServers
   }
 }
 
@@ -40,6 +42,7 @@ export class SgpEds {
   private _sgp = new SgpApi()
 
   static TENCENT_REGION = 'TENCENT'
+  static SGP_SERVERS_JSON = 'supported-sgp-servers_v1.json'
 
   constructor(private _edsm: ExternalDataSourceModule) {}
 
@@ -47,9 +50,31 @@ export class SgpEds {
     this._lcu = this._edsm.manager.getModule('lcu-state-sync')
     this._lc = this._edsm.manager.getModule('lcu-connection')
 
+    await this._loadAvailableServersFromLocalFile()
     this._setupMethodCall()
     this._handleUpdateSupportedInfo()
     this._maintainSessionToken()
+  }
+
+  private async _loadAvailableServersFromLocalFile() {
+    try {
+      if (!(await this._edsm.ss.jsonConfigExists(SgpEds.SGP_SERVERS_JSON))) {
+        if (fs.existsSync(builtinSgpServersJson)) {
+          // 拷贝到目标目录下
+          const data = await fs.promises.readFile(builtinSgpServersJson, 'utf-8')
+          await this._edsm.ss.writeToJsonConfig(SgpEds.SGP_SERVERS_JSON, JSON.parse(data))
+        } else {
+          this._edsm.logger.warn('未找到内置的 SGP 服务器配置文件')
+          return
+        }
+      }
+
+      const json = await this._edsm.ss.readFromJsonConfig(SgpEds.SGP_SERVERS_JSON)
+      this._sgp.setAvailableSgpServers(json)
+      this.state.setAvailability('', false, json)
+    } catch (error) {
+      this._edsm.logger.warn(`加载 SGP 服务器配置文件时发生错误: ${formatError(error)}`)
+    }
   }
 
   private _handleUpdateSupportedInfo() {

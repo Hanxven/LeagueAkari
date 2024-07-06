@@ -26,6 +26,10 @@ export class ExternalDataSourceModule extends MobxBasedBasicModule {
     return this._sgp
   }
 
+  get ss() {
+    return this._ss
+  }
+
   constructor() {
     super('external-data-source')
   }
