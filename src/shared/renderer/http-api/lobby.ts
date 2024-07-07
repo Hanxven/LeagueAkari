@@ -139,3 +139,10 @@ export function getEogStatus() {
     method: 'GET'
   })
 }
+
+export function deleteLobby() {
+  return request<void>({
+    url: '/lol-lobby/v2/lobby',
+    method: 'DELETE'
+  })
+}

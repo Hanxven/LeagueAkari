@@ -47,20 +47,18 @@
       <ControlItem class="control-item-margin" label="战绩源" :label-width="320">
         <template #labelDescription>
           <div>将从指定的战绩源拉取玩家战绩信息</div>
-          <div>
-            <span style="font-weight: 700">SGP: </span
-            >直接请求远程服务器。若当前区域不受支持，则使用 LCU API
-          </div>
-          <div><span style="font-weight: 700">LCU: </span>通过 LCU API 获取</div>
-          <div
-            v-if="
-              !eds.sgpAvailability.currentRegionSupported &&
-              cf.settings.matchHistorySource === 'sgp' && lc.state === 'connected'
-            "
-            style="color: rgb(209, 170, 124); font-weight: 700"
-          >
-            暂不支持当前服务器使用 SGP 接口：{{ eds.sgpAvailability.currentRegion }}
-          </div>
+          <template v-if="cf.settings.matchHistorySource === 'sgp' && lc.state === 'connected'">
+            <div
+              v-if="eds.sgpAvailability.currentRegionSupported"
+              style="color: #63e2b7; font-weight: 700"
+            >
+              当前 ({{ eds.sgpAvailability.currentRegion }}):
+              {{ eds.sgpAvailability.supportedServers[eds.sgpAvailability.currentRegion].server }}
+            </div>
+            <div v-else style="color: rgb(209, 170, 124); font-weight: 700">
+              暂不支持当前服务器使用 SGP 接口: {{ eds.sgpAvailability.currentRegion }}
+            </div>
+          </template>
         </template>
         <NSelect
           style="width: 160px"

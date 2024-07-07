@@ -3,7 +3,8 @@
     <template #header
       ><span class="card-header-title"
         >观战<span v-if="gameflow.phase === 'Lobby'" style="color: yellow; font-size: 14px">
-          (需要先退出当前房间)</span
+          (需要先退出当前房间)
+          <NButton size="tiny" secondary @click="() => deleteLobby()">退出房间</NButton></span
         ></span
       ></template
     >
@@ -45,6 +46,7 @@
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { getFriends } from '@shared/renderer/http-api/chat'
+import { deleteLobby } from '@shared/renderer/http-api/lobby'
 import { launchSpectator } from '@shared/renderer/http-api/spectator'
 import { getSummonerAlias, getSummonerByName } from '@shared/renderer/http-api/summoner'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'

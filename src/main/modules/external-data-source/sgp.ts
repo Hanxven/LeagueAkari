@@ -28,9 +28,11 @@ export class SgpEdsState {
     currentRegionSupported: boolean,
     supportedServers: AvailableServersMap
   ) {
-    this.availability.currentRegion = currentRegion
-    this.availability.currentRegionSupported = currentRegionSupported
-    this.availability.supportedServers = supportedServers
+    this.availability = {
+      currentRegion,
+      currentRegionSupported,
+      supportedServers
+    }
   }
 }
 
@@ -299,19 +301,19 @@ export class SgpEds {
           return {
             teamId,
             bans,
-            baronKills: objectives.baron.kills,
-            dragonKills: objectives.dragon.kills,
-            firstBaron: objectives.baron.first,
+            baronKills: objectives.baron?.kills || 0,
+            dragonKills: objectives.dragon?.kills || 0,
+            firstBaron: objectives.baron?.first || false,
             firstBlood: firstBloodTeamId === t.teamId,
-            firstDargon: objectives.dragon.first, // LCU 接口中的 Dragon 拼写就是如此，不确定是否是有意为之
-            firstInhibitor: objectives.inhibitor.first,
-            firstTower: objectives.tower.first,
-            hordeKills: objectives.horde.kills,
-            inhibitorKills: objectives.inhibitor.kills,
-            riftHeraldKills: objectives.riftHerald.kills,
+            firstDargon: objectives.dragon?.first || false, // LCU 接口中的 Dragon 拼写就是如此，不确定是否是有意为之
+            firstInhibitor: objectives.inhibitor?.first || false,
+            firstTower: objectives.tower?.first || false,
+            hordeKills: objectives.horde?.kills || 0,
+            inhibitorKills: objectives.inhibitor?.kills || 0,
+            riftHeraldKills: objectives.riftHerald?.kills || 0,
             vilemawKills: 0, // 默认值
             dominionVictoryScore: 0, // 默认值
-            towerKills: objectives.tower.kills,
+            towerKills: objectives.tower?.kills || 0,
             win: win ? 'Win' : 'Fail'
           }
         })

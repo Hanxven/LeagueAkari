@@ -2,17 +2,19 @@
   <template v-if="showingRank">
     <NPopover placement="bottom" :disabled="!simple && sortedRankedQueues.length <= 1">
       <template #trigger>
-        <span v-bind="$attrs" class="summoner-rank">
-          {{ formatRankText(showingRank, simple) }}
-          <NIcon v-if="simple || sortedRankedQueues.length > 1" class="icon"
-            ><InformationIcon /></NIcon
-        ></span>
+        <div v-bind="$attrs" class="summoner-rank">
+          <img
+            v-if="showingRank.tier && rankedMedalMap[showingRank.tier]"
+            :src="rankedMedalMap[showingRank.tier]"
+            class="ranked-medal"
+          />
+          <span>
+            {{ formatRankText(showingRank, simple) }}
+          </span>
+        </div>
       </template>
       <div class="summoner-rank-popover" v-for="q of sortedRankedQueues" :key="q.queueType">
         {{ formatRankText(q) }}
-      </div>
-      <div v-if="!queueType" class="tip" style="margin-top: 4px">
-        展示优先级：单双排位 > 灵活排位 > 云顶之弈 > 竞技场
       </div>
     </NPopover>
   </template>
@@ -21,9 +23,19 @@
 
 <script setup lang="ts">
 import { RankedEntry, RankedStats } from '@shared/types/lcu/ranked'
-import { InformationCircleOutline as InformationIcon } from '@vicons/ionicons5'
-import { NIcon, NPopover } from 'naive-ui'
+import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
+
+import BronzeMedal from '@main-window/assets/ranked-icons/bronze.png'
+import ChallengerMedal from '@main-window/assets/ranked-icons/challenger.png'
+import DiamondMedal from '@main-window/assets/ranked-icons/diamond.png'
+import EmeraldMedal from '@main-window/assets/ranked-icons/emerald.png'
+import GoldMedal from '@main-window/assets/ranked-icons/gold.png'
+import GrandmasterMedal from '@main-window/assets/ranked-icons/grandmaster.png'
+import IronMedal from '@main-window/assets/ranked-icons/iron.png'
+import MasterMedal from '@main-window/assets/ranked-icons/master.png'
+import PlatinumMedal from '@main-window/assets/ranked-icons/platinum.png'
+import SilverMedal from '@main-window/assets/ranked-icons/silver.png'
 
 const props = defineProps<{
   ranked: RankedStats
@@ -87,6 +99,19 @@ const tierTextMap: Record<string, string> = {
   MASTER: '超凡大师',
   GRANDMASTER: '傲世宗师',
   CHALLENGER: '最强王者'
+}
+
+const rankedMedalMap: Record<string, string> = {
+  IRON: IronMedal,
+  BRONZE: BronzeMedal,
+  SILVER: SilverMedal,
+  GOLD: GoldMedal,
+  PLATINUM: PlatinumMedal,
+  EMERALD: EmeraldMedal,
+  DIAMOND: DiamondMedal,
+  MASTER: MasterMedal,
+  GRANDMASTER: GrandmasterMedal,
+  CHALLENGER: ChallengerMedal
 }
 
 const sortedRankedQueues = computed(() => {
@@ -190,14 +215,18 @@ const formatRankText = (rank: RankedEntry, simple = false) => {
 </script>
 
 <style lang="less" scoped>
-// 与外面的颜色风格保持一致
-// 因为组件的原因，难以在父组件调整样式
 .summoner-rank {
   display: flex;
   align-items: center;
   font-size: 12px;
   color: rgb(159, 159, 159);
   width: fit-content;
+  gap: 4px;
+
+  .ranked-medal {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .summoner-rank-popover {

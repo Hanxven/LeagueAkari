@@ -94,7 +94,6 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
     this.onEvent(
       'update/ongoing-player/match-history',
       (puuid, history: { isDetailed: boolean; game: Game }[]) => {
-        console.log('update/ongoing-player/match-history', puuid, history)
         if (store.ongoingPlayers[puuid]) {
           store.ongoingPlayers[puuid].matchHistory = history.map((g) => ({
             isDetailed: g.isDetailed,

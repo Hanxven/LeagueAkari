@@ -27,7 +27,7 @@ class CoreFunctionalitySettings {
 
   delaySecondsBeforeLoading: number = 1
 
-  matchHistorySource: 'lcu' | 'sgp' = 'lcu'
+  matchHistorySource: 'lcu' | 'sgp' = 'sgp'
 
   constructor() {
     makeAutoObservable(this)
