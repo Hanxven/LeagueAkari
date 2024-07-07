@@ -110,9 +110,8 @@
               <NIcon class="dice-icon"><DiceIcon /></NIcon>
               <span class="dice-count">{{ tab.summoner.rerollPoints.numberOfRolls }}</span>
             </div>
-            <!-- UNDER DEVELOPMENT -->
             <div title="标记玩家" class="tag" v-if="!isSelfTab" @click="handleTagPlayer">
-              <NIcon><TagIcon /></NIcon>
+              <NIcon><EditIcon /></NIcon>
               <span class="tagged" v-if="tab.savedInfo?.tag">已标记</span>
               <span class="untagged" v-else>标记</span>
             </div>
@@ -133,20 +132,22 @@
           </div>
         </div>
       </div>
-      <div class="user-status" v-if="tab.summoner">
-        <div
-          v-if="!isSelfTab && tab.summoner.privacy === 'PRIVATE'"
-          class="statistics-block privacy-private-alert"
-        >
-          <div class="title">生涯隐藏</div>
-          <div class="content">
-            {{ hideMatchHistoryText(tab.summoner.summonerId) }}
-          </div>
+      <div
+        v-if="!isSelfTab && tab.summoner && tab.summoner.privacy === 'PRIVATE'"
+        class="statistics-block privacy-private-alert"
+      >
+        <div class="title">生涯隐藏</div>
+        <div class="content">
+          {{
+            app.settings.isInKyokoMode
+              ? hideMatchHistoryText(tab.summoner.summonerId)
+              : '该名玩家未公开生涯'
+          }}
         </div>
       </div>
-      <div class="statistics-block tag-text" v-if="false">
+      <div class="statistics-block tag-text" v-if="!isSelfTab && tab.savedInfo?.tag">
         <div class="title">已标记的玩家</div>
-        <div class="content">标记的，标记的内容。</div>
+        <div class="content tag-text-scroll-area">{{ tab.savedInfo.tag }}</div>
       </div>
       <div class="statistics-block statistics" v-if="false">
         <div class="title">对局历史</div>
@@ -190,10 +191,11 @@
 <script setup lang="ts">
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { hideMatchHistoryText } from '@shared/renderer/utils/sarcasms'
 import { summonerName } from '@shared/utils/name'
-import { Tag as TagIcon } from '@vicons/carbon'
+import { Edit20Filled as EditIcon } from '@vicons/fluent'
 import { Dice as DiceIcon } from '@vicons/ionicons5'
 import { createReusableTemplate, useDebounce, useScroll } from '@vueuse/core'
 import { useMagicKeys, whenever } from '@vueuse/core'
@@ -227,6 +229,7 @@ const props = withDefaults(
 
 const mh = useMatchHistoryTabsStore()
 const gameData = useGameDataStore()
+const app = useAppStore()
 
 const handleLoadPage = async (page: number) => {
   const r = await mhm.fetchTabMatchHistory(
@@ -659,6 +662,7 @@ defineExpose({
   border-radius: 4px;
   padding: 8px 16px;
   color: rgb(255, 255, 255);
+  margin-bottom: 12px;
 
   .title {
     font-size: 14px;
@@ -673,5 +677,20 @@ defineExpose({
 
 .privacy-private-alert {
   background-color: rgba(100, 14, 14, 0.6);
+}
+
+.tag-text {
+  white-space: pre-wrap;
+  background-color: rgba(0, 64, 125, 0.6);
+
+  .tag-text-scroll-area {
+    position: relative;
+    overflow: auto;
+    max-height: 100px;
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+  }
 }
 </style>
