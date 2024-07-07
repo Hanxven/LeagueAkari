@@ -5,7 +5,7 @@ import { shallowRef } from 'vue'
 
 export const useExternalDataSourceStore = defineStore('module:external-data-source', () => {
   const balanceData = shallowRef<{
-    name: string
+    dataSource: string
     map: ChampBalanceMapV1
     updateAt: Date
   } | null>(null)

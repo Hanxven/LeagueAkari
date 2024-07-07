@@ -34,7 +34,7 @@
                 >{{ formatBalanceValue(b.value, b.meta.type === 'percentage') }}</span
               >
             </div>
-            <div class="balance-data-source-name">{{ eds.balanceData?.name }}</div>
+            <div class="balance-data-source-name">{{ eds.balanceData?.dataSource }}</div>
           </div>
         </NTooltip>
         <div class="btns">
@@ -98,7 +98,7 @@
                 >{{ formatBalanceValue(b.value, b.meta.type === 'percentage') }}</span
               >
             </div>
-            <div class="balance-data-source-name">{{ eds.balanceData?.name }}</div>
+            <div class="balance-data-source-name">{{ eds.balanceData?.dataSource }}</div>
           </div>
         </NTooltip>
         <div

@@ -39,11 +39,7 @@ export class ChampBalanceEdsState {
   data: {
     map: ChampBalanceMapV1
     updateAt: Date
-  } | null = null
-
-  currentDataSource: {
-    name: string
-    id: string
+    dataSource: string
   } | null = null
 
   async updateData() {
@@ -61,8 +57,7 @@ export class ChampBalanceEdsState {
       }
 
       runInAction(() => {
-        this.data = { map: result, updateAt: this.fandom.updateAt }
-        this.currentDataSource = { name: this.fandom.name, id: this.fandom.id }
+        this.data = { map: result, updateAt: this.fandom.updateAt, dataSource: this.fandom.name }
       })
     }
   }
