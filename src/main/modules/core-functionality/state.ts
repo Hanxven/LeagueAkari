@@ -3,6 +3,7 @@ import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { lcuConnectionModule as lcm } from '../akari-core/lcu-connection'
@@ -25,7 +26,7 @@ class CoreFunctionalitySettings {
 
   playerAnalysisFetchConcurrency: number = 3
 
-  delaySecondsBeforeLoading: number = 1
+  delaySecondsBeforeLoading: number = 0
 
   matchHistorySource: 'lcu' | 'sgp' = 'sgp'
 
@@ -86,6 +87,9 @@ class CoreFunctionalitySettings {
   }
 }
 
+/**
+ * 当前正在进行游戏的玩家的基础信息
+ */
 export interface OngoingPlayer {
   // 当前的召唤师 ID，和 key 值相同
   puuid: string
@@ -103,7 +107,7 @@ export interface OngoingPlayer {
   /**
    * 用于分析的战绩列表封装
    */
-  matchHistory?: MatchHistoryWithState[]
+  matchHistory?: MatchHistoryGameWithState[]
 
   /**
    * 记录的玩家信息
@@ -111,7 +115,18 @@ export interface OngoingPlayer {
   savedInfo?: SavedPlayer & { encounteredGames: number[] }
 }
 
-export interface MatchHistoryWithState {
+/**
+ * 当前正在进行游戏的玩家的分析信息
+ */
+export interface OngoingPlayerAnalysis {
+  puuid: string
+}
+
+export interface OngoingTeamAnalysis {
+  teamId: string
+}
+
+export interface MatchHistoryGameWithState {
   game: Game
   isDetailed: boolean
 }
@@ -125,6 +140,11 @@ export class CoreFunctionalityState {
    * 出于性能优化，手动同步该状态
    */
   ongoingPlayers = observable(new Map<string, OngoingPlayer>(), { deep: false })
+
+  /**
+   * 当前正在进行的玩家分析
+   */
+  ongoingPlayerAnalysis: Record<string, MatchHistoryGamesAnalysisAll> | null = null
 
   isWaitingForDelay = false
 
@@ -266,6 +286,7 @@ export class CoreFunctionalityState {
     this.ongoingPlayers.clear()
     this.tempDetailedGames.clear()
     this.ongoingPreMadeTeams = []
+    this.ongoingPlayerAnalysis = null
     this.sendList = {}
     this.isWaitingForDelay = false
   }
@@ -329,7 +350,8 @@ export class CoreFunctionalityState {
       ongoingGameInfo: computed.struct,
       ongoingTeams: computed.struct,
       sendList: observable.shallow,
-      ongoingPreMadeTeams: observable.struct
+      ongoingPreMadeTeams: observable.struct,
+      ongoingPlayerAnalysis: observable.struct
     })
   }
 }

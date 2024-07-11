@@ -48,7 +48,7 @@ export class ExternalDataSourceRendererModule extends StateSyncModule {
 
     // FOR DEBUGGING
     // @ts-ignore
-    window.eds = this
+    window.sgp = this.sgp.getMatchHistoryLcuFormat.bind(this.sgp)
   }
 }
 

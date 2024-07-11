@@ -1,8 +1,9 @@
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
 import { defineStore } from 'pinia'
-import { reactive, ref, shallowRef } from 'vue'
+import { reactive, ref, shallowRef, watchEffect } from 'vue'
 
 /**
  * 存储在本地的玩家信息
@@ -27,6 +28,9 @@ export interface SavedPlayerInfo {
   encounteredGames: number[]
 }
 
+/**
+ * 当前正在进行游戏的玩家的基础信息，类型同主进程定义
+ */
 export interface OngoingPlayer {
   puuid: string
 
@@ -43,7 +47,7 @@ export interface OngoingPlayer {
   /**
    * 用于分析的战绩列表封装
    */
-  matchHistory?: MatchHistoryWithState[]
+  matchHistory?: MatchHistoryGameWithState[]
 
   /**
    * 记录的玩家信息
@@ -51,7 +55,7 @@ export interface OngoingPlayer {
   savedInfo?: SavedPlayerInfo
 }
 
-export interface MatchHistoryWithState {
+export interface MatchHistoryGameWithState {
   game: Game
   isDetailed: boolean
 }
@@ -87,6 +91,14 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
   const ongoingChampionSelections = shallowRef<Record<string | number, number> | null>(null)
   const isWaitingForDelay = ref(false)
 
+  const ongoingPlayerAnalysis = shallowRef<Record<string, MatchHistoryGamesAnalysisAll> | null>(
+    null
+  )
+
+  watchEffect(() => {
+    console.log(ongoingPlayerAnalysis.value)
+  })
+
   // 战绩加载功能
   const settings = reactive({
     fetchAfterGame: true,
@@ -102,7 +114,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     fetchDetailedGame: false,
 
     // 拉取分页大小
-    matchHistoryLoadCount: 40,
+    matchHistoryLoadCount: 20,
 
     // 允许在游戏内发送对局 KDA 信息
     sendKdaInGame: false,
@@ -114,7 +126,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     sendKdaThreshold: 0,
 
     // 对局中战绩获取的最大并发限制
-    playerAnalysisFetchConcurrency: 5,
+    playerAnalysisFetchConcurrency: 3,
 
     // 延迟加载时间
     delaySecondsBeforeLoading: 0,
@@ -132,6 +144,8 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     isInEndgamePhase,
     ongoingChampionSelections,
     isWaitingForDelay,
+
+    ongoingPlayerAnalysis,
 
     settings,
 

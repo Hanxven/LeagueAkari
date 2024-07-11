@@ -1,5 +1,5 @@
-import SendInputWorker from '@main/workers/send-input?nodeWorker'
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import SendInputWorker from '@main/workers/send-input?nodeWorker'
 import { Menu, MenuItem, Notification, Tray, app } from 'electron'
 import { GlobalKeyboardListener } from 'node-global-key-listener'
 import { randomUUID } from 'node:crypto'
@@ -24,6 +24,7 @@ export class PlatformModule extends MobxBasedBasicModule {
 
   private _tray: Tray | null = null
   private _auxWindowTrayItem: MenuItem | null = null
+  private _auxWindowTrayDevItem: MenuItem | null = null
 
   private _bus = new EventEmitter()
 
@@ -120,6 +121,10 @@ export class PlatformModule extends MobxBasedBasicModule {
     if (this._auxWindowTrayItem) {
       this._auxWindowTrayItem.enabled = enabled
     }
+
+    if (this._auxWindowTrayDevItem) {
+      this._auxWindowTrayDevItem.enabled = enabled
+    }
   }
 
   private _initTray() {
@@ -133,6 +138,26 @@ export class PlatformModule extends MobxBasedBasicModule {
       }
     })
 
+    this._auxWindowTrayDevItem = new MenuItem({
+      label: 'Toggle DevTools - AuxiliaryWindow',
+      type: 'normal',
+      click: () => {
+        this._awm.auxWindow?.webContents.toggleDevTools()
+      }
+    })
+
+    const devSubMenu = new Menu()
+    devSubMenu.append(
+      new MenuItem({
+        label: 'Toggle DevTools - MainWindow',
+        type: 'normal',
+        click: () => {
+          this._mwm.mainWindow?.webContents.toggleDevTools()
+        }
+      })
+    )
+    devSubMenu.append(this._auxWindowTrayDevItem)
+
     const contextMenu = Menu.buildFromTemplate([
       {
         label: 'League Akari',
@@ -140,6 +165,14 @@ export class PlatformModule extends MobxBasedBasicModule {
         click: () => {
           this._mwm.restoreAndFocus()
         }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Dev',
+        type: 'submenu',
+        submenu: devSubMenu
       },
       {
         type: 'separator'

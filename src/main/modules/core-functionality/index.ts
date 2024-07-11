@@ -6,7 +6,12 @@ import { getRankedStats } from '@main/http-api/ranked'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
-import { getAnalysis, withSelfParticipantMatchHistory } from '@shared/utils/analysis'
+import {
+  MatchHistoryGamesAnalysisAll,
+  analyzeMatchHistory,
+  getAnalysis,
+  withSelfParticipantMatchHistory
+} from '@shared/utils/analysis'
 import { formatError } from '@shared/utils/errors'
 import { summonerName } from '@shared/utils/name'
 import { cancellableSleep, sleep } from '@shared/utils/sleep'
@@ -157,6 +162,22 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         const result = this._analyzeTeamUp()
         if (result && this.state.queryState !== 'unavailable') {
           runInAction(() => (this.state.ongoingPreMadeTeams = result))
+        } else {
+          runInAction(() => (this.state.ongoingPreMadeTeams = []))
+        }
+      },
+      { delay: 500 }
+    )
+
+    // Akari's Opinion
+    this.autoDisposeReaction(
+      () => Array.from(this.state.ongoingPlayers.values()).map((p) => p.matchHistory),
+      () => {
+        const result = this._analyzePlayers()
+        if (result && this.state.queryState !== 'unavailable') {
+          runInAction(() => (this.state.ongoingPlayerAnalysis = result))
+        } else {
+          runInAction(() => (this.state.ongoingPlayerAnalysis = null))
         }
       },
       { delay: 500 }
@@ -568,6 +589,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       )
 
       let grouped: { teamId: number; puuid: string }[]
+
+      // 对于竞技场模式，在战绩接口中只有一个队伍。如果要区分小队，需要使用 subteamPlacement 或 subteamId 字段
       if (mode === 'CHERRY') {
         grouped = game.participants.map((p) => ({
           teamId: p.stats.subteamPlacement, // 取值范围是 1, 2, 3, 4, 这个实际上也是最终队伍排名
@@ -636,6 +659,23 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     return removeSubsets(teams, (team) => team.players)
   }
 
+  /**
+   * 分析当前对局玩家的数据
+   */
+  private _analyzePlayers() {
+    const result: Record<string, MatchHistoryGamesAnalysisAll> = {}
+
+    for (const [puuid, { matchHistory }] of this.state.ongoingPlayers.entries()) {
+      if (!matchHistory) {
+        continue
+      }
+
+      result[puuid] = analyzeMatchHistory(matchHistory, puuid)
+    }
+
+    return result
+  }
+
   private async _loadPlayerStats(signal: AbortSignal, puuid: string, retries = 2) {
     if (!this.state.ongoingPlayers.has(puuid)) {
       runInAction(() =>
@@ -644,12 +684,11 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       this.sendEvent('create/ongoing-player', puuid)
     }
 
-    this._logger.info(`对局分析: ${puuid}`)
-
     const player = this.state.ongoingPlayers.get(puuid)!
 
     try {
       // 召唤师信息必须被提前加载完成
+      this._logger.info(`加载玩家信息 Summoner: ${puuid}`)
       const summonerInfo = await this._playerAnalysisFetchLimiter
         .add(() => getSummonerByPuuid(puuid), {
           signal,
@@ -677,6 +716,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           return
         }
 
+        this._logger.info(`加载玩家信息 SavedPlayer: ${puuid}`)
+
         const savedInfo = await this._sm.players.querySavedPlayerWithGames({
           region: auth.region,
           rsoPlatformId: auth.rsoPlatformId,
@@ -695,6 +736,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         if (player.rankedStats) {
           return
         }
+
+        this._logger.info(`加载玩家信息 Ranked: ${puuid}`)
 
         const rankedStats = await this._playerAnalysisFetchLimiter
           .add(() => getRankedStats(puuid), {
@@ -719,7 +762,9 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           this.state.settings.matchHistorySource === 'sgp' &&
           this._edsm.sgp.state.availability.currentRegionSupported
 
-        this._logger.info(`API: ${useSgpApi ? 'SGP' : 'LCU'}, 拉取玩家战绩: ${puuid}`)
+        this._logger.info(
+          `Use API: ${useSgpApi ? 'SGP' : 'LCU'}, 加载玩家信息 MatchHistory: ${puuid}`
+        )
 
         try {
           const matchHistory = await this._playerAnalysisFetchLimiter
@@ -752,7 +797,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
           const withDetailedFields = matchHistory.games.games.map((g) => ({
             game: g,
-            isDetailed: useSgpApi
+            isDetailed: useSgpApi // SGP API 会返回详细战绩。倒是 LCU API 会多做一步无用的提取
           }))
 
           withDetailedFields.forEach((g) => {
@@ -890,6 +935,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this.simpleSync('ongoing-teams', () => this.state.ongoingTeams)
     this.simpleSync('send-list', () => toJS(this.state.sendList))
     this.simpleSync('is-waiting-for-delay', () => this.state.isWaitingForDelay)
+    this.simpleSync('ongoing-player-analysis', () => this.state.ongoingPlayerAnalysis)
   }
 
   private _setupMethodCall() {

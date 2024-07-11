@@ -1,10 +1,11 @@
 <template>
-  <span class="beautiful-akari" :class="{ 'akari-bold': bold }">League Akari</span>
+  <span class="beautiful-akari" :class="{ 'akari-bold': bold }">{{ text ?? 'League Akari' }}</span>
 </template>
 
 <script setup lang="ts">
 defineProps<{
   bold?: boolean
+  text?: string
 }>()
 </script>
 

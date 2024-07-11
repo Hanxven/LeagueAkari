@@ -512,7 +512,7 @@ defineExpose({
     transition: all 0.3s ease;
 
     &:hover .tagged {
-      color: rgb(255, 204, 0);
+      color: rgb(0, 217, 255);
     }
 
     &:hover .untagged {
@@ -523,7 +523,7 @@ defineExpose({
       margin-left: 2px;
       font-size: 12px;
       font-weight: 700;
-      color: rgb(255, 157, 0);
+      color: rgb(0, 179, 255);
       transition: all 0.3s ease;
     }
 
@@ -542,6 +542,9 @@ defineExpose({
   }
 
   .tag-line {
+    margin-left: 4px;
+    font-size: 12px;
+    font-weight: normal;
     color: rgb(178, 178, 178);
   }
 

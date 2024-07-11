@@ -230,7 +230,7 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import {
-  MatchHistoryWithState,
+  MatchHistoryGameWithState,
   SavedPlayerInfo
 } from '@shared/renderer/modules/core-functionality/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
@@ -260,7 +260,7 @@ const props = defineProps<{
   isSelf: boolean
   summonerInfo?: SummonerInfo
   rankedStats?: RankedStats
-  matchHistory?: MatchHistoryWithState[]
+  matchHistory?: MatchHistoryGameWithState[]
   championId?: number
   team?: string
   queueType?: string

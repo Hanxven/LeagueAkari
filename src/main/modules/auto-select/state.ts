@@ -6,7 +6,7 @@ import { lcuSyncModule as lcu } from '../lcu-state-sync'
 
 class AutoSelectSettings {
   normalModeEnabled: boolean = false
-  onlySimulMode: boolean = true
+  onlySimulMode: boolean = false
   expectedChampions: number[] = []
   selectTeammateIntendedChampion: boolean = false
   showIntent: boolean = false

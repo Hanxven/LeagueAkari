@@ -5,7 +5,7 @@
       <ControlItem
         class="control-item-margin"
         label="重生倒计时"
-        label-description="在标题栏展示一个距离重生时间的指示器"
+        label-description="在标题栏展示一个距离重生剩余时间的指示器"
         :label-width="320"
       >
         <NSwitch
@@ -30,6 +30,7 @@
         />
       </ControlItem>
       <ControlItem
+        v-if="app.settings.isInKyokoMode"
         class="control-item-margin"
         label="战绩页面拉取详细对局"
         label-description="在请求页面战绩列表时，也同时加载所有对局的详细信息"

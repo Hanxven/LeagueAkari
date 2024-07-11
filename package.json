@@ -5,7 +5,7 @@
     "name": "Hanxven",
     "email": "hanxven@gmail.com"
   },
-  "description": "基于 League Client Update (LCU) 的工具集，最完美的开源工具",
+  "description": "基于 LCU 的工具集",
   "main": "./out/main/main.js",
   "scripts": {
     "format": "prettier --write .",

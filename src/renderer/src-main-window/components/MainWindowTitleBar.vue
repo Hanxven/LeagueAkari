@@ -179,22 +179,17 @@ import {
 } from '@vicons/fluent'
 import {
   CloseOutlined as CloseOutlinedIcon,
-  MinimizeFilled as MinimizeFilledIcon,
   UpgradeFilled as UpgradeFilledIcon
 } from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
-import { computed, inject, ref, watch } from 'vue'
+import { inject, ref, watch } from 'vue'
+
+import { useTitleText } from '@main-window/compositions/title'
 
 const app = useAppStore()
 
-const titleText = computed(() => {
-  if (app.version.includes('rabi')) {
-    return `League Rabi [${app.version.split('-')[1]}]`
-  } else {
-    return `League Akari`
-  }
-})
+const { title: titleText } = useTitleText()
 
 const appInject = inject('app') as any
 

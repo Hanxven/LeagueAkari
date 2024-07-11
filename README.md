@@ -10,8 +10,6 @@
 
 利用 League Client Update (LCU) API 实现的工具集，功能很多。
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Hanxven/LeagueAkari&type=Date)](https://star-history.com/#Hanxven/LeagueAkari&Date)
-
 ## 1.1 使用方法
 
 在右侧 Release 中寻找最新的构建版本压缩包，解压后即可运行。
@@ -22,11 +20,11 @@
 
 一旦检测到游戏客户端，则会自动连接。无需考虑启动顺序。
 
-> League Akari 会很好地处理中途启动的情况。
+League Akari 会很好地处理中途启动的情况。
 
 ## 1.2 企鹅群组
 
-一个适合反馈 BUG、提出建议以及闲聊的好地方。
+一个适合吹水开黑聊天的好地方，甚至还能反馈 BUG 和提出建议。
 
 企鹅群组：301157623
 
@@ -199,7 +197,9 @@ League Akari 的实现参考了许多现有的优秀开源项目，这些项目�
 
 # 9. FAQ
 
-[参见 FAQ.md](https://github.com/Hanxven/LeagueAkari/blob/main/FAQ.md "FAQ")
+[参见 FAQ.md](https://github.com/Hanxven/LeagueAkari/blob/main/FAQ.md 'FAQ')
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Hanxven/LeagueAkari&type=Date)](https://star-history.com/#Hanxven/LeagueAkari&Date)
 
 # 10. 免责声明
 

@@ -1,6 +1,6 @@
+import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { action, benchSwap, pickOrBan } from '@main/http-api/champ-select'
 import { chatSend } from '@main/http-api/chat'
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
 
@@ -344,6 +344,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
 
     try {
       await benchSwap(this.state.upcomingGrab.championId)
+      this._logger.info(`已交换英雄: ${this.state.upcomingGrab.championId}`)
     } catch (error) {
       this._logger.warn(`在尝试交换英雄时发生错误 ${formatError(error)}`)
       this._mwm.notify.warn('auto-select', '自动选择', `交换英雄失败`)
@@ -448,10 +449,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     )
 
     this.state.settings.setOnlySimulMode(
-      await this._sm.settings.get(
-        'auto-select/only-simul-mode',
-        this.state.settings.onlySimulMode
-      )
+      await this._sm.settings.get('auto-select/only-simul-mode', this.state.settings.onlySimulMode)
     )
 
     this.state.settings.setExpectedChampions(
@@ -469,10 +467,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     )
 
     this.state.settings.setShowIntent(
-      await this._sm.settings.get(
-        'auto-select/show-intent',
-        this.state.settings.showIntent
-      )
+      await this._sm.settings.get('auto-select/show-intent', this.state.settings.showIntent)
     )
 
     this.state.settings.setCompleted(
@@ -501,10 +496,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     )
 
     this.state.settings.setBanEnabled(
-      await this._sm.settings.get(
-        'auto-select/ban-enabled',
-        this.state.settings.banEnabled
-      )
+      await this._sm.settings.get('auto-select/ban-enabled', this.state.settings.banEnabled)
     )
 
     this.state.settings.setBannedChampions(

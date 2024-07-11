@@ -1,10 +1,10 @@
 import { GameflowSession } from '@shared/types/lcu/gameflow'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
-import { MatchHistoryWithState } from '@shared/utils/analysis'
+import { MatchHistoryGameWithState } from '@shared/utils/analysis'
 
 export interface PlayerOngoingInformation {
-  matchHistory: MatchHistoryWithState[]
+  matchHistory: MatchHistoryGameWithState[]
   summoner?: SummonerInfo
   rankedStats?: RankedStats
 }

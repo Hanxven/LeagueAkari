@@ -334,6 +334,10 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     }
   }
 
+  get auxWindow() {
+    return this._w
+  }
+
   private _createWindow() {
     this._w = new BrowserWindow({
       width: AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor,
