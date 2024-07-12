@@ -10,7 +10,7 @@
     <NTabs type="line" animated size="small" v-model:value="tabName">
       <NTabPane name="basic" tab="应用"><AppSettings /></NTabPane>
       <NTabPane name="general" tab="通用"><GeneralSettings /></NTabPane>
-      <NTabPane name="process" tab="进程"><ProcessSettings /></NTabPane>
+      <NTabPane name="process" tab="客户端"><ProcessSettings /></NTabPane>
       <NTabPane name="debug" tab="调试"><DebugSettings /></NTabPane>
       <NTabPane name="about" tab="关于"><AboutPane /></NTabPane>
     </NTabs>

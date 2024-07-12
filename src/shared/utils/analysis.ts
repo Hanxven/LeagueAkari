@@ -237,17 +237,27 @@ export function findOutstandingPlayers(
 }
 
 export interface MatchHistoryGamesAnalysis {
-  // 伤害系列，仅计算对英雄伤害
+  // 总伤害（包括对其他非英雄单位的伤害）
   damageShareToTop: number
   physicalDamageShareToTop: number
   magicDamageShareToTop: number
   trueDamageShareToTop: number
 
-  // 所有伤害来源
+  damageShareOfTeam: number
+  physicalDamageShareOfTeam: number
+  magicDamageShareOfTeam: number
+  trueDamageShareOfTeam: number
+
+  // 对英雄造成的伤害
   damageDealtToChampionShareToTop: number
   physicalDamageDealtToChampionShareToTop: number
   magicDamageDealtToChampionShareToTop: number
   trueDamageDealtToChampionShareToTop: number
+
+  damageDealtToChampionShareOfTeam: number
+  physicalDamageDealtToChampionShareOfTeam: number
+  magicDamageDealtToChampionShareOfTeam: number
+  trueDamageDealtToChampionShareOfTeam: number
 
   // 承受伤害系列
   damageTakenShareToTop: number
@@ -255,16 +265,22 @@ export interface MatchHistoryGamesAnalysis {
   magicDamageTakenShareToTop: number
   trueDamageTakenShareToTop: number
 
+  damageTakenShareOfTeam: number
+  physicalDamageTakenShareOfTeam: number
+  magicDamageTakenShareOfTeam: number
+  trueDamageTakenShareOfTeam: number
+
   // KDA 系列
   killParticipationRate: number
-
   kda: number
 
   // 补兵占比 (包括野怪和小兵)
   csShareToTop: number
+  csShareOfTeam: number
 
   // 经济占比
   goldShareToTop: number
+  goldShareOfTeam: number
 
   // -
   championId: number
@@ -276,22 +292,43 @@ export interface MatchHistoryGamesAnalysisSummary {
   averageMagicDamageShareToTop: number
   averageTrueDamageShareToTop: number
 
+  averageDamageShareOfTeam: number
+  averagePhysicalDamageShareOfTeam: number
+  averageMagicDamageShareOfTeam: number
+  averageTrueDamageShareOfTeam: number
+
   averageDamageDealtToChampionShareToTop: number
   averagePhysicalDamageDealtToChampionShareToTop: number
   averageMagicDamageDealtToChampionShareToTop: number
   averageTrueDamageDealtToChampionShareToTop: number
+
+  averageDamageDealtToChampionShareOfTeam: number
+  averagePhysicalDamageDealtToChampionShareOfTeam: number
+  averageMagicDamageDealtToChampionShareOfTeam: number
+  averageTrueDamageDealtToChampionShareOfTeam: number
 
   averageDamageTakenShareToTop: number
   averagePhysicalDamageTakenShareToTop: number
   averageMagicDamageTakenShareToTop: number
   averageTrueDamageTakenShareToTop: number
 
+  averageDamageTakenShareOfTeam: number
+  averagePhysicalDamageTakenShareOfTeam: number
+  averageMagicDamageTakenShareOfTeam: number
+  averageTrueDamageTakenShareOfTeam: number
+
   averageKillParticipationRate: number
   averageKda: number
 
   averageCsShareToTop: number
+  averageCsShareOfTeam: number
 
   averageGoldShareToTop: number
+  averageGoldShareOfTeam: number
+
+  win: number
+  lose: number
+  winRate: number
 }
 
 export interface MatchHistoryGamesAnalysisAll {
@@ -300,7 +337,7 @@ export interface MatchHistoryGamesAnalysisAll {
 }
 
 /**
- * 根据玩家近期战绩分析数值，新的 API
+ * 根据玩家近期战绩分析数值
  * @param mh 玩家近期战绩，要求格式为 LCU-MatchHistory['games'][index]-like
  * @param selfPuuid 玩家 PUUID
  */
@@ -308,46 +345,74 @@ export function analyzeMatchHistory(
   games: MatchHistoryGameWithState[],
   selfPuuid: string,
   queueType?: number[]
-): MatchHistoryGamesAnalysisAll {
+): MatchHistoryGamesAnalysisAll | null {
   // 仅分析详细战绩，因为简略战绩会大幅减少分析的准确性
   const detailedGames = games
     .filter((g) => g.isDetailed)
     .filter((g) => !queueType || queueType.includes(g.game.queueId))
+    .filter((g) => !g.game.participants.some((p) => p.stats.gameEndedInEarlySurrender))
+    .filter((g) => g.game.gameType === 'MATCHED_GAME' && !isPveQueue(g.game.queueId))
     .map((g) => g.game)
 
-  const gameAnalysisList: [number, MatchHistoryGamesAnalysis][] = []
+  if (detailedGames.length === 0) {
+    return null
+  }
+
+  let win = 0
+  let lose = 0
+
+  const gameAnalyses: [number, MatchHistoryGamesAnalysis][] = []
   for (let i = 0; i < detailedGames.length; i++) {
     const game = detailedGames[i]
 
     // 确定玩家在这场游戏中的参与者 ID
-    const selfPi = game.participantIdentities.find((p) => p.player.puuid === selfPuuid)
-    if (!selfPi) {
+    const selfIdentity = game.participantIdentities.find((p) => p.player.puuid === selfPuuid)
+    if (!selfIdentity) {
       continue
     }
 
-    const selfP = game.participants.find((p) => p.participantId === selfPi.participantId)
-    if (!selfP) {
+    const watashi = game.participants.find((p) => p.participantId === selfIdentity.participantId)
+    if (!watashi) {
       continue
+    }
+
+    if (watashi.stats.win) {
+      win++
+    } else {
+      lose++
     }
 
     const gameAnalysis: MatchHistoryGamesAnalysis = {
-      // 伤害系列，仅计算对英雄伤害
       damageShareToTop: 0,
       physicalDamageShareToTop: 0,
       magicDamageShareToTop: 0,
       trueDamageShareToTop: 0,
 
-      // 所有伤害来源
+      damageShareOfTeam: 0,
+      physicalDamageShareOfTeam: 0,
+      magicDamageShareOfTeam: 0,
+      trueDamageShareOfTeam: 0,
+
       damageDealtToChampionShareToTop: 0,
       physicalDamageDealtToChampionShareToTop: 0,
       magicDamageDealtToChampionShareToTop: 0,
       trueDamageDealtToChampionShareToTop: 0,
+
+      damageDealtToChampionShareOfTeam: 0,
+      physicalDamageDealtToChampionShareOfTeam: 0,
+      magicDamageDealtToChampionShareOfTeam: 0,
+      trueDamageDealtToChampionShareOfTeam: 0,
 
       // 承受伤害系列
       damageTakenShareToTop: 0,
       physicalDamageTakenShareToTop: 0,
       magicDamageTakenShareToTop: 0,
       trueDamageTakenShareToTop: 0,
+
+      damageTakenShareOfTeam: 0,
+      physicalDamageTakenShareOfTeam: 0,
+      magicDamageTakenShareOfTeam: 0,
+      trueDamageTakenShareOfTeam: 0,
 
       // KDA 系列
       killParticipationRate: 0,
@@ -356,9 +421,11 @@ export function analyzeMatchHistory(
 
       // 补兵占比 (包括野怪和小兵)
       csShareToTop: 0,
+      csShareOfTeam: 0,
 
       // 经济占比
       goldShareToTop: 0,
+      goldShareOfTeam: 0,
 
       // -
       championId: 0
@@ -368,27 +435,41 @@ export function analyzeMatchHistory(
     let maxPhysicalDamageDealt = 0
     let maxMagicDamageDealt = 0
     let maxTrueDamageDealt = 0
+    let totalDamageDealt = 0
+    let totalPhysicalDamageDealt = 0
+    let totalMagicDamageDealt = 0
+    let totalTrueDamageDealt = 0
     let maxDamageDealtToChampion = 0
     let maxPhysicalDamageDealtToChampion = 0
     let maxMagicDamageDealtToChampion = 0
     let maxTrueDamageDealtToChampion = 0
+    let totalDamageDealtToChampion = 0
+    let totalPhysicalDamageDealtToChampion = 0
+    let totalMagicDamageDealtToChampion = 0
+    let totalTrueDamageDealtToChampion = 0
     let maxDamageTaken = 0
     let maxPhysicalDamageTaken = 0
     let maxMagicDamageTaken = 0
     let maxTrueDamageTaken = 0
+    let totalDamageTaken = 0
+    let totalPhysicalDamageTaken = 0
+    let totalMagicDamageTaken = 0
+    let totalTrueDamageTaken = 0
     let kills = 0
     let deaths = 0
     let assists = 0
     let maxCs = 0
+    let totalCs = 0
     let maxGold = 0
+    let totalGold = 0
 
     let selfTeamParticipants: Participant[]
     if (game.gameMode === 'CHERRY') {
       selfTeamParticipants = game.participants.filter(
-        (p) => p.stats.playerSubteamId === selfP.stats.playerSubteamId
+        (p) => p.stats.playerSubteamId === watashi.stats.playerSubteamId
       )
     } else {
-      selfTeamParticipants = game.participants.filter((p) => p.teamId === selfP.teamId)
+      selfTeamParticipants = game.participants.filter((p) => p.teamId === watashi.teamId)
     }
 
     for (const p of selfTeamParticipants) {
@@ -417,49 +498,95 @@ export function analyzeMatchHistory(
       maxMagicDamageTaken = Math.max(maxMagicDamageTaken, p.stats.magicalDamageTaken)
       maxTrueDamageTaken = Math.max(maxTrueDamageTaken, p.stats.trueDamageTaken)
 
+      totalDamageDealt += p.stats.totalDamageDealt
+      totalPhysicalDamageDealt += p.stats.physicalDamageDealt
+      totalMagicDamageDealt += p.stats.magicDamageDealt
+      totalTrueDamageDealt += p.stats.trueDamageDealt
+      totalDamageDealtToChampion += p.stats.totalDamageDealtToChampions
+      totalPhysicalDamageDealtToChampion += p.stats.physicalDamageDealtToChampions
+      totalMagicDamageDealtToChampion += p.stats.magicDamageDealtToChampions
+      totalTrueDamageDealtToChampion += p.stats.trueDamageDealtToChampions
+      totalDamageTaken += p.stats.totalDamageTaken
+      totalPhysicalDamageTaken += p.stats.physicalDamageTaken
+      totalMagicDamageTaken += p.stats.magicalDamageTaken
+      totalTrueDamageTaken += p.stats.trueDamageTaken
+
       kills += p.stats.kills
       deaths += p.stats.deaths
       assists += p.stats.assists
 
       maxCs = Math.max(maxCs, p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled)
+      totalCs += p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled
+
       maxGold = Math.max(maxGold, p.stats.goldEarned)
+      totalGold += p.stats.goldEarned
     }
 
-    gameAnalysis.damageShareToTop = selfP.stats.totalDamageDealt / (maxDamageDealt || 1)
+    gameAnalysis.damageShareToTop = watashi.stats.totalDamageDealt / (maxDamageDealt || 1)
     gameAnalysis.physicalDamageShareToTop =
-      selfP.stats.physicalDamageDealt / (maxPhysicalDamageDealt || 1)
-    gameAnalysis.magicDamageShareToTop = selfP.stats.magicDamageDealt / (maxMagicDamageDealt || 1)
-    gameAnalysis.trueDamageShareToTop = selfP.stats.trueDamageDealt / (maxTrueDamageDealt || 1)
+      watashi.stats.physicalDamageDealt / (maxPhysicalDamageDealt || 1)
+    gameAnalysis.magicDamageShareToTop = watashi.stats.magicDamageDealt / (maxMagicDamageDealt || 1)
+    gameAnalysis.trueDamageShareToTop = watashi.stats.trueDamageDealt / (maxTrueDamageDealt || 1)
+
+    gameAnalysis.damageShareOfTeam = watashi.stats.totalDamageDealt / (totalDamageDealt || 1)
+    gameAnalysis.physicalDamageShareOfTeam =
+      watashi.stats.physicalDamageDealt / (totalPhysicalDamageDealt || 1)
+    gameAnalysis.magicDamageShareOfTeam =
+      watashi.stats.magicDamageDealt / (totalMagicDamageDealt || 1)
+    gameAnalysis.trueDamageShareOfTeam = watashi.stats.trueDamageDealt / (totalTrueDamageDealt || 1)
 
     gameAnalysis.damageDealtToChampionShareToTop =
-      selfP.stats.totalDamageDealtToChampions / (maxDamageDealtToChampion || 1)
+      watashi.stats.totalDamageDealtToChampions / (maxDamageDealtToChampion || 1)
     gameAnalysis.physicalDamageDealtToChampionShareToTop =
-      selfP.stats.physicalDamageDealtToChampions / (maxPhysicalDamageDealtToChampion || 1)
+      watashi.stats.physicalDamageDealtToChampions / (maxPhysicalDamageDealtToChampion || 1)
     gameAnalysis.magicDamageDealtToChampionShareToTop =
-      selfP.stats.magicDamageDealtToChampions / (maxMagicDamageDealtToChampion || 1)
+      watashi.stats.magicDamageDealtToChampions / (maxMagicDamageDealtToChampion || 1)
     gameAnalysis.trueDamageDealtToChampionShareToTop =
-      selfP.stats.trueDamageDealtToChampions / (maxTrueDamageDealtToChampion || 1)
+      watashi.stats.trueDamageDealtToChampions / (maxTrueDamageDealtToChampion || 1)
 
-    gameAnalysis.damageTakenShareToTop = selfP.stats.totalDamageTaken / (maxDamageDealt || 1)
+    gameAnalysis.damageDealtToChampionShareOfTeam =
+      watashi.stats.totalDamageDealtToChampions / (totalDamageDealtToChampion || 1)
+    gameAnalysis.physicalDamageDealtToChampionShareOfTeam =
+      watashi.stats.physicalDamageDealtToChampions / (totalPhysicalDamageDealtToChampion || 1)
+    gameAnalysis.magicDamageDealtToChampionShareOfTeam =
+      watashi.stats.magicDamageDealtToChampions / (totalMagicDamageDealtToChampion || 1)
+    gameAnalysis.trueDamageDealtToChampionShareOfTeam =
+      watashi.stats.trueDamageDealtToChampions / (totalTrueDamageDealtToChampion || 1)
+
+    gameAnalysis.damageTakenShareToTop = watashi.stats.totalDamageTaken / (maxDamageTaken || 1)
     gameAnalysis.physicalDamageTakenShareToTop =
-      selfP.stats.physicalDamageTaken / (maxPhysicalDamageDealt || 1)
+      watashi.stats.physicalDamageTaken / (maxPhysicalDamageTaken || 1)
     gameAnalysis.magicDamageTakenShareToTop =
-      selfP.stats.magicalDamageTaken / (maxMagicDamageDealt || 1)
-    gameAnalysis.trueDamageTakenShareToTop = selfP.stats.trueDamageTaken / (maxTrueDamageDealt || 1)
+      watashi.stats.magicalDamageTaken / (maxMagicDamageTaken || 1)
+    gameAnalysis.trueDamageTakenShareToTop =
+      watashi.stats.trueDamageTaken / (maxTrueDamageTaken || 1)
 
-    gameAnalysis.killParticipationRate = (selfP.stats.kills + selfP.stats.assists) / (kills || 1)
-    gameAnalysis.kda = (selfP.stats.kills + selfP.stats.assists) / (selfP.stats.deaths || 1)
+    gameAnalysis.damageTakenShareOfTeam = watashi.stats.totalDamageTaken / (totalDamageTaken || 1)
+    gameAnalysis.physicalDamageTakenShareOfTeam =
+      watashi.stats.physicalDamageTaken / (totalPhysicalDamageTaken || 1)
+    gameAnalysis.magicDamageTakenShareOfTeam =
+      watashi.stats.magicalDamageTaken / (totalMagicDamageTaken || 1)
+    gameAnalysis.trueDamageTakenShareOfTeam =
+      watashi.stats.trueDamageTaken / (totalTrueDamageTaken || 1)
+
+    gameAnalysis.killParticipationRate =
+      (watashi.stats.kills + watashi.stats.assists) / (kills || 1)
+    gameAnalysis.kda = (watashi.stats.kills + watashi.stats.assists) / (watashi.stats.deaths || 1)
 
     gameAnalysis.csShareToTop =
-      (selfP.stats.totalMinionsKilled + selfP.stats.neutralMinionsKilled) / (maxCs || 1)
-    gameAnalysis.goldShareToTop = selfP.stats.goldEarned / (maxGold || 1)
+      (watashi.stats.totalMinionsKilled + watashi.stats.neutralMinionsKilled) / (maxCs || 1)
+    gameAnalysis.csShareOfTeam =
+      (watashi.stats.totalMinionsKilled + watashi.stats.neutralMinionsKilled) / (totalCs || 1)
 
-    gameAnalysis.championId = selfP.championId
+    gameAnalysis.goldShareToTop = watashi.stats.goldEarned / (maxGold || 1)
+    gameAnalysis.goldShareOfTeam = watashi.stats.goldEarned / (totalGold || 1)
 
-    gameAnalysisList.push([game.gameId, gameAnalysis])
+    gameAnalysis.championId = watashi.championId
+
+    gameAnalyses.push([game.gameId, gameAnalysis])
   }
 
-  const gamesAnalysisMap = Object.fromEntries(gameAnalysisList)
+  const gamesAnalysisMap = Object.fromEntries(gameAnalyses)
 
   const summary: MatchHistoryGamesAnalysisSummary = {
     averageDamageShareToTop: 0,
@@ -467,105 +594,208 @@ export function analyzeMatchHistory(
     averageMagicDamageShareToTop: 0,
     averageTrueDamageShareToTop: 0,
 
+    averageDamageShareOfTeam: 0,
+    averagePhysicalDamageShareOfTeam: 0,
+    averageMagicDamageShareOfTeam: 0,
+    averageTrueDamageShareOfTeam: 0,
+
     averageDamageDealtToChampionShareToTop: 0,
     averagePhysicalDamageDealtToChampionShareToTop: 0,
     averageMagicDamageDealtToChampionShareToTop: 0,
     averageTrueDamageDealtToChampionShareToTop: 0,
+
+    averageDamageDealtToChampionShareOfTeam: 0,
+    averagePhysicalDamageDealtToChampionShareOfTeam: 0,
+    averageMagicDamageDealtToChampionShareOfTeam: 0,
+    averageTrueDamageDealtToChampionShareOfTeam: 0,
 
     averageDamageTakenShareToTop: 0,
     averagePhysicalDamageTakenShareToTop: 0,
     averageMagicDamageTakenShareToTop: 0,
     averageTrueDamageTakenShareToTop: 0,
 
+    averageDamageTakenShareOfTeam: 0,
+    averagePhysicalDamageTakenShareOfTeam: 0,
+    averageMagicDamageTakenShareOfTeam: 0,
+    averageTrueDamageTakenShareOfTeam: 0,
+
     averageKillParticipationRate: 0,
     averageKda: 0,
 
     averageCsShareToTop: 0,
+    averageCsShareOfTeam: 0,
 
-    averageGoldShareToTop: 0
+    averageGoldShareToTop: 0,
+    averageGoldShareOfTeam: 0,
+
+    winRate: win / (win + lose),
+    win: win,
+    lose: lose
   }
 
   let totalDamageShareToTop = 0
   let totalPhysicalDamageShareToTop = 0
   let totalMagicDamageShareToTop = 0
   let totalTrueDamageShareToTop = 0
+  let totalDamageShareOfTeam = 0
+  let totalPhysicalDamageShareOfTeam = 0
+  let totalMagicDamageShareOfTeam = 0
+  let totalTrueDamageShareOfTeam = 0
 
   let totalDamageDealtToChampionShareToTop = 0
   let totalPhysicalDamageDealtToChampionShareToTop = 0
   let totalMagicDamageDealtToChampionShareToTop = 0
   let totalTrueDamageDealtToChampionShareToTop = 0
+  let totalDamageDealtToChampionOfTeam = 0
+  let totalPhysicalDamageDealtToChampionOfTeam = 0
+  let totalMagicDamageDealtToChampionOfTeam = 0
+  let totalTrueDamageDealtToChampionOfTeam = 0
 
   let totalDamageTakenShareToTop = 0
   let totalPhysicalDamageTakenShareToTop = 0
   let totalMagicDamageTakenShareToTop = 0
   let totalTrueDamageTakenShareToTop = 0
+  let totalDamageTakenOfTeam = 0
+  let totalPhysicalDamageTakenOfTeam = 0
+  let totalMagicDamageTakenOfTeam = 0
+  let totalTrueDamageTakenOfTeam = 0
 
   let totalKillParticipationRate = 0
   let totalKda = 0
 
   let totalCsShareToTop = 0
+  let totalCsShareOfTeam = 0
 
   let totalGoldShareToTop = 0
+  let totalGoldShareOfTeam = 0
 
-  for (const [_gameId, analysis] of gameAnalysisList) {
+  for (const [_gameId, analysis] of gameAnalyses) {
     totalDamageShareToTop += analysis.damageShareToTop
     totalPhysicalDamageShareToTop += analysis.physicalDamageShareToTop
     totalMagicDamageShareToTop += analysis.magicDamageShareToTop
     totalTrueDamageShareToTop += analysis.trueDamageShareToTop
+
+    totalDamageShareOfTeam += analysis.damageShareOfTeam
+    totalPhysicalDamageShareOfTeam += analysis.physicalDamageShareOfTeam
+    totalMagicDamageShareOfTeam += analysis.magicDamageShareOfTeam
+    totalTrueDamageShareOfTeam += analysis.trueDamageShareOfTeam
 
     totalDamageDealtToChampionShareToTop += analysis.damageDealtToChampionShareToTop
     totalPhysicalDamageDealtToChampionShareToTop += analysis.physicalDamageDealtToChampionShareToTop
     totalMagicDamageDealtToChampionShareToTop += analysis.magicDamageDealtToChampionShareToTop
     totalTrueDamageDealtToChampionShareToTop += analysis.trueDamageDealtToChampionShareToTop
 
+    totalDamageDealtToChampionOfTeam += analysis.damageDealtToChampionShareOfTeam
+    totalPhysicalDamageDealtToChampionOfTeam += analysis.physicalDamageDealtToChampionShareOfTeam
+    totalMagicDamageDealtToChampionOfTeam += analysis.magicDamageDealtToChampionShareOfTeam
+    totalTrueDamageDealtToChampionOfTeam += analysis.trueDamageDealtToChampionShareOfTeam
+
     totalDamageTakenShareToTop += analysis.damageTakenShareToTop
     totalPhysicalDamageTakenShareToTop += analysis.physicalDamageTakenShareToTop
     totalMagicDamageTakenShareToTop += analysis.magicDamageTakenShareToTop
     totalTrueDamageTakenShareToTop += analysis.trueDamageTakenShareToTop
 
+    totalDamageTakenOfTeam += analysis.damageTakenShareOfTeam
+    totalPhysicalDamageTakenOfTeam += analysis.physicalDamageTakenShareOfTeam
+    totalMagicDamageTakenOfTeam += analysis.magicDamageTakenShareOfTeam
+    totalTrueDamageTakenOfTeam += analysis.trueDamageTakenShareOfTeam
+
     totalKillParticipationRate += analysis.killParticipationRate
     totalKda += analysis.kda
 
     totalCsShareToTop += analysis.csShareToTop
+    totalCsShareOfTeam += analysis.csShareOfTeam
 
     totalGoldShareToTop += analysis.goldShareToTop
+    totalGoldShareOfTeam += analysis.goldShareOfTeam
   }
 
   // for summary calculation
 
-  summary.averageDamageShareToTop = totalDamageShareToTop / (gameAnalysisList.length || 1)
+  summary.averageDamageShareToTop = totalDamageShareToTop / (gameAnalyses.length || 1)
   summary.averagePhysicalDamageShareToTop =
-    totalPhysicalDamageShareToTop / (gameAnalysisList.length || 1)
-  summary.averageMagicDamageShareToTop = totalMagicDamageShareToTop / (gameAnalysisList.length || 1)
-  summary.averageTrueDamageShareToTop = totalTrueDamageShareToTop / (gameAnalysisList.length || 1)
+    totalPhysicalDamageShareToTop / (gameAnalyses.length || 1)
+  summary.averageMagicDamageShareToTop = totalMagicDamageShareToTop / (gameAnalyses.length || 1)
+  summary.averageTrueDamageShareToTop = totalTrueDamageShareToTop / (gameAnalyses.length || 1)
+
+  summary.averageDamageShareOfTeam = totalDamageShareOfTeam / (gameAnalyses.length || 1)
+  summary.averagePhysicalDamageShareOfTeam =
+    totalPhysicalDamageShareOfTeam / (gameAnalyses.length || 1)
+  summary.averageMagicDamageShareOfTeam = totalMagicDamageShareOfTeam / (gameAnalyses.length || 1)
+  summary.averageTrueDamageShareOfTeam = totalTrueDamageShareOfTeam / (gameAnalyses.length || 1)
 
   summary.averageDamageDealtToChampionShareToTop =
-    totalDamageDealtToChampionShareToTop / (gameAnalysisList.length || 1)
+    totalDamageDealtToChampionShareToTop / (gameAnalyses.length || 1)
   summary.averagePhysicalDamageDealtToChampionShareToTop =
-    totalPhysicalDamageDealtToChampionShareToTop / (gameAnalysisList.length || 1)
+    totalPhysicalDamageDealtToChampionShareToTop / (gameAnalyses.length || 1)
   summary.averageMagicDamageDealtToChampionShareToTop =
-    totalMagicDamageDealtToChampionShareToTop / (gameAnalysisList.length || 1)
+    totalMagicDamageDealtToChampionShareToTop / (gameAnalyses.length || 1)
   summary.averageTrueDamageDealtToChampionShareToTop =
-    totalTrueDamageDealtToChampionShareToTop / (gameAnalysisList.length || 1)
+    totalTrueDamageDealtToChampionShareToTop / (gameAnalyses.length || 1)
 
-  summary.averageDamageTakenShareToTop = totalDamageTakenShareToTop / (gameAnalysisList.length || 1)
+  summary.averageDamageDealtToChampionShareOfTeam =
+    totalDamageDealtToChampionOfTeam / (gameAnalyses.length || 1)
+  summary.averagePhysicalDamageDealtToChampionShareOfTeam =
+    totalPhysicalDamageDealtToChampionOfTeam / (gameAnalyses.length || 1)
+  summary.averageMagicDamageDealtToChampionShareOfTeam =
+    totalMagicDamageDealtToChampionOfTeam / (gameAnalyses.length || 1)
+  summary.averageTrueDamageDealtToChampionShareOfTeam =
+    totalTrueDamageDealtToChampionOfTeam / (gameAnalyses.length || 1)
+
+  summary.averageDamageTakenShareToTop = totalDamageTakenShareToTop / (gameAnalyses.length || 1)
   summary.averagePhysicalDamageTakenShareToTop =
-    totalPhysicalDamageTakenShareToTop / (gameAnalysisList.length || 1)
+    totalPhysicalDamageTakenShareToTop / (gameAnalyses.length || 1)
   summary.averageMagicDamageTakenShareToTop =
-    totalMagicDamageTakenShareToTop / (gameAnalysisList.length || 1)
+    totalMagicDamageTakenShareToTop / (gameAnalyses.length || 1)
   summary.averageTrueDamageTakenShareToTop =
-    totalTrueDamageTakenShareToTop / (gameAnalysisList.length || 1)
+    totalTrueDamageTakenShareToTop / (gameAnalyses.length || 1)
 
-  summary.averageKillParticipationRate = totalKillParticipationRate / (gameAnalysisList.length || 1)
+  summary.averageDamageTakenShareOfTeam = totalDamageTakenOfTeam / (gameAnalyses.length || 1)
+  summary.averagePhysicalDamageTakenShareOfTeam =
+    totalPhysicalDamageTakenOfTeam / (gameAnalyses.length || 1)
+  summary.averageMagicDamageTakenShareOfTeam =
+    totalMagicDamageTakenOfTeam / (gameAnalyses.length || 1)
+  summary.averageTrueDamageTakenShareOfTeam =
+    totalTrueDamageTakenOfTeam / (gameAnalyses.length || 1)
 
-  summary.averageKda = totalKda / (gameAnalysisList.length || 1)
+  summary.averageKillParticipationRate = totalKillParticipationRate / (gameAnalyses.length || 1)
 
-  summary.averageCsShareToTop = totalCsShareToTop / (gameAnalysisList.length || 1)
+  summary.averageKda = totalKda / (gameAnalyses.length || 1)
 
-  summary.averageGoldShareToTop = totalGoldShareToTop / (gameAnalysisList.length || 1)
+  summary.averageCsShareToTop = totalCsShareToTop / (gameAnalyses.length || 1)
+  summary.averageCsShareOfTeam = totalCsShareOfTeam / (gameAnalyses.length || 1)
+
+  summary.averageGoldShareToTop = totalGoldShareToTop / (gameAnalyses.length || 1)
+  summary.averageGoldShareOfTeam = totalGoldShareOfTeam / (gameAnalyses.length || 1)
 
   return {
     games: gamesAnalysisMap,
     summary: summary
+  }
+}
+
+export interface MatchHistoryGamesAnalysisTeamSide {
+  averageWinRate: number
+  averageKda: number
+}
+
+export function analyzeTeamMatchHistory(
+  analyses: MatchHistoryGamesAnalysisAll[]
+): MatchHistoryGamesAnalysisTeamSide | null {
+  if (analyses.length === 0) {
+    return null
+  }
+
+  let totalWinRate = 0
+  let totalKda = 0
+
+  for (const analysis of analyses) {
+    totalWinRate += analysis.summary.winRate
+    totalKda += analysis.summary.averageKda
+  }
+
+  return {
+    averageWinRate: totalWinRate / analyses.length,
+    averageKda: totalKda / analyses.length
   }
 }

@@ -3,7 +3,10 @@ import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
-import { MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
+import {
+  MatchHistoryGamesAnalysisAll,
+  MatchHistoryGamesAnalysisTeamSide
+} from '@shared/utils/analysis'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { lcuConnectionModule as lcm } from '../akari-core/lcu-connection'
@@ -144,7 +147,10 @@ export class CoreFunctionalityState {
   /**
    * 当前正在进行的玩家分析
    */
-  ongoingPlayerAnalysis: Record<string, MatchHistoryGamesAnalysisAll> | null = null
+  ongoingPlayerAnalysis: {
+    players: Record<string, MatchHistoryGamesAnalysisAll>
+    teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
+  } | null = null
 
   isWaitingForDelay = false
 

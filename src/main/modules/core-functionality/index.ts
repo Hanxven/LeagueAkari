@@ -8,7 +8,9 @@ import { EMPTY_PUUID } from '@shared/constants/common'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import {
   MatchHistoryGamesAnalysisAll,
+  MatchHistoryGamesAnalysisTeamSide,
   analyzeMatchHistory,
+  analyzeTeamMatchHistory,
   getAnalysis,
   withSelfParticipantMatchHistory
 } from '@shared/utils/analysis'
@@ -156,7 +158,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         [
           Array.from(this.state.tempDetailedGames.values()),
           Array.from(this.state.ongoingPlayers.values()).map((p) => p.summoner),
-          this.state.ongoingTeams
+          this.state.ongoingTeams,
+          this.state.queryState
         ] as const,
       () => {
         const result = this._analyzeTeamUp()
@@ -171,14 +174,51 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
     // Akari's Opinion
     this.autoDisposeReaction(
-      () => Array.from(this.state.ongoingPlayers.values()).map((p) => p.matchHistory),
-      () => {
-        const result = this._analyzePlayers()
-        if (result && this.state.queryState !== 'unavailable') {
-          runInAction(() => (this.state.ongoingPlayerAnalysis = result))
-        } else {
+      () =>
+        [
+          Array.from(this.state.ongoingPlayers.values()).map((p) => p.matchHistory),
+          this.state.ongoingTeams,
+          this.state.queryState
+        ] as const,
+      ([_, teams, qs]) => {
+        if (qs === 'unavailable') {
           runInAction(() => (this.state.ongoingPlayerAnalysis = null))
+          return
         }
+
+        if (!teams) {
+          return
+        }
+
+        const playerAnalyses: Record<string, MatchHistoryGamesAnalysisAll> = {}
+
+        for (const [puuid, { matchHistory }] of this.state.ongoingPlayers.entries()) {
+          if (!matchHistory) {
+            continue
+          }
+
+          const analysis = analyzeMatchHistory(matchHistory, puuid)
+          if (analysis) {
+            playerAnalyses[puuid] = analysis
+          }
+        }
+
+        const teamAnalyses: Record<string, MatchHistoryGamesAnalysisTeamSide> = {}
+
+        for (const [sideId, playerPuuids] of Object.entries(teams)) {
+          const teamPlayerAnalyses = playerPuuids.map((p) => playerAnalyses[p]).filter(Boolean)
+          const teamAnalysis = analyzeTeamMatchHistory(teamPlayerAnalyses)
+          if (teamAnalysis) {
+            teamAnalyses[sideId] = teamAnalysis
+          }
+        }
+
+        runInAction(() => {
+          this.state.ongoingPlayerAnalysis = {
+            players: playerAnalyses,
+            teams: teamAnalyses
+          }
+        })
       },
       { delay: 500 }
     )
@@ -663,14 +703,23 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
    * 分析当前对局玩家的数据
    */
   private _analyzePlayers() {
-    const result: Record<string, MatchHistoryGamesAnalysisAll> = {}
+    const result: {
+      players: Record<string, MatchHistoryGamesAnalysisAll>
+      teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
+    } = {
+      players: {},
+      teams: {}
+    }
 
     for (const [puuid, { matchHistory }] of this.state.ongoingPlayers.entries()) {
       if (!matchHistory) {
         continue
       }
 
-      result[puuid] = analyzeMatchHistory(matchHistory, puuid)
+      const analysis = analyzeMatchHistory(matchHistory, puuid)
+      if (analysis) {
+        result.players[puuid] = analysis
+      }
     }
 
     return result
@@ -817,7 +866,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           // 将详细信息加载到每个对局中，因为 LCU 需要多请求一步
           const loadGameTasks: Promise<void>[] = []
 
-          for (let i = 0; i < this.state.settings.matchHistoryLoadCount; i++) {
+          for (let i = 0; i < player.matchHistory!.length; i++) {
             const game = player.matchHistory![i]
 
             if (game.isDetailed) {
