@@ -23,6 +23,7 @@
     "@electron-toolkit/utils": "^3.0.0",
     "@types/luaparse": "^0.2.12",
     "axios": "^1.7.2",
+    "axios-retry": "^4.4.1",
     "dayjs": "^1.11.11",
     "lodash": "^4.17.21",
     "luaparse": "^0.3.1",

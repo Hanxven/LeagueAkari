@@ -167,7 +167,7 @@ export class SgpEds {
    * 始终是 detailed 的，但只有部分属性
    * 不是很优雅
    */
-  parseSgpToLcu0Format(sgpMh: SgpMatchHistoryLol, start = 0, count = 0): MatchHistory {
+  parseSgpToLcu0Format(sgpMh: SgpMatchHistoryLol, start = 0, count = 20): MatchHistory {
     const jsonArr = sgpMh.games
       .map((game) => game.json)
       .map((json) => {

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import axiosRetry from 'axios-retry'
 
 import { SgpGameDetailsLol, SgpGameSummaryLol, SgpMatchHistoryLol } from './types'
 
@@ -26,6 +27,14 @@ export class SgpApi {
   })
 
   constructor() {
+    axiosRetry(this._http, {
+      retries: 3,
+      retryDelay: () => 0,
+      retryCondition: (error) => {
+        return Boolean(error.response)
+      }
+    })
+
     this._http.interceptors.request.use((req) => {
       if (!req.headers.Authorization) {
         req.headers.Authorization = `Bearer ${this._jwtToken}`
