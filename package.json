@@ -24,6 +24,7 @@
     "@types/luaparse": "^0.2.12",
     "axios": "^1.7.2",
     "axios-retry": "^4.4.1",
+    "chart.js": "^4.4.3",
     "dayjs": "^1.11.11",
     "lodash": "^4.17.21",
     "luaparse": "^0.3.1",
@@ -33,6 +34,7 @@
     "sqlite3": "5.1.6",
     "typeorm": "^0.3.20",
     "vm2": "^3.9.19",
+    "vue-chartjs": "^5.3.1",
     "winston": "^3.13.0",
     "ws": "^8.17.1"
   },

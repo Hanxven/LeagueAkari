@@ -1,7 +1,10 @@
 import axios from 'axios'
-import axiosRetry from 'axios-retry'
+import { AxiosRetry } from 'axios-retry'
 
 import { SgpGameDetailsLol, SgpGameSummaryLol, SgpMatchHistoryLol } from './types'
+
+// can only be imported like this
+const axiosRetry = require('axios-retry').default as AxiosRetry
 
 export interface AvailableServersMap {
   [region: string]: {
