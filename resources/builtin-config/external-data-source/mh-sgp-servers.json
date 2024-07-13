@@ -31,6 +31,10 @@
     "name": "峡谷之巅",
     "server": "https://bgp2-k8s-sgp.lol.qq.com:21019"
   },
+  "TW2": {
+    "name": "台湾",
+    "server": "https://apse1-red.pp.sgp.pvp.net"
+  },
   "SG2": {
     "name": "新加坡",
     "server": "https://apse1-red.pp.sgp.pvp.net"
