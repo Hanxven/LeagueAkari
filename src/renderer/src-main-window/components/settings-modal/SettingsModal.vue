@@ -10,7 +10,6 @@
     <NTabs type="line" animated size="small" v-model:value="tabName">
       <NTabPane name="basic" tab="应用"><AppSettings /></NTabPane>
       <NTabPane name="general" tab="通用"><GeneralSettings /></NTabPane>
-      <NTabPane name="process" tab="客户端"><ProcessSettings /></NTabPane>
       <NTabPane name="debug" tab="调试"><DebugSettings /></NTabPane>
       <NTabPane name="about" tab="关于"><AboutPane /></NTabPane>
     </NTabs>
@@ -25,7 +24,6 @@ import AboutPane from './AboutPane.vue'
 import AppSettings from './AppSettings.vue'
 import DebugSettings from './DebugSettings.vue'
 import GeneralSettings from './GeneralSettings.vue'
-import ProcessSettings from './ProcessSettings.vue'
 
 const styles = useCssModule()
 const show = defineModel<boolean>('show', { default: false })

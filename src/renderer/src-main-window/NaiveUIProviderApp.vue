@@ -38,6 +38,9 @@ const themeOverrides: GlobalThemeOverrides = {
   },
   Message: {
     color: '#272727'
+  },
+  Menu: {
+    padding: '1px'
   }
 }
 </script>

@@ -372,7 +372,7 @@ const filteredGameInfo = computed(() => {
   }
 })
 
-const { Ctrl_Left, Ctrl_Right } = useMagicKeys()
+const { Ctrl_Left, Ctrl_Right, F5 } = useMagicKeys()
 
 whenever(Ctrl_Left, () => {
   if (props.tab.matchHistory.page > 1) {
@@ -382,6 +382,10 @@ whenever(Ctrl_Left, () => {
 
 whenever(Ctrl_Right, () => {
   handleLoadPage(props.tab.matchHistory.page + 1)
+})
+
+whenever(F5, () => {
+  handleLoadPage(props.tab.matchHistory.page)
 })
 
 const handleChangePageSize = async (pageSize: number) => {

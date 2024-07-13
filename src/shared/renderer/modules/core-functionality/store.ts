@@ -96,7 +96,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
   )
 
   watchEffect(() => {
-    console.log(ongoingPlayerAnalysis.value)
+    console.log('[DEBUG] 玩家战绩分析', ongoingPlayerAnalysis.value)
   })
 
   // 战绩加载功能

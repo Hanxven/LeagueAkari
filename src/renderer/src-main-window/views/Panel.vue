@@ -2,6 +2,7 @@
   <div class="panel">
     <div class="sider">
       <NMenu
+        :indent="12"
         :collapsed="false"
         :options="options"
         :value="currentMenu"
@@ -120,12 +121,44 @@ const options = ref<MenuOption[]>([
   {
     label: '自动化',
     key: 'automation',
-    icon: renderIcon(AiStatusIcon)
+    icon: renderIcon(AiStatusIcon),
+    children: [
+      {
+        label: '自动流程',
+        key: 'automation-auto-gameflow'
+      },
+      {
+        label: '选择禁用',
+        key: 'automation-auto-select'
+      },
+      {
+        label: '其他',
+        key: 'automation-misc'
+      }
+    ]
   },
   {
     label: '工具',
     key: 'toolkit',
-    icon: renderIcon(AppSwitcherIcon)
+    icon: renderIcon(AppSwitcherIcon),
+    children: [
+      {
+        label: '过程中',
+        key: 'toolkit-in-process'
+      },
+      {
+        label: '房间',
+        key: 'toolkit-lobby'
+      },
+      {
+        label: '客户端',
+        key: 'toolkit-client'
+      },
+      {
+        label: '杂项',
+        key: 'toolkit-misc'
+      }
+    ]
   }
 ])
 
@@ -236,6 +269,7 @@ const emits = defineEmits<{
 
   .sider {
     display: flex;
+    width: 124px;
     flex-direction: column;
     justify-content: space-between;
     flex-shrink: 0;
@@ -250,9 +284,9 @@ const emits = defineEmits<{
         font-size: 16px;
       }
 
-      .n-menu-item-content {
-        padding-left: 12px !important;
-      }
+      // .n-menu-item-content {
+      //   padding-left: 12px !important;
+      // }
     }
 
     .bottom-operations {
@@ -264,6 +298,7 @@ const emits = defineEmits<{
       .operation {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 12px;
         padding: 4px 8px;
         cursor: pointer;

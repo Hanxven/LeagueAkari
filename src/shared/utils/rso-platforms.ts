@@ -37,7 +37,13 @@ export const rsoPlatformText = {
   WT1_NEW: '比尔吉沃特',
   WT3_NEW: '弗雷尔卓德',
   WT2_NEW: '德玛西亚',
-  WT4_NEW: '无畏先锋'
+  WT4_NEW: '无畏先锋',
+
+  NJ100: '联盟一区',
+  GZ100: '联盟二区',
+  CQ100: '联盟三区',
+  TJ100: '联盟四区',
+  TJ101: '联盟五区'
 } as const
 
 export const regionText = {

@@ -266,9 +266,9 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
 
   async fetchTabMatchHistory(
     puuid: string,
-    page: number = 1,
-    pageSize: number = 20,
-    queueFilter: number | string = -1
+    page?: number,
+    pageSize?: number,
+    queueFilter?: number | string
   ) {
     const cf = useCoreFunctionalityStore()
     const mh = useMatchHistoryTabsStore()
@@ -283,6 +283,10 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
       }
 
       tab.data.loading.isLoadingMatchHistory = true
+
+      page = page || tab.data.matchHistory.page || 1
+      pageSize = pageSize || tab.data.matchHistory.pageSize || 10
+      queueFilter = queueFilter || tab.data.matchHistory.queueFilter || -1
 
       try {
         const previousExpanded = new Set(
