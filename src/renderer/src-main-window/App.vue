@@ -20,6 +20,16 @@ import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
 import { greeting } from '@shared/renderer/utils/greeting'
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  Title,
+  Tooltip,
+  ArcElement
+} from 'chart.js'
 import { useNotification } from 'naive-ui'
 import { provide, ref, watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
@@ -28,6 +38,8 @@ import DeclarationModal from './components/DeclarationModal.vue'
 import MainWindowTitleBar from './components/MainWindowTitleBar.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
 greeting()
 

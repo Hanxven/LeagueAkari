@@ -18,7 +18,7 @@
         >。
         <a
           target="_blank"
-          href="https://github.com/Hanxven/LeagueAkari?tab=readme-ov-file#8-%E5%8F%82%E8%80%83"
+          href="https://github.com/Hanxven/LeagueAkari?tab=readme-ov-file#4-%E5%8F%82%E8%80%83"
           >项目参考</a
         >.
       </div>

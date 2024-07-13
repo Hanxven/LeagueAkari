@@ -9,7 +9,18 @@
   基于 LCU API 的英雄联盟客户端工具集
 </div>
 
+<p align="center">
+    <a href="https://github.com/Hanxven/LeagueAkari/releases"><img src="https://img.shields.io/github/release/Hanxven/LeagueAkari.svg?style=flat-square&maxAge=600" alt="Downloads"></a>
+    <a href="https://github.com/Hanxven/LeagueAkari/releases">
+    <img src="https://img.shields.io/github/downloads/Hanxven/LeagueAkari/total?style=flat&label=Downloads"></a>
+    <a href="https://github.com/Hanxven/LeagueAkari/stargazers">
+    <img src="https://img.shields.io/github/stars/Hanxven/LeagueAkari?style=flat&label=Stars">
+  </a>
+</p>
+
 # 1. League Akari
+
+Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/Hanxven/LeagueAkari)
 
 ## 1.1 已支持功能
 

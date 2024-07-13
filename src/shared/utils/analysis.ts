@@ -270,6 +270,9 @@ export interface MatchHistoryGamesAnalysis {
   magicDamageTakenShareOfTeam: number
   trueDamageTakenShareOfTeam: number
 
+  towerDamageShareToTop: number
+  towerDamageShareOfTeam: number
+
   // KDA 系列
   killParticipationRate: number
   kda: number
@@ -331,9 +334,17 @@ export interface MatchHistoryGamesAnalysisSummary {
   winRate: number
 }
 
+export interface MatchHistoryChampionAnalysis {
+  count: number
+  win: number
+  lose: number
+  winRate: number
+}
+
 export interface MatchHistoryGamesAnalysisAll {
   games: Record<number, MatchHistoryGamesAnalysis>
   summary: MatchHistoryGamesAnalysisSummary
+  champions: Record<number, MatchHistoryChampionAnalysis>
 }
 
 /**
@@ -360,6 +371,8 @@ export function analyzeMatchHistory(
 
   let win = 0
   let lose = 0
+
+  const champions: Record<number, MatchHistoryChampionAnalysis> = {}
 
   const gameAnalyses: [number, MatchHistoryGamesAnalysis][] = []
   for (let i = 0; i < detailedGames.length; i++) {
@@ -414,6 +427,9 @@ export function analyzeMatchHistory(
       magicDamageTakenShareOfTeam: 0,
       trueDamageTakenShareOfTeam: 0,
 
+      towerDamageShareToTop: 0,
+      towerDamageShareOfTeam: 0,
+
       // KDA 系列
       killParticipationRate: 0,
 
@@ -455,6 +471,8 @@ export function analyzeMatchHistory(
     let totalPhysicalDamageTaken = 0
     let totalMagicDamageTaken = 0
     let totalTrueDamageTaken = 0
+    let maxTowerDamage = 0
+    let totalTowerDamage = 0
     let kills = 0
     let deaths = 0
     let assists = 0
@@ -510,6 +528,9 @@ export function analyzeMatchHistory(
       totalPhysicalDamageTaken += p.stats.physicalDamageTaken
       totalMagicDamageTaken += p.stats.magicalDamageTaken
       totalTrueDamageTaken += p.stats.trueDamageTaken
+
+      maxTowerDamage = Math.max(maxTowerDamage, p.stats.damageDealtToTurrets)
+      totalTowerDamage += p.stats.damageDealtToTurrets
 
       kills += p.stats.kills
       deaths += p.stats.deaths
@@ -569,6 +590,10 @@ export function analyzeMatchHistory(
     gameAnalysis.trueDamageTakenShareOfTeam =
       watashi.stats.trueDamageTaken / (totalTrueDamageTaken || 1)
 
+    gameAnalysis.towerDamageShareToTop = watashi.stats.damageDealtToTurrets / (maxTowerDamage || 1)
+    gameAnalysis.towerDamageShareOfTeam =
+      watashi.stats.damageDealtToTurrets / (totalTowerDamage || 1)
+
     gameAnalysis.killParticipationRate =
       (watashi.stats.kills + watashi.stats.assists) / (kills || 1)
     gameAnalysis.kda = (watashi.stats.kills + watashi.stats.assists) / (watashi.stats.deaths || 1)
@@ -582,6 +607,25 @@ export function analyzeMatchHistory(
     gameAnalysis.goldShareOfTeam = watashi.stats.goldEarned / (totalGold || 1)
 
     gameAnalysis.championId = watashi.championId
+
+    if (!champions[watashi.championId]) {
+      champions[watashi.championId] = {
+        count: 0,
+        win: 0,
+        lose: 0,
+        winRate: 0
+      }
+    }
+
+    champions[watashi.championId].count++
+    if (watashi.stats.win) {
+      champions[watashi.championId].win++
+    } else {
+      champions[watashi.championId].lose++
+    }
+
+    champions[watashi.championId].winRate =
+      champions[watashi.championId].win / champions[watashi.championId].count
 
     gameAnalyses.push([game.gameId, gameAnalysis])
   }
@@ -770,7 +814,8 @@ export function analyzeMatchHistory(
 
   return {
     games: gamesAnalysisMap,
-    summary: summary
+    summary: summary,
+    champions: champions
   }
 }
 
