@@ -69,7 +69,7 @@ export class MainWindowModule extends MobxBasedBasicModule {
   static INITIAL_SHOW = false
   static PARTITION = 'persist:main-window'
   static WINDOW_DEFAULT_SIZE = [1000, 700] as [number, number]
-  static WINDOW_MIN_SIZE = [800, 520] as [number, number]
+  static WINDOW_MIN_SIZE = [800, 600] as [number, number]
 
   constructor() {
     super('main-window')

@@ -231,13 +231,8 @@ const mh = useMatchHistoryTabsStore()
 const gameData = useGameDataStore()
 const app = useAppStore()
 
-const handleLoadPage = async (page: number) => {
-  const r = await mhm.fetchTabMatchHistory(
-    props.tab.puuid,
-    page,
-    props.tab.matchHistory.pageSize,
-    props.tab.matchHistory.queueFilter
-  )
+const handleLoadPage = async (page?: number) => {
+  const r = await mhm.fetchTabMatchHistory(props.tab.puuid, page)
   scrollToTop()
   return r
 }

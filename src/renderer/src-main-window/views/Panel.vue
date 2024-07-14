@@ -2,8 +2,11 @@
   <div class="panel">
     <div class="sider">
       <NMenu
-        :indent="12"
+        :root-indent="12"
+        
         :collapsed="false"
+        :icon-size="18"
+        default-expand-all
         :options="options"
         :value="currentMenu"
         @update:value="handleMenuChange"
@@ -155,7 +158,7 @@ const options = ref<MenuOption[]>([
         key: 'toolkit-client'
       },
       {
-        label: '杂项',
+        label: '其他',
         key: 'toolkit-misc'
       }
     ]
@@ -283,10 +286,6 @@ const emits = defineEmits<{
       .n-menu-item-content__icon .n-icon {
         font-size: 16px;
       }
-
-      // .n-menu-item-content {
-      //   padding-left: 12px !important;
-      // }
     }
 
     .bottom-operations {

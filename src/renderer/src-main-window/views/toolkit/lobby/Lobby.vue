@@ -8,7 +8,6 @@
 
 <script setup lang="ts">
 import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
-import { useAppStore } from '@shared/renderer/modules/app/store'
 import { ref } from 'vue'
 
 import LobbyTool from './LobbyTool.vue'
