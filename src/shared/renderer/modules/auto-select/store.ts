@@ -1,5 +1,6 @@
+import { Action, ChampSelectSession, ChampSelectTeam } from '@shared/types/lcu/champ-select'
 import { defineStore } from 'pinia'
-import { reactive, shallowRef } from 'vue'
+import { markRaw, reactive, shallowRef } from 'vue'
 
 export interface UpcomingActionInfo {
   championId: number
@@ -16,6 +17,16 @@ export interface UpcomingGrabInfo {
   championId: number
 }
 
+export interface ChampSelectActionInfo {
+  pick: Action[]
+  ban: Action[]
+  session: ChampSelectSession
+  memberMe: ChampSelectTeam
+  isActingNow: boolean
+  currentPickables: Set<number>
+  currentBannables: Set<number>
+}
+
 export const useAutoSelectStore = defineStore('module:auto-select', () => {
   const settings = reactive({
     normalModeEnabled: false,
@@ -23,6 +34,15 @@ export const useAutoSelectStore = defineStore('module:auto-select', () => {
     onlySimulMode: true,
 
     expectedChampions: [] as number[],
+
+    expectedChampions2: markRaw({
+      top: [],
+      middle: [],
+      bottom: [],
+      jungle: [],
+      utility: [],
+      default: []
+    } as Record<string, number[]>),
 
     // 自动选择的时候是否避开队友预选
     selectTeammateIntendedChampion: false,
@@ -45,6 +65,15 @@ export const useAutoSelectStore = defineStore('module:auto-select', () => {
 
     bannedChampions: [] as number[],
 
+    bannedChampions2: markRaw({
+      top: [],
+      middle: [],
+      bottom: [],
+      jungle: [],
+      utility: [],
+      default: []
+    } as Record<string, number[]>),
+
     // ban 的时候是否考虑队友预选
     banTeammateIntendedChampion: false
   })
@@ -55,10 +84,13 @@ export const useAutoSelectStore = defineStore('module:auto-select', () => {
 
   const upcomingGrab = shallowRef<UpcomingGrabInfo | null>(null)
 
+  const memberMe = shallowRef<ChampSelectTeam | null>(null)
+
   return {
     settings,
     upcomingBan,
     upcomingPick,
-    upcomingGrab
+    upcomingGrab,
+    memberMe
   }
 })

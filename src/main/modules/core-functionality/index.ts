@@ -96,7 +96,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this.autoDisposeReaction(
       () => this.state.ongoingGameInfo,
       () => {
-        this._logger.info(`当前游戏信息: ${toJS(this.state.ongoingGameInfo)}`)
+        this._logger.info(`当前游戏信息: ${JSON.stringify(toJS(this.state.ongoingGameInfo))}`)
       }
     )
 

@@ -63,12 +63,99 @@
             <template #unchecked>亮出</template></NSwitch
           >
         </ControlItem>
-        <ControlItem class="control-item-margin" label="意向英雄">
+        <ControlItem class="control-item-margin" label="意向英雄" v-if="false">
           <OrderedChampionList
             type="pick"
             :value="as.settings.expectedChampions"
             @update:value="(list) => asm.setExpectedChampions(list)"
           />
+        </ControlItem>
+        <ControlItem class="control-item-margin" label="意向英雄">
+          <template #labelDescription>
+            <div style="margin-bottom: 8px">将根据预设列表选择英雄</div>
+            <div style="margin-bottom: 8px">
+              若当前模式不存在分路信息，则按照<span style="font-weight: 700">默认</span>列表进行选择
+            </div>
+            <div>选择优先级为列表定义顺序，优先选择位置靠前的英雄</div>
+          </template>
+          <div class="expected-champion-groups">
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'top' }">
+                上路
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.expectedChampions2.top"
+                @update:value="
+                  (list) =>
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, top: list })
+                "
+              />
+            </div>
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'middle' }">
+                中路
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.expectedChampions2.middle"
+                @update:value="
+                  (list) =>
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, middle: list })
+                "
+              />
+            </div>
+            <div class="group" :class="{ current: as.memberMe?.assignedPosition === 'jungle' }">
+              <div class="label">打野</div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.expectedChampions2.jungle"
+                @update:value="
+                  (list) =>
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, jungle: list })
+                "
+              />
+            </div>
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'bottom' }">
+                下路
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.expectedChampions2.bottom"
+                @update:value="
+                  (list) =>
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, bottom: list })
+                "
+              />
+            </div>
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'utility' }">
+                辅助
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.expectedChampions2.utility"
+                @update:value="
+                  (list) =>
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, utility: list })
+                "
+              />
+            </div>
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === '' }">
+                默认
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.expectedChampions2.default"
+                @update:value="
+                  (list) =>
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, default: list })
+                "
+              />
+            </div>
+          </div>
         </ControlItem>
       </NCard>
       <NCard size="small" style="margin-top: 8px">
@@ -138,13 +225,102 @@
             size="small"
           ></NSwitch>
         </ControlItem>
-        <ControlItem class="control-item-margin" label="意向英雄">
+        <ControlItem class="control-item-margin" label="意向英雄" v-if="false">
           <OrderedChampionList
             :value="as.settings.bannedChampions"
             allow-empty
             type="ban"
             @update:value="(list) => asm.setBannedChampions(list)"
           />
+        </ControlItem>
+        <ControlItem class="control-item-margin" label="意向英雄">
+          <template #labelDescription>
+            <div style="margin-bottom: 8px">将根据预设列表禁用英雄</div>
+            <div style="margin-bottom: 8px">
+              若当前模式不存在分路信息，则按照<span style="font-weight: 700">默认</span>列表进行选择
+            </div>
+            <div>禁用优先级为列表定义顺序，优先禁用位置靠前的英雄</div>
+          </template>
+          <div class="expected-champion-groups">
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'top' }">
+                上路
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.bannedChampions2.top"
+                @update:value="
+                  (list) =>
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, top: list })
+                "
+              />
+            </div>
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'middle' }">
+                中路
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.bannedChampions2.middle"
+                @update:value="
+                  (list) =>
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, middle: list })
+                "
+              />
+            </div>
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'jungle' }">
+                打野
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.bannedChampions2.jungle"
+                @update:value="
+                  (list) =>
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, jungle: list })
+                "
+              />
+            </div>
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'bottom' }">
+                下路
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.bannedChampions2.bottom"
+                @update:value="
+                  (list) =>
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, bottom: list })
+                "
+              />
+            </div>
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'utility' }">
+                辅助
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.bannedChampions2.utility"
+                @update:value="
+                  (list) =>
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, utility: list })
+                "
+              />
+            </div>
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === '' }">
+                默认
+              </div>
+              <OrderedChampionList
+                type="pick"
+                :value="as.settings.bannedChampions2.default"
+                @update:value="
+                  (list) =>
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, default: list })
+                "
+              />
+            </div>
+          </div>
         </ControlItem>
       </NCard>
     </div>
@@ -208,6 +384,28 @@ useKeepAliveScrollPositionMemo(el)
 
   :deep(.n-card) {
     background-color: transparent;
+  }
+}
+
+.expected-champion-groups {
+  .group {
+    display: flex;
+    align-items: center;
+    height: 24px;
+  }
+
+  .group:not(:last-child) {
+    margin-bottom: 12px;
+  }
+
+  .label {
+    margin-right: 12px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .label.current {
+    color: #88f6d1;
   }
 }
 </style>

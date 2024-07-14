@@ -8,6 +8,14 @@ class AutoSelectSettings {
   normalModeEnabled: boolean = false
   onlySimulMode: boolean = false
   expectedChampions: number[] = []
+  expectedChampions2: Record<string, number[]> = {
+    top: [],
+    jungle: [],
+    middle: [],
+    bottom: [],
+    utility: [],
+    default: []
+  }
   selectTeammateIntendedChampion: boolean = false
   showIntent: boolean = false
   completed: boolean = false
@@ -16,6 +24,14 @@ class AutoSelectSettings {
   grabDelaySeconds: number = 1
   banEnabled: boolean = false
   bannedChampions: number[] = []
+  bannedChampions2: Record<string, number[]> = {
+    top: [],
+    jungle: [],
+    middle: [],
+    bottom: [],
+    utility: [],
+    default: []
+  }
   banTeammateIntendedChampion: boolean = false
 
   setNormalModeEnabled(value: boolean) {
@@ -28,6 +44,10 @@ class AutoSelectSettings {
 
   setExpectedChampions(value: number[]) {
     this.expectedChampions = value
+  }
+
+  setExpectedChampions2(value: Record<string, number[]>) {
+    this.expectedChampions2 = value
   }
 
   setSelectTeammateIntendedChampion(value: boolean) {
@@ -62,6 +82,10 @@ class AutoSelectSettings {
     this.bannedChampions = value
   }
 
+  setBannedChampions2(value: Record<string, number[]>) {
+    this.bannedChampions2 = value
+  }
+
   setBanTeammateIntendedChampion(value: boolean) {
     this.banTeammateIntendedChampion = value
   }
@@ -70,7 +94,9 @@ class AutoSelectSettings {
     makeAutoObservable(this, {
       expectedChampions: observable.struct,
       benchExpectedChampions: observable.struct,
-      bannedChampions: observable.struct
+      bannedChampions: observable.struct,
+      expectedChampions2: observable.struct,
+      bannedChampions2: observable.struct
     })
   }
 }
@@ -125,7 +151,7 @@ export class AutoSelectState {
   }
 
   get upcomingPick() {
-    if (!this.settings.expectedChampions || !this.settings.normalModeEnabled) {
+    if (!this.settings.normalModeEnabled) {
       return null
     }
 
@@ -198,9 +224,19 @@ export class AutoSelectState {
       unpickables.add(c)
     )
 
+    let expectedChampions: number[]
+    if (a.memberMe.assignedPosition) {
+      // 出于可用性考虑，若存在分路信息，若提供的分路信息不在当前应用的支持范围内，则使用默认列表
+      expectedChampions =
+        this.settings.expectedChampions2[a.memberMe.assignedPosition] ||
+        this.settings.expectedChampions2.default
+    } else {
+      expectedChampions = this.settings.expectedChampions2.default
+    }
+
     // 现在可选的英雄，排除不可选的和服务器当前允许选择的 (受制于热禁用等)
     // DEBUG PBE 模式整活，仅限 Kyoko 模式
-    const pickables = this.settings.expectedChampions.filter(
+    const pickables = expectedChampions.filter(
       (c) =>
         !unpickables.has(c) &&
         ((appModule.state.settings.isInKyokoMode && c >= 3000) || a.currentPickables.has(c))
@@ -263,7 +299,16 @@ export class AutoSelectState {
       })
     }
 
-    const bannables = this.settings.bannedChampions.filter(
+    let bannedChampions: number[]
+    if (a.memberMe.assignedPosition) {
+      bannedChampions =
+        this.settings.bannedChampions2[a.memberMe.assignedPosition] ||
+        this.settings.bannedChampions2.default
+    } else {
+      bannedChampions = this.settings.bannedChampions2.default
+    }
+
+    const bannables = bannedChampions.filter(
       (c) =>
         (c == -1 && !a.session.isCustomGame) || (!unbannables.has(c) && a.currentBannables.has(c))
     )

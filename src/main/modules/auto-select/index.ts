@@ -372,6 +372,12 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     )
 
     this.simpleSettingSync(
+      'expected-champions2',
+      () => this.state.settings.expectedChampions2,
+      (s) => this.state.settings.setExpectedChampions2(s)
+    )
+
+    this.simpleSettingSync(
       'select-teammate-intended-champion',
       () => this.state.settings.selectTeammateIntendedChampion,
       (s) => this.state.settings.setSelectTeammateIntendedChampion(s)
@@ -420,6 +426,12 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     )
 
     this.simpleSettingSync(
+      'banned-champions2',
+      () => this.state.settings.bannedChampions2,
+      (s) => this.state.settings.setBannedChampions2(s)
+    )
+
+    this.simpleSettingSync(
       'ban-teammate-intended-champion',
       () => this.state.settings.banTeammateIntendedChampion,
       (s) => this.state.settings.setBanTeammateIntendedChampion(s)
@@ -429,7 +441,13 @@ export class AutoSelectModule extends MobxBasedBasicModule {
   }
 
   private async _setupStateSync() {
-    this.simpleSync('champ-select-action-info', () => this.state.champSelectActionInfo)
+    this.simpleSync('champ-select-action-info/member-me', () => {
+      if (this.state.champSelectActionInfo) {
+        return this.state.champSelectActionInfo.memberMe
+      }
+
+      return null
+    })
     this.simpleSync('upcoming-pick', () => this.state.upcomingPick)
     this.simpleSync('upcoming-ban', () => this.state.upcomingBan)
     this.simpleSync('upcoming-grab', () => this.state.upcomingGrab)

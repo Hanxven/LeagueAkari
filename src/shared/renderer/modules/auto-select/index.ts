@@ -1,4 +1,5 @@
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
+import { markRaw } from 'vue'
 
 import { useAutoSelectStore } from './store'
 
@@ -16,7 +17,7 @@ export class AutoSelectRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAutoSelectStore()
 
-    //this.simpleSync('champ-select-action-info', ?)
+    this.simpleSync('champ-select-action-info/member-me', (s) => (store.memberMe = s))
     this.simpleSync('upcoming-pick', (s) => (store.upcomingPick = s))
     this.simpleSync('upcoming-ban', (s) => (store.upcomingBan = s))
     this.simpleSync('upcoming-grab', (s) => (store.upcomingGrab = s))
@@ -24,6 +25,10 @@ export class AutoSelectRendererModule extends StateSyncModule {
     this.simpleSync('settings/normal-mode-enabled', (s) => (store.settings.normalModeEnabled = s))
     this.simpleSync('settings/only-simul-mode', (s) => (store.settings.onlySimulMode = s))
     this.simpleSync('settings/expected-champions', (s) => (store.settings.expectedChampions = s))
+    this.simpleSync(
+      'settings/expected-champions2',
+      (s) => (store.settings.expectedChampions2 = markRaw(s))
+    )
     this.simpleSync(
       'settings/select-teammate-intended-champion',
       (s) => (store.settings.selectTeammateIntendedChampion = s)
@@ -38,6 +43,10 @@ export class AutoSelectRendererModule extends StateSyncModule {
     this.simpleSync('settings/grab-delay-seconds', (s) => (store.settings.grabDelaySeconds = s))
     this.simpleSync('settings/ban-enabled', (s) => (store.settings.banEnabled = s))
     this.simpleSync('settings/banned-champions', (s) => (store.settings.bannedChampions = s))
+    this.simpleSync(
+      'settings/banned-champions2',
+      (s) => (store.settings.bannedChampions2 = markRaw(s))
+    )
     this.simpleSync(
       'settings/ban-teammate-intended-champion',
       (s) => (store.settings.banTeammateIntendedChampion = s)
@@ -54,6 +63,10 @@ export class AutoSelectRendererModule extends StateSyncModule {
 
   setExpectedChampions(value: number[]) {
     return this.call('set-setting/expected-champions', value)
+  }
+
+  setExpectedChampions2(value: Record<string, number[]>) {
+    return this.call('set-setting/expected-champions2', value)
   }
 
   setSelectTeammateIntendedChampion(value: boolean) {
@@ -86,6 +99,10 @@ export class AutoSelectRendererModule extends StateSyncModule {
 
   setBannedChampions(value: number[]) {
     return this.call('set-setting/banned-champions', value)
+  }
+
+  setBannedChampions2(value: Record<string, number[]>) {
+    return this.call('set-setting/banned-champions2', value)
   }
 
   setBanTeammateIntendedChampion(value: boolean) {
