@@ -137,7 +137,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     this._lcm = this.manager.getModule<LcuClientModule>('league-client')
 
     await this._migrateSettings()
-    await this._loadSettings()
+    await this._setupSettingsSync()
     this._setupStateSync()
     this._setupMethodCall()
     this._handleConnect()
@@ -224,9 +224,11 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     )
   }
 
-  private async _loadSettings() {
-    this.state.settings.setAutoConnect(
-      await this._sm.settings.get('lcu-connection/auto-connect', true)
+  private async _setupSettingsSync() {
+    this.simpleSettingSync(
+      'auto-connect',
+      () => this.state.settings.autoConnect,
+      (s) => this.state.settings.setAutoConnect(s)
     )
   }
 
@@ -525,11 +527,6 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     this.onCall('lcu-disconnect', async () => {
       this._disconnect()
     })
-
-    this.onCall('set-setting/auto-connect', async (value: boolean) => {
-      this.state.settings.setAutoConnect(value)
-      await this._sm.settings.set('lcu-connection/auto-connect', value)
-    })
   }
 
   private _disconnect() {
@@ -546,7 +543,6 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.simpleSync('settings/auto-connect', () => this.state.settings.autoConnect)
     this.simpleSync('state', () => this.state.state)
     this.simpleSync('auth', () => this.state.auth)
     this.simpleSync('launched-clients', () => this.state.launchedClients)

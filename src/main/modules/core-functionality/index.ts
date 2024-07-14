@@ -1050,13 +1050,13 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this.simpleSettingSync(
       'send-kda-threshold',
       () => this.state.settings.sendKdaThreshold,
-      (s, ss) => {
+      async (s, ss) => {
         if (s < 0) {
           s = 0
         }
 
         this.state.settings.setSendKdaThreshold(s)
-        ss.set('send-kda-threshold', s)
+        await ss.set('send-kda-threshold', s)
         return true
       }
     )

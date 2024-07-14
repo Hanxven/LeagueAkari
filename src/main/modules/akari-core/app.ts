@@ -119,7 +119,7 @@ export class AppModule extends MobxBasedBasicModule {
     this._lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
     this._aum = this.manager.getModule<AutoUpdateModule>('auto-update')
 
-    await this._loadSettings()
+    await this._setupSettingsSync()
     this._setupAkariProtocol()
     this._setupMethodCall()
     this._setupStateSync()
@@ -191,38 +191,11 @@ export class AppModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.simpleSync(
-      'settings/show-free-software-declaration',
-      () => this.state.settings.showFreeSoftwareDeclaration
-    )
-    this.simpleSync('settings/close-strategy', () => this.state.settings.closeStrategy)
-    this.simpleSync('settings/use-wmic', () => this.state.settings.useWmic)
-    this.simpleSync('settings/is-in-kyoko-mode', () => this.state.settings.isInKyokoMode)
     this.simpleSync('is-administrator', () => this.state.isAdministrator)
   }
 
   private _setupMethodCall() {
     this.onCall('get-app-version', () => app.getVersion())
-
-    this.onCall('set-setting/show-free-software-declaration', async (enabled) => {
-      this.state.settings.setShowFreeSoftwareDeclaration(enabled)
-      await this._sm.settings.set('app/show-free-software-declaration', enabled)
-    })
-
-    this.onCall('set-setting/close-strategy', async (s) => {
-      this.state.settings.setCloseStrategy(s)
-      await this._sm.settings.set('app/close-strategy', s)
-    })
-
-    this.onCall('set-setting/use-wmic', async (s) => {
-      this.state.settings.setUseWmic(s)
-      await this._sm.settings.set('app/use-wmic', s)
-    })
-
-    this.onCall('set-setting/is-in-kyoko-mode', async (b) => {
-      this.state.settings.setInKyokoMode(b)
-      await this._sm.settings.set('app/is-in-kyoko-mode', b)
-    })
 
     this.onCall('migrate-settings-from-legacy-version', async (all: Record<string, string>) => {
       return await this._migrateSettingsFromLegacyVersion(all)
@@ -237,25 +210,32 @@ export class AppModule extends MobxBasedBasicModule {
     })
   }
 
-  private async _loadSettings() {
-    this.state.settings.setShowFreeSoftwareDeclaration(
-      await this._sm.settings.get(
-        'app/show-free-software-declaration',
-        this.state.settings.showFreeSoftwareDeclaration
-      )
+  private async _setupSettingsSync() {
+    this.simpleSettingSync(
+      'show-free-software-declaration',
+      () => this.state.settings.showFreeSoftwareDeclaration,
+      (s) => this.state.settings.setShowFreeSoftwareDeclaration(s)
     )
 
-    this.state.settings.setCloseStrategy(
-      await this._sm.settings.get('app/close-strategy', this.state.settings.closeStrategy)
+    this.simpleSettingSync(
+      'close-strategy',
+      () => this.state.settings.closeStrategy,
+      (s) => this.state.settings.setCloseStrategy(s)
     )
 
-    this.state.settings.setUseWmic(
-      await this._sm.settings.get('app/use-wmic', this.state.settings.useWmic)
+    this.simpleSettingSync(
+      'use-wmic',
+      () => this.state.settings.useWmic,
+      (s) => this.state.settings.setUseWmic(s)
     )
 
-    this.state.settings.setInKyokoMode(
-      await this._sm.settings.get('app/is-in-kyoko-mode', this.state.settings.isInKyokoMode)
+    this.simpleSettingSync(
+      'is-in-kyoko-mode',
+      () => this.state.settings.isInKyokoMode,
+      (b) => this.state.settings.setInKyokoMode(b)
     )
+
+    await this.loadSettings()
   }
 
   private _setupAkariProtocol() {

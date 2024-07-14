@@ -30,9 +30,7 @@ export class AutoReplyModule extends MobxBasedBasicModule {
     this._lcm = this.manager.getModule('lcu-connection')
     this._logger = this.manager.getModule<LogModule>('log').createLogger('auto-reply')
 
-    await this._loadSettings()
-    this._setupMethodCall()
-    this._setupStateSync()
+    await this._setupSettingsSync()
     this._handleAutoReply()
 
     this._logger.info('初始化完成')
@@ -65,41 +63,24 @@ export class AutoReplyModule extends MobxBasedBasicModule {
     )
   }
 
-  private _setupMethodCall() {
-    this.onCall('set-setting/enabled', async (enabled) => {
-      this.state.settings.setEnabled(enabled)
-      await this._sm.settings.set('auto-reply/enabled', enabled)
-    })
-
-    this.onCall('set-setting/enable-on-away', async (enabled) => {
-      this.state.settings.setEnableOnAway(enabled)
-      await this._sm.settings.set('auto-reply/enable-on-away', enabled)
-    })
-
-    this.onCall('set-setting/text', async (text) => {
-      this.state.settings.setText(text)
-      await this._sm.settings.set('auto-reply/text', text)
-    })
-  }
-
-  private _setupStateSync() {
-    this.simpleSync('settings/enabled', () => this.state.settings.enabled)
-    this.simpleSync('settings/enable-on-away', () => this.state.settings.enableOnAway)
-    this.simpleSync('settings/text', () => this.state.settings.text)
-  }
-
-  private async _loadSettings() {
-    this.state.settings.setEnabled(
-      await this._sm.settings.get('auto-reply/enabled', this.state.settings.enabled)
+  private async _setupSettingsSync() {
+    this.simpleSettingSync(
+      'enabled',
+      () => this.state.settings.enabled,
+      (s) => this.state.settings.setEnabled(s)
+    )
+    this.simpleSettingSync(
+      'enable-on-away',
+      () => this.state.settings.enableOnAway,
+      (s) => this.state.settings.setEnableOnAway(s)
+    )
+    this.simpleSettingSync(
+      'text',
+      () => this.state.settings.text,
+      (s) => this.state.settings.setText(s)
     )
 
-    this.state.settings.setEnableOnAway(
-      await this._sm.settings.get('auto-reply/enable-on-away', this.state.settings.enableOnAway)
-    )
-
-    this.state.settings.setText(
-      await this._sm.settings.get('auto-reply/text', this.state.settings.text)
-    )
+    await this.loadSettings()
   }
 }
 

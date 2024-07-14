@@ -3,7 +3,6 @@
     <div class="sider">
       <NMenu
         :root-indent="12"
-        
         :collapsed="false"
         :icon-size="18"
         default-expand-all
@@ -60,7 +59,7 @@
               rsoPlatformText[c.rsoPlatformId] || c.rsoPlatformId
             }}</span>
             <span class="pid" title="Process ID">{{ c.pid }}</span>
-            <span class="connected-label" v-if="c.connected">已连接</span>
+            <span class="connected-indicator" v-if="c.connected"></span>
           </div>
         </NPopover>
         <div class="operation" title="设置" @click="handleOpenSettingsModal">
@@ -350,6 +349,7 @@ const emits = defineEmits<{
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.03);
   width: 160px;
+  overflow: hidden;
 
   &:hover:not(.connected) {
     background-color: rgba(255, 255, 255, 0.15);
@@ -383,13 +383,13 @@ const emits = defineEmits<{
     margin-left: 8px;
   }
 
-  .connected-label {
+  .connected-indicator {
+    display: block;
     position: absolute;
-    top: 0px;
-    right: 6px;
-    font-size: 12px;
-    color: #8aa08ee7;
-    margin-left: 8px;
+    width: 4px;
+    height: 100%;
+    background-color: #8ede7c;
+    left: 0px;
   }
 
   .left-widget {

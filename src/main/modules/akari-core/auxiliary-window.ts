@@ -119,7 +119,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this._appModule = this.manager.getModule<AppModule>('app')
     this._logger = this._logModule.createLogger('auxiliary-window')
 
-    await this._loadSetting()
+    await this._setupSettingsSync()
     this._setupStateSync()
     this._setupMethodCall()
 
@@ -219,12 +219,6 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this.simpleSync('state', () => this.state.state)
     this.simpleSync('focus', () => this.state.focus)
     this.simpleSync('is-show', () => this.state.isShow)
-    this.simpleSync('settings/is-pinned', () => this.state.settings.isPinned)
-    this.simpleSync('settings/opacity', () => this.state.settings.opacity)
-    this.simpleSync('settings/enabled', () => this.state.settings.enabled)
-    this.simpleSync('settings/show-skin-selector', () => this.state.settings.showSkinSelector)
-    this.simpleSync('settings/zoom-factor', () => this.state.settings.zoomFactor)
-    this.simpleSync('settings/taskbar-icon', () => this.state.settings.taskbarIcon)
   }
 
   private _setupMethodCall() {
@@ -268,37 +262,8 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       this.showWindow()
     })
 
-    this.onCall('set-setting/opacity', async (opacity) => {
-      this.state.settings.setOpacity(opacity)
-      await this._sm.settings.set('auxiliary-window/opacity', opacity)
-    })
-
-    this.onCall('set-always-on-top', (flag, level, relativeLevel) => {
-      this._w?.setAlwaysOnTop(flag, level, relativeLevel)
-    })
-
     this.onCall('reset-window-position', () => {
       this.resetWindowPosition()
-    })
-
-    this.onCall('set-setting/enabled', async (enabled) => {
-      this.state.settings.setEnabled(enabled)
-      await this._sm.settings.set('auxiliary-window/enabled', enabled)
-    })
-
-    this.onCall('set-setting/show-skin-selector', async (s) => {
-      this.state.settings.setShowSkinSelector(s)
-      await this._sm.settings.set('auxiliary-window/show-skin-selector', s)
-    })
-
-    this.onCall('set-setting/zoom-factor', async (f) => {
-      this.state.settings.setZoomFactor(f)
-      await this._sm.settings.set('auxiliary-window/zoom-factor', f)
-    })
-
-    this.onCall('set-setting/taskbar-icon', async (b) => {
-      this.state.settings.setTaskbarIcon(b)
-      await this._sm.settings.set('auxiliary-window/taskbar-icon', b)
     })
   }
 
@@ -460,33 +425,39 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this._logger.info('辅助窗口创建')
   }
 
-  private async _loadSetting() {
-    this.state.settings.setOpacity(
-      await this._sm.settings.get('auxiliary-window/opacity', this.state.settings.opacity)
+  private async _setupSettingsSync() {
+    this.simpleSettingSync(
+      'opacity',
+      () => this.state.settings.opacity,
+      (s) => this.state.settings.setOpacity(s)
+    )
+    this.simpleSettingSync(
+      'enabled',
+      () => this.state.settings.enabled,
+      (s) => this.state.settings.setEnabled(s)
+    )
+    this.simpleSettingSync(
+      'is-pinned',
+      () => this.state.settings.isPinned,
+      (s) => this.state.settings.setPinned(s)
+    )
+    this.simpleSettingSync(
+      'show-skin-selector',
+      () => this.state.settings.showSkinSelector,
+      (s) => this.state.settings.setShowSkinSelector(s)
+    )
+    this.simpleSettingSync(
+      'zoom-factor',
+      () => this.state.settings.zoomFactor,
+      (s) => this.state.settings.setZoomFactor(s)
+    )
+    this.simpleSettingSync(
+      'taskbar-icon',
+      () => this.state.settings.taskbarIcon,
+      (s) => this.state.settings.setTaskbarIcon(s)
     )
 
-    this.state.settings.setEnabled(
-      await this._sm.settings.get('auxiliary-window/enabled', this.state.settings.enabled)
-    )
-
-    this.state.settings.setPinned(
-      await this._sm.settings.get('auxiliary-window/is-pinned', this.state.settings.isPinned)
-    )
-
-    this.state.settings.setShowSkinSelector(
-      await this._sm.settings.get(
-        'auxiliary-window/show-skin-selector',
-        this.state.settings.showSkinSelector
-      )
-    )
-
-    this.state.settings.setZoomFactor(
-      await this._sm.settings.get('auxiliary-window/zoom-factor', this.state.settings.zoomFactor)
-    )
-
-    this.state.settings.setTaskbarIcon(
-      await this._sm.settings.get('auxiliary-window/taskbar-icon', this.state.settings.taskbarIcon)
-    )
+    await this.loadSettings()
   }
 
   private _adjustWindowSize(x?: number, y?: number) {

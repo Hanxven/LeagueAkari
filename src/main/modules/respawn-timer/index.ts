@@ -27,9 +27,8 @@ export class RespawnTimerModule extends MobxBasedBasicModule {
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._logger = this.manager.getModule<LogModule>('log').createLogger('respawn-timer')
 
-    await this._loadSettings()
+    await this._setupSettingsSync()
     this._setupStateSync()
-    this._setupMethodCall()
 
     this.autoDisposeReaction(
       () => this._lcu.gameflow.phase,
@@ -51,10 +50,25 @@ export class RespawnTimerModule extends MobxBasedBasicModule {
     this._logger.info('初始化完成')
   }
 
-  private async _loadSettings() {
-    this.state.settings.setEnabled(
-      await this._sm.settings.get('respawn-timer/enabled', this.state.settings.enabled)
+  private async _setupSettingsSync() {
+    this.simpleSettingSync(
+      'enabled',
+      () => this.state.settings.enabled,
+      async (s, ss) => {
+        if (s && this._lcu.gameflow.phase === 'InProgress') {
+          this._startRespawnTimerPoll()
+        } else if (s === false) {
+          this._stopRespawnTimerPoll()
+        }
+
+        this.state.settings.setEnabled(s)
+        await ss.set('enabled', s)
+
+        return true
+      }
     )
+
+    await this.loadSettings()
   }
 
   private async _queryRespawnTime() {
@@ -127,23 +141,9 @@ export class RespawnTimerModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.simpleSync('settings/enabled', () => this.state.settings.enabled)
     this.simpleSync('is-dead', () => this.state.isDead)
     this.simpleSync('time-left', () => this.state.timeLeft)
     this.simpleSync('total-time', () => this.state.totalTime)
-  }
-
-  private _setupMethodCall() {
-    this.onCall('set-setting/enabled', async (enabled) => {
-      if (enabled && this._lcu.gameflow.phase === 'InProgress') {
-        this._startRespawnTimerPoll()
-      } else if (enabled === false) {
-        this._stopRespawnTimerPoll()
-      }
-
-      this.state.settings.setEnabled(enabled)
-      await this._sm.settings.set('respawn-timer/enabled', enabled)
-    })
   }
 }
 

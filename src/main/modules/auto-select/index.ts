@@ -29,10 +29,8 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._mwm = this.manager.getModule('main-window')
 
-    await this._loadSettings()
+    await this._setupSettingsSync()
     this._setupStateSync()
-    this._setupSettingsSync()
-    this._setupMethodCall()
     this._handleAutoPickBan()
     this._handleBenchMode()
 
@@ -354,164 +352,80 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     }
   }
 
-  private _setupSettingsSync() {
-    this.simpleSync('settings/normal-mode-enabled', () => this.state.settings.normalModeEnabled)
-    this.simpleSync('settings/only-simul-mode', () => this.state.settings.onlySimulMode)
-    this.simpleSync('settings/expected-champions', () => this.state.settings.expectedChampions)
-    this.simpleSync(
-      'settings/select-teammate-intended-champion',
-      () => this.state.settings.selectTeammateIntendedChampion
-    )
-    this.simpleSync('settings/show-intent', () => this.state.settings.showIntent)
-    this.simpleSync('settings/completed', () => this.state.settings.completed)
-    this.simpleSync('settings/bench-mode-enabled', () => this.state.settings.benchModeEnabled)
-    this.simpleSync(
-      'settings/bench-expected-champions',
-      () => this.state.settings.benchExpectedChampions
-    )
-    this.simpleSync('settings/grab-delay-seconds', () => this.state.settings.grabDelaySeconds)
-    this.simpleSync('settings/ban-enabled', () => this.state.settings.banEnabled)
-    this.simpleSync('settings/banned-champions', () => this.state.settings.bannedChampions)
-    this.simpleSync(
-      'settings/ban-teammate-intended-champion',
-      () => this.state.settings.banTeammateIntendedChampion
-    )
-  }
-
-  private _setupMethodCall() {
-    this.onCall('set-setting/normal-mode-enabled', async (enabled) => {
-      this.state.settings.setNormalModeEnabled(enabled)
-      await this._sm.settings.set('auto-select/normal-mode-enabled', enabled)
-    })
-
-    this.onCall('set-setting/only-simul-mode', async (enabled) => {
-      this.state.settings.setOnlySimulMode(enabled)
-      await this._sm.settings.set('auto-select/only-simul-mode', enabled)
-    })
-
-    this.onCall('set-setting/expected-champions', async (champions) => {
-      this.state.settings.setExpectedChampions(champions)
-      await this._sm.settings.set('auto-select/expected-champions', champions)
-    })
-
-    this.onCall('set-setting/select-teammate-intended-champion', async (enabled) => {
-      this.state.settings.setSelectTeammateIntendedChampion(enabled)
-      await this._sm.settings.set('auto-select/select-teammate-intended-champion', enabled)
-    })
-
-    this.onCall('set-setting/show-intent', async (enabled) => {
-      this.state.settings.setShowIntent(enabled)
-      await this._sm.settings.set('auto-select/show-intent', enabled)
-    })
-
-    this.onCall('set-setting/completed', async (enabled) => {
-      this.state.settings.setCompleted(enabled)
-      await this._sm.settings.set('auto-select/completed', enabled)
-    })
-
-    this.onCall('set-setting/bench-mode-enabled', async (enabled) => {
-      this.state.settings.setBenchModeEnabled(enabled)
-      await this._sm.settings.set('auto-select/bench-mode-enabled', enabled)
-    })
-
-    this.onCall('set-setting/bench-expected-champions', async (champions) => {
-      this.state.settings.setBenchExpectedChampions(champions)
-      await this._sm.settings.set('auto-select/bench-expected-champions', champions)
-    })
-
-    this.onCall('set-setting/grab-delay-seconds', async (seconds) => {
-      this.state.settings.setGrabDelaySeconds(seconds)
-      await this._sm.settings.set('auto-select/grab-delay-seconds', seconds)
-    })
-
-    this.onCall('set-setting/ban-enabled', async (enabled) => {
-      this.state.settings.setBanEnabled(enabled)
-      await this._sm.settings.set('auto-select/ban-enabled', enabled)
-    })
-
-    this.onCall('set-setting/banned-champions', async (champions) => {
-      this.state.settings.setBannedChampions(champions)
-      await this._sm.settings.set('auto-select/banned-champions', champions)
-    })
-
-    this.onCall('set-setting/ban-teammate-intended-champion', async (enabled) => {
-      this.state.settings.setBanTeammateIntendedChampion(enabled)
-      await this._sm.settings.set('auto-select/ban-teammate-intended-champion', enabled)
-    })
-  }
-
-  private async _loadSettings() {
-    this.state.settings.setNormalModeEnabled(
-      await this._sm.settings.get(
-        'auto-select/normal-mode-enabled',
-        this.state.settings.normalModeEnabled
-      )
+  private async _setupSettingsSync() {
+    this.simpleSettingSync(
+      'normal-mode-enabled',
+      () => this.state.settings.normalModeEnabled,
+      (s) => this.state.settings.setNormalModeEnabled(s)
     )
 
-    this.state.settings.setOnlySimulMode(
-      await this._sm.settings.get('auto-select/only-simul-mode', this.state.settings.onlySimulMode)
+    this.simpleSettingSync(
+      'only-simul-mode',
+      () => this.state.settings.onlySimulMode,
+      (s) => this.state.settings.setOnlySimulMode(s)
     )
 
-    this.state.settings.setExpectedChampions(
-      await this._sm.settings.get(
-        'auto-select/expected-champions',
-        this.state.settings.expectedChampions
-      )
+    this.simpleSettingSync(
+      'expected-champions',
+      () => this.state.settings.expectedChampions,
+      (s) => this.state.settings.setExpectedChampions(s)
     )
 
-    this.state.settings.setSelectTeammateIntendedChampion(
-      await this._sm.settings.get(
-        'auto-select/select-teammate-intended-champion',
-        this.state.settings.selectTeammateIntendedChampion
-      )
+    this.simpleSettingSync(
+      'select-teammate-intended-champion',
+      () => this.state.settings.selectTeammateIntendedChampion,
+      (s) => this.state.settings.setSelectTeammateIntendedChampion(s)
     )
 
-    this.state.settings.setShowIntent(
-      await this._sm.settings.get('auto-select/show-intent', this.state.settings.showIntent)
+    this.simpleSettingSync(
+      'show-intent',
+      () => this.state.settings.showIntent,
+      (s) => this.state.settings.setShowIntent(s)
     )
 
-    this.state.settings.setCompleted(
-      await this._sm.settings.get('auto-select/completed', this.state.settings.completed)
+    this.simpleSettingSync(
+      'completed',
+      () => this.state.settings.completed,
+      (s) => this.state.settings.setCompleted(s)
     )
 
-    this.state.settings.setBenchModeEnabled(
-      await this._sm.settings.get(
-        'auto-select/bench-mode-enabled',
-        this.state.settings.benchModeEnabled
-      )
+    this.simpleSettingSync(
+      'bench-mode-enabled',
+      () => this.state.settings.benchModeEnabled,
+      (s) => this.state.settings.setBenchModeEnabled(s)
     )
 
-    this.state.settings.setBenchExpectedChampions(
-      await this._sm.settings.get(
-        'auto-select/bench-expected-champions',
-        this.state.settings.benchExpectedChampions
-      )
+    this.simpleSettingSync(
+      'bench-expected-champions',
+      () => this.state.settings.benchExpectedChampions,
+      (s) => this.state.settings.setBenchExpectedChampions(s)
     )
 
-    this.state.settings.setGrabDelaySeconds(
-      await this._sm.settings.get(
-        'auto-select/grab-delay-seconds',
-        this.state.settings.grabDelaySeconds
-      )
+    this.simpleSettingSync(
+      'grab-delay-seconds',
+      () => this.state.settings.grabDelaySeconds,
+      (s) => this.state.settings.setGrabDelaySeconds(s)
     )
 
-    this.state.settings.setBanEnabled(
-      await this._sm.settings.get('auto-select/ban-enabled', this.state.settings.banEnabled)
+    this.simpleSettingSync(
+      'ban-enabled',
+      () => this.state.settings.banEnabled,
+      (s) => this.state.settings.setBanEnabled(s)
     )
 
-    this.state.settings.setBannedChampions(
-      await this._sm.settings.get(
-        'auto-select/banned-champions',
-        this.state.settings.bannedChampions
-      )
+    this.simpleSettingSync(
+      'banned-champions',
+      () => this.state.settings.bannedChampions,
+      (s) => this.state.settings.setBannedChampions(s)
     )
 
-    this.state.settings.setBanTeammateIntendedChampion(
-      await this._sm.settings.get(
-        'auto-select/ban-teammate-intended-champion',
-        this.state.settings.banTeammateIntendedChampion
-      )
+    this.simpleSettingSync(
+      'ban-teammate-intended-champion',
+      () => this.state.settings.banTeammateIntendedChampion,
+      (s) => this.state.settings.setBanTeammateIntendedChampion(s)
     )
+
+    await this.loadSettings()
   }
 
   private async _setupStateSync() {

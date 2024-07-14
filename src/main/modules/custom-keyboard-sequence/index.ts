@@ -26,9 +26,7 @@ export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
     this._pm = this.manager.getModule('win-platform')
     this._lcu = this.manager.getModule('lcu-state-sync')
 
-    await this._loadSettings()
-    this._setupStateSync()
-    this._setupMethodCall()
+    await this._setupSettingsSync()
 
     this._handleCks()
 
@@ -73,11 +71,6 @@ export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
     this._isSending = false
   }
 
-  private _setupStateSync() {
-    this.simpleSync('settings/enabled', () => this.state.settings.enabled)
-    this.simpleSync('settings/text', () => this.state.settings.text)
-  }
-
   private _handleCks() {
     this._pm.bus.on('global-shortcut/delete', () => {
       if (this.state.settings.enabled) {
@@ -90,26 +83,19 @@ export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
     })
   }
 
-  private _setupMethodCall() {
-    this.onCall('set-setting/enabled', async (enabled) => {
-      this.state.settings.setEnabled(enabled)
-      await this._sm.settings.set('custom-keyboard-sequence/enabled', enabled)
-    })
-
-    this.onCall('set-setting/text', async (text) => {
-      this.state.settings.setText(text)
-      await this._sm.settings.set('custom-keyboard-sequence/text', text)
-    })
-  }
-
-  private async _loadSettings() {
-    this.state.settings.setEnabled(
-      await this._sm.settings.get('custom-keyboard-sequence/enabled', this.state.settings.enabled)
+  private async _setupSettingsSync() {
+    this.simpleSettingSync(
+      'enabled',
+      () => this.state.settings.enabled,
+      (s) => this.state.settings.setEnabled(s)
+    )
+    this.simpleSettingSync(
+      'text',
+      () => this.state.settings.text,
+      (s) => this.state.settings.setText(s)
     )
 
-    this.state.settings.setText(
-      await this._sm.settings.get('custom-keyboard-sequence/text', this.state.settings.text)
-    )
+    await this.loadSettings()
   }
 }
 

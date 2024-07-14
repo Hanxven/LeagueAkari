@@ -50,26 +50,17 @@ export class LcuClientModule extends MobxBasedBasicModule {
     this._appModule = this.manager.getModule('app')
     this._lcm = this.manager.getModule('lcu-connection')
 
-    await this._loadSettings()
-    this._setupStateSync()
+    await this._setupSettingsSync()
     this._setupMethodCall()
 
     this._logger.info('初始化完成')
   }
 
-  private async _loadSettings() {
-    this.settings.setFixWindowMethodsAOptions(
-      await this._sm.settings.get(
-        'league-client-ux/fix-window-method-a-options',
-        this.settings.fixWindowMethodAOptions
-      )
-    )
-  }
-
-  private _setupStateSync() {
-    this.simpleSync(
-      'settings/fix-window-method-a-options',
-      () => this.settings.fixWindowMethodAOptions
+  private async _setupSettingsSync() {
+    this.simpleSettingSync(
+      'fix-window-method-a-options',
+      () => this.settings.fixWindowMethodAOptions,
+      (s) => this.settings.setFixWindowMethodsAOptions(s)
     )
   }
 
@@ -94,11 +85,6 @@ export class LcuClientModule extends MobxBasedBasicModule {
       } catch (error) {
         throw error
       }
-    })
-
-    this.onCall('set-setting/fix-window-method-a-options', async (option) => {
-      this.settings.setFixWindowMethodsAOptions(option)
-      await this._sm.settings.set('league-client-ux/fix-window-method-a-options', option)
     })
 
     this.onCall('get-launched-clients', async () => {
