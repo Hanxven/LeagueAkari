@@ -1,7 +1,7 @@
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
 
-import { useLeagueClientStore } from './store'
 import { LcuAuth } from '../lcu-connection/store'
+import { useLeagueClientStore } from './store'
 
 export class LeagueClientRendererModule extends StateSyncModule {
   constructor() {
@@ -21,6 +21,11 @@ export class LeagueClientRendererModule extends StateSyncModule {
       'settings/fix-window-method-a-options',
       (s) => (store.settings.fixWindowMethodAOptions = s)
     )
+
+    this.simpleSync(
+      'settings/terminate-game-client-on-alt-f4',
+      (s) => (store.settings.terminateGameClientOnAltF4 = s)
+    )
   }
 
   fixWindowMethodA() {
@@ -33,6 +38,14 @@ export class LeagueClientRendererModule extends StateSyncModule {
 
   getLaunchedClients(): Promise<LcuAuth[]> {
     return this.call('get-launched-clients')
+  }
+
+  setTerminateGameClientOnAltF4(value: boolean) {
+    return this.call('set-setting/terminate-game-client-on-alt-f4', value)
+  }
+
+  terminateGameClient() {
+    return this.call('terminate-game-client')
   }
 }
 

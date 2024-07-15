@@ -69,6 +69,10 @@ League Akari 会很好地处理中途启动的情况。
 
 企鹅群组：301157623
 
+## 1.4 测试版本
+
+在群聊中，定期会发布测试版本，测试版本会包含若干将在下个正式版本中发布的功能。
+
 # 2. 加入到开发
 
 百密一疏，各种问题总是难以避免，作为使用者，您可以：
@@ -77,7 +81,7 @@ League Akari 会很好地处理中途启动的情况。
 
 Github Issues 是最重要的反馈渠道，请精准描述您的需求、遇到的问题或任何可行的想法。
 
-除了 Github，另一个反馈渠道是 Bilibili 的[作者私信](https://space.bilibili.com/34532360)和[专栏评论区](https://www.bilibili.com/read/cv28654091/)。
+除了 Github，另一个反馈渠道是 Bilibili 的[作者私信](https://space.bilibili.com/34532360)。
 
 ## 2.2 加入开发
 

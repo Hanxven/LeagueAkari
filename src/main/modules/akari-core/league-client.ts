@@ -6,6 +6,7 @@ import { queryLcuAuth, queryLcuAuthNative } from '../../utils/lcu-auth'
 import { AppModule } from './app'
 import { LcuConnectionModule } from './lcu-connection'
 import { AppLogger, LogModule } from './log'
+import { PlatformModule } from './platform'
 
 class LcuClientSettings {
   /**
@@ -19,8 +20,14 @@ class LcuClientSettings {
     baseHeight: 900
   }
 
+  terminateGameClientOnAltF4 = false
+
   setFixWindowMethodsAOptions(option: { baseWidth: number; baseHeight: number }) {
     this.fixWindowMethodAOptions = option
+  }
+
+  setTerminateGameClientOnAltF4(value: boolean) {
+    this.terminateGameClientOnAltF4 = value
   }
 
   constructor() {
@@ -36,8 +43,12 @@ export class LcuClientModule extends MobxBasedBasicModule {
   private _logger: AppLogger
   private _appModule: AppModule
   private _lcm: LcuConnectionModule
+  private _pm: PlatformModule
 
   static LEAGUE_CLIENT_UX_PROCESS_NAME = 'LeagueClientUx.exe'
+  static LEAGUE_GAME_CLIENT_PROCESS_NAME = 'League of Legends.exe'
+
+  static TERMINATE_DELAY = 200
 
   constructor() {
     super('league-client')
@@ -49,9 +60,11 @@ export class LcuClientModule extends MobxBasedBasicModule {
     this._logger = this.manager.getModule<LogModule>('log').createLogger('league-client')
     this._appModule = this.manager.getModule('app')
     this._lcm = this.manager.getModule('lcu-connection')
+    this._pm = this.manager.getModule('win-platform')
 
     await this._setupSettingsSync()
     this._setupMethodCall()
+    this._handleTerminateGameClientOnAltF4()
 
     this._logger.info('初始化完成')
   }
@@ -61,6 +74,12 @@ export class LcuClientModule extends MobxBasedBasicModule {
       'fix-window-method-a-options',
       () => this.settings.fixWindowMethodAOptions,
       (s) => this.settings.setFixWindowMethodsAOptions(s)
+    )
+
+    this.simpleSettingSync(
+      'terminate-game-client-on-alt-f4',
+      () => this.settings.terminateGameClientOnAltF4,
+      (s) => this.settings.setTerminateGameClientOnAltF4(s)
     )
   }
 
@@ -89,6 +108,46 @@ export class LcuClientModule extends MobxBasedBasicModule {
 
     this.onCall('get-launched-clients', async () => {
       return this.getLaunchedClients()
+    })
+
+    this.onCall('terminate-game-client', () => {
+      this._terminateGameClient()
+    })
+  }
+
+  private _handleTerminateGameClientOnAltF4() {
+    let leftAltPressed = false
+    let rightAltPressed = false
+
+    this._pm.gkl?.addListener((event) => {
+      if (event.name === 'LEFT ALT') {
+        leftAltPressed = event.state === 'DOWN'
+      } else if (event.name === 'RIGHT ALT') {
+        rightAltPressed = event.state === 'DOWN'
+      } else if (
+        event.name === 'F4' &&
+        (leftAltPressed || rightAltPressed) &&
+        event.state === 'DOWN'
+      ) {
+        if (this.settings.terminateGameClientOnAltF4) {
+          this._terminateGameClient()
+        }
+      }
+    })
+  }
+
+  private _terminateGameClient() {
+    toolkit.getPidsByName(LcuClientModule.LEAGUE_GAME_CLIENT_PROCESS_NAME).forEach((pid) => {
+      if (!toolkit.isProcessForeground(pid)) {
+        return
+      }
+
+      this._logger.info(`终止游戏客户端进程 ${pid}`)
+      
+      // 这里设置 200 ms，用于使客户端消耗 Alt+F4 事件，避免穿透
+      setTimeout(() => {
+        toolkit.terminateProcess(pid)
+      }, LcuClientModule.TERMINATE_DELAY)
     })
   }
 

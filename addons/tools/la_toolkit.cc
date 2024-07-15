@@ -220,12 +220,64 @@ Napi::Value IsElevated(const Napi::CallbackInfo& info) {
   return Napi::Boolean::New(env, bIsElevated);
 }
 
+bool TerminateProcessByID(DWORD processID) {
+  HANDLE hProcess = OpenProcessFromPid(processID, PROCESS_TERMINATE);
+  if (hProcess == NULL) {
+    std::cerr << "Cannot open process: " << GetLastError() << std::endl;
+    return false;
+  }
+
+  // 结束进程
+  if (!TerminateProcess(hProcess, 0)) {
+    std::cerr << "Cannot terminate process: " << GetLastError() << std::endl;
+    CloseHandle(hProcess);
+    return false;
+  }
+
+  CloseHandle(hProcess);
+  return true;
+}
+
+Napi::Boolean TerminateProcessNode(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  if (info.Length() < 1 || !info[0].IsNumber()) {
+    Napi::TypeError::New(env, "League Akari - Number expected").ThrowAsJavaScriptException();
+    return Napi::Boolean::New(env, false);
+  }
+
+  DWORD processID = info[0].As<Napi::Number>().Uint32Value();
+  bool result = TerminateProcessByID(processID);
+  return Napi::Boolean::New(env, result);
+}
+
+bool IsProcessForeground(DWORD processID) {
+  HWND hwndForeground = GetForegroundWindow();
+  DWORD foregroundProcID;
+  GetWindowThreadProcessId(hwndForeground, &foregroundProcID);
+  return (foregroundProcID == processID);
+}
+
+Napi::Boolean IsProcessForegroundNode(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  if (info.Length() < 1 || !info[0].IsNumber()) {
+    Napi::TypeError::New(env, "League Akari - Number expected").ThrowAsJavaScriptException();
+    return Napi::Boolean::New(env, false);
+  }
+
+  DWORD processID = info[0].As<Napi::Number>().Uint32Value();
+  bool isForeground = IsProcessForeground(processID);
+  return Napi::Boolean::New(env, isForeground);
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set("fixWindowMethodA", Napi::Function::New(env, FixWindowMethodA));
   exports.Set("isElevated", Napi::Function::New(env, IsElevated));
   exports.Set("GetLeagueClientWindowPlacementInfo", Napi::Function::New(env, GetLeagueClientWindowPlacementInfo));
   exports.Set("getCommandLine1", Napi::Function::New(env, GetCommandLine1));
   exports.Set("getPidsByName", Napi::Function::New(env, GetPidsByName));
+  exports.Set("terminateProcess", Napi::Function::New(env, TerminateProcessNode));
+  exports.Set("isProcessForeground", Napi::Function::New(env, IsProcessForegroundNode));
   return exports;
 }
 

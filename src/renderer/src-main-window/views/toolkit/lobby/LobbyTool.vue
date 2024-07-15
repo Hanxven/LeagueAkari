@@ -60,12 +60,17 @@
     </ControlItem>
     <ControlItem class="control-item-margin" label="创建 5v5 训练房间">
       <NFlex>
-        <NButton @click="handleCreatePractice5v5" size="tiny" :disabled="lc.state !== 'connected'"
+        <NButton
+          @click="handleCreatePractice5v5"
+          size="tiny"
+          :disabled="lc.state !== 'connected'"
+          :loading="isCreatingPractice5v5"
           >创建</NButton
         >
         <NInput
           :status="practice5v5LobbyName.length ? 'success' : 'warning'"
           v-model:value="practice5v5LobbyName"
+          @keyup.enter="handleCreatePractice5v5"
           style="width: 180px"
           size="tiny"
         />
@@ -99,8 +104,14 @@ const getRandomLobbyName = () => {
 }
 
 const practice5v5LobbyName = ref(getRandomLobbyName())
-
+const isCreatingPractice5v5 = ref(false)
 const handleCreatePractice5v5 = async () => {
+  if (isCreatingPractice5v5.value) {
+    return
+  }
+
+  isCreatingPractice5v5.value = true
+
   try {
     if (!practice5v5LobbyName.value) {
       practice5v5LobbyName.value = getRandomLobbyName()
@@ -110,6 +121,8 @@ const handleCreatePractice5v5 = async () => {
     practice5v5LobbyName.value = getRandomLobbyName()
   } catch (error) {
     laNotification.warn('房间工具', '尝试创建房间失败', error)
+  } finally {
+    isCreatingPractice5v5.value = false
   }
 }
 

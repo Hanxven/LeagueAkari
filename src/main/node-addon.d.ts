@@ -92,6 +92,18 @@ declare module '*/laToolkitWin32x64.node' {
      * @param name 进程名
      */
     getPidsByName(name: string): number[]
+
+    /**
+     * 结束进程
+     * @param pid 进程 PID
+     */
+    terminateProcess(pid: number): boolean
+
+    /**
+     * 判断进程是否在前台
+     * @param pid 进程 PID
+     */
+    isProcessForeground(pid: number): boolean
   }
 
   const lt1: LeagueAkari1Addon

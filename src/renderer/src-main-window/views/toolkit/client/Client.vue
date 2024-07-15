@@ -33,6 +33,25 @@
             >关闭 Client 进程</NButton
           >
         </ControlItem>
+        <ControlItem
+          class="control-item-margin"
+          label-description="当游戏客户端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏客户端进程"
+          :disabled="!app.isAdministrator"
+          :label="
+            app.isAdministrator
+              ? '使用 Alt+F4 结束游戏客户端'
+              : '使用 Alt+F4 结束游戏客户端 (需要管理员权限)'
+          "
+          :label-width="320"
+        >
+          <NSwitch
+            :disabled="!app.isAdministrator || lc.state !== 'connected'"
+            size="small"
+            type="warning"
+            :value="lc2.settings.terminateGameClientOnAltF4"
+            @update:value="(v) => lcm2.setTerminateGameClientOnAltF4(v)"
+          />
+        </ControlItem>
       </NCard>
       <NCard size="small" style="margin-top: 8px">
         <template #header><span class="card-header-title">League Client UX</span></template>
@@ -150,7 +169,7 @@ import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { leagueClientRendererModule as lcm2 } from '@shared/renderer/modules/league-client'
 import { useLeagueClientStore } from '@shared/renderer/modules/league-client/store'
-import { NButton, NCard, NInputNumber, NScrollbar, useDialog } from 'naive-ui'
+import { NButton, NCard, NInputNumber, NSwitch, useDialog } from 'naive-ui'
 import { ref } from 'vue'
 
 const app = useAppStore()

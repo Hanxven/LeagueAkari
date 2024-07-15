@@ -36,6 +36,10 @@ export class PlatformModule extends MobxBasedBasicModule {
     return this._bus
   }
 
+  get gkl() {
+    return this._gkl
+  }
+
   override async setup() {
     await super.setup()
 
@@ -86,6 +90,10 @@ export class PlatformModule extends MobxBasedBasicModule {
     let pageDownShortcut = false
     let deleteShortcut = false
 
+    // ! refactor this
+    // ! refactor this
+    // ! refactor this
+    // ! 逻辑冗余，将在之后重构
     gkl.addListener((event) => {
       if (event.state === 'DOWN') {
         if (event.name === 'PAGE UP') {
