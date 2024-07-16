@@ -37,7 +37,7 @@ class LcuClientSettings {
   }
 }
 
-export class LcuClientModule extends MobxBasedBasicModule {
+export class LeagueClientModule extends MobxBasedBasicModule {
   public settings = new LcuClientSettings()
 
   private _logger: AppLogger
@@ -137,17 +137,17 @@ export class LcuClientModule extends MobxBasedBasicModule {
   }
 
   private _terminateGameClient() {
-    toolkit.getPidsByName(LcuClientModule.LEAGUE_GAME_CLIENT_PROCESS_NAME).forEach((pid) => {
+    toolkit.getPidsByName(LeagueClientModule.LEAGUE_GAME_CLIENT_PROCESS_NAME).forEach((pid) => {
       if (!toolkit.isProcessForeground(pid)) {
         return
       }
 
       this._logger.info(`终止游戏客户端进程 ${pid}`)
-      
+
       // 这里设置 200 ms，用于使客户端消耗 Alt+F4 事件，避免穿透
       setTimeout(() => {
         toolkit.terminateProcess(pid)
-      }, LcuClientModule.TERMINATE_DELAY)
+      }, LeagueClientModule.TERMINATE_DELAY)
     })
   }
 
@@ -157,11 +157,20 @@ export class LcuClientModule extends MobxBasedBasicModule {
         throw new Error('insufficient permissions')
       }
 
-      return queryLcuAuth(LcuClientModule.LEAGUE_CLIENT_UX_PROCESS_NAME)
+      return queryLcuAuth(LeagueClientModule.LEAGUE_CLIENT_UX_PROCESS_NAME)
     }
 
-    return queryLcuAuthNative(LcuClientModule.LEAGUE_CLIENT_UX_PROCESS_NAME)
+    return queryLcuAuthNative(LeagueClientModule.LEAGUE_CLIENT_UX_PROCESS_NAME)
+  }
+
+  isGameClientForeground() {
+    const pids = toolkit.getPidsByName(LeagueClientModule.LEAGUE_GAME_CLIENT_PROCESS_NAME)
+    if (pids.length === 0) {
+      return false
+    }
+
+    return toolkit.isProcessForeground(pids[0])
   }
 }
 
-export const leagueClientModule = new LcuClientModule()
+export const leagueClientModule = new LeagueClientModule()

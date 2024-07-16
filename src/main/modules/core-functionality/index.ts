@@ -21,8 +21,10 @@ import { calculateTogetherTimes, removeSubsets } from '@shared/utils/team-up-cal
 import dayjs from 'dayjs'
 import { comparer, computed, observable, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
+import { HighlightSpanKind } from 'typescript'
 
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
+import { LeagueClientModule } from '../akari-core/league-client'
 import { AppLogger, LogModule } from '../akari-core/log'
 import { MainWindowModule } from '../akari-core/main-window'
 import { PlatformModule } from '../akari-core/platform'
@@ -48,6 +50,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
   private _logger: AppLogger
   private _lcm: LcuConnectionModule
+  private _lcm2: LeagueClientModule
   private _lcu: LcuSyncModule
   private _pm: PlatformModule
   private _mwm: MainWindowModule
@@ -72,6 +75,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this._logger = this.manager.getModule<LogModule>('log').createLogger('core-functionality')
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._lcm = this.manager.getModule('lcu-connection')
+    this._lcm2 = this.manager.getModule('league-client')
     this._mwm = this.manager.getModule('main-window')
     this._pm = this.manager.getModule('win-platform')
     this._edsm = this.manager.getModule('external-data-source')
@@ -376,12 +380,20 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         return
       }
 
+      if (!this._lcm2.isGameClientForeground()) {
+        return
+      }
+
       this._sendPlayerStatsInGame('our')
     }
 
     const sendTheir = () => {
       if (this._isSimulatingKeyboard) {
         this._isSimulatingKeyboard = false
+        return
+      }
+
+      if (!this._lcm2.isGameClientForeground()) {
         return
       }
 

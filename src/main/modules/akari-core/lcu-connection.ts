@@ -12,7 +12,7 @@ import PQueue from 'p-queue'
 import { WebSocket } from 'ws'
 
 import { AppModule } from './app'
-import { LcuClientModule } from './league-client'
+import { LeagueClientModule } from './league-client'
 import { AppLogger, LogModule } from './log'
 import { MainWindowModule } from './main-window'
 
@@ -83,7 +83,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
   private _logModule: LogModule
   private _appModule: AppModule
   private _mwm: MainWindowModule
-  private _lcm: LcuClientModule
+  private _lcm: LeagueClientModule
 
   static GAME_CLIENT_BASE_URL = 'https://127.0.0.1:2999'
   static INTERVAL_TIMEOUT = 12500
@@ -134,7 +134,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     this._appModule = this.manager.getModule<AppModule>('app')
     this._logger = this._logModule.createLogger('lcu-connection')
     this._mwm = this.manager.getModule<MainWindowModule>('main-window')
-    this._lcm = this.manager.getModule<LcuClientModule>('league-client')
+    this._lcm = this.manager.getModule<LeagueClientModule>('league-client')
 
     await this._migrateSettings()
     await this._setupSettingsSync()

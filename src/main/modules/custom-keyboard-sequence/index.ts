@@ -1,6 +1,7 @@
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { sleep } from '@shared/utils/sleep'
 
+import { LeagueClientModule } from '../akari-core/league-client'
 import { AppLogger, LogModule } from '../akari-core/log'
 import { PlatformModule } from '../akari-core/platform'
 import { LcuSyncModule } from '../lcu-state-sync'
@@ -14,6 +15,7 @@ export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
   private _logger: AppLogger
   private _pm: PlatformModule
   private _lcu: LcuSyncModule
+  private _lcm: LeagueClientModule
 
   constructor() {
     super('custom-keyboard-sequence')
@@ -25,6 +27,7 @@ export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
     this._logger = this.manager.getModule<LogModule>('log').createLogger('log')
     this._pm = this.manager.getModule('win-platform')
     this._lcu = this.manager.getModule('lcu-state-sync')
+    this._lcm = this.manager.getModule('league-client')
 
     await this._setupSettingsSync()
 
@@ -76,9 +79,14 @@ export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
       if (this.state.settings.enabled) {
         if (this._isSending) {
           this._isSending = false
-        } else {
-          this._sendCustomSequence()
+          return
         }
+
+        if (!this._lcm.isGameClientForeground()) {
+          return
+        }
+
+        this._sendCustomSequence()
       }
     })
   }
