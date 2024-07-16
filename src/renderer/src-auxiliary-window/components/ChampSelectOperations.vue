@@ -15,10 +15,8 @@
         <span style="font-size: 12px">这将退出英雄选择阶段</span>
       </NPopconfirm>
     </NFlex>
-    <NFlex align="center" class="control-item">
-      <span class="label" v-if="!isCustomGame" style="flex: 1"
-        >最后一秒秒退{{ agf.willDodgeAtLastSecond  ? ` (${countdownTime.toFixed(1)} s)` : '' }}</span
-      >
+    <NFlex align="center" class="control-item" v-if="!isCustomGame">
+      <span class="label" style="flex: 1">{{ dodgeAtLastSecondLabelText }}</span>
       <NSwitch
         size="small"
         :value="agf.willDodgeAtLastSecond"
@@ -53,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { useCountdown } from '@shared/renderer/compositions/useCountdown'
+import { useCountdownSeconds } from '@shared/renderer/compositions/useCountdown'
 import { dodge } from '@shared/renderer/http-api/login'
 import { autoGameflowRendererModule as agfm } from '@shared/renderer/modules/auto-gameflow'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
@@ -86,10 +84,22 @@ const handleDodge = async () => {
   } catch (error) {}
 }
 
-const { countdownTime } = useCountdown(
+const { countdownTime } = useCountdownSeconds(
   () => agf.willDodgeAtLastSecond,
   () => agf.willDodgeAt
 )
+
+const dodgeAtLastSecondLabelText = computed(() => {
+  if (agf.willDodgeAtLastSecond) {
+    if (agf.willDodgeAt < 0) {
+      return `最后一秒秒退 (等待时机)`
+    }
+
+    return `最后一秒秒退 (${countdownTime.value.toFixed(1)} s)`
+  }
+
+  return '最后一秒秒退'
+})
 </script>
 
 <style scoped lang="less">

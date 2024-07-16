@@ -1,7 +1,9 @@
 import { MaybeRefOrGetter, toRef, useIntervalFn } from '@vueuse/core'
 import { ref, watch } from 'vue'
 
-export function useCountdown(start: MaybeRefOrGetter<boolean>, deadline: MaybeRefOrGetter<number>) {
+const INTERVAL_CONSTANT = 92
+
+export function useCountdownSeconds(start: MaybeRefOrGetter<boolean>, deadline: MaybeRefOrGetter<number>) {
   const _countdownTime = ref(0)
   const _deadline = toRef(deadline)
   const _start = toRef(start)
@@ -11,7 +13,7 @@ export function useCountdown(start: MaybeRefOrGetter<boolean>, deadline: MaybeRe
       const s = (_deadline.value - Date.now()) / 1e3
       _countdownTime.value = Math.abs(Math.max(s, 0))
     },
-    92,
+    INTERVAL_CONSTANT,
     { immediate: false, immediateCallback: true }
   )
 
