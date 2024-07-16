@@ -54,6 +54,8 @@ export class AutoGameflowRendererModule extends StateSyncModule {
     this.simpleSync('will-search-match', (s) => (store.willSearchMatch = s))
     this.simpleSync('will-search-match-at', (s) => (store.willSearchMatchAt = s))
     this.simpleSync('activity-start-status', (s) => (store.activityStartStatus = s))
+    this.simpleSync('will-dodge-at', (s) => (store.willDodgeAt = s))
+    this.simpleSync('will-dodge-at-last-second', (s) => (store.willDodgeAtLastSecond = s))
   }
 
   async setAutoHonorEnabled(value: boolean) {
@@ -106,6 +108,10 @@ export class AutoGameflowRendererModule extends StateSyncModule {
 
   async cancelAutoSearchMatch() {
     return this.call('cancel-auto-search-match')
+  }
+
+  async setDodgeAtLastSecond(value: boolean) {
+    return this.call('set-dodge-at-last-second', value)
   }
 }
 

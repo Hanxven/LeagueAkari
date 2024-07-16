@@ -97,6 +97,16 @@ export class AutoGameflowState {
    */
   willSearchMatchAt: number = -1
 
+  /**
+   * 即将进行的秒退操作将在指定时间执行
+   */
+  willDodgeAt: number = -1
+
+  /**
+   * 是否在最后一秒秒退
+   */
+  willDodgeAtLastSecond: boolean = false
+
   get activityStartStatus() {
     if (!lcu.lobby.lobby) {
       return 'unavailable'
@@ -154,6 +164,14 @@ export class AutoGameflowState {
   setSearchMatchAt(at: number) {
     this.willSearchMatch = true
     this.willSearchMatchAt = at
+  }
+
+  setWillDodgeAtLastSecond(yes: boolean) {
+    this.willDodgeAtLastSecond = yes
+  }
+
+  setDodgeAt(at: number) {
+    this.willDodgeAt = at
   }
 
   clearAutoAccept() {

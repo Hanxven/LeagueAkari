@@ -185,7 +185,7 @@ import { useIntervalFn } from '@vueuse/core'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
 import { inject, ref, watch } from 'vue'
 
-import { useTitleText } from '@main-window/compositions/title'
+import { useTitleText } from '@main-window/compositions/useTitleText'
 
 const app = useAppStore()
 

@@ -29,6 +29,9 @@ export const useAutoGameflowStore = defineStore('module:auto-gameflow', () => {
 
   const activityStartStatus = ref('unavailable')
 
+  const willDodgeAt = ref(-1)
+  const willDodgeAtLastSecond = ref(false)
+
   return {
     settings,
     willAccept,
@@ -36,6 +39,8 @@ export const useAutoGameflowStore = defineStore('module:auto-gameflow', () => {
     willSearchMatch,
     willRematchAt,
     willSearchMatchAt,
-    activityStartStatus
+    activityStartStatus,
+    willDodgeAt,
+    willDodgeAtLastSecond
   }
 })

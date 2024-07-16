@@ -10,10 +10,20 @@
         positive-text="退出"
       >
         <template #trigger>
-          <NButton size="tiny" type="warning" secondary style="font-size: 10px">秒退</NButton>
+          <NButton size="tiny" type="warning" secondary style="font-size: 10px">立即秒退</NButton>
         </template>
         <span style="font-size: 12px">这将退出英雄选择阶段</span>
       </NPopconfirm>
+    </NFlex>
+    <NFlex align="center" class="control-item">
+      <span class="label" v-if="!isCustomGame" style="flex: 1"
+        >最后一秒秒退{{ agf.willDodgeAtLastSecond  ? ` (${countdownTime.toFixed(1)} s)` : '' }}</span
+      >
+      <NSwitch
+        size="small"
+        :value="agf.willDodgeAtLastSecond"
+        @update:value="(val) => agfm.setDodgeAtLastSecond(val)"
+      />
     </NFlex>
     <NFlex align="center" v-if="!isBenchMode" class="control-item">
       <span class="label" style="flex: 1">自动选择</span>
@@ -43,7 +53,10 @@
 </template>
 
 <script setup lang="ts">
+import { useCountdown } from '@shared/renderer/compositions/useCountdown'
 import { dodge } from '@shared/renderer/http-api/login'
+import { autoGameflowRendererModule as agfm } from '@shared/renderer/modules/auto-gameflow'
+import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { autoSelectRendererModule as asm } from '@shared/renderer/modules/auto-select'
 import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
@@ -55,6 +68,7 @@ import { computed } from 'vue'
 const gameflow = useGameflowStore()
 const as = useAutoSelectStore()
 const cs = useChampSelectStore()
+const agf = useAutoGameflowStore()
 
 const isBenchMode = computed(() => isBenchEnabledSession(cs.session))
 
@@ -71,6 +85,11 @@ const handleDodge = async () => {
     await dodge()
   } catch (error) {}
 }
+
+const { countdownTime } = useCountdown(
+  () => agf.willDodgeAtLastSecond,
+  () => agf.willDodgeAt
+)
 </script>
 
 <style scoped lang="less">
@@ -87,4 +106,3 @@ const handleDodge = async () => {
   }
 }
 </style>
-@shared/renderer/modules/auto-select@shared/renderer/modules/auto-select/store@shared/renderer/modules/lcu-state-sync/champ-select@shared/renderer/modules/lcu-state-sync/gameflow

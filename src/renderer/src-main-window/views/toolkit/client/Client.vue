@@ -20,8 +20,8 @@
         </ControlItem>
         <ControlItem
           class="control-item-margin"
-          label="关闭游戏客户端进程"
-          label-description="这会导致游戏客户端立刻关闭"
+          label="关闭客户端进程"
+          label-description="关闭 LeagueClient"
           :label-width="320"
         >
           <NButton
@@ -35,12 +35,12 @@
         </ControlItem>
         <ControlItem
           class="control-item-margin"
-          label-description="当游戏客户端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏客户端进程"
+          label-description="当游戏端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏端 (游戏本体) 进程"
           :disabled="!app.isAdministrator"
           :label="
             app.isAdministrator
-              ? '使用 Alt+F4 结束游戏客户端'
-              : '使用 Alt+F4 结束游戏客户端 (需要管理员权限)'
+              ? '使用 Alt+F4 结束游戏端'
+              : '使用 Alt+F4 结束游戏端 (需要管理员权限)'
           "
           :label-width="320"
         >

@@ -2,6 +2,7 @@ import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-m
 import { chatSend } from '@main/http-api/chat'
 import { honor } from '@main/http-api/honor-v2'
 import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
+import { dodge } from '@main/http-api/login'
 import { accept } from '@main/http-api/matchmaking'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { TimeoutTask } from '@main/utils/timer'
@@ -30,12 +31,18 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   private _autoSearchMatchCountdownTimerId: NodeJS.Timeout | null = null
 
   private _playAgainTask = new TimeoutTask(() => this._playAgainFn())
+  private _dodgeTask = new TimeoutTask(() => this._dodgeFn())
 
   static HONOR_CATEGORY = ['COOL', 'SHOTCALLER', 'HEART'] as const
 
   static PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT = 3250
   static PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT = 10000
   static PLAY_AGAIN_BUFFER_TIMEOUT = 1575
+
+  /**
+   * 虽说是一秒，但考虑到服务器延迟，实际上这里用 2 秒
+   */
+  static DODGE_MS_BEFORE_GAME_START = 2000
 
   constructor() {
     super('auto-gameflow')
@@ -58,6 +65,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     this._handleAutoSearchMatch()
     this._handleAutoPlayAgain()
     this._handleLogging()
+    this._handleLastSecondDodge()
 
     this._logger.info('初始化完成')
   }
@@ -68,6 +76,8 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     this.simpleSync('will-search-match', () => this.state.willSearchMatch)
     this.simpleSync('will-search-match-at', () => this.state.willSearchMatchAt)
     this.simpleSync('activity-start-status', () => this.state.activityStartStatus)
+    this.simpleSync('will-dodge-at', () => this.state.willDodgeAt)
+    this.simpleSync('will-dodge-at-last-second', () => this.state.willDodgeAtLastSecond)
   }
 
   private async _setupSettingsSync() {
@@ -155,6 +165,9 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     })
     this.onCall('cancel-auto-search-match', () => {
       this.cancelAutoSearchMatch('normal')
+    })
+    this.onCall('set-dodge-at-last-second', (enabled: boolean) => {
+      this.state.setWillDodgeAtLastSecond(enabled)
     })
   }
 
@@ -275,6 +288,17 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       await playAgain()
     } catch (error) {
       this._logger.warn(`尝试 Play again 时失败 ${formatError(error)}`)
+    }
+  }
+
+  private async _dodgeFn() {
+    try {
+      this._logger.info('Dodge, 秒退')
+      await dodge()
+    } catch (error) {
+      this._logger.warn(`尝试秒退时失败 ${formatError(error)}`)
+    } finally {
+      this.state.setDodgeAt(-1)
     }
   }
 
@@ -557,6 +581,41 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
         }
       },
       { equals: comparer.shallow, fireImmediately: true }
+    )
+  }
+
+  private _adjustDodgeTimer(msLeft: number) {
+    const dodgeIn = Math.max(msLeft - AutoGameflowModule.DODGE_MS_BEFORE_GAME_START, 0)
+    this._logger.info(`时间校正：将在 ${dodgeIn} ms 后秒退`)
+    this._dodgeTask.start(dodgeIn)
+    this.state.setDodgeAt(Date.now() + dodgeIn)
+  }
+
+  private _handleLastSecondDodge() {
+    this.autoDisposeReaction(
+      () => [Boolean(this._lcu.champSelect.session), this.state.willDodgeAtLastSecond] as const,
+      ([hasSession, enabled]) => {
+        if (!hasSession || !enabled) {
+          if (this._dodgeTask.cancel()) {
+            this._logger.info('预定秒退已取消')
+          }
+          this.state.setDodgeAt(-1)
+          this.state.setWillDodgeAtLastSecond(false)
+          return
+        }
+      },
+      { equals: comparer.shallow }
+    )
+
+    this.autoDisposeReaction(
+      () => [this._lcu.champSelect.session?.timer, this.state.willDodgeAtLastSecond] as const,
+      ([timer, enabled]) => {
+        if (timer && enabled) {
+          if (timer.phase === 'FINALIZATION') {
+            this._adjustDodgeTimer(timer.adjustedTimeLeftInPhase)
+          }
+        }
+      }
     )
   }
 }

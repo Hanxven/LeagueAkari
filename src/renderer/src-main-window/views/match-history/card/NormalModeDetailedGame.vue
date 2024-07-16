@@ -392,7 +392,7 @@ table {
       cursor: pointer;
       transition: color 0.3s ease;
       &:hover {
-        color: rgb(167, 167, 255);
+        color: #63e2b7;
       }
     }
   }

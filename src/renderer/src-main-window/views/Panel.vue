@@ -86,11 +86,12 @@ import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import {
   AiStatus as AiStatusIcon,
   AppSwitcher as AppSwitcherIcon,
+  Application as ApplicationIcon,
   Layers as LayersIcon,
+  Settings as SettingsIcon,
   Template as TemplateIcon
 } from '@vicons/carbon'
-import { Application as ApplicationIcon, Settings as SettingsIcon } from '@vicons/carbon'
-import { CubeSharp as CubeSharpIcon } from '@vicons/ionicons5'
+import { CubeSharp as CubeSharpIcon, TicketSharp as TicketSharpIcon } from '@vicons/ionicons5'
 import { useIntervalFn } from '@vueuse/core'
 import { MenuOption, NIcon, NMenu, NPopover, NSpin } from 'naive-ui'
 import {
@@ -161,6 +162,12 @@ const options = ref<MenuOption[]>([
         key: 'toolkit-misc'
       }
     ]
+  },
+  {
+    label: '测试',
+    key: 'test',
+    icon: renderIcon(TicketSharpIcon),
+    show: import.meta.env.DEV
   }
 ])
 

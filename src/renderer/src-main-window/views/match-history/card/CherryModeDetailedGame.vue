@@ -366,7 +366,7 @@ table {
     overflow: hidden;
 
     &:hover {
-      color: rgb(167, 167, 255);
+      color: #63e2b7;
     }
   }
 

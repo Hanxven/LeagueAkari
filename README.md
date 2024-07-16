@@ -48,8 +48,9 @@ Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/H
   - [x] 自定义在线状态
   - [x] 游戏内发送自定义文本
   - [x] 修复客户端窗口大小
-- **计划中**
-  - [ ] 符文设置
+- **外部数据源**
+  - [x] 英雄平衡性信息
+  - [ ] OP.GG
 
 ## 1.2 使用方法
 

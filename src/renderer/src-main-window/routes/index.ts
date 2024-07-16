@@ -73,6 +73,11 @@ const router = createRouter({
               component: () => import('@main-window/views/automation/AutoMisc.vue')
             }
           ]
+        },
+        {
+          name: 'test',
+          path: 'test',
+          component: () => import('@main-window/views/test/Test.vue')
         }
       ]
     }
