@@ -1,5 +1,5 @@
 <template>
-  <div class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper" ref="el">
     <div class="inner-wrapper">
       <NCard size="small">
         <template #header><span class="card-header-title">自动回复</span></template>
@@ -36,21 +36,16 @@
         </ControlItem>
       </NCard>
     </div>
-  </div>
+  </NScrollbar>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { autoReplyRendererModule as arm } from '@shared/renderer/modules/auto-reply'
 import { useAutoReplyStore } from '@shared/renderer/modules/auto-reply/store'
-import { NCard, NInput, NSwitch } from 'naive-ui'
-import { ref } from 'vue'
+import { NCard, NInput, NScrollbar, NSwitch } from 'naive-ui'
 
 const ar = useAutoReplyStore()
-
-const el = ref()
-useKeepAliveScrollPositionMemo(el)
 </script>
 
 <style lang="less" scoped>
@@ -69,7 +64,6 @@ useKeepAliveScrollPositionMemo(el)
   position: relative;
   height: 100%;
   max-width: 100%;
-  overflow: auto;
 }
 
 .inner-wrapper {

@@ -1,5 +1,5 @@
 <template>
-  <div class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper" ref="el">
     <div class="inner-wrapper">
       <NCard size="small">
         <template #header><span class="card-header-title">League Client</span></template>
@@ -156,12 +156,11 @@
         </ControlItem>
       </NCard>
     </div>
-  </div>
+  </NScrollbar>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { quit } from '@shared/renderer/http-api/process-control'
 import { killUx, launchUx, restartUx } from '@shared/renderer/http-api/riotclient'
 import { useAppStore } from '@shared/renderer/modules/app/store'
@@ -169,7 +168,7 @@ import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { leagueClientRendererModule as lcm2 } from '@shared/renderer/modules/league-client'
 import { useLeagueClientStore } from '@shared/renderer/modules/league-client/store'
-import { NButton, NCard, NInputNumber, NSwitch, useDialog } from 'naive-ui'
+import { NButton, NCard, NInputNumber, NScrollbar, NSwitch, useDialog } from 'naive-ui'
 import { ref } from 'vue'
 
 const app = useAppStore()
@@ -264,9 +263,6 @@ const handleFixWindowMethodA = async () => {
     }
   })
 }
-
-const el = ref()
-useKeepAliveScrollPositionMemo(el)
 </script>
 
 <style lang="less" scoped>
@@ -274,7 +270,6 @@ useKeepAliveScrollPositionMemo(el)
   position: relative;
   height: 100%;
   max-width: 100%;
-  overflow: auto;
 }
 
 .inner-wrapper {

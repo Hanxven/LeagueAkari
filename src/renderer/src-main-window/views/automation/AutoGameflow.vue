@@ -1,5 +1,5 @@
 <template>
-  <div class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper" ref="el">
     <div class="inner-wrapper">
       <NCard size="small">
         <template #header><span class="card-header-title">游戏流</span></template>
@@ -170,21 +170,16 @@
         </ControlItem>
       </NCard>
     </div>
-  </div>
+  </NScrollbar>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { autoGameflowRendererModule as am } from '@shared/renderer/modules/auto-gameflow'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
-import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NSwitch } from 'naive-ui'
-import { ref } from 'vue'
-
+import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NSwitch, NScrollbar } from 'naive-ui'
 const agf = useAutoGameflowStore()
 
-const el = ref()
-useKeepAliveScrollPositionMemo(el)
 </script>
 
 <style lang="less" scoped>
@@ -210,7 +205,6 @@ useKeepAliveScrollPositionMemo(el)
   position: relative;
   height: 100%;
   max-width: 100%;
-  overflow: auto;
 }
 
 .inner-wrapper {

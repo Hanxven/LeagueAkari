@@ -26,7 +26,7 @@
         class="champion"
         :title="gameData.champions[c]?.name"
         :class="{
-          'not-pickable':
+          [styles['not-pickable']]:
             gameflow.phase === 'ChampSelect' &&
             (type === 'pick'
               ? !champSelect.currentPickableChampions.has(c)
@@ -269,7 +269,7 @@ const handleDrop = (id: number) => {
 .transfer {
   width: 600px;
   height: 65vh;
-  background-color: rgba(24, 24, 24, 0.95);
+  background-color: rgba(24, 24, 24, 0.98);
 }
 </style>
 

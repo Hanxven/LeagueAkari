@@ -226,10 +226,8 @@ export class AutoSelectState {
 
     let expectedChampions: number[]
     if (a.memberMe.assignedPosition) {
-      // 出于可用性考虑，若存在分路信息，若提供的分路信息不在当前应用的支持范围内，则使用默认列表
-      expectedChampions =
-        this.settings.expectedChampions2[a.memberMe.assignedPosition] ||
-        this.settings.expectedChampions2.default
+      const preset = this.settings.expectedChampions2[a.memberMe.assignedPosition] || []
+      expectedChampions = [...preset, ...this.settings.expectedChampions2.default]
     } else {
       expectedChampions = this.settings.expectedChampions2.default
     }
@@ -301,9 +299,8 @@ export class AutoSelectState {
 
     let bannedChampions: number[]
     if (a.memberMe.assignedPosition) {
-      bannedChampions =
-        this.settings.bannedChampions2[a.memberMe.assignedPosition] ||
-        this.settings.bannedChampions2.default
+      const preset = this.settings.bannedChampions2[a.memberMe.assignedPosition] || []
+      bannedChampions = [...preset, ...this.settings.bannedChampions2.default]
     } else {
       bannedChampions = this.settings.bannedChampions2.default
     }

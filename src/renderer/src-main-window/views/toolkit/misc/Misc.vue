@@ -1,5 +1,5 @@
 <template>
-  <div class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper" ref="el">
     <div class="inner-wrapper">
       <AvailabilityCheck class="tool" v-if="app.settings.isInKyokoMode" />
       <SummonerProfile class="tool" />
@@ -10,13 +10,12 @@
       <GameView class="tool" />
       <CustomKeyboardSequence class="tool" />
     </div>
-  </div>
+  </NScrollbar>
 </template>
 
 <script setup lang="ts">
-import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { useAppStore } from '@shared/renderer/modules/app/store'
-import { ref } from 'vue'
+import { NScrollbar } from 'naive-ui'
 
 import AvailabilityCheck from './AvailabilityCheck.vue'
 import ChatAvailability from './ChatAvailability.vue'
@@ -29,8 +28,6 @@ import SummonerProfile from './SummonerProfile.vue'
 
 const app = useAppStore()
 
-const el = ref()
-useKeepAliveScrollPositionMemo(el)
 </script>
 
 <style lang="less" scoped>
@@ -38,7 +35,6 @@ useKeepAliveScrollPositionMemo(el)
   position: relative;
   height: 100%;
   max-width: 100%;
-  overflow: auto;
 }
 
 .inner-wrapper {

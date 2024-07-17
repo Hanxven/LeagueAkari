@@ -1,21 +1,17 @@
 <template>
-  <div class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper" ref="el">
     <div class="inner-wrapper">
       <ChampionBench class="tool" />
       <GameflowInProcess class="tool" />
     </div>
-  </div>
+  </NScrollbar>
 </template>
 
 <script setup lang="ts">
-import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
-import { ref } from 'vue'
+import { NScrollbar } from 'naive-ui'
 
 import ChampionBench from './ChampionBench.vue'
 import GameflowInProcess from './GameflowInProcess.vue'
-
-const el = ref()
-useKeepAliveScrollPositionMemo(el)
 </script>
 
 <style lang="less" scoped>
@@ -23,7 +19,6 @@ useKeepAliveScrollPositionMemo(el)
   position: relative;
   height: 100%;
   max-width: 100%;
-  overflow: auto;
 }
 
 .inner-wrapper {

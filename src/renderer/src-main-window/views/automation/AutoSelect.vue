@@ -1,5 +1,5 @@
 <template>
-  <div class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper" ref="el">
     <div class="inner-wrapper">
       <NCard size="small">
         <template #header><span class="card-header-title">自动英雄选择 · 普通模式</span></template>
@@ -74,7 +74,10 @@
           <template #labelDescription>
             <div style="margin-bottom: 8px">将根据预设列表选择英雄</div>
             <div style="margin-bottom: 8px">
-              若当前模式不存在分路信息，则按照<span style="font-weight: 700">默认</span>列表进行选择
+              若当前模式<span style="font-weight: 700">不存在分路信息</span>或<span
+                style="font-weight: 700"
+                >当前分路未设置英雄</span
+              >，则按照<span style="font-weight: 700">默认</span>列表进行选择
             </div>
             <div>选择优先级为列表定义顺序，优先选择位置靠前的英雄</div>
           </template>
@@ -237,7 +240,10 @@
           <template #labelDescription>
             <div style="margin-bottom: 8px">将根据预设列表禁用英雄</div>
             <div style="margin-bottom: 8px">
-              若当前模式不存在分路信息，则按照<span style="font-weight: 700">默认</span>列表进行选择
+              若当前模式<span style="font-weight: 700">不存在分路信息</span>或<span
+                style="font-weight: 700"
+                >当前分路未设置英雄</span
+              >，则按照<span style="font-weight: 700">默认</span>列表进行选择
             </div>
             <div>禁用优先级为列表定义顺序，优先禁用位置靠前的英雄</div>
           </template>
@@ -329,16 +335,14 @@
         </ControlItem>
       </NCard>
     </div>
-  </div>
+  </NScrollbar>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
 import { autoSelectRendererModule as asm } from '@shared/renderer/modules/auto-select'
 import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
-import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
-import { ref } from 'vue'
+import { NCard, NInputNumber, NScrollbar, NSwitch, NTooltip } from 'naive-ui'
 
 import OrderedChampionList from '@main-window/components/OrderedChampionListNew.vue'
 
@@ -351,9 +355,6 @@ const completeStrategy = ({ checked }: { checked: boolean }) => {
     return { 'background-color': 'rgb(42,148,125)', 'font-size': '12px' }
   }
 }
-
-const el = ref()
-useKeepAliveScrollPositionMemo(el)
 </script>
 
 <style lang="less" scoped>
@@ -379,7 +380,6 @@ useKeepAliveScrollPositionMemo(el)
   position: relative;
   height: 100%;
   max-width: 100%;
-  overflow: auto;
 }
 
 .inner-wrapper {
