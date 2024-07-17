@@ -51,6 +51,8 @@ Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/H
 - **外部数据源**
   - [x] 英雄平衡性信息
   - [ ] OP.GG
+- **其他功能**
+  - [x] 敬请探索
 
 ## 1.2 使用方法
 

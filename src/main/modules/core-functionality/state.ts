@@ -1,5 +1,6 @@
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { EMPTY_PUUID } from '@shared/constants/common'
+import { PlayerChampionMastery } from '@shared/types/lcu/champion-mastery'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -111,6 +112,11 @@ export interface OngoingPlayer {
    * 用于分析的战绩列表封装
    */
   matchHistory?: MatchHistoryGameWithState[]
+
+  /**
+   * 玩家英雄点数相关信息
+   */
+  championMastery?: PlayerChampionMastery
 
   /**
    * 记录的玩家信息

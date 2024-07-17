@@ -67,7 +67,13 @@ export class SgpApi {
     this._http.defaults.headers.Authorization = `Bearer ${this._jwtToken}`
   }
 
-  getMatchHistory(sgpServerId: string, playerPuuid: string, start: number, count: number) {
+  getMatchHistory(
+    sgpServerId: string,
+    playerPuuid: string,
+    start: number,
+    count: number,
+    tag?: string
+  ) {
     if (!this._jwtToken) {
       throw new Error('jwt token is not set')
     }
@@ -78,8 +84,15 @@ export class SgpApi {
     }
 
     return this._http.get<SgpMatchHistoryLol>(
-      `/match-history-query/v1/products/lol/player/${playerPuuid}/SUMMARY?startIndex=${start}&count=${count}`,
-      { baseURL: platformSgpServer.server }
+      `/match-history-query/v1/products/lol/player/${playerPuuid}/SUMMARY`,
+      {
+        baseURL: platformSgpServer.server,
+        params: {
+          startIndex: start,
+          count,
+          tag
+        }
+      }
     )
   }
 

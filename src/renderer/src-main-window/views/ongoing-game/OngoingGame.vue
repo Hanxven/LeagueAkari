@@ -170,7 +170,7 @@ import { Game } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { NCard, NCheckbox, NFlex, NSpin } from 'naive-ui'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
@@ -178,12 +178,24 @@ import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMatchHistoryCardModal.vue'
 import PlayerInfoCard from './PlayerInfoCard.vue'
 
-const cf = useCoreFunctionalityStore()
 const router = useRouter()
+
+const cf = useCoreFunctionalityStore()
 const gameflow = useGameflowStore()
 const summoner = useSummonerStore()
 
 const app = useAppStore()
+
+// FOR DEBUGGING ONLY
+watchEffect(() => {
+  const value = Object.entries(cf.ongoingPlayers)
+    .filter((p) => Boolean(p[1].championMastery))
+    .map((p) => ({
+      puuid: p[0],
+      mastery: p[1].championMastery
+    }))
+  console.log(value)
+})
 
 const handleToSummoner = (puuid: string) => {
   if (!puuid || puuid === EMPTY_PUUID) {

@@ -296,6 +296,7 @@ table {
 
 .info {
   display: flex;
+  align-items: center;
   gap: 4px;
 }
 

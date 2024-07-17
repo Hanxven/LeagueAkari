@@ -129,7 +129,13 @@ export class SgpEds {
    * @param sgpServerId 目标 SGP 服务器 ID，如果不提供则使用当前登录 LCU 的服务器 ID
    * @returns
    */
-  getMatchHistory(playerPuuid: string, start: number, count: number, sgpServerId?: string) {
+  getMatchHistory(
+    playerPuuid: string,
+    start: number,
+    count: number,
+    tag?: string,
+    sgpServerId?: string
+  ) {
     if (!sgpServerId) {
       const auth = this._lc.state.auth
       if (!auth) {
@@ -144,16 +150,17 @@ export class SgpEds {
       }
     }
 
-    return this._sgp.getMatchHistory(sgpServerId, playerPuuid, start, count)
+    return this._sgp.getMatchHistory(sgpServerId, playerPuuid, start, count, tag)
   }
 
   async getMatchHistoryLcuFormat(
     playerPuuid: string,
     start: number,
     count: number,
+    tag?: string,
     sgpServerId?: string
   ) {
-    const result = await this.getMatchHistory(playerPuuid, start, count, sgpServerId)
+    const result = await this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)
 
     try {
       return this.parseSgpToLcu0Format(result.data, start, count)
@@ -350,8 +357,27 @@ export class SgpEds {
 
     this._edsm.onCall(
       'get-match-history-lcu-format',
-      async (playerPuuid: string, start: number, count: number, sgpServerId?: string) => {
-        return this.getMatchHistoryLcuFormat(playerPuuid, start, count, sgpServerId)
+      async (
+        playerPuuid: string,
+        start: number,
+        count: number,
+        tag?: string,
+        sgpServerId?: string
+      ) => {
+        return this.getMatchHistoryLcuFormat(playerPuuid, start, count, tag, sgpServerId)
+      }
+    )
+
+    this._edsm.onCall(
+      'get-match-history',
+      async (
+        playerPuuid: string,
+        start: number,
+        count: number,
+        tag?: string,
+        sgpServerId?: string
+      ) => {
+        return this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)
       }
     )
   }

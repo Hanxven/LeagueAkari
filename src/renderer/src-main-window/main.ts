@@ -1,3 +1,4 @@
+import '@shared/renderer/assets/mi-sans-font.less'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'

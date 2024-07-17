@@ -1,5 +1,6 @@
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
+import { getPlayerChampionMasteryTopN } from '@main/http-api/champion-mastery'
 import { chatSend } from '@main/http-api/chat'
 import { getGame, getMatchHistory } from '@main/http-api/match-history'
 import { getRankedStats } from '@main/http-api/ranked'
@@ -40,7 +41,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     SUMMONER_INFO: 97,
     MATCH_HISTORY: 89,
     RANKED_STATS: 83,
-    GAME: 79
+    CHAMPION_MASTERY: 79,
+    GAME: 73
   } as const
 
   static SEND_INTERVAL = 65
@@ -927,7 +929,31 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         }
       }
 
-      await Promise.allSettled([_loadSavedInfo(), _loadRankedStats(), _loadMatchHistory()])
+      const _loadChampionMastery = async () => {
+        if (player.championMastery) {
+          return
+        }
+
+        this._logger.info(`加载玩家信息 ChampionMastery: ${puuid}`)
+        const mastery = await this._playerAnalysisFetchLimiter
+          .add(() => getPlayerChampionMasteryTopN(puuid, 3), {
+            signal,
+            priority: CoreFunctionalityModule.FETCH_PRIORITY.CHAMPION_MASTERY
+          })
+          .catch((error) => this._handleAbortError(error))
+
+        if (mastery) {
+          runInAction(() => (player.championMastery = mastery.data))
+          this.sendEvent('update/ongoing-player/champion-mastery', puuid, mastery.data)
+        }
+      }
+
+      await Promise.allSettled([
+        _loadSavedInfo(),
+        _loadRankedStats(),
+        _loadMatchHistory(),
+        _loadChampionMastery()
+      ])
     } catch (error) {
       this._logger.warn(`无法加载召唤师信息, ID: ${puuid} ${formatError(error)}`)
     }

@@ -1,3 +1,4 @@
+import { SgpMatchHistoryLol } from '@shared/external-data-source/sgp/types'
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
 import { MatchHistory } from '@shared/types/lcu/match-history'
 
@@ -19,6 +20,15 @@ class SgpEdsRenderer {
     sgpServerId?: string
   ): Promise<MatchHistory> {
     return this._edsm.call('get-match-history-lcu-format', playerPuuid, start, count, sgpServerId)
+  }
+
+  getMatchHistory(
+    playerPuuid: string,
+    start: number,
+    count: number,
+    sgpServerId?: string
+  ): Promise<SgpMatchHistoryLol> {
+    return this._edsm.call('get-match-history', playerPuuid, start, count, sgpServerId)
   }
 }
 

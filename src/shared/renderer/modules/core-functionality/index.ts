@@ -74,21 +74,27 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
       store.ongoingPlayers[puuid] = { puuid }
     })
 
-    this.onEvent('update/ongoing-player/summoner', (puuid, info) => {
+    this.onEvent('update/ongoing-player/summoner', (puuid, summoner) => {
       if (store.ongoingPlayers[puuid]) {
-        store.ongoingPlayers[puuid].summoner = info
+        store.ongoingPlayers[puuid].summoner = markRaw(summoner)
       }
     })
 
     this.onEvent('update/ongoing-player/saved-info', (puuid, info) => {
       if (store.ongoingPlayers[puuid]) {
-        store.ongoingPlayers[puuid].savedInfo = info
+        store.ongoingPlayers[puuid].savedInfo = markRaw(info)
       }
     })
 
     this.onEvent('update/ongoing-player/ranked-stats', (puuid, ranked) => {
       if (store.ongoingPlayers[puuid]) {
-        store.ongoingPlayers[puuid].rankedStats = ranked
+        store.ongoingPlayers[puuid].rankedStats = markRaw(ranked)
+      }
+    })
+
+    this.onEvent('update/ongoing-player/champion-mastery', (puuid, mastery) => {
+      if (store.ongoingPlayers[puuid]) {
+        store.ongoingPlayers[puuid].championMastery = markRaw(mastery)
       }
     })
 

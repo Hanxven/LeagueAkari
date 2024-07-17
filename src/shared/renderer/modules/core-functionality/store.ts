@@ -1,3 +1,4 @@
+import { PlayerChampionMastery } from '@shared/types/lcu/champion-mastery'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -29,7 +30,7 @@ export interface SavedPlayerInfo {
 }
 
 /**
- * 当前正在进行游戏的玩家的基础信息，类型同主进程定义
+ * copied from 主进程
  */
 export interface OngoingPlayer {
   puuid: string
@@ -48,6 +49,11 @@ export interface OngoingPlayer {
    * 用于分析的战绩列表封装
    */
   matchHistory?: MatchHistoryGameWithState[]
+
+  /**
+   * 玩家英雄点数相关信息
+   */
+  championMastery?: PlayerChampionMastery
 
   /**
    * 记录的玩家信息

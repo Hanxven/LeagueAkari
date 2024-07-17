@@ -270,6 +270,12 @@ export interface MatchHistoryGamesAnalysis {
   magicDamageTakenShareOfTeam: number
   trueDamageTakenShareOfTeam: number
 
+  selfMitigatedShareToTop: number
+  selfMitigatedShareOfTeam: number
+
+  healingShareToTop: number
+  healingShareOfTeam: number
+
   towerDamageShareToTop: number
   towerDamageShareOfTeam: number
 
@@ -430,6 +436,12 @@ export function analyzeMatchHistory(
       towerDamageShareToTop: 0,
       towerDamageShareOfTeam: 0,
 
+      selfMitigatedShareToTop: 0,
+      selfMitigatedShareOfTeam: 0,
+
+      healingShareToTop: 0,
+      healingShareOfTeam: 0,
+
       // KDA 系列
       killParticipationRate: 0,
 
@@ -471,6 +483,10 @@ export function analyzeMatchHistory(
     let totalPhysicalDamageTaken = 0
     let totalMagicDamageTaken = 0
     let totalTrueDamageTaken = 0
+    let maxSelfMitigated = 0
+    let totalSelfMitigated = 0
+    let maxHealing = 0
+    let totalHealing = 0
     let maxTowerDamage = 0
     let totalTowerDamage = 0
     let kills = 0
@@ -531,6 +547,12 @@ export function analyzeMatchHistory(
 
       maxTowerDamage = Math.max(maxTowerDamage, p.stats.damageDealtToTurrets)
       totalTowerDamage += p.stats.damageDealtToTurrets
+
+      maxSelfMitigated = Math.max(maxSelfMitigated, p.stats.damageSelfMitigated)
+      totalSelfMitigated += p.stats.damageSelfMitigated
+
+      maxHealing = Math.max(maxHealing, p.stats.totalHeal)
+      totalHealing += p.stats.totalHeal
 
       kills += p.stats.kills
       deaths += p.stats.deaths
@@ -593,6 +615,14 @@ export function analyzeMatchHistory(
     gameAnalysis.towerDamageShareToTop = watashi.stats.damageDealtToTurrets / (maxTowerDamage || 1)
     gameAnalysis.towerDamageShareOfTeam =
       watashi.stats.damageDealtToTurrets / (totalTowerDamage || 1)
+
+    gameAnalysis.selfMitigatedShareToTop =
+      watashi.stats.damageSelfMitigated / (maxSelfMitigated || 1)
+    gameAnalysis.selfMitigatedShareOfTeam =
+      watashi.stats.damageSelfMitigated / (totalSelfMitigated || 1)
+
+    gameAnalysis.healingShareToTop = watashi.stats.totalHeal / (maxHealing || 1)
+    gameAnalysis.healingShareOfTeam = watashi.stats.totalHeal / (totalHealing || 1)
 
     gameAnalysis.killParticipationRate =
       (watashi.stats.kills + watashi.stats.assists) / (kills || 1)
