@@ -217,6 +217,16 @@ watch(
   { immediate: true }
 )
 
+watch(
+  () => mh.currentTab?.id,
+  (id) => {
+    if (route.params.puuid !== id) {
+      router.replace(`/match-history/${id}`)
+    }
+  },
+  { immediate: true }
+)
+
 const menuProps = reactive({
   x: 0,
   y: 0,

@@ -110,7 +110,7 @@ import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-d
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NPopover, NSelect } from 'naive-ui'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch, watchEffect } from 'vue'
 
 const props = withDefaults(
   defineProps<{

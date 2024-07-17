@@ -66,8 +66,8 @@
         <ControlItem class="control-item-margin" label="意向英雄" v-if="false">
           <OrderedChampionList
             type="pick"
-            :value="as.settings.expectedChampions"
-            @update:value="(list) => asm.setExpectedChampions(list)"
+            :champions="as.settings.expectedChampions"
+            @update:champions="(list) => asm.setExpectedChampions(list)"
           />
         </ControlItem>
         <ControlItem class="control-item-margin" label="意向英雄">
@@ -85,8 +85,8 @@
               </div>
               <OrderedChampionList
                 type="pick"
-                :value="as.settings.expectedChampions2.top"
-                @update:value="
+                :champions="as.settings.expectedChampions2.top"
+                @update:champions="
                   (list) =>
                     asm.setExpectedChampions2({ ...as.settings.expectedChampions2, top: list })
                 "
@@ -98,8 +98,8 @@
               </div>
               <OrderedChampionList
                 type="pick"
-                :value="as.settings.expectedChampions2.middle"
-                @update:value="
+                :champions="as.settings.expectedChampions2.middle"
+                @update:champions="
                   (list) =>
                     asm.setExpectedChampions2({ ...as.settings.expectedChampions2, middle: list })
                 "
@@ -109,8 +109,8 @@
               <div class="label">打野</div>
               <OrderedChampionList
                 type="pick"
-                :value="as.settings.expectedChampions2.jungle"
-                @update:value="
+                :champions="as.settings.expectedChampions2.jungle"
+                @update:champions="
                   (list) =>
                     asm.setExpectedChampions2({ ...as.settings.expectedChampions2, jungle: list })
                 "
@@ -122,8 +122,8 @@
               </div>
               <OrderedChampionList
                 type="pick"
-                :value="as.settings.expectedChampions2.bottom"
-                @update:value="
+                :champions="as.settings.expectedChampions2.bottom"
+                @update:champions="
                   (list) =>
                     asm.setExpectedChampions2({ ...as.settings.expectedChampions2, bottom: list })
                 "
@@ -135,8 +135,8 @@
               </div>
               <OrderedChampionList
                 type="pick"
-                :value="as.settings.expectedChampions2.utility"
-                @update:value="
+                :champions="as.settings.expectedChampions2.utility"
+                @update:champions="
                   (list) =>
                     asm.setExpectedChampions2({ ...as.settings.expectedChampions2, utility: list })
                 "
@@ -148,8 +148,8 @@
               </div>
               <OrderedChampionList
                 type="pick"
-                :value="as.settings.expectedChampions2.default"
-                @update:value="
+                :champions="as.settings.expectedChampions2.default"
+                @update:champions="
                   (list) =>
                     asm.setExpectedChampions2({ ...as.settings.expectedChampions2, default: list })
                 "
@@ -196,8 +196,8 @@
         <ControlItem class="control-item-margin" label="期望英雄">
           <OrderedChampionList
             type="pick"
-            :value="as.settings.benchExpectedChampions"
-            @update:value="(list) => asm.setBenchExpectedChampions(list)"
+            :champions="as.settings.benchExpectedChampions"
+            @update:champions="(list) => asm.setBenchExpectedChampions(list)"
           />
         </ControlItem>
       </NCard>
@@ -227,10 +227,10 @@
         </ControlItem>
         <ControlItem class="control-item-margin" label="意向英雄" v-if="false">
           <OrderedChampionList
-            :value="as.settings.bannedChampions"
+            :champions="as.settings.bannedChampions"
             allow-empty
             type="ban"
-            @update:value="(list) => asm.setBannedChampions(list)"
+            @update:champions="(list) => asm.setBannedChampions(list)"
           />
         </ControlItem>
         <ControlItem class="control-item-margin" label="意向英雄">
@@ -247,11 +247,11 @@
                 上路
               </div>
               <OrderedChampionList
-                type="pick"
-                :value="as.settings.bannedChampions2.top"
-                @update:value="
-                  (list) =>
-                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, top: list })
+                type="ban"
+                allow-empty
+                :champions="as.settings.bannedChampions2.top"
+                @update:champions="
+                  (list) => asm.setBannedChampions2({ ...as.settings.bannedChampions2, top: list })
                 "
               />
             </div>
@@ -260,9 +260,10 @@
                 中路
               </div>
               <OrderedChampionList
-                type="pick"
-                :value="as.settings.bannedChampions2.middle"
-                @update:value="
+                type="ban"
+                allow-empty
+                :champions="as.settings.bannedChampions2.middle"
+                @update:champions="
                   (list) =>
                     asm.setBannedChampions2({ ...as.settings.bannedChampions2, middle: list })
                 "
@@ -273,9 +274,10 @@
                 打野
               </div>
               <OrderedChampionList
-                type="pick"
-                :value="as.settings.bannedChampions2.jungle"
-                @update:value="
+                type="ban"
+                allow-empty
+                :champions="as.settings.bannedChampions2.jungle"
+                @update:champions="
                   (list) =>
                     asm.setBannedChampions2({ ...as.settings.bannedChampions2, jungle: list })
                 "
@@ -286,9 +288,10 @@
                 下路
               </div>
               <OrderedChampionList
-                type="pick"
-                :value="as.settings.bannedChampions2.bottom"
-                @update:value="
+                type="ban"
+                allow-empty
+                :champions="as.settings.bannedChampions2.bottom"
+                @update:champions="
                   (list) =>
                     asm.setBannedChampions2({ ...as.settings.bannedChampions2, bottom: list })
                 "
@@ -299,9 +302,10 @@
                 辅助
               </div>
               <OrderedChampionList
-                type="pick"
-                :value="as.settings.bannedChampions2.utility"
-                @update:value="
+                type="ban"
+                allow-empty
+                :champions="as.settings.bannedChampions2.utility"
+                @update:champions="
                   (list) =>
                     asm.setBannedChampions2({ ...as.settings.bannedChampions2, utility: list })
                 "
@@ -312,9 +316,10 @@
                 默认
               </div>
               <OrderedChampionList
-                type="pick"
-                :value="as.settings.bannedChampions2.default"
-                @update:value="
+                type="ban"
+                allow-empty
+                :champions="as.settings.bannedChampions2.default"
+                @update:champions="
                   (list) =>
                     asm.setBannedChampions2({ ...as.settings.bannedChampions2, default: list })
                 "
@@ -335,7 +340,7 @@ import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
 import { NCard, NInputNumber, NSwitch, NTooltip } from 'naive-ui'
 import { ref } from 'vue'
 
-import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
+import OrderedChampionList from '@main-window/components/OrderedChampionListNew.vue'
 
 const as = useAutoSelectStore()
 
