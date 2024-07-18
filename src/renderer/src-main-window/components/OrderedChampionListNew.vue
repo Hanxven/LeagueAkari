@@ -168,7 +168,8 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
           style: { 'margin-left': 'auto' },
           focusable: false,
           class: styles['move-btn'],
-          onClick: () => moveUp(option.value as number)
+          onClick: () => moveUp(option.value as number),
+          disabled: champions.value.indexOf(option.value as number) === 0
         },
         () => '↑上移'
       ),

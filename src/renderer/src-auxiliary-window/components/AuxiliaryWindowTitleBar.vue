@@ -1,7 +1,6 @@
 <template>
   <div class="title-bar" :class="{ blurred: aw.focusState === 'blurred' }">
     <div style="flex: 1"></div>
-    <div class="title">League Akari</div>
     <div class="traffic">
       <div
         :title="aw.settings.isPinned ? `取消置顶` : `置顶`"

@@ -521,7 +521,7 @@ defineExpose({
     .tagged {
       margin-left: 2px;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: bold;
       color: rgb(0, 179, 255);
       transition: all 0.3s ease;
     }
@@ -529,7 +529,7 @@ defineExpose({
     .untagged {
       margin-left: 2px;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: bold;
       color: rgb(196, 196, 196);
       transition: all 0.3s ease;
     }
@@ -537,7 +537,7 @@ defineExpose({
 
   .summoner-name {
     font-size: 16px;
-    font-weight: 700;
+    font-weight: bold;
   }
 
   .tag-line {
@@ -668,7 +668,7 @@ defineExpose({
 
   .title {
     font-size: 14px;
-    font-weight: 700;
+    font-weight: bold;
   }
 
   .content {

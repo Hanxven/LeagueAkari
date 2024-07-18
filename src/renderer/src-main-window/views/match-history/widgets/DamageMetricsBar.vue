@@ -52,23 +52,23 @@
         "
       >
         <div>
-          <div style="font-size: 11px; font-weight: 700">伤害总计</div>
+          <div style="font-size: 11px; font-weight: bold">伤害总计</div>
           <div>{{ totalDamage.toLocaleString() }}</div>
         </div>
         <div>
-          <div style="font-size: 11px; font-weight: 700">
+          <div style="font-size: 11px; font-weight: bold">
             物理伤害 ({{ ((physicalDamage / (totalDamage || 1)) * 100).toFixed() }} %)
           </div>
           <div>{{ physicalDamage.toLocaleString() }}</div>
         </div>
         <div>
-          <div style="font-size: 11px; font-weight: 700">
+          <div style="font-size: 11px; font-weight: bold">
             魔法伤害 ({{ ((magicDamage / (totalDamage || 1)) * 100).toFixed() }} %)
           </div>
           <div>{{ magicDamage.toLocaleString() }}</div>
         </div>
         <div>
-          <div style="font-size: 11px; font-weight: 700">
+          <div style="font-size: 11px; font-weight: bold">
             真实伤害 ({{ ((trueDamage / (totalDamage || 1)) * 100).toFixed() }} %)
           </div>
           <div>{{ trueDamage.toLocaleString() }}</div>
@@ -150,7 +150,7 @@ const orderedInner = computed(() => {
 }
 
 .best {
-  font-weight: 700;
+  font-weight: bold;
   color: rgb(167, 167, 255);
 }
 

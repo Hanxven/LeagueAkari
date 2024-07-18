@@ -44,19 +44,22 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">战绩获取</span></template>
-      <ControlItem class="control-item-margin" label="战绩源" :label-width="320">
+      <template #header><span class="card-header-title">战绩源</span></template>
+      <ControlItem class="control-item-margin" label="首选战绩源" :label-width="320">
         <template #labelDescription>
-          <div>将从指定的战绩源拉取玩家战绩信息</div>
+          <div>
+            战绩页面以及对局分析模块将首选从指定位置获取战绩信息。使用 SGP API
+            将提供更多的特性支持，当 SGP API 不可用时，将使用 LCU API
+          </div>
           <template v-if="cf.settings.matchHistorySource === 'sgp' && lc.state === 'connected'">
             <div
               v-if="eds.sgpAvailability.currentRegionSupported"
-              style="color: #63e2b7; font-weight: 700"
+              style="color: #63e2b7; font-weight: bold"
             >
               当前 ({{ eds.sgpAvailability.currentRegion }}):
               {{ eds.sgpAvailability.supportedServers[eds.sgpAvailability.currentRegion].server }}
             </div>
-            <div v-else style="color: rgb(209, 170, 124); font-weight: 700">
+            <div v-else style="color: rgb(209, 170, 124); font-weight: bold">
               暂不支持当前服务器使用 SGP 接口: {{ eds.sgpAvailability.currentRegion }}
             </div>
           </template>
@@ -252,16 +255,16 @@
       >
         <template #labelDescription="{ disabled }">
           <div :style="{ filter: disabled ? 'brightness(0.6)' : 'unset' }">
-            <span style="font-weight: 700; color: rgb(0, 179, 195)">PageUp</span> - 发送友方 KDA
-            简报，<span style="font-weight: 700; color: rgb(0, 179, 195)">PageDown</span> - 发送敌方
-            KDA 简报<br />
+            <span style="font-weight: bold; color: rgb(0, 179, 195)">PageUp</span> - 发送友方 KDA
+            简报，<span style="font-weight: bold; color: rgb(0, 179, 195)">PageDown</span> -
+            发送敌方 KDA 简报<br />
             在英雄选择中时，将通过聊天室发送。在游戏进行中时，将通过模拟键盘输入发送<br />
             <span style="font-style: italic">🚩 在游戏中发送时，确保聊天框处于关闭状态</span><br />
             <span style="font-style: italic"
               >🚩 在游戏中发送时，可在发送全程按住 Shift 将消息发送到全局</span
             ><br />
             <span style="font-style: italic"
-              >KDA 分析局数和 <span style="font-weight: 700">对局战绩分析数量</span> 一致。({{
+              >KDA 分析局数和 <span style="font-weight: bold">对局战绩分析数量</span> 一致。({{
                 cf.settings.matchHistoryLoadCount
               }}
               场)</span

@@ -2,17 +2,16 @@
   <NScrollbar class="outer-wrapper" ref="el">
     <div class="inner-wrapper">
       <LobbyTool class="tool" />
+      <StrawberryTool class="tool" />
     </div>
   </NScrollbar>
 </template>
 
 <script setup lang="ts">
-
-
-import LobbyTool from './LobbyTool.vue'
 import { NScrollbar } from 'naive-ui'
 
-
+import LobbyTool from './LobbyTool.vue'
+import StrawberryTool from './StrawberryTool.vue'
 </script>
 
 <style lang="less" scoped>

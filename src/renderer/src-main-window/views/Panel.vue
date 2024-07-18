@@ -377,7 +377,7 @@ const emits = defineEmits<{
 
   .rso {
     font-size: 14px;
-    font-weight: 700;
+    font-weight: bold;
     margin-left: 8px;
   }
 

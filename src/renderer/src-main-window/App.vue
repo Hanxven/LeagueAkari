@@ -139,7 +139,7 @@ useKeyboardCombo(KYOKO_MODE_KEY_SEQUENCE, {
   maxInterval: 500
 })
 
-useKeyboardCombo('LEAGUEAKARI', {
+useKeyboardCombo('AKARI', {
   onFinish: () => {
     notification.success({
       title: 'League Akari',

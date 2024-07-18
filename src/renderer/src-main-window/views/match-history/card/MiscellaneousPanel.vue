@@ -15,7 +15,7 @@
       >
     </div>
     <div v-if="hasBan" class="bans">
-      <span style="margin-right: 12px; font-weight: 700; columns: #fff">禁用：</span>
+      <span style="margin-right: 12px; font-weight: bold; columns: #fff">禁用：</span>
       <div v-for="t of game.teams.filter((a) => a.bans.length)" :key="t.teamId" class="team-bans">
         <span>{{ formatTeam(t.teamId) }}</span>
         <LcuImage
@@ -405,7 +405,7 @@ const tableData = computed(() => {
 
 .meta {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: bold;
   margin-bottom: 4px;
   display: flex;
   gap: 8px;

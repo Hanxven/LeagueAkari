@@ -56,7 +56,7 @@ process.on('uncaughtException', (e) => {
   }
 
   dialog.showErrorBox('未捕获的异常', e.message)
-  app.quit()
+  console.error(e)
 })
 
 process.on('unhandledRejection', (e) => {

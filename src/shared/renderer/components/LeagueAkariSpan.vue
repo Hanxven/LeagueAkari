@@ -17,6 +17,6 @@ defineProps<{
 }
 
 .akari-bold {
-  font-weight: 700;
+  font-weight: bold;
 }
 </style>

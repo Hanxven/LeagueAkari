@@ -384,7 +384,7 @@ table {
 
   .name {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: bold;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -413,7 +413,7 @@ table {
 
   .kda-ratio {
     font-size: 11px;
-    font-weight: 700;
+    font-weight: bold;
   }
 }
 
@@ -433,7 +433,7 @@ table {
   font-size: 11px;
 
   .cs-count {
-    font-weight: 700;
+    font-weight: bold;
   }
 }
 
@@ -457,7 +457,7 @@ table {
 }
 
 .best {
-  font-weight: 700;
+  font-weight: bold;
   color: rgb(167, 167, 255);
 }
 </style>

@@ -27,13 +27,25 @@
     </NModal>
 
     <NCard size="small">
-      <template #header><span class="card-header-title">Electron</span></template>
-      <div class="buttons">
+      <template #header><span class="card-header-title">Akari's Electron</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="开发者工具"
+        label-description="Toggle DevTools"
+        :label-width="320"
+      >
         <NButton size="tiny" secondary type="primary" @click="handleToggleDevtools"
           >Toggle Devtools</NButton
         >
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="页面重载"
+        label-description="刷新 League Akari 用户界面"
+        :label-width="320"
+      >
         <NButton size="tiny" secondary type="primary" @click="handleReload">重新加载界面</NButton>
-      </div>
+      </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">存储</span></template>
@@ -53,7 +65,7 @@
           应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
           <NPopover>
             <template #trigger>
-              <span style="font-weight: 700; color: #fff; cursor: pointer">详情</span>
+              <span style="font-weight: bold; color: #fff; cursor: pointer">详情</span>
             </template>
             <div style="font-size: 12px">该目录下：</div>
             <div style="font-size: 12px">LeagueAkari.db - 存储用户设置、已标记的玩家等信息</div>
@@ -393,6 +405,12 @@ const handleReload = () => {
 
 .text {
   font-size: 13px;
+}
+
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
 }
 </style>
 

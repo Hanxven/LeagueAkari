@@ -731,7 +731,7 @@ const handleToSummoner = (puuid: string) => {
 
     .name.self {
       cursor: default;
-      font-weight: 700;
+      font-weight: bold;
       color: white;
     }
   }

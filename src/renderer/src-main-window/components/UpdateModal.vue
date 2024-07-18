@@ -83,7 +83,7 @@ const props = defineProps<{
   h3,
   h4,
   h5 {
-    font-weight: 700;
+    font-weight: bold;
 
     &::before {
       content: '⭐';

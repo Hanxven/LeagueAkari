@@ -117,7 +117,7 @@ const formatRarity = (r: string) => {
   .right-side {
     margin-left: 8px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: bold;
   }
 }
 

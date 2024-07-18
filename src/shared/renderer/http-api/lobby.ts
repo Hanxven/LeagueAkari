@@ -146,3 +146,11 @@ export function deleteLobby() {
     method: 'DELETE'
   })
 }
+
+export function setPlayerSlotsStrawberry1(championId: number) {
+  return request({
+    method: 'PUT',
+    url: '/lol-lobby/v1/lobby/members/localMember/player-slots',
+    data: [{ championId, positionPreference: 'UNSELECTED', spell1: 1, spell2: 1 }]
+  })
+}

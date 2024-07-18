@@ -74,10 +74,10 @@
           <template #labelDescription>
             <div style="margin-bottom: 8px">将根据预设列表选择英雄</div>
             <div style="margin-bottom: 8px">
-              若当前模式<span style="font-weight: 700">不存在分路信息</span>或<span
-                style="font-weight: 700"
+              若当前模式<span style="font-weight: bold">不存在分路信息</span>或<span
+                style="font-weight: bold"
                 >当前分路未设置英雄</span
-              >，则按照<span style="font-weight: 700">默认</span>列表进行选择
+              >，则按照<span style="font-weight: bold">默认</span>列表进行选择
             </div>
             <div>选择优先级为列表定义顺序，优先选择位置靠前的英雄</div>
           </template>
@@ -179,7 +179,7 @@
             目标英雄出现在英雄选择台上的累计时间需达到此值才会执行交换操作，单位为秒
             <NTooltip>
               <template #trigger
-                ><span style="text-decoration: underline; font-weight: 700">(?)</span></template
+                ><span style="text-decoration: underline; font-weight: bold">(?)</span></template
               >
               <div style="font-size: 12px; max-width: 300px">
                 当英雄出现在英雄选择台上时，会针对该英雄进行计时。仅当其在英雄选择台上的累计时间满足设定值时，自动交换才会执行，避免过早选择英雄，即
@@ -240,10 +240,10 @@
           <template #labelDescription>
             <div style="margin-bottom: 8px">将根据预设列表禁用英雄</div>
             <div style="margin-bottom: 8px">
-              若当前模式<span style="font-weight: 700">不存在分路信息</span>或<span
-                style="font-weight: 700"
+              若当前模式<span style="font-weight: bold">不存在分路信息</span>或<span
+                style="font-weight: bold"
                 >当前分路未设置英雄</span
-              >，则按照<span style="font-weight: 700">默认</span>列表进行选择
+              >，则按照<span style="font-weight: bold">默认</span>列表进行选择
             </div>
             <div>禁用优先级为列表定义顺序，优先禁用位置靠前的英雄</div>
           </template>
@@ -406,7 +406,7 @@ const completeStrategy = ({ checked }: { checked: boolean }) => {
   .label {
     margin-right: 12px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: bold;
   }
 
   .label.current {

@@ -113,7 +113,7 @@ const handleToSummoner = () => {
 
   .highlight {
     color: #fff;
-    font-weight: 700;
+    font-weight: bold;
   }
 
   .privacy-private {
@@ -136,7 +136,7 @@ const handleToSummoner = () => {
 .name {
   margin-left: 8px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: bold;
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;

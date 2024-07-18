@@ -98,7 +98,7 @@ const gameData = useGameDataStore()
     .name {
       font-size: 12px;
       line-height: 12px;
-      font-weight: 700;
+      font-weight: bold;
       margin-bottom: 2px;
     }
 

@@ -249,7 +249,7 @@ const formatMatchmakingSearchText = (search: GetSearch) => {
 
 .main-text {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: bold;
   margin-bottom: 8px;
 }
 
@@ -259,7 +259,7 @@ const formatMatchmakingSearchText = (search: GetSearch) => {
   overflow: hidden;
   white-space: nowrap;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: bold;
   margin-bottom: 8px;
   max-width: 280px;
 }

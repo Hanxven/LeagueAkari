@@ -403,7 +403,7 @@ useKeepAliveScrollPositionMemo(el)
 
     .team-side {
       font-size: 12px;
-      font-weight: 700;
+      font-weight: bold;
       color: rgb(203, 203, 203);
     }
 

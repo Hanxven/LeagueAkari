@@ -359,7 +359,7 @@ table {
 
   .name {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: bold;
     cursor: pointer;
     transition: color 0.3s ease;
     text-overflow: ellipsis;
@@ -419,7 +419,7 @@ table {
 
   .kda-ratio {
     font-size: 11px;
-    font-weight: 700;
+    font-weight: bold;
   }
 }
 

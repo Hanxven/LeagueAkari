@@ -487,7 +487,7 @@ const autoUpdateTaskShow = useCompleteVisibility(autoUpdateTaskEl, titleBarItems
 }
 
 .close-confirmation-header {
-  font-weight: 700;
+  font-weight: bold;
   font-size: 16px;
 }
 </style>

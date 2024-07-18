@@ -41,7 +41,7 @@ const slots = useSlots()
 
   .label {
     font-size: 14px;
-    font-weight: 700;
+    font-weight: bold;
     color: #fff;
     transition: color 0.3s ease;
   }
