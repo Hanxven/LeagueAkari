@@ -7,7 +7,7 @@
         >区服:
         {{
           rsoPlatformText[game.platformId]
-            ? `${rsoPlatformText[game.platformId]} (${game.platformId})`
+            ? `${rsoPlatformText[game.platformId]} (${game.platformId}) (TENCENT)`
             : regionText[game.platformId]
               ? `${regionText[game.platformId]} (${game.platformId})`
               : game.platformId

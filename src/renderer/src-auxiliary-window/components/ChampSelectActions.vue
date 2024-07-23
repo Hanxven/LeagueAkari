@@ -43,13 +43,11 @@ import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { Action } from '@shared/types/lcu/champ-select'
 import { NCard, NTimeline, NTimelineItem } from 'naive-ui'
 import { computed } from 'vue'
 
 const cs = useChampSelectStore()
-const summoner = useSummonerStore()
 const as = useAutoSelectStore()
 
 const selfActions = computed(() => {
@@ -62,7 +60,7 @@ const selfActions = computed(() => {
     return
   }
 
-  const memberMe = cs.session.myTeam.find((p) => p.puuid === summoner.me?.puuid)
+  const memberMe = as.memberMe
 
   if (!memberMe) {
     return null

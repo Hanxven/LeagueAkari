@@ -1,6 +1,6 @@
 {
   "name": "league-akari",
-  "version": "1.2.3-rabi.6",
+  "version": "1.2.3-rabi.7",
   "author": {
     "name": "Hanxven",
     "email": "hanxven@gmail.com"
@@ -71,6 +71,7 @@
     "prettier": "^3.3.2",
     "semver": "^7.6.2",
     "typescript": "^5.5.3",
+    "vfonts": "^0.0.3",
     "vite": "^5.3.3",
     "vue": "^3.4.31",
     "vue-chartjs": "^5.3.1",

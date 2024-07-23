@@ -24,7 +24,7 @@
             v-for="p of participants"
             :key="p.identity.player.puuid"
           >
-            <td style="min-width: 180px">
+            <td style="min-width: 100px">
               <div class="info">
                 <div class="champion">
                   <LcuImage class="champion-icon" :src="championIcon(p.championId)" />
@@ -64,7 +64,7 @@
                 </div>
               </div>
             </td>
-            <td style="width: 100px">
+            <td style="width: 92px">
               <div class="kda">
                 <div class="kda-text">
                   {{ p.stats.kills }}/{{ p.stats.deaths }}/{{ p.stats.assists }} ({{
@@ -80,7 +80,7 @@
                 </div>
               </div>
             </td>
-            <td style="width: 150px">
+            <td style="width: 124px">
               <div class="damage">
                 <DamageMetricsBar
                   :baseline-damage="match.recordStats.maxTotalDamageDealtToChampions"
@@ -127,7 +127,7 @@
                 </div>
               </div>
             </td>
-            <td class="cell-gold" style="width: 60px">
+            <td class="cell-gold" style="width: 50px">
               <div
                 class="gold"
                 :title="p.stats.goldEarned.toString()"
@@ -140,7 +140,7 @@
                 {{ (p.stats.goldEarned / 1e3).toFixed(2) }} K
               </div>
             </td>
-            <td style="width: 164px">
+            <td style="width: 162px">
               <div class="items">
                 <ItemDisplay :size="20" :item-id="p.stats.item0" />
                 <ItemDisplay :size="20" :item-id="p.stats.item1" />
@@ -279,6 +279,7 @@ const handleToSummoner = (puuid: string) => {
   background-color: rgb(45, 45, 45);
   border-radius: 4px;
   overflow: hidden;
+  width: 740px;
   container: detailed-card / inline-size;
 }
 

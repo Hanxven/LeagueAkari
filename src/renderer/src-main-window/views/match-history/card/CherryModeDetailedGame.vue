@@ -23,7 +23,7 @@
             v-for="p of participants"
             :key="p.identity.player.puuid"
           >
-            <td style="min-width: 180px">
+            <td style="min-width: 100px">
               <div class="info">
                 <div class="champion">
                   <LcuImage class="champion-icon" :src="championIcon(p.championId)" />
@@ -55,15 +55,15 @@
                 </div>
               </div>
             </td>
-            <td style="width: 110px">
+            <td style="width: 92px">
               <div class="augments">
-                <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment1" />
-                <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment2" />
-                <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment3" />
-                <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment4" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment1" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment2" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment3" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment4" />
               </div>
             </td>
-            <td style="width: 100px">
+            <td style="width: 96px">
               <div class="kda">
                 <div class="kda-text">
                   {{ p.stats.kills }}/{{ p.stats.deaths }}/{{ p.stats.assists }} ({{
@@ -79,7 +79,7 @@
                 </div>
               </div>
             </td>
-            <td style="width: 140px">
+            <td style="width: 128px">
               <div class="damage">
                 <DamageMetricsBar
                   :baseline-damage="match.recordStats.maxTotalDamageDealtToChampions"
@@ -97,12 +97,12 @@
                 />
               </div>
             </td>
-            <td class="cell-gold" style="width: 76px">
+            <td class="cell-gold" style="width: 50px">
               <div class="gold" :title="p.stats.goldEarned.toLocaleString()">
                 {{ (p.stats.goldEarned / 1e3).toFixed(2) }} K
               </div>
             </td>
-            <td style="width: 180px">
+            <td style="width: 162px">
               <div class="items">
                 <ItemDisplay :size="20" :item-id="p.stats.item0" />
                 <ItemDisplay :size="20" :item-id="p.stats.item1" />
@@ -255,6 +255,7 @@ const handleToSummoner = (puuid: string) => {
 .detailed-game-card {
   background-color: rgb(45, 45, 45);
   border-radius: 4px;
+  width: 740px;
   overflow: hidden;
 }
 

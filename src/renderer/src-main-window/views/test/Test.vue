@@ -1,5 +1,4 @@
 <template>
-  <MatchHistoryTabNew />
 </template>
 
 <script lang="ts" setup>

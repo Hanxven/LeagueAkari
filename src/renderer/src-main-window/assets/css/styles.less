@@ -42,20 +42,6 @@ body,
 }
 
 body {
-  font-family:
-    'MiSans',
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif,
-    'Apple Color Emoji',
-    'Segoe UI Emoji',
-    'Segoe UI Symbol';
-  font-weight: normal;
-}
-
-body {
   // 防止一些使用绝对布局的元素溢出，产生多余的滚动条
   overflow: hidden;
 }
@@ -114,4 +100,35 @@ a:visited {
 
 .n-message {
   background-color: #2c2c2c;
+}
+
+.n-popover-shared.popover-transition-enter-from,
+.n-popover-shared.popover-transition-leave-to {
+  transform: none;
+}
+
+.n-popover-shared.popover-transition-enter-to,
+.n-popover-shared.popover-transition-leave-from {
+  transform: none;
+}
+
+// 当前无需覆盖
+// .n-popover-shared.popover-transition-enter-active {
+//   transition:
+//     box-shadow 0.3s var(--n-bezier),
+//     background-color 0.3s var(--n-bezier),
+//     color 0.3s var(--n-bezier),
+//     opacity 0.15s var(--n-bezier-ease-out);
+// }
+
+.n-modal.fade-in-scale-up-transition-enter-from,
+.n-modal.fade-in-scale-up-transition-leave-to {
+  opacity: 0;
+  transform: none;
+}
+
+.n-modal.fade-in-scale-up-transition-leave-from,
+.n-modal.fade-in-scale-up-transition-enter-to {
+  opacity: 1;
+  transform: none;
 }

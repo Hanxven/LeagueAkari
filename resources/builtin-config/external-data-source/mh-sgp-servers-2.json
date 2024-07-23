@@ -1,0 +1,67 @@
+{
+  "servers": {
+    "HN1": {
+      "name": "艾欧尼亚",
+      "server": "https://hn1-k8s-sgp.lol.qq.com:21019"
+    },
+    "HN10": {
+      "name": "黑色玫瑰",
+      "server": "https://hn10-k8s-sgp.lol.qq.com:21019"
+    },
+    "TJ100": {
+      "name": "服务器TJ100",
+      "server": "https://tj100-sgp.lol.qq.com:21019"
+    },
+    "TJ101": {
+      "name": "服务器TJ101",
+      "server": "https://tj101-sgp.lol.qq.com:21019"
+    },
+    "NJ100": {
+      "name": "服务器NJ100",
+      "server": "https://nj100-sgp.lol.qq.com:21019"
+    },
+    "GZ100": {
+      "name": "服务器GZ100",
+      "server": "https://gz100-sgp.lol.qq.com:21019"
+    },
+    "CQ100": {
+      "name": "服务器CQ100",
+      "server": "https://cq100-sgp.lol.qq.com:21019"
+    },
+    "BGP2": {
+      "name": "峡谷之巅",
+      "server": "https://bgp2-k8s-sgp.lol.qq.com:21019"
+    },
+    "TW2": {
+      "name": "台湾",
+      "server": "https://apse1-red.pp.sgp.pvp.net"
+    },
+    "SG2": {
+      "name": "新加坡",
+      "server": "https://apse1-red.pp.sgp.pvp.net"
+    },
+    "PBE": {
+      "name": "PBE",
+      "server": "https://usw2-red.pp.sgp.pvp.net"
+    }
+  },
+  "groups": [
+    [
+      "HN1",
+      "HN10",
+      "TJ100",
+      "TJ101",
+      "NJ100",
+      "GZ100",
+      "CQ100",
+      "BGP2"
+    ],
+    [
+      "TW2",
+      "SG2"
+    ],
+    [
+      "PBE"
+    ]
+  ]
+}

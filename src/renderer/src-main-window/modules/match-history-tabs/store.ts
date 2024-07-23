@@ -3,6 +3,7 @@ import { SavedPlayerInfo } from '@shared/renderer/modules/core-functionality/sto
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { GameRelationship, MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
 
@@ -35,16 +36,10 @@ export interface SummonerTabMatchHistory {
   games: MatchHistoryGameTabCard[]
 
   /** 用于按照 ID 快速查找 */
-  gamesMap: Record<number, MatchHistoryGameTabCard>
+  _gamesMap: Record<number, MatchHistoryGameTabCard>
 
   /** 上次拉取战绩的时间 */
   lastUpdate?: number
-
-  /** 请求的战绩是否为空，区分未加载和加载为空的情况 */
-  isEmpty: boolean
-
-  /** 是否请求出错 */
-  hasError: boolean
 
   /** 第几页，from 1 to Infinity */
   page: number
@@ -53,11 +48,18 @@ export interface SummonerTabMatchHistory {
   pageSize: number
 
   queueFilter: number | string
+
+  analysis: MatchHistoryGamesAnalysisAll | null
+
+  playerRelationship: Record<string, GameRelationship>
 }
 
 export interface TabState {
   /** 页面的 puuid */
   puuid: string
+
+  /** 该玩家数据来源自哪个大区 */
+  platformId: string
 
   /** 召唤师信息需要加载 */
   summoner?: SummonerInfo
@@ -77,14 +79,6 @@ export interface TabState {
     isLoadingSummoner: boolean
     isLoadingMatchHistory: boolean
     isLoadingRankedStats: boolean
-  }
-
-  /**
-   * 记录页面的滚动位置
-   */
-  scrollPosition: {
-    x: number
-    y: number
   }
 }
 /** 和战绩相关的一切基础功能 store */
@@ -107,18 +101,6 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
     tabs
   } = useTabs<TabState>()
 
-  const isLoadingTab = (puuid: string) => {
-    const tab = get(puuid)
-    if (tab) {
-      return (
-        tab.data.loading.isLoadingMatchHistory ||
-        tab.data.loading.isLoadingRankedStats ||
-        tab.data.loading.isLoadingSummoner
-      )
-    }
-    return false
-  }
-
   /** 创建一个新的 Tab 并自动进行初始化操作 */
   const createTab = (
     puuid: string,
@@ -132,29 +114,26 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
       return
     }
 
-    const newTab = {
+    const newTab: TabState = {
       puuid,
+      platformId: '',
       matchHistory: {
         games: [],
-        gamesMap: {},
+        _gamesMap: {},
         page: 1,
         pageSize: 20,
-        isEmpty: false,
-        hasError: false,
         lastUpdate: Date.now(),
-        queueFilter: -1
+        queueFilter: -1,
+        analysis: null,
+        playerRelationship: {}
       },
       detailedGamesCache: markRaw(new Map()),
       loading: {
         isLoadingSummoner: false,
         isLoadingMatchHistory: false,
         isLoadingRankedStats: false
-      },
-      scrollPosition: {
-        x: 0,
-        y: 0
       }
-    } as TabState
+    }
 
     add(puuid, newTab, options)
 
@@ -163,23 +142,11 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
     }
   }
 
-  const setTabScrollPosition = (puuid: string, x: number, y: number) => {
-    const tab = get(puuid)
-    if (tab) {
-      tab.data.scrollPosition = {
-        x,
-        y
-      }
-      return true
-    }
-    return false
-  }
-
   const setMatchHistoryExpand = (puuid: string, gameId: number, expand: boolean) => {
     const tab = get(puuid)
 
     if (tab) {
-      const match = tab.data.matchHistory.gamesMap[gameId]
+      const match = tab.data.matchHistory._gamesMap[gameId]
       if (match) {
         match.isExpanded = expand
       }
@@ -210,9 +177,6 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
     closeAllTemporaryTabs: closeAllTemporary,
     closeAllTabs: closeAll,
     setQueueFilter,
-
-    isLoading: isLoadingTab,
-    setMatchHistoryExpand,
-    setScrollPosition: setTabScrollPosition
+    setMatchHistoryExpand
   }
 })

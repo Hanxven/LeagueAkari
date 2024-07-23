@@ -45,8 +45,4 @@ const themeOverrides: GlobalThemeOverrides = {
 }
 </script>
 
-<style>
-#g {
-  color: #313131fa;
-}
-</style>
+<style></style>

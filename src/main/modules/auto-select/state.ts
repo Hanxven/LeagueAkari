@@ -232,12 +232,8 @@ export class AutoSelectState {
       expectedChampions = this.settings.expectedChampions2.default
     }
 
-    // 现在可选的英雄，排除不可选的和服务器当前允许选择的 (受制于热禁用等)
-    // DEBUG PBE 模式整活，仅限 Kyoko 模式
     const pickables = expectedChampions.filter(
-      (c) =>
-        !unpickables.has(c) &&
-        ((appModule.state.settings.isInKyokoMode && c >= 3000) || a.currentPickables.has(c))
+      (c) => !unpickables.has(c) && a.currentPickables.has(c)
     )
 
     if (!pickables.length) {

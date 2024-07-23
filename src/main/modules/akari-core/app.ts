@@ -301,9 +301,13 @@ export class AppModule extends MobxBasedBasicModule {
     const nodeStream = Readable.from({
       async *[Symbol.asyncIterator]() {
         while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          yield value
+          try {
+            const { done, value } = await reader.read()
+            if (done) break
+            yield value
+          } catch {
+            break
+          }
         }
       }
     })

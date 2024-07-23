@@ -97,34 +97,12 @@
       />
     </div>
     <div class="content">
-      <div class="fab reload" v-if="mh.currentTab">
-        <NButton
-          title="重新拉取数据"
-          :loading="
-            mh.currentTab.data.loading.isLoadingMatchHistory ||
-            mh.currentTab.data.loading.isLoadingSummoner ||
-            mh.currentTab.data.loading.isLoadingRankedStats
-          "
-          @click="() => handleRefresh(mh.currentTab!.id)"
-          circle
-          type="primary"
-          ><template #icon
-            ><NIcon><RefreshIcon /></NIcon></template
-        ></NButton>
-      </div>
-      <div class="fab back-to-up" v-if="mh.currentTab">
-        <NButton title="回到顶部" circle type="primary" @click="handleBackToTop"
-          ><template #icon
-            ><NIcon><ArrowUpIcon /></NIcon></template
-        ></NButton>
-      </div>
       <template v-if="mh.currentTab">
-        <MatchHistoryTab
+        <MatchHistoryTabNew
           v-for="t of mh.tabs"
           :key="t.id"
           v-show="t.id === mh.currentTab.id"
-          ref="innerComps"
-          :is-self-tab="mh.currentTab.id === summoner.me?.puuid"
+          :is-self="mh.currentTab.id === summoner.me?.puuid"
           :tab="t.data as TabState"
         />
       </template>
@@ -153,7 +131,6 @@ import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summon
 import { laNotification } from '@shared/renderer/notification'
 import { summonerName } from '@shared/utils/name'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
-import { ArrowUp as ArrowUpIcon, Refresh as RefreshIcon } from '@vicons/ionicons5'
 import { NButton, NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -163,6 +140,7 @@ import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/matc
 import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
+import MatchHistoryTabNew from './MatchHistoryTabNew.vue'
 
 const mh = useMatchHistoryTabsStore()
 const lc = useLcuConnectionStore()
@@ -375,13 +353,13 @@ const handleBackToTop = () => {
     border-right: none;
     border-top: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.09);
-    background-color: rgb(60, 60, 60);
-    color: rgb(200, 200, 200);
+    background-color: rgb(46, 46, 46);
+    color:  rgb(99, 226, 183);
     cursor: pointer;
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: rgb(83, 83, 83);
+      background-color: rgb(67, 67, 67);
     }
   }
 }
@@ -390,37 +368,6 @@ const handleBackToTop = () => {
   position: relative;
   flex: 1;
   height: 0;
-
-  .fab {
-    position: absolute;
-    z-index: 1500;
-    opacity: 0.6;
-    transition:
-      opacity 0.2s ease,
-      box-shadow 0.2s ease;
-    overflow: hidden;
-    border-radius: 50%;
-    box-shadow: 0 0 12px 0 rgba(84, 84, 84, 0.35);
-
-    &:hover {
-      opacity: 1;
-      box-shadow: 0 0 24px 0 rgb(84, 84, 84, 0.5);
-    }
-
-    .n-button {
-      vertical-align: bottom;
-    }
-  }
-
-  .fab.reload {
-    bottom: 48px;
-    right: 24px;
-  }
-
-  .fab.back-to-up {
-    bottom: 96px;
-    right: 24px;
-  }
 }
 
 .tab {

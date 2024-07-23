@@ -108,8 +108,8 @@
                 "
               />
             </div>
-            <div class="group" :class="{ current: as.memberMe?.assignedPosition === 'jungle' }">
-              <div class="label">打野</div>
+            <div class="group">
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'jungle' }">打野</div>
               <OrderedChampionList
                 type="pick"
                 :champions="as.settings.expectedChampions2.jungle"

@@ -531,3 +531,232 @@ export interface Augment {
   augmentSmallIconPath: string
   rarity: string
 }
+
+export interface StrawberryHub {
+  AllowedChampions: StAllowedChampions
+  MapDisplayInfoList: MapDisplayInfoList[]
+  ProgressGroups: ProgressGroup[]
+  PowerUpGroups: PowerUpGroup[]
+  EoGNarrativeBarks: EoGNarrativeBark[]
+}
+
+interface EoGNarrativeBark {
+  id: string
+  o: number
+  value: EoGNarrativeBarkValue
+}
+
+interface EoGNarrativeBarkValue {
+  RewardGroup: RewardGroup
+  Title: string
+  SubHeader: string
+  Content: string
+  DetailTextLine1: string
+  DetailTextLine2: string
+  DetailTextLine3: string
+  Image: string
+  IconImage: string
+  IsPrimordian: boolean
+}
+
+interface RewardGroup {
+  Id: string
+  Name: string
+  Description: string
+  RewardStrategy: string
+  SelectionStrategyConfig: SelectionStrategyConfig2
+  Rewards: RewardGroupReward[]
+}
+
+interface RewardGroupReward {
+  Title: string
+  Details: string
+  Media: Media | Media | null
+  ItemId: string
+  ItemType?: string
+}
+
+interface PowerUpGroup {
+  id: string
+  o: number
+  value: PowerUpGroupValue
+}
+
+interface PowerUpGroupValue {
+  Name: string
+  Description: string
+  IconImage: string
+  Boons: Boon[]
+  PrerequisiteBoon: PrerequisiteBoon | null
+}
+
+interface Boon {
+  id: string
+  o: number
+  value: PrerequisiteBoon
+}
+
+interface ProgressGroup {
+  id: string
+  o: number
+  value: ProgressGroupValue
+}
+
+interface ProgressGroupValue {
+  Name: string
+  IconImage: string
+  Milestones: Milestone[]
+  PrerequisiteBoon: PrerequisiteBoon | null
+}
+
+interface PrerequisiteBoon {
+  ContentId: string
+  OfferId: string
+  ItemId: number
+  OfferPrice: number
+  ShortValueSummary: string
+}
+
+interface Milestone {
+  id: string
+  o: number
+  value: MilestoneValue
+}
+
+interface MilestoneValue {
+  Id: string
+  Name: string
+  TriggerValue: number
+  Properties: Property[]
+  Counter: Counter
+}
+
+interface Counter {
+  Id: string
+  Name: string
+}
+
+interface Property {
+  Id: string
+  Name: string
+  Description: string
+  RewardStrategy: string
+  SelectionStrategyConfig: SelectionStrategyConfig2
+  Rewards: PropertyReward[]
+}
+
+interface PropertyReward {
+  Title?: string
+  Details?: string
+  Media?: Media
+  ItemId?: string
+  ItemType?: string
+  LootReward?: LootReward
+}
+
+interface LootReward {
+  Id: string
+  LocalizedTitle: string
+  LocalizedDetails: string
+  RewardType: string
+  Quantity: number
+  Media: Media
+  LootItemToGrant: null
+  LegacyLootItem: string
+}
+
+interface Media {
+  IconPath: IconPath
+}
+
+interface IconPath {
+  Image: string
+  SplashImage: string
+}
+
+interface SelectionStrategyConfig2 {
+  SelectionStrategyConfig: SelectionStrategyConfig
+}
+
+interface SelectionStrategyConfig {
+  MinSelectionsAllowed: number
+  MaxSelectionsAllowed: number
+}
+
+interface MapDisplayInfoList {
+  id: string
+  o: number
+  value: MapDisplayInfoListValue
+}
+
+interface MapDisplayInfoListValue {
+  Name: string
+  Bark: string
+  BarkImage: string
+  Map: StMap
+  CompletedMapBoon: null
+}
+
+interface StMap {
+  DisplayName: string
+  ContentId: string
+  OfferId: string
+  ItemId: number
+}
+
+interface StAllowedChampions {
+  champions: StAllowedChampions[]
+}
+
+interface StAllowedChampions {
+  id: string
+  o: number
+  value: ChampionValue
+}
+
+interface ChampionValue {
+  ContentId: string
+  OfferId: string
+  ItemId: number
+}
+
+
+export interface AccountScopeLoadouts {
+  id: string;
+  itemId: null;
+  loadout: Loadout;
+  name: string;
+  refreshTime: string;
+  scope: string;
+}
+
+interface Loadout {
+  COMPANION_SLOT: COMPANIONSLOT;
+  EMOTES_ACE: COMPANIONSLOT;
+  EMOTES_FIRST_BLOOD: COMPANIONSLOT;
+  EMOTES_START: COMPANIONSLOT;
+  EMOTES_VICTORY: COMPANIONSLOT;
+  EMOTES_WHEEL_CENTER: COMPANIONSLOT;
+  EMOTES_WHEEL_LEFT: COMPANIONSLOT;
+  EMOTES_WHEEL_LOWER: COMPANIONSLOT;
+  EMOTES_WHEEL_LOWER_LEFT: COMPANIONSLOT;
+  EMOTES_WHEEL_LOWER_RIGHT: COMPANIONSLOT;
+  EMOTES_WHEEL_RIGHT: COMPANIONSLOT;
+  EMOTES_WHEEL_UPPER: COMPANIONSLOT;
+  EMOTES_WHEEL_UPPER_LEFT: COMPANIONSLOT;
+  EMOTES_WHEEL_UPPER_RIGHT: COMPANIONSLOT;
+  REGALIA_BANNER_SLOT: COMPANIONSLOT;
+  REGALIA_CREST_SLOT: COMPANIONSLOT;
+  STRAWBERRY_DIFFICULTY: COMPANIONSLOT;
+  STRAWBERRY_MAP_SLOT: COMPANIONSLOT;
+  TFT_MAP_SKIN_SLOT: COMPANIONSLOT;
+  TFT_PLAYBOOK_SLOT: COMPANIONSLOT;
+  TOURNAMENT_TROPHY: COMPANIONSLOT;
+  WARD_SKIN_SLOT: COMPANIONSLOT;
+}
+
+interface COMPANIONSLOT {
+  contentId: string;
+  inventoryType: string;
+  itemId: number;
+}

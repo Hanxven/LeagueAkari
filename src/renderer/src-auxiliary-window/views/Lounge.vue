@@ -204,9 +204,15 @@ const formatMapModeText = () => {
   return `${gameModeName} · ${mapName}`
 }
 
+const formatNumber = (num: number, precision = 1) => {
+  let formatted = num.toFixed(precision)
+  formatted = formatted.replace(/(\.\d*?)0+$/, '$1')
+  return formatted.replace(/\.$/, '')
+}
+
 const formatMatchmakingSearchText = (search: GetSearch) => {
   if (search.lowPriorityData && search.lowPriorityData.penaltyTime) {
-    return `等待 ${search.lowPriorityData.penaltyTimeRemaining} s (${search.lowPriorityData.penaltyTime} s) `
+    return `等待 ${formatNumber(search.lowPriorityData.penaltyTimeRemaining)} s (${formatNumber(search.lowPriorityData.penaltyTime)} s) `
   }
 
   if (agf.settings.autoSearchMatchRematchStrategy === 'fixed-duration') {

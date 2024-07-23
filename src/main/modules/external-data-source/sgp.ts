@@ -133,7 +133,7 @@ export class SgpEds {
     playerPuuid: string,
     start: number,
     count: number,
-    tag?: string,
+    tag?: string | null,
     sgpServerId?: string
   ) {
     if (!sgpServerId) {
@@ -150,14 +150,18 @@ export class SgpEds {
       }
     }
 
-    return this._sgp.getMatchHistory(sgpServerId, playerPuuid, start, count, tag)
+    if (tag) {
+      return this._sgp.getMatchHistory(sgpServerId, playerPuuid, start, count, tag)
+    }
+
+    return this._sgp.getMatchHistory(sgpServerId, playerPuuid, start, count)
   }
 
   async getMatchHistoryLcuFormat(
     playerPuuid: string,
     start: number,
     count: number,
-    tag?: string,
+    tag?: string | null,
     sgpServerId?: string
   ) {
     const result = await this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)
@@ -165,7 +169,9 @@ export class SgpEds {
     try {
       return this.parseSgpToLcu0Format(result.data, start, count)
     } catch (error) {
-      this._edsm.logger.warn(`转换战绩数据 SGP 到 LCU 时发生错误: ${formatError(error)}`)
+      this._edsm.logger.warn(
+        `转换战绩数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${playerPuuid}`
+      )
       throw error
     }
   }

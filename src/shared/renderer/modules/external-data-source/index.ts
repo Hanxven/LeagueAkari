@@ -17,18 +17,27 @@ class SgpEdsRenderer {
     playerPuuid: string,
     start: number,
     count: number,
+    tag?: string | null,
     sgpServerId?: string
   ): Promise<MatchHistory> {
-    return this._edsm.call('get-match-history-lcu-format', playerPuuid, start, count, sgpServerId)
+    return this._edsm.call(
+      'get-match-history-lcu-format',
+      playerPuuid,
+      start,
+      count,
+      tag,
+      sgpServerId
+    )
   }
 
   getMatchHistory(
     playerPuuid: string,
     start: number,
     count: number,
+    tag?: string | null,
     sgpServerId?: string
   ): Promise<SgpMatchHistoryLol> {
-    return this._edsm.call('get-match-history', playerPuuid, start, count, sgpServerId)
+    return this._edsm.call('get-match-history', playerPuuid, start, count, tag, sgpServerId)
   }
 }
 

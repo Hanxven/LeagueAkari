@@ -12,12 +12,16 @@ import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summon
 import { StorageRendererModule } from '@shared/renderer/modules/storage'
 import { laNotification } from '@shared/renderer/notification'
 import { MatchHistory } from '@shared/types/lcu/match-history'
+import { analyzeMatchHistory, analyzeMatchHistoryPlayers } from '@shared/utils/analysis'
 import { summonerName } from '@shared/utils/name'
 import { AxiosError } from 'axios'
 import { computed, markRaw, watch } from 'vue'
 
 import { MatchHistoryGameTabCard, SummonerTabMatchHistory, useMatchHistoryTabsStore } from './store'
 
+/**
+ * 仅适用于主窗口战绩页面的渲染端模块
+ */
 export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
   private _storageModule!: StorageRendererModule
 
@@ -97,6 +101,16 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
         }
       }
     )
+
+    // 在切换数据源后清除一些状态
+    watch(
+      () => cf.settings.matchHistorySource,
+      () => {
+        mh.tabs.forEach((t) => {
+          t.data.matchHistory.queueFilter = -1
+        })
+      }
+    )
   }
 
   async fetchTabFullData(puuid: string) {
@@ -105,34 +119,37 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     const summoner = await this.fetchTabSummoner(puuid)
 
     if (!summoner) {
-      return puuid
+      throw new Error('Failed to fetch full data')
     }
 
     let failed = false
-    await Promise.allSettled([
-      (async () => {
-        const r = await this.fetchTabMatchHistory(puuid)
-        if (!r) {
-          failed = true
-        }
-      })(),
-      (async () => {
-        const r = await this.fetchTabRankedStats(puuid)
-        if (!r) {
-          failed = true
-        }
-      })(),
-      (async () => {
-        await this.querySavedInfo(puuid)
-      })()
-    ])
+
+    const loadMatchHistoryTask = async () => {
+      const r = await this.fetchTabMatchHistory(puuid, 1)
+      if (!r) {
+        failed = true
+      }
+    }
+
+    const loadRankedStatsTask = async () => {
+      const r = await this.fetchTabRankedStats(puuid)
+      if (!r) {
+        failed = true
+      }
+    }
+
+    const loadSavedInfoTask = async () => {
+      await this.querySavedInfo(puuid)
+    }
+
+    await Promise.allSettled([loadMatchHistoryTask(), loadRankedStatsTask(), loadSavedInfoTask()])
 
     if (failed) {
-      return puuid
+      throw new Error('Failed to fetch full data')
     }
 
     if (lc.auth && s.me) {
-      this.saveSearchHistory(
+      this.saveLocalStorageSearchHistory(
         summonerName(summoner.gameName, summoner.tagLine),
         summoner.puuid,
         lc.auth.region,
@@ -149,7 +166,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     const tab = mh.getTab(puuid)
 
     if (tab) {
-      const match = tab.data.matchHistory.gamesMap[gameId]
+      const match = tab.data.matchHistory._gamesMap[gameId]
       if (match) {
         if (match.isLoading || match.isDetailed) {
           return
@@ -268,7 +285,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     puuid: string,
     page?: number,
     pageSize?: number,
-    queueFilter?: number | string
+    queueFilter?: number | string | null
   ) {
     const cf = useCoreFunctionalityStore()
     const mh = useMatchHistoryTabsStore()
@@ -301,8 +318,10 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           matchHistory = await edsm.sgp.getMatchHistoryLcuFormat(
             puuid,
             (page - 1) * pageSize,
-            pageSize
+            pageSize,
+            queueFilter === -1 ? undefined : `q_${queueFilter}`
           )
+
           matchHistory.games.games.forEach((g) => {
             tab.data.detailedGamesCache.set(g.gameId, markRaw(g))
           })
@@ -316,25 +335,30 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           ).data
         }
 
-        tab.data.matchHistory.hasError = false
+        const matchHistoryWithState = matchHistory.games.games.map((g) => ({
+          game: tab.data.detailedGamesCache.get(g.gameId) || markRaw(g),
+          isDetailed: tab.data.detailedGamesCache.get(g.gameId) !== undefined,
+          isLoading: false,
+          hasError: false,
+          isExpanded: previousExpanded.has(g.gameId)
+        }))
+
+        const analysis = analyzeMatchHistory(matchHistoryWithState, puuid)
+        const playerRelationship = analyzeMatchHistoryPlayers(matchHistoryWithState, puuid)
 
         tab.data.matchHistory = {
-          games: matchHistory.games.games.map((g) => ({
-            game: tab.data.detailedGamesCache.get(g.gameId) || markRaw(g),
-            isDetailed: tab.data.detailedGamesCache.get(g.gameId) !== undefined,
-            isLoading: false,
-            isExpanded: previousExpanded.has(g.gameId)
-          })),
-          gamesMap: {},
+          games: matchHistoryWithState,
+          _gamesMap: {},
           page,
           pageSize,
           lastUpdate: Date.now(),
-          isEmpty: matchHistory.games.games.length === 0,
-          queueFilter
-        } as SummonerTabMatchHistory
+          queueFilter,
+          analysis: analysis ? markRaw(analysis) : null,
+          playerRelationship: playerRelationship ? markRaw(playerRelationship) : {}
+        }
 
         // 用于快速查找
-        tab.data.matchHistory.gamesMap = tab.data.matchHistory.games.reduce(
+        tab.data.matchHistory._gamesMap = matchHistoryWithState.reduce(
           (acc, cur) => {
             acc[cur.game.gameId] = cur
             return acc
@@ -372,12 +396,11 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
             }
           })
 
-          Promise.allSettled(tasks).catch()
+          Promise.allSettled(tasks).catch(() => {})
         }
 
         return matchHistory
       } catch (error) {
-        tab.data.matchHistory.hasError = true
         if (
           (error as AxiosError)?.response?.status === 500 ||
           (error as AxiosError)?.response?.status === 503
@@ -401,7 +424,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
   /**
    * 基于本地存储
    */
-  saveSearchHistory(
+  saveLocalStorageSearchHistory(
     playerName: string,
     puuid: string,
     region: string,
@@ -436,7 +459,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     }
   }
 
-  getSearchHistory(
+  getLocalStorageSearchHistory(
     region: string,
     rsoPlatformId: string,
     selfPuuid: string
@@ -451,7 +474,12 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     }
   }
 
-  deleteSearchHistoryItem(region: string, rsoPlatformId: string, selfPuuid: string, puuid: string) {
+  deleteLocalStorageSearchHistory(
+    region: string,
+    rsoPlatformId: string,
+    selfPuuid: string,
+    puuid: string
+  ) {
     const key = `search-history-${selfPuuid}-${region}-${rsoPlatformId || '_'}`
     const str = localStorage.getItem(key) || '[]'
     try {

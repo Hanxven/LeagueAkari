@@ -1,4 +1,11 @@
-import { Game, MatchHistory, Participant, isPveQueue } from '@shared/types/lcu/match-history'
+import {
+  Game,
+  MatchHistory,
+  Participant,
+  ParticipantIdentity,
+  Player,
+  isPveQueue
+} from '@shared/types/lcu/match-history'
 
 const WIN_RATE_TEAM_THRESHOLD = 0.9418
 
@@ -203,17 +210,17 @@ export interface AnalysisResult {
   maybeWinRateTeam: boolean
 }
 
-interface Player {
+interface PlayerWithKda {
   id: number
   kda: number
 }
 
 // 暂未实装
 export function findOutstandingPlayers(
-  players: Player[],
+  players: PlayerWithKda[],
   thresholdMultiplier: number = 1.5,
   includeAverage: boolean = true
-): Player[] {
+): PlayerWithKda[] {
   if (players.length === 0) return []
 
   // 计算平均KDA
@@ -341,6 +348,7 @@ export interface MatchHistoryGamesAnalysisSummary {
 }
 
 export interface MatchHistoryChampionAnalysis {
+  id: number
   count: number
   win: number
   lose: number
@@ -640,6 +648,7 @@ export function analyzeMatchHistory(
 
     if (!champions[watashi.championId]) {
       champions[watashi.championId] = {
+        id: watashi.championId,
         count: 0,
         win: 0,
         lose: 0,
@@ -873,4 +882,184 @@ export function analyzeTeamMatchHistory(
     averageWinRate: totalWinRate / analyses.length,
     averageKda: totalKda / analyses.length
   }
+}
+
+function percentile(sorted: number[], p: number): number {
+  if (sorted.length === 0) {
+    return 0
+  }
+
+  const index = p * (sorted.length - 1)
+  const lower = Math.floor(index)
+  const fraction = index - lower
+
+  if (lower === sorted.length - 1) {
+    return sorted[lower]
+  }
+
+  return sorted[lower] + fraction * (sorted[lower + 1] - sorted[lower])
+}
+
+/**
+ * 是找出过高高评分和过低评分的玩家
+ */
+export function findOutliersByIQR<T>(
+  data: T[],
+  keyGetter?: (value: T) => number,
+  threshold: number = 1.5
+): { below: T[]; over: T[] } {
+  if (!keyGetter) {
+    keyGetter = (value: T) => value as any as number
+  }
+
+  const sorted = data.slice().sort((a, b) => keyGetter(a) - keyGetter(b))
+  const q1 = percentile(sorted.map(keyGetter), 0.25)
+  const q3 = percentile(sorted.map(keyGetter), 0.75)
+  const iqr = q3 - q1
+  const lowerBound = q1 - threshold * iqr
+  const upperBound = q3 + threshold * iqr
+
+  const below: T[] = []
+  const over: T[] = []
+
+  for (const d of data) {
+    if (keyGetter(d) < lowerBound) {
+      below.push(d)
+    } else if (keyGetter(d) > upperBound) {
+      over.push(d)
+    }
+  }
+
+  return {
+    below,
+    over
+  }
+}
+
+export interface GameRelationship {
+  selfPuuid: string
+  targetPuuid: string
+  targetGameName: string
+  targetTagLine: string
+  games: {
+    gameId: number
+    win: boolean
+    isOpponent: boolean
+    selfChampionId: number
+    targetChampionId: number
+  }[]
+  selfProfileIconId: number
+  targetProfileIconId: number
+}
+
+/* 分析一页战绩中遇到的玩家，并统计胜负 */
+export function analyzeMatchHistoryPlayers(games: MatchHistoryGameWithState[], selfPuuid: string) {
+  const relationship: Record<string, GameRelationship> = {}
+
+  for (const game of games) {
+    if (!game.isDetailed) {
+      continue
+    }
+
+    if (game.game.gameType !== 'MATCHED_GAME') {
+      continue
+    }
+
+    if (isPveQueue(game.game.queueId)) {
+      continue
+    }
+
+    const participantIdentityMap = game.game.participantIdentities.reduce(
+      (acc, p) => {
+        acc[p.participantId] = p
+        return acc
+      },
+      {} as Record<number, ParticipantIdentity>
+    )
+
+    const selfIdentity = game.game.participantIdentities.find((p) => p.player.puuid === selfPuuid)
+
+    if (!selfIdentity) {
+      continue
+    }
+
+    const selfParticipant = game.game.participants.find(
+      (p) => p.participantId === selfIdentity.participantId
+    )
+
+    if (!selfParticipant) {
+      continue
+    }
+
+    // 斗魂竞技场有 N 个小队
+    if (game.game.gameMode === 'CHERRY') {
+      const selfSubTeamId = selfParticipant.stats.playerSubteamId
+
+      for (const p of game.game.participants) {
+        const identity = participantIdentityMap[p.participantId]
+
+        if (!identity) {
+          continue
+        }
+
+        if (identity.player.puuid === selfPuuid) {
+          continue
+        }
+
+        if (!relationship[identity.player.puuid]) {
+          relationship[identity.player.puuid] = {
+            selfProfileIconId: selfIdentity.player.profileIcon,
+            targetProfileIconId: identity.player.profileIcon,
+            selfPuuid: selfPuuid,
+            targetPuuid: identity.player.puuid,
+            targetGameName: identity.player.gameName,
+            targetTagLine: identity.player.tagLine,
+            games: []
+          }
+        }
+
+        relationship[identity.player.puuid].games.push({
+          gameId: game.game.gameId,
+          win: p.stats.win,
+          isOpponent: p.stats.playerSubteamId !== selfSubTeamId,
+          selfChampionId: selfParticipant.championId,
+          targetChampionId: p.championId
+        })
+      }
+    } else {
+      for (const p of game.game.participants) {
+        const identity = participantIdentityMap[p.participantId]
+
+        if (!identity) {
+          continue
+        }
+
+        if (identity.player.puuid === selfPuuid) {
+          continue
+        }
+
+        if (!relationship[identity.player.puuid]) {
+          relationship[identity.player.puuid] = {
+            selfProfileIconId: selfIdentity.player.profileIcon,
+            targetProfileIconId: identity.player.profileIcon,
+            selfPuuid: selfPuuid,
+            targetPuuid: identity.player.puuid,
+            targetGameName: identity.player.gameName,
+            targetTagLine: identity.player.tagLine,
+            games: []
+          }
+        }
+
+        relationship[identity.player.puuid].games.push({
+          gameId: game.game.gameId,
+          win: p.stats.win,
+          isOpponent: p.teamId !== selfParticipant.teamId,
+          selfChampionId: selfParticipant.championId,
+          targetChampionId: p.championId
+        })
+      }
+    }
+  }
+
+  return relationship
 }

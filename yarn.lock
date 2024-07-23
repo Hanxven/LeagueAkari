@@ -3945,6 +3945,7 @@ __metadata:
     sqlite3: "npm:5.1.6"
     typeorm: "npm:^0.3.20"
     typescript: "npm:^5.5.3"
+    vfonts: "npm:^0.0.3"
     vite: "npm:^5.3.3"
     vm2: "npm:^3.9.19"
     vue: "npm:^3.4.31"
@@ -5879,6 +5880,13 @@ __metadata:
     core-util-is: "npm:1.0.2"
     extsprintf: "npm:^1.2.0"
   checksum: 10c0/293fb060a4c9b07965569a0c3e45efa954127818707995a8a4311f691b5d6687be99f972c759838ba6eecae717f9af28e3c49d2afc7bbdf5f0b675238f1426e8
+  languageName: node
+  linkType: hard
+
+"vfonts@npm:^0.0.3":
+  version: 0.0.3
+  resolution: "vfonts@npm:0.0.3"
+  checksum: 10c0/f2e25473a92296186d3ee3c3799cedc8d42e22799d87a06dde47a81b76aaaadc91f6d48d7f6dd3afdde85e099d71195743d3ff7943b126fa20706c0ec62e0ded
   languageName: node
   linkType: hard
 

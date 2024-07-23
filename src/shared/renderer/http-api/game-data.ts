@@ -8,6 +8,7 @@ import {
   Perk,
   Perkstyles,
   Queue,
+  StrawberryHub,
   SummonerSpell
 } from '@shared/types/lcu/game-data'
 
@@ -80,5 +81,12 @@ export function getAugments() {
   return request<Augment[]>({
     method: 'GET',
     url: '/lol-game-data/assets/v1/cherry-augments.json'
+  })
+}
+
+export function getStrawberryHub() {
+  return request<StrawberryHub[]>({
+    method: 'GET',
+    url: '/lol-game-data/assets/v1/strawberry-hub.json'
   })
 }

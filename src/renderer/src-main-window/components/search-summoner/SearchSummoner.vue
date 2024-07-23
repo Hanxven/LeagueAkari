@@ -208,7 +208,7 @@ const updateSearchHistory = async () => {
   }
 
   autoCompleteOptions.value = mhm
-    .getSearchHistory(lc.auth.region, lc.auth.rsoPlatformId, summoner.me.puuid)
+    .getLocalStorageSearchHistory(lc.auth.region, lc.auth.rsoPlatformId, summoner.me.puuid)
     .map((m) => ({
       label: m.playerName,
       value: m.puuid
@@ -235,7 +235,7 @@ const renderLabel = (option: SelectOption): VNodeChild => {
             return
           }
 
-          mhm.deleteSearchHistoryItem(
+          mhm.deleteLocalStorageSearchHistory(
             lc.auth.region,
             lc.auth.rsoPlatformId,
             summoner.me.puuid,

@@ -4,7 +4,7 @@
       <MiscellaneousPanel :game="game" />
     </NModal>
     <DefineSubTeam v-slot="{ participants, mode }">
-      <div class="sub-team">
+      <div class="sub-team" :class="{ 'only-one-team': isOnlyOneTeam }" v-if="participants?.length">
         <div class="player" v-for="p of participants" :key="p.participantId">
           <LcuImage
             class="image"
@@ -148,25 +148,25 @@
       </div>
       <div class="summary" v-if="self.summary && game.gameMode !== 'STRAWBERRY'">
         <div
-          class="tag kpr"
+          class="kpr"
           :title="`在队伍中参与了击杀的程度 ${(self.summary.kpr * 100).toFixed(3)} %`"
         >
-          {{ (self.summary.kpr * 100).toFixed() }} % 击杀
+          击杀参与率 {{ (self.summary.kpr * 100).toFixed() }} %
         </div>
         <div
-          class="tag ddr"
+          class="ddr"
           :title="`在队伍中对英雄造成的伤害占比 ${(self.summary.ddr * 100).toFixed(3)} %`"
         >
-          {{ (self.summary.ddr * 100).toFixed() }} % 伤害
+          队伍伤害比 {{ (self.summary.ddr * 100).toFixed() }} %
         </div>
         <div
-          class="tag dtr"
+          class="dtr"
           :title="`在队伍中的承受所有伤害占比 ${(self.summary.dtr * 100).toFixed(3)} %`"
         >
-          {{ (self.summary.dtr * 100).toFixed() }} % 承受
+          队伍承伤比 {{ (self.summary.dtr * 100).toFixed() }} %
         </div>
-        <div class="tag gr" :title="`在队伍中的金币占比 ${(self.summary.gr * 100).toFixed(3)} %`">
-          {{ (self.summary.gr * 100).toFixed() }} % 金币
+        <div class="gr" :title="`在队伍中的金币占比 ${(self.summary.gr * 100).toFixed(3)} %`">
+          队伍经济比 {{ (self.summary.gr * 100).toFixed() }} %
         </div>
       </div>
       <div class="players">
@@ -435,6 +435,18 @@ const teams = computed(() => {
   }
 })
 
+const isOnlyOneTeam = computed(() => {
+  const tt = Object.values(teams.value)
+  let teamThatHasPlayers = 0
+  for (const t of tt) {
+    if (t.length) {
+      teamThatHasPlayers++
+    }
+  }
+
+  return teamThatHasPlayers === 1
+})
+
 const handleShowMiscellaneous = () => {
   emits('loadDetailedGame', props.game.gameId)
   isModalShow.value = true
@@ -467,10 +479,11 @@ const handleToSummoner = (puuid: string) => {
 <style lang="less" scoped>
 .match-history-card {
   display: flex;
-  padding: 0px 0px 0px 8px;
+  padding: 0px 0px 0px 12px;
   border-radius: 4px;
   box-sizing: border-box;
   background-color: rgb(45, 45, 45);
+  width: 740px;
   height: 96px;
   overflow: hidden;
 }
@@ -478,7 +491,7 @@ const handleToSummoner = (puuid: string) => {
 .standalone-misc-btn {
   margin-left: auto;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 2px;
   width: 32px;
   background-color: rgb(52, 52, 52);
 
@@ -624,61 +637,28 @@ const handleToSummoner = (puuid: string) => {
   flex-direction: column;
   padding: 10px 0;
   width: 126px;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 14px;
   align-items: flex-start;
   gap: 2px;
+  color: #9f9f9f;
 
   .kpr {
-    border-color: rgba(211, 211, 211, 0.4);
-    background-color: rgba(211, 211, 211, 0.1);
-    color: rgb(228, 228, 228);
-  }
-
-  .ddr {
-    border-color: rgba(209, 134, 81, 0.4);
-    background-color: rgba(209, 134, 81, 0.1);
-    color: rgb(235, 161, 108);
-  }
-
-  .dtr {
-    border-color: rgba(88, 184, 84, 0.4);
-    background-color: rgba(88, 184, 84, 0.1);
-    color: rgb(119, 224, 115);
-  }
-
-  .gr {
-    border-color: rgba(206, 164, 109, 0.4);
-    background-color: rgba(206, 164, 109, 0.1);
-    color: rgb(226, 185, 133);
-  }
-
-  .tag {
-    padding: 0px 8px;
-    border-radius: 6px;
-    box-sizing: border-box;
-    border-width: 1px;
-    border-style: solid;
-    width: 80px;
-    text-align: center;
+    color: #e84057;
+    font-size: 12px;
   }
 }
 
 .players {
   flex: 1;
 
-  .players-normal {
-    display: flex;
-    height: 100%;
-    align-items: center;
-    gap: 16px;
-  }
-
+  .players-normal,
   .players-cherry {
     display: flex;
     height: 100%;
     align-items: center;
     gap: 16px;
+    margin-right: 12px;
   }
 }
 
@@ -686,8 +666,14 @@ const handleToSummoner = (puuid: string) => {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  width: 128px;
+  width: 100px;
   position: relative;
+  height: 100%;
+  justify-content: center;
+
+  &.only-one-team {
+    width: 200px;
+  }
 
   .placement {
     position: absolute;
@@ -739,6 +725,7 @@ const handleToSummoner = (puuid: string) => {
 
 .show-more {
   display: flex;
+  flex-shrink: 0;
   flex-direction: column;
   gap: 2px;
   justify-content: center;

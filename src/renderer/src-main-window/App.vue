@@ -6,7 +6,7 @@
       v-model:show="isShowingFreeSoftwareDeclaration"
       @confirm="handleConfirmation"
     />
-    <MainWindowTitleBar />
+    <MainWindowTitleBar class="title-bar-area" />
     <div class="content"><RouterView /></div>
   </div>
 </template>
@@ -21,14 +21,14 @@ import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functio
 import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
 import { greeting } from '@shared/renderer/utils/greeting'
 import {
+  ArcElement,
   BarElement,
   CategoryScale,
   Chart as ChartJS,
   Legend,
   LinearScale,
   Title,
-  Tooltip,
-  ArcElement
+  Tooltip
 } from 'chart.js'
 import { useNotification } from 'naive-ui'
 import { provide, ref, watch, watchEffect } from 'vue'
@@ -161,10 +161,18 @@ useKeyboardCombo('AKARI', {
   min-width: var(--app-min-width);
   min-height: var(--app-min-height);
 
+  > .title-bar-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
   > .content {
     height: 0;
     flex: 1;
     overflow: hidden;
+    margin-top: var(--title-bar-height);
   }
 }
 </style>

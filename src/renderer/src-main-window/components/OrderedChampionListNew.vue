@@ -81,6 +81,10 @@ const gameData = useGameDataStore()
 const gameflow = useGameflowStore()
 const champSelect = useChampSelectStore()
 
+const maybePveChampion = (id: number) => {
+  return id >= 3000 && id < 4000
+}
+
 const championOptions = computed(() => {
   const sorted = Object.values(gameData.champions).sort((a, b) =>
     a.name.localeCompare(b.name, 'zh-Hans-CN')
@@ -88,6 +92,10 @@ const championOptions = computed(() => {
 
   return sorted
     .filter((b) => {
+      if (maybePveChampion(b.id)) {
+        return false
+      }
+
       if (props.allowEmpty) {
         return b.id !== 0
       }

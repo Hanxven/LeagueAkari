@@ -24,7 +24,7 @@ const url = ref<string | null>(null)
 const lc = useLcuConnectionStore()
 
 watchEffect(() => {
-  if (lc.state === 'connected') {
+  if (lc.state === 'connected' && typeof props.src !== 'undefined') {
     url.value = `akari://lcu${addLeadingSlash(props.src)}`
   } else {
     url.value = null

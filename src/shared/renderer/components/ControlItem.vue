@@ -1,11 +1,11 @@
 <template>
   <div class="control-item">
     <div class="label-area" :style="{ width: `${labelWidth ?? 200}px` }">
-      <div v-if="slots.label" class="label">
+      <div v-if="$slots.label" class="label">
         <slot name="label" :disabled="disabled"></slot>
       </div>
       <div v-else class="label" :class="{ disabled: disabled }">{{ label }}</div>
-      <div v-if="slots.labelDescription" class="label-description">
+      <div v-if="$slots.labelDescription" class="label-description">
         <slot name="labelDescription" :disabled="disabled"></slot>
       </div>
       <div v-else-if="labelDescription" class="label-description" :class="{ disabled: disabled }">
@@ -17,16 +17,12 @@
 </template>
 
 <script setup lang="ts">
-import { useSlots } from 'vue'
-
 defineProps<{
   labelWidth?: number
   label?: string
   labelDescription?: string
   disabled?: boolean
 }>()
-
-const slots = useSlots()
 </script>
 
 <style lang="less" scoped>

@@ -48,15 +48,20 @@
       <ControlItem class="control-item-margin" label="首选战绩源" :label-width="320">
         <template #labelDescription>
           <div>
-            战绩页面以及对局分析模块将首选从指定位置获取战绩信息。使用 SGP API
-            将提供更多的特性支持，当 SGP API 不可用时，将使用 LCU API
+            战绩页面以及对局分析模块将首选从指定位置获取战绩信息。使用 SGP
+            接口可获得更多特性的支持，包括：
+            <div style="margin-left: 12px; font-weight: bold; color: #63e2b7">
+              · 战绩页面可按照队列进行全局筛选
+            </div>
+            <div style="margin-left: 12px; font-weight: bold; color: #63e2b7">· 更稳定的客户端</div>
+            若当前服务器的 SGP 接口不在支持范围内，则使用 LCU API
           </div>
           <template v-if="cf.settings.matchHistorySource === 'sgp' && lc.state === 'connected'">
             <div
               v-if="eds.sgpAvailability.currentRegionSupported"
               style="color: #63e2b7; font-weight: bold"
             >
-              当前 ({{ eds.sgpAvailability.currentRegion }}):
+              当前 ({{ eds.sgpAvailability.currentRegion }}) SGP Server:
               {{ eds.sgpAvailability.supportedServers[eds.sgpAvailability.currentRegion].server }}
             </div>
             <div v-else style="color: rgb(209, 170, 124); font-weight: bold">

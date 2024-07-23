@@ -119,7 +119,6 @@ watch(
 
 <style lang="less" scoped>
 .wrapper {
-  padding: 12px;
   position: relative;
   overflow: auto;
   top: calc(var(--title-bar-height) / 2);
@@ -130,8 +129,6 @@ watch(
 }
 
 .card {
-  max-width: 840px;
-  min-width: 760px;
   max-height: 80vh;
   min-height: 30vh;
   margin: auto;

@@ -21,7 +21,7 @@
             v-for="p of participants"
             :key="p.identity.player.puuid"
           >
-            <td style="min-width: 180px">
+            <td style="min-width: 100px">
               <div class="info">
                 <div class="champion">
                   <LcuImage class="champion-icon" :src="championIcon(p.championId)" />
@@ -51,17 +51,17 @@
             <td style="width: 64px">
               <div class="kda">{{ p.stats.kills }}/{{ p.stats.deaths }}/{{ p.stats.assists }}</div>
             </td>
-            <td style="width: 180px">
+            <td style="width: 128px">
               <div class="augments">
-                <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment1" />
-                <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment2" />
-                <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment3" />
-                <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment4" />
-                <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment5" />
-                <AugmentDisplay :size="24" :augment-id="p.stats.playerAugment6" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment1" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment2" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment3" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment4" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment5" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment6" />
               </div>
             </td>
-            <td style="width: 160px">
+            <td style="width: 124px">
               <div class="damage">
                 <DamageMetricsBar
                   :baseline-damage="match.recordStats.maxTotalDamageDealt"
@@ -79,12 +79,12 @@
                 />
               </div>
             </td>
-            <td class="cell-gold" style="width: 76px">
+            <td class="cell-gold" style="width: 72px">
               <div class="gold" :title="p.stats.goldEarned.toLocaleString()">
                 {{ p.stats.goldEarned }} G
               </div>
             </td>
-            <td style="width: 180px">
+            <td style="width: 162px">
               <div class="items">
                 <ItemDisplay :size="20" :item-id="p.stats.item0" />
                 <ItemDisplay :size="20" :item-id="p.stats.item1" />
@@ -177,6 +177,7 @@ const handleToSummoner = (puuid: string) => {
 .detailed-game-card {
   background-color: rgb(45, 45, 45);
   border-radius: 4px;
+  width: 740px;
   overflow: hidden;
 }
 

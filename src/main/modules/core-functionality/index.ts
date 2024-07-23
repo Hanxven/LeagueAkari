@@ -22,7 +22,6 @@ import { calculateTogetherTimes, removeSubsets } from '@shared/utils/team-up-cal
 import dayjs from 'dayjs'
 import { comparer, computed, observable, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
-import { HighlightSpanKind } from 'typescript'
 
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
 import { LeagueClientModule } from '../akari-core/league-client'

@@ -52,7 +52,7 @@ export class AuxWindowRendererModule extends StateSyncModule {
   }
 
   setAlwaysOnTop(top: boolean) {
-    return this.call('set-always-on-top', top)
+    return this.call('set-setting/is-pinned', top)
   }
 
   resetWindowPosition() {

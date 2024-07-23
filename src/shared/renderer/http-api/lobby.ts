@@ -147,10 +147,18 @@ export function deleteLobby() {
   })
 }
 
-export function setPlayerSlotsStrawberry1(championId: number) {
+export function setPlayerSlotsStrawberry1(championId: number, mapId = 1, difficultyId = 1) {
   return request({
     method: 'PUT',
     url: '/lol-lobby/v1/lobby/members/localMember/player-slots',
-    data: [{ championId, positionPreference: 'UNSELECTED', spell1: 1, spell2: 1 }]
+    data: [{ championId, positionPreference: 'UNSELECTED', spell1: mapId, spell2: difficultyId }]
+  })
+}
+
+export function setStrawberryMapId(data: { contentId: string; itemId: number }) {
+  return request<void>({
+    method: 'PUT',
+    url: '/lol-lobby/v2/lobby/strawberryMapId',
+    data
   })
 }

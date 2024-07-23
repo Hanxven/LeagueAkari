@@ -439,7 +439,13 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this.simpleSettingSync(
       'is-pinned',
       () => this.state.settings.isPinned,
-      (s) => this.state.settings.setPinned(s)
+      async (s, ss) => {
+        this.state.settings.setPinned(s)
+        this._w?.setAlwaysOnTop(s)
+        await ss.set('is-pinned', s)
+
+        return true
+      }
     )
     this.simpleSettingSync(
       'show-skin-selector',
