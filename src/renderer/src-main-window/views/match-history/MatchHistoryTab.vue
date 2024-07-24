@@ -58,12 +58,7 @@
         </div>
       </div>
     </Transition>
-    <NScrollbar
-      x-scrollable
-      ref="scrollRef"
-      style="height: 100%; width: 100%"
-      @scroll="(e) => handleMainContentScroll(e)"
-    >
+    <NScrollbar x-scrollable ref="scrollRef" @scroll="(e) => handleMainContentScroll(e)">
       <div class="inner-container">
         <div class="header">
           <div class="header-profile">

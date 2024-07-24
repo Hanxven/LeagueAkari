@@ -215,8 +215,6 @@ const formatPreviousTier = computed(() => {
 
 .ranked-highest {
   display: flex;
-  padding-top: 2px;
-  border-top: 1px solid #ffffff10;
   font-size: 10px;
   color: rgb(200, 200, 200);
 

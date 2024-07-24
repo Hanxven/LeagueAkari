@@ -128,13 +128,7 @@
         >
       </div>
     </div>
-    <div class="title-area">
-      <span class="title" v-if="lc.state === 'connected'">{{ titleText }} </span>
-      <span class="title" v-else-if="lc.state === 'connecting'"
-        >{{ titleText }} <span class="connecting">连接中</span></span
-      >
-      <span class="title" v-else>{{ titleText }} <span class="disconnected">[未连接]</span></span>
-    </div>
+
     <div class="traffic">
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
         <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
@@ -185,11 +179,7 @@ import { useIntervalFn } from '@vueuse/core'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
 import { inject, ref, watch } from 'vue'
 
-import { useTitleText } from '@main-window/compositions/useTitleText'
-
 const app = useAppStore()
-
-const { title: titleText } = useTitleText()
 
 const appInject = inject('app') as any
 
@@ -444,7 +434,6 @@ const autoUpdateTaskShow = useCompleteVisibility(autoUpdateTaskEl, titleBarItems
 .traffic {
   height: 100%;
   display: flex;
-  flex: 1;
   justify-content: flex-end;
   transition: all 0.3s ease;
 
