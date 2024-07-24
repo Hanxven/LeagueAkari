@@ -22,10 +22,16 @@
         class="image"
         :src="`/lol-game-data/assets/v1/profile-icons/${summoner.profileIconId}.jpg`"
       />
-      <CopyableText
-        class="name"
-        :text="summonerName(summoner.gameName || summoner.displayName, summoner.tagLine)"
-      />
+      <div class="name-zone">
+        <CopyableText
+          class="name"
+          :text="summonerName(summoner.gameName || summoner.displayName, summoner.tagLine)"
+        />
+        <div class="other-copyable">
+          <CopyableText :text="summoner.puuid">PUUID</CopyableText>
+          <CopyableText :text="summoner.summonerId">ID</CopyableText>
+        </div>
+      </div>
     </div>
   </NCard>
   <NCard size="small" hoverable class="card" v-else>
@@ -125,6 +131,7 @@ const handleToSummoner = () => {
 .summoner-info {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .image {
@@ -133,13 +140,24 @@ const handleToSummoner = () => {
   border-radius: 50%;
 }
 
-.name {
+.name-zone {
+  display: flex;
+  flex-direction: column;
   margin-left: 8px;
-  font-size: 14px;
-  font-weight: bold;
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+
+  .name {
+    font-size: 14px;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .other-copyable {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: #858585;
+  }
 }
 </style>

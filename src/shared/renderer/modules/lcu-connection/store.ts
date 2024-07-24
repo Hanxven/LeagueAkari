@@ -3,21 +3,24 @@ import { reactive, ref, shallowRef } from 'vue'
 
 export type LcuConnectionState = 'connecting' | 'connected' | 'disconnected'
 
-export interface LcuAuth {
+// copied from main process
+export interface UxCommandLine {
   port: number
   pid: number
-  password: string
+  authToken: string
   certificate: string
-  rsoPlatformId: string
   region: string
+  rsoPlatformId: string
+  riotClientPort: number
+  riotClientAuthToken: string
 }
 
 export const useLcuConnectionStore = defineStore('module:lcu-connection', () => {
   const state = ref<LcuConnectionState>('connecting')
-  const auth = shallowRef<LcuAuth | null>(null)
+  const auth = shallowRef<UxCommandLine | null>(null)
 
-  const connectingClient = shallowRef<LcuAuth | null>(null)
-  const launchedClients = shallowRef<LcuAuth[]>([])
+  const connectingClient = shallowRef<UxCommandLine | null>(null)
+  const launchedClients = shallowRef<UxCommandLine[]>([])
 
   const settings = reactive({
     autoConnect: true

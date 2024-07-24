@@ -2,21 +2,21 @@ import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connect
 import { GameflowPhase, GameflowSession } from '@shared/types/lcu/gameflow'
 
 export function getGameflowPhase() {
-  return lcm.request<GameflowPhase>({
+  return lcm.lcuRequest<GameflowPhase>({
     method: 'GET',
     url: '/lol-gameflow/v1/gameflow-phase'
   })
 }
 
 export function getGameflowSession() {
-  return lcm.request<GameflowSession>({
+  return lcm.lcuRequest<GameflowSession>({
     method: 'GET',
     url: '/lol-gameflow/v1/session'
   })
 }
 
 export function earlyExit() {
-  return lcm.request({
+  return lcm.lcuRequest({
     url: '/lol-gameflow/v1/early-exit',
     method: 'POST'
   })
@@ -24,7 +24,7 @@ export function earlyExit() {
 
 // DEBUGGING
 export function dodge() {
-  return lcm.request({
+  return lcm.lcuRequest({
     url: '/lol-gameflow/v1/session/dodge',
     method: 'POST',
     data: {

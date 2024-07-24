@@ -2,20 +2,20 @@ import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connect
 import { GetSearch } from '@shared/types/lcu/matchmaking'
 
 export function accept() {
-  return lcm.request({
+  return lcm.lcuRequest({
     method: 'POST',
     url: '/lol-matchmaking/v1/ready-check/accept'
   })
 }
 export function decline() {
-  return lcm.request({
+  return lcm.lcuRequest({
     method: 'POST',
     url: '/lol-matchmaking/v1/ready-check/decline'
   })
 }
 
 export function getSearch() {
-  return lcm.request<GetSearch>({
+  return lcm.lcuRequest<GetSearch>({
     url: '/lol-matchmaking/v1/search',
     method: 'GET'
   })

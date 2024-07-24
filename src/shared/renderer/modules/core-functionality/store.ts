@@ -6,6 +6,25 @@ import { MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
 import { defineStore } from 'pinia'
 import { reactive, ref, shallowRef, watchEffect } from 'vue'
 
+// copied from main process
+export interface EncounteredGame {
+  id: number
+
+  gameId: number
+
+  puuid: string
+
+  selfPuuid: string
+
+  region: string
+
+  rsoPlatformId: string
+
+  updateAt: Date
+
+  queueType: string
+}
+
 /**
  * 存储在本地的玩家信息
  */
@@ -26,7 +45,7 @@ export interface SavedPlayerInfo {
 
   rsoPlatformId: string
 
-  encounteredGames: number[]
+  encounteredGames: EncounteredGame[]
 }
 
 /**

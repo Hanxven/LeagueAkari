@@ -2,7 +2,7 @@ import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-m
 import { makeAutoObservable, observable } from 'mobx'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
-import { queryLcuAuth, queryLcuAuthNative } from '../../utils/lcu-auth'
+import { queryUxCommandLine, queryUxCommandLineNative } from '../../utils/ux-cmd'
 import { AppModule } from './app'
 import { LcuConnectionModule } from './lcu-connection'
 import { AppLogger, LogModule } from './log'
@@ -157,10 +157,10 @@ export class LeagueClientModule extends MobxBasedBasicModule {
         throw new Error('insufficient permissions')
       }
 
-      return queryLcuAuth(LeagueClientModule.LEAGUE_CLIENT_UX_PROCESS_NAME)
+      return queryUxCommandLine(LeagueClientModule.LEAGUE_CLIENT_UX_PROCESS_NAME)
     }
 
-    return queryLcuAuthNative(LeagueClientModule.LEAGUE_CLIENT_UX_PROCESS_NAME)
+    return queryUxCommandLineNative(LeagueClientModule.LEAGUE_CLIENT_UX_PROCESS_NAME)
   }
 
   isGameClientForeground() {

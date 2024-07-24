@@ -13,70 +13,70 @@ import {
 } from '@shared/types/lcu/game-data'
 
 export function getSummonerSpells() {
-  return lcm.request<SummonerSpell[]>({
+  return lcm.lcuRequest<SummonerSpell[]>({
     url: '/lol-game-data/assets/v1/summoner-spells.json',
     method: 'GET'
   })
 }
 
 export function getPerkstyles() {
-  return lcm.request<Perkstyles>({
+  return lcm.lcuRequest<Perkstyles>({
     url: '/lol-game-data/assets/v1/perkstyles.json',
     method: 'GET'
   })
 }
 
 export function getItems() {
-  return lcm.request<Item[]>({
+  return lcm.lcuRequest<Item[]>({
     url: '/lol-game-data/assets/v1/items.json',
     method: 'GET'
   })
 }
 
 export function getChampionSummary() {
-  return lcm.request<ChampionSimple[]>({
+  return lcm.lcuRequest<ChampionSimple[]>({
     url: '/lol-game-data/assets/v1/champion-summary.json',
     method: 'GET'
   })
 }
 
 export function getMaps() {
-  return lcm.request<GameMap[]>({
+  return lcm.lcuRequest<GameMap[]>({
     url: '/lol-game-data/assets/v1/maps.json',
     method: 'GET'
   })
 }
 
 export function getPerks() {
-  return lcm.request<Perk[]>({
+  return lcm.lcuRequest<Perk[]>({
     url: '/lol-game-data/assets/v1/perks.json',
     method: 'GET'
   })
 }
 
 export function getQueues() {
-  return lcm.request<Queue[]>({
+  return lcm.lcuRequest<Queue[]>({
     url: '/lol-game-data/assets/v1/queues.json',
     method: 'GET'
   })
 }
 
 export function getMapAssets() {
-  return lcm.request<GameMapAsset>({
+  return lcm.lcuRequest<GameMapAsset>({
     url: '/lol-game-data/assets/v1/map-assets/map-assets.json',
     method: 'GET'
   })
 }
 
 export function getChampDetails(champId: number) {
-  return lcm.request<ChampDetails>({
+  return lcm.lcuRequest<ChampDetails>({
     url: `/lol-game-data/assets/v1/champions/${champId}.json`,
     method: 'GET'
   })
 }
 
 export function getAugments() {
-  return lcm.request<Augment[]>({
+  return lcm.lcuRequest<Augment[]>({
     method: 'GET',
     url: '/lol-game-data/assets/v1/cherry-augments.json'
   })

@@ -32,6 +32,7 @@ import { SettingService } from '../akari-core/storage'
 import { ExternalDataSourceModule } from '../external-data-source'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { CoreFunctionalityState } from './state'
+import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 
 export class CoreFunctionalityModule extends MobxBasedBasicModule {
   public state = new CoreFunctionalityState()
@@ -292,7 +293,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
   private _formatTagRemindingText(
     summonerInfo: SummonerInfo,
-    savedInfo: SavedPlayer & { encounteredGames: number[] }
+    savedInfo: SavedPlayer & { encounteredGames: EncounteredGame[] }
   ) {
     const { gameName, tagLine } = summonerInfo
     if (savedInfo.lastMetAt) {

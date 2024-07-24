@@ -1,6 +1,7 @@
 import { optimizer } from '@electron-toolkit/utils'
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
+import { AxiosRequestConfig } from 'axios'
 import { BrowserWindow, app, protocol, session, shell } from 'electron'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { Readable } from 'node:stream'
@@ -257,15 +258,21 @@ export class AppModule extends MobxBasedBasicModule {
 
       switch (domain) {
         case 'lcu':
+        case 'rc':
           try {
-            const res = await this._lcm.request({
+            const config: AxiosRequestConfig = {
               method: req.method,
               url: uri,
               data: req.body ? this._convertWebStreamToNodeStream(req.body) : undefined,
               validateStatus: () => true,
               responseType: 'stream',
               headers: reqHeaders
-            })
+            }
+
+            const res =
+              domain === 'lcu'
+                ? await this._lcm.lcuRequest(config)
+                : await this._lcm.rcRequest(config)
 
             const resHeaders = Object.fromEntries(
               Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')

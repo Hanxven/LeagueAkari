@@ -41,8 +41,6 @@ import SettingsModal from './components/settings-modal/SettingsModal.vue'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
-greeting()
-
 setupNaiveUiNotificationEvents()
 
 const router = useRouter()
@@ -50,6 +48,8 @@ const router = useRouter()
 const app = useAppStore()
 const cf = useCoreFunctionalityStore()
 const au = useAutoUpdateStore()
+
+greeting(app.version)
 
 provide('app', {
   openSettingsModal: (tabName?: string) => {

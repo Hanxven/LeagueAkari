@@ -60,7 +60,7 @@
           </div>
         </NTab>
       </NTabs>
-      <div class="search-zone">
+      <div class="search-zone" v-if="lc.state === 'connected'">
         <NPopover
           content-style="padding: 0;"
           raw
@@ -98,12 +98,13 @@
     </div>
     <div class="content">
       <template v-if="mh.currentTab">
-        <MatchHistoryTabNew
+        <MatchHistoryTab
           v-for="t of mh.tabs"
           :key="t.id"
           v-show="t.id === mh.currentTab.id"
           :is-self="mh.currentTab.id === summoner.me?.puuid"
           :tab="t.data as TabState"
+          ref="tabsRef"
         />
       </template>
       <div v-else class="tabs-placeholder">
@@ -128,10 +129,9 @@ import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functio
 import { championIcon, profileIcon } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
-import { laNotification } from '@shared/renderer/notification'
 import { summonerName } from '@shared/utils/name'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
-import { NButton, NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
+import { NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -140,7 +140,6 @@ import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/matc
 import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
-import MatchHistoryTabNew from './MatchHistoryTabNew.vue'
 
 const mh = useMatchHistoryTabsStore()
 const lc = useLcuConnectionStore()
@@ -161,16 +160,12 @@ const handleTabChange = async (puuid: string) => {
   await router.replace(`/match-history/${puuid}`)
 }
 
-const handleRefresh = async (puuid: string) => {
-  const result = await mhm.fetchTabFullData(puuid)
+const tabsRef = ref<any[]>()
 
-  if (typeof result === 'string') {
-    laNotification.warn('召唤师信息', `无法拉取用户 ${puuid} 的信息`)
-  } else {
-    laNotification.success(
-      '召唤师信息',
-      `拉取召唤师 ${summonerName(result.gameName || result.displayName, result.tagLine)} 的信息成功`
-    )
+const handleRefresh = async (puuid: string) => {
+  if (tabsRef.value) {
+    const tab = tabsRef.value.find((t) => t.puuid === puuid)
+    tab.refresh()
   }
 }
 
@@ -198,7 +193,7 @@ watch(
 watch(
   () => mh.currentTab?.id,
   (id) => {
-    if (route.params.puuid !== id) {
+    if (id && route.params.puuid !== id) {
       router.replace(`/match-history/${id}`)
     }
   },
@@ -244,7 +239,18 @@ const dropdownOptions = reactive([
   {
     label: '刷新',
     key: 'refresh',
-    disabled: computed(() => mh.isLoading(menuProps.id))
+    disabled: computed(() => {
+      const tab = mh.getTab(menuProps.id)
+      if (tab) {
+        return (
+          tab.data.loading.isLoadingMatchHistory ||
+          tab.data.loading.isLoadingRankedStats ||
+          tab.data.loading.isLoadingSummoner
+        )
+      }
+
+      return true
+    })
   },
   {
     label: '关闭',
@@ -281,14 +287,6 @@ const handleShowMenu = (e: PointerEvent, puuid: string) => {
   menuProps.x = e.clientX
   menuProps.y = e.clientY - 30 /* 30 = title-bar-height */
   menuProps.id = puuid
-}
-
-const innerComps = ref<(typeof MatchHistoryTab)[]>([])
-const handleBackToTop = () => {
-  const tab = innerComps.value.find((t) => t.id === mh.currentTab?.id)
-  if (tab) {
-    tab.scrollToTop()
-  }
 }
 </script>
 
@@ -354,7 +352,7 @@ const handleBackToTop = () => {
     border-top: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.09);
     background-color: rgb(46, 46, 46);
-    color:  rgb(99, 226, 183);
+    color: rgb(99, 226, 183);
     cursor: pointer;
     transition: background-color 0.3s ease;
 

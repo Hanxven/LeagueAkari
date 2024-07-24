@@ -12,6 +12,7 @@ import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { lcuConnectionModule as lcm } from '../akari-core/lcu-connection'
 import { lcuSyncModule as lcu } from '../lcu-state-sync'
+import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 
 class CoreFunctionalitySettings {
   fetchAfterGame: boolean = true
@@ -121,7 +122,7 @@ export interface OngoingPlayer {
   /**
    * 记录的玩家信息
    */
-  savedInfo?: SavedPlayer & { encounteredGames: number[] }
+  savedInfo?: SavedPlayer & { encounteredGames: EncounteredGame[] }
 }
 
 /**

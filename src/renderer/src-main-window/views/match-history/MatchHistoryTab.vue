@@ -77,10 +77,11 @@
               </div>
             </div>
             <div class="profile-name">
-              <span
+              <CopyableText
                 class="game-name"
                 :class="{ 'long-name': tab.summoner && tab.summoner.gameName.length >= 12 }"
-                >{{ tab.summoner?.gameName || '-' }}</span
+                :text="summonerName(tab.summoner?.gameName, tab.summoner?.tagLine, '-')"
+                >{{ tab.summoner?.gameName || '-' }}</CopyableText
               >
               <span class="tag-line">#{{ tab.summoner?.tagLine || '-' }}</span>
             </div>
@@ -317,11 +318,13 @@
 
 <script setup lang="ts">
 import { EMPTY_PUUID } from '@shared/constants/common'
+import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { championIcon, profileIcon } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { laNotification } from '@shared/renderer/notification'
+import { summonerName } from '@shared/utils/name'
 import { Edit20Filled as EditIcon } from '@vicons/fluent'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import {
@@ -556,6 +559,11 @@ watch(
     }
   }
 )
+
+defineExpose({
+  puuid: props.tab.puuid,
+  refresh: handleRefresh
+})
 </script>
 
 <style lang="less" scoped>

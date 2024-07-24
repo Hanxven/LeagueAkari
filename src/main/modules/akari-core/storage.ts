@@ -156,7 +156,7 @@ export class SavedPlayerService {
         queueType: query.queueType
       })
 
-      return { ...savedPlayer, encounteredGames: encounteredGames.map((g) => g.gameId) }
+      return { ...savedPlayer, encounteredGames }
     }
 
     return null

@@ -31,22 +31,15 @@ EcGfKZ+g024k/J32XP4hdho7WYAS2xMiV83CfLR/MNi8oSMaVQTdKD8cpgiWJk3L
 XWehWA==
 -----END CERTIFICATE-----`
 
-export interface LcuAuth {
+export interface UxCommandLine {
   port: number
   pid: number
-  password: string
+  authToken: string
   certificate: string
   region: string
   rsoPlatformId: string
-}
-
-export function isLcuAuthObject(obj: any): obj is LcuAuth {
-  return (
-    typeof obj === 'object' &&
-    typeof obj.port === 'number' &&
-    typeof obj.pid === 'number' &&
-    typeof obj.password === 'string'
-  )
+  riotClientPort: number
+  riotClientAuthToken: string
 }
 
 const WMIC_PATH = 'C:\\Windows\\System32\\wbem\\WMIC.exe'
@@ -119,17 +112,21 @@ export async function getProcessPidByName(name: string): Promise<number[]> {
 }
 
 const portRegex = /--app-port=([0-9]+)/
-const passwordRegex = /--remoting-auth-token=([\w-_]+)/
+const remotingAuth = /--remoting-auth-token=([\w-_]+)/
 const pidRegex = /--app-pid=([0-9]+)/
 const rsoPlatformIdRegex = /--rso_platform_id=([\w-_]+)/
 const regionRegex = /--region=([\w-_]+)/
+const riotClientPortRegex = /--riotclient-app-port=52260=([0-9]+)/
+const riotClientAuthRegex = /--riotclient-auth-token=([\w-_]+)/
 
-function parseLcuAuth(s: string): LcuAuth | null {
+function parseCommandLine(s: string): UxCommandLine | null {
   const [, port] = s.match(portRegex) || []
-  const [, password] = s.match(passwordRegex) || []
+  const [, password] = s.match(remotingAuth) || []
   const [, pid] = s.match(pidRegex) || []
   const [, rsoPlatformId = ''] = s.match(rsoPlatformIdRegex) || []
   const [, region = ''] = s.match(regionRegex) || []
+  const [, riotClientPort = ''] = s.match(riotClientPortRegex) || []
+  const [, riotClientAuth = ''] = s.match(riotClientAuthRegex) || []
 
   if (!port || !password || !pid) {
     return null
@@ -138,16 +135,18 @@ function parseLcuAuth(s: string): LcuAuth | null {
   return {
     port: Number(port),
     pid: Number(pid),
-    password,
+    authToken: password,
     rsoPlatformId,
     region,
-    certificate: RIOT_CERTIFICATE
+    certificate: RIOT_CERTIFICATE,
+    riotClientPort: Number(riotClientPort),
+    riotClientAuthToken: riotClientAuth
   }
 }
 
-export async function queryLcuAuth(pid: number): Promise<LcuAuth[]>
-export async function queryLcuAuth(clientName: string): Promise<LcuAuth[]>
-export async function queryLcuAuth(arg: string | number): Promise<LcuAuth[]> {
+export async function queryUxCommandLine(pid: number): Promise<UxCommandLine[]>
+export async function queryUxCommandLine(clientName: string): Promise<UxCommandLine[]>
+export async function queryUxCommandLine(arg: string | number): Promise<UxCommandLine[]> {
   return new Promise((resolve, reject) => {
     let task: Promise<string>
 
@@ -170,8 +169,8 @@ export async function queryLcuAuth(arg: string | number): Promise<LcuAuth[]> {
           .split('\n')
           .map((s) => s.trim())
           .filter((s) => Boolean(s) && s.toUpperCase() !== 'COMMANDLINE')
-          .map(parseLcuAuth)
-          .filter(Boolean) as LcuAuth[]
+          .map(parseCommandLine)
+          .filter(Boolean) as UxCommandLine[]
 
         resolve(authObjects)
       })
@@ -179,14 +178,14 @@ export async function queryLcuAuth(arg: string | number): Promise<LcuAuth[]> {
   })
 }
 
-export function queryLcuAuthNative(clientName: string): LcuAuth[] {
+export function queryUxCommandLineNative(clientName: string): UxCommandLine[] {
   const pids = toolkit.getPidsByName(clientName)
 
-  const auths: LcuAuth[] = []
+  const auths: UxCommandLine[] = []
   for (const p of pids) {
     try {
       const cmd = toolkit.getCommandLine1(p)
-      const parsed = parseLcuAuth(cmd)
+      const parsed = parseCommandLine(cmd)
       if (parsed) {
         auths.push(parsed)
       }

@@ -4,7 +4,7 @@
       <template v-if="slots.default"><slot></slot></template>
       <template v-else>{{ text }}</template>
     </span>
-    <NIcon title="复制" class="copyable-icon" @click="handleCopy"><CopyIcon /></NIcon>
+    <NIcon title="复制" class="copyable-icon" @click.stop="handleCopy"><CopyIcon /></NIcon>
   </div>
 </template>
 

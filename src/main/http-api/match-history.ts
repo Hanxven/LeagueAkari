@@ -2,7 +2,7 @@ import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connect
 import { Game, MatchHistory } from '@shared/types/lcu/match-history'
 
 export function getCurrentSummonerMatchHistory() {
-  return lcm.request({
+  return lcm.lcuRequest({
     url: '/lol-match-history/v1/products/lol/current-summoner/matches',
     method: 'GET'
   })
@@ -15,7 +15,7 @@ export function getMatchHistory(
   endIndex: number = 19,
   maxRetries = 3
 ) {
-  return lcm.request<MatchHistory>(
+  return lcm.lcuRequest<MatchHistory>(
     {
       url: `/lol-match-history/v1/products/lol/${puuid}/matches`,
       method: 'GET',
@@ -29,7 +29,7 @@ export function getMatchHistory(
 }
 
 export function getGame(gameId: number, maxRetries = 3) {
-  return lcm.request<Game>(
+  return lcm.lcuRequest<Game>(
     {
       url: `/lol-match-history/v1/games/${gameId}`,
       method: 'GET'

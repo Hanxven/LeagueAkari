@@ -7,7 +7,7 @@ export function honor(
   summonerId?: string | number,
   puuid?: string
 ) {
-  return lcm.request({
+  return lcm.lcuRequest({
     url: '/lol-honor-v2/v1/honor-player/',
     method: 'POST',
     data: {
@@ -20,7 +20,7 @@ export function honor(
 }
 
 export function getBallot() {
-  return lcm.request<BallotLegacy>({
+  return lcm.lcuRequest<BallotLegacy>({
     url: '/lol-honor-v2/v1/ballot/',
     method: 'GET'
   })

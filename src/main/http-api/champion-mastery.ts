@@ -2,7 +2,7 @@ import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connect
 import { PlayerChampionMastery } from '@shared/types/lcu/champion-mastery'
 
 export function getPlayerChampionMasteryTopN(puuid: string, count = 3) {
-  return lcm.request<PlayerChampionMastery>({
+  return lcm.lcuRequest<PlayerChampionMastery>({
     method: 'POST',
     url: `/lol-champion-mastery/v1/${puuid}/champion-mastery/top`,
     params: { count },

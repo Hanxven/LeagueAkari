@@ -1,5 +1,5 @@
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
-import { LcuAuth } from '@main/utils/lcu-auth'
+import { UxCommandLine } from '@main/utils/ux-cmd'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { formatError } from '@shared/utils/errors'
@@ -35,11 +35,11 @@ class LcuConnectionState {
 
   state: LcuConnectionStateType = 'disconnected'
 
-  auth: LcuAuth | null = null
+  auth: UxCommandLine | null = null
 
-  launchedClients: LcuAuth[] = []
+  launchedClients: UxCommandLine[] = []
 
-  connectingClient: LcuAuth | null = null
+  connectingClient: UxCommandLine | null = null
 
   constructor() {
     makeAutoObservable(this, {
@@ -49,7 +49,7 @@ class LcuConnectionState {
     })
   }
 
-  setConnected(auth: LcuAuth) {
+  setConnected(auth: UxCommandLine) {
     this.state = 'connected'
     this.auth = auth
   }
@@ -64,11 +64,11 @@ class LcuConnectionState {
     this.auth = null
   }
 
-  setLaunchedClients(c: LcuAuth[]) {
+  setLaunchedClients(c: UxCommandLine[]) {
     this.launchedClients = c
   }
 
-  setConnectingClient(c: LcuAuth | null) {
+  setConnectingClient(c: UxCommandLine | null) {
     this.connectingClient = c
   }
 }
@@ -101,6 +101,8 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
       maxCachedSessions: 2048
     })
   })
+
+  private _rcHttp: AxiosInstance | null = null
 
   private _clientPollTimerId: NodeJS.Timeout
 
@@ -232,21 +234,21 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     )
   }
 
-  private async _initWebSocket(auth: LcuAuth) {
-    this._lcuWs = new WebSocket(`wss://riot:${auth.password}@127.0.0.1:${auth.port}`, {
+  private async _initWebSocket(auth: UxCommandLine) {
+    this._lcuWs = new WebSocket(`wss://riot:${auth.authToken}@127.0.0.1:${auth.port}`, {
       headers: {
-        Authorization: `Basic ${Buffer.from(`riot:${auth.password}`).toString('base64')}`
+        Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
       },
       protocol: 'wamp',
       rejectUnauthorized: false
     })
   }
 
-  private async _initHttpInstance(auth: LcuAuth) {
+  private async _initLcuHttpInstance(auth: UxCommandLine) {
     this._lcuHttp = axios.create({
       baseURL: `https://127.0.0.1:${auth.port}`,
       headers: {
-        Authorization: `Basic ${Buffer.from(`riot:${auth.password}`).toString('base64')}`
+        Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
       },
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,
@@ -273,6 +275,27 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     }
   }
 
+  private async _initRcHttpInstance(auth: UxCommandLine) {
+    this._rcHttp = axios.create({
+      baseURL: `https://127.0.0.1:${auth.riotClientPort}`,
+      headers: {
+        Authorization: `Basic ${Buffer.from(`riot:${auth.riotClientAuthToken}`).toString('base64')}`
+      },
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false,
+        keepAlive: true,
+        maxCachedSessions: 2048,
+        maxFreeSockets: 1024
+      }),
+      httpAgent: new http.Agent({
+        keepAlive: true,
+        maxFreeSockets: 1024
+      }),
+      timeout: LcuConnectionModule.REQUEST_TIMEOUT_MS,
+      proxy: false
+    })
+  }
+
   private async _migrateSettings() {
     if (await this._sm.settings.has('app/auto-connect')) {
       this._sm.settings.set(
@@ -283,7 +306,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     }
   }
 
-  private async _connectToLcu(auth: LcuAuth) {
+  private async _connectToLcu(auth: UxCommandLine) {
     try {
       if (this.state.state === 'connecting' || this.state.state === 'connected') {
         return
@@ -308,7 +331,8 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
 
         this._lcuWs!.on('open', async () => {
           try {
-            await this._initHttpInstance(auth)
+            await this._initLcuHttpInstance(auth)
+            this._initRcHttpInstance(auth)
             clearTimeout(timeoutTimer)
           } catch (error) {
             this._lcuWs?.close()
@@ -399,27 +423,35 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     }
   }
 
-  async request<T = any, D = any>(config: AxiosRequestConfig<D>, maxRetries = 3) {
+  async lcuRequest<T = any, D = any>(config: AxiosRequestConfig<D>, maxRetries = 3) {
     if (!this._lcuHttp) {
       throw new Error('LCU disconnected')
     }
 
     if (config.url && config.url.startsWith('lol-game-data/assets')) {
-      return this._requestWithLimiter<T, D>(config, this._assetLimiter, maxRetries)
+      return this._lcuRequestWithLimiter<T, D>(config, this._assetLimiter, maxRetries)
     } else {
-      return this._requestWithRetries<T, D>(config, maxRetries)
+      return this._lcuRequestWithRetries<T, D>(config, maxRetries)
     }
+  }
+
+  async rcRequest<T = any, D = any>(config: AxiosRequestConfig<D>) {
+    if (!this._rcHttp) {
+      throw new Error('Riot Client unavailable')
+    }
+
+    return this._rcHttp.request<T>(config)
   }
 
   /**
    * 有并发限制的请求，适合请求资源
    */
-  private async _requestWithLimiter<T = any, D = any>(
+  private async _lcuRequestWithLimiter<T = any, D = any>(
     config: AxiosRequestConfig<D>,
     limiter: PQueue,
     maxRetries = 3
   ) {
-    const res = await limiter.add(() => this._requestWithRetries<T>(config, maxRetries))
+    const res = await limiter.add(() => this._lcuRequestWithRetries<T>(config, maxRetries))
 
     if (!res) {
       throw new Error('asset request failed')
@@ -428,7 +460,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     return res
   }
 
-  async _requestWithRetries<T = any, D = any>(config: AxiosRequestConfig<D>, maxRetries = 3) {
+  async _lcuRequestWithRetries<T = any, D = any>(config: AxiosRequestConfig<D>, maxRetries = 3) {
     if (!this._lcuHttp) {
       throw new Error('LCU disconnected')
     }
@@ -515,7 +547,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
       }
     })
 
-    this.onCall('lcu-connect', async (auth: LcuAuth) => {
+    this.onCall('lcu-connect', async (auth: UxCommandLine) => {
       if (this.state.state === 'connected') {
         this._disconnect()
       }

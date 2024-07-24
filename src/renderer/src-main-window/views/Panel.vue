@@ -80,7 +80,7 @@
 
 <script setup lang="ts">
 import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
-import { LcuAuth, useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
+import { UxCommandLine, useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { leagueClientRendererModule as lcm2 } from '@shared/renderer/modules/league-client'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import {
@@ -196,7 +196,7 @@ const handleOpenSettingsModal = () => {
 
 const lc = useLcuConnectionStore()
 const isClientsPreviewShow = ref(false)
-const launchedClients = shallowRef<LcuAuth[]>([])
+const launchedClients = shallowRef<UxCommandLine[]>([])
 const updateCurrentLaunchedClients = async () => {
   launchedClients.value = await lcm2.getLaunchedClients()
 }
@@ -257,7 +257,7 @@ watchEffect(() => {
   }
 })
 
-const handleConnectToLcu = (auth: LcuAuth) => {
+const handleConnectToLcu = (auth: UxCommandLine) => {
   if (lc.state === 'connected' && lc.auth?.pid === auth.pid) {
     return
   }

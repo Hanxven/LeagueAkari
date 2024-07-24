@@ -39,8 +39,8 @@
                   >相关对局：<span
                     class="encountered-game"
                     v-for="g of savedInfo.encounteredGames.slice(0, 10)"
-                    @click="() => emits('showGameById', g, puuid)"
-                    >{{ g }}</span
+                    @click="() => emits('showGameById', g.gameId, puuid)"
+                    >{{ g.gameId }}</span
                   ></span
                 >
               </div>
@@ -61,7 +61,6 @@
             >生涯隐藏</span
           >
           <span
-            :title="winRateTeamText(summonerInfo?.summonerId || 0)"
             class="tag win-rate-team"
             v-if="analysis.maybeWinRateTeam && !isSelf"
             >胜率队</span
@@ -235,7 +234,6 @@ import {
 } from '@shared/renderer/modules/core-functionality/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
-import { winRateTeamText } from '@shared/renderer/utils/sarcasms'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'

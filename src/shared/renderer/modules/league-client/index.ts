@@ -1,6 +1,6 @@
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
 
-import { LcuAuth } from '../lcu-connection/store'
+import { UxCommandLine } from '../lcu-connection/store'
 import { useLeagueClientStore } from './store'
 
 export class LeagueClientRendererModule extends StateSyncModule {
@@ -36,7 +36,7 @@ export class LeagueClientRendererModule extends StateSyncModule {
     return this.call('set-setting/fix-window-method-a-options', option)
   }
 
-  getLaunchedClients(): Promise<LcuAuth[]> {
+  getLaunchedClients(): Promise<UxCommandLine[]> {
     return this.call('get-launched-clients')
   }
 

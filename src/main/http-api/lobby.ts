@@ -9,7 +9,7 @@ export function createCustomLobby(
   lobbyPassword: string | null,
   isCustom: boolean
 ) {
-  return lcm.request<Lobby>({
+  return lcm.lcuRequest<Lobby>({
     method: 'POST',
     url: '/lol-lobby/v2/lobby',
     data: {
@@ -32,7 +32,7 @@ export function createCustomLobby(
 }
 
 export function createQueueLobby(queueId: number) {
-  return lcm.request({
+  return lcm.lcuRequest({
     url: '/lol-lobby/v2/lobby',
     method: 'POST',
     data: { queueId }
@@ -48,7 +48,7 @@ export function createPractice5x5(name = 'League Stalker Room', password = '') {
  * @param summonerId 目标召唤师 ID
  */
 export function promote(summonerId: string | number) {
-  return lcm.request<number>({
+  return lcm.lcuRequest<number>({
     url: `/lol-lobby/v2/lobby/members/${summonerId}/promote`,
     method: 'POST'
   })
@@ -59,21 +59,21 @@ export function promote(summonerId: string | number) {
  * @param summonerId 目标召唤师 ID
  */
 export function kick(summonerId: string | number) {
-  return lcm.request<number>({
+  return lcm.lcuRequest<number>({
     url: `/lol-lobby/v2/lobby/members/${summonerId}/kick`,
     method: 'POST'
   })
 }
 
 export function getMembers() {
-  return lcm.request<LobbyMember[]>({
+  return lcm.lcuRequest<LobbyMember[]>({
     url: '/lol-lobby/v2/lobby/members',
     method: 'GET'
   })
 }
 
 export function getLobby() {
-  return lcm.request<Lobby>({
+  return lcm.lcuRequest<Lobby>({
     url: '/lol-lobby/v2/lobby',
     method: 'GET'
   })
@@ -83,7 +83,7 @@ export function getLobby() {
  * 可以选择的人机种类
  */
 export function getAvailableBots() {
-  return lcm.request<AvailableBot[]>({
+  return lcm.lcuRequest<AvailableBot[]>({
     url: '/lol-lobby/v2/lobby/custom/available-bots',
     method: 'GET'
   })
@@ -93,14 +93,14 @@ export function getAvailableBots() {
  * 是否可以添加人机
  */
 export function isBotEnabled() {
-  return lcm.request<boolean>({
+  return lcm.lcuRequest<boolean>({
     url: '/lol-lobby/v2/lobby/custom/bots-enabled',
     method: 'GET'
   })
 }
 
 export function addBot(botDifficulty: string, champId: number, teamId: '100' | '200') {
-  return lcm.request({
+  return lcm.lcuRequest({
     url: '/lol-lobby/v1/lobby/custom/bots',
     method: 'POST',
     data: {
@@ -112,28 +112,28 @@ export function addBot(botDifficulty: string, champId: number, teamId: '100' | '
 }
 
 export function searchMatch() {
-  return lcm.request({
+  return lcm.lcuRequest({
     url: '/lol-lobby/v2/lobby/matchmaking/search',
     method: 'POST'
   })
 }
 
 export function deleteSearchMatch() {
-  return lcm.request({
+  return lcm.lcuRequest({
     url: '/lol-lobby/v2/lobby/matchmaking/search',
     method: 'DELETE'
   })
 }
 
 export function playAgain() {
-  return lcm.request({
+  return lcm.lcuRequest({
     url: '/lol-lobby/v2/play-again',
     method: 'POST'
   })
 }
 
 export function getEogStatus() {
-  return lcm.request<EogStatus>({
+  return lcm.lcuRequest<EogStatus>({
     url: '/lol-lobby/v2/party/eog-status',
     method: 'GET'
   })

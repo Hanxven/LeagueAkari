@@ -2,7 +2,7 @@ import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connect
 import { LoginQueueState } from '@shared/types/lcu/login'
 
 export function dodge() {
-  return lcm.request({
+  return lcm.lcuRequest({
     method: 'POST',
     url: '/lol-login/v1/session/invoke',
     data: ['', 'teambuilder-draft', 'quitV2', ''],
@@ -15,7 +15,7 @@ export function dodge() {
 }
 
 export function getLoginQueueState() {
-  return lcm.request<LoginQueueState>({
+  return lcm.lcuRequest<LoginQueueState>({
     url: '/lol-login/v1/login-queue-state',
     method: 'GET'
   })

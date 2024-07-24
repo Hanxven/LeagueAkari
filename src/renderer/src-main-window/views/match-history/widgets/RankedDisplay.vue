@@ -1,17 +1,40 @@
 <template>
-  <div v-if="rankedEntry" class="ranked-display">
+  <div v-if="rankedEntry" class="ranked-wrapper">
     <div class="ranked-type">
       {{ queueTypeTextMap[rankedEntry.queueType] || rankedEntry.queueType }}
     </div>
-    <img
-      class="ranked-image"
-      :src="rankedImageMap[rankedEntry.tier] || rankedImageMap['UNRANKED']"
-    />
-    <div class="ranked-info">
-      <span class="ranked-name">{{ formatTier }}</span>
-      <span class="ranked-wins-lp"
-        >{{ rankedEntry.wins }} 胜 {{ rankedEntry.leaguePoints }} LP</span
-      >
+    <div class="ranked-display">
+      <img
+        class="ranked-image"
+        :src="rankedImageMap[rankedEntry.tier] || rankedImageMap['UNRANKED']"
+      />
+      <div class="ranked-info">
+        <span class="ranked-name">{{ formatTier }}</span>
+        <span class="ranked-wins-lp"
+          >{{ rankedEntry.wins }} 胜 {{ rankedEntry.leaguePoints }} LP</span
+        >
+        <div
+          class="ranked-highest"
+          :class="{
+            'highest-unranked':
+              rankedEntry.previousSeasonHighestTier === '' ||
+              rankedEntry.previousSeasonHighestTier === 'NA'
+          }"
+        >
+          <span class="label">最高</span>
+          <div class="content">
+            <img
+              v-if="
+                rankedEntry.previousSeasonHighestTier &&
+                rankedMedalMap[rankedEntry.previousSeasonHighestTier]
+              "
+              :src="rankedMedalMap[rankedEntry.previousSeasonHighestTier]"
+              class="ranked-medal"
+            />
+            <span>{{ formatPreviousTier }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div v-else class="ranked-display-empty">无内容</div>
@@ -25,6 +48,7 @@ import { computed } from 'vue'
 import RankedBronze from '@main-window/assets/ranked-icons-large/bronze.png'
 import RankedChallenger from '@main-window/assets/ranked-icons-large/challenger.png'
 import RankedDiamond from '@main-window/assets/ranked-icons-large/diamond.png'
+import RankedEmerald from '@main-window/assets/ranked-icons-large/emerald.png'
 import RankedGold from '@main-window/assets/ranked-icons-large/gold.png'
 import RankedGrandmaster from '@main-window/assets/ranked-icons-large/grandmaster.png'
 import RankedIron from '@main-window/assets/ranked-icons-large/iron.png'
@@ -32,22 +56,46 @@ import RankedMaster from '@main-window/assets/ranked-icons-large/master.png'
 import RankedPlatinum from '@main-window/assets/ranked-icons-large/platinum.png'
 import RankedSilver from '@main-window/assets/ranked-icons-large/silver.png'
 import RankedNone from '@main-window/assets/ranked-icons-large/unranked.png'
+import BronzeMedal from '@main-window/assets/ranked-icons/bronze.png'
+import ChallengerMedal from '@main-window/assets/ranked-icons/challenger.png'
+import DiamondMedal from '@main-window/assets/ranked-icons/diamond.png'
+import EmeraldMedal from '@main-window/assets/ranked-icons/emerald.png'
+import GoldMedal from '@main-window/assets/ranked-icons/gold.png'
+import GrandmasterMedal from '@main-window/assets/ranked-icons/grandmaster.png'
+import IronMedal from '@main-window/assets/ranked-icons/iron.png'
+import MasterMedal from '@main-window/assets/ranked-icons/master.png'
+import PlatinumMedal from '@main-window/assets/ranked-icons/platinum.png'
+import SilverMedal from '@main-window/assets/ranked-icons/silver.png'
 
 const props = defineProps<{
   rankedEntry?: RankedEntry
 }>()
 
-const rankedImageMap = {
+const rankedImageMap: Record<string, string> = {
   UNRANKED: RankedNone,
   IRON: RankedIron,
   BRONZE: RankedBronze,
   SILVER: RankedSilver,
   GOLD: RankedGold,
+  EMERALD: RankedEmerald,
   PLATINUM: RankedPlatinum,
   DIAMOND: RankedDiamond,
   MASTER: RankedMaster,
   GRANDMASTER: RankedGrandmaster,
   CHALLENGER: RankedChallenger
+}
+
+const rankedMedalMap: Record<string, string> = {
+  IRON: IronMedal,
+  BRONZE: BronzeMedal,
+  SILVER: SilverMedal,
+  GOLD: GoldMedal,
+  PLATINUM: PlatinumMedal,
+  EMERALD: EmeraldMedal,
+  DIAMOND: DiamondMedal,
+  MASTER: MasterMedal,
+  GRANDMASTER: GrandmasterMedal,
+  CHALLENGER: ChallengerMedal
 }
 
 const formatTier = computed(() => {
@@ -69,19 +117,47 @@ const formatTier = computed(() => {
 
   return `${tier} ${division}`
 })
+
+const formatPreviousTier = computed(() => {
+  if (!props.rankedEntry) {
+    return ''
+  }
+
+  const tier =
+    tierTextMap[props.rankedEntry.previousSeasonHighestTier] ||
+    props.rankedEntry.previousSeasonHighestTier
+
+  if (tier === '' || tier === 'NA') {
+    return '未定级'
+  }
+
+  const division = props.rankedEntry.previousSeasonHighestDivision
+
+  if (division === '' || division === 'NA') {
+    return tier
+  }
+
+  return `${tier} ${division}`
+})
 </script>
 
 <style lang="less" scoped>
-.ranked-display {
-  position: relative;
+.ranked-wrapper {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 240px;
+  position: relative;
   height: 108px;
+  width: 240px;
   background-color: #ffffff04;
   border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.ranked-display {
+  position: relative;
+  top: 4px;
+  display: flex;
+  align-items: center;
 }
 
 .ranked-type {
@@ -96,7 +172,6 @@ const formatTier = computed(() => {
 .ranked-image,
 .ranked-info {
   position: relative;
-  top: 6px;
 }
 
 .ranked-image {
@@ -136,5 +211,28 @@ const formatTier = computed(() => {
   height: 108px;
   border: 1px solid #ffffff10;
   border-radius: 4px;
+}
+
+.ranked-highest {
+  display: flex;
+  padding-top: 2px;
+  border-top: 1px solid #ffffff10;
+  font-size: 10px;
+  color: rgb(200, 200, 200);
+
+  .label {
+    margin-right: 2px;
+  }
+
+  .ranked-medal {
+    width: 16px;
+    height: 16px;
+    margin-right: 2px;
+    vertical-align: bottom;
+  }
+
+  &.highest-unranked {
+    color: rgb(119, 119, 119);
+  }
 }
 </style>
