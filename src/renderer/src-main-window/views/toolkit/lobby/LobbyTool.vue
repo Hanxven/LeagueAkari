@@ -40,6 +40,7 @@
         <NSelect
           placeholder="选择或指定 ID"
           style="width: 180px"
+          @update:show="handleLoadEligibleQueues"
           size="tiny"
           filterable
           tag
@@ -85,13 +86,15 @@ import {
   addBot,
   createPractice5x5,
   createQueueLobby,
-  getAvailableBots
+  getAvailableBots,
+  getEligiblePartyQueues,
+  getEligibleSelfQueues
 } from '@shared/renderer/http-api/lobby'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { laNotification } from '@shared/renderer/notification'
-import { AvailableBot } from '@shared/types/lcu/lobby'
+import { AvailableBot, QueueEligibility } from '@shared/types/lcu/lobby'
 import { NButton, NCard, NFlex, NInput, NSelect, useMessage } from 'naive-ui'
 import { computed, reactive, ref, shallowRef } from 'vue'
 
@@ -137,17 +140,62 @@ const handleAddBot = async () => {
   }
 }
 
+const eligiblePartyQueues = shallowRef<QueueEligibility[]>([])
+const eligibleSelfQueues = shallowRef<QueueEligibility[]>([])
+
+const handleLoadEligibleQueues = async (show: boolean) => {
+  if (show && lc.state === 'connected') {
+    try {
+      const { data: d1 } = await getEligiblePartyQueues()
+      const { data: d2 } = await getEligibleSelfQueues()
+
+      eligiblePartyQueues.value = d1
+      eligibleSelfQueues.value = d2
+    } catch (error) {
+      laNotification.warn('房间工具', '尝试加载可用队列列表失败', error)
+    }
+  }
+}
+
 const queueOptions = computed(() => {
   if (gameData.queues === null) {
     return []
   }
 
-  return Object.keys(gameData.queues).map((k) => {
-    return {
-      value: Number(k),
-      label: `${gameData.queues[k].name} (${k})`
+  const eligiblePartyMap = new Map(eligiblePartyQueues.value.map((q) => [q.queueId, q]))
+  const eligibleSelfMap = new Map(eligibleSelfQueues.value.map((q) => [q.queueId, q]))
+
+  const availableQueues: number[] = []
+  const unavailableQueues: number[] = []
+
+  for (const v of Object.values(gameData.queues)) {
+    if (eligiblePartyMap.has(v.id) && eligibleSelfMap.has(v.id)) {
+      availableQueues.push(v.id)
+    } else {
+      unavailableQueues.push(v.id)
     }
-  })
+  }
+
+  const options = [
+    {
+      label: '可用队列',
+      type: 'group',
+      children: availableQueues.map((k) => ({
+        value: k,
+        label: `${gameData.queues[k].name} (${k})`
+      }))
+    },
+    {
+      label: '当前已禁用队列',
+      type: 'group',
+      children: unavailableQueues.map((k) => ({
+        value: k,
+        label: `${gameData.queues[k].name} (${k})`
+      }))
+    }
+  ]
+
+  return options
 })
 
 const availableBots = shallowRef<AvailableBot[] | null>(null)
@@ -235,7 +283,7 @@ const handleCreateQueueLobby = async () => {
   try {
     await createQueueLobby(queueLobbySettings.queueId)
   } catch (error) {
-    laNotification.warn('房间工具', '尝试创建队列房间失败，队列可能未开放', error)
+    laNotification.warn('房间工具', `尝试创建队列房间失败，${(error as any).message}`, error)
   }
 }
 
@@ -243,7 +291,7 @@ const handleCreateQueueLobby = async () => {
 let acknowledged = false
 const message = useMessage()
 const handleLoadAvailableBots = async (show: boolean) => {
-  if (show) {
+  if (show && lc.state === 'connected') {
     try {
       const bots = (await getAvailableBots()).data
       availableBots.value = bots

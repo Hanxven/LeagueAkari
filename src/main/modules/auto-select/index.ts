@@ -372,12 +372,6 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     )
 
     this.simpleSettingSync(
-      'expected-champions2',
-      () => this.state.settings.expectedChampions2,
-      (s) => this.state.settings.setExpectedChampions2(s)
-    )
-
-    this.simpleSettingSync(
       'select-teammate-intended-champion',
       () => this.state.settings.selectTeammateIntendedChampion,
       (s) => this.state.settings.setSelectTeammateIntendedChampion(s)
@@ -423,12 +417,6 @@ export class AutoSelectModule extends MobxBasedBasicModule {
       'banned-champions',
       () => this.state.settings.bannedChampions,
       (s) => this.state.settings.setBannedChampions(s)
-    )
-
-    this.simpleSettingSync(
-      'banned-champions2',
-      () => this.state.settings.bannedChampions2,
-      (s) => this.state.settings.setBannedChampions2(s)
     )
 
     this.simpleSettingSync(

@@ -161,3 +161,19 @@ export interface EogStatus {
   partySize: number
   readyPlayers: string[]
 }
+
+export interface QueueEligibility {
+  eligible: boolean
+  queueId: number
+  restrictions: Restriction[]
+}
+
+interface Restriction {
+  expiredTimestamp: number
+  restrictionArgs: RestrictionArgs
+  restrictionCode: string
+  summonerIds: any[]
+  summonerIdsString: string
+}
+
+interface RestrictionArgs {}

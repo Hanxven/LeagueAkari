@@ -88,10 +88,10 @@
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions2.top"
+                :champions="as.settings.expectedChampions.top"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, top: list })
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions, top: list })
                 "
               />
             </div>
@@ -101,10 +101,10 @@
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions2.middle"
+                :champions="as.settings.expectedChampions.middle"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, middle: list })
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions, middle: list })
                 "
               />
             </div>
@@ -112,10 +112,10 @@
               <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'jungle' }">打野</div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions2.jungle"
+                :champions="as.settings.expectedChampions.jungle"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, jungle: list })
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions, jungle: list })
                 "
               />
             </div>
@@ -125,10 +125,10 @@
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions2.bottom"
+                :champions="as.settings.expectedChampions.bottom"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, bottom: list })
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions, bottom: list })
                 "
               />
             </div>
@@ -138,10 +138,10 @@
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions2.utility"
+                :champions="as.settings.expectedChampions.utility"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, utility: list })
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions, utility: list })
                 "
               />
             </div>
@@ -151,10 +151,10 @@
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions2.default"
+                :champions="as.settings.expectedChampions.default"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions2({ ...as.settings.expectedChampions2, default: list })
+                    asm.setExpectedChampions2({ ...as.settings.expectedChampions, default: list })
                 "
               />
             </div>
@@ -255,9 +255,9 @@
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions2.top"
+                :champions="as.settings.bannedChampions.top"
                 @update:champions="
-                  (list) => asm.setBannedChampions2({ ...as.settings.bannedChampions2, top: list })
+                  (list) => asm.setBannedChampions2({ ...as.settings.bannedChampions, top: list })
                 "
               />
             </div>
@@ -268,10 +268,10 @@
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions2.middle"
+                :champions="as.settings.bannedChampions.middle"
                 @update:champions="
                   (list) =>
-                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, middle: list })
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions, middle: list })
                 "
               />
             </div>
@@ -282,10 +282,10 @@
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions2.jungle"
+                :champions="as.settings.bannedChampions.jungle"
                 @update:champions="
                   (list) =>
-                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, jungle: list })
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions, jungle: list })
                 "
               />
             </div>
@@ -296,10 +296,10 @@
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions2.bottom"
+                :champions="as.settings.bannedChampions.bottom"
                 @update:champions="
                   (list) =>
-                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, bottom: list })
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions, bottom: list })
                 "
               />
             </div>
@@ -310,10 +310,10 @@
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions2.utility"
+                :champions="as.settings.bannedChampions.utility"
                 @update:champions="
                   (list) =>
-                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, utility: list })
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions, utility: list })
                 "
               />
             </div>
@@ -324,10 +324,10 @@
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions2.default"
+                :champions="as.settings.bannedChampions.default"
                 @update:champions="
                   (list) =>
-                    asm.setBannedChampions2({ ...as.settings.bannedChampions2, default: list })
+                    asm.setBannedChampions2({ ...as.settings.bannedChampions, default: list })
                 "
               />
             </div>

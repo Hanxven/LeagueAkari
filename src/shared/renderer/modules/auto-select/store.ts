@@ -35,7 +35,7 @@ export const useAutoSelectStore = defineStore('module:auto-select', () => {
 
     expectedChampions: [] as number[],
 
-    expectedChampions2: markRaw({
+    expectedChampions: markRaw({
       top: [],
       middle: [],
       bottom: [],
@@ -65,7 +65,7 @@ export const useAutoSelectStore = defineStore('module:auto-select', () => {
 
     bannedChampions: [] as number[],
 
-    bannedChampions2: markRaw({
+    bannedChampions: markRaw({
       top: [],
       middle: [],
       bottom: [],

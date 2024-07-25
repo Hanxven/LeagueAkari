@@ -122,7 +122,7 @@
           </tr>
           <tr>
             <td>密钥</td>
-            <td><CopyableText :text="lc.auth?.password ?? '-'" /></td>
+            <td><CopyableText :text="lc.auth?.authToken ?? '-'" /></td>
           </tr>
           <tr>
             <td>区服</td>

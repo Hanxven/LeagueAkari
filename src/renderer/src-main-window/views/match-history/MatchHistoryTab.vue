@@ -60,7 +60,7 @@
     </Transition>
     <NScrollbar x-scrollable ref="scrollRef" @scroll="(e) => handleMainContentScroll(e)">
       <div class="inner-container">
-        <div class="header">
+        <div class="profile">
           <div class="header-profile">
             <div class="profile-image">
               <LcuImage
@@ -569,7 +569,7 @@ defineExpose({
   height: 100%;
 }
 
-.header {
+.profile {
   display: flex;
   align-items: center;
   height: 140px;
@@ -583,8 +583,9 @@ defineExpose({
   right: 0;
   height: 64px;
   z-index: 1;
-  background-color: var(--background-color-primary);
+  background-color: rgba(36, 36, 36, 0.8);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
 
   .header-simplified-inner {
     display: flex;
@@ -689,7 +690,7 @@ defineExpose({
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 360px;
+    height: 200px;
     width: 740px;
     background-color: #ffffff05;
     color: rgb(83, 83, 83);

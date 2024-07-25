@@ -7,8 +7,7 @@ import { lcuSyncModule as lcu } from '../lcu-state-sync'
 class AutoSelectSettings {
   normalModeEnabled: boolean = false
   onlySimulMode: boolean = false
-  expectedChampions: number[] = []
-  expectedChampions2: Record<string, number[]> = {
+  expectedChampions: Record<string, number[]> = {
     top: [],
     jungle: [],
     middle: [],
@@ -23,8 +22,7 @@ class AutoSelectSettings {
   benchExpectedChampions: number[] = []
   grabDelaySeconds: number = 1
   banEnabled: boolean = false
-  bannedChampions: number[] = []
-  bannedChampions2: Record<string, number[]> = {
+  bannedChampions: Record<string, number[]> = {
     top: [],
     jungle: [],
     middle: [],
@@ -42,12 +40,8 @@ class AutoSelectSettings {
     this.onlySimulMode = value
   }
 
-  setExpectedChampions(value: number[]) {
+  setExpectedChampions(value: Record<string, number[]>) {
     this.expectedChampions = value
-  }
-
-  setExpectedChampions2(value: Record<string, number[]>) {
-    this.expectedChampions2 = value
   }
 
   setSelectTeammateIntendedChampion(value: boolean) {
@@ -78,12 +72,8 @@ class AutoSelectSettings {
     this.banEnabled = value
   }
 
-  setBannedChampions(value: number[]) {
+  setBannedChampions(value: Record<string, number[]>) {
     this.bannedChampions = value
-  }
-
-  setBannedChampions2(value: Record<string, number[]>) {
-    this.bannedChampions2 = value
   }
 
   setBanTeammateIntendedChampion(value: boolean) {
@@ -92,11 +82,9 @@ class AutoSelectSettings {
 
   constructor() {
     makeAutoObservable(this, {
-      expectedChampions: observable.struct,
       benchExpectedChampions: observable.struct,
-      bannedChampions: observable.struct,
-      expectedChampions2: observable.struct,
-      bannedChampions2: observable.struct
+      expectedChampions: observable.struct,
+      bannedChampions: observable.struct
     })
   }
 }
@@ -226,10 +214,10 @@ export class AutoSelectState {
 
     let expectedChampions: number[]
     if (a.memberMe.assignedPosition) {
-      const preset = this.settings.expectedChampions2[a.memberMe.assignedPosition] || []
-      expectedChampions = [...preset, ...this.settings.expectedChampions2.default]
+      const preset = this.settings.expectedChampions[a.memberMe.assignedPosition] || []
+      expectedChampions = [...preset, ...this.settings.expectedChampions.default]
     } else {
-      expectedChampions = this.settings.expectedChampions2.default
+      expectedChampions = this.settings.expectedChampions.default
     }
 
     const pickables = expectedChampions.filter(
@@ -295,10 +283,10 @@ export class AutoSelectState {
 
     let bannedChampions: number[]
     if (a.memberMe.assignedPosition) {
-      const preset = this.settings.bannedChampions2[a.memberMe.assignedPosition] || []
-      bannedChampions = [...preset, ...this.settings.bannedChampions2.default]
+      const preset = this.settings.bannedChampions[a.memberMe.assignedPosition] || []
+      bannedChampions = [...preset, ...this.settings.bannedChampions.default]
     } else {
-      bannedChampions = this.settings.bannedChampions2.default
+      bannedChampions = this.settings.bannedChampions.default
     }
 
     const bannables = bannedChampions.filter(

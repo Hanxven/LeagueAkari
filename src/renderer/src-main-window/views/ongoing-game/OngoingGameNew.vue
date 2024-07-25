@@ -1,21 +1,32 @@
 <template>
   <div class="ongoing-game-page">
-    <NScrollbar x-scrollable ref="scrollRef" >
+    <NScrollbar x-scrollable ref="scrollRef">
       <div class="inner-container">
-        <div class="ongoing-header"></div>
-        <div class="team1">
-          <div class="team-player"></div>
-          <div class="team-player"></div>
-          <div class="team-player"></div>
-          <div class="team-player"></div>
-          <div class="team-player"></div>
+        <div class="ongoing-header">
+          <NSelect
+            placeholder="队列"
+            style="width: 160px"
+            size="small"
+            :options="queueOptions"
+          ></NSelect>
+          <NRadioGroup class="view-type-btn-group" size="small" v-model:value="viewType">
+            <NRadioButton value="match-history">战绩</NRadioButton>
+            <NRadioButton value="chart">图表</NRadioButton>
+          </NRadioGroup>
         </div>
-        <div class="team1">
-          <div class="team-player"></div>
-          <div class="team-player"></div>
-          <div class="team-player"></div>
-          <div class="team-player"></div>
-          <div class="team-player"></div>
+        <div class="team-5x5">
+          <PlayerInfoCardNew class="team-player-card" />
+          <PlayerInfoCardNew class="team-player-card" />
+          <PlayerInfoCardNew class="team-player-card" />
+          <PlayerInfoCardNew class="team-player-card" />
+          <PlayerInfoCardNew class="team-player-card" />
+        </div>
+        <div class="team-5x5">
+          <PlayerInfoCardNew class="team-player-card" />
+          <PlayerInfoCardNew class="team-player-card" />
+          <PlayerInfoCardNew class="team-player-card" />
+          <PlayerInfoCardNew class="team-player-card" />
+          <PlayerInfoCardNew class="team-player-card" />
         </div>
       </div>
     </NScrollbar>
@@ -23,7 +34,39 @@
 </template>
 
 <script setup lang="ts">
-import { NScrollbar } from 'naive-ui'
+import { NRadioButton, NRadioGroup, NScrollbar, NSelect } from 'naive-ui'
+import { ref } from 'vue'
+
+import PlayerInfoCardNew from './PlayerInfoCardNew.vue'
+
+const viewType = ref('chart')
+
+const queueOptions = ref([
+  {
+    label: '当前队列',
+    value: 'current'
+  },
+  {
+    label: '单双排位',
+    value: 'solo'
+  },
+  {
+    label: '灵活排位',
+    value: 'flex'
+  },
+  {
+    label: '极地大乱斗',
+    value: 'aram'
+  },
+  {
+    label: '无限火力',
+    value: 'urf'
+  },
+  {
+    label: '所有',
+    value: 'all'
+  }
+])
 </script>
 
 <style lang="less" scoped>
@@ -31,9 +74,11 @@ import { NScrollbar } from 'naive-ui'
   height: 100%;
 }
 
-@container-width: 1064px;
+// 维持每个卡片元素的偶数宽度，= 4 * gap + 5 * 1fr
+@container-width: 1016px;
 
 .inner-container {
+  position: relative;
   height: 100%;
   width: @container-width;
   margin: 0 auto;
@@ -44,20 +89,28 @@ import { NScrollbar } from 'naive-ui'
 }
 
 .ongoing-header {
+  position: sticky;
+  z-index: 10; 
+  top: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
   height: 36px;
-  background-color: rgba(108, 108, 108, 0.429);
+  background-color: rgba(63, 63, 63, 0.8);
+  gap: 4px;
+  justify-content: flex-end;
 }
 
-.team1 {
+.team-5x5 {
   display: flex;
   flex-wrap: wrap;
   margin-top: 4px;
   gap: 4px;
 
-  .team-player {
+  .team-player-card {
     flex: 1;
-    height: 300px;
-    background-color: rgba(45, 104, 57, 0.429);
+    height: 340px;
+    width: 0;
   }
 }
 </style>

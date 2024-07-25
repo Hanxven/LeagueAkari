@@ -155,7 +155,7 @@
         <div class="hint" v-else>统计自最近 {{ analysis.validGames }} 场有效对局</div>
       </div>
       <NDivider vertical style="height: 100%" />
-      <div v-if="matchHistoryList.length !== 0" v-bind="containerProps" class="match-history">
+      <div v-if="matchHistoryList.length !== 0" v-bind="containerProps" class="charts">
         <div v-bind="wrapperProps">
           <div
             class="match-history-item"
@@ -563,7 +563,7 @@ const { list, containerProps, wrapperProps } = useVirtualList(matchHistoryList, 
     font-size: 12px;
   }
 
-  .match-history {
+  .charts {
     width: @match-history-width;
 
     .match-history-item {

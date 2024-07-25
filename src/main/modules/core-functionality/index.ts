@@ -1,4 +1,5 @@
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { getPlayerChampionMasteryTopN } from '@main/http-api/champion-mastery'
 import { chatSend } from '@main/http-api/chat'
@@ -32,7 +33,6 @@ import { SettingService } from '../akari-core/storage'
 import { ExternalDataSourceModule } from '../external-data-source'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { CoreFunctionalityState } from './state'
-import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 
 export class CoreFunctionalityModule extends MobxBasedBasicModule {
   public state = new CoreFunctionalityState()
@@ -1023,6 +1023,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this.simpleSync('send-list', () => toJS(this.state.sendList))
     this.simpleSync('is-waiting-for-delay', () => this.state.isWaitingForDelay)
     this.simpleSync('ongoing-player-analysis', () => this.state.ongoingPlayerAnalysis)
+    this.simpleSync('queue-filter', () => this.state.queueFilter)
   }
 
   private _setupMethodCall() {
@@ -1057,6 +1058,20 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       }
 
       return r
+    })
+
+    /**
+     * 设置战绩队列筛选，仅限使用 SGP 服务器时有效
+     */
+    this.onCall('set-queue-filter', (queueId: number | null) => {
+      // TODO
+    })
+
+    /**
+     * 刷新对局分析的所有当前内容
+     */
+    this.onCall('refresh', () => {
+      // TODO
     })
   }
 

@@ -706,7 +706,7 @@ const handleToSummoner = (puuid: string) => {
       text-overflow: ellipsis;
       white-space: nowrap;
       font-size: 12px;
-      color: rgb(225, 225, 225);
+      color: rgb(187, 187, 187);
       cursor: pointer;
       transition: all 0.3s ease;
 

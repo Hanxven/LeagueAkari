@@ -26,8 +26,8 @@ export class AutoSelectRendererModule extends StateSyncModule {
     this.simpleSync('settings/only-simul-mode', (s) => (store.settings.onlySimulMode = s))
     this.simpleSync('settings/expected-champions', (s) => (store.settings.expectedChampions = s))
     this.simpleSync(
-      'settings/expected-champions2',
-      (s) => (store.settings.expectedChampions2 = markRaw(s))
+      'settings/expected-champions',
+      (s) => (store.settings.expectedChampions = markRaw(s))
     )
     this.simpleSync(
       'settings/select-teammate-intended-champion',
@@ -44,8 +44,8 @@ export class AutoSelectRendererModule extends StateSyncModule {
     this.simpleSync('settings/ban-enabled', (s) => (store.settings.banEnabled = s))
     this.simpleSync('settings/banned-champions', (s) => (store.settings.bannedChampions = s))
     this.simpleSync(
-      'settings/banned-champions2',
-      (s) => (store.settings.bannedChampions2 = markRaw(s))
+      'settings/banned-champions',
+      (s) => (store.settings.bannedChampions = markRaw(s))
     )
     this.simpleSync(
       'settings/ban-teammate-intended-champion',
@@ -66,7 +66,7 @@ export class AutoSelectRendererModule extends StateSyncModule {
   }
 
   setExpectedChampions2(value: Record<string, number[]>) {
-    return this.call('set-setting/expected-champions2', value)
+    return this.call('set-setting/expected-champions', value)
   }
 
   setSelectTeammateIntendedChampion(value: boolean) {
@@ -102,7 +102,7 @@ export class AutoSelectRendererModule extends StateSyncModule {
   }
 
   setBannedChampions2(value: Record<string, number[]>) {
-    return this.call('set-setting/banned-champions2', value)
+    return this.call('set-setting/banned-champions', value)
   }
 
   setBanTeammateIntendedChampion(value: boolean) {

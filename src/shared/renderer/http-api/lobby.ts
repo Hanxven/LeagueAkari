@@ -1,4 +1,10 @@
-import { AvailableBot, EogStatus, Lobby, LobbyMember } from '@shared/types/lcu/lobby'
+import {
+  AvailableBot,
+  EogStatus,
+  Lobby,
+  LobbyMember,
+  QueueEligibility
+} from '@shared/types/lcu/lobby'
 
 import { request } from './common'
 
@@ -160,5 +166,19 @@ export function setStrawberryMapId(data: { contentId: string; itemId: number }) 
     method: 'PUT',
     url: '/lol-lobby/v2/lobby/strawberryMapId',
     data
+  })
+}
+
+export function getEligiblePartyQueues() {
+  return request<QueueEligibility[]>({
+    url: '/lol-lobby/v2/eligibility/party',
+    method: 'POST'
+  })
+}
+
+export function getEligibleSelfQueues() {
+  return request<QueueEligibility[]>({
+    url: '/lol-lobby/v2/eligibility/self',
+    method: 'POST'
   })
 }

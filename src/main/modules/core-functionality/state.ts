@@ -152,6 +152,14 @@ export class CoreFunctionalityState {
   ongoingPlayers = observable(new Map<string, OngoingPlayer>(), { deep: false })
 
   /**
+   * 对局分析的队列过滤
+   * 
+   * `-1` 为全部
+   * `null` 为当前队列，若不在支持范围内，则全部
+   */
+  queueFilter: number | null
+
+  /**
    * 当前正在进行的玩家分析
    */
   ongoingPlayerAnalysis: {
