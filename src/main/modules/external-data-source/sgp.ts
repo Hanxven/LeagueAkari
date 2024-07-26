@@ -13,8 +13,12 @@ import { LcuSyncModule } from '../lcu-state-sync'
 export class SgpEdsState {
   availability = {
     currentRegion: '',
+    currentRsoPlatform: '',
     currentRegionSupported: false,
-    supportedServers: {} as AvailableServersMap
+    supportedServers: {
+      servers: {},
+      groups: []
+    } as AvailableServersMap
   }
 
   constructor() {
@@ -25,11 +29,13 @@ export class SgpEdsState {
 
   setAvailability(
     currentRegion: string,
+    currentRsoPlatform: string,
     currentRegionSupported: boolean,
     supportedServers: AvailableServersMap
   ) {
     this.availability = {
       currentRegion,
+      currentRsoPlatform: currentRsoPlatform,
       currentRegionSupported,
       supportedServers
     }
@@ -44,7 +50,7 @@ export class SgpEds {
   private _sgp = new SgpApi()
 
   static TENCENT_REGION = 'TENCENT'
-  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v2.json'
+  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v3.json'
 
   constructor(private _edsm: ExternalDataSourceModule) {}
 
@@ -74,23 +80,39 @@ export class SgpEds {
       this._edsm.logger.info('加载到本地 SGP 服务器配置文件')
       const json = await this._edsm.ss.readFromJsonConfig(SgpEds.MH_SGP_SERVERS_JSON)
 
-      // 检测是否是 Record<string, AvailableServersMap> 类型
-      if (typeof json !== 'object') {
-        throw new Error('配置文件格式错误')
+      if (typeof json !== 'object' || !json.servers || !json.groups) {
+        throw new Error('SGP 服务器配置文件格式错误')
       }
 
-      for (const key in json) {
-        if (typeof json[key] !== 'object') {
-          throw new Error('配置文件格式错误')
+      for (const key in json.servers) {
+        const server = json.servers[key]
+        if (typeof server !== 'object' || !server.name || !server.server) {
+          throw new Error('SGP 服务器配置文件格式错误')
         }
 
-        if (typeof json[key].name !== 'string' || typeof json[key].server !== 'string') {
-          throw new Error('配置文件格式错误')
+        if (typeof server.name !== 'string' || typeof server.server !== 'string') {
+          throw new Error('SGP 服务器配置文件格式错误')
+        }
+      }
+
+      if (!Array.isArray(json.groups)) {
+        throw new Error('SGP 服务器配置文件格式错误')
+      }
+
+      for (const group of json.groups) {
+        if (!Array.isArray(group)) {
+          throw new Error('SGP 服务器配置文件格式错误')
+        }
+
+        for (const server of group) {
+          if (typeof server !== 'string') {
+            throw new Error('SGP 服务器配置文件格式错误')
+          }
         }
       }
 
       this._sgp.setAvailableSgpServers(json)
-      this.state.setAvailability('', false, json)
+      this.state.setAvailability('', '', false, json)
     } catch (error) {
       this._edsm.logger.warn(`加载 SGP 服务器配置文件时发生错误: ${formatError(error)}`)
     }
@@ -106,16 +128,12 @@ export class SgpEds {
           return
         }
 
-        let region = auth.region
-
-        if (region === SgpEds.TENCENT_REGION) {
-          region = auth.rsoPlatformId
-        }
-
-        const supported = this._sgp.supportsPlatform(region)
+        const supported = this._sgp.supportsPlatform(
+          auth.region === 'TENCENT' ? auth.rsoPlatformId : auth.region
+        )
         const supportedPlatforms = this._sgp.supportedPlatforms()
 
-        this.state.setAvailability(region, supported, supportedPlatforms)
+        this.state.setAvailability(auth.region, auth.rsoPlatformId, supported, supportedPlatforms)
       },
       { fireImmediately: true }
     )

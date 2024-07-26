@@ -1,22 +1,34 @@
 import axios from 'axios'
 import { AxiosRetry } from 'axios-retry'
 
-import { SgpGameDetailsLol, SgpGameSummaryLol, SgpMatchHistoryLol } from './types'
+import {
+  SgpGameDetailsLol,
+  SgpGameSummaryLol,
+  SgpMatchHistoryLol,
+  SgpRankedStats,
+  SgpSummoner
+} from './types'
 
 // can only be imported like this
 const axiosRetry = require('axios-retry').default as AxiosRetry
 
 export interface AvailableServersMap {
-  [region: string]: {
-    name: string
-    server: string
+  servers: {
+    [region: string]: {
+      name: string
+      server: string
+    }
   }
+  groups: string[][]
 }
 
 export class SgpApi {
   static USER_AGENT = 'LeagueOfLegendsClient/14.13.596.7996 (rcp-be-lol-match-history)'
 
-  private _availableSgpServers: AvailableServersMap = {}
+  private _availableSgpServers: AvailableServersMap = {
+    servers: {},
+    groups: []
+  }
 
   /**
    * SGP API 需要用户登录的 Session
@@ -51,7 +63,7 @@ export class SgpApi {
   }
 
   supportsPlatform(platformId: string) {
-    return this._availableSgpServers[platformId.toUpperCase()] !== undefined
+    return this._availableSgpServers.servers[platformId.toUpperCase()] !== undefined
   }
 
   supportedPlatforms() {
@@ -67,6 +79,15 @@ export class SgpApi {
     this._http.defaults.headers.Authorization = `Bearer ${this._jwtToken}`
   }
 
+  private _getSgpServerId(platformId: string) {
+    const platformSgpServer = this._availableSgpServers.servers[platformId.toUpperCase()]
+    if (!platformSgpServer) {
+      throw new Error(`unknown platformId: ${platformId}`)
+    }
+
+    return platformSgpServer
+  }
+
   getMatchHistory(
     sgpServerId: string,
     playerPuuid: string,
@@ -78,10 +99,7 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = this._availableSgpServers[sgpServerId.toUpperCase()]
-    if (!platformSgpServer) {
-      throw new Error(`unknown sgpServerId: ${sgpServerId}`)
-    }
+    const platformSgpServer = this._getSgpServerId(sgpServerId)
 
     return this._http.get<SgpMatchHistoryLol>(
       `/match-history-query/v1/products/lol/player/${playerPuuid}/SUMMARY`,
@@ -101,10 +119,7 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = this._availableSgpServers[platformId.toUpperCase()]
-    if (!platformSgpServer) {
-      throw new Error(`unknown platformId: ${platformId}`)
-    }
+    const platformSgpServer = this._getSgpServerId(platformId)
 
     return this._http.get<SgpGameSummaryLol>(
       `/match-history-query/v1/products/lol/${platformId.toUpperCase()}_${gameId}/SUMMARY`,
@@ -117,10 +132,7 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = this._availableSgpServers[platformId.toUpperCase()]
-    if (!platformSgpServer) {
-      throw new Error(`unknown platformId: ${platformId}`)
-    }
+    const platformSgpServer = this._getSgpServerId(platformId)
 
     return this._http.get<SgpGameDetailsLol>(
       `/match-history-query/v1/products/lol/${platformId.toUpperCase()}_${gameId}/DETAILS`,
@@ -128,65 +140,29 @@ export class SgpApi {
     )
   }
 
-  /**
-   * 将 SGP 格式的比赛历史数据转换为 LCU 格式，用于在英雄联盟客户端中展示
-   */
-  // private _parseMatchHistoryLolToLcu(sgpFormatted: SgpMatchHistoryLol) {
-  //   if (sgpFormatted.games.length === 0) {
-  //     return null
-  //   }
+  getRankedStatsTencent(platformId: string, puuid: string) {
+    if (!this._jwtToken) {
+      throw new Error('jwt token is not set')
+    }
 
-  //   const first = sgpFormatted.games[0]
+    const platformSgpServer = this._getSgpServerId(platformId)
 
-  //   const outer = {
-  //     accountId: 0,
-  //     platformId: 0
-  //   }
+    return this._http.get<SgpRankedStats>(`/leagues-ledge/v2/rankedStats/puuid/${puuid}`, {
+      baseURL: platformSgpServer.server
+    })
+  }
 
-  //   const games = sgpFormatted.games.map((game) => {
-  //     const json = game.json
+  getSummonerByPuuidTencent(platformId: string, puuid: string) {
+    if (!this._jwtToken) {
+      throw new Error('jwt token is not set')
+    }
 
-  //     const lcuTeams = game.json.teams.map((team) => {
-  //       const lcuTeam = {
-  //         ...team,
-  //         bans: team.bans,
-  //         baronKills: team.objectives.baron.kills,
-  //         dominionVictoryScore: 0,
-  //         dragonKills: team.objectives.dragon,
-  //         firstBaron: team.objectives.baron.first,
-  //         firstBlood: team.objectives.,
-  //         teamId: team.teamId,
-  //         win: team.win
-  //       }
-  //     })
+    const platformSgpServer = this._getSgpServerId(platformId)
 
-  //     const lcuGame = {
-  //       ...json,
-  //       gameCreation: json.gameCreation,
-  //       gameCreateDate: '',
-  //       gameDuration: json.gameDuration,
-  //       gameId: json.gameId,
-  //       gameMode: json.gameMode,
-  //       gameType: json.gameType,
-  //       gameVersion: json.gameVersion,
-  //       mapId: json.mapId,
-  //       participantIdentities: [],
-  //       participants: [],
-  //       platformId: json.platformId,
-  //       queueId: json.queueId,
-  //       seasonId: json.seasonId
-  //     }
-  //   })
-
-  //   const gamesMeta = {
-  //     gameBeginDate: first.json.gameStartTimestamp,
-  //     gameEndDate: first.json.gameEndTimestamp,
-  //     gameCount: sgpFormatted.games.length,
-  //     gameIndexBegin: 0, // just put it here for now
-  //     gameIndexEnd: 0,
-  //     games: []
-  //   }
-
-  //   return outer
-  // }
+    return this._http.post<SgpSummoner[]>(
+      `/summoner-ledge/v1/regions/${platformId.toUpperCase()}/summoners/puuids`,
+      [puuid],
+      { baseURL: platformSgpServer.server }
+    )
+  }
 }

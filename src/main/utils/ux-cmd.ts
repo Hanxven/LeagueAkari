@@ -116,7 +116,7 @@ const remotingAuth = /--remoting-auth-token=([\w-_]+)/
 const pidRegex = /--app-pid=([0-9]+)/
 const rsoPlatformIdRegex = /--rso_platform_id=([\w-_]+)/
 const regionRegex = /--region=([\w-_]+)/
-const riotClientPortRegex = /--riotclient-app-port=52260=([0-9]+)/
+const riotClientPortRegex = /--riotclient-app-port=([0-9]+)/
 const riotClientAuthRegex = /--riotclient-auth-token=([\w-_]+)/
 
 function parseCommandLine(s: string): UxCommandLine | null {

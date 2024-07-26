@@ -12,8 +12,12 @@ export const useExternalDataSourceStore = defineStore('module:external-data-sour
 
   const sgpAvailability = shallowRef({
     currentRegion: '',
+    currentRsoPlatform: '',
     currentRegionSupported: false,
-    supportedServers: {} as AvailableServersMap
+    supportedServers: {
+      servers: {},
+      groups: []
+    } as AvailableServersMap
   })
 
   return {

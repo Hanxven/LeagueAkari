@@ -58,7 +58,7 @@ export interface TabState {
   /** 页面的 puuid */
   puuid: string
 
-  /** 该玩家数据来源自哪个大区 */
+  /** 该玩家数据来源自哪个大区或 RSO */
   platformId: string
 
   /** 召唤师信息需要加载 */

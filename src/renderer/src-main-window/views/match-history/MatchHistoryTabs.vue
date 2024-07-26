@@ -65,7 +65,7 @@
           content-style="padding: 0;"
           raw
           style="
-            width: 460px;
+            width: 420px;
             max-height: 600px;
             border-radius: 4px;
             background-color: rgb(29, 29, 29);

@@ -61,11 +61,26 @@
               v-if="eds.sgpAvailability.currentRegionSupported"
               style="color: #63e2b7; font-weight: bold"
             >
-              当前 ({{ eds.sgpAvailability.currentRegion }}) SGP Server:
-              {{ eds.sgpAvailability.supportedServers[eds.sgpAvailability.currentRegion].server }}
+              当前 ({{
+                eds.sgpAvailability.currentRegion === 'TENCENT'
+                  ? `${eds.sgpAvailability.currentRegion}-${eds.sgpAvailability.currentRsoPlatform}`
+                  : eds.sgpAvailability.currentRegion
+              }}) SGP Server:
+              {{
+                eds.sgpAvailability.supportedServers.servers[
+                  eds.sgpAvailability.currentRegion === 'TENCENT'
+                    ? eds.sgpAvailability.currentRsoPlatform
+                    : eds.sgpAvailability.currentRegion
+                ].server
+              }}
             </div>
             <div v-else style="color: rgb(209, 170, 124); font-weight: bold">
-              暂不支持当前服务器使用 SGP 接口: {{ eds.sgpAvailability.currentRegion }}
+              暂不支持当前服务器使用 SGP 接口:
+              {{
+                eds.sgpAvailability.currentRegion === 'TENCENT'
+                  ? eds.sgpAvailability.currentRsoPlatform
+                  : eds.sgpAvailability.currentRegion
+              }}
             </div>
           </template>
         </template>

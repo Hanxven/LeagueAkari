@@ -16,6 +16,12 @@
           @keyup.enter="handleSearch"
           :disabled="isSearching"
         />
+        <NSelect
+          v-if="false && serverOptions.length"
+          style="width: 200px"
+          v-model:value="currentServer"
+          :options="serverOptions"
+        />
         <NButton type="primary" :disabled="!inputText" :loading="isSearching" @click="handleSearch"
           >搜索</NButton
         >
@@ -49,7 +55,11 @@
         v-if="!isNoSearchResult && !byNameResult && !bySummonerIdResult && !byPuuidResult"
         size="small"
       >
-        输入召唤师名称、ID 或 PUUID，开始精确搜索
+        {{
+          isCrossServer
+            ? '输入召唤师名称或 PUUID，开始精确搜索'
+            : '输入召唤师名称、ID 或 PUUID，开始精确搜索'
+        }}
         <template v-if="summoner.newIdSystemEnabled">
           <span :class="{ 'need-tag': isTagNeeded }" class="need-tag-hint"
             >召唤师名称查询需满足格式 [名称]#[TAG]</span
@@ -67,13 +77,23 @@ import {
   getSummonerByName,
   getSummonerByPuuid
 } from '@shared/renderer/http-api/summoner'
+import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { inferType, resolveSummonerName } from '@shared/utils/identity'
+import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import { Close as CloseIcon } from '@vicons/carbon'
-import { AutoCompleteOption, NAutoComplete, NButton, NFlex, NIcon, SelectOption } from 'naive-ui'
-import { VNodeChild, computed, h, nextTick, onMounted, ref } from 'vue'
+import {
+  AutoCompleteOption,
+  NAutoComplete,
+  NButton,
+  NFlex,
+  NIcon,
+  NSelect,
+  SelectOption
+} from 'naive-ui'
+import { VNodeChild, computed, h, nextTick, onMounted, ref, watchEffect } from 'vue'
 
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
 
@@ -91,6 +111,52 @@ const isNoSearchResult = ref(false)
 const bySummonerIdResult = ref<SummonerInfo>()
 const byNameResult = ref<SummonerInfo>()
 const byPuuidResult = ref<SummonerInfo>()
+
+const eds = useExternalDataSourceStore()
+
+const currentServer = ref('')
+
+watchEffect(() => {
+  currentServer.value =
+    eds.sgpAvailability.currentRegion === 'TENCENT'
+      ? eds.sgpAvailability.currentRsoPlatform
+      : eds.sgpAvailability.currentRegion
+})
+
+const serverOptions = computed(() => {
+  if (!eds.sgpAvailability.currentRegionSupported) {
+    return []
+  }
+
+  const platform =
+    eds.sgpAvailability.currentRegion === 'TENCENT'
+      ? eds.sgpAvailability.currentRsoPlatform
+      : eds.sgpAvailability.currentRegion
+
+  const thatGroup = eds.sgpAvailability.supportedServers.groups.find((g) =>
+    g.find((s) => s === platform)
+  )
+
+  if (!thatGroup || thatGroup.length <= 1) {
+    return []
+  }
+
+  return thatGroup
+    .map((s) => ({
+      label: eds.sgpAvailability.currentRsoPlatform ? rsoPlatformText[s] || s : regionText[s] || s,
+      value: s
+    }))
+    .toSorted((a, b) => a.label.localeCompare(b.label))
+})
+
+// 跨区查询需要额外步骤
+const isCrossServer = computed(() => {
+  if (eds.sgpAvailability.currentRegion === 'TENCENT') {
+    return eds.sgpAvailability.currentRsoPlatform !== currentServer.value
+  }
+
+  return eds.sgpAvailability.currentRegion !== currentServer.value
+})
 
 function isNumeric(str: string): boolean {
   return /^\d+$/.test(str)
@@ -221,8 +287,19 @@ const generateCompleteOptions = async () => {
 }
 
 const renderLabel = (option: SelectOption): VNodeChild => {
-  return h(NFlex, { justify: 'space-between', style: { width: '286px' } }, () => [
-    option.label,
+  return h(NFlex, { justify: 'space-between', style: { width: '246px' } }, () => [
+    h(
+      'div',
+      {
+        style: {
+          'max-width': '200px',
+          overflow: 'hidden',
+          'text-overflow': 'ellipsis',
+          'white-space': 'nowrap'
+        }
+      },
+      option.label as string
+    ),
     h(
       NButton,
       {
@@ -268,7 +345,7 @@ onMounted(() => {
 .search-inner {
   margin: 0 auto;
   padding: 24px 0;
-  max-width: 800px;
+  max-width: 940px;
 }
 
 .search-input-area {
