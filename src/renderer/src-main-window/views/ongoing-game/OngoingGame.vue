@@ -8,12 +8,11 @@
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
     <PlayerTagEditModal v-model:show="isPlayerTagEditModalShow" :puuid="tagEditingSummonerPuuid" />
-
     <div
       v-if="!isIdle && !cf.isWaitingForDelay && cf.settings.ongoingAnalysisEnabled"
       class="ongoing-game-inner"
     >
-      <div class="header">
+      <div class="header" v-if="cf.settings.matchHistorySource === 'sgp'">
         <NSelect
           style="width: 180px"
           size="small"
@@ -35,7 +34,7 @@
             :match-history="p.matchHistory"
             :champion-id="cf.ongoingChampionSelections?.[p.puuid]"
             :team="team"
-            :queue-type="cf.ongoingGameInfo?.queueType"
+            :queue-type="showingQueueType"
             :saved-info="p.savedInfo"
             @show-game-by-id="(id, selfId) => handleShowGameById(id, selfId)"
             @show-game="(game, puuid) => handleShowGame(game, puuid)"
@@ -207,6 +206,15 @@ watchEffect(() => {
       mastery: p[1].championMastery
     }))
   console.log(value)
+})
+
+// just a workaround
+const showingQueueType = computed(() => {
+  if (cf.queueFilter === 1700) {
+    return 'CHERRY'
+  }
+
+  return cf.ongoingGameInfo?.queueType
 })
 
 const queueOptions = computed(() => {

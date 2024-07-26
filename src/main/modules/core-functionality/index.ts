@@ -122,9 +122,10 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         [
           this.state.queryState,
           this.state.settings.ongoingAnalysisEnabled,
-          this.state.queueFilter
+          this.state.queueFilter,
+          this.state.settings.matchHistorySource
         ] as const,
-      async ([state, s, queueFilter]) => {
+      async ([state, s, queueFilter, src]) => {
         if (state === 'unavailable' || !s) {
           this.sendEvent('clear/ongoing-players')
           this.state.clearOngoingVars()
@@ -138,7 +139,11 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         }
 
         let queue = -1
-        if (queueFilter && CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(queueFilter)) {
+        if (
+          src === 'sgp' &&
+          queueFilter &&
+          CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(queueFilter)
+        ) {
           queue = queueFilter
         }
 

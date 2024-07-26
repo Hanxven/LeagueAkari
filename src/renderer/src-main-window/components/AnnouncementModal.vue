@@ -7,7 +7,7 @@
     :class="styles['ann-modal']"
   >
     <template #header><span class="card-header-title">公告</span></template>
-    <div v-if="au.currentAnnouncement">
+    <div>
       <NScrollbar
         style="max-height: 50vh"
         :class="styles['markdown-text-scroll-wrapper']"
@@ -18,7 +18,7 @@
       <div style="display: flex; justify-content: flex-end">
         <NButton
           type="primary"
-          v-if="au.currentAnnouncement.isRead"
+          v-if="!au.currentAnnouncement || au.currentAnnouncement.isRead"
           @click="show = false"
           size="tiny"
           >关闭</NButton
@@ -34,14 +34,14 @@ import { autoUpdateRendererModule as aum } from '@shared/renderer/modules/auto-u
 import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { markdownIt } from '@shared/renderer/utils/markdown'
 import { NButton, NModal, NScrollbar } from 'naive-ui'
-import { computed, useCssModule, watchEffect } from 'vue'
+import { computed, useCssModule } from 'vue'
 
 const au = useAutoUpdateStore()
 
 const styles = useCssModule()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(au.currentAnnouncement?.content || '无内容')
+  return markdownIt.render(au.currentAnnouncement?.content || '当前没有任何公告')
 })
 
 const show = defineModel<boolean>('show', { default: false })
@@ -49,8 +49,8 @@ const show = defineModel<boolean>('show', { default: false })
 const handleRead = () => {
   if (au.currentAnnouncement) {
     aum.setReadAnnouncement(au.currentAnnouncement.sha)
-    show.value = false
   }
+  show.value = false
 }
 </script>
 

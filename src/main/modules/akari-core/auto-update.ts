@@ -147,7 +147,10 @@ export class AutoUpdateState {
 
   setAnnouncementRead(isRead: boolean) {
     if (this.currentAnnouncement) {
-      this.currentAnnouncement.isRead = isRead
+      this.currentAnnouncement = {
+        ...this.currentAnnouncement,
+        isRead
+      }
     }
   }
 
