@@ -2,6 +2,7 @@
   <div id="app-frame">
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
     <UpdateModal v-model:show="isShowingNewUpdateModal" :showing-new-update="isShowingNewUpdate" />
+    <AnnouncementModal v-model:show="isShowingAnnouncementModal" />
     <DeclarationModal
       v-model:show="isShowingFreeSoftwareDeclaration"
       @confirm="handleConfirmation"
@@ -38,6 +39,7 @@ import { useNotification } from 'naive-ui'
 import { provide, ref, watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
+import AnnouncementModal from './components/AnnouncementModal.vue'
 import DeclarationModal from './components/DeclarationModal.vue'
 import MainWindowTitleBar from './components/MainWindowTitleBar.vue'
 import UpdateModal from './components/UpdateModal.vue'
@@ -81,6 +83,9 @@ provide('app', {
     } else {
       isShowingNewUpdate.value = false
     }
+  },
+  openAnnouncementModal: () => {
+    isShowingAnnouncementModal.value = true
   }
 })
 
@@ -104,10 +109,17 @@ const settingModelTab = ref('basic')
 const isShowingNewUpdateModal = ref(false)
 const isShowingNewUpdate = ref(false)
 const isShowingFreeSoftwareDeclaration = ref(false)
+const isShowingAnnouncementModal = ref(false)
 
 watchEffect(() => {
   if (app.settings.showFreeSoftwareDeclaration) {
     isShowingFreeSoftwareDeclaration.value = true
+  }
+})
+
+watchEffect(() => {
+  if (au.currentAnnouncement && !au.currentAnnouncement.isRead) {
+    isShowingAnnouncementModal.value = true
   }
 })
 

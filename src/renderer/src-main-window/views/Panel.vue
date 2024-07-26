@@ -11,6 +11,10 @@
         @update:value="handleMenuChange"
       ></NMenu>
       <div class="bottom-operations">
+        <div class="operation" title="公告" @click="handleOpenAnnouncementModal">
+          <NIcon class="icon"><NotificationIcon /></NIcon>
+          <span class="label">公告</span>
+        </div>
         <NPopover
           trigger="click"
           placement="right"
@@ -88,6 +92,7 @@ import {
   AppSwitcher as AppSwitcherIcon,
   Application as ApplicationIcon,
   Layers as LayersIcon,
+  Notification as NotificationIcon,
   Settings as SettingsIcon,
   Template as TemplateIcon
 } from '@vicons/carbon'
@@ -192,6 +197,10 @@ const appInject = inject('app') as any
 
 const handleOpenSettingsModal = () => {
   appInject.openSettingsModal()
+}
+
+const handleOpenAnnouncementModal = () => {
+  appInject.openAnnouncementModal()
 }
 
 const lc = useLcuConnectionStore()

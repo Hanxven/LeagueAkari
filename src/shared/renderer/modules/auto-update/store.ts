@@ -12,6 +12,13 @@ interface NewUpdates {
   filename: string
 }
 
+interface CurrentAnnouncement {
+  content: string
+  updateAt: Date
+  sha: string
+  isRead: boolean
+}
+
 // copied from main module
 interface UpdateProgressInfo {
   phase: 'downloading' | 'unpacking' | 'waiting-for-restart' | 'download-failed' | 'unpack-failed'
@@ -38,12 +45,14 @@ export const useAutoUpdateStore = defineStore('module:auto-update', () => {
   const newUpdates = shallowRef<NewUpdates | null>(null)
   const lastCheckAt = ref<Date | null>(null)
   const updateProgressInfo = shallowRef<UpdateProgressInfo | null>(null)
+  const currentAnnouncement = shallowRef<CurrentAnnouncement | null>(null)
 
   return {
     settings,
     newUpdates,
     isCheckingUpdates,
     updateProgressInfo,
-    lastCheckAt
+    lastCheckAt,
+    currentAnnouncement
   }
 })

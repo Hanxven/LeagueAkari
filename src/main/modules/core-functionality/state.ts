@@ -1,3 +1,4 @@
+import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { PlayerChampionMastery } from '@shared/types/lcu/champion-mastery'
@@ -12,7 +13,6 @@ import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { lcuConnectionModule as lcm } from '../akari-core/lcu-connection'
 import { lcuSyncModule as lcu } from '../lcu-state-sync'
-import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 
 class CoreFunctionalitySettings {
   fetchAfterGame: boolean = true
@@ -115,6 +115,11 @@ export interface OngoingPlayer {
   matchHistory?: MatchHistoryGameWithState[]
 
   /**
+   * 当前战绩使用的队列
+   */
+  matchHistoryQueue?: number
+
+  /**
    * 玩家英雄点数相关信息
    */
   championMastery?: PlayerChampionMastery
@@ -153,11 +158,11 @@ export class CoreFunctionalityState {
 
   /**
    * 对局分析的队列过滤
-   * 
+   *
    * `-1` 为全部
    * `null` 为当前队列，若不在支持范围内，则全部
    */
-  queueFilter: number | null
+  queueFilter: number = -1
 
   /**
    * 当前正在进行的玩家分析
@@ -315,6 +320,10 @@ export class CoreFunctionalityState {
 
   setWaitingForDelay(value: boolean) {
     this.isWaitingForDelay = value
+  }
+
+  setQueueFilter(value: number) {
+    this.queueFilter = value
   }
 
   /**

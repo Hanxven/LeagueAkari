@@ -8,10 +8,20 @@
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
     <PlayerTagEditModal v-model:show="isPlayerTagEditModalShow" :puuid="tagEditingSummonerPuuid" />
+
     <div
       v-if="!isIdle && !cf.isWaitingForDelay && cf.settings.ongoingAnalysisEnabled"
       class="ongoing-game-inner"
     >
+      <div class="header">
+        <NSelect
+          style="width: 180px"
+          size="small"
+          :options="queueOptions"
+          @update:value="(val) => cfm.setQueueFilter(val)"
+          :value="cf.queueFilter"
+        ></NSelect>
+      </div>
       <!-- 蓝队 -->
       <DefineOngoingTeam v-slot="{ participants, team }">
         <div class="team">
@@ -164,12 +174,13 @@ import {
 } from '@shared/renderer/modules/core-functionality/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { Game } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
-import { NCard, NCheckbox, NFlex, NSpin } from 'naive-ui'
+import { NCard, NCheckbox, NFlex, NSelect, NSpin } from 'naive-ui'
 import { computed, reactive, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -183,6 +194,7 @@ const router = useRouter()
 const cf = useCoreFunctionalityStore()
 const gameflow = useGameflowStore()
 const summoner = useSummonerStore()
+const gameData = useGameDataStore()
 
 const app = useAppStore()
 
@@ -195,6 +207,48 @@ watchEffect(() => {
       mastery: p[1].championMastery
     }))
   console.log(value)
+})
+
+const queueOptions = computed(() => {
+  return [
+    {
+      label: '所有队列',
+      value: -1
+    },
+    {
+      label: gameData.queues[420]?.name || 'Ranked Solo/Duo',
+      value: 420
+    },
+    {
+      label: gameData.queues[430]?.name || 'Normal',
+      value: 430
+    },
+    {
+      label: gameData.queues[440]?.name || 'Ranked Flex',
+      value: 440
+    },
+    {
+      label: gameData.queues[450]?.name || 'ARAM',
+      value: 450
+    },
+
+    {
+      label: gameData.queues[1700]?.name || 'ARENA',
+      value: 1700
+    },
+    {
+      label: gameData.queues[490]?.name || 'Quickplay',
+      value: 490
+    },
+    {
+      label: gameData.queues[1900]?.name || 'URF',
+      value: 1900
+    },
+    {
+      label: gameData.queues[900]?.name || 'ARURF',
+      value: 900
+    }
+  ]
 })
 
 const handleToSummoner = (puuid: string) => {
@@ -332,6 +386,14 @@ useKeepAliveScrollPositionMemo(el)
 
   font-size: 12px;
   white-space: pre;
+
+  .header {
+    height: 36px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
 }
 
 .no-ongoing-game {

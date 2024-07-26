@@ -45,6 +45,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     GAME: 73
   } as const
 
+  static QUEUE_FILTER_QUEUES = new Set([-1, 420, 430, 440, 450, 1700, 490, 1900, 900])
+
   static SEND_INTERVAL = 65
 
   private _controller: AbortController | null = null
@@ -116,8 +118,13 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
   private _handleOngoingAnalyzing() {
     this.autoDisposeReaction(
-      () => [this.state.queryState, this.state.settings.ongoingAnalysisEnabled] as const,
-      async ([state, s]) => {
+      () =>
+        [
+          this.state.queryState,
+          this.state.settings.ongoingAnalysisEnabled,
+          this.state.queueFilter
+        ] as const,
+      async ([state, s, queueFilter]) => {
         if (state === 'unavailable' || !s) {
           this.sendEvent('clear/ongoing-players')
           this.state.clearOngoingVars()
@@ -128,6 +135,11 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
         if (!this._controller) {
           this._controller = new AbortController()
+        }
+
+        let queue = -1
+        if (queueFilter && CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(queueFilter)) {
+          queue = queueFilter
         }
 
         try {
@@ -147,9 +159,9 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
             } finally {
               this.state.setWaitingForDelay(false)
             }
-            await this._champSelectQuery(this._controller.signal)
+            await this._champSelectQuery(this._controller.signal, queue)
           } else if (state === 'in-game') {
-            await this._inGameQuery(this._controller.signal)
+            await this._inGameQuery(this._controller.signal, queue)
           }
         } catch (error) {
           this._mwm.notify.warn('core-functionality', '对局中', '无法加载对局中信息')
@@ -713,33 +725,12 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     return removeSubsets(teams, (team) => team.players)
   }
 
-  /**
-   * 分析当前对局玩家的数据
-   */
-  private _analyzePlayers() {
-    const result: {
-      players: Record<string, MatchHistoryGamesAnalysisAll>
-      teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
-    } = {
-      players: {},
-      teams: {}
-    }
-
-    for (const [puuid, { matchHistory }] of this.state.ongoingPlayers.entries()) {
-      if (!matchHistory) {
-        continue
-      }
-
-      const analysis = analyzeMatchHistory(matchHistory, puuid)
-      if (analysis) {
-        result.players[puuid] = analysis
-      }
-    }
-
-    return result
-  }
-
-  private async _loadPlayerStats(signal: AbortSignal, puuid: string, retries = 2) {
+  private async _loadPlayerStats(
+    signal: AbortSignal,
+    puuid: string,
+    queueFilter?: number,
+    retries = 2
+  ) {
     if (!this.state.ongoingPlayers.has(puuid)) {
       runInAction(() =>
         this.state.ongoingPlayers.set(puuid, observable({ puuid }, {}, { deep: false }))
@@ -817,7 +808,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       }
 
       const _loadMatchHistory = async () => {
-        if (player.matchHistory) {
+        if (player.matchHistory && player.matchHistoryQueue === queueFilter) {
           return
         }
 
@@ -837,7 +828,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
                   return await this._edsm.sgp.getMatchHistoryLcuFormat(
                     puuid,
                     0,
-                    this.state.settings.matchHistoryLoadCount
+                    this.state.settings.matchHistoryLoadCount,
+                    queueFilter && queueFilter !== -1 ? `q_${queueFilter}` : undefined
                   )
                 } else {
                   return (
@@ -959,7 +951,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     }
   }
 
-  private async _champSelectQuery(signal: AbortSignal) {
+  private async _champSelectQuery(signal: AbortSignal, queueFilter?: number) {
     const session = this._lcu.champSelect.session
     if (!session) {
       return
@@ -976,13 +968,13 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     const visiblePlayerPuuids = [...m, ...t]
 
     const playerTasks = visiblePlayerPuuids.map((p) => {
-      return this._loadPlayerStats(signal, p.puuid)
+      return this._loadPlayerStats(signal, p.puuid, queueFilter)
     })
 
     await Promise.allSettled(playerTasks)
   }
 
-  private async _inGameQuery(signal: AbortSignal) {
+  private async _inGameQuery(signal: AbortSignal, queueFilter?: number) {
     const session = this._lcu.gameflow.session
 
     if (!session) {
@@ -1000,7 +992,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     const visiblePlayerPuuids = [...m, ...t]
 
     const playerTasks = visiblePlayerPuuids.map((p) => {
-      return this._loadPlayerStats(signal, p.puuid)
+      return this._loadPlayerStats(signal, p.puuid, queueFilter)
     })
 
     await Promise.allSettled(playerTasks)
@@ -1063,8 +1055,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     /**
      * 设置战绩队列筛选，仅限使用 SGP 服务器时有效
      */
-    this.onCall('set-queue-filter', (queueId: number | null) => {
-      // TODO
+    this.onCall('set-queue-filter', (queueId: number) => {
+      this.state.setQueueFilter(queueId)
     })
 
     /**

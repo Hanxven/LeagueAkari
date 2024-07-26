@@ -1,9 +1,10 @@
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import {
+  LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL,
   LEAGUE_AKARI_GITEE_CHECK_UPDATES_URL,
   LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL
 } from '@shared/constants/common'
-import { GithubApiLatestRelease } from '@shared/types/github'
+import { FileInfo, GithubApiLatestRelease } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosResponse } from 'axios'
 import { app, shell } from 'electron'
@@ -28,6 +29,13 @@ interface NewUpdates {
   downloadUrl: string
   filename: string
   releaseNotes: string
+}
+
+interface CurrentAnnouncement {
+  content: string
+  updateAt: Date
+  isRead: boolean
+  sha: string
 }
 
 export class AutoUpdateSettings {
@@ -116,9 +124,12 @@ export class AutoUpdateState {
 
   updateProgressInfo: UpdateProgressInfo | null = null
 
+  currentAnnouncement: CurrentAnnouncement | null
+
   constructor() {
     makeAutoObservable(this, {
-      updateProgressInfo: observable.ref
+      updateProgressInfo: observable.ref,
+      currentAnnouncement: observable.ref
     })
   }
 
@@ -128,6 +139,16 @@ export class AutoUpdateState {
 
   setNewUpdates(updates: NewUpdates | null) {
     this.newUpdates.set(updates)
+  }
+
+  setCurrentAnnouncement(announcement: CurrentAnnouncement | null) {
+    this.currentAnnouncement = announcement
+  }
+
+  setAnnouncementRead(isRead: boolean) {
+    if (this.currentAnnouncement) {
+      this.currentAnnouncement.isRead = isRead
+    }
   }
 
   setUpdateProgressInfo(info: UpdateProgressInfo | null) {
@@ -147,11 +168,13 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
   private _logger: AppLogger
 
   private _checkUpdateTimerId: NodeJS.Timeout | null = null
+  private _checkAnnouncementTimerId: NodeJS.Timeout | null = null
 
   private _lastQuitTask: (() => void) | null = null
   private _currentUpdateTaskCanceler: (() => void) | null = null
 
   static UPDATES_CHECK_INTERVAL = 7.2e6
+  static ANNOUNCEMENT_CHECK_INTERVAL = 3.6e6
   static DOWNLOAD_DIR_NAME = 'NewUpdates'
   static UPDATE_SCRIPT_NAME = 'LeagueAkariUpdate.ps1'
   static UPDATE_PROGRESS_UPDATE_INTERVAL = 200
@@ -214,6 +237,30 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
       },
       { equals: comparer.shallow }
     )
+
+    this._updateAnnouncement()
+    this._checkAnnouncementTimerId = setInterval(() => {
+      this._updateAnnouncement()
+    }, AutoUpdateModule.ANNOUNCEMENT_CHECK_INTERVAL)
+  }
+
+  private async _updateAnnouncement() {
+    try {
+      const { data } = await this._http.get<FileInfo>(LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL)
+
+      const { data: announcement } = await this._http.get<string>(data.download_url)
+
+      const lastRead = await this._ss.get('last-read-announcement-sha', '')
+
+      this.state.setCurrentAnnouncement({
+        content: announcement,
+        updateAt: new Date(),
+        isRead: data.sha === lastRead,
+        sha: data.sha
+      })
+    } catch (error) {
+      this._logger.warn(`更新公告时发生错误 ${formatError(error)}`)
+    }
   }
 
   private async _fetchLatestReleaseInfo(gitLikeUrl: string) {
@@ -769,6 +816,15 @@ Try {
       }
     })
 
+    this.onCall('set-read', async (sha: string) => {
+      if (this.state.currentAnnouncement) {
+        this.state.setAnnouncementRead(true)
+        await this._ss.set('last-read-announcement-sha', sha)
+      }
+
+      return
+    })
+
     this.onCall('cancel-update', () => {
       this._cancelUpdateProcess()
     })
@@ -784,6 +840,7 @@ Try {
     this.simpleSync('new-updates', () => toJS(this.state.newUpdates.get()))
     this.simpleSync('update-progress-info', () => this.state.updateProgressInfo)
     this.simpleSync('last-check-at', () => this.state.lastCheckAt)
+    this.simpleSync('current-announcement', () => this.state.currentAnnouncement)
   }
 }
 

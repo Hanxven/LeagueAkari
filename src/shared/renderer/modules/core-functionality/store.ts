@@ -115,6 +115,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
   const isInEndgamePhase = ref(false)
   const ongoingChampionSelections = shallowRef<Record<string | number, number> | null>(null)
   const isWaitingForDelay = ref(false)
+  const queueFilter = ref(-1)
 
   const ongoingPlayerAnalysis = shallowRef<Record<string, MatchHistoryGamesAnalysisAll> | null>(
     null
@@ -171,6 +172,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     isWaitingForDelay,
 
     ongoingPlayerAnalysis,
+    queueFilter,
 
     settings,
 

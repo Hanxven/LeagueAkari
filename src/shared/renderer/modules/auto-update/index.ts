@@ -26,6 +26,7 @@ export class AutoUpdateRendererModule extends StateSyncModule {
     this.simpleSync('new-updates', (s) => (store.newUpdates = s))
     this.simpleSync('update-progress-info', (s) => (store.updateProgressInfo = s))
     this.simpleSync('last-check-at', (s) => (store.lastCheckAt = s))
+    this.simpleSync('current-announcement', (s) => (store.currentAnnouncement = s))
   }
 
   checkUpdates() {
@@ -42,6 +43,10 @@ export class AutoUpdateRendererModule extends StateSyncModule {
 
   setDownloadSource(source: string) {
     return this.call('set-setting/download-source', source)
+  }
+
+  setReadAnnouncement(sha: string) {
+    return this.call('set-read', sha)
   }
 
   openDownloadDir() {

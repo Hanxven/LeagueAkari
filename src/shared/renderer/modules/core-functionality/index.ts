@@ -62,6 +62,7 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
     )
     this.simpleSync('is-waiting-for-delay', (s) => (store.isWaitingForDelay = s))
     this.simpleSync('ongoing-player-analysis', (s) => (store.ongoingPlayerAnalysis = s))
+    this.simpleSync('queue-filter', (s) => (store.queueFilter = s))
   }
 
   /**
@@ -188,6 +189,10 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
 
   setMatchHistorySource(value: string) {
     return this.call('set-setting/match-history-source', value)
+  }
+
+  setQueueFilter(queueId: number | null) {
+    return this.call('set-queue-filter', queueId)
   }
 }
 
