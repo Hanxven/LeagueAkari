@@ -9,8 +9,11 @@
         :src="rankedImageMap[rankedEntry.tier] || rankedImageMap['UNRANKED']"
       />
       <div class="ranked-info">
-        <span class="ranked-name">{{ formatTier }}</span>
-        <span class="ranked-wins-lp"
+        <span class="ranked-name" v-if="rankedEntry.queueType !== 'CHERRY'">{{ formatTier }}</span>
+        <span v-if="rankedEntry.ratedRating" class="wins"
+          >{{ rankedEntry.wins }} 胜 {{ rankedEntry.ratedRating }} 分</span
+        >
+        <span v-else class="ranked-wins-lp"
           >{{ rankedEntry.wins }} 胜 {{ rankedEntry.leaguePoints }} LP</span
         >
         <div

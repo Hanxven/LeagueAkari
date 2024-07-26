@@ -257,7 +257,7 @@ const items = Array.from({ length: 100 }, (_, i) => ({
   margin-top: 4px;
   gap: 2px;
 
-  .ranked-solo,
+  .ranked,
   .ranked-flex {
     display: flex;
     flex: 1;

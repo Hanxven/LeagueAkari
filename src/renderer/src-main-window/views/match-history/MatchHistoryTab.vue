@@ -5,6 +5,16 @@
       v-model:show="isShowingTagEditModal"
       @edited="(id) => handleTagEdited(id)"
     />
+    <NModal v-model:show="isShowingRankedModal">
+      <div class="ranked-modal">
+        <RankedDisplay
+          v-for="r of tab.rankedStats?.queueMap"
+          :key="r.queueType"
+          class="ranked"
+          :ranked-entry="r"
+        />
+      </div>
+    </NModal>
     <Transition name="fade">
       <div class="player-header-simplified" v-if="shouldShowTinyHeader">
         <div class="header-simplified-inner">
@@ -83,13 +93,20 @@
           </div>
           <div class="header-ranked">
             <RankedDisplay
-              class="ranked-solo"
+              class="ranked"
               :ranked-entry="tab.rankedStats?.queueMap['RANKED_SOLO_5x5']"
             />
             <RankedDisplay
-              class="ranked-flex"
+              class="ranked"
               :ranked-entry="tab.rankedStats?.queueMap['RANKED_FLEX_SR']"
             />
+            <div class="ranked-more">
+              <NButton :focusable="false" title="更多" size="tiny" secondary @click="isShowingRankedModal = true">
+                <template #icon>
+                  <MoreHorizFilledIcon />
+                </template>
+              </NButton>
+            </div>
           </div>
           <div class="buttons-container">
             <NButton
@@ -323,11 +340,12 @@ import { summonerName } from '@shared/utils/name'
 import { Edit20Filled as EditIcon } from '@vicons/fluent'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import {
+  MoreHorizFilled as MoreHorizFilledIcon,
   NavigateBeforeOutlined as NavigateBeforeOutlinedIcon,
   NavigateNextOutlined as NavigateNextOutlinedIcon
 } from '@vicons/material'
-import { NButton, NIcon, NInputNumber, NScrollbar, NSelect, NSpin } from 'naive-ui'
-import { computed, nextTick, ref, watch, watchEffect } from 'vue'
+import { NButton, NIcon, NInputNumber, NModal, NScrollbar, NSelect, NSpin } from 'naive-ui'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
@@ -357,6 +375,8 @@ const gameData = useGameDataStore()
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
   mh.setMatchHistoryExpand(props.tab.puuid, gameId, expand)
 }
+
+const isShowingRankedModal = ref(false)
 
 const isSomethingLoading = computed(() => {
   return (
@@ -569,6 +589,16 @@ defineExpose({
   height: 100%;
 }
 
+.ranked-modal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  background-color: #000000b4;
+  backdrop-filter: blur(8px);
+  border-radius: 4px;
+  padding: 16px;
+}
+
 .profile {
   display: flex;
   align-items: center;
@@ -755,10 +785,14 @@ defineExpose({
 }
 
 .header-ranked {
+  position: relative;
   display: flex;
+  gap: 12px;
 
-  .ranked-solo {
-    margin-right: 12px;
+  .ranked-more {
+    position: absolute;
+    bottom: -6px;
+    right: -8px;
   }
 }
 

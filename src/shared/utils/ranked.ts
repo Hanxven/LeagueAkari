@@ -14,5 +14,8 @@ export const tierTextMap: Record<string, string> = {
 export const queueTypeTextMap: Record<string, string> = {
   RANKED_SOLO_5x5: '单排 / 双排',
   RANKED_FLEX_SR: '灵活组排',
-  CHERRY: '斗魂竞技场'
+  CHERRY: '斗魂竞技场',
+  RANKED_TFT: '云顶之弈',
+  RANKED_TFT_TURBO: '云顶之弈 (狂暴模式)',
+  RANKED_TFT_DOUBLE_UP: '云顶之弈 (双人作战)'
 }
