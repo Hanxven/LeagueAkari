@@ -33,8 +33,6 @@ export const useAutoSelectStore = defineStore('module:auto-select', () => {
 
     onlySimulMode: true,
 
-    expectedChampions: [] as number[],
-
     expectedChampions: markRaw({
       top: [],
       middle: [],
@@ -62,8 +60,6 @@ export const useAutoSelectStore = defineStore('module:auto-select', () => {
 
     // 自动 ban
     banEnabled: false,
-
-    bannedChampions: [] as number[],
 
     bannedChampions: markRaw({
       top: [],

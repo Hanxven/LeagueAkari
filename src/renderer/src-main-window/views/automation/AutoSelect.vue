@@ -63,13 +63,6 @@
             <template #unchecked>亮出</template></NSwitch
           >
         </ControlItem>
-        <ControlItem class="control-item-margin" label="意向英雄" v-if="false">
-          <OrderedChampionList
-            type="pick"
-            :champions="as.settings.expectedChampions"
-            @update:champions="(list) => asm.setExpectedChampions(list)"
-          />
-        </ControlItem>
         <ControlItem class="control-item-margin" label="意向英雄">
           <template #labelDescription>
             <div style="margin-bottom: 8px">将根据预设列表选择英雄</div>
@@ -109,7 +102,9 @@
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'jungle' }">打野</div>
+              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'jungle' }">
+                打野
+              </div>
               <OrderedChampionList
                 type="pick"
                 :champions="as.settings.expectedChampions.jungle"
@@ -227,14 +222,6 @@
             :value="as.settings.banTeammateIntendedChampion"
             size="small"
           ></NSwitch>
-        </ControlItem>
-        <ControlItem class="control-item-margin" label="意向英雄" v-if="false">
-          <OrderedChampionList
-            :champions="as.settings.bannedChampions"
-            allow-empty
-            type="ban"
-            @update:champions="(list) => asm.setBannedChampions(list)"
-          />
         </ControlItem>
         <ControlItem class="control-item-margin" label="意向英雄">
           <template #labelDescription>
