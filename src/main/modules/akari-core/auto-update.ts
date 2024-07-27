@@ -177,7 +177,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
   private _currentUpdateTaskCanceler: (() => void) | null = null
 
   static UPDATES_CHECK_INTERVAL = 7.2e6
-  static ANNOUNCEMENT_CHECK_INTERVAL = 3.6e6
+  static ANNOUNCEMENT_CHECK_INTERVAL = 7.2e6
   static DOWNLOAD_DIR_NAME = 'NewUpdates'
   static UPDATE_SCRIPT_NAME = 'LeagueAkariUpdate.ps1'
   static UPDATE_PROGRESS_UPDATE_INTERVAL = 200
@@ -248,17 +248,19 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
   }
 
   private async _updateAnnouncement() {
+    this._logger.info(`正在拉取最新公告: ${LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL}`)
+
     try {
       const { data } = await this._http.get<FileInfo>(LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL)
 
       const { data: announcement } = await this._http.get<string>(data.download_url)
 
-      const lastRead = await this._ss.get('last-read-announcement-sha', '')
+      const lastReadSha = await this._ss.get('last-read-announcement-sha', '')
 
       this.state.setCurrentAnnouncement({
         content: announcement,
         updateAt: new Date(),
-        isRead: data.sha === lastRead,
+        isRead: data.sha === lastReadSha,
         sha: data.sha
       })
     } catch (error) {

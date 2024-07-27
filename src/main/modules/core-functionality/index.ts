@@ -399,7 +399,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         return
       }
 
-      if (!this._lcm2.isGameClientForeground()) {
+      if (this.state.queryState === 'in-game' && !this._lcm2.isGameClientForeground()) {
         return
       }
 

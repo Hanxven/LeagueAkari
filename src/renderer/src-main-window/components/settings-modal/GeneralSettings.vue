@@ -239,18 +239,6 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="任务栏图标"
-        label-description="是否在任务栏中展示一个图标"
-        :label-width="320"
-      >
-        <NSwitch
-          size="small"
-          :value="aux.settings.taskbarIcon"
-          @update:value="(val) => awm.setTaskbarIcon(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
         label="重设辅助窗口位置"
         label-description="重新设置辅助窗口的位置，还原到默认主屏幕正中心"
         :label-width="320"

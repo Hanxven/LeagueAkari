@@ -19,8 +19,6 @@ class AuxiliaryWindowSettings {
 
   zoomFactor: number = 1.0
 
-  taskbarIcon: boolean = true
-
   isPinned = true
 
   setOpacity(opacity: number) {
@@ -37,10 +35,6 @@ class AuxiliaryWindowSettings {
 
   setZoomFactor(f: number) {
     this.zoomFactor = f
-  }
-
-  setTaskbarIcon(b: boolean) {
-    this.taskbarIcon = b
   }
 
   constructor() {
@@ -194,25 +188,6 @@ export class AuxWindowModule extends MobxBasedBasicModule {
         }
       }
     )
-
-    this.autoDisposeReaction(
-      () => this.state.settings.zoomFactor,
-      () => {
-        this._adjustWindowSize()
-      }
-    )
-
-    this.autoDisposeReaction(
-      () => this.state.settings.taskbarIcon,
-      (b) => {
-        this._w?.setSkipTaskbar(!b)
-        this._w?.setMinimizable(b)
-
-        if (!b) {
-          this._w?.show()
-        }
-      }
-    )
   }
 
   private _setupStateSync() {
@@ -308,19 +283,17 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       width: AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor,
       height: AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor,
       minWidth: AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor,
-      maxWidth: AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor,
       minHeight: AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor,
-      maxHeight: AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor,
-      resizable: false,
+      resizable: true,
       frame: false,
       show: AuxWindowModule.INITIAL_SHOW,
       title: 'Mini Akari',
       autoHideMenuBar: true,
       maximizable: false,
-      minimizable: false,
+      minimizable: true,
       icon,
       fullscreenable: false,
-      skipTaskbar: true,
+      skipTaskbar: false,
       alwaysOnTop: this.state.settings.isPinned,
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
@@ -331,9 +304,9 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       }
     })
 
-    this._getLastWindowBounds().then((r) => {
-      if (r) {
-        this._adjustWindowSize(r.x, r.y)
+    this._getLastWindowBounds().then((bounds) => {
+      if (bounds) {
+        this._w?.setBounds(bounds)
       }
     })
 
@@ -341,8 +314,6 @@ export class AuxWindowModule extends MobxBasedBasicModule {
 
     this._w.setOpacity(this.state.settings.opacity)
 
-    this._w.setSkipTaskbar(!this.state.settings.taskbarIcon)
-    this._w.setMinimizable(this.state.settings.taskbarIcon)
 
     this._w.webContents.on('did-finish-load', () => {
       this._w?.webContents.setZoomFactor(this.state.settings.zoomFactor)
@@ -457,45 +428,11 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       () => this.state.settings.zoomFactor,
       (s) => this.state.settings.setZoomFactor(s)
     )
-    this.simpleSettingSync(
-      'taskbar-icon',
-      () => this.state.settings.taskbarIcon,
-      (s) => this.state.settings.setTaskbarIcon(s)
-    )
 
     await this.loadSettings()
   }
 
-  private _adjustWindowSize(x?: number, y?: number) {
-    if (this._w) {
-      this._w.webContents.setZoomFactor(this.state.settings.zoomFactor)
-
-      if (!x || !y) {
-        ;[x, y] = this._w.getPosition()
-      }
-
-      this._w.setBounds({
-        x,
-        y,
-        width: Math.ceil(AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor),
-        height: Math.ceil(AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor)
-      })
-      this._w.setMinimumSize(
-        Math.ceil(AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor),
-        Math.ceil(AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor)
-      )
-      this._w.setMaximumSize(
-        Math.ceil(AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor),
-        Math.ceil(AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor)
-      )
-
-      this._saveWindowBounds(this._w.getBounds())
-    }
-  }
-
   private _saveWindowBounds(bounds: Rectangle) {
-    bounds.width = AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor
-    bounds.height = AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor
     return this._sm.settings.set('auxiliary-window/bounds', bounds)
   }
 

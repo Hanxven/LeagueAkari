@@ -10,6 +10,9 @@
       >
         <NIcon><PinFilledIcon /></NIcon>
       </div>
+      <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
+        <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
+      </div>
       <div title="关闭" class="traffic-button close" @click="handleClose">
         <NIcon><CloseIcon /></NIcon>
       </div>
@@ -21,6 +24,7 @@
 import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
 import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
+import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/fluent'
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 
@@ -28,6 +32,10 @@ const aw = useAuxiliaryWindowStore()
 
 const handleClose = () => {
   return awm.hide()
+}
+
+const handleMinimize = () => {
+  return awm.minimize()
 }
 
 const handlePin = (b: boolean) => {
@@ -88,7 +96,7 @@ const handlePin = (b: boolean) => {
     }
   }
 
-  .traffic-button.pin {
+  .traffic-button.pin, .traffic-button.minimize {
     &.pinned {
       background-color: rgba(102, 102, 102, 0.15);
     }
@@ -100,4 +108,3 @@ const handlePin = (b: boolean) => {
   }
 }
 </style>
-@shared/renderer/modules/auxiliary-window@shared/renderer/modules/auxiliary-window/store
