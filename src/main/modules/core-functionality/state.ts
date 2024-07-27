@@ -190,6 +190,7 @@ export class CoreFunctionalityState {
     }
 
     return {
+      queueId: lcu.gameflow.session.gameData.queue.id,
       queueType: lcu.gameflow.session.gameData.queue.type,
       gameId: lcu.gameflow.session.gameData.gameId,
       gameMode: lcu.gameflow.session.gameData.queue.gameMode

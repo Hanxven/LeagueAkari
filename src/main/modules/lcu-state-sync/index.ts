@@ -28,7 +28,7 @@ import { LcuEvent } from '@shared/types/lcu/event'
 import { BallotLegacy } from '@shared/types/lcu/honorV2'
 import { formatError } from '@shared/utils/errors'
 import { isAxiosError } from 'axios'
-import { comparer, runInAction } from 'mobx'
+import { comparer, computed, runInAction } from 'mobx'
 import PQueue from 'p-queue'
 
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
@@ -318,10 +318,11 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       async (state) => {
         if (state === 'connected') {
           try {
-            const a = (async () => {
+            const loadPickables = async () => {
               try {
                 const pickables = (await getPickableChampIds()).data
                 this.champSelect.setCurrentPickableChampionArray(pickables)
+                this._logger.info(`更新可选用英雄列表, 共 ${pickables.length} 个`)
               } catch (error) {
                 if (isAxiosError(error) && error.response?.status === 404) {
                   this.champSelect.setCurrentPickableChampionArray([])
@@ -330,12 +331,13 @@ export class LcuSyncModule extends MobxBasedBasicModule {
 
                 throw error
               }
-            })()
+            }
 
-            const b = (async () => {
+            const loadBannables = async () => {
               try {
                 const bannables = (await getBannableChampIds()).data
                 this.champSelect.setCurrentBannableChampionArray(bannables)
+                this._logger.info(`更新可禁用英雄列表, 共 ${bannables.length} 个`)
               } catch (error) {
                 if (isAxiosError(error) && error.response?.status === 404) {
                   this.champSelect.setCurrentBannableChampionArray([])
@@ -344,9 +346,9 @@ export class LcuSyncModule extends MobxBasedBasicModule {
 
                 throw error
               }
-            })()
+            }
 
-            await Promise.all([a, b])
+            await Promise.all([loadPickables(), loadBannables()])
           } catch (error) {
             this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取可选英雄/可禁用英雄失败')
             this._logger.warn(`获取可选英雄/可禁用英雄失败 ${formatError(error)}`)
@@ -361,10 +363,10 @@ export class LcuSyncModule extends MobxBasedBasicModule {
 
     let isCellSummonerUpdated = false
     this.autoDisposeReaction(
-      () => [this.champSelect.session?.myTeam, this.summoner.me?.puuid] as const,
-      async ([myTeam, puuid]) => {
-        if (!isCellSummonerUpdated && myTeam && puuid) {
-          const self = myTeam.find((t) => t.puuid === puuid)
+      () => this.champSelect.session,
+      async (session) => {
+        if (!isCellSummonerUpdated && session) {
+          const self = session.myTeam.find((t) => t.cellId === session.localPlayerCellId)
           if (self) {
             try {
               const s = await getChampSelectSummoner(self.cellId)
@@ -382,6 +384,29 @@ export class LcuSyncModule extends MobxBasedBasicModule {
         }
       },
       { fireImmediately: true }
+    )
+
+    const selfSummonerExtracted = computed(() => {
+      if (!this.champSelect.selfSummoner) {
+        return null
+      }
+
+      const { championId, cellId, isActingNow, isPickIntenting } = this.champSelect.selfSummoner
+
+      return {
+        championId,
+        cellId,
+        isActingNow,
+        isPickIntenting
+      }
+    })
+
+    this.autoDisposeReaction(
+      () => selfSummonerExtracted.get(),
+      (s) => {
+        this._logger.info(`Self Summoner Cell: ${JSON.stringify(s)}`)
+      },
+      { equals: comparer.structural }
     )
 
     this.autoDisposeReaction(
@@ -402,9 +427,11 @@ export class LcuSyncModule extends MobxBasedBasicModule {
           try {
             const c = (await getCurrentChamp()).data
             this.champSelect.setCurrentChampion(c)
+            this._logger.info(`当前选择的英雄: ${c}`)
           } catch (error) {
             if (isAxiosError(error) && error.response?.status === 404) {
               this.champSelect.setCurrentChampion(null)
+              this._logger.info(`当前选择的英雄: 无`)
               return
             }
 
@@ -432,6 +459,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
         if (event.eventType === 'Delete') {
           this.champSelect.setCurrentPickableChampionArray([])
         } else {
+          this._logger.info(`更新可选用英雄列表, 共 ${event.data.length} 个`)
           this.champSelect.setCurrentPickableChampionArray(event.data)
         }
       }
@@ -443,6 +471,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
         if (event.eventType === 'Delete') {
           this.champSelect.setCurrentBannableChampionArray([])
         } else {
+          this._logger.info(`更新可禁用英雄列表, 共 ${event.data.length} 个`)
           this.champSelect.setCurrentBannableChampionArray(event.data)
         }
       }
@@ -461,6 +490,8 @@ export class LcuSyncModule extends MobxBasedBasicModule {
     const d5 = this._lcm.lcuEventBus.on<LcuEvent<number>>(
       '/lol-champ-select/v1/current-champion',
       (event) => {
+        this._logger.info(`当前选择的英雄: ${event.data}`)
+
         if (event.eventType === 'Delete') {
           this.champSelect.setCurrentChampion(null)
         }
