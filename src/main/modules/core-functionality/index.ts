@@ -819,7 +819,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
         const useSgpApi =
           this.state.settings.matchHistorySource === 'sgp' &&
-          this._edsm.sgp.state.availability.currentRegionSupported
+          this._edsm.sgp.state.availability.currentSgpServerSupported
 
         this._logger.info(
           `Use API: ${useSgpApi ? 'SGP' : 'LCU'}, 加载玩家信息 MatchHistory: ${puuid}`

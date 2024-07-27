@@ -313,7 +313,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
         let matchHistory: MatchHistory
         if (
           cf.settings.matchHistorySource === 'sgp' &&
-          eds.sgpAvailability.currentRegionSupported
+          eds.sgpAvailability.currentSgpServerSupported
         ) {
           matchHistory = await edsm.sgp.getMatchHistoryLcuFormat(
             puuid,

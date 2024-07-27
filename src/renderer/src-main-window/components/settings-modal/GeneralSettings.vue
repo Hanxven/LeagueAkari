@@ -58,7 +58,7 @@
           </div>
           <template v-if="cf.settings.matchHistorySource === 'sgp' && lc.state === 'connected'">
             <div
-              v-if="eds.sgpAvailability.currentRegionSupported"
+              v-if="eds.sgpAvailability.currentSgpServerSupported"
               style="color: #63e2b7; font-weight: bold"
             >
               当前 ({{
@@ -67,7 +67,7 @@
                   : eds.sgpAvailability.currentRegion
               }}) SGP Server:
               {{
-                eds.sgpAvailability.supportedServers.servers[
+                eds.sgpAvailability.supportedSgpServers.servers[
                   eds.sgpAvailability.currentRegion === 'TENCENT'
                     ? eds.sgpAvailability.currentRsoPlatform
                     : eds.sgpAvailability.currentRegion

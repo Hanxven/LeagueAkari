@@ -14,8 +14,8 @@ export class SgpEdsState {
   availability = {
     currentRegion: '',
     currentRsoPlatform: '',
-    currentRegionSupported: false,
-    supportedServers: {
+    currentSgpServerSupported: false,
+    supportedSgpServers: {
       servers: {},
       groups: []
     } as AvailableServersMap
@@ -30,14 +30,14 @@ export class SgpEdsState {
   setAvailability(
     currentRegion: string,
     currentRsoPlatform: string,
-    currentRegionSupported: boolean,
-    supportedServers: AvailableServersMap
+    currentSgpServerSupported: boolean,
+    supportedSgpServers: AvailableServersMap
   ) {
     this.availability = {
       currentRegion,
-      currentRsoPlatform: currentRsoPlatform,
-      currentRegionSupported,
-      supportedServers
+      currentRsoPlatform,
+      currentSgpServerSupported,
+      supportedSgpServers
     }
   }
 }
@@ -128,7 +128,7 @@ export class SgpEds {
           return
         }
 
-        const supported = this._sgp.supportsPlatform(
+        const supported = this._sgp.supportsSgpServer(
           auth.region === 'TENCENT' ? auth.rsoPlatformId : auth.region
         )
         const supportedPlatforms = this._sgp.supportedPlatforms()
@@ -155,17 +155,7 @@ export class SgpEds {
     sgpServerId?: string
   ) {
     if (!sgpServerId) {
-      const auth = this._lc.state.auth
-      if (!auth) {
-        throw new Error('LCU is not connected')
-      }
-
-      // 对于腾讯服务器，存在多个子服务器
-      if (auth.region === SgpEds.TENCENT_REGION) {
-        sgpServerId = auth.rsoPlatformId
-      } else {
-        sgpServerId = auth.region
-      }
+      sgpServerId = this._getSgpServerIdFromLcuAuth()
     }
 
     if (tag) {
@@ -374,6 +364,38 @@ export class SgpEds {
     }
   }
 
+  private _getSgpServerIdFromLcuAuth() {
+    let sgpServerId: string
+    const auth = this._lc.state.auth
+    if (!auth) {
+      throw new Error('LCU is not connected')
+    }
+
+    if (auth.region === SgpEds.TENCENT_REGION) {
+      sgpServerId = auth.rsoPlatformId
+    } else {
+      sgpServerId = auth.region
+    }
+
+    return sgpServerId
+  }
+
+  async getRankedStats(puuid: string, sgpServerId?: string) {
+    if (!sgpServerId) {
+      sgpServerId = this._getSgpServerIdFromLcuAuth()
+    }
+
+    return (await this._sgp.getRankedStatsTencent(sgpServerId, puuid)).data
+  }
+
+  async getSummoner(puuid: string, sgpServerId?: string) {
+    if (!sgpServerId) {
+      sgpServerId = this._getSgpServerIdFromLcuAuth()
+    }
+
+    return (await this._sgp.getSummonerByPuuidTencent(sgpServerId, puuid)).data[0]
+  }
+
   private _setupMethodCall() {
     this._edsm.onCall('supported-sgp-servers', () => {
       return this._sgp.supportedPlatforms()
@@ -401,7 +423,7 @@ export class SgpEds {
         tag?: string,
         sgpServerId?: string
       ) => {
-        return this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)
+        return (await this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)).data
       }
     )
   }

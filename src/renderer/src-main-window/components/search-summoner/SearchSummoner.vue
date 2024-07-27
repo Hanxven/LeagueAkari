@@ -124,7 +124,7 @@ watchEffect(() => {
 })
 
 const serverOptions = computed(() => {
-  if (!eds.sgpAvailability.currentRegionSupported) {
+  if (!eds.sgpAvailability.currentSgpServerSupported) {
     return []
   }
 
@@ -133,7 +133,7 @@ const serverOptions = computed(() => {
       ? eds.sgpAvailability.currentRsoPlatform
       : eds.sgpAvailability.currentRegion
 
-  const thatGroup = eds.sgpAvailability.supportedServers.groups.find((g) =>
+  const thatGroup = eds.sgpAvailability.supportedSgpServers.groups.find((g) =>
     g.find((s) => s === platform)
   )
 

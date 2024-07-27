@@ -62,7 +62,7 @@ export class SgpApi {
     this._availableSgpServers = servers
   }
 
-  supportsPlatform(platformId: string) {
+  supportsSgpServer(platformId: string) {
     return this._availableSgpServers.servers[platformId.toUpperCase()] !== undefined
   }
 
@@ -160,7 +160,7 @@ export class SgpApi {
     const platformSgpServer = this._getSgpServerId(platformId)
 
     return this._http.post<SgpSummoner[]>(
-      `/summoner-ledge/v1/regions/${platformId.toUpperCase()}/summoners/puuids`,
+      `/summoner-ledge/v1/regions/${platformId.toLowerCase()}/summoners/puuids`,
       [puuid],
       { baseURL: platformSgpServer.server }
     )
