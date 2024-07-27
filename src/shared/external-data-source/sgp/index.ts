@@ -66,7 +66,7 @@ export class SgpApi {
     return this._availableSgpServers.servers[platformId.toUpperCase()] !== undefined
   }
 
-  supportedPlatforms() {
+  supportedSgpServers() {
     return this._availableSgpServers
   }
 

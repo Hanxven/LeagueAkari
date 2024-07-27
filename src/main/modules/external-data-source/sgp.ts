@@ -14,6 +14,7 @@ export class SgpEdsState {
   availability = {
     currentRegion: '',
     currentRsoPlatform: '',
+    currentSgpServerId: '',
     currentSgpServerSupported: false,
     supportedSgpServers: {
       servers: {},
@@ -30,12 +31,14 @@ export class SgpEdsState {
   setAvailability(
     currentRegion: string,
     currentRsoPlatform: string,
+    currentSgpServerId: string,
     currentSgpServerSupported: boolean,
     supportedSgpServers: AvailableServersMap
   ) {
     this.availability = {
       currentRegion,
       currentRsoPlatform,
+      currentSgpServerId,
       currentSgpServerSupported,
       supportedSgpServers
     }
@@ -112,7 +115,7 @@ export class SgpEds {
       }
 
       this._sgp.setAvailableSgpServers(json)
-      this.state.setAvailability('', '', false, json)
+      this.state.setAvailability('', '', '', false, json)
     } catch (error) {
       this._edsm.logger.warn(`加载 SGP 服务器配置文件时发生错误: ${formatError(error)}`)
     }
@@ -128,12 +131,18 @@ export class SgpEds {
           return
         }
 
-        const supported = this._sgp.supportsSgpServer(
-          auth.region === 'TENCENT' ? auth.rsoPlatformId : auth.region
-        )
-        const supportedPlatforms = this._sgp.supportedPlatforms()
+        const sgpServerId = auth.region === 'TENCENT' ? auth.rsoPlatformId : auth.region
 
-        this.state.setAvailability(auth.region, auth.rsoPlatformId, supported, supportedPlatforms)
+        const supported = this._sgp.supportsSgpServer(sgpServerId)
+        const supportedSgpServers = this._sgp.supportedSgpServers()
+
+        this.state.setAvailability(
+          auth.region,
+          auth.rsoPlatformId,
+          sgpServerId,
+          supported,
+          supportedSgpServers
+        )
       },
       { fireImmediately: true }
     )
@@ -398,7 +407,7 @@ export class SgpEds {
 
   private _setupMethodCall() {
     this._edsm.onCall('supported-sgp-servers', () => {
-      return this._sgp.supportedPlatforms()
+      return this._sgp.supportedSgpServers()
     })
 
     this._edsm.onCall(

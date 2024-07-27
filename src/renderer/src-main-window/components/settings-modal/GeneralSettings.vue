@@ -63,14 +63,12 @@
             >
               当前 ({{
                 eds.sgpAvailability.currentRegion === 'TENCENT'
-                  ? `${eds.sgpAvailability.currentRegion}-${eds.sgpAvailability.currentRsoPlatform}`
-                  : eds.sgpAvailability.currentRegion
+                  ? `TENCENT-${eds.sgpAvailability.currentSgpServerId}`
+                  : eds.sgpAvailability.currentSgpServerId
               }}) SGP Server:
               {{
                 eds.sgpAvailability.supportedSgpServers.servers[
-                  eds.sgpAvailability.currentRegion === 'TENCENT'
-                    ? eds.sgpAvailability.currentRsoPlatform
-                    : eds.sgpAvailability.currentRegion
+                  eds.sgpAvailability.currentSgpServerId
                 ].server
               }}
             </div>

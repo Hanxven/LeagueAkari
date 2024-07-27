@@ -14,6 +14,7 @@ export const useExternalDataSourceStore = defineStore('module:external-data-sour
     currentRegion: '',
     currentRsoPlatform: '',
     currentSgpServerSupported: false,
+    currentSgpServerId: '',
     supportedSgpServers: {
       servers: {},
       groups: []
