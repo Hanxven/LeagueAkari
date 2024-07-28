@@ -35,7 +35,7 @@
         </ControlItem>
         <ControlItem
           class="control-item-margin"
-          label-description="当游戏端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏端 (游戏本体) 进程"
+          label-description="当游戏端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏端 (游戏本体) 进程。请注意，此操作为强制结束进程，而非正常的游戏退出流程，可能产生意料之外的副作用"
           :disabled="!app.isAdministrator"
           :label="
             app.isAdministrator

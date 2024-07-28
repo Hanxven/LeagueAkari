@@ -1,7 +1,6 @@
 import { Action } from '@shared/types/lcu/champ-select'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
-import { appModule } from '../akari-core/app'
 import { lcuSyncModule as lcu } from '../lcu-state-sync'
 
 class AutoSelectSettings {
@@ -97,7 +96,9 @@ export class AutoSelectState {
       return null
     }
 
-    const memberMe = lcu.champSelect.session.myTeam.find((p) => p.puuid === lcu.summoner.me?.puuid)
+    const memberMe = lcu.champSelect.session.myTeam.find(
+      (p) => p.cellId === lcu.champSelect.session?.localPlayerCellId
+    )
 
     if (!memberMe) {
       return null
@@ -168,7 +169,7 @@ export class AutoSelectState {
 
     // 不能选择队友 (包括自己) 已经选择或亮出的英雄
     ;[...a.session.myTeam, ...a.session.theirTeam].forEach((t) => {
-      if (t.championId && t.puuid !== lcu.summoner.me!.puuid) {
+      if (t.championId && t.puuid !== a.memberMe.puuid) {
         unpickables.add(t.championId)
       }
     })

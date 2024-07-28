@@ -137,6 +137,60 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     )
 
     this.autoDisposeReaction(
+      () => this.state.upcomingPick,
+      (pick) => {
+        this._logger.info(`Upcoming Pick - 即将进行的选择: ${JSON.stringify(pick)}`)
+      }
+    )
+
+    this.autoDisposeReaction(
+      () => this.state.upcomingBan,
+      (ban) => {
+        this._logger.info(`Upcoming Ban - 即将进行的禁用: ${JSON.stringify(ban)}`)
+      }
+    )
+
+    this.autoDisposeReaction(
+      () => this.state.upcomingGrab,
+      (grab) => {
+        this._logger.info(`Upcoming Grab - 即将进行的交换: ${JSON.stringify(grab)}`)
+      }
+    )
+
+    // for logging only
+    const positionInfo = computed(() => {
+      if (!this.state.champSelectActionInfo) {
+        return null
+      }
+
+      if (!this.state.settings.normalModeEnabled || !this.state.settings.banEnabled) {
+        return null
+      }
+
+      const position = this.state.champSelectActionInfo.memberMe.assignedPosition
+
+      const championsBan = this.state.settings.bannedChampions
+      const championsPick = this.state.settings.expectedChampions
+
+      return {
+        position,
+        ban: championsBan,
+        pick: championsPick
+      }
+    }, { equals: comparer.structural })
+
+    this.autoDisposeReaction(
+      () => positionInfo.get(),
+      (info) => {
+        if (info) {
+          this._logger.info(
+            `当前分配到位置: ${info.position || '<空>'}, 预设选用英雄: ${JSON.stringify(info.pick)}, 预设禁用英雄: ${JSON.stringify(info.ban)}`
+          )
+        }
+      }
+    )
+
+    this.autoDisposeReaction(
       () => this._lcu.chat.conversations.championSelect?.id,
       (id) => {
         if (id && this._lcu.gameflow.phase === 'ChampSelect') {
@@ -149,11 +203,11 @@ export class AutoSelectModule extends MobxBasedBasicModule {
             !this._lcu.champSelect.session.benchEnabled &&
             this.state.settings.normalModeEnabled
           ) {
-            texts.push('普通模式自动选择')
+            texts.push('普通模式自动选择已开启')
           }
 
           if (this._lcu.champSelect.session.benchEnabled && this.state.settings.benchModeEnabled) {
-            texts.push('随机模式自动选择')
+            texts.push('随机模式自动选择已开启')
           }
 
           if (!this._lcu.champSelect.session.benchEnabled && this.state.settings.banEnabled) {
@@ -165,12 +219,12 @@ export class AutoSelectModule extends MobxBasedBasicModule {
               }
             }
             if (hasBanAction) {
-              texts.push('自动禁用')
+              texts.push('自动禁用已开启')
             }
           }
 
           if (texts.length) {
-            chatSend(id, `[League Akari] ${texts.join('、')}已开启`, 'celebration').catch()
+            chatSend(id, `[League Akari] ${texts.join(', ')}`, 'celebration').catch()
           }
         }
       }
@@ -366,7 +420,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     )
 
     this.simpleSettingSync(
-      'expected-champions',
+      'expected-champions-multi',
       () => this.state.settings.expectedChampions,
       (s) => this.state.settings.setExpectedChampions(s)
     )
@@ -414,7 +468,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     )
 
     this.simpleSettingSync(
-      'banned-champions',
+      'banned-champions-multi',
       () => this.state.settings.bannedChampions,
       (s) => this.state.settings.setBannedChampions(s)
     )

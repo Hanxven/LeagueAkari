@@ -80,12 +80,12 @@ export class SgpApi {
   }
 
   private _getSgpServerId(platformId: string) {
-    const platformSgpServer = this._availableSgpServers.servers[platformId.toUpperCase()]
-    if (!platformSgpServer) {
+    const sgpServer = this._availableSgpServers.servers[platformId.toUpperCase()]
+    if (!sgpServer) {
       throw new Error(`unknown platformId: ${platformId}`)
     }
 
-    return platformSgpServer
+    return sgpServer
   }
 
   getMatchHistory(
@@ -119,11 +119,11 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = this._getSgpServerId(platformId)
+    const sgpServer = this._getSgpServerId(platformId)
 
     return this._http.get<SgpGameSummaryLol>(
       `/match-history-query/v1/products/lol/${platformId.toUpperCase()}_${gameId}/SUMMARY`,
-      { baseURL: platformSgpServer.server }
+      { baseURL: sgpServer.server }
     )
   }
 
@@ -140,29 +140,35 @@ export class SgpApi {
     )
   }
 
+  /**
+   * 注: 暂未测试非腾讯的服务器, 因此使用 Tencent 后缀
+   */
   getRankedStatsTencent(platformId: string, puuid: string) {
     if (!this._jwtToken) {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = this._getSgpServerId(platformId)
+    const sgpServer = this._getSgpServerId(platformId)
 
     return this._http.get<SgpRankedStats>(`/leagues-ledge/v2/rankedStats/puuid/${puuid}`, {
-      baseURL: platformSgpServer.server
+      baseURL: sgpServer.server
     })
   }
 
+  /**
+   * 注: 暂未测试非腾讯的服务器, 因此使用 Tencent 后缀
+   */
   getSummonerByPuuidTencent(platformId: string, puuid: string) {
     if (!this._jwtToken) {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = this._getSgpServerId(platformId)
+    const sgpServer = this._getSgpServerId(platformId)
 
     return this._http.post<SgpSummoner[]>(
       `/summoner-ledge/v1/regions/${platformId.toLowerCase()}/summoners/puuids`,
       [puuid],
-      { baseURL: platformSgpServer.server }
+      { baseURL: sgpServer.server }
     )
   }
 }

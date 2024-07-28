@@ -14,6 +14,18 @@
 </template>
 
 <script setup lang="ts">
+// 适用于数据源 OP.GG 的适配页面
+import { OpggDataSource } from '@shared/external-data-source/opgg'
+import { externalDataSourceRendererModule as edsm } from '@shared/renderer/modules/external-data-source'
+import { ref, shallowRef, watchEffect } from 'vue'
+
+const currentMode = ref<string | null>()
+const currentModeTierData = shallowRef()
+
+// 独立使用的外部数据源
+const opggSource = new OpggDataSource()
+
+watchEffect(() => {})
 </script>
 
 <style scoped lang="less"></style>

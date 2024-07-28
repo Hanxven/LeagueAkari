@@ -423,7 +423,7 @@ export class AppModule extends MobxBasedBasicModule {
     )
     await _toNewSettings(
       'autoSelect.expectedChampions',
-      'auto-select/expected-champions',
+      'auto-select/expected-champions-multi',
       (s) =>
         (this._asm.state.settings.expectedChampions = {
           top: [],
@@ -436,7 +436,7 @@ export class AppModule extends MobxBasedBasicModule {
     )
     await _toNewSettings(
       'autoSelect.bannedChampions',
-      'auto-select/banned-champions',
+      'auto-select/banned-champions-multi',
       (s) =>
         (this._asm.state.settings.bannedChampions = {
           top: [],

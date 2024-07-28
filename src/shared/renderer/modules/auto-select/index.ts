@@ -24,9 +24,8 @@ export class AutoSelectRendererModule extends StateSyncModule {
 
     this.simpleSync('settings/normal-mode-enabled', (s) => (store.settings.normalModeEnabled = s))
     this.simpleSync('settings/only-simul-mode', (s) => (store.settings.onlySimulMode = s))
-    this.simpleSync('settings/expected-champions', (s) => (store.settings.expectedChampions = s))
     this.simpleSync(
-      'settings/expected-champions',
+      'settings/expected-champions-multi',
       (s) => (store.settings.expectedChampions = markRaw(s))
     )
     this.simpleSync(
@@ -44,7 +43,7 @@ export class AutoSelectRendererModule extends StateSyncModule {
     this.simpleSync('settings/ban-enabled', (s) => (store.settings.banEnabled = s))
     this.simpleSync('settings/banned-champions', (s) => (store.settings.bannedChampions = s))
     this.simpleSync(
-      'settings/banned-champions',
+      'settings/banned-champions-multi',
       (s) => (store.settings.bannedChampions = markRaw(s))
     )
     this.simpleSync(
@@ -61,12 +60,8 @@ export class AutoSelectRendererModule extends StateSyncModule {
     return this.call('set-setting/only-simul-mode', value)
   }
 
-  setExpectedChampions(value: number[]) {
-    return this.call('set-setting/expected-champions', value)
-  }
-
-  setExpectedChampions2(value: Record<string, number[]>) {
-    return this.call('set-setting/expected-champions', value)
+  setExpectedChampions(value: Record<string, number[]>) {
+    return this.call('set-setting/expected-champions-multi', value)
   }
 
   setSelectTeammateIntendedChampion(value: boolean) {
@@ -97,12 +92,8 @@ export class AutoSelectRendererModule extends StateSyncModule {
     return this.call('set-setting/ban-enabled', value)
   }
 
-  setBannedChampions(value: number[]) {
-    return this.call('set-setting/banned-champions', value)
-  }
-
-  setBannedChampions2(value: Record<string, number[]>) {
-    return this.call('set-setting/banned-champions', value)
+  setBannedChampions(value: Record<string, number[]>) {
+    return this.call('set-setting/banned-champions-multi', value)
   }
 
   setBanTeammateIntendedChampion(value: boolean) {

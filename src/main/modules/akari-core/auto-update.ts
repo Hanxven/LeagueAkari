@@ -176,8 +176,8 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
   private _lastQuitTask: (() => void) | null = null
   private _currentUpdateTaskCanceler: (() => void) | null = null
 
-  static UPDATES_CHECK_INTERVAL = 7.2e6
-  static ANNOUNCEMENT_CHECK_INTERVAL = 7.2e6
+  static UPDATES_CHECK_INTERVAL = 7.2e6 // 2 hours
+  static ANNOUNCEMENT_CHECK_INTERVAL = 7.2e6 // 2 hours
   static DOWNLOAD_DIR_NAME = 'NewUpdates'
   static UPDATE_SCRIPT_NAME = 'LeagueAkariUpdate.ps1'
   static UPDATE_PROGRESS_UPDATE_INTERVAL = 200
