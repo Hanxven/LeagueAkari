@@ -41,7 +41,6 @@ export class AutoSelectRendererModule extends StateSyncModule {
     )
     this.simpleSync('settings/grab-delay-seconds', (s) => (store.settings.grabDelaySeconds = s))
     this.simpleSync('settings/ban-enabled', (s) => (store.settings.banEnabled = s))
-    this.simpleSync('settings/banned-champions', (s) => (store.settings.bannedChampions = s))
     this.simpleSync(
       'settings/banned-champions-multi',
       (s) => (store.settings.bannedChampions = markRaw(s))

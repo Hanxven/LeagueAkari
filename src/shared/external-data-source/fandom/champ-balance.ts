@@ -1,29 +1,29 @@
 import axios from 'axios'
+import { AxiosRetry } from 'axios-retry'
 import luaparse from 'luaparse'
 
 import { ChampBalanceDataSourceV1, ChampBalanceMapV1 } from '../normalized/champ-balance'
 
-const FANDOM_DATA_URL = 'https://leagueoflegends.fandom.com'
-
-const USER_AGENT =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
-
-const GAME_MODES = ['aram', 'ar', 'nb', 'ofa', 'urf', 'usb'] as const
-
-const BALANCE_TYPES = [
-  'dmg_dealt',
-  'dmg_taken',
-  'healing',
-  'shielding',
-  'ability_haste',
-  'mana_regen',
-  'energy_regen',
-  'attack_speed',
-  'movement_speed',
-  'tenacity'
-] as const
+const axiosRetry = require('axios-retry').default as AxiosRetry
 
 export class FandomWikiChampBalanceDataSource implements ChampBalanceDataSourceV1 {
+  static BASE_URL = 'https://leagueoflegends.fandom.com'
+  static USER_AGENT =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+  static GAME_MODES = ['aram', 'ar', 'nb', 'ofa', 'urf', 'usb'] as const
+  static BALANCE_TYPES = [
+    'dmg_dealt',
+    'dmg_taken',
+    'healing',
+    'shielding',
+    'ability_haste',
+    'mana_regen',
+    'energy_regen',
+    'attack_speed',
+    'movement_speed',
+    'tenacity'
+  ] as const
+
   private _name = 'Fandom Wiki'
 
   private _version = 'v0.0.1'
@@ -52,6 +52,16 @@ export class FandomWikiChampBalanceDataSource implements ChampBalanceDataSourceV
     return this._data
   }
 
+  constructor() {
+    axiosRetry(this._http, {
+      retries: 3,
+      retryDelay: () => 0,
+      retryCondition: (error) => {
+        return Boolean(error.response)
+      }
+    })
+  }
+
   async update() {
     const raw = await this._fetchScriptRawString()
     this._data = this._parseBalanceData(raw)
@@ -72,10 +82,10 @@ export class FandomWikiChampBalanceDataSource implements ChampBalanceDataSourceV
     return null
   }
 
-  private _axiosInstance = axios.create({
-    baseURL: FANDOM_DATA_URL,
+  private _http = axios.create({
+    baseURL: FandomWikiChampBalanceDataSource.BASE_URL,
     headers: {
-      'User-Agent': USER_AGENT
+      'User-Agent': FandomWikiChampBalanceDataSource.USER_AGENT
     }
   })
 
@@ -95,7 +105,7 @@ export class FandomWikiChampBalanceDataSource implements ChampBalanceDataSourceV
   }
 
   private async _fetchScriptRawString() {
-    const res = await this._axiosInstance.get('/wiki/Module:ChampionData/data')
+    const res = await this._http.get('/wiki/Module:ChampionData/data')
 
     const tagStart = "<pre class='mw-code mw-script' dir='ltr'>"
     const tagEnd = '</pre>'
@@ -125,11 +135,11 @@ export class FandomWikiChampBalanceDataSource implements ChampBalanceDataSourceV
       }
 
       const balance = {} as any
-      for (const m of GAME_MODES) {
+      for (const m of FandomWikiChampBalanceDataSource.GAME_MODES) {
         const fields = this._getValue(stats.fields, m)?.fields
 
         const modeBalance = {} as any
-        for (const t of BALANCE_TYPES) {
+        for (const t of FandomWikiChampBalanceDataSource.BALANCE_TYPES) {
           const value = this._getNumberValue(fields, t)
           if (value !== null) {
             switch (t) {

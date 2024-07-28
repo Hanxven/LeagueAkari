@@ -51,9 +51,20 @@ class BalanceEdsRenderer {
   }
 }
 
+export class GtimgEdsRenderer {
+  constructor(private _edsm: ExternalDataSourceRendererModule) {}
+
+  async setup() {
+    const store = useExternalDataSourceStore()
+
+    this._edsm.simpleSync('gtimg/hero-list', (s) => (store.heroList = s))
+  }
+}
+
 export class ExternalDataSourceRendererModule extends StateSyncModule {
   sgp = new SgpEdsRenderer(this)
   balance = new BalanceEdsRenderer(this)
+  gtimg = new GtimgEdsRenderer(this)
 
   constructor() {
     super('external-data-source')
@@ -64,6 +75,7 @@ export class ExternalDataSourceRendererModule extends StateSyncModule {
 
     await this.sgp.setup()
     await this.balance.setup()
+    await this.gtimg.setup()
 
     // FOR DEBUGGING
     // @ts-ignore

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { AxiosRetry } from 'axios-retry'
 
 import { NormalizedExternalChampBuildDataSourceMeta } from '../normalized/champ-build'
 import {
@@ -14,12 +15,13 @@ import {
   Versions
 } from './types'
 
-const OPGG_BASE_URL = 'https://lol-api-champion.op.gg'
-
-const USER_AGENT =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+const axiosRetry = require('axios-retry').default as AxiosRetry
 
 export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMeta {
+  static USER_AGENT =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+  static BASE_URL = 'https://lol-api-champion.op.gg'
+
   private _name = 'OP.GG'
 
   private _version = 'v0.0.1'
@@ -44,17 +46,25 @@ export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMet
     return this._id
   }
 
-  private _axiosInstance = axios.create({
-    baseURL: OPGG_BASE_URL,
+  private _http = axios.create({
+    baseURL: OpggDataSource.BASE_URL,
     headers: {
-      'User-Agent': USER_AGENT
+      'User-Agent': OpggDataSource.USER_AGENT
     }
   })
 
+  constructor() {
+    axiosRetry(this._http, {
+      retries: 3,
+      retryDelay: () => 0,
+      retryCondition: (error) => {
+        return Boolean(error.response)
+      }
+    })
+  }
+
   async getVersions(region: RegionType, mode: ModeType) {
-    const versions = await this._axiosInstance.get<Versions>(
-      `/api/${region}/champions/${mode}/versions`
-    )
+    const versions = await this._http.get<Versions>(`/api/${region}/champions/${mode}/versions`)
     return versions.data
   }
 
@@ -81,7 +91,7 @@ export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMet
       version = versions.data[0]
     }
 
-    const result = await this._axiosInstance.get<OpggARAMChampionSummary>(
+    const result = await this._http.get<OpggARAMChampionSummary>(
       `/api/${region}/champions/${mode}`,
       {
         params: {
@@ -142,7 +152,7 @@ export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMet
       url = `/api/${region}/champions/${mode}/${id}/${position}`
     }
 
-    const data = await this._axiosInstance.get(url, {
+    const data = await this._http.get(url, {
       params: { tier }
     })
 
@@ -150,6 +160,6 @@ export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMet
   }
 
   async getARAMBalance() {
-    return (await this._axiosInstance.get<OpggARAMBalance>('/api/contents/aram-balance')).data
+    return (await this._http.get<OpggARAMBalance>('/api/contents/aram-balance')).data
   }
 }

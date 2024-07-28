@@ -2,6 +2,7 @@ import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-m
 
 import { AppLogger, LogModule } from '../akari-core/log'
 import { BalanceEds } from './fandom'
+import { GtimgEds } from './gtimg'
 import { SgpEds } from './sgp'
 
 export class ExternalDataSourceModule extends MobxBasedBasicModule {
@@ -10,6 +11,8 @@ export class ExternalDataSourceModule extends MobxBasedBasicModule {
   private _balance = new BalanceEds(this)
 
   private _sgp = new SgpEds(this)
+
+  private _gtimg = new GtimgEds(this)
 
   /**
    * make it public for sub-modules
@@ -41,6 +44,7 @@ export class ExternalDataSourceModule extends MobxBasedBasicModule {
 
     await this._balance.setup()
     await this._sgp.setup()
+    await this._gtimg.setup()
 
     this._logger.info('初始化完成')
   }

@@ -19,12 +19,12 @@ function isSubsequence(s: string, t: string, caseSensitive = false): boolean {
   return index === s.length
 }
 
-export function isChampionNameMatch(pattern: string, title: string, name?: string): boolean {
+export function isChampionNameMatch(pattern: string, title: string): boolean {
   if (!title) {
     return false
   }
 
-  if (isSubsequence(pattern, title) || (name && isSubsequence(pattern, name))) {
+  if (isSubsequence(pattern, title)) {
     return true
   }
 
@@ -34,17 +34,25 @@ export function isChampionNameMatch(pattern: string, title: string, name?: strin
     return true
   }
 
-  if (name) {
-    const namePinyin = pinyin(name, { separator: '', toneType: 'none' })
-
-    if (isSubsequence(pattern, namePinyin)) {
-      return true
-    }
-  }
-
   const patternPinyin = pinyin(pattern, { separator: '', toneType: 'none' })
 
   if (isSubsequence(patternPinyin, titlePinyin)) {
+    return true
+  }
+
+  return false
+}
+
+export function isChampionNameMatchKeywords(pattern: string, keywords: string[] | string): boolean {
+  if (keywords.length === 0) {
+    return false
+  }
+
+  if (typeof keywords === 'string') {
+    return isChampionNameMatch(pattern, keywords)
+  }
+
+  if (keywords.some((keyword) => isChampionNameMatch(pattern, keyword))) {
     return true
   }
 

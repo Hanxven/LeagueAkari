@@ -27,17 +27,6 @@
         </ControlItem>
         <ControlItem
           class="control-item-margin"
-          label="无视队友预选"
-          label-description="开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突"
-        >
-          <NSwitch
-            @update:value="(v) => asm.setSelectTeammateIntendedChampion(v)"
-            :value="as.settings.selectTeammateIntendedChampion"
-            size="small"
-          />
-        </ControlItem>
-        <ControlItem
-          class="control-item-margin"
           label="提前预选"
           label-description="预选即将自动选用的英雄"
         >
@@ -46,6 +35,17 @@
             size="small"
             :value="as.settings.showIntent"
             @update:value="(val) => asm.setShowIntent(val)"
+          />
+        </ControlItem>
+        <ControlItem
+          class="control-item-margin"
+          label="无视队友预选"
+          label-description="开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突"
+        >
+          <NSwitch
+            @update:value="(v) => asm.setSelectTeammateIntendedChampion(v)"
+            :value="as.settings.selectTeammateIntendedChampion"
+            size="small"
           />
         </ControlItem>
         <ControlItem

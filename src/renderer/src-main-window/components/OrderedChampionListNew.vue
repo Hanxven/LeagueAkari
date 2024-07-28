@@ -10,10 +10,7 @@
         :render-source-label="renderSourceLabel"
         :render-target-label="renderTargetLabel"
         source-filter-placeholder="搜索英雄"
-        :filter="
-          (a, b) =>
-            isChampionNameMatch(a, b.label as string) || Boolean(b.value?.toString().includes(a))
-        "
+        :filter="(a, b) => isNameMatch(a, b.label as string, b.value as number)"
         source-filterable
       />
     </NModal>
@@ -43,11 +40,12 @@
 
 <script lang="ts" setup>
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { championIcon } from '@shared/renderer/modules/game-data'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { isChampionNameMatch } from '@shared/utils/string-match'
+import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
 import {
   NButton,
   NModal,
@@ -107,6 +105,32 @@ const championOptions = computed(() => {
       label: b.name
     }))
 })
+
+const eds = useExternalDataSourceStore()
+
+const isNameMatch = (pattern: string, label: string, value?: number) => {
+  try {
+    if (eds.heroListMap && value !== undefined) {
+      const c = eds.heroListMap[value]
+
+      if (c) {
+        const keywords = c.keywords.split(',')
+        return (
+          isChampionNameMatchKeywords(pattern, [label, ...keywords]) ||
+          value.toString().includes(pattern)
+        )
+      }
+    }
+
+    return (
+      isChampionNameMatch(pattern, label) || Boolean(value && value.toString().includes(pattern))
+    )
+  } catch {
+    return (
+      isChampionNameMatch(pattern, label) || Boolean(value && value.toString().includes(pattern))
+    )
+  }
+}
 
 const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
   let pickable = true

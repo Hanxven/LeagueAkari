@@ -1,7 +1,8 @@
+import { GtimgHeroListJs, Hero } from '@shared/external-data-source/gtimg'
 import { ChampBalanceMapV1 } from '@shared/external-data-source/normalized/champ-balance'
 import { AvailableServersMap } from '@shared/external-data-source/sgp'
 import { defineStore } from 'pinia'
-import { shallowRef } from 'vue'
+import { computed, shallowRef } from 'vue'
 
 export const useExternalDataSourceStore = defineStore('module:external-data-source', () => {
   const balanceData = shallowRef<{
@@ -9,6 +10,20 @@ export const useExternalDataSourceStore = defineStore('module:external-data-sour
     map: ChampBalanceMapV1
     updateAt: Date
   } | null>(null)
+
+  const heroList = shallowRef<GtimgHeroListJs | null>(null)
+
+  // id 用 string 表示，确实有点...
+  const heroListMap = computed(() => {
+    if (!heroList.value) return {}
+    return heroList.value.hero.reduce(
+      (acc, hero) => {
+        acc[Number(hero.heroId)] = hero
+        return acc
+      },
+      {} as Record<string, Hero>
+    )
+  })
 
   const sgpAvailability = shallowRef({
     currentRegion: '',
@@ -23,6 +38,8 @@ export const useExternalDataSourceStore = defineStore('module:external-data-sour
 
   return {
     balanceData,
-    sgpAvailability
+    sgpAvailability,
+    heroList,
+    heroListMap
   }
 })
