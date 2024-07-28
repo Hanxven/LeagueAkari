@@ -1,0 +1,76 @@
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+    
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      # Pre build
+      - name: Get 7-digit commit SHA
+        run: echo "SHORT_SHA=$("${{ github.sha }}" | cut -c1-7)" >> $env:GITHUB_ENV
+
+      - name: Insert SHA to version string
+        run: |
+          $json = Get-Content package.json -Raw | ConvertFrom-Json
+          $json.version += "+$env:SHORT_SHA"
+          $json | ConvertTo-Json | Set-Content package.json         
+
+      - name: Modify electron-builder.yml
+        shell: pwsh
+        run: |
+          $yamlContent = Get-Content -Path electron-builder.yml -Raw
+          $yamlContent = $yamlContent -replace "target: 7z", "target: dir"
+          Set-Content -Path electron-builder.yml -Value $yamlContent  
+
+      - name: Get final akari version
+        run: |
+          $AKARI_VERSION = (Get-Content package.json | ConvertFrom-Json).version
+          echo "akari_version=$AKARI_VERSION" >> $env:GITHUB_ENV
+          
+      # Build               
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Run yarn install
+        uses: borales/actions-yarn@v5.0.0
+        with:
+          cmd: install
+
+      - name: Install node-gyp
+        run: npm i node-gyp -g
+
+      - name: Build C++ addons
+        run: |          
+          $addons = Get-ChildItem -Directory .\addons
+          Write-Host "Found addons: $($addons.Count)"
+          $addons | ForEach-Object -Process {
+            Write-Host "Processing addon: $($_.FullName)"
+            Set-Location $_.FullName
+            node-gyp configure
+            node-gyp build        
+            Set-Location -Path ..\..          
+            Copy-Item -Path "$($_.FullName)\build\Release\*.node" -Destination .\src\main\native -Force
+          }        
+
+      - name: Run yarn build:win
+        uses: borales/actions-yarn@v5.0.0
+        with:
+          cmd: build:win
+
+      # Post build
+      - name: Upload build outputs
+        uses: actions/upload-artifact@v3
+        with:
+          name: League Akari-${{ env.akari_version }}
+          path: dist/win-unpacked
