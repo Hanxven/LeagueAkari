@@ -19,7 +19,7 @@ export interface AvailableServersMap {
       server: string
     }
   }
-  groups: string[][]
+  groups: string[][] // 同一组内的不同服务器可以互相通用，目前仅支持腾讯系服务器
 }
 
 export class SgpApi {
