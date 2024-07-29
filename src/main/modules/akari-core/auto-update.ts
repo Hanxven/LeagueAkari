@@ -181,11 +181,11 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
   static DOWNLOAD_DIR_NAME = 'NewUpdates'
   static UPDATE_SCRIPT_NAME = 'LeagueAkariUpdate.ps1'
   static UPDATE_PROGRESS_UPDATE_INTERVAL = 200
-  static FAKE_USER_AGENT = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 LeagueAkari/${app.getVersion()} `
+  static USER_AGENT = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 LeagueAkari/${app.getVersion()} `
 
   private _http = axios.create({
     headers: {
-      'User-Agent': AutoUpdateModule.FAKE_USER_AGENT
+      'User-Agent': AutoUpdateModule.USER_AGENT
     }
   })
 
@@ -681,7 +681,11 @@ Try {
     )
 
     const scriptPath = path.join(app.getPath('temp'), AutoUpdateModule.UPDATE_SCRIPT_NAME)
-    fs.writeFileSync(scriptPath, generatedPowershellScript)
+
+    const bom = Buffer.from([0xef, 0xbb, 0xbf])
+    const scriptFileWithBom = Buffer.concat([bom, Buffer.from(generatedPowershellScript, 'utf-8')])
+
+    fs.writeFileSync(scriptPath, scriptFileWithBom)
 
     this._logger.info(`写入更新脚本 ${scriptPath}`)
 

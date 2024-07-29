@@ -112,7 +112,7 @@
         <ControlItem
           class="control-item-margin"
           label="更新文件夹"
-          label-description="当前更新已下载的位置，若无法只能自动僧更新流程，将需要手动更新"
+          label-description="当前更新已下载的位置，若无法执行完整的自动更新流程，则需要手动更新"
           :label-width="180"
           v-if="
             processStatus.current >= 2 ||

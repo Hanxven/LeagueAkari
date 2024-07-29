@@ -19,8 +19,17 @@
       label="退出结算页面"
       label-description="立即退出结算界面。适用于由于客户端原因无法退出结算页面的情况"
     >
-      <NButton type="success" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="tiny"
+      <NButton type="primary" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="tiny"
         >回到房间</NButton
+      >
+    </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="退出当前房间"
+      label-description="立即退出当前房间"
+    >
+      <NButton :disabled="gameflow.phase !== 'Lobby'" @click="deleteLobby" size="tiny"
+        >退出房间</NButton
       >
     </ControlItem>
   </NCard>
@@ -28,10 +37,11 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { earlyExit } from '@shared/renderer/http-api/gameflow'
 import { playAgain } from '@shared/renderer/http-api/lobby'
+import { deleteLobby } from '@shared/renderer/http-api/lobby'
 import { dodge } from '@shared/renderer/http-api/login'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { laNotification } from '@shared/renderer/notification'
 import { NButton, NCard } from 'naive-ui'
 import { computed } from 'vue'
