@@ -6,7 +6,13 @@
     v-model:show="show"
     :class="styles['ann-modal']"
   >
-    <template #header><span class="card-header-title">公告</span></template>
+    <template #header
+      ><span class="card-header-title"
+        >公告<span style="font-size: 12px" v-if="au.currentAnnouncement">
+          ({{ dayjs(au.currentAnnouncement.updateAt).locale('zh-cn').fromNow() }} 更新)</span
+        ></span
+      ></template
+    >
     <div>
       <NScrollbar
         style="max-height: 50vh"
@@ -33,6 +39,7 @@
 import { autoUpdateRendererModule as aum } from '@shared/renderer/modules/auto-update'
 import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { markdownIt } from '@shared/renderer/utils/markdown'
+import dayjs from 'dayjs'
 import { NButton, NModal, NScrollbar } from 'naive-ui'
 import { computed, useCssModule } from 'vue'
 
