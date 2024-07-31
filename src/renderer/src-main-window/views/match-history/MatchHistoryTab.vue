@@ -182,7 +182,10 @@
                   ></NSelect>
                 </div>
                 <NSelect
-                  v-if="cf.settings.matchHistorySource === 'sgp'"
+                  v-if="
+                    cf.settings.matchHistorySource === 'sgp' ||
+                    eds.sgpAvailability.currentSgpServerId !== tab.sgpServerId
+                  "
                   size="tiny"
                   :value="tab.matchHistory.queueFilter"
                   @update:value="handleChangeSgpTag"
@@ -277,14 +280,24 @@
                   </span>
                 </div>
                 <div class="stat-item" v-if="frequentlyUsedChampions.length">
-                  <span class="stat-item-label">最常用英雄</span>
+                  <span class="stat-item-label">英雄使用</span>
                   <div class="stat-item-content-champions">
-                    <LcuImage
-                      v-for="c of frequentlyUsedChampions.slice(0, 5)"
-                      :key="c.id"
-                      style="width: 20px; height: 20px"
-                      :src="championIcon(c.id)"
-                    />
+                    <NPopover v-for="c of frequentlyUsedChampions" :key="c.id">
+                      <template #trigger>
+                        <div class="champion-slot">
+                          <LcuImage style="width: 100%; height: 100%" :src="championIcon(c.id)" />
+                          <div class="champion-used-count">{{ c.count }}</div>
+                        </div>
+                      </template>
+                      <div class="stat-item-content-champion">
+                        <div>{{ gameData.champions[c.id]?.name }} · {{ c.count }} 场</div>
+                        <div class="win-lose-box">
+                          <span class="win">{{ c.win }} 胜</span>
+                          <span class="lose">{{ c.lose }} 负</span>
+                          <span>(胜率 {{ (c.winRate * 100).toFixed() }} %)</span>
+                        </div>
+                      </div>
+                    </NPopover>
                   </div>
                 </div>
               </div>
@@ -339,6 +352,7 @@
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
+import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { championIcon, profileIcon } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { laNotification } from '@shared/renderer/notification'
@@ -350,9 +364,17 @@ import {
   NavigateBeforeOutlined as NavigateBeforeOutlinedIcon,
   NavigateNextOutlined as NavigateNextOutlinedIcon
 } from '@vicons/material'
-import { NButton, NIcon, NInputNumber, NModal, NScrollbar, NSelect, NSpin } from 'naive-ui'
+import {
+  NButton,
+  NIcon,
+  NInputNumber,
+  NModal,
+  NPopover,
+  NScrollbar,
+  NSelect,
+  NSpin
+} from 'naive-ui'
 import { computed, nextTick, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
@@ -370,6 +392,8 @@ const props = withDefaults(
     isSelf: false
   }
 )
+
+const eds = useExternalDataSourceStore()
 
 const scrollRef = ref()
 const rightEl = ref()
@@ -515,7 +539,7 @@ const handleTagEdited = (puuid: string) => {
   mhm.querySavedInfo(puuid)
 }
 
-const FREQUENT_USE_CHAMPION_THRESHOLD = 2
+const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 const RECENTLY_PLAYED_PLAYER_THRESHOLD = 2
 
 const frequentlyUsedChampions = computed(() => {
@@ -596,10 +620,13 @@ defineExpose({
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  background-color: #000000b4;
-  backdrop-filter: blur(8px);
   border-radius: 4px;
+  background-color: #000000ed;
   padding: 16px;
+
+  .ranked {
+    background-color: #f4f4f420;
+  }
 }
 
 .profile {
@@ -797,6 +824,10 @@ defineExpose({
     bottom: -6px;
     right: -8px;
   }
+
+  .ranked {
+    background-color: #ffffff04;
+  }
 }
 
 .stat-item {
@@ -822,11 +853,29 @@ defineExpose({
   }
 
   .stat-item-content-champions {
-    flex: 1;
+    max-width: 110px;
+    margin-left: auto;
     display: flex;
+    flex-wrap: wrap;
     gap: 2px;
-    justify-content: flex-end;
-    margin-top: 4px;
+    justify-content: end;
+
+    .champion-slot {
+      position: relative;
+      width: 20px;
+      height: 20px;
+    }
+
+    .champion-used-count {
+      position: absolute;
+      bottom: -4px;
+      right: -2px;
+      font-size: 10px;
+      color: #d3d3d3;
+      background-color: #00000060;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
   }
 }
 
@@ -890,6 +939,24 @@ defineExpose({
 .header-button {
   width: 32px;
   height: 32px;
+}
+
+.stat-item-content-champion {
+  font-size: 12px;
+
+  .win-lose-box {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .win {
+    color: #239b23;
+  }
+
+  .lose {
+    color: #c76713;
+  }
 }
 
 .fade-enter-active,
