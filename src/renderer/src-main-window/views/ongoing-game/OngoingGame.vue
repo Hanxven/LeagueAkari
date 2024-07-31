@@ -181,14 +181,12 @@ import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { NCard, NCheckbox, NFlex, NSelect, NSpin } from 'naive-ui'
 import { computed, reactive, ref, watchEffect } from 'vue'
-import { useRouter } from 'vue-router'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
+import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
 
 import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMatchHistoryCardModal.vue'
 import PlayerInfoCard from './PlayerInfoCard.vue'
-
-const router = useRouter()
 
 const cf = useCoreFunctionalityStore()
 const gameflow = useGameflowStore()
@@ -259,11 +257,10 @@ const queueOptions = computed(() => {
   ]
 })
 
+const { navigateToTab } = mhm.useNavigateToTab()
+
 const handleToSummoner = (puuid: string) => {
-  if (!puuid || puuid === EMPTY_PUUID) {
-    return
-  }
-  return router.replace(`/match-history/${puuid}`)
+  navigateToTab(puuid)
 }
 
 const lc = useLcuConnectionStore()

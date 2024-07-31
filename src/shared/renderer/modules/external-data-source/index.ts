@@ -1,6 +1,11 @@
-import { SgpMatchHistoryLol } from '@shared/external-data-source/sgp/types'
+import {
+  SgpMatchHistoryLol,
+  SgpRankedStats,
+  SgpSummoner
+} from '@shared/external-data-source/sgp/types'
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
 import { MatchHistory } from '@shared/types/lcu/match-history'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 
 import { useExternalDataSourceStore } from './store'
 
@@ -10,7 +15,7 @@ class SgpEdsRenderer {
   async setup() {
     const store = useExternalDataSourceStore()
 
-    this._edsm.simpleSync('sgp/availability', (s) => (store.sgpAvailability = s))
+    await this._edsm.simpleSync('sgp/availability', (s) => (store.sgpAvailability = s))
   }
 
   getMatchHistoryLcuFormat(
@@ -38,6 +43,18 @@ class SgpEdsRenderer {
     sgpServerId?: string
   ): Promise<SgpMatchHistoryLol> {
     return this._edsm.call('get-match-history', playerPuuid, start, count, tag, sgpServerId)
+  }
+
+  getSummoner(puuid: string, sgpServerId?: string): Promise<SgpSummoner> {
+    return this._edsm.call('get-summoner', puuid, sgpServerId)
+  }
+
+  getSummonerLcuFormat(playerPuuid: string, sgpServerId?: string): Promise<SummonerInfo> {
+    return this._edsm.call('get-summoner-lcu-format', playerPuuid, sgpServerId)
+  }
+
+  getRankedStats(puuid: string, sgpServerId?: string): Promise<SgpRankedStats> {
+    return this._edsm.call('get-ranked-stats', puuid, sgpServerId)
   }
 }
 
@@ -79,7 +96,7 @@ export class ExternalDataSourceRendererModule extends StateSyncModule {
 
     // FOR DEBUGGING
     // @ts-ignore
-    window.sgp = this.sgp.getMatchHistoryLcuFormat.bind(this.sgp)
+    window.sgp = this.sgp
   }
 }
 

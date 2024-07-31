@@ -1,6 +1,7 @@
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
-import { gameClientRequest, request } from '@shared/renderer/http-api/common'
+import { gameClientRequest, request as lcuRequest } from '@shared/renderer/http-api/common'
+import { request as rcRequest } from '@shared/renderer/rc-http-api/common'
 import { watch } from 'vue'
 
 import { router } from '@main-window/routes'
@@ -19,7 +20,9 @@ export class DebugRendererModule extends StateSyncModule {
 
     // 全局功能
     // @ts-ignore
-    window.lcuRequest = request
+    window.lcuRequest = lcuRequest
+    // @ts-ignore
+    window.rcRequest = rcRequest
     // @ts-ignore
     window.gameClientRequest = gameClientRequest
     // @ts-ignore

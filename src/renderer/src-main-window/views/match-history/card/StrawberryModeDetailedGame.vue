@@ -36,7 +36,7 @@
                       )
                     "
                     class="name"
-                    @click="handleToSummoner(p.identity.player.puuid)"
+                    @click="() => emits('toSummoner', p.identity.player.puuid)"
                   >
                     {{
                       summonerName(
@@ -113,7 +113,6 @@ import { Game, Participant, ParticipantIdentity } from '@shared/types/lcu/match-
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 
@@ -124,6 +123,10 @@ const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
 const props = defineProps<{
   game: Game
   selfPuuid?: string
+}>()
+
+const emits = defineEmits<{
+  (e: 'toSummoner', puuid: string): void
 }>()
 
 type ParticipantWithIdentity = Participant & { isSelf: boolean; identity: ParticipantIdentity }
@@ -161,16 +164,6 @@ const match = computed(() => {
     recordStats
   }
 })
-
-const router = useRouter()
-
-const handleToSummoner = (puuid: string) => {
-  // 人机不跳
-  if (!puuid || puuid === EMPTY_PUUID) {
-    return
-  }
-  router.replace(`/match-history/${puuid}`)
-}
 </script>
 
 <style lang="less" scoped>

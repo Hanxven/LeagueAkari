@@ -42,7 +42,7 @@
                   <div class="name">
                     <span
                       class="name-span"
-                      @click="handleToSummoner(p.identity.player.puuid)"
+                      @click="() => emits('toSummoner', p.identity.player.puuid)"
                       :title="
                         summonerName(
                           p.identity.player.gameName || p.identity.player.summonerName,
@@ -173,7 +173,6 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants/common'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
@@ -184,7 +183,6 @@ import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 
@@ -197,6 +195,10 @@ const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
 const props = defineProps<{
   game: Game
   selfPuuid?: string
+}>()
+
+const emits = defineEmits<{
+  (e: 'toSummoner', puuid: string): void
 }>()
 
 const match = computed(() => {
@@ -263,15 +265,6 @@ const match = computed(() => {
     recordStats: recordStats
   }
 })
-const router = useRouter()
-
-const handleToSummoner = (puuid: string) => {
-  // 人机不跳
-  if (!puuid || puuid === EMPTY_PUUID) {
-    return
-  }
-  router.replace(`/match-history/${puuid}`)
-}
 </script>
 
 <style lang="less" scoped>

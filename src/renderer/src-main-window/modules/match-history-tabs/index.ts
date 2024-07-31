@@ -1,3 +1,4 @@
+import { EMPTY_PUUID } from '@shared/constants/common'
 import { LeagueAkariRendererModule } from '@shared/renderer/akari-ipc/renderer-akari-module'
 import { getGame, getMatchHistory } from '@shared/renderer/http-api/match-history'
 import { getRankedStats } from '@shared/renderer/http-api/ranked'
@@ -5,19 +6,22 @@ import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { externalDataSourceRendererModule as edsm } from '@shared/renderer/modules/external-data-source'
 import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
-import { LcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { StorageRendererModule } from '@shared/renderer/modules/storage'
 import { laNotification } from '@shared/renderer/notification'
+import { getPlayerAccountNameset } from '@shared/renderer/rc-http-api/rc-api'
 import { MatchHistory } from '@shared/types/lcu/match-history'
 import { analyzeMatchHistory, analyzeMatchHistoryPlayers } from '@shared/utils/analysis'
 import { summonerName } from '@shared/utils/name'
 import { AxiosError } from 'axios'
 import { computed, markRaw, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
-import { MatchHistoryGameTabCard, SummonerTabMatchHistory, useMatchHistoryTabsStore } from './store'
+import { router } from '@main-window/routes'
+
+import { MatchHistoryGameTabCard, useMatchHistoryTabsStore } from './store'
 
 /**
  * 仅适用于主窗口战绩页面的渲染端模块
@@ -74,18 +78,27 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
       }
     )
 
-    // 召唤师加载自动创建固定 Tab 页面
+    // 当前召唤师登录时，立即创建一个页面
     watch(
-      () => summoner.me,
-      (val) => {
-        if (val) {
+      [() => summoner.me, () => lc.auth],
+      ([me, auth]) => {
+        if (me && auth) {
           mh.tabs.forEach((t) => mh.setTabPinned(t.id, false))
 
-          if (mh.getTab(val.puuid)) {
-            mh.setTabPinned(val.puuid, true)
+          let sgpServerId: string
+          if (auth.region === 'TENCENT') {
+            sgpServerId = auth.rsoPlatformId
           } else {
-            mh.createTab(val.puuid, { pin: true })
-            this.fetchTabFullData(val.puuid)
+            sgpServerId = auth.region
+          }
+
+          const unionId = `${sgpServerId}/${me.puuid}`
+
+          if (mh.getTab(unionId)) {
+            mh.setTabPinned(unionId, true)
+          } else {
+            mh.createTab(unionId, { pin: true })
+            this.fetchTabFullData(unionId)
           }
         }
       },
@@ -113,52 +126,79 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     )
   }
 
-  async fetchTabFullData(puuid: string) {
+  private _isCrossRegion(targetSgpServerId: string) {
     const lc = useLcuConnectionStore()
-    const s = useSummonerStore()
-    const summoner = await this.fetchTabSummoner(puuid)
-
-    if (!summoner) {
-      throw new Error('Failed to fetch full data')
+    if (!lc.auth) {
+      return false
     }
 
-    let failed = false
+    if (lc.auth.region === 'TENCENT') {
+      return lc.auth.rsoPlatformId !== targetSgpServerId
+    } else {
+      return lc.auth.region !== targetSgpServerId
+    }
+  }
+
+  async fetchTabFullData(unionId: string) {
+    const lc = useLcuConnectionStore()
+    const self = useSummonerStore()
+    const mh = useMatchHistoryTabsStore()
+
+    const loadSummoner = async () => {
+      await this.fetchTabSummoner(unionId)
+    }
 
     const loadMatchHistoryTask = async () => {
-      const r = await this.fetchTabMatchHistory(puuid, 1)
-      if (!r) {
-        failed = true
-      }
+      await this.fetchTabMatchHistory(unionId, 1)
     }
 
     const loadRankedStatsTask = async () => {
-      const r = await this.fetchTabRankedStats(puuid)
-      if (!r) {
-        failed = true
-      }
+      await this.fetchTabRankedStats(unionId)
     }
 
     const loadSavedInfoTask = async () => {
-      await this.querySavedInfo(puuid)
+      await this.querySavedInfo(unionId)
     }
 
-    await Promise.allSettled([loadMatchHistoryTask(), loadRankedStatsTask(), loadSavedInfoTask()])
+    const [summonerR, matchHistoryR, rankedStatsR, savedInfoR] = await Promise.allSettled([
+      loadSummoner(),
+      loadMatchHistoryTask(),
+      loadRankedStatsTask(),
+      loadSavedInfoTask()
+    ])
 
-    if (failed) {
-      throw new Error('Failed to fetch full data')
+    if (summonerR.status === 'fulfilled') {
+      const tab = mh.getTab(unionId)
+      if (
+        lc.auth &&
+        self.me &&
+        tab &&
+        tab.data.summoner &&
+        !this._isCrossRegion(tab.data.sgpServerId) // 暂时不会记录跨区玩家
+      ) {
+        this.saveLocalStorageSearchHistory(
+          summonerName(tab.data.summoner.gameName, tab.data.summoner.tagLine),
+          tab.data.summoner.puuid,
+          lc.auth.region,
+          lc.auth.rsoPlatformId,
+          self.me.puuid
+        )
+      }
+    } else {
+      throw summonerR.reason
     }
 
-    if (lc.auth && s.me) {
-      this.saveLocalStorageSearchHistory(
-        summonerName(summoner.gameName, summoner.tagLine),
-        summoner.puuid,
-        lc.auth.region,
-        lc.auth.rsoPlatformId,
-        s.me.puuid
-      )
+    if (matchHistoryR.status === 'rejected') {
+      throw matchHistoryR.reason
     }
 
-    return summoner
+    if (rankedStatsR.status === 'rejected') {
+      throw rankedStatsR.reason
+    }
+
+    if (savedInfoR.status === 'rejected') {
+      throw savedInfoR.reason
+    }
   }
 
   async fetchTabDetailedGame(puuid: string, gameId: number) {
@@ -200,7 +240,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     return null
   }
 
-  async querySavedInfo(puuid: string) {
+  async querySavedInfo(unionId: string) {
     const summoner = useSummonerStore()
     const mh = useMatchHistoryTabsStore()
     const lc = useLcuConnectionStore()
@@ -209,7 +249,9 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
       return
     }
 
-    const tab = mh.getTab(puuid)
+    const tab = mh.getTab(unionId)
+
+    const { puuid } = this.parseUnionId(unionId)
 
     if (tab) {
       try {
@@ -230,59 +272,77 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     return null
   }
 
-  async fetchTabRankedStats(puuid: string) {
+  async fetchTabRankedStats(unionId: string) {
     const mh = useMatchHistoryTabsStore()
 
-    const tab = mh.getTab(puuid)
-    if (tab && tab.data.summoner) {
+    const { puuid, sgpServerId } = this.parseUnionId(unionId)
+
+    if (this._isCrossRegion(sgpServerId)) {
+      return
+    }
+
+    const tab = mh.getTab(unionId)
+    if (tab) {
       if (tab.data.loading.isLoadingRankedStats) {
-        return null
+        return
       }
 
       tab.data.loading.isLoadingRankedStats = true
 
       try {
-        const rankedStats = (await getRankedStats(tab.data.summoner.puuid)).data
+        const rankedStats = (await getRankedStats(puuid)).data
         tab.data.rankedStats = markRaw(rankedStats)
-
-        return rankedStats
       } catch (error) {
         laNotification.warn('加载失败', '拉取段位信息失败', error)
+        throw error
       } finally {
         tab.data.loading.isLoadingRankedStats = false
       }
     }
-
-    return null
   }
 
-  async fetchTabSummoner(puuid: string) {
+  async fetchTabSummoner(unionId: string) {
     const mh = useMatchHistoryTabsStore()
-    const tab = mh.getTab(puuid)
+    const eds = useExternalDataSourceStore()
+    const tab = mh.getTab(unionId)
+
+    const { puuid, sgpServerId } = this.parseUnionId(unionId)
 
     if (tab) {
       if (tab.data.loading.isLoadingSummoner) {
-        return null
+        return
       }
 
       tab.data.loading.isLoadingSummoner = true
 
       try {
-        const summoner = (await getSummonerByPuuid(puuid)).data
-        tab.data.summoner = markRaw(summoner)
-        return summoner
+        if (this._isCrossRegion(sgpServerId)) {
+          if (!eds.sgpAvailability.supportedSgpServers.servers[sgpServerId]) {
+            throw new Error('Unsupported sgp server')
+          }
+
+          const summoner = await edsm.sgp.getSummonerLcuFormat(puuid, sgpServerId)
+
+          const ns = await getPlayerAccountNameset(puuid)
+          summoner.gameName = ns.gnt.gameName
+          summoner.tagLine = ns.gnt.tagLine
+
+          tab.data.summoner = markRaw(summoner)
+        } else {
+          const summoner = (await getSummonerByPuuid(puuid)).data
+          tab.data.summoner = markRaw(summoner)
+        }
       } catch (error) {
         laNotification.warn('加载失败', '拉取召唤师信息失败', error)
+        throw error
       } finally {
         tab.data.loading.isLoadingSummoner = false
       }
     }
-
-    return null
   }
 
   async fetchTabMatchHistory(
-    puuid: string,
+    unionId: string,
     page?: number,
     pageSize?: number,
     queueFilter?: number | string | null
@@ -292,11 +352,13 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     const lc = useLcuConnectionStore()
     const eds = useExternalDataSourceStore()
 
-    const tab = mh.getTab(puuid)
+    const tab = mh.getTab(unionId)
 
-    if (tab && tab.data.summoner) {
+    const { puuid, sgpServerId } = this.parseUnionId(unionId)
+
+    if (tab) {
       if (tab.data.loading.isLoadingMatchHistory) {
-        return null
+        return
       }
 
       tab.data.loading.isLoadingMatchHistory = true
@@ -311,28 +373,44 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
         )
 
         let matchHistory: MatchHistory
-        if (
-          cf.settings.matchHistorySource === 'sgp' &&
-          eds.sgpAvailability.currentSgpServerSupported
-        ) {
+        if (this._isCrossRegion(sgpServerId)) {
+          if (!eds.sgpAvailability.supportedSgpServers.servers[sgpServerId]) {
+            throw new Error('Unsupported sgp server')
+          }
+
           matchHistory = await edsm.sgp.getMatchHistoryLcuFormat(
             puuid,
             (page - 1) * pageSize,
             pageSize,
-            queueFilter === -1 ? undefined : `q_${queueFilter}`
+            queueFilter === -1 ? undefined : `q_${queueFilter}`,
+            sgpServerId
           )
 
           matchHistory.games.games.forEach((g) => {
             tab.data.detailedGamesCache.set(g.gameId, markRaw(g))
           })
         } else {
-          matchHistory = (
-            await getMatchHistory(
-              tab.data.summoner.puuid,
+          if (
+            cf.settings.matchHistorySource === 'sgp' &&
+            eds.sgpAvailability.currentSgpServerSupported
+          ) {
+            matchHistory = await edsm.sgp.getMatchHistoryLcuFormat(
+              puuid,
               (page - 1) * pageSize,
-              page * pageSize - 1
+              pageSize,
+              queueFilter === -1 ? undefined : `q_${queueFilter}`,
+              sgpServerId
             )
-          ).data
+
+            matchHistory.games.games.forEach((g) => {
+              tab.data.detailedGamesCache.set(g.gameId, markRaw(g))
+            })
+          } else {
+            // is lcu
+            matchHistory = (
+              await getMatchHistory(puuid, (page - 1) * pageSize, page * pageSize - 1)
+            ).data
+          }
         }
 
         const matchHistoryWithState = matchHistory.games.games.map((g) => ({
@@ -398,8 +476,6 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
 
           Promise.allSettled(tasks).catch(() => {})
         }
-
-        return matchHistory
       } catch (error) {
         if (
           (error as AxiosError)?.response?.status === 500 ||
@@ -410,6 +486,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
             `拉取战绩失败，服务器异常。远程服务器返回内部错误 ${(error as AxiosError)?.response?.status}${lc.auth?.rsoPlatformId === 'HN1' ? '，当前服务器为艾欧尼亚，由于服务器原因，特定时间段内无法访问战绩接口。' : ''}`,
             error
           )
+          throw error
         } else {
           laNotification.warn('加载失败', '拉取战绩失败', error)
         }
@@ -417,8 +494,6 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
         tab.data.loading.isLoadingMatchHistory = false
       }
     }
-
-    return null
   }
 
   /**
@@ -492,6 +567,43 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     } catch {
       localStorage.setItem(key, '[]')
     }
+  }
+
+  // 如果直接引用 router, 在热更新的时候会失效
+  useNavigateToTab() {
+    const router = useRouter()
+
+    const navigateToTab = (puuid: string, sgpServerId?: string) => {
+      if (!puuid || puuid === EMPTY_PUUID) {
+        return
+      }
+
+      const lc = useLcuConnectionStore()
+
+      if (!lc.auth) {
+        return
+      }
+
+      if (sgpServerId === undefined) {
+        if (lc.auth.region === 'TENCENT') {
+          sgpServerId = lc.auth.rsoPlatformId
+        } else {
+          sgpServerId = lc.auth.region
+        }
+      }
+
+      router.replace({
+        name: 'match-history',
+        params: { puuid, sgpServerId }
+      })
+    }
+
+    return { navigateToTab }
+  }
+
+  parseUnionId(unionId: string) {
+    const [sgpServerId, puuid] = unionId.split('/')
+    return { sgpServerId, puuid }
   }
 }
 

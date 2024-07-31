@@ -1,4 +1,4 @@
-<template>
+t <template>
   <NModal v-model:show="show" preset="card" style="max-width: 60vw">
     <template #header><span class="card-header-title">编辑玩家标记</span></template>
     <template v-if="summonerInfo">

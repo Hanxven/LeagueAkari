@@ -142,6 +142,7 @@ export class SgpApi {
 
   /**
    * 注: 暂未测试非腾讯的服务器, 因此使用 Tencent 后缀
+   * 注: 服务端会做校验，仅当前大区的 puuid 才能查询
    */
   getRankedStatsTencent(platformId: string, puuid: string) {
     if (!this._jwtToken) {
@@ -157,6 +158,7 @@ export class SgpApi {
 
   /**
    * 注: 暂未测试非腾讯的服务器, 因此使用 Tencent 后缀
+   * 注: 可以跨腾讯大区查询
    */
   getSummonerByPuuidTencent(platformId: string, puuid: string) {
     if (!this._jwtToken) {

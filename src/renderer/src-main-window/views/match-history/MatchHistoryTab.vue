@@ -91,7 +91,7 @@
               <span class="tag-line">#{{ tab.summoner?.tagLine || '-' }}</span>
             </div>
           </div>
-          <div class="header-ranked">
+          <div class="header-ranked" v-if="tab.rankedStats">
             <RankedDisplay
               class="ranked"
               :ranked-entry="tab.rankedStats?.queueMap['RANKED_SOLO_5x5']"
@@ -101,7 +101,13 @@
               :ranked-entry="tab.rankedStats?.queueMap['RANKED_FLEX_SR']"
             />
             <div class="ranked-more">
-              <NButton :focusable="false" title="更多" size="tiny" secondary @click="isShowingRankedModal = true">
+              <NButton
+                :focusable="false"
+                title="更多"
+                size="tiny"
+                secondary
+                @click="isShowingRankedModal = true"
+              >
                 <template #icon>
                   <MoreHorizFilledIcon />
                 </template>
@@ -309,7 +315,8 @@
               class="match-history-card-item"
               @set-show-detailed-game="handleToggleShowDetailedGame"
               @load-detailed-game="(gameId) => mhm.fetchTabDetailedGame(tab.puuid, gameId)"
-              :self-puuid="tab.summoner?.puuid"
+              @to-summoner="(puuid) => handleToSummoner(puuid)"
+              :self-puuid="tab.puuid"
               :is-detailed="g.isDetailed"
               :is-loading="g.isLoading"
               :is-expanded="g.isExpanded"
@@ -329,7 +336,6 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants/common'
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
@@ -357,7 +363,7 @@ import RankedDisplay from './widgets/RankedDisplay.vue'
 
 const props = withDefaults(
   defineProps<{
-    tab: TabState
+    tab: TabState & { id: string }
     isSelf?: boolean
   }>(),
   {
@@ -373,7 +379,7 @@ const cf = useCoreFunctionalityStore()
 const gameData = useGameDataStore()
 
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
-  mh.setMatchHistoryExpand(props.tab.puuid, gameId, expand)
+  mh.setMatchHistoryExpand(props.tab.id, gameId, expand)
 }
 
 const isShowingRankedModal = ref(false)
@@ -395,15 +401,15 @@ const scrollToRightElTop = () => {
 
 const handleRefresh = async () => {
   try {
-    await mhm.fetchTabFullData(props.tab.puuid)
+    await mhm.fetchTabFullData(props.tab.id)
     scrollToRightElTop()
   } catch {
-    laNotification.warn('召唤师信息', `无法拉取用户 ${props.tab.puuid} 的信息`)
+    laNotification.warn('召唤师信息', `无法拉取用户 ${props.tab.id} 的信息`)
   }
 }
 
 const handleLoadPage = async (page?: number) => {
-  const r = await mhm.fetchTabMatchHistory(props.tab.puuid, page)
+  const r = await mhm.fetchTabMatchHistory(props.tab.id, page)
   scrollToRightElTop()
   return r
 }
@@ -434,7 +440,7 @@ const pageSizeOptions = [
 
 const handleChangePageSize = async (pageSize: number) => {
   const r = await mhm.fetchTabMatchHistory(
-    props.tab.puuid,
+    props.tab.id,
     props.tab.matchHistory.page,
     pageSize,
     props.tab.matchHistory.queueFilter
@@ -493,7 +499,7 @@ const sgpTagOptions = computed(() => {
 
 const handleChangeSgpTag = async (queueFilter: number | string) => {
   const r = await mhm.fetchTabMatchHistory(
-    props.tab.puuid,
+    props.tab.id,
     props.tab.matchHistory.page,
     props.tab.matchHistory.pageSize,
     queueFilter
@@ -545,14 +551,11 @@ const recentlyTeammates = computed(() => {
   return teammates
 })
 
-const router = useRouter()
+const { navigateToTab } = mhm.useNavigateToTab()
 
 const handleToSummoner = (puuid: string) => {
-  if (!puuid || puuid === EMPTY_PUUID) {
-    return
-  }
-
-  router.replace(`/match-history/${puuid}`)
+  const { sgpServerId } = mhm.parseUnionId(props.tab.id)
+  navigateToTab(puuid, sgpServerId)
 }
 
 const SHOW_TINY_HEADER_THRESHOLD = 160

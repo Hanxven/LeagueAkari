@@ -61,7 +61,6 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants/common'
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
@@ -70,22 +69,23 @@ import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NCard } from 'naive-ui'
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 
 // 内部组件
 const props = defineProps<{
   condition?: 'name' | 'id' | 'puuid'
   searchText?: string
 
+  sgpServerId?: string
   // 如果提供 ID，那么就加载
   // 或者直接提供现成的数据
   summoner: SummonerInfo | string
 }>()
 
-const selfData = ref<SummonerInfo>()
+const emits = defineEmits<{
+  (e: 'toSummoner', puuid: string, sgpServerId?: string): void
+}>()
 
-const route = useRoute()
-const router = useRouter()
+const selfData = ref<SummonerInfo>()
 
 onMounted(async () => {
   if (typeof props.summoner === 'string') {
@@ -99,12 +99,7 @@ onMounted(async () => {
 
 const handleToSummoner = () => {
   const id = typeof props.summoner === 'object' ? props.summoner.puuid : props.summoner
-
-  if (!id || id === EMPTY_PUUID) {
-    return
-  }
-
-  router.replace(`/match-history/${id}`)
+  emits('toSummoner', id, props.sgpServerId)
 }
 </script>
 

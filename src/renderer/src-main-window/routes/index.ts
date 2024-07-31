@@ -15,7 +15,7 @@ const router = createRouter({
       children: [
         {
           name: 'match-history',
-          path: '/match-history/:puuid?',
+          path: '/match-history/:sgpServerId?/:puuid?',
           component: () => import('@main-window/views/match-history/MatchHistoryTabs.vue')
         },
         {

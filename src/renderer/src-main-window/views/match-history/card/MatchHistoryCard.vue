@@ -20,7 +20,7 @@
             "
             class="name"
             :class="{ self: p.isSelf }"
-            @click="() => handleToSummoner(p.identity.player.puuid)"
+            @click="() => emits('toSummoner', p.identity.player.puuid)"
           >
             {{
               summonerName(
@@ -227,14 +227,22 @@
           :game="game"
           :self-puuid="selfPuuid"
           v-if="game.gameMode === 'CHERRY'"
+          @to-summoner="(puuid) => emits('toSummoner', puuid)"
         />
         <StrawberryModeDetailedGame
           class="detailed-game"
           :game="game"
           :self-puuid="selfPuuid"
           v-else-if="game.gameMode === 'STRAWBERRY'"
+          @to-summoner="(puuid) => emits('toSummoner', puuid)"
         />
-        <NormalNodeDetailedGame class="detailed-game" v-else :game="game" :self-puuid="selfPuuid" />
+        <NormalNodeDetailedGame
+          class="detailed-game"
+          v-else
+          :game="game"
+          :self-puuid="selfPuuid"
+          @to-summoner="(puuid) => emits('toSummoner', puuid)"
+        />
       </template>
       <div v-else-if="isLoading" class="loading">加载中...</div>
       <div v-else class="loading">无法加载</div>
@@ -243,7 +251,6 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants/common'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import AugmentDisplay from '@shared/renderer/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
@@ -263,7 +270,6 @@ import { createReusableTemplate, useTimeoutPoll } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NIcon, NModal } from 'naive-ui'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
 
 import '../lol-view.less'
 import CherryModeDetailedGame from './CherryModeDetailedGame.vue'
@@ -462,18 +468,10 @@ const handleToggleShowDetailedGame = () => {
 }
 
 const emits = defineEmits<{
-  (e: 'setShowDetailedGame', gameId: number, expand: boolean)
-  (e: 'loadDetailedGame', gameId: number)
+  (e: 'setShowDetailedGame', gameId: number, expand: boolean): void
+  (e: 'loadDetailedGame', gameId: number): void
+  (e: 'toSummoner', puuid: string): void
 }>()
-
-const router = useRouter()
-const handleToSummoner = (puuid: string) => {
-  if (!puuid || puuid === EMPTY_PUUID) {
-    return
-  }
-
-  router.replace(`/match-history/${puuid}`)
-}
 </script>
 
 <style lang="less" scoped>

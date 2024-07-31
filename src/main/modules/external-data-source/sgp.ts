@@ -1,6 +1,7 @@
 import { AvailableServersMap, SgpApi } from '@shared/external-data-source/sgp'
-import { SgpMatchHistoryLol } from '@shared/external-data-source/sgp/types'
+import { SgpMatchHistoryLol, SgpSummoner } from '@shared/external-data-source/sgp/types'
 import { MatchHistory } from '@shared/types/lcu/match-history'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { formatError } from '@shared/utils/errors'
 import { makeAutoObservable, observable } from 'mobx'
 import fs from 'node:fs'
@@ -148,6 +149,20 @@ export class SgpEds {
     )
   }
 
+  async getSummoner(puuid: string, sgpServerId?: string) {
+    if (!sgpServerId) {
+      sgpServerId = this._getSgpServerIdFromLcuAuth()
+    }
+
+    const { data } = await this._sgp.getSummonerByPuuidTencent(sgpServerId, puuid)
+
+    if (!data || data.length === 0) {
+      return null
+    }
+
+    return data[0]
+  }
+
   /**
    * 获取玩家的战绩记录
    * @param playerPuuid 玩家的 PUUID
@@ -184,10 +199,26 @@ export class SgpEds {
     const result = await this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)
 
     try {
-      return this.parseSgpToLcu0Format(result.data, start, count)
+      return this.parseSgpMatchHistoryToLcu0Format(result.data, start, count)
     } catch (error) {
       this._edsm.logger.warn(
         `转换战绩数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${playerPuuid}`
+      )
+      throw error
+    }
+  }
+
+  async getSummonerLcuFormat(playerPuuid: string, sgpServerId?: string) {
+    const result = await this.getSummoner(playerPuuid, sgpServerId)
+    if (!result) {
+      throw new Error(`Summoner ${playerPuuid} not found`)
+    }
+
+    try {
+      return this.parseSgpSummonerToLcu0Format(result)
+    } catch (error) {
+      this._edsm.logger.warn(
+        `转换召唤师数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${playerPuuid}`
       )
       throw error
     }
@@ -197,7 +228,7 @@ export class SgpEds {
    * 始终是 detailed 的，但只有部分属性
    * 不是很优雅
    */
-  parseSgpToLcu0Format(sgpMh: SgpMatchHistoryLol, start = 0, count = 20): MatchHistory {
+  parseSgpMatchHistoryToLcu0Format(sgpMh: SgpMatchHistoryLol, start = 0, count = 20): MatchHistory {
     const jsonArr = sgpMh.games
       .map((game) => game.json)
       .map((json) => {
@@ -373,6 +404,37 @@ export class SgpEds {
     }
   }
 
+  parseSgpSummonerToLcu0Format(sgpSummoner: SgpSummoner): SummonerInfo {
+    return {
+      accountId: sgpSummoner.accountId,
+      displayName: sgpSummoner.name,
+      gameName: '',
+      internalName: sgpSummoner.internalName,
+      nameChangeFlag: sgpSummoner.nameChangeFlag,
+      percentCompleteForNextLevel: Math.round(
+        (sgpSummoner.expPoints / sgpSummoner.expToNextLevel) * 100
+      ),
+      privacy: sgpSummoner.privacy as 'PUBLIC' | 'PRIVATE' | string, // 强制转换以匹配类型
+      profileIconId: sgpSummoner.profileIconId,
+      puuid: sgpSummoner.puuid,
+
+      // 默认留空
+      rerollPoints: {
+        currentPoints: 0,
+        maxRolls: 0,
+        pointsToReroll: 0,
+        numberOfRolls: 0,
+        pointsCostToRoll: 0
+      },
+      tagLine: '',
+      summonerId: sgpSummoner.id,
+      summonerLevel: sgpSummoner.level,
+      unnamed: sgpSummoner.unnamed,
+      xpSinceLastLevel: sgpSummoner.expPoints,
+      xpUntilNextLevel: sgpSummoner.expToNextLevel - sgpSummoner.expPoints
+    }
+  }
+
   private _getSgpServerIdFromLcuAuth() {
     let sgpServerId: string
     const auth = this._lc.state.auth
@@ -394,15 +456,13 @@ export class SgpEds {
       sgpServerId = this._getSgpServerIdFromLcuAuth()
     }
 
-    return (await this._sgp.getRankedStatsTencent(sgpServerId, puuid)).data
-  }
-
-  async getSummoner(puuid: string, sgpServerId?: string) {
-    if (!sgpServerId) {
-      sgpServerId = this._getSgpServerIdFromLcuAuth()
+    try {
+      const { data } = await this._sgp.getRankedStatsTencent(sgpServerId, puuid)
+      return data
+    } catch (error) {
+      console.log(error)
+      return null
     }
-
-    return (await this._sgp.getSummonerByPuuidTencent(sgpServerId, puuid)).data[0]
   }
 
   private _setupMethodCall() {
@@ -435,6 +495,18 @@ export class SgpEds {
         return (await this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)).data
       }
     )
+
+    this._edsm.onCall('get-summoner', async (puuid: string, sgpServerId?: string) => {
+      return this.getSummoner(puuid, sgpServerId)
+    })
+
+    this._edsm.onCall('get-summoner-lcu-format', async (puuid: string, sgpServerId?: string) => {
+      return this.getSummonerLcuFormat(puuid, sgpServerId)
+    })
+
+    this._edsm.onCall('get-ranked-stats', async (puuid: string, sgpServerId?: string) => {
+      return this.getRankedStats(puuid, sgpServerId)
+    })
   }
 
   private _maintainSessionToken() {

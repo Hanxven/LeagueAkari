@@ -59,7 +59,7 @@ export interface TabState {
   puuid: string
 
   /** 该玩家数据来源自哪个大区或 RSO */
-  platformId: string
+  sgpServerId: string
 
   /** 召唤师信息需要加载 */
   summoner?: SummonerInfo
@@ -102,21 +102,21 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
   } = useTabs<TabState>()
 
   /** 创建一个新的 Tab 并自动进行初始化操作 */
-  const createTab = (
-    puuid: string,
-    options: { setCurrent?: boolean; pin?: boolean; temporary?: boolean } = {}
-  ) => {
-    const tab = get(puuid)
+  const createTab = (unionId: string, options: { setCurrent?: boolean; pin?: boolean } = {}) => {
+    const tab = get(unionId)
     if (tab) {
       if (options.setCurrent) {
-        setCurrent(puuid)
+        setCurrent(unionId)
       }
       return
     }
 
+    // TODO 合并此文件内容到 Module, 重构之
+    const [sgpServerId, puuid] = unionId.split('/')
+
     const newTab: TabState = {
       puuid,
-      platformId: '',
+      sgpServerId,
       matchHistory: {
         games: [],
         _gamesMap: {},
@@ -135,15 +135,15 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
       }
     }
 
-    add(puuid, newTab, options)
+    add(unionId, newTab, options)
 
     if (options.setCurrent) {
-      setCurrent(puuid)
+      setCurrent(unionId)
     }
   }
 
-  const setMatchHistoryExpand = (puuid: string, gameId: number, expand: boolean) => {
-    const tab = get(puuid)
+  const setMatchHistoryExpand = (unionId: string, gameId: number, expand: boolean) => {
+    const tab = get(unionId)
 
     if (tab) {
       const match = tab.data.matchHistory._gamesMap[gameId]

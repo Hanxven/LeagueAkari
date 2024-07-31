@@ -125,7 +125,6 @@
             @update:value="(value) => am.setAutoSearchMatchDelaySeconds(value || 0)"
             placeholder="秒"
             :min="0"
-            :max="20"
             size="tiny"
           />
         </ControlItem>
@@ -177,9 +176,9 @@
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { autoGameflowRendererModule as am } from '@shared/renderer/modules/auto-gameflow'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
-import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NSwitch, NScrollbar } from 'naive-ui'
-const agf = useAutoGameflowStore()
+import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
 
+const agf = useAutoGameflowStore()
 </script>
 
 <style lang="less" scoped>

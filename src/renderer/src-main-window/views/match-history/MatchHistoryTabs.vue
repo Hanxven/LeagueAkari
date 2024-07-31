@@ -14,13 +14,7 @@
           v-for="tab of mh.tabs"
           @contextmenu="(event) => handleShowMenu(event, tab.id)"
           :key="tab.id"
-          :tab="
-            summonerName(
-              tab.data.summoner?.gameName || tab.data.summoner?.displayName,
-              tab.data.summoner?.tagLine,
-              tab.id
-            )
-          "
+          :tab="tabNames[tab.id]"
           :name="tab.id"
           :closable="tab.id !== summoner.me?.puuid"
           :draggable="true"
@@ -45,11 +39,7 @@
               :src="tab.data.summoner ? profileIcon(tab.data.summoner.profileIconId) : undefined"
             />
             <span class="tab-title" :class="{ 'temporary-tab': tab.isTemporary }">{{
-              summonerName(
-                tab.data.summoner?.gameName || tab.data.summoner?.displayName,
-                tab.data.summoner?.tagLine,
-                tab.id
-              )
+              tabNames[tab.id]
             }}</span>
             <NIcon
               v-if="tab.id !== summoner.me?.puuid && tab.data.summoner?.privacy === 'PRIVATE'"
@@ -64,12 +54,7 @@
         <NPopover
           content-style="padding: 0;"
           raw
-          style="
-            width: 420px;
-            max-height: 600px;
-            border-radius: 4px;
-            background-color: rgb(29, 29, 29);
-          "
+          style="max-height: 600px; border-radius: 4px; background-color: rgb(29, 29, 29)"
           :show-arrow="false"
           trigger="click"
           scrollable
@@ -102,8 +87,8 @@
           v-for="t of mh.tabs"
           :key="t.id"
           v-show="t.id === mh.currentTab.id"
-          :is-self="mh.currentTab.id === summoner.me?.puuid"
-          :tab="t.data as TabState"
+          :is-self="mh.currentTab.data.puuid === summoner.me?.puuid"
+          :tab="{ id: t.id, ...(t.data as TabState) }"
           ref="tabsRef"
         />
       </template>
@@ -130,9 +115,10 @@ import { championIcon, profileIcon } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { summonerName } from '@shared/utils/name'
+import { rsoPlatformText } from '@shared/utils/rso-platforms'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
 import { NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
@@ -156,8 +142,11 @@ const handleTabClose = (puuid: string) => {
   mh.closeTab(puuid)
 }
 
-const handleTabChange = async (puuid: string) => {
-  await router.replace(`/match-history/${puuid}`)
+const { navigateToTab } = mhm.useNavigateToTab()
+
+const handleTabChange = async (unionId: string) => {
+  const { puuid, sgpServerId } = mhm.parseUnionId(unionId)
+  navigateToTab(puuid, sgpServerId)
 }
 
 const tabsRef = ref<any[]>()
@@ -169,32 +158,95 @@ const handleRefresh = async (puuid: string) => {
   }
 }
 
-watch(
-  () => route.params.puuid,
-  (puuid) => {
-    if (typeof puuid !== 'string' || !puuid) {
+const matchHistoryRoute = computed(() => {
+  const puuid = route.params.puuid as string
+  const sgpServerId = route.params.sgpServerId as string
+
+  if (typeof puuid === 'string' && typeof sgpServerId === 'string' && puuid && sgpServerId) {
+    return { puuid, sgpServerId }
+  }
+
+  return null
+})
+
+const tabNames = computed(() => {
+  const nameMap: Record<string, string> = {}
+
+  // 统计是否只有一种 sgpServerId
+  const sgpServerIds = new Set<string>()
+  for (const tab of mh.tabs) {
+    const { sgpServerId } = mhm.parseUnionId(tab.id)
+    sgpServerIds.add(sgpServerId)
+  }
+
+  const onlyOneType = sgpServerIds.size === 1
+
+  mh.tabs.forEach((tab) => {
+    if (tab.data.summoner) {
+      const n = summonerName(tab.data.summoner.gameName, tab.data.summoner.tagLine)
+
+      if (onlyOneType) {
+        nameMap[tab.id] = n
+        return
+      }
+
+      // TODO: 目前只支持腾讯服务器, 所以固定为 rso-platforms.ts 中的文本
+      const { sgpServerId } = mhm.parseUnionId(tab.id)
+      const s = rsoPlatformText[sgpServerId] || sgpServerId
+
+      nameMap[tab.id] = `${n} [${s}]`
       return
     }
 
-    const tab = mh.getTab(puuid)
+    nameMap[tab.id] = tab.id
+  })
+
+  return nameMap
+})
+
+watch(
+  () => matchHistoryRoute.value,
+  (r) => {
+    if (!r) {
+      return
+    }
+
+    const unionId = `${r.sgpServerId}/${r.puuid}`
+
+    const tab = mh.getTab(unionId)
     if (tab) {
-      mh.setCurrentTab(puuid)
+      mh.setCurrentTab(unionId)
     } else {
-      mh.createTab(puuid, {
+      mh.createTab(unionId, {
         setCurrent: true,
-        pin: summoner.me?.puuid === puuid
+        pin: summoner.me?.puuid === r.puuid // 庆幸的是，puuid 是唯一的
       })
-      mhm.fetchTabFullData(puuid)
+      mhm.fetchTabFullData(unionId)
     }
   },
   { immediate: true }
 )
 
 watch(
-  () => mh.currentTab?.id,
-  (id) => {
-    if (id && route.params.puuid !== id) {
-      router.replace(`/match-history/${id}`)
+  () => mh.currentTab,
+  (tab) => {
+    if (!tab) {
+      router.replace({ name: 'match-history' })
+      return
+    }
+
+    if (
+      tab.id &&
+      matchHistoryRoute.value &&
+      (tab.id !== matchHistoryRoute.value.puuid ||
+        tab.data.sgpServerId !== matchHistoryRoute.value.sgpServerId)
+    ) {
+      const { sgpServerId, puuid } = mhm.parseUnionId(tab.id)
+
+      router.replace({
+        name: 'match-history',
+        params: { puuid, sgpServerId }
+      })
     }
   },
   { immediate: true }

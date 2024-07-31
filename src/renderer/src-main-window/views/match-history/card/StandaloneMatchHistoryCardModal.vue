@@ -10,6 +10,7 @@
         :is-loading="!game && isLoading"
         :is-expanded="selfPuuid ? isExpanded : true"
         @set-show-detailed-game="(_, expand) => (isExpanded = expand)"
+        @to-summoner="(puuid) => handleToSummoner(puuid)"
       />
       <div class="placeholder" v-else>
         <span>{{
@@ -35,6 +36,8 @@ import { Game } from '@shared/types/lcu/match-history'
 import { AxiosError } from 'axios'
 import { NButton, NModal } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
+
+import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
 
 import MatchHistoryCard from './MatchHistoryCard.vue'
 
@@ -115,6 +118,12 @@ watch(
   },
   { immediate: true }
 )
+
+const { navigateToTab } = mhm.useNavigateToTab()
+
+const handleToSummoner = (puuid) => {
+  navigateToTab(puuid)
+}
 </script>
 
 <style lang="less" scoped>

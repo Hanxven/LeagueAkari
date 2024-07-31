@@ -261,9 +261,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
 
   showWindow() {
     if (this._w) {
-      if (!this.state.isShow) {
-        this._w.show()
-      }
+      this._w.show()
       this._w.focus()
     }
   }
@@ -313,7 +311,6 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this.state.setShow(AuxWindowModule.INITIAL_SHOW)
 
     this._w.setOpacity(this.state.settings.opacity)
-
 
     this._w.webContents.on('did-finish-load', () => {
       this._w?.webContents.setZoomFactor(this.state.settings.zoomFactor)

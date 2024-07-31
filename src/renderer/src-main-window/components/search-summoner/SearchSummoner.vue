@@ -17,10 +17,10 @@
           :disabled="isSearching"
         />
         <NSelect
-          v-if="false && serverOptions.length"
+          v-if="sgpServerOptions.length"
           style="width: 200px"
-          v-model:value="currentServer"
-          :options="serverOptions"
+          v-model:value="currentSgpServer"
+          :options="sgpServerOptions"
         />
         <NButton type="primary" :disabled="!inputText" :loading="isSearching" @click="handleSearch"
           >搜索</NButton
@@ -33,6 +33,8 @@
           condition="name"
           :summoner="byNameResult"
           :search-text="searchText"
+          :sgp-server-id="searchSgpServerId"
+          @to-summoner="handleToSummoner"
         />
         <SummonerCard
           class="card"
@@ -40,6 +42,8 @@
           condition="id"
           :summoner="bySummonerIdResult"
           :search-text="searchText"
+          :sgp-server-id="searchSgpServerId"
+          @to-summoner="handleToSummoner"
         />
         <SummonerCard
           class="card"
@@ -47,6 +51,8 @@
           condition="puuid"
           :summoner="byPuuidResult"
           :search-text="searchText"
+          :sgp-server-id="searchSgpServerId"
+          @to-summoner="handleToSummoner"
         />
       </div>
       <div class="empty" v-if="isNoSearchResult" size="small">没有符合条件的用户</div>
@@ -77,9 +83,11 @@ import {
   getSummonerByName,
   getSummonerByPuuid
 } from '@shared/renderer/http-api/summoner'
+import { externalDataSourceRendererModule as edsm } from '@shared/renderer/modules/external-data-source'
 import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
+import { getPlayerAccountAlias, getPlayerAccountNameset } from '@shared/renderer/rc-http-api/rc-api'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { inferType, resolveSummonerName } from '@shared/utils/identity'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
@@ -103,6 +111,7 @@ const summoner = useSummonerStore()
 
 const inputText = ref('')
 const searchText = ref('')
+const searchSgpServerId = ref('')
 
 const inputEl = ref()
 
@@ -114,16 +123,16 @@ const byPuuidResult = ref<SummonerInfo>()
 
 const eds = useExternalDataSourceStore()
 
-const currentServer = ref('')
+const currentSgpServer = ref('')
 
 watchEffect(() => {
-  currentServer.value =
+  currentSgpServer.value =
     eds.sgpAvailability.currentRegion === 'TENCENT'
       ? eds.sgpAvailability.currentRsoPlatform
       : eds.sgpAvailability.currentRegion
 })
 
-const serverOptions = computed(() => {
+const sgpServerOptions = computed(() => {
   if (!eds.sgpAvailability.currentSgpServerSupported) {
     return []
   }
@@ -152,10 +161,10 @@ const serverOptions = computed(() => {
 // 跨区查询需要额外步骤
 const isCrossServer = computed(() => {
   if (eds.sgpAvailability.currentRegion === 'TENCENT') {
-    return eds.sgpAvailability.currentRsoPlatform !== currentServer.value
+    return eds.sgpAvailability.currentRsoPlatform !== currentSgpServer.value
   }
 
-  return eds.sgpAvailability.currentRegion !== currentServer.value
+  return eds.sgpAvailability.currentRegion !== currentSgpServer.value
 })
 
 function isNumeric(str: string): boolean {
@@ -175,7 +184,7 @@ const isTagNeeded = computed(() => {
     return false
   }
 
-  if (!isNumeric(inputText.value)) {
+  if (!isCrossServer.value && !isNumeric(inputText.value)) {
     const [name, tag] = resolveSummonerName(inputText.value)
     if (!name || !tag) {
       return true
@@ -192,6 +201,7 @@ const handleSearch = async () => {
   }
   isSearching.value = true
   searchText.value = inputText.value
+  searchSgpServerId.value = currentSgpServer.value
 
   const inferredTypes = inferType(inputText.value)
   const tasks: Promise<void>[] = []
@@ -201,11 +211,20 @@ const handleSearch = async () => {
       tasks.push(
         (async () => {
           if (type.isWithTagLine) {
+            const [name, tag] = resolveSummonerName(type.value)
+
             try {
-              const [name, tag] = resolveSummonerName(type.value)
-              const summoner2 = await getSummonerAlias(name, tag)
-              if (summoner2) {
-                byNameResult.value = summoner2
+              if (isCrossServer.value) {
+                const a = await getPlayerAccountAlias(name, tag)
+                const p = await edsm.sgp.getSummonerLcuFormat(a.puuid, currentSgpServer.value)
+                p.gameName = a.alias.game_name
+                p.tagLine = a.alias.tag_line
+                byNameResult.value = p
+              } else {
+                const summoner2 = await getSummonerAlias(name, tag)
+                if (summoner2) {
+                  byNameResult.value = summoner2
+                }
               }
             } catch (error) {
               console.warn(`查找名称+TagLine ${type.value}`, error)
@@ -225,18 +244,31 @@ const handleSearch = async () => {
         })()
       )
     }
+
     if (type.type === 'puuid') {
       tasks.push(
         (async () => {
           try {
-            const summoner = await getSummonerByPuuid(type.value)
-            byPuuidResult.value = summoner.data
+            if (isCrossServer.value) {
+              const summoner = await edsm.sgp.getSummonerLcuFormat(
+                type.value,
+                currentSgpServer.value
+              )
+              const s = await getPlayerAccountNameset(type.value)
+              summoner.gameName = s.gnt.gameName
+              summoner.tagLine = s.gnt.tagLine
+              byPuuidResult.value = summoner
+            } else {
+              const summoner = await getSummonerByPuuid(type.value)
+              byPuuidResult.value = summoner.data
+            }
           } catch (error) {
             console.warn(`查找 PUUID ${type.value}`, error)
           }
         })()
       )
     }
+
     if (type.type === 'summonerId') {
       tasks.push(
         (async () => {
@@ -287,19 +319,7 @@ const generateCompleteOptions = async () => {
 }
 
 const renderLabel = (option: SelectOption): VNodeChild => {
-  return h(NFlex, { justify: 'space-between', style: { width: '246px' } }, () => [
-    h(
-      'div',
-      {
-        style: {
-          'max-width': '200px',
-          overflow: 'hidden',
-          'text-overflow': 'ellipsis',
-          'white-space': 'nowrap'
-        }
-      },
-      option.label as string
-    ),
+  return h(NFlex, { justify: 'space-between', style: { width: '100%' } }, () => [
     h(
       NButton,
       {
@@ -322,6 +342,17 @@ const renderLabel = (option: SelectOption): VNodeChild => {
         }
       },
       { icon: () => h(NIcon, () => h(CloseIcon)) }
+    ),
+    h(
+      'div',
+      {
+        style: {
+          overflow: 'hidden',
+          'text-overflow': 'ellipsis',
+          'white-space': 'nowrap'
+        }
+      },
+      option.label as string
     )
   ])
 }
@@ -333,6 +364,12 @@ const handleApplyAutoCompletion = (_: string) => {
 onMounted(() => {
   inputEl.value?.focus()
 })
+
+const { navigateToTab } = mhm.useNavigateToTab()
+
+const handleToSummoner = (puuid: string, sgpServerId?: string) => {
+  navigateToTab(puuid, sgpServerId)
+}
 </script>
 
 <style lang="less" scoped>
@@ -340,6 +377,7 @@ onMounted(() => {
   height: 100%;
   overflow-y: scroll;
   padding: 0 24px;
+  width: 500px;
 }
 
 .search-inner {
@@ -355,6 +393,10 @@ onMounted(() => {
   border: 1px solid rgb(60, 60, 60);
   border-radius: 4px;
   box-sizing: border-box;
+
+  :deep(.n-base-select-option__content) {
+    width: 100%;
+  }
 }
 
 .summoners-area {
