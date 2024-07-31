@@ -292,7 +292,6 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       icon,
       fullscreenable: false,
       skipTaskbar: false,
-      alwaysOnTop: this.state.settings.isPinned,
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         sandbox: false,
@@ -311,6 +310,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this.state.setShow(AuxWindowModule.INITIAL_SHOW)
 
     this._w.setOpacity(this.state.settings.opacity)
+    this._w.setAlwaysOnTop(this.state.settings.isPinned, 'normal')
 
     this._w.webContents.on('did-finish-load', () => {
       this._w?.webContents.setZoomFactor(this.state.settings.zoomFactor)
@@ -360,7 +360,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     })
 
     this._w.on('always-on-top-changed', (_, b) => {
-      this._sm.settings.set('auxiliary-window/is-pinned', b)
+      this._ss.set('is-pinned', b)
       this.state.settings.setPinned(b)
     })
 
@@ -408,8 +408,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       'is-pinned',
       () => this.state.settings.isPinned,
       async (s, ss) => {
-        this.state.settings.setPinned(s)
-        this._w?.setAlwaysOnTop(s)
+        this._w?.setAlwaysOnTop(s, 'normal')
         await ss.set('is-pinned', s)
 
         return true
