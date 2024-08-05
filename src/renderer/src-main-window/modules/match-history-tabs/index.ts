@@ -19,8 +19,6 @@ import { AxiosError } from 'axios'
 import { computed, markRaw, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { router } from '@main-window/routes'
-
 import { MatchHistoryGameTabCard, useMatchHistoryTabsStore } from './store'
 
 /**
@@ -69,11 +67,13 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
       () => isEndGame.value,
       (is, _prevP) => {
         if (cf.settings.fetchAfterGame && is) {
-          Object.keys(cf.ongoingPlayers).forEach((key) => {
-            if (mh.getTab(key)) {
-              this.fetchTabFullData(key)
+          const set = new Set<string>(Object.keys(cf.ongoingPlayers))
+
+          for (const tab of mh.tabs) {
+            if (set.has(tab.data.puuid)) {
+              this.fetchTabMatchHistory(this.toUnionId(tab.data.sgpServerId, tab.data.puuid))
             }
-          })
+          }
         }
       }
     )
@@ -604,6 +604,10 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
   parseUnionId(unionId: string) {
     const [sgpServerId, puuid] = unionId.split('/')
     return { sgpServerId, puuid }
+  }
+
+  toUnionId(sgpServerId: string, puuid: string) {
+    return `${sgpServerId}/${puuid}`
   }
 }
 

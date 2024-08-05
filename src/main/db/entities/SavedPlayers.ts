@@ -23,7 +23,7 @@ export class SavedPlayer {
   /**
    * 平台，腾讯服务器会有，用作区服
    *
-   * 如新加披服 (SG2)，无此字段
+   * 如新加坡服 (SG2)，无此字段
    */
   @PrimaryColumn({ type: 'varchar' })
   rsoPlatformId: string

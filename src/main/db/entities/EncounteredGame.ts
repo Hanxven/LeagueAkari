@@ -1,4 +1,4 @@
-import { Column, Entity, Index, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
 
 /**
  * 记录与某位玩家相遇的情况，遇到 ta 的每一局游戏都会被记录在内

@@ -1,6 +1,6 @@
 <template>
   <div class="title-bar" :class="{ blurred: aw.focusState === 'blurred' }">
-    <div style="flex: 1"></div>
+    <div class="text-area"></div>
     <div class="traffic">
       <div
         :title="aw.settings.isPinned ? `取消置顶` : `置顶`"
@@ -21,12 +21,15 @@
 </template>
 
 <script setup lang="ts">
+import OpggIcon from '@auxiliary-window/assets/icon/OpggIcon.vue'
 import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
 import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
 import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/fluent'
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
+import { watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 
 const aw = useAuxiliaryWindowStore()
 
@@ -41,6 +44,8 @@ const handleMinimize = () => {
 const handlePin = (b: boolean) => {
   return awm.setAlwaysOnTop(b)
 }
+
+const route = useRoute()
 </script>
 
 <style lang="less" scoped>
@@ -51,6 +56,13 @@ const handlePin = (b: boolean) => {
   align-items: center;
   z-index: 10000000;
   -webkit-app-region: drag;
+}
+
+.text-area {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  flex: 1;
 }
 
 .blurred :is(.title, .traffic) {
@@ -96,7 +108,8 @@ const handlePin = (b: boolean) => {
     }
   }
 
-  .traffic-button.pin, .traffic-button.minimize {
+  .traffic-button.pin,
+  .traffic-button.minimize {
     &.pinned {
       background-color: rgba(102, 102, 102, 0.15);
     }

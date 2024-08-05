@@ -1,3 +1,1355 @@
 <template>
-  <div>站位</div>
+  <div class="opgg-champion-wrapper">
+    <!-- 真的想不出一点容易组织的结构, 就这样复制粘贴吧 -->
+    <NSpin description="Fetching data from OP.GG ..." v-if="loading" class="spin-mask"></NSpin>
+    <NScrollbar>
+      <div class="card-area" v-if="info">
+        <div class="card-content">
+          <div class="first-line" :title="info.id === 893 ? '兔兔好可爱' : ''">
+            <LcuImage class="image" :src="championIcon(info.id)" />
+            <div class="name-tier">
+              <div class="name">
+                {{ gameData.champions[info.id]?.name || '-' }}
+              </div>
+              <div class="tier" :class="[[`tier-${info.tier}`]]">
+                {{ tierText }}
+              </div>
+              <div class="position" v-if="props.position && props.position !== 'none'">
+                {{ positionTextMap[props.position.toUpperCase()] || props.position }}
+              </div>
+            </div>
+            <div class="prop-groups">
+              <div class="prop-field" v-if="info.total_place && info.play">
+                <div class="prop">平均排名</div>
+                <div class="value">{{ (info.total_place / (info.play || 1)).toFixed(2) }}</div>
+              </div>
+              <div class="prop-field" v-if="info.first_place && info.play">
+                <div class="prop">第一</div>
+                <div class="value">
+                  {{ ((info.first_place / (info.play || 1)) * 100).toFixed(2) }}%
+                </div>
+              </div>
+              <div class="prop-field" v-if="info.win_rate">
+                <div class="prop">胜率</div>
+                <div class="value">{{ (info.win_rate * 100).toFixed(2) }}%</div>
+              </div>
+              <div class="prop-field" v-if="info.play && info.win">
+                <div class="prop">胜率</div>
+                <div class="value">{{ ((info.win / (info.play || 1)) * 100).toFixed(2) }}%</div>
+              </div>
+
+              <div class="prop-field" v-if="info.pick_rate">
+                <div class="prop">登场率</div>
+                <div class="value">{{ (info.pick_rate * 100).toFixed(2) }}%</div>
+              </div>
+              <div class="prop-field" v-if="info.ban_rate">
+                <div class="prop">禁用率</div>
+                <div class="value">{{ (info.ban_rate * 100).toFixed(2) }}%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-area" v-if="info && info.position">
+        <div class="card-title">劣势对抗</div>
+        <div class="card-content">
+          <div class="counters">
+            <div class="counter" v-for="c of info.position.counters">
+              <LcuImage class="image" :src="championIcon(c.champion_id)" />
+              <div class="win-rate" title="胜率">
+                {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
+              </div>
+              <div class="play">{{ c.play }} 场</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 完整的 counters 列表, 但这里选择不展示 -->
+      <div
+        class="card-area"
+        v-if="false && data && data.data.counters && data.data.counters.length"
+      >
+        <div class="card-title">劣势对抗</div>
+        <div class="card-content">
+          <div class="counters">
+            <div class="counter" v-for="c of data.data.counters">
+              <LcuImage class="image" :src="championIcon(c.champion_id)" />
+              <div class="win-rate" title="胜率">
+                {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
+              </div>
+              <div class="play">{{ c.play }} 场</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="card-area"
+        v-if="data && data.data.summoner_spells && data.data.summoner_spells.length"
+      >
+        <div class="card-title">
+          召唤师技能<NCheckbox size="small" v-model:checked="isSummonerSpellsExpanded"
+            >展示全部</NCheckbox
+          >
+        </div>
+        <div class="card-content">
+          <div
+            class="summoner-spells-group"
+            v-for="(s, i) of data.data.summoner_spells.slice(
+              0,
+              isSummonerSpellsExpanded ? Infinity : 2
+            )"
+          >
+            <div class="index">#{{ i + 1 }}</div>
+            <div class="spells">
+              <SummonerSpellDisplay :size="28" :spell-id="spell" v-for="spell of s.ids" />
+            </div>
+            <div class="desc">
+              <div class="pick">
+                <span class="pick-rate" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
+                <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+              </div>
+              <div class="win-rate" title="胜率">
+                {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
+              </div>
+              <div class="buttons">
+                <NButton
+                  @click="() => handleSetSummonerSpells(s.ids)"
+                  size="tiny"
+                  type="primary"
+                  secondary
+                  :disabled="gameflow.phase !== 'ChampSelect'"
+                  title="点按以设置为此召唤师技能"
+                  >应用</NButton
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-area" v-if="data && data.data.runes && data.data.runes.length">
+        <div class="card-title">
+          符文配法<NCheckbox size="small" v-model:checked="isRunesExpanded">展示全部</NCheckbox>
+        </div>
+        <div class="card-content">
+          <div
+            class="runes-group"
+            v-for="(r, i) of data.data.runes.slice(0, isRunesExpanded ? Infinity : 2)"
+          >
+            <div class="index">#{{ i + 1 }}</div>
+            <div>
+              <div class="primary">
+                <PerkstyleDisplay
+                  style="margin-right: 4px"
+                  :size="24"
+                  :perkstyle-id="r.primary_page_id"
+                />
+                <PerkDisplay
+                  :max-width="280"
+                  :size="18"
+                  v-for="p of r.primary_rune_ids"
+                  :perk-id="p"
+                />
+              </div>
+              <div class="secondary">
+                <PerkstyleDisplay
+                  style="margin-right: 4px"
+                  class="secondary-style"
+                  :size="24"
+                  :perkstyle-id="r.secondary_page_id"
+                />
+                <PerkDisplay
+                  :max-width="280"
+                  :size="18"
+                  v-for="p of r.secondary_rune_ids"
+                  :perk-id="p"
+                />
+                <div class="gap"></div>
+                <PerkDisplay :max-width="280" :size="18" v-for="p of r.stat_mod_ids" :perk-id="p" />
+              </div>
+            </div>
+            <div class="desc">
+              <div class="pick">
+                <span class="pick-rate" title="登场率">{{ (r.pick_rate * 100).toFixed(2) }}%</span>
+                <span class="pick-play" title="总场次">{{ r.play }} 场</span>
+              </div>
+              <div class="win-rate" title="胜率">
+                {{ ((r.win / (r.play || 1)) * 100).toFixed(2) }}%
+              </div>
+              <div class="buttons">
+                <NButton
+                  @click="() => handleSetRunes(r)"
+                  size="tiny"
+                  type="primary"
+                  secondary
+                  title="点按以设置为此符文配法"
+                  >应用</NButton
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-area" v-if="data && data.data.synergies && data.data.synergies.length">
+        <div class="card-title">
+          伙伴<NCheckbox size="small" v-model:checked="isSynergiesExpanded">展示全部</NCheckbox>
+        </div>
+        <div class="card-content">
+          <div
+            class="synergies-group"
+            v-for="(s, i) of data.data.synergies.slice(0, isSynergiesExpanded ? Infinity : 4)"
+          >
+            <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
+            <div class="image-name">
+              <LcuImage class="image" :src="championIcon(s.champion_id)" />
+              <span>{{ gameData.champions[s.champion_id]?.name || s.champion_id }}</span>
+            </div>
+            <div class="desc">
+              <div class="value-text">
+                <span class="value">{{ (s.total_place / (s.play || 1)).toFixed(2) }}</span>
+                <span class="text">平均排名</span>
+              </div>
+              <div class="value-text">
+                <span class="value">{{ ((s.first_place / (s.play || 1)) * 100).toFixed(2) }}%</span>
+                <span class="text">第一名</span>
+              </div>
+              <div class="value-text">
+                <span class="value" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
+                <span class="text" title="总场次">{{ s.play }} 场</span>
+              </div>
+              <div class="value-text">
+                <span class="value" title="胜率"
+                  >{{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%</span
+                >
+                <span class="text" title="胜率">胜率</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-area" v-if="augments && Object.keys(augments).length">
+        <NTabs v-model:value="augmentTab" size="small" :animated="false">
+          <template #suffix>
+            <NCheckbox size="small" v-model:checked="isAugmentsExpanded">展示全部</NCheckbox>
+          </template>
+          <NTabPane name="silver" v-if="augments && augments[1]">
+            <template #tab>
+              <span class="augments-tab-title">白银阶</span>
+            </template>
+
+            <div
+              class="augments-group"
+              v-for="(a, i) of augments[1].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+            >
+              <div class="index">#{{ i + 1 }}</div>
+              <div class="image-name">
+                <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
+                <span class="name">{{ gameData.augments[a.id]?.nameTRA || a.id }}</span>
+              </div>
+              <div class="desc">
+                <div class="pick">
+                  <span class="pick-rate" title="登场率"
+                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                  >
+                  <span class="pick-play" title="总场次">{{ a.play }} 场</span>
+                </div>
+                <div class="win-rate" title="胜率">
+                  {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
+                </div>
+              </div>
+            </div>
+          </NTabPane>
+          <NTabPane name="gold" v-if="augments && augments[4]">
+            <template #tab>
+              <span class="augments-tab-title">黄金阶</span>
+            </template>
+            <div
+              class="augments-group"
+              v-for="(a, i) of augments[4].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+            >
+              <div class="index">#{{ i + 1 }}</div>
+              <div class="image-name">
+                <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
+                <span class="name">{{ gameData.augments[a.id]?.nameTRA || a.id }}</span>
+              </div>
+              <div class="desc">
+                <div class="pick">
+                  <span class="pick-rate" title="登场率"
+                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                  >
+                  <span class="pick-play" title="总场次">{{ a.play }} 场</span>
+                </div>
+                <div class="win-rate" title="胜率">
+                  {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
+                </div>
+              </div>
+            </div>
+          </NTabPane>
+          <NTabPane name="prism" v-if="augments && augments[8]">
+            <template #tab>
+              <span class="augments-tab-title">棱彩阶</span>
+            </template>
+
+            <div
+              class="augments-group"
+              v-for="(a, i) of augments[8].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+            >
+              <div class="index">#{{ i + 1 }}</div>
+              <div class="image-name">
+                <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
+                <span class="name">{{ gameData.augments[a.id]?.nameTRA || a.id }}</span>
+              </div>
+              <div class="desc">
+                <div class="pick">
+                  <span class="pick-rate" title="登场率"
+                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                  >
+                  <span class="pick-play" title="总场次">{{ a.play }} 场</span>
+                </div>
+                <div class="win-rate" title="胜率">
+                  {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
+                </div>
+              </div>
+            </div>
+          </NTabPane>
+        </NTabs>
+      </div>
+      <div
+        class="card-area"
+        v-if="data && data.data.skill_masteries && data.data.skill_masteries.length"
+      >
+        <div class="card-title">
+          技能点法<NCheckbox
+            v-if="data.data.skill_masteries.length > 2"
+            size="small"
+            v-model:checked="isSkillMasteriesExpanded"
+            >展示全部</NCheckbox
+          >
+        </div>
+        <div class="card-content">
+          <div
+            class="skills-group"
+            v-for="(m, i) of data.data.skill_masteries.slice(
+              0,
+              isSkillMasteriesExpanded ? Infinity : 2
+            )"
+          >
+            <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
+            <div>
+              <div class="skill-route">
+                <template v-for="(s, i) of m.ids">
+                  <div
+                    class="skill"
+                    :class="{
+                      w: s === 'W',
+                      q: s === 'Q',
+                      e: s === 'E',
+                      r: s === 'R'
+                    }"
+                  >
+                    {{ s }}
+                  </div>
+                  <NIcon v-if="i < m.ids.length - 1" class="separator">
+                    <ArrowForwardIosOutlinedIcon />
+                  </NIcon>
+                </template>
+              </div>
+              <div class="skill-details">
+                <!-- display only one group of it -->
+                <div
+                  class="skill"
+                  :class="{
+                    w: s === 'W',
+                    q: s === 'Q',
+                    e: s === 'E',
+                    r: s === 'R'
+                  }"
+                  v-for="s of m.builds[0].order"
+                >
+                  {{ s }}
+                </div>
+              </div>
+            </div>
+            <div class="desc">
+              <div class="pick">
+                <span class="pick-rate" title="登场率">{{ (m.pick_rate * 100).toFixed(2) }}%</span>
+                <span class="pick-play" title="总场次">{{ m.play }} 场</span>
+              </div>
+              <div class="win-rate" title="胜率">
+                {{ ((m.win / (m.play || 1)) * 100).toFixed(2) }}%
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="card-area"
+        v-if="data && data.data.starter_items && data.data.starter_items.length"
+      >
+        <div class="card-title">
+          初始装备<NCheckbox
+            v-if="data.data.starter_items.length > 4"
+            size="small"
+            v-model:checked="isStarterItemsExpanded"
+            >展示全部</NCheckbox
+          >
+        </div>
+        <div class="card-content">
+          <div
+            class="items-group"
+            v-for="(s, i) of data.data.starter_items.slice(
+              0,
+              isStarterItemsExpanded ? Infinity : 4
+            )"
+          >
+            <div class="index">#{{ i + 1 }}</div>
+            <template v-for="(ss, i) of s.ids">
+              <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+              <NIcon v-if="i < s.ids.length - 1" class="separator">
+                <ArrowForwardIosOutlinedIcon />
+              </NIcon>
+            </template>
+            <div class="desc">
+              <div class="pick">
+                <span class="pick-rate" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
+                <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+              </div>
+              <div class="win-rate" title="胜率">
+                {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-area" v-if="data && data.data.starter_items && data.data.boots.length">
+        <div class="card-title">
+          鞋子<NCheckbox
+            v-if="data.data.boots.length > 4"
+            size="small"
+            v-model:checked="isBootsExpanded"
+            >展示全部</NCheckbox
+          >
+        </div>
+        <div class="card-content">
+          <div class="double-columns">
+            <div
+              class="items-group"
+              v-for="(s, i) of data.data.boots.slice(0, isBootsExpanded ? Infinity : 4)"
+            >
+              <div class="index">#{{ i + 1 }}</div>
+              <template v-for="(ss, i) of s.ids">
+                <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+                <NIcon v-if="i < s.ids.length - 1" class="separator">
+                  <ArrowForwardIosOutlinedIcon />
+                </NIcon>
+              </template>
+              <div class="desc">
+                <div class="pick">
+                  <span class="pick-rate" title="登场率"
+                    >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                  >
+                  <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+                </div>
+                <div class="win-rate" title="胜率">
+                  {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-area" v-if="data && data.data.prism_items && data.data.prism_items.length">
+        <div class="card-title">
+          棱彩阶装备<NCheckbox
+            v-if="data.data.prism_items.length > 4"
+            size="small"
+            v-model:checked="isPrismItemsExpanded"
+            >展示全部</NCheckbox
+          >
+        </div>
+        <div class="card-content">
+          <div class="double-columns">
+            <div
+              class="items-group"
+              v-for="(s, i) of data.data.prism_items.slice(0, isPrismItemsExpanded ? Infinity : 4)"
+            >
+              <div class="index">#{{ i + 1 }}</div>
+              <template v-for="(ss, i) of s.ids">
+                <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+                <NIcon v-if="i < s.ids.length - 1" class="separator">
+                  <ArrowForwardIosOutlinedIcon />
+                </NIcon>
+              </template>
+              <div class="desc">
+                <div class="pick">
+                  <span class="pick-rate" title="登场率"
+                    >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                  >
+                  <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+                </div>
+                <div class="win-rate" title="胜率">
+                  {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-area" v-if="data && data.data.starter_items && data.data.core_items.length">
+        <div class="card-title">
+          核心装备<NCheckbox
+            v-if="data.data.core_items.length > 4"
+            size="small"
+            v-model:checked="isCoreItemsExpanded"
+            >展示全部</NCheckbox
+          >
+        </div>
+        <div class="card-content">
+          <div
+            class="items-group"
+            v-for="(s, i) of data.data.core_items.slice(0, isCoreItemsExpanded ? Infinity : 4)"
+          >
+            <div class="index">#{{ i + 1 }}</div>
+            <template v-for="(ss, i) of s.ids">
+              <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+              <NIcon v-if="i < s.ids.length - 1" class="separator">
+                <ArrowForwardIosOutlinedIcon />
+              </NIcon>
+            </template>
+            <div class="desc">
+              <div class="pick">
+                <span class="pick-rate" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
+                <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+              </div>
+              <div class="win-rate" title="胜率">
+                {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-area" v-if="data && data.data.starter_items && data.data.last_items.length">
+        <div class="card-title">
+          最后一件<NCheckbox
+            v-if="data.data.last_items.length > 8"
+            size="small"
+            v-model:checked="isLastItemsExpanded"
+            >展示全部</NCheckbox
+          >
+        </div>
+        <div class="card-content">
+          <div class="double-columns">
+            <div
+              class="items-group"
+              v-for="(s, i) of data.data.last_items.slice(0, isLastItemsExpanded ? Infinity : 8)"
+            >
+              <div class="index">#{{ i + 1 }}</div>
+              <template v-for="(ss, i) of s.ids">
+                <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+                <NIcon v-if="i < s.ids.length - 1" class="separator">
+                  <ArrowForwardIosOutlinedIcon />
+                </NIcon>
+              </template>
+              <div class="desc">
+                <div class="pick">
+                  <span class="pick-rate" title="登场率"
+                    >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                  >
+                  <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+                </div>
+                <div class="win-rate" title="胜率">
+                  {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </NScrollbar>
+  </div>
 </template>
+
+<script setup lang="ts">
+import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import AugmentDisplay from '@shared/renderer/components/widgets/AugmentDisplay.vue'
+import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
+import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
+import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
+import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
+import { getMySelections, setMySummonerSpells } from '@shared/renderer/http-api/champ-select'
+import { chatSend } from '@shared/renderer/http-api/chat'
+import {
+  getPerkInventory,
+  getPerkPages,
+  postPerkPage,
+  putCurrentPage,
+  putPage
+} from '@shared/renderer/http-api/perks'
+import { championIcon } from '@shared/renderer/modules/game-data'
+import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
+import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
+import { NButton, NCheckbox, NIcon, NScrollbar, NSpin, NTabPane, NTabs, useMessage } from 'naive-ui'
+import { computed, ref, watchEffect } from 'vue'
+
+const props = defineProps<{
+  region?: string // global, kr, ..., (no tencent region)
+  tier?: string // platinum_plus, diamond_plus, master_plus, grandmaster_plus, challenger, ...
+  mode?: string // normal, aram, arena, nexusblitz, urf
+  position?: string
+  version?: string // undefined => 当前
+  loading?: boolean
+  champion?: any
+  data?: any
+}>()
+
+const gameflow = useGameflowStore()
+const chat = useChatStore()
+
+const positionTextMap = {
+  TOP: '上单',
+  JUNGLE: '打野',
+  MID: '中单',
+  ADC: '下路',
+  SUPPORT: '辅助'
+}
+
+const info = computed(() => {
+  if (!props.champion) {
+    return null
+  }
+
+  if (props.mode === 'ranked') {
+    const position = props.champion.positions?.find(
+      (p: any) => p.name.toUpperCase() === props.position?.toUpperCase()
+    )
+
+    return {
+      id: props.champion.id,
+      pick_rate: position?.stats?.pick_rate,
+      win_rate: position?.stats?.win_rate,
+      ban_rate: position?.stats?.ban_rate,
+      tier: position?.stats?.tier_data?.tier,
+      position: position
+    }
+  }
+
+  return {
+    id: props.champion.id,
+    pick_rate: props.champion.average_stats?.pick_rate,
+    win_rate: props.champion.average_stats?.win_rate,
+    ban_rate: props.champion.average_stats?.ban_rate,
+    tier: props.champion.average_stats?.tier,
+    first_place: props.champion.average_stats?.first_place,
+    total_place: props.champion.average_stats?.total_place,
+    play: props.champion.average_stats?.play,
+    win: props.champion.average_stats?.win
+  }
+})
+
+// OP.GG 使用 rarity 来表示三种不同的 augment 等级
+// 1 - silver, 4 - gold, 8 - prism
+const augments = computed(() => {
+  if (!props.data) {
+    return null
+  }
+
+  if (!props.data.data.augment_group) {
+    return null
+  }
+
+  return props.data.data.augment_group.reduce((acc: any, cur: any) => {
+    acc[cur.rarity] = cur
+    return acc
+  }, {})
+})
+
+const augmentTab = ref<string | undefined>('silver')
+watchEffect(() => {
+  if (!augments.value) {
+    augmentTab.value = undefined
+    return
+  }
+
+  if (augments.value[1]) {
+    augmentTab.value = 'silver'
+  } else if (augments.value[4]) {
+    augmentTab.value = 'gold'
+  } else if (augments.value[8]) {
+    augmentTab.value = 'prism'
+  } else {
+    augmentTab.value = undefined
+  }
+})
+
+const isSummonerSpellsExpanded = ref(false)
+const isRunesExpanded = ref(false)
+const isSynergiesExpanded = ref(false)
+const isAugmentsExpanded = ref(false)
+const isSkillMasteriesExpanded = ref(false)
+const isStarterItemsExpanded = ref(false)
+const isBootsExpanded = ref(false)
+const isPrismItemsExpanded = ref(false)
+const isCoreItemsExpanded = ref(false)
+const isLastItemsExpanded = ref(false)
+
+watchEffect(() => {
+  if (!props.data) {
+    isSummonerSpellsExpanded.value = false
+    isRunesExpanded.value = false
+    isSynergiesExpanded.value = false
+    isAugmentsExpanded.value = false
+    isSkillMasteriesExpanded.value = false
+    isStarterItemsExpanded.value = false
+    isBootsExpanded.value = false
+    isPrismItemsExpanded.value = false
+    isCoreItemsExpanded.value = false
+    isLastItemsExpanded.value = false
+  }
+})
+
+const tierText = computed(() => {
+  if (!info.value) {
+    return '-'
+  }
+
+  if (info.value.tier === undefined) {
+    return '-'
+  }
+
+  if (info.value.tier === 0) {
+    return 'OP'
+  }
+
+  return `T${info.value.tier} 级`
+})
+
+const gameData = useGameDataStore()
+
+watchEffect(() => {
+  console.log(props.data, props.champion, info.value)
+})
+
+watchEffect(() => {
+  console.log('p', info.value?.position)
+})
+
+const message = useMessage()
+
+const handleSetSummonerSpells = async (ids: number[]) => {
+  console.log(ids)
+
+  try {
+    const selection = (await getMySelections()).data
+
+    const [oldSpell1Id, oldSpell2Id] = [selection.spell1Id, selection.spell2Id]
+    let [newSpell1Id, newSpell2Id] = ids
+
+    // 需要尽可能保持原有的技能位置, 俗话说的好, D 闪都是白银, 我们要避免成为白银——如果你曾经是 F 闪玩家的话...
+    if (newSpell1Id === oldSpell2Id || newSpell2Id === oldSpell1Id) {
+      ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
+    }
+
+    await setMySummonerSpells({
+      spell1Id: newSpell1Id,
+      spell2Id: newSpell2Id
+    })
+    message.success('请求已发送')
+  } catch (error) {
+    console.warn(error)
+    message.warning(`设置召唤师技能失败: ${(error as any).message}`)
+  }
+}
+
+const handleSetRunes = async (r: {
+  primary_page_id: number
+  secondary_page_id: number
+  primary_rune_ids: number[]
+  secondary_rune_ids: number[]
+  stat_mod_ids: number[]
+}) => {
+  try {
+    const inventory = (await getPerkInventory()).data
+
+    if (inventory.canAddCustomPage) {
+      const { data: added } = await postPerkPage({
+        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}`,
+        isEditable: true,
+        primaryStyleId: r.primary_page_id.toString()
+      })
+      await putPage({
+        id: added.id,
+        isRecommendationOverride: false,
+        isTemporary: false,
+        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}`,
+        primaryStyleId: r.primary_page_id,
+        selectedPerkIds: [...r.primary_rune_ids, ...r.secondary_rune_ids, ...r.stat_mod_ids],
+        subStyleId: r.secondary_page_id
+      })
+      await putCurrentPage(added.id)
+    } else {
+      const pages = (await getPerkPages()).data
+      if (!pages.length) {
+        return
+      }
+
+      const page1 = pages[0]
+      await putPage({
+        id: page1.id,
+        isRecommendationOverride: false,
+        isTemporary: false,
+        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}`,
+        primaryStyleId: r.primary_page_id,
+        selectedPerkIds: [...r.primary_rune_ids, ...r.secondary_rune_ids, ...r.stat_mod_ids],
+        subStyleId: r.secondary_page_id
+      })
+      await putCurrentPage(page1.id)
+    }
+
+    // just for fun, taking effect only in dev mode
+    if (import.meta.env.DEV && chat.conversations.championSelect?.id) {
+      await chatSend(
+        chat.conversations.championSelect.id,
+        `${gameData.champions[info.value?.id]?.name || '-'} 符文已设置 —— League Akari OP.GG Ver.`,
+        'chat'
+      )
+    }
+
+    message.success('请求已发送')
+  } catch (error) {
+    console.warn(error)
+    message.warning(`设置符文配法失败: ${(error as any).message}`)
+  }
+}
+</script>
+
+<style lang="less" scoped>
+.opgg-champion-wrapper {
+  position: relative;
+  height: 100%;
+
+  .spin-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.card-area {
+  border-radius: 2px;
+  border: 1px solid #37373c;
+  padding: 8px 8px;
+
+  .card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
+
+  &.toggle-to-current {
+    background-color: #1b4e71;
+    cursor: pointer;
+  }
+}
+
+.skill-route {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+  align-items: center;
+
+  .skill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+  }
+
+  .separator {
+    font-size: 10px;
+    color: #909090;
+  }
+}
+
+.skill-details {
+  display: flex;
+  gap: 2px;
+
+  .skill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    border-radius: 2px;
+  }
+}
+
+.skill.w {
+  color: #00d7b0;
+  background-color: #3f3f46;
+}
+
+.skill.q {
+  color: #01a8fb;
+  background-color: #3f3f46;
+}
+
+.skill.e {
+  color: #ff8200;
+  background-color: #3f3f46;
+}
+
+.skill.r {
+  color: white;
+  background-color: #5f32e6;
+}
+
+.first-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .image {
+    width: 78px;
+    height: 78px;
+  }
+
+  .prop-groups {
+    display: flex;
+    flex-wrap: wrap;
+    align-self: flex-end;
+    gap: 8px;
+    justify-content: flex-end;
+    width: 172px;
+  }
+
+  .name-tier {
+    margin-right: auto;
+  }
+
+  .name {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .position {
+    font-size: 13px;
+    color: #c9c9c9;
+  }
+
+  .prop-field {
+    width: 50px;
+  }
+
+  .tier {
+    font-size: 14px;
+    color: #c9c9c9;
+  }
+
+  .prop {
+    color: #b2b2b2;
+    font-size: 11px;
+  }
+
+  .value {
+    font-size: 13px;
+    font-weight: bold;
+  }
+}
+
+.summoner-spells-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
+
+  .spells {
+    display: flex;
+    gap: 4px;
+  }
+
+  .desc {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex: 1;
+  }
+
+  .pick {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 76px;
+
+    .pick-rate {
+      font-size: 12px;
+      color: #ebebeb;
+      font-weight: bold;
+    }
+
+    .pick-play {
+      font-size: 12px;
+      color: #bebebe;
+    }
+  }
+
+  .win-rate {
+    width: 76px;
+    font-size: 12px;
+    color: #a0c6f8;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .buttons {
+    display: flex;
+    width: 76px;
+    justify-content: center;
+  }
+}
+
+.tier {
+  font-weight: bold;
+  font-size: 14px;
+
+  &.tier-0 {
+    color: #ff7300;
+  }
+
+  &.tier-1 {
+    color: #0093ff;
+  }
+
+  &.tier-2 {
+    color: #00bba3;
+  }
+
+  &.tier-3 {
+    color: #ffb900;
+  }
+
+  &.tier-4 {
+    color: #9aa4af;
+  }
+
+  &.tier-5 {
+    color: #a88a67;
+  }
+
+  &.tier-6 {
+    color: rgb(85, 34, 83);
+  }
+}
+
+.counters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .counter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 46px;
+
+    .image {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 4px;
+    }
+
+    .win-rate {
+      font-size: 11px;
+      font-weight: bold;
+      color: #d75a5a;
+    }
+
+    .play {
+      font-size: 10px;
+      color: #a4a4a4;
+    }
+  }
+}
+
+.skills-group {
+  display: flex;
+  align-items: center;
+  height: 56px;
+
+  &:not(:last-child) {
+    margin-bottom: 8px;
+  }
+
+  .desc {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+
+    .pick {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 76px;
+
+      .pick-rate {
+        font-size: 12px;
+        color: #ebebeb;
+        font-weight: bold;
+      }
+
+      .pick-play {
+        font-size: 12px;
+        color: #bebebe;
+      }
+    }
+
+    .win-rate {
+      width: 76px;
+      font-size: 12px;
+      color: #a0c6f8;
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+}
+
+.runes-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .primary {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    margin-bottom: 4px;
+  }
+
+  .secondary {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+
+  .gap {
+    width: 24px;
+  }
+
+  .desc {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+
+    .pick {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 76px;
+
+      .pick-rate {
+        font-size: 12px;
+        color: #ebebeb;
+        font-weight: bold;
+      }
+
+      .pick-play {
+        font-size: 12px;
+        color: #bebebe;
+      }
+    }
+
+    .win-rate {
+      width: 76px;
+      font-size: 12px;
+      color: #a0c6f8;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .buttons {
+      display: flex;
+      width: 76px;
+      justify-content: center;
+    }
+  }
+}
+
+.items-group {
+  gap: 4px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+
+  .separator {
+    font-size: 10px;
+    color: #909090;
+  }
+
+  .desc {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+
+    .pick {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 76px;
+
+      .pick-rate {
+        font-size: 12px;
+        color: #ebebeb;
+        font-weight: bold;
+      }
+
+      .pick-play {
+        font-size: 12px;
+        color: #bebebe;
+      }
+    }
+
+    .win-rate {
+      width: 76px;
+      font-size: 12px;
+      color: #a0c6f8;
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+}
+
+.synergies-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &:not(:last-child) {
+    margin-bottom: 4px;
+  }
+
+  .image-name {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    gap: 4px;
+
+    .image {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .desc {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+
+    .value-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 76px;
+
+      .value {
+        font-size: 12px;
+        color: #ebebeb;
+        font-weight: bold;
+      }
+
+      .text {
+        font-size: 12px;
+        color: #bebebe;
+      }
+    }
+  }
+}
+
+.double-columns {
+  display: grid;
+  column-gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.index {
+  min-width: 16px;
+  font-size: 10px;
+  color: #b2b2b2;
+}
+
+.augments-tab-title {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.augments-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 4px;
+
+  .image-name {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .name {
+      font-size: 12px;
+    }
+  }
+
+  .desc {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+
+    .pick {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 76px;
+
+      .pick-rate {
+        font-size: 12px;
+        color: #ebebeb;
+        font-weight: bold;
+      }
+
+      .pick-play {
+        font-size: 12px;
+        color: #bebebe;
+      }
+    }
+
+    .win-rate {
+      width: 76px;
+      font-size: 12px;
+      color: #a0c6f8;
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+}
+</style>

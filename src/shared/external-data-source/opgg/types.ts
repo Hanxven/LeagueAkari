@@ -1,12 +1,12 @@
-export interface OpggARAMChampion {
-  data: ARAMChampionData
+export interface OpggNormalModeChampion {
+  data: OpggNormalModeChampionData
   meta: {
     version: string
     cached_at: string
   }
 }
 
-interface ARAMChampionData {
+interface OpggNormalModeChampionData {
   summary: Summary
   summoner_spells: IdItems[]
   core_items: IdItems[]
@@ -113,10 +113,10 @@ export interface Versions {
 }
 
 export interface OpggARAMBalance {
-  data: Datum[]
+  data: OpggBalanceDataItem[]
 }
 
-interface Datum {
+interface OpggBalanceDataItem {
   champion_id: number
   attack_speed: number
   damage_dealt: number
@@ -133,27 +133,56 @@ interface Datum {
 // {{baseUrl}}/api/global/champions/aram/101/none?tier=platinum_plus&version=14.10
 // {{baseUrl}}/api/global/champions/aram/versions {"data":["14.10","14.09","14.08"]}
 
+export interface OpggARAMDataItem {
+  id: number
+  is_rotation: boolean
+  is_rip: boolean
+  average_stats: {
+    win_rate: number
+    pick_rate: number
+    ban_rate: null
+    tier: number
+    kda: number
+    rank: number
+  }
+  positions: null
+  roles: any[]
+}
+
 export interface OpggARAMChampionSummary {
-  data: {
-    id: number
-    is_rotation: boolean
-    is_rip: boolean
-    average_stats: {
-      win_rate: number
-      pick_rate: number
-      ban_rate: null
-      kda: number
-      tier: number
-      rank: number
-    }
-    positions: null
-    roles: any[]
-  }[]
+  data: OpggARAMDataItem[]
   meta: {
     version: string
     cached_at: string
     match_count: number
     analyzed_at: string
+  }
+}
+
+export interface OpggArenaChampionSummary {
+  data: OpggArenaDataItem[]
+  meta: {
+    version: string
+    cached_at: string
+  }
+}
+
+export interface OpggArenaDataItem {
+  id: number
+  is_rotation: boolean
+  is_rip: boolean
+  average_stats: {
+    win: number
+    play: number
+    total_place: number
+    first_place: number
+    pick_rate: number
+    ban_rate: number
+    kills: number
+    assists: number
+    deaths: number
+    tier: number
+    rank: number
   }
 }
 
@@ -192,31 +221,33 @@ export type RegionType =
 
 export type ModeType = 'aram' | 'arena' | 'nexus_blitz' | 'urf' | 'ranked'
 
-export type PositionType = 'mid' | 'jungle' | 'adc' | 'top' | 'support' | 'none'
+export type PositionType = 'mid' | 'jungle' | 'adc' | 'top' | 'support' | 'all' | 'none'
 
 export interface OpggRankedChampionsSummary {
-  data: {
-    id: number
-    is_rotation: boolean
-    is_rip: boolean
-    average_stats: Averagestat | null
-    positions: (
-      | Position
-      | Positions2
-      | Positions3
-      | Positions4
-      | Positions5
-      | Positions6
-      | Positions7
-    )[]
-    roles: any[]
-  }[]
+  data: OpggRankedDataItem[]
   meta: {
     version: string
     cached_at: string
     match_count: number
     analyzed_at: string
   }
+}
+
+export interface OpggRankedDataItem {
+  id: number
+  is_rotation: boolean
+  is_rip: boolean
+  average_stats: Averagestat | null
+  positions: (
+    | Position
+    | Positions2
+    | Positions3
+    | Positions4
+    | Positions5
+    | Positions6
+    | Positions7
+  )[]
+  roles: any[]
 }
 
 interface Positions7 {
@@ -359,15 +390,15 @@ interface Averagestat {
   rank: number
 }
 
-export interface ArenaChampion {
-  data: Data
+export interface OpggArenaModeChampion {
+  data: OpggArenaChampionData
   meta: {
     version: string
     cached_at: string
   }
 }
 
-interface Data {
+interface OpggArenaChampionData {
   summary: ArenaSummary
   core_items: Coreitem[]
   boots: Coreitem[]

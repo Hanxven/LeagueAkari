@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="opgg-champion-tier-wrapper">
     <div class="meta">
       <CopyableText :text="game.gameId">对局 ID: {{ game.gameId }}</CopyableText>
       <span>对局时间: {{ dayjs(game.gameCreation).format('YYYY-MM-DD HH:mm:ss') }}</span>
@@ -35,6 +35,7 @@
       :data="tableData"
       :columns="columns"
       size="small"
+      :row-key="(row) => row.propKey"
     />
   </div>
 </template>
@@ -390,7 +391,7 @@ const tableData = computed(() => {
 </script>
 
 <style lang="less" scoped>
-.wrapper {
+.opgg-champion-tier-wrapper {
   padding: 12px;
   max-height: 85vh;
   max-width: 80vw;

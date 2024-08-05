@@ -25,7 +25,7 @@ Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/H
 ## 1.1 已支持功能
 
 - **战绩查询**
-  - [x] 同大区玩家战绩查询
+  - [x] 同大区玩家战绩查询以及有限的跨区查询
 - **自动操作**
   - [x] 接受对局
   - [x] 点赞玩家
@@ -49,7 +49,7 @@ Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/H
   - [x] 游戏内发送自定义文本
   - [x] 修复客户端窗口大小
 - **外部数据源**
-  - [x] 英雄平衡性信息
+  - [x] 英雄平衡性信息 (Fandom)
   - [ ] OP.GG
 - **其他功能**
   - [x] 敬请探索
@@ -83,8 +83,6 @@ League Akari 会很好地处理中途启动的情况。
 ## 2.1 Github Issues
 
 Github Issues 是最重要的反馈渠道，请精准描述您的需求、遇到的问题或任何可行的想法。
-
-除了 Github，另一个反馈渠道是 Bilibili 的[作者私信](https://space.bilibili.com/34532360)。
 
 ## 2.2 加入开发
 

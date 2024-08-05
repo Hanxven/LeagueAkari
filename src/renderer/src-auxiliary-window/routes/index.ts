@@ -17,6 +17,11 @@ const router = createRouter({
       path: '/lounge',
       name: 'lounge',
       component: () => import('@auxiliary-window/views/Lounge.vue')
+    },
+    {
+      path: '/opgg',
+      name: 'opgg',
+      component: () => import('@auxiliary-window/views/Test.vue')
     }
   ]
 })

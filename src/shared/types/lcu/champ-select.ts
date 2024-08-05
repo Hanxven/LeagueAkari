@@ -283,3 +283,20 @@ interface Ownership {
 interface Rental {
   rented: boolean
 }
+
+export interface MySelection {
+  assignedPosition: string;
+  cellId: number;
+  championId: number;
+  championPickIntent: number;
+  nameVisibilityType: string;
+  obfuscatedPuuid: string;
+  obfuscatedSummonerId: number;
+  puuid: string;
+  selectedSkinId: number;
+  spell1Id: number;
+  spell2Id: number;
+  summonerId: number;
+  team: number;
+  wardSkinId: number;
+}

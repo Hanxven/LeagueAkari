@@ -1,5 +1,5 @@
 <template>
-  <video v-bind="$attrs" loop autoplay v-if="url" :src="url" class="lcu-video" />
+  <video v-bind="$attrs" :loop :autoplay v-if="url" :src="url" class="lcu-video" />
   <div v-else ref="placeholderEl" class="lcu-video-placeholder"></div>
 </template>
 
@@ -11,6 +11,8 @@ import { useLcuConnectionStore } from '../modules/lcu-connection/store'
 
 const props = defineProps<{
   src?: string
+  loop?: boolean
+  autoplay?: boolean
 }>()
 
 const url = ref<string | null>(null)

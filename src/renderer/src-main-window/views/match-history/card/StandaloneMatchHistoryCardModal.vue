@@ -1,6 +1,6 @@
 <template>
   <NModal size="small" v-model:show="show">
-    <div class="wrapper" @click.self="handleHideModal">
+    <div class="opgg-champion-tier-wrapper" @click.self="handleHideModal">
       <MatchHistoryCard
         class="card"
         v-if="showingGame"
@@ -127,7 +127,7 @@ const handleToSummoner = (puuid) => {
 </script>
 
 <style lang="less" scoped>
-.wrapper {
+.opgg-champion-tier-wrapper {
   position: relative;
   overflow: auto;
   top: calc(var(--title-bar-height) / 2);

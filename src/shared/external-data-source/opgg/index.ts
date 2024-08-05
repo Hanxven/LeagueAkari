@@ -1,13 +1,15 @@
 import axios from 'axios'
 import { AxiosRetry } from 'axios-retry'
+import axiosRetry from 'axios-retry'
 
 import { NormalizedExternalChampBuildDataSourceMeta } from '../normalized/champ-build'
 import {
-  ArenaChampion,
   ModeType,
   OpggARAMBalance,
   OpggARAMChampionSummary,
-  OpggARAMChampion as OpggNormalModeChampion,
+  OpggArenaChampionSummary,
+  OpggArenaModeChampion,
+  OpggNormalModeChampion,
   OpggRankedChampionsSummary,
   PositionType,
   RegionType,
@@ -15,7 +17,10 @@ import {
   Versions
 } from './types'
 
-const axiosRetry = require('axios-retry').default as AxiosRetry
+const isNodeEnvironment =
+  typeof process !== 'undefined' && process.versions != null && process.versions.node != null
+
+const _axiosRetry: AxiosRetry = isNodeEnvironment ? require('axios-retry').default : axiosRetry
 
 export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMeta {
   static USER_AGENT =
@@ -47,14 +52,14 @@ export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMet
   }
 
   private _http = axios.create({
-    baseURL: OpggDataSource.BASE_URL,
-    headers: {
-      'User-Agent': OpggDataSource.USER_AGENT
-    }
+    baseURL: OpggDataSource.BASE_URL
+    // headers: {
+    //   'User-Agent': OpggDataSource.USER_AGENT
+    // }
   })
 
   constructor() {
-    axiosRetry(this._http, {
+    _axiosRetry(this._http, {
       retries: 3,
       retryDelay: () => 0,
       retryCondition: (error) => {
@@ -63,84 +68,45 @@ export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMet
     })
   }
 
-  async getVersions(region: RegionType, mode: ModeType) {
-    const versions = await this._http.get<Versions>(`/api/${region}/champions/${mode}/versions`)
+  async getVersions(options: { region: RegionType; mode: ModeType; signal?: AbortSignal }) {
+    let { mode, region } = options
+    const versions = await this._http.get<Versions>(`/api/${region}/champions/${mode}/versions`, {
+      signal: options.signal
+    })
     return versions.data
   }
 
-  async getChampionsSummary(
-    region: RegionType,
-    mode: 'ranked',
-    tier: TierType,
+  async getChampionsSummary(options: {
+    region: RegionType
+    mode: ModeType
+    tier: TierType
     version?: string
-  ): Promise<OpggRankedChampionsSummary>
-  async getChampionsSummary(
-    region: RegionType,
-    mode: 'aram',
-    tier: TierType,
-    version?: string
-  ): Promise<OpggARAMChampionSummary>
-  async getChampionsSummary(
-    region: RegionType,
-    mode: ModeType,
-    tier: TierType,
-    version?: string
-  ): Promise<any> {
-    if (!version) {
-      const versions = await this.getVersions(region, mode)
-      version = versions.data[0]
-    }
+    signal?: AbortSignal
+  }): Promise<OpggRankedChampionsSummary | OpggArenaChampionSummary | OpggARAMChampionSummary> {
+    let { region, mode, tier, version, signal: abortSignal } = options
 
-    const result = await this._http.get<OpggARAMChampionSummary>(
-      `/api/${region}/champions/${mode}`,
-      {
-        params: {
-          tier,
-          version
-        }
-      }
-    )
+    const result = await this._http.get(`/api/${region}/champions/${mode}`, {
+      params: {
+        tier,
+        version
+      },
+      signal: abortSignal
+    })
 
     return result.data
   }
 
-  /**
-   * 斗魂竞技场模式，会返回特殊的结构
-   */
-  async getChampion(
-    id: number,
-    region: RegionType,
-    mode: 'arena',
+  async getChampion(options: {
+    id: number
+    region: RegionType
+    mode: ModeType
     tier: TierType
-  ): Promise<ArenaChampion>
-
-  /**
-   * ARAM 模式，要求 position 为 none
-   */
-  async getChampion(
-    id: number,
-    region: RegionType,
-    mode: 'aram',
-    tier: TierType
-  ): Promise<OpggNormalModeChampion>
-
-  /**
-   * 其他模式，如 URF, nexus_blitz 等
-   */
-  async getChampion(
-    id: number,
-    region: RegionType,
-    mode: ModeType,
-    tier: TierType,
-    position: PositionType
-  ): Promise<OpggNormalModeChampion>
-  async getChampion(
-    id: number,
-    region: RegionType,
-    mode: string,
-    tier: TierType,
     position?: PositionType
-  ): Promise<any> {
+    version?: string
+    signal?: AbortSignal
+  }): Promise<OpggNormalModeChampion | OpggArenaModeChampion | OpggArenaModeChampion> {
+    let { id, region, mode, tier, position, version, signal: abortSignal } = options
+
     let url: string
     if (mode === 'arena') {
       url = `/api/${region}/champions/${mode}/${id}`
@@ -153,7 +119,8 @@ export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMet
     }
 
     const data = await this._http.get(url, {
-      params: { tier }
+      params: { tier, version },
+      signal: abortSignal
     })
 
     return data.data

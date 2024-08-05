@@ -1,11 +1,18 @@
 <template>
   <div id="aux-window-frame">
     <AuxiliaryWindowTitleBar class="title-bar" />
-    <div class="content"><RouterView /></div>
+    <div class="content">
+      <RouterView v-slot="{ Component }">
+        <KeepAlive>
+          <component :is="Component" />
+        </KeepAlive>
+      </RouterView>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useKeyboardCombo } from '@shared/renderer/compositions/useKeyboardCombo'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -40,6 +47,12 @@ watch(
   },
   { immediate: true }
 )
+
+useKeyboardCombo('opgg', {
+  onFinish: () => {
+    router.replace({ name: 'opgg' })
+  }
+})
 </script>
 
 <style lang="less">

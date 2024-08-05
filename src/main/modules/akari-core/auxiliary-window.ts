@@ -310,6 +310,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this.state.setShow(AuxWindowModule.INITIAL_SHOW)
 
     this._w.setOpacity(this.state.settings.opacity)
+
     this._w.setAlwaysOnTop(this.state.settings.isPinned, 'normal')
 
     this._w.webContents.on('did-finish-load', () => {
@@ -409,6 +410,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       () => this.state.settings.isPinned,
       async (s, ss) => {
         this._w?.setAlwaysOnTop(s, 'normal')
+        this.state.settings.setPinned(s)
         await ss.set('is-pinned', s)
 
         return true
@@ -447,17 +449,13 @@ export class AuxWindowModule extends MobxBasedBasicModule {
 
   resetWindowPosition() {
     if (this._w) {
+      const bounds = this._w.getBounds()
       const p = this._getCenteredRectangle(
-        AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor,
-        AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor
+        bounds.width * this.state.settings.zoomFactor,
+        bounds.height * this.state.settings.zoomFactor
       )
       this._w.webContents.setZoomFactor(this.state.settings.zoomFactor)
-      this._w.setBounds({
-        x: p.x,
-        y: p.y,
-        width: Math.ceil(AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor),
-        height: Math.ceil(AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor)
-      })
+      this._w.setPosition(p.x, p.y)
     }
 
     this._logger.info('重置辅助窗口位置到主显示器中心')

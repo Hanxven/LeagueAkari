@@ -535,8 +535,8 @@ const isShowingTagEditModal = ref(false)
 const handleTagPlayer = async () => {
   isShowingTagEditModal.value = true
 }
-const handleTagEdited = (puuid: string) => {
-  mhm.querySavedInfo(puuid)
+const handleTagEdited = (_puuid: string) => {
+  mhm.querySavedInfo(props.tab.id)
 }
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1

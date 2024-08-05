@@ -1,3 +1,4 @@
+import { TimeoutTask } from '@main/utils/timer'
 import { Gtimg, GtimgHeroListJs } from '@shared/external-data-source/gtimg'
 import { formatError } from '@shared/utils/errors'
 import { makeAutoObservable, observable } from 'mobx'
@@ -23,9 +24,10 @@ export class GtimgEds {
 
   private _gtimg = new Gtimg()
 
-  static HERO_LIST_UPDATE_INTERVAL = 7.2e6 // 2 hours
+  static HERO_LIST_UPDATE_INTERVAL = 3.6e6 // 1 hour
+  static HERO_LIST_UPDATE_INTERVAL_ON_ERROR = 60000 // 1 minute
 
-  private _updateHeroListTimerId: NodeJS.Timeout | null = null
+  private _timerTask = new TimeoutTask(() => this._updateHeroList())
 
   constructor(private _edsm: ExternalDataSourceModule) {}
 
@@ -40,17 +42,18 @@ export class GtimgEds {
 
   private _handleUpdate() {
     this._updateHeroList()
-    this._updateHeroListTimerId = setInterval(() => {
-      this._updateHeroList()
-    }, GtimgEds.HERO_LIST_UPDATE_INTERVAL)
   }
 
   private async _updateHeroList() {
     try {
+      this._edsm.logger.info('Gtimg: 更新英雄列表')
       const heroList = await this._gtimg.getHeroList()
       this.state.setHeroList(heroList)
+      this._timerTask.start(GtimgEds.HERO_LIST_UPDATE_INTERVAL)
+      this._edsm.logger.info('Gtimg: 英雄列表更新成功')
     } catch (error) {
-      this._edsm.logger.error(`Gtimg: 更新英雄列表失败: ${formatError(error)}`)
+      this._timerTask.start(GtimgEds.HERO_LIST_UPDATE_INTERVAL_ON_ERROR)
+      this._edsm.logger.warn(`Gtimg: 更新英雄列表失败: ${formatError(error)}`)
     }
   }
 }

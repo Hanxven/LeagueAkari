@@ -46,7 +46,12 @@
         :key="item"
       />
     </div>
-    <div style="max-width: 460px" lol-view v-html="gameData.items[itemId].description"></div>
+    <div
+      :style="{ maxWidth: `${maxWidth}px` }"
+      style="font-size: 12px"
+      lol-view
+      v-html="gameData.items[itemId].description"
+    ></div>
   </NPopover>
   <div
     v-else
@@ -69,11 +74,13 @@ withDefaults(
 
     // trinkets 有一些不一样的样式
     isTrinket?: boolean
+    maxWidth?: number
     size?: number
   }>(),
   {
     isTrinket: false,
-    size: 20
+    size: 20,
+    maxWidth: 400
   }
 )
 

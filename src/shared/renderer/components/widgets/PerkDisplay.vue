@@ -8,11 +8,16 @@
         class="perk"
       />
     </template>
-    <div style="width: 460px" class="info">
+    <div :style="{ 'max-width': `${maxWidth}px` }" class="info">
       <LcuImage class="image" :src="gameData.perks[perkId].iconPath" />
       <div class="right-side">{{ gameData.perks[perkId].name }}</div>
     </div>
-    <div style="max-width: 460px" lol-view v-html="gameData.perks[perkId].longDesc"></div>
+    <div
+      :style="{ 'max-width': `${maxWidth}px` }"
+      style="font-size: 12px"
+      lol-view
+      v-html="gameData.perks[perkId].longDesc"
+    ></div>
   </NPopover>
   <div
     v-else
@@ -32,9 +37,11 @@ withDefaults(
   defineProps<{
     perkId?: number
     size?: number
+    maxWidth?: number
   }>(),
   {
-    size: 20
+    size: 20,
+    maxWidth: 400
   }
 )
 
@@ -68,5 +75,3 @@ const gameData = useGameDataStore()
   background-color: rgb(34, 34, 34);
 }
 </style>
-@main-window/modules/lcu-state-sync/game-data
-@shared/renderer/modules/lcu-state-sync/game-data
