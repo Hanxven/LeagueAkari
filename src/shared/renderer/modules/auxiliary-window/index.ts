@@ -69,6 +69,14 @@ export class AuxWindowRendererModule extends StateSyncModule {
   setZoomFactor(f: number) {
     return this.call('set-setting/zoom-factor', f)
   }
+
+  setWindowSize(width: number, height: number) {
+    return this.call('set-window-size', width, height)
+  }
+
+  getWindowSize(): Promise<{ width: number; height: number }> {
+    return this.call('get-window-size')
+  }
 }
 
 export const auxiliaryWindowRendererModule = new AuxWindowRendererModule()

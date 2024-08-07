@@ -593,11 +593,11 @@ import { NButton, NCheckbox, NIcon, NScrollbar, NSpin, NTabPane, NTabs, useMessa
 import { computed, ref, watchEffect } from 'vue'
 
 const props = defineProps<{
-  region?: string // global, kr, ..., (no tencent region)
-  tier?: string // platinum_plus, diamond_plus, master_plus, grandmaster_plus, challenger, ...
-  mode?: string // normal, aram, arena, nexusblitz, urf
+  region?: string
+  tier?: string
+  mode?: string
   position?: string
-  version?: string // undefined => 当前
+  version?: string
   loading?: boolean
   champion?: any
   data?: any
@@ -726,19 +726,19 @@ const tierText = computed(() => {
 
 const gameData = useGameDataStore()
 
-watchEffect(() => {
-  console.log(props.data, props.champion, info.value)
-})
+if (import.meta.env.DEV) {
+  watchEffect(() => {
+    console.log('OPGG Component: ', props.data, props.champion, info.value)
+  })
 
-watchEffect(() => {
-  console.log('p', info.value?.position)
-})
+  watchEffect(() => {
+    console.log('OPGG Component: Info', info.value)
+  })
+}
 
 const message = useMessage()
 
 const handleSetSummonerSpells = async (ids: number[]) => {
-  console.log(ids)
-
   try {
     const selection = (await getMySelections()).data
 
@@ -807,13 +807,13 @@ const handleSetRunes = async (r: {
     }
 
     // just for fun, taking effect only in dev mode
-    if (import.meta.env.DEV && chat.conversations.championSelect?.id) {
-      await chatSend(
-        chat.conversations.championSelect.id,
-        `${gameData.champions[info.value?.id]?.name || '-'} 符文已设置 —— League Akari OP.GG Ver.`,
-        'chat'
-      )
-    }
+    // if (import.meta.env.DEV && chat.conversations.championSelect?.id) {
+    //   await chatSend(
+    //     chat.conversations.championSelect.id,
+    //     `[重大告知] ${gameData.champions[info.value?.id]?.name || '-'} 符文已设置 —— League Akari OP.GG Ver.`,
+    //     'chat'
+    //   )
+    // }
 
     message.success('请求已发送')
   } catch (error) {

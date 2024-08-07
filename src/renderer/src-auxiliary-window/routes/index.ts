@@ -6,22 +6,34 @@ const router = createRouter({
     {
       path: '/',
       name: 'root',
-      component: () => import('@auxiliary-window/views/Placeholder.vue')
+      redirect: { name: 'indicator' }
     },
     {
-      path: '/champ-select',
-      name: 'champ-select',
-      component: () => import('@auxiliary-window/views/ChampSelect.vue')
-    },
-    {
-      path: '/lounge',
-      name: 'lounge',
-      component: () => import('@auxiliary-window/views/Lounge.vue')
+      path: '/indicator',
+      name: 'indicator',
+      component: () => import('@auxiliary-window/views/indicator/Indicator.vue'),
+      children: [
+        {
+          path: 'champ-select',
+          name: 'champ-select',
+          component: () => import('@auxiliary-window/views/indicator/ChampSelect.vue')
+        },
+        {
+          path: 'lounge',
+          name: 'lounge',
+          component: () => import('@auxiliary-window/views/indicator/Lounge.vue')
+        },
+        {
+          path: 'placeholder',
+          name: 'placeholder',
+          component: () => import('@auxiliary-window/views/indicator/Placeholder.vue')
+        }
+      ]
     },
     {
       path: '/opgg',
       name: 'opgg',
-      component: () => import('@auxiliary-window/views/Test.vue')
+      component: () => import('@auxiliary-window/views/opgg/Opgg.vue')
     }
   ]
 })

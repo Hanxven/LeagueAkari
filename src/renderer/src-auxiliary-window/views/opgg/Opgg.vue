@@ -2,6 +2,17 @@
   <div class="opgg-panel">
     <div class="tabs-area">
       <a href="https://op.gg" title="转到 OP.GG" target="_blank"><OpggIcon class="opgg-icon" /></a>
+      <NButton
+        secondary
+        class="square-refresh-button"
+        title="刷新"
+        :loading="isLoading"
+        @click="() => loadAll()"
+      >
+        <template #icon>
+          <NIcon><RefreshIcon /></NIcon>
+        </template>
+      </NButton>
       <NTabs class="tabs" v-model:value="currentTab" type="segment" size="small">
         <NTab title="梯队" name="tier" tab="梯队" />
         <NTab title="英雄" name="champion" tab="英雄" :disabled="!championId" />
@@ -12,7 +23,8 @@
         size="small"
         placeholder="模式"
         :options="modeOptions"
-        v-model:value="mode"
+        :value="mode"
+        @update:value="handleModeChange"
         :render-label="renderLabel"
         style="width: 0; flex: 1"
         :consistent-menu-width="false"
@@ -22,7 +34,8 @@
         size="small"
         placeholder="地区"
         :options="regionOptions"
-        v-model:value="region"
+        :value="region"
+        @update:value="handleRegionChange"
         :render-label="renderLabel"
         style="width: 0; flex: 1"
         :consistent-menu-width="false"
@@ -32,7 +45,8 @@
         size="small"
         placeholder="段位"
         :options="tierOptions"
-        v-model:value="tier"
+        :value="tier"
+        @update:value="handleTierChange"
         :render-label="renderLabel"
         style="width: 0; flex: 1"
         :consistent-menu-width="false"
@@ -42,7 +56,8 @@
         size="small"
         placeholder="位置"
         :options="positionOptions"
-        v-model:value="position"
+        :value="position"
+        @update:value="handlePositionChange"
         style="width: 72px"
         :render-label="renderLabel"
         :consistent-menu-width="false"
@@ -51,8 +66,9 @@
       <NSelect
         size="small"
         placeholder="版本"
-        v-model:value="version"
+        :value="version"
         :options="versionOptions"
+        @update:value="handleVersionChange"
         :render-label="renderLabel"
         style="width: 72px"
         :consistent-menu-width="false"
@@ -101,11 +117,24 @@ import {
   TierType
 } from '@shared/external-data-source/opgg/types'
 import { useStableComputed } from '@shared/renderer/compositions/useStableComputed'
+import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { maybePveChampion } from '@shared/types/lcu/game-data'
+import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import { watchDebounced } from '@vueuse/core'
-import { NSelect, NTab, NTabs, SelectRenderLabel, useMessage } from 'naive-ui'
-import { computed, h, onErrorCaptured, ref, shallowRef, watch, watchEffect } from 'vue'
+import { NButton, NIcon, NSelect, NTab, NTabs, SelectRenderLabel, useMessage } from 'naive-ui'
+import {
+  computed,
+  h,
+  onActivated,
+  onErrorCaptured,
+  onMounted,
+  ref,
+  shallowRef,
+  watch,
+  watchEffect
+} from 'vue'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
@@ -189,7 +218,7 @@ const loadVersionsData = async () => {
       version.value = versions.value[0]
     }
   } catch (error) {
-    if ((error as any).name === 'AbortError') {
+    if ((error as any).name === 'CanceledError') {
       return
     }
 
@@ -209,17 +238,15 @@ const loadTierData = async () => {
   loadTierController = new AbortController()
 
   try {
-    tierData.value = await opgg.getChampionsSummary({
+    tierData.value = await opgg.getChampionsTier({
       region: region.value,
       mode: mode.value,
       tier: tier.value,
       version: version.value ?? undefined,
       signal: loadTierController.signal
     })
-
-    console.log(tierData.value)
   } catch (error) {
-    if ((error as any).name === 'AbortError') {
+    if ((error as any).name === 'CanceledError') {
       return
     }
 
@@ -253,7 +280,7 @@ const loadChampionData = async () => {
       signal: loadChampionController.signal
     })
   } catch (error) {
-    if ((error as any).name === 'AbortError') {
+    if ((error as any).name === 'CanceledError') {
       return
     }
 
@@ -264,27 +291,46 @@ const loadChampionData = async () => {
   }
 }
 
-watch(
-  [region, mode, tier, version],
-  async ([r, m, t, v], [pr, pm, pt, pv]) => {
-    try {
-      champion.value = null
-      tierData.value = null
+const loadAll = async () => {
+  try {
+    champion.value = null
+    tierData.value = null
+    versions.value = []
+    await loadVersionsData()
+    await loadTierData()
+    await loadChampionData()
+  } catch {
+  } finally {
+  }
+}
 
-      await loadVersionsData()
-      await loadTierData()
-      await loadChampionData()
-    } catch {
-    } finally {
-    }
-  },
-  { immediate: true }
-)
+const handleVersionChange = async (v: string) => {
+  try {
+    version.value = v
+    await loadAll()
+  } catch {}
+}
 
-watch(position, () => {
+const handleModeChange = async (m: ModeType) => {
+  mode.value = m
+  await loadAll()
+}
+
+const handleRegionChange = async (r: RegionType) => {
+  region.value = r
+  await loadAll()
+}
+
+const handleTierChange = async (t: TierType) => {
+  tier.value = t
+  await loadAll()
+}
+
+const handlePositionChange = async (p: PositionType) => {
+  position.value = p
   champion.value = null
-  loadChampionData()
-})
+  await loadChampionData()
+}
 
 const handleToChampion = (id: number) => {
   currentTab.value = 'champion'
@@ -292,6 +338,10 @@ const handleToChampion = (id: number) => {
   champion.value = null
   loadChampionData()
 }
+
+onMounted(() => {
+  loadAll()
+})
 
 const championItem = computed(() => {
   return tierData.value?.data.find((c) => c.id === championId.value)
@@ -368,10 +418,7 @@ watchEffect(() => {
   }
 })
 
-watchEffect(() => {
-  console.log(currentTab.value)
-})
-
+// 这将实时锁定正在选择的英雄
 const automation = useStableComputed(() => {
   if (!champSelect.session || !gameflow.session) {
     return
@@ -379,14 +426,17 @@ const automation = useStableComputed(() => {
 
   const selfCellId = champSelect.session.localPlayerCellId
   const self = champSelect.session.myTeam.find((p) => p.cellId === selfCellId)
+  const selfActionChampionId = champSelect.session.actions
+    .flat(1)
+    .find((a) => a.actorCellId === selfCellId && a.type === 'pick' && a.championId)?.championId
 
-  if (!self) {
+  if (!self && !selfActionChampionId) {
     return
   }
 
   return {
-    championId: self.championId,
-    assignedPosition: self.assignedPosition,
+    championId: self?.championId || selfActionChampionId,
+    assignedPosition: self?.assignedPosition,
     gameMode: gameflow.session.gameData.queue.gameMode
   }
 })
@@ -399,22 +449,24 @@ watchDebounced(
     }
 
     // set to assigned position
-    switch (atm.assignedPosition) {
-      case 'top':
-        position.value = 'top'
-        break
-      case 'jungle':
-        position.value = 'jungle'
-        break
-      case 'middle':
-        position.value = 'mid'
-        break
-      case 'bottom':
-        position.value = 'adc'
-        break
-      case 'utility':
-        position.value = 'support'
-        break
+    if (atm.assignedPosition) {
+      switch (atm.assignedPosition) {
+        case 'top':
+          position.value = 'top'
+          break
+        case 'jungle':
+          position.value = 'jungle'
+          break
+        case 'middle':
+          position.value = 'mid'
+          break
+        case 'bottom':
+          position.value = 'adc'
+          break
+        case 'utility':
+          position.value = 'support'
+          break
+      }
     }
 
     switch (atm.gameMode) {
@@ -423,6 +475,7 @@ watchDebounced(
         break
       case 'ARAM':
         mode.value = 'aram'
+        position.value = 'none'
         break
       case 'CHERRY':
         mode.value = 'arena'
@@ -436,12 +489,21 @@ watchDebounced(
         break
     }
 
-    if (atm.championId) {
+    // 排除 PVE 模式的英雄
+    if (atm.championId && !maybePveChampion(atm.championId)) {
       handleToChampion(atm.championId)
     }
   },
   { immediate: true, debounce: 500 }
 )
+
+onActivated(async () => {
+  const size = await awm.getWindowSize()
+
+  if (size.width < 480 || size.height < 720) {
+    awm.setWindowSize(480, 720)
+  }
+})
 </script>
 
 <style lang="less" scoped>
@@ -464,6 +526,11 @@ watchDebounced(
     display: block;
     height: 32px;
     width: 32px;
+  }
+
+  .square-refresh-button {
+    width: 32px;
+    height: 32px;
   }
 
   .filters {

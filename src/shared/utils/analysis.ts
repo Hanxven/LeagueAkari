@@ -1,6 +1,5 @@
 import {
   Game,
-  MatchHistory,
   Participant,
   ParticipantIdentity,
   Player,

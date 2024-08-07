@@ -4,7 +4,7 @@
       v-model:value="filterText"
       placeholder="查找英雄"
       size="small"
-      style="font-size: 12px"
+      style="font-size: 12px; margin-bottom: 4px"
       clearable
     />
     <NDataTable
@@ -32,11 +32,11 @@ import { computed, h, ref, useCssModule, watchEffect } from 'vue'
 
 const props = defineProps<{
   championId?: number
-  region?: string // global, kr, ..., (no tencent region)
-  tier?: string // platinum_plus, diamond_plus, master_plus, grandmaster_plus, challenger, ...
-  mode?: string // normal, aram, arena, nexusblitz, urf
+  region?: string
+  tier?: string
+  mode?: string
   position?: string
-  version?: string // undefined => 当前
+  version?: string
   loading?: boolean
   data?: any // 类型较复杂，此处不做类型检查
 }>()
@@ -369,10 +369,6 @@ const data = computed(() => {
       return isNameMatch(filterText.value, gameData.champions[value.id]?.name, value.id)
     })
 })
-
-watchEffect(() => {
-  console.log(data.value[0])
-})
 </script>
 
 <style lang="less" scoped>
@@ -380,10 +376,6 @@ watchEffect(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
-
-  .scroll {
-    flex: 1;
-  }
 
   .tier-table {
     flex: 1;

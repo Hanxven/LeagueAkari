@@ -13,46 +13,23 @@
 
 <script setup lang="ts">
 import { useKeyboardCombo } from '@shared/renderer/compositions/useKeyboardCombo'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { watch } from 'vue'
+import { auxiliaryWindowRendererModule as auxm } from '@shared/renderer/modules/auxiliary-window'
 import { useRouter } from 'vue-router'
 
 import AuxiliaryWindowTitleBar from './components/AuxiliaryWindowTitleBar.vue'
 
-const gameflow = useGameflowStore()
 const router = useRouter()
-
-watch(
-  () => gameflow.phase,
-  (phase) => {
-    switch (phase) {
-      case 'None':
-      case 'EndOfGame':
-      case 'PreEndOfGame':
-      case 'WatchInProgress':
-      case 'GameStart':
-      case 'InProgress':
-      case 'WaitingForStats':
-      case 'Reconnect':
-        router.replace({ name: 'root' })
-        break
-      case 'Matchmaking':
-      case 'ReadyCheck':
-      case 'Lobby':
-        router.replace({ name: 'lounge' })
-        break
-      case 'ChampSelect':
-        router.replace({ name: 'champ-select' })
-    }
-  },
-  { immediate: true }
-)
 
 useKeyboardCombo('opgg', {
   onFinish: () => {
     router.replace({ name: 'opgg' })
   }
 })
+
+// @ts-ignore
+window.sw = (width: number, height: number) => {
+  auxm.setWindowSize(width, height)
+}
 </script>
 
 <style lang="less">

@@ -45,6 +45,7 @@ import { championIcon } from '@shared/renderer/modules/game-data'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { maybePveChampion } from '@shared/types/lcu/game-data'
 import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
 import {
   NButton,
@@ -78,10 +79,6 @@ const styles = useCssModule()
 const gameData = useGameDataStore()
 const gameflow = useGameflowStore()
 const champSelect = useChampSelectStore()
-
-const maybePveChampion = (id: number) => {
-  return id >= 3000 && id < 4000
-}
 
 const championOptions = computed(() => {
   const sorted = Object.values(gameData.champions).sort((a, b) =>

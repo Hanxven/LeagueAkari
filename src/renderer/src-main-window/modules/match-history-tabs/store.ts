@@ -48,10 +48,6 @@ export interface SummonerTabMatchHistory {
   pageSize: number
 
   queueFilter: number | string
-
-  analysis: MatchHistoryGamesAnalysisAll | null
-
-  playerRelationship: Record<string, GameRelationship>
 }
 
 export interface TabState {
@@ -123,9 +119,7 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
         page: 1,
         pageSize: 20,
         lastUpdate: Date.now(),
-        queueFilter: -1,
-        analysis: null,
-        playerRelationship: {}
+        queueFilter: -1
       },
       detailedGamesCache: markRaw(new Map()),
       loading: {

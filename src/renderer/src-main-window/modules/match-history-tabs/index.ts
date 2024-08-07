@@ -13,7 +13,6 @@ import { StorageRendererModule } from '@shared/renderer/modules/storage'
 import { laNotification } from '@shared/renderer/notification'
 import { getPlayerAccountNameset } from '@shared/renderer/rc-http-api/rc-api'
 import { MatchHistory } from '@shared/types/lcu/match-history'
-import { analyzeMatchHistory, analyzeMatchHistoryPlayers } from '@shared/utils/analysis'
 import { summonerName } from '@shared/utils/name'
 import { AxiosError } from 'axios'
 import { computed, markRaw, watch } from 'vue'
@@ -421,18 +420,13 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           isExpanded: previousExpanded.has(g.gameId)
         }))
 
-        const analysis = analyzeMatchHistory(matchHistoryWithState, puuid)
-        const playerRelationship = analyzeMatchHistoryPlayers(matchHistoryWithState, puuid)
-
         tab.data.matchHistory = {
           games: matchHistoryWithState,
           _gamesMap: {},
           page,
           pageSize,
           lastUpdate: Date.now(),
-          queueFilter,
-          analysis: analysis ? markRaw(analysis) : null,
-          playerRelationship: playerRelationship ? markRaw(playerRelationship) : {}
+          queueFilter
         }
 
         // 用于快速查找

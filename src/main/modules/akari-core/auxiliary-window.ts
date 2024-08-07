@@ -141,7 +141,8 @@ export class AuxWindowModule extends MobxBasedBasicModule {
         if (timing === 'show') {
           this.showWindow()
         } else {
-          this.hideWindow()
+          // FOR DEBUGGING, NEVER HIDE WINDOW
+          // this.hideWindow()
         }
       }
     )
@@ -239,6 +240,15 @@ export class AuxWindowModule extends MobxBasedBasicModule {
 
     this.onCall('reset-window-position', () => {
       this.resetWindowPosition()
+    })
+
+    this.onCall('set-window-size', (width, height) => {
+      this._w?.setSize(width, height)
+    })
+
+    this.onCall('get-window-size', () => {
+      const [width, height] = this._w?.getSize() || []
+      return { width, height }
     })
   }
 

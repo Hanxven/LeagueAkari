@@ -208,22 +208,20 @@
                 <div class="left-content-item-content">{{ tab.savedInfo.tag }}</div>
               </NScrollbar>
             </div>
-            <div class="left-content-item" v-if="tab.matchHistory.analysis">
+            <div class="left-content-item" v-if="analysis.matchHistory">
               <div class="left-content-item-title">总览 (本页)</div>
               <div class="left-content-item-content">
                 <div class="stat-item">
                   <span class="stat-item-label">平均 KDA</span>
                   <span class="stat-item-content">{{
-                    tab.matchHistory.analysis.summary.averageKda.toFixed(2)
+                    analysis.matchHistory.summary.averageKda.toFixed(2)
                   }}</span>
                 </div>
                 <div class="stat-item">
                   <span class="stat-item-label">平均击杀参与率</span>
                   <span class="stat-item-content"
                     >{{
-                      (
-                        tab.matchHistory.analysis.summary.averageKillParticipationRate * 100
-                      ).toFixed()
+                      (analysis.matchHistory.summary.averageKillParticipationRate * 100).toFixed()
                     }}
                     %</span
                   >
@@ -233,8 +231,7 @@
                   <span class="stat-item-content"
                     >{{
                       (
-                        tab.matchHistory.analysis.summary.averageDamageDealtToChampionShareOfTeam *
-                        100
+                        analysis.matchHistory.summary.averageDamageDealtToChampionShareOfTeam * 100
                       ).toFixed()
                     }}
                     %</span
@@ -244,9 +241,7 @@
                   <span class="stat-item-label">平均承受伤害比</span>
                   <span class="stat-item-content"
                     >{{
-                      (
-                        tab.matchHistory.analysis.summary.averageDamageTakenShareOfTeam * 100
-                      ).toFixed()
+                      (analysis.matchHistory.summary.averageDamageTakenShareOfTeam * 100).toFixed()
                     }}
                     %</span
                   >
@@ -255,7 +250,7 @@
                   <span class="stat-item-label">平均队伍经济比</span>
                   <span class="stat-item-content"
                     >{{
-                      (tab.matchHistory.analysis.summary.averageGoldShareOfTeam * 100).toFixed()
+                      (analysis.matchHistory.summary.averageGoldShareOfTeam * 100).toFixed()
                     }}
                     %</span
                   >
@@ -264,7 +259,7 @@
                   <span class="stat-item-label">平均击杀小兵比</span>
                   <span class="stat-item-content"
                     >{{
-                      (tab.matchHistory.analysis.summary.averageCsShareOfTeam * 100).toFixed()
+                      (analysis.matchHistory.summary.averageCsShareOfTeam * 100).toFixed()
                     }}
                     %</span
                   >
@@ -272,9 +267,9 @@
                 <div class="stat-item">
                   <span class="stat-item-label">胜负</span>
                   <span class="stat-item-content"
-                    >{{ tab.matchHistory.analysis.summary.win }} 胜
-                    {{ tab.matchHistory.analysis.summary.lose }} 负 ({{
-                      (tab.matchHistory.analysis.summary.winRate * 100).toFixed()
+                    >{{ analysis.matchHistory.summary.win }} 胜
+                    {{ analysis.matchHistory.summary.lose }} 负 ({{
+                      (analysis.matchHistory.summary.winRate * 100).toFixed()
                     }}
                     %)
                   </span>
@@ -356,6 +351,7 @@ import { useExternalDataSourceStore } from '@shared/renderer/modules/external-da
 import { championIcon, profileIcon } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { laNotification } from '@shared/renderer/notification'
+import { analyzeMatchHistory, analyzeMatchHistoryPlayers } from '@shared/utils/analysis'
 import { summonerName } from '@shared/utils/name'
 import { Edit20Filled as EditIcon } from '@vicons/fluent'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
@@ -392,6 +388,16 @@ const props = withDefaults(
     isSelf: false
   }
 )
+
+const analysis = computed(() => {
+  const matchHistory = analyzeMatchHistory(props.tab.matchHistory.games, props.tab.puuid)
+  const players = analyzeMatchHistoryPlayers(props.tab.matchHistory.games, props.tab.puuid)
+
+  return {
+    matchHistory: matchHistory,
+    playerRelationship: players
+  }
+})
 
 const eds = useExternalDataSourceStore()
 
@@ -543,18 +549,18 @@ const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 const RECENTLY_PLAYED_PLAYER_THRESHOLD = 2
 
 const frequentlyUsedChampions = computed(() => {
-  const analysis = props.tab.matchHistory.analysis
-  if (!analysis) {
+  const a = analysis.value.matchHistory
+  if (!a) {
     return []
   }
 
-  return Object.values(analysis.champions)
+  return Object.values(a.champions)
     .filter((c) => c.count >= FREQUENT_USE_CHAMPION_THRESHOLD)
     .sort((a, b) => b.count - a.count)
 })
 
 const recentlyTeammates = computed(() => {
-  const relationship = props.tab.matchHistory.playerRelationship
+  const relationship = analysis.value.playerRelationship
   const teammates = Object.values(relationship)
     .filter((a) => a.games.length >= RECENTLY_PLAYED_PLAYER_THRESHOLD)
     .map((a) => {

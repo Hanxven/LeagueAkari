@@ -60,7 +60,7 @@ export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMet
 
   constructor() {
     _axiosRetry(this._http, {
-      retries: 3,
+      retries: 2, // set it to 2 in order to fast fail
       retryDelay: () => 0,
       retryCondition: (error) => {
         return Boolean(error.response)
@@ -76,7 +76,7 @@ export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMet
     return versions.data
   }
 
-  async getChampionsSummary(options: {
+  async getChampionsTier(options: {
     region: RegionType
     mode: ModeType
     tier: TierType
