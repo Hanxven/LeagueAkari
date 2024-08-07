@@ -3,6 +3,7 @@ import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { createPinia } from 'pinia'
+import 'vfonts/Lato.css'
 import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'

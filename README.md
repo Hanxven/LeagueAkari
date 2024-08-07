@@ -50,7 +50,7 @@ Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/H
   - [x] 修复客户端窗口大小
 - **外部数据源**
   - [x] 英雄平衡性信息 (Fandom)
-  - [ ] OP.GG
+  - [x] OP.GG (目前仅在测试版中实装)
 - **其他功能**
   - [x] 敬请探索
 

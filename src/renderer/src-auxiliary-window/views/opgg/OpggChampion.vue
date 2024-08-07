@@ -50,34 +50,53 @@
           </div>
         </div>
       </div>
-      <div class="card-area" v-if="info && info.position">
-        <div class="card-title">劣势对抗</div>
-        <div class="card-content">
+      <div
+        class="card-area"
+        v-if="(info && info.position) || (data && data.data.counters && data.data.counters.length)"
+      >
+        <div class="card-title">
+          {{ isCountersExpanded ? '全部对位' : '劣势对位' }}
+          <NSwitch
+            size="small"
+            v-model:value="isCountersExpanded"
+            :round="false"
+            :rail-style="
+              ({ checked }) => ({
+                backgroundColor: checked ? '#4ebc5d' : '#d75a5a'
+              })
+            "
+          >
+            <template #checked>全部</template>
+            <template #unchecked>劣势</template>
+          </NSwitch>
+        </div>
+        <div class="card-content" v-if="!isCountersExpanded && info && info.position">
           <div class="counters">
             <div class="counter" v-for="c of info.position.counters">
               <LcuImage class="image" :src="championIcon(c.champion_id)" />
               <div class="win-rate" title="胜率">
                 {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
               </div>
-              <div class="play">{{ c.play }} 场</div>
+              <div class="play">{{ c.play.toLocaleString() }} 场</div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- 完整的 counters 列表, 但这里选择不展示 -->
-      <div
-        class="card-area"
-        v-if="false && data && data.data.counters && data.data.counters.length"
-      >
-        <div class="card-title">劣势对抗</div>
-        <div class="card-content">
+        <div
+          class="card-content"
+          v-if="isCountersExpanded && data && data.data.counters && data.data.counters.length"
+        >
           <div class="counters">
-            <div class="counter" v-for="c of data.data.counters">
+            <div
+              class="counter"
+              v-for="c of data.data.counters.toSorted(
+                (a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1)
+              )"
+            >
               <LcuImage class="image" :src="championIcon(c.champion_id)" />
-              <div class="win-rate" title="胜率">
+              <div class="win-rate" title="胜率" :class="{ win: c.win / (c.play || 1) > 0.5 }">
                 {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
               </div>
-              <div class="play">{{ c.play }} 场</div>
+              <div class="play">{{ c.play.toLocaleString() }} 场</div>
             </div>
           </div>
         </div>
@@ -106,7 +125,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+                <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
               </div>
               <div class="win-rate" title="胜率">
                 {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
@@ -170,7 +189,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" title="登场率">{{ (r.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="pick-play" title="总场次">{{ r.play }} 场</span>
+                <span class="pick-play" title="总场次">{{ r.play.toLocaleString() }} 场</span>
               </div>
               <div class="win-rate" title="胜率">
                 {{ ((r.win / (r.play || 1)) * 100).toFixed(2) }}%
@@ -214,7 +233,7 @@
               </div>
               <div class="value-text">
                 <span class="value" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="text" title="总场次">{{ s.play }} 场</span>
+                <span class="text" title="总场次">{{ s.play.toLocaleString() }} 场</span>
               </div>
               <div class="value-text">
                 <span class="value" title="胜率"
@@ -250,7 +269,7 @@
                   <span class="pick-rate" title="登场率"
                     >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ a.play }} 场</span>
+                  <span class="pick-play" title="总场次">{{ a.play.toLocaleString() }} 场</span>
                 </div>
                 <div class="win-rate" title="胜率">
                   {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
@@ -276,7 +295,7 @@
                   <span class="pick-rate" title="登场率"
                     >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ a.play }} 场</span>
+                  <span class="pick-play" title="总场次">{{ a.play.toLocaleString() }} 场</span>
                 </div>
                 <div class="win-rate" title="胜率">
                   {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
@@ -303,7 +322,7 @@
                   <span class="pick-rate" title="登场率"
                     >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ a.play }} 场</span>
+                  <span class="pick-play" title="总场次">{{ a.play.toLocaleString() }} 场</span>
                 </div>
                 <div class="win-rate" title="胜率">
                   {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
@@ -372,7 +391,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" title="登场率">{{ (m.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="pick-play" title="总场次">{{ m.play }} 场</span>
+                <span class="pick-play" title="总场次">{{ m.play.toLocaleString() }} 场</span>
               </div>
               <div class="win-rate" title="胜率">
                 {{ ((m.win / (m.play || 1)) * 100).toFixed(2) }}%
@@ -411,7 +430,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+                <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
               </div>
               <div class="win-rate" title="胜率">
                 {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
@@ -447,7 +466,7 @@
                   <span class="pick-rate" title="登场率"
                     >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+                  <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
                 </div>
                 <div class="win-rate" title="胜率">
                   {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
@@ -484,7 +503,7 @@
                   <span class="pick-rate" title="登场率"
                     >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+                  <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
                 </div>
                 <div class="win-rate" title="胜率">
                   {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
@@ -518,7 +537,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+                <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
               </div>
               <div class="win-rate" title="胜率">
                 {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
@@ -554,7 +573,7 @@
                   <span class="pick-rate" title="登场率"
                     >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ s.play }} 场</span>
+                  <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
                 </div>
                 <div class="win-rate" title="胜率">
                   {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
@@ -589,7 +608,17 @@ import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
-import { NButton, NCheckbox, NIcon, NScrollbar, NSpin, NTabPane, NTabs, useMessage } from 'naive-ui'
+import {
+  NButton,
+  NCheckbox,
+  NIcon,
+  NScrollbar,
+  NSpin,
+  NSwitch,
+  NTabPane,
+  NTabs,
+  useMessage
+} from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
 const props = defineProps<{
@@ -683,6 +712,7 @@ watchEffect(() => {
 })
 
 const isSummonerSpellsExpanded = ref(false)
+const isCountersExpanded = ref(false)
 const isRunesExpanded = ref(false)
 const isSynergiesExpanded = ref(false)
 const isAugmentsExpanded = ref(false)
@@ -1081,6 +1111,10 @@ const handleSetRunes = async (r: {
       font-size: 11px;
       font-weight: bold;
       color: #d75a5a;
+    }
+
+    .win-rate.win {
+      color: #a0c6f8;
     }
 
     .play {
