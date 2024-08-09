@@ -82,6 +82,39 @@ export class AppRendererModule extends StateSyncModule {
   openLogsDirInExplorer() {
     return this.call('open-in-explorer/logs')
   }
+
+  private _stringifyError(data: any) {
+    if (data instanceof Error) {
+      return {
+        message: data.message,
+        stack: data.stack,
+        name: data.name
+      }
+    }
+
+    return data
+  }
+
+  get logger() {
+    return {
+      info: async (message: string, data?: any) => {
+        console.info(`\x1b[32m[info]\x1b[0m ${message}`, data)
+        await this.call('renderer-log', 'info', message, this._stringifyError(data))
+      },
+      warn: async (message: string, data?: any) => {
+        console.warn(`\x1b[33m[warn]\x1b[0m ${message}`, data)
+        await this.call('renderer-log', 'warn', message, this._stringifyError(data))
+      },
+      error: async (message: string, data?: any) => {
+        console.error(`\x1b[31m[error]\x1b[0m ${message}`, data)
+        await this.call('renderer-log', 'error', message, this._stringifyError(data))
+      },
+      debug: async (message: string, data?: any) => {
+        console.debug(`\x1b[34m[debug]\x1b[0m ${message}`, data)
+        await this.call('renderer-log', 'debug', message, this._stringifyError(data))
+      }
+    }
+  }
 }
 
 export const appRendererModule = new AppRendererModule()

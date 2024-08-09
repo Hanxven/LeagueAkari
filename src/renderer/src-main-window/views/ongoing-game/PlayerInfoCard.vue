@@ -224,6 +224,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import { appRendererModule as am } from '@shared/renderer/modules/app'
 import {
   MatchHistoryGameWithState,
   SavedPlayerInfo
@@ -345,8 +346,9 @@ const { list, containerProps, wrapperProps } = useVirtualList(matchHistoryList, 
   overscan: 1
 })
 
-onErrorCaptured((error) => {
-  console.error('Component PlayerInfoCard Error:', error)
+onErrorCaptured((error, instance, info) => {
+  console.error('Component PlayerInfoCard Error:', error, instance, info)
+  am.logger.warn(`Component PlayerInfoCard Error: ${info}`, error)
 })
 </script>
 

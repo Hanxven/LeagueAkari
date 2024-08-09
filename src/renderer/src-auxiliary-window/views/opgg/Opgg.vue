@@ -117,13 +117,14 @@ import {
   TierType
 } from '@shared/external-data-source/opgg/types'
 import { useStableComputed } from '@shared/renderer/compositions/useStableComputed'
+import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { maybePveChampion } from '@shared/types/lcu/game-data'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import { useLocalStorage, watchDebounced } from '@vueuse/core'
 import { NButton, NIcon, NSelect, NTab, NTabs, SelectRenderLabel, useMessage } from 'naive-ui'
-import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watchEffect } from 'vue'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
@@ -140,7 +141,8 @@ const savedPreferences = useLocalStorage('opgg-preferences', {
 })
 
 onErrorCaptured((error, instance, info) => {
-  console.warn('Component OP.GG error: ', error, instance, info)
+  console.warn('Component OP.GG error:', error, instance, info)
+  am.logger.warn(`Component OP.GG error: ${info}`, error)
   return false
 })
 

@@ -1,3 +1,4 @@
+import { appRendererModule as am } from '@shared/renderer/modules/app'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'
@@ -23,5 +24,9 @@ try {
 } catch (error) {
   console.error('League Akari 无法正确加载：', error)
 } finally {
+  app.config.errorHandler = (err, instance, info) => {
+    am.logger.error(info, err)
+    console.error('Vue Error:', err, instance, info)
+  }
   app.mount('#app')
 }

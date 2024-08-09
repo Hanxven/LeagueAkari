@@ -1,7 +1,7 @@
 <template>
   <div class="opgg-champion-wrapper">
     <!-- 真的想不出一点容易组织的结构, 就这样复制粘贴吧 -->
-    <NSpin description="Fetching data from OP.GG ..." v-if="loading" class="spin-mask"></NSpin>
+    <NSpin description="从 OP.GG 拉取数据中 ..." v-if="loading" class="spin-mask"></NSpin>
     <NScrollbar>
       <div class="card-area" v-if="info">
         <div class="card-content">
@@ -637,7 +637,6 @@ const props = defineProps<{
 }>()
 
 const gameflow = useGameflowStore()
-const chat = useChatStore()
 const lc = useLcuConnectionStore()
 
 const positionTextMap = {
@@ -841,15 +840,6 @@ const handleSetRunes = async (r: {
       })
       await putCurrentPage(page1.id)
     }
-
-    // just for fun, taking effect only in dev mode
-    // if (import.meta.env.DEV && chat.conversations.championSelect?.id) {
-    //   await chatSend(
-    //     chat.conversations.championSelect.id,
-    //     `[重大告知] ${gameData.champions[info.value?.id]?.name || '-'} 符文已设置 —— League Akari OP.GG Ver.`,
-    //     'chat'
-    //   )
-    // }
 
     message.success('请求已发送')
   } catch (error) {

@@ -19,7 +19,6 @@ import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
-import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
 import { greeting } from '@shared/renderer/utils/greeting'
 import {

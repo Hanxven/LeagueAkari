@@ -28,7 +28,7 @@ import { championIcon } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
 import { DataTableColumns, DataTableCreateRowProps, NDataTable, NInput } from 'naive-ui'
-import { computed, h, ref, useCssModule, watchEffect } from 'vue'
+import { computed, h, ref, useCssModule } from 'vue'
 
 const props = defineProps<{
   championId?: number
