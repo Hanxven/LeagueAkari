@@ -167,9 +167,14 @@ export function withSelfParticipantMatchHistory(
     if (m.isDetailed) {
       const participantId = m.game.participantIdentities.find(
         (p) => p.player.puuid === selfPuuid
-      )!.participantId
+      )?.participantId
 
-      const selfParticipant = m.game.participants.find((p) => participantId === p.participantId)!
+      const selfParticipant = m.game.participants.find((p) => participantId === p.participantId)
+
+      if (!selfParticipant) {
+        return null
+      }
+
       return {
         ...m,
         selfParticipant
@@ -182,7 +187,7 @@ export function withSelfParticipantMatchHistory(
     }
   })
 
-  return r
+  return r.filter((v) => v !== null) as SelfParticipantGame[]
 }
 
 export interface AnalysisResult {

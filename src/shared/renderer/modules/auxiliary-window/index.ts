@@ -10,11 +10,13 @@ export class AuxWindowRendererModule extends StateSyncModule {
   override async setup() {
     await super.setup()
 
-    this._syncMainState()
+    await this._syncMainState()
   }
 
-  private _syncMainState() {
+  private async _syncMainState() {
     const store = useAuxiliaryWindowStore()
+
+    store.currentFunctionality = await this.getFunctionality()
 
     this.simpleSync('state', (s) => (store.windowState = s))
     this.simpleSync('focus', (s) => (store.focusState = s))
@@ -76,6 +78,14 @@ export class AuxWindowRendererModule extends StateSyncModule {
 
   getWindowSize(): Promise<{ width: number; height: number }> {
     return this.call('get-window-size')
+  }
+
+  setFunctionality(f: string) {
+    return this.call('set-functionality', f)
+  }
+
+  getFunctionality() {
+    return this.call('get-functionality')
   }
 }
 

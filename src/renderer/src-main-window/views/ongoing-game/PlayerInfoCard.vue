@@ -60,11 +60,7 @@
             v-if="summonerInfo?.privacy === 'PRIVATE' && !isSelf"
             >生涯隐藏</span
           >
-          <span
-            class="tag win-rate-team"
-            v-if="analysis.maybeWinRateTeam && !isSelf"
-            >胜率队</span
-          >
+          <span class="tag win-rate-team" v-if="analysis.maybeWinRateTeam && !isSelf">胜率队</span>
           <span
             :title="
               analysis.maybeWinRateTeam ? '这，就是胜率队' : `该玩家 ${analysis.winningStreak} 连胜`
@@ -242,7 +238,7 @@ import { summonerName } from '@shared/utils/name'
 import { useTimeoutPoll, useVirtualList } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NDivider, NPopover } from 'naive-ui'
-import { computed, ref, watch } from 'vue'
+import { computed, onErrorCaptured, ref, watch } from 'vue'
 
 import RankedSpan from '../match-history/widgets/RankedSpan.vue'
 
@@ -347,6 +343,10 @@ const matchHistoryList = computed(() => {
 const { list, containerProps, wrapperProps } = useVirtualList(matchHistoryList, {
   itemHeight: matchHistoryItemHeight + matchHistoryItemMargin,
   overscan: 1
+})
+
+onErrorCaptured((error) => {
+  console.error('Component PlayerInfoCard Error:', error)
 })
 </script>
 

@@ -176,11 +176,11 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">辅助窗口</span></template>
+      <template #header><span class="card-header-title">小窗口</span></template>
       <ControlItem
         class="control-item-margin"
-        label="使用辅助窗口"
-        label-description="在一些游戏流程中使用辅助窗口来展示状态以及提供便捷操作"
+        label="使用小窗口"
+        label-description="在一些游戏流程中使用小窗口来展示状态以及提供额外操作"
         :label-width="320"
       >
         <NSwitch
@@ -191,8 +191,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="辅助窗口不透明度"
-        label-description="辅助窗口的半透明状态"
+        label="小窗口不透明度"
+        label-description="小窗口的半透明状态"
         :label-width="320"
       >
         <NSlider
@@ -209,7 +209,7 @@
       <ControlItem
         class="control-item-margin"
         label="皮肤设置器"
-        label-description="在辅助窗口展示一个设置皮肤的快捷入口"
+        label-description="在小窗口展示一个设置皮肤的快捷入口"
         :label-width="320"
       >
         <NSwitch
@@ -221,7 +221,7 @@
       <ControlItem
         class="control-item-margin"
         label="缩放"
-        label-description="可以调整辅助窗口的大小"
+        label-description="可以调整小窗口的整体大小"
         :label-width="320"
       >
         <NInputNumber
@@ -236,8 +236,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="重设辅助窗口位置"
-        label-description="重新设置辅助窗口的位置，还原到默认主屏幕正中心"
+        label="重置小窗口位置"
+        label-description="重新设置小窗口的位置，还原到默认主屏幕正中心"
         :label-width="320"
       >
         <NButton size="tiny" type="warning" secondary @click="() => awm.resetWindowPosition()"

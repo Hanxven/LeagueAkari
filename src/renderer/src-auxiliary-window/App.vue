@@ -12,23 +12,41 @@
 </template>
 
 <script setup lang="ts">
-import { useKeyboardCombo } from '@shared/renderer/compositions/useKeyboardCombo'
-import { auxiliaryWindowRendererModule as auxm } from '@shared/renderer/modules/auxiliary-window'
-import { useRouter } from 'vue-router'
+import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
+import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
+import { watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import AuxiliaryWindowTitleBar from './components/AuxiliaryWindowTitleBar.vue'
 
-const router = useRouter()
+const am = useAuxiliaryWindowStore()
 
-useKeyboardCombo('opgg', {
-  onFinish: () => {
+const router = useRouter()
+const route = useRoute()
+
+// watch(
+//   () => route.path,
+//   (path) => {
+//     if (path.startsWith('/indicator')) {
+//       awm.setFunctionality('indicator')
+//     } else if (path.startsWith('/opgg')) {
+//       awm.setFunctionality('opgg')
+//     }
+//   }
+// )
+
+switch (am.currentFunctionality) {
+  case 'indicator':
+    router.replace({ name: 'indicator' })
+    break
+  case 'opgg':
     router.replace({ name: 'opgg' })
-  }
-})
+    break
+}
 
 // @ts-ignore
 window.sw = (width: number, height: number) => {
-  auxm.setWindowSize(width, height)
+  awm.setWindowSize(width, height)
 }
 </script>
 

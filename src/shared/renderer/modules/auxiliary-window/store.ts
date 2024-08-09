@@ -4,6 +4,7 @@ import { reactive, ref } from 'vue'
 export const useAuxiliaryWindowStore = defineStore('module:auxiliary-window', () => {
   const windowState = 'normal'
   const focusState = 'focused'
+  const currentFunctionality = 'indicator'
   const isShow = ref(false)
 
   const settings = reactive({
@@ -18,6 +19,7 @@ export const useAuxiliaryWindowStore = defineStore('module:auxiliary-window', ()
     windowState,
     focusState,
     isShow,
+    currentFunctionality,
     settings
   }
 })

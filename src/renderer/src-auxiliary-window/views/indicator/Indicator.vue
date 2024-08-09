@@ -5,13 +5,20 @@
 <script setup lang="ts">
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { onActivated, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const gameflow = useGameflowStore()
+const route = useRoute()
 const router = useRouter()
 
+// 在 indicator 主页面，根据当前的 phase 跳转到对应的页面
 const routeTo = (phase: string | null) => {
+  if (!route.matched.some((record) => record.name === 'indicator')) {
+    return
+  }
+
   switch (phase) {
+    case null:
     case 'None':
     case 'EndOfGame':
     case 'PreEndOfGame':

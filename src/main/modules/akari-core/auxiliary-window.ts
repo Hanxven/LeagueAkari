@@ -1,7 +1,7 @@
 import { is } from '@electron-toolkit/utils'
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { BrowserWindow, Rectangle, screen, shell } from 'electron'
-import { comparer, computed, makeAutoObservable } from 'mobx'
+import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
 import { join } from 'path'
 
 import icon from '../../../../resources/LA_ICON.ico?asset'
@@ -55,12 +55,28 @@ class AuxiliaryWindowState {
 
   isReady: boolean = false
 
+  /**
+   * 同步大小状态以持久化
+   */
   bounds: Rectangle | null = null
+
+  /**
+   * 根据小窗充当的功能，记录功能窗口的位置
+   */
+  functionalityBounds: Record<string, Rectangle> = {}
+
+  /**
+   * 小窗口当前充当的功能
+   */
+  currentFunctionality: 'indicator' | 'opgg' = 'indicator'
 
   settings = new AuxiliaryWindowSettings()
 
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      bounds: observable.ref,
+      functionalityBounds: observable.ref
+    })
   }
 
   setState(s: 'normal' | 'minimized') {
@@ -82,10 +98,19 @@ class AuxiliaryWindowState {
   setBounds(bounds: Rectangle | null) {
     this.bounds = bounds
   }
+
+  setFunctionality(f: 'indicator' | 'opgg') {
+    this.currentFunctionality = f
+  }
+
+  setFunctionalityBounds(fb: Record<string, Rectangle>) {
+    this.functionalityBounds = fb
+  }
 }
 
 export class AuxWindowModule extends MobxBasedBasicModule {
   public state = new AuxiliaryWindowState()
+
   private _lcm: LcuConnectionModule
   private _lcu: LcuSyncModule
   private _logModule: LogModule
@@ -97,6 +122,9 @@ export class AuxWindowModule extends MobxBasedBasicModule {
   static INITIAL_SHOW = false
   static WINDOW_BASE_WIDTH = 300
   static WINDOW_BASE_HEIGHT = 350
+
+  static WINDOW_OPGG_BASE_WIDTH = 480
+  static WINDOW_OPGG_BASE_HEIGHT = 720
 
   static PARTITION = 'persist:auxiliary-window'
 
@@ -114,6 +142,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this._logger = this._logModule.createLogger('auxiliary-window')
 
     await this._setupSettingsSync()
+    await this._loadPreferences()
     this._setupStateSync()
     this._setupMethodCall()
 
@@ -151,10 +180,31 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       () => this.state.bounds,
       (bounds) => {
         if (bounds) {
-          this._saveWindowBounds(bounds)
+          const currentFunctionality = this.state.currentFunctionality
+          if (currentFunctionality) {
+            this.state.setFunctionalityBounds({
+              ...this.state.functionalityBounds,
+              [currentFunctionality]: bounds
+            })
+            this._ss.set('functionality-bounds', this.state.functionalityBounds)
+          }
         }
       },
-      { delay: 500, equals: comparer.shallow }
+      { delay: 250, equals: comparer.shallow }
+    )
+
+    this.autoDisposeReaction(
+      () => this.state.currentFunctionality,
+      (f) => {
+        this._ss.set('functionality', f)
+      }
+    )
+
+    this.autoDisposeReaction(
+      () => this.state.settings.zoomFactor,
+      (f) => {
+        this._w?.webContents.setZoomFactor(f)
+      }
     )
 
     this.autoDisposeReaction(
@@ -250,6 +300,69 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       const [width, height] = this._w?.getSize() || []
       return { width, height }
     })
+
+    this.onCall('set-functionality', (f: 'indicator' | 'opgg') => {
+      this._adjustForFunctionality(f)
+    })
+
+    this.onCall('get-functionality', () => {
+      return this.state.currentFunctionality
+    })
+  }
+
+  private _adjustForFunctionality(f: 'indicator' | 'opgg') {
+    let bounds: Partial<Rectangle> = this.state.functionalityBounds[f]
+
+    switch (f) {
+      case 'indicator':
+        if (bounds) {
+          bounds = {
+            ...bounds,
+            width: Math.max(bounds.width || 0, AuxWindowModule.WINDOW_BASE_WIDTH),
+            height: Math.max(bounds.height || 0, AuxWindowModule.WINDOW_BASE_HEIGHT)
+          }
+        } else {
+          bounds = {
+            width: AuxWindowModule.WINDOW_BASE_WIDTH,
+            height: AuxWindowModule.WINDOW_BASE_HEIGHT
+          }
+        }
+
+        this._w?.setMinimumSize(
+          AuxWindowModule.WINDOW_BASE_WIDTH,
+          AuxWindowModule.WINDOW_BASE_HEIGHT
+        )
+        this._w?.setTitle('Mini Akari')
+        this._w?.setBounds(bounds)
+
+        break
+      case 'opgg':
+        if (bounds) {
+          bounds = {
+            ...bounds,
+            width: Math.max(bounds.width || 0, AuxWindowModule.WINDOW_OPGG_BASE_WIDTH),
+            height: Math.max(bounds.height || 0, AuxWindowModule.WINDOW_OPGG_BASE_HEIGHT)
+          }
+        } else {
+          bounds = {
+            width: AuxWindowModule.WINDOW_OPGG_BASE_WIDTH,
+            height: AuxWindowModule.WINDOW_OPGG_BASE_HEIGHT
+          }
+        }
+
+        this._w?.setMinimumSize(
+          AuxWindowModule.WINDOW_OPGG_BASE_WIDTH,
+          AuxWindowModule.WINDOW_OPGG_BASE_HEIGHT
+        )
+        this._w?.setTitle('OP.GG Akari')
+        this._w?.setBounds(bounds)
+        break
+      default:
+        this._w?.setTitle('Vanished Akari')
+        return
+    }
+
+    this.state.setFunctionality(f)
   }
 
   createWindow() {
@@ -288,10 +401,10 @@ export class AuxWindowModule extends MobxBasedBasicModule {
 
   private _createWindow() {
     this._w = new BrowserWindow({
-      width: AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor,
-      height: AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor,
-      minWidth: AuxWindowModule.WINDOW_BASE_WIDTH * this.state.settings.zoomFactor,
-      minHeight: AuxWindowModule.WINDOW_BASE_HEIGHT * this.state.settings.zoomFactor,
+      width: AuxWindowModule.WINDOW_BASE_WIDTH,
+      height: AuxWindowModule.WINDOW_BASE_HEIGHT,
+      minWidth: AuxWindowModule.WINDOW_BASE_WIDTH,
+      minHeight: AuxWindowModule.WINDOW_BASE_HEIGHT,
       resizable: true,
       frame: false,
       show: AuxWindowModule.INITIAL_SHOW,
@@ -311,13 +424,11 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       }
     })
 
-    this._getLastWindowBounds().then((bounds) => {
-      if (bounds) {
-        this._w?.setBounds(bounds)
-      }
-    })
-
     this.state.setShow(AuxWindowModule.INITIAL_SHOW)
+
+    this._adjustForFunctionality(this.state.currentFunctionality)
+
+    this.state.setBounds(this._w.getBounds())
 
     this._w.setOpacity(this.state.settings.opacity)
 
@@ -404,6 +515,13 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this._logger.info('辅助窗口创建')
   }
 
+  private async _loadPreferences() {
+    this.state.setFunctionalityBounds(
+      await this._ss.get('functionality-bounds', this.state.functionalityBounds)
+    )
+    this.state.setFunctionality(await this._ss.get('functionality', 'indicator'))
+  }
+
   private async _setupSettingsSync() {
     this.simpleSettingSync(
       'opacity',
@@ -438,14 +556,6 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     )
 
     await this.loadSettings()
-  }
-
-  private _saveWindowBounds(bounds: Rectangle) {
-    return this._sm.settings.set('auxiliary-window/bounds', bounds)
-  }
-
-  private async _getLastWindowBounds() {
-    return this._sm.settings.get<Rectangle | null>('auxiliary-window/bounds', null)
   }
 
   private _getCenteredRectangle(width: number, height: number) {

@@ -1,7 +1,7 @@
 import { is } from '@electron-toolkit/utils'
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { BrowserWindow, Event, app, shell } from 'electron'
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, observable } from 'mobx'
 import { join } from 'node:path'
 
 import icon from '../../../../resources/LA_ICON.ico?asset'
@@ -9,21 +9,7 @@ import { AppModule } from './app'
 import { AuxWindowModule } from './auxiliary-window'
 import { AppLogger, LogModule } from './log'
 
-class MainWindowSettings {
-  windowSize: [number, number] = [1000, 700]
-
-  constructor() {
-    makeAutoObservable(this)
-  }
-
-  setWindowSize(size: [number, number]) {
-    this.windowSize = size
-  }
-}
-
 class MainWindowState {
-  settings = new MainWindowSettings()
-
   state: 'normal' | 'maximized' | 'minimized' = 'normal'
 
   focus: 'focused' | 'blurred' = 'focused'
@@ -32,8 +18,12 @@ class MainWindowState {
 
   isShow: boolean = true
 
+  windowSize: [number, number] = MainWindowModule.WINDOW_DEFAULT_SIZE
+
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      windowSize: observable.ref
+    })
   }
 
   setState(s: 'normal' | 'maximized' | 'minimized') {
@@ -50,6 +40,10 @@ class MainWindowState {
 
   setReady(ready: boolean) {
     this.ready = ready
+  }
+
+  setWindowSize(size: [number, number]) {
+    this.windowSize = size
   }
 }
 
@@ -89,7 +83,7 @@ export class MainWindowModule extends MobxBasedBasicModule {
     this._awm = this.manager.getModule<AuxWindowModule>('auxiliary-window')
     this._logger = this._logModule.createLogger('main-window')
 
-    await this._loadSettings()
+    await this._loadPreferences()
     this._setupStateSync()
     this._setupMethodCall()
     this._handleChores()
@@ -107,7 +101,7 @@ export class MainWindowModule extends MobxBasedBasicModule {
   private async _handleChores() {
     // 保存窗口大小，一秒内只保存一次
     this.autoDisposeReaction(
-      () => this.state.settings.windowSize,
+      () => this.state.windowSize,
       (size) => {
         size[0] = Math.max(size[0], MainWindowModule.WINDOW_MIN_SIZE[0])
         size[1] = Math.max(size[1], MainWindowModule.WINDOW_MIN_SIZE[1])
@@ -117,10 +111,9 @@ export class MainWindowModule extends MobxBasedBasicModule {
     )
   }
 
-  private async _loadSettings() {
-    this.state.settings.windowSize = await this._ss.get(
-      'window-size',
-      MainWindowModule.WINDOW_DEFAULT_SIZE
+  private async _loadPreferences() {
+    this.state.setWindowSize(
+      await this._ss.get('window-size', MainWindowModule.WINDOW_DEFAULT_SIZE)
     )
   }
 
@@ -162,7 +155,7 @@ export class MainWindowModule extends MobxBasedBasicModule {
   }
 
   private _createWindow() {
-    const [w, h] = this.state.settings.windowSize
+    const [w, h] = this.state.windowSize
     const [minW, minH] = MainWindowModule.WINDOW_MIN_SIZE
 
     this._w = new BrowserWindow({
@@ -195,7 +188,7 @@ export class MainWindowModule extends MobxBasedBasicModule {
     this._w.on('resize', () => {
       const size = this._w?.getSize()
       if (size) {
-        this.state.settings.setWindowSize(size as [number, number])
+        this.state.setWindowSize(size as [number, number])
       }
     })
 

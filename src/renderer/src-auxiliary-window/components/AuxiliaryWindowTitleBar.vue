@@ -3,7 +3,7 @@
     <div class="text-area">
       <div class="shortcut" v-if="!isInIndicatorView" @click="handleBackToIndicatorView">
         <NIcon class="shortcut-icon"><ArrowBackIosFilledIcon /></NIcon>
-        <span class="shortcut-text">返回</span>
+        <span class="shortcut-text">小窗</span>
       </div>
       <template v-else>
         <div
@@ -115,6 +115,7 @@ const handleBackToIndicatorView = () => {
     -webkit-app-region: none;
     transition: all 0.3s;
     cursor: pointer;
+    border-radius: 2px;
 
     &:hover {
       background-color: rgb(86, 86, 86);
@@ -130,6 +131,7 @@ const handleBackToIndicatorView = () => {
   }
 
   .shortcut-text {
+    line-height: 12px;
     font-size: 12px;
     font-weight: bold;
   }

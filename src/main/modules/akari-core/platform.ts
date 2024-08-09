@@ -139,7 +139,7 @@ export class PlatformModule extends MobxBasedBasicModule {
     this._tray = new Tray(icon)
 
     this._auxWindowTrayItem = new MenuItem({
-      label: '辅助窗口',
+      label: '小窗口',
       type: 'normal',
       click: () => {
         this._awm.showWindow()

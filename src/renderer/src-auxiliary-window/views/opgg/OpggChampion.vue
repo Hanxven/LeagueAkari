@@ -37,7 +37,6 @@
                 <div class="prop">胜率</div>
                 <div class="value">{{ ((info.win / (info.play || 1)) * 100).toFixed(2) }}%</div>
               </div>
-
               <div class="prop-field" v-if="info.pick_rate">
                 <div class="prop">登场率</div>
                 <div class="value">{{ (info.pick_rate * 100).toFixed(2) }}%</div>
@@ -52,7 +51,10 @@
       </div>
       <div
         class="card-area"
-        v-if="(info && info.position) || (data && data.data.counters && data.data.counters.length)"
+        v-if="
+          (info && info.position && info.position.counters?.length) ||
+          (data && data.data.counters && data.data.counters.length)
+        "
       >
         <div class="card-title">
           {{ isCountersExpanded ? '全部对位' : '劣势对位' }}
@@ -60,6 +62,7 @@
             size="small"
             v-model:value="isCountersExpanded"
             :round="false"
+            style="margin-right: 8px; /* a little adjustment for a better looking */"
             :rail-style="
               ({ checked }) => ({
                 backgroundColor: checked ? '#4ebc5d' : '#d75a5a'
@@ -70,8 +73,8 @@
             <template #unchecked>劣势</template>
           </NSwitch>
         </div>
-        <div class="card-content" v-if="!isCountersExpanded && info && info.position">
-          <div class="counters">
+        <div class="card-content" v-if="!isCountersExpanded">
+          <div class="counters" v-if="info && info.position">
             <div class="counter" v-for="c of info.position.counters">
               <LcuImage class="image" :src="championIcon(c.champion_id)" />
               <div class="win-rate" title="胜率">
@@ -80,12 +83,10 @@
               <div class="play">{{ c.play.toLocaleString() }} 场</div>
             </div>
           </div>
+          <div class="counter-empty" v-else>暂无数据</div>
         </div>
-        <div
-          class="card-content"
-          v-if="isCountersExpanded && data && data.data.counters && data.data.counters.length"
-        >
-          <div class="counters">
+        <div class="card-content" v-if="isCountersExpanded">
+          <div class="counters" v-if="data && data.data.counters && data.data.counters.length">
             <div
               class="counter"
               v-for="c of data.data.counters.toSorted(
@@ -99,6 +100,7 @@
               <div class="play">{{ c.play.toLocaleString() }} 场</div>
             </div>
           </div>
+          <div class="counter-empty" v-else>暂无数据</div>
         </div>
       </div>
       <div
@@ -199,6 +201,7 @@
                   @click="() => handleSetRunes(r)"
                   size="tiny"
                   type="primary"
+                  :disabled="lc.state !== 'connected'"
                   secondary
                   title="点按以设置为此符文配法"
                   >应用</NButton
@@ -604,6 +607,7 @@ import {
   putPage
 } from '@shared/renderer/http-api/perks'
 import { championIcon } from '@shared/renderer/modules/game-data'
+import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
@@ -634,6 +638,7 @@ const props = defineProps<{
 
 const gameflow = useGameflowStore()
 const chat = useChatStore()
+const lc = useLcuConnectionStore()
 
 const positionTextMap = {
   TOP: '上单',
@@ -735,6 +740,7 @@ watchEffect(() => {
     isPrismItemsExpanded.value = false
     isCoreItemsExpanded.value = false
     isLastItemsExpanded.value = false
+    isCountersExpanded.value = false
   }
 })
 
@@ -1087,6 +1093,17 @@ const handleSetRunes = async (r: {
 
   &.tier-6 {
     color: rgb(85, 34, 83);
+  }
+}
+
+.card-content {
+  .counter-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20px;
+    font-size: 12px;
+    color: #a4a4a4;
   }
 }
 

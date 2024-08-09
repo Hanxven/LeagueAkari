@@ -1,3 +1,4 @@
+import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({
@@ -6,12 +7,15 @@ const router = createRouter({
     {
       path: '/',
       name: 'root',
-      redirect: { name: 'indicator' }
+      component: () => import('@auxiliary-window/views/indicator/Placeholder.vue')
     },
     {
       path: '/indicator',
       name: 'indicator',
       component: () => import('@auxiliary-window/views/indicator/Indicator.vue'),
+      beforeEnter: () => {
+        awm.setFunctionality('indicator')
+      },
       children: [
         {
           path: 'champ-select',
@@ -33,6 +37,9 @@ const router = createRouter({
     {
       path: '/opgg',
       name: 'opgg',
+      beforeEnter: () => {
+        awm.setFunctionality('opgg')
+      },
       component: () => import('@auxiliary-window/views/opgg/Opgg.vue')
     }
   ]

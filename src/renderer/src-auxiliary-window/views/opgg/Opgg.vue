@@ -117,24 +117,13 @@ import {
   TierType
 } from '@shared/external-data-source/opgg/types'
 import { useStableComputed } from '@shared/renderer/compositions/useStableComputed'
-import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { maybePveChampion } from '@shared/types/lcu/game-data'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
-import { watchDebounced } from '@vueuse/core'
+import { useLocalStorage, watchDebounced } from '@vueuse/core'
 import { NButton, NIcon, NSelect, NTab, NTabs, SelectRenderLabel, useMessage } from 'naive-ui'
-import {
-  computed,
-  h,
-  onActivated,
-  onErrorCaptured,
-  onMounted,
-  ref,
-  shallowRef,
-  watch,
-  watchEffect
-} from 'vue'
+import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
@@ -142,6 +131,13 @@ import OpggTier from './OpggTier.vue'
 const currentTab = ref('tier')
 const gameflow = useGameflowStore()
 const champSelect = useChampSelectStore()
+
+const savedPreferences = useLocalStorage('opgg-preferences', {
+  mode: 'ranked',
+  position: 'top',
+  region: 'global',
+  tier: 'all'
+})
 
 onErrorCaptured((error, instance, info) => {
   console.warn('Component OP.GG error: ', error, instance, info)
@@ -161,10 +157,10 @@ const renderLabel: SelectRenderLabel = (option) => {
 }
 
 const championId = ref<number | null>(null)
-const mode = ref<ModeType>('ranked')
-const position = ref<PositionType>('top')
-const region = ref<RegionType>('global')
-const tier = ref<TierType>('all')
+const mode = ref<ModeType>(savedPreferences.value.mode as ModeType)
+const position = ref<PositionType>(savedPreferences.value.position as PositionType)
+const region = ref<RegionType>(savedPreferences.value.region as RegionType)
+const tier = ref<TierType>(savedPreferences.value.tier as TierType)
 const version = ref<string | null>(null)
 
 const versions = shallowRef<string[]>([])
@@ -191,6 +187,23 @@ const isLoadingTier = ref(false)
 const isLoading = computed(
   () => isLoadingVersions.value || isLoadingChampion.value || isLoadingTier.value
 )
+
+// 一些模式没有位置相关的数据，所以添加一个视觉上的效果以保证其不可选
+watchEffect(() => {
+  if (mode.value !== 'ranked') {
+    position.value = 'none'
+  } else {
+    position.value = savedPreferences.value.position as PositionType
+  }
+})
+
+watchEffect(() => {
+  if (mode.value === 'arena') {
+    tier.value = 'all'
+  } else {
+    tier.value = savedPreferences.value.tier as TierType
+  }
+})
 
 // 以防万一, 我们需要一些丑陋的冗余逻辑
 let loadVersionsController: AbortController | null = null
@@ -313,21 +326,25 @@ const handleVersionChange = async (v: string) => {
 
 const handleModeChange = async (m: ModeType) => {
   mode.value = m
+  savedPreferences.value.mode = m
   await loadAll()
 }
 
 const handleRegionChange = async (r: RegionType) => {
   region.value = r
+  savedPreferences.value.region = r
   await loadAll()
 }
 
 const handleTierChange = async (t: TierType) => {
   tier.value = t
+  savedPreferences.value.tier = t
   await loadAll()
 }
 
 const handlePositionChange = async (p: PositionType) => {
   position.value = p
+  savedPreferences.value.position = p
   champion.value = null
   await loadChampionData()
 }
@@ -401,21 +418,6 @@ const tierOptions = [
 
 const versionOptions = computed(() => {
   return versions.value.map((v) => ({ label: v, value: v }))
-})
-
-// 一些模式没有位置相关的数据，所以添加一个视觉上的效果以保证其不可选
-watchEffect(() => {
-  if (mode.value !== 'ranked') {
-    position.value = 'none'
-  } else {
-    position.value = 'top'
-  }
-})
-
-watchEffect(() => {
-  if (mode.value === 'arena') {
-    tier.value = 'all'
-  }
 })
 
 // 这将实时锁定正在选择的英雄
@@ -496,14 +498,6 @@ watchDebounced(
   },
   { immediate: true, debounce: 500 }
 )
-
-onActivated(async () => {
-  const size = await awm.getWindowSize()
-
-  if (size.width < 480 || size.height < 720) {
-    awm.setWindowSize(480, 720)
-  }
-})
 </script>
 
 <style lang="less" scoped>
