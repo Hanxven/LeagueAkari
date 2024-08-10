@@ -11,7 +11,7 @@
       class="tier-table"
       flex-height
       :data="data"
-      :columns="columns"
+      :columns="combinedColumns"
       :row-key="(item) => item.id"
       virtual-scroll
       :row-props="rowProps"
@@ -27,8 +27,15 @@ import { useExternalDataSourceStore } from '@shared/renderer/modules/external-da
 import { championIcon } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
-import { DataTableColumns, DataTableCreateRowProps, NDataTable, NInput } from 'naive-ui'
-import { computed, h, ref, useCssModule } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
+import {
+  DataTableColumn,
+  DataTableColumns,
+  DataTableCreateRowProps,
+  NDataTable,
+  NInput
+} from 'naive-ui'
+import { computed, h, ref, useCssModule, watchEffect } from 'vue'
 
 const props = defineProps<{
   championId?: number
@@ -67,7 +74,7 @@ const columns: DataTableColumns<any> = [
     key: 'rank',
     align: 'center',
     className: styles['column-title'],
-    width: 52,
+    width: 46,
     render: (row, index) => {
       if (props.mode === 'ranked' && props.position !== 'none') {
         const position = row.positions?.find(
@@ -110,7 +117,7 @@ const columns: DataTableColumns<any> = [
             {
               class: [styles.name]
             },
-            [gameData.champions[row.id]?.name || row.id]
+            gameData.champions[row.id]?.name || row.id
           )
         ]
       )
@@ -135,7 +142,7 @@ const columns: DataTableColumns<any> = [
         )
 
         let tierText: string
-        if (position === undefined) {
+        if (position === undefined || position === null) {
           tierText = '-'
         } else if (position.stats?.tier_data?.tier === 0) {
           tierText = 'OP'
@@ -282,6 +289,111 @@ const columns: DataTableColumns<any> = [
     }
   }
 ]
+
+const countersColumn: DataTableColumn<any> = {
+  title: '劣势对位',
+  key: 'counters',
+  align: 'center',
+  width: 90,
+  className: styles['column-title'],
+  render: (row) => {
+    if (props.mode === 'ranked' && props.position !== 'none') {
+      const position = row.positions?.find(
+        (p: any) => p.name.toUpperCase() === props.position?.toUpperCase()
+      )
+
+      if (!position || !position.counters || !position.counters.length) {
+        return '-'
+      }
+
+      return h(
+        'div',
+        {
+          style: {
+            display: 'flex',
+            'align-items': 'center',
+            gap: '2px',
+            'justify-content': 'center'
+          }
+        },
+        position.counters.slice(0, 3).map((c: any) => {
+          return h(LcuImage, {
+            style: { width: '18px', height: '18px' },
+            src: championIcon(c.champion_id)
+          })
+        })
+      )
+    }
+
+    return '-'
+  }
+}
+
+const banRateColumn: DataTableColumn<any> = {
+  title: '禁用率',
+  key: 'banRate',
+  align: 'center',
+  width: 86,
+  sorter: (a, b) => {
+    if (props.mode === 'ranked' && props.position !== 'none') {
+      const aPosition = a.positions?.find(
+        (p: any) => p.name.toUpperCase() === props.position?.toUpperCase()
+      )
+      const bPosition = b.positions?.find(
+        (p: any) => p.name.toUpperCase() === props.position?.toUpperCase()
+      )
+
+      const aBanRate = aPosition?.stats.ban_rate || 0
+      const bBanRate = bPosition?.stats.ban_rate || 0
+
+      return aBanRate - bBanRate
+    }
+
+    const aBanRate = a.average_stats?.ban_rate || 0
+    const bBanRate = b.average_stats?.ban_rate || 0
+
+    return aBanRate - bBanRate
+  },
+  className: styles['column-title'],
+  render: (row) => {
+    if (props.mode === 'ranked' && props.position !== 'none') {
+      const position = row.positions?.find(
+        (p: any) => p.name.toUpperCase() === props.position?.toUpperCase()
+      )
+
+      if (!position || !position.stats || position.stats.ban_rate === null) {
+        return '-'
+      }
+
+      return `${(position.stats?.ban_rate * 100 || 0).toFixed(2)} %`
+    }
+
+    if (!row.average_stats || row.average_stats.ban_rate === null) {
+      return '-'
+    }
+
+    return `${(row.average_stats.ban_rate * 100).toFixed(2)} %`
+  }
+}
+
+const isLargeEnoughToShow = useMediaQuery('(min-width: 520px)')
+const isSuperLargeEnoughToShow = useMediaQuery('(min-width: 600px)')
+
+const combinedColumns = computed(() => {
+  if (isSuperLargeEnoughToShow.value) {
+    return [...columns, banRateColumn, countersColumn]
+  }
+
+  if (isLargeEnoughToShow.value) {
+    return [...columns, countersColumn]
+  }
+
+  return columns
+})
+
+watchEffect(() => {
+  console.log('isLargeEnoughToShow', isLargeEnoughToShow.value)
+})
 
 const filterText = ref('')
 
@@ -536,6 +648,7 @@ const data = computed(() => {
   .image {
     height: 32px;
     width: 32px;
+    flex-shrink: 0;
   }
 
   .name {

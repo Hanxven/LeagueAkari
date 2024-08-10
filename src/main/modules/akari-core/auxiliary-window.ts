@@ -152,7 +152,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
   }
 
   private _handleObservations() {
-    const auxWindowShowTiming = computed(() => {
+    const auxWindowIndicatorShowTiming = computed(() => {
       switch (this._lcu.gameflow.phase) {
         case 'ChampSelect':
         case 'Lobby':
@@ -165,13 +165,16 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     })
 
     this.autoDisposeReaction(
-      () => auxWindowShowTiming.get(),
+      () => auxWindowIndicatorShowTiming.get(),
       (timing) => {
+        if (this.state.currentFunctionality !== 'indicator') {
+          return
+        }
+
         if (timing === 'show') {
           this.showWindow()
         } else {
-          // FOR DEBUGGING, NEVER HIDE WINDOW
-          // this.hideWindow()
+          this.hideWindow()
         }
       }
     )

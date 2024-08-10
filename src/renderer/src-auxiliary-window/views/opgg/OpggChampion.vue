@@ -608,7 +608,6 @@ import {
 } from '@shared/renderer/http-api/perks'
 import { championIcon } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
