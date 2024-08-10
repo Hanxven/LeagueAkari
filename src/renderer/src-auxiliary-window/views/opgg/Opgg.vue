@@ -406,7 +406,7 @@ const regionOptions = [
 ]
 
 const tierOptions = [
-  { label: '全部', value: 'all' },
+  { label: '全部段位', value: 'all' },
   { label: '黄金 -', value: 'ibsg' },
   { label: '黄金 +', value: 'gold_plus' },
   { label: '铂金 +', value: 'platinum_plus' },

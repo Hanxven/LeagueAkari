@@ -1,14 +1,15 @@
 <template>
-  <div v-if="rankedEntry" class="ranked-wrapper">
+  <div v-if="rankedEntry" class="ranked-wrapper" :class="{ small: small }">
     <div class="ranked-type">
       {{ queueTypeTextMap[rankedEntry.queueType] || rankedEntry.queueType }}
     </div>
     <div class="ranked-display">
       <img
         class="ranked-image"
+        v-if="!small"
         :src="rankedImageMap[rankedEntry.tier] || rankedImageMap['UNRANKED']"
       />
-      <div class="ranked-info">
+      <div class="ranked-info" :class="{ small: small }">
         <span class="ranked-name" v-if="rankedEntry.queueType !== 'CHERRY'">{{ formatTier }}</span>
         <span v-if="rankedEntry.ratedRating" class="wins"
           >{{ rankedEntry.wins }} 胜 {{ rankedEntry.ratedRating }} 分</span
@@ -72,6 +73,7 @@ import SilverMedal from '@main-window/assets/ranked-icons/silver.png'
 
 const props = defineProps<{
   rankedEntry?: RankedEntry
+  small?: boolean
 }>()
 
 const rankedImageMap: Record<string, string> = {
@@ -153,6 +155,11 @@ const formatPreviousTier = computed(() => {
   border-radius: 4px;
   align-items: center;
   justify-content: center;
+
+  &.small {
+    width: 120px;
+    height: 96px;
+  }
 }
 
 .ranked-display {
@@ -186,6 +193,10 @@ const formatPreviousTier = computed(() => {
   display: flex;
   flex-direction: column;
   width: 96px;
+
+  &.small {
+    width: unset;
+  }
 
   .hint {
     font-size: 12px;

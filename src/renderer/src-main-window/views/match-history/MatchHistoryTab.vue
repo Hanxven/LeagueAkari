@@ -94,10 +94,12 @@
           <div class="header-ranked" v-if="tab.rankedStats">
             <RankedDisplay
               class="ranked"
+              :small="isSmallScreen"
               :ranked-entry="tab.rankedStats?.queueMap['RANKED_SOLO_5x5']"
             />
             <RankedDisplay
               class="ranked"
+              :small="isSmallScreen"
               :ranked-entry="tab.rankedStats?.queueMap['RANKED_FLEX_SR']"
             />
             <div class="ranked-more">
@@ -138,6 +140,56 @@
               </template>
             </NButton>
           </div>
+        </div>
+        <div class="show-on-smaller-screen">
+          <NInputNumber
+            size="tiny"
+            placeholder=""
+            style="width: 48px"
+            v-model:value="inputtingPage"
+            @blur="handleInputBlur"
+            @keyup.enter="() => handleLoadPage(inputtingPage || 1)"
+            :disabled="tab.loading.isLoadingMatchHistory"
+            :min="1"
+            :show-button="false"
+          />
+          <NButton
+            size="tiny"
+            title="切换到上一页"
+            @click="handleLoadPage(tab.matchHistory.page - 1)"
+            :disabled="tab.matchHistory.page <= 1 || tab.loading.isLoadingMatchHistory"
+            secondary
+            >上一页</NButton
+          >
+          <NButton
+            title="切换到下一页"
+            size="tiny"
+            @click="() => handleLoadPage(tab.matchHistory.page + 1)"
+            :disabled="tab.loading.isLoadingMatchHistory"
+            secondary
+            >下一页</NButton
+          >
+          <NSelect
+            :value="tab.matchHistory.pageSize"
+            @update:value="handleChangePageSize"
+            :disabled="tab.loading.isLoadingMatchHistory"
+            class="page-select"
+            size="tiny"
+            style="width: 108px"
+            :options="pageSizeOptions"
+          ></NSelect>
+          <NSelect
+            v-if="
+              cf.settings.matchHistorySource === 'sgp' ||
+              eds.sgpAvailability.currentSgpServerId !== tab.sgpServerId
+            "
+            size="tiny"
+            :value="tab.matchHistory.queueFilter"
+            style="width: 160px"
+            @update:value="handleChangeSgpTag"
+            :disabled="tab.loading.isLoadingMatchHistory"
+            :options="sgpTagOptions"
+          ></NSelect>
         </div>
         <div class="content">
           <div class="left">
@@ -280,7 +332,10 @@
                     <NPopover v-for="c of frequentlyUsedChampions" :key="c.id">
                       <template #trigger>
                         <div class="champion-slot">
-                          <LcuImage style="width: 100%; height: 100%" :src="championIconUrl(c.id)" />
+                          <LcuImage
+                            style="width: 100%; height: 100%"
+                            :src="championIconUrl(c.id)"
+                          />
                           <div class="champion-used-count">{{ c.count }}</div>
                         </div>
                       </template>
@@ -360,6 +415,7 @@ import {
   NavigateBeforeOutlined as NavigateBeforeOutlinedIcon,
   NavigateNextOutlined as NavigateNextOutlinedIcon
 } from '@vicons/material'
+import { useMediaQuery } from '@vueuse/core'
 import {
   NButton,
   NIcon,
@@ -388,6 +444,9 @@ const props = withDefaults(
     isSelf: false
   }
 )
+
+// 1182px - is same in which defined in CSS
+const isSmallScreen = useMediaQuery(`(max-width: 1182px)`)
 
 const analysis = computed(() => {
   const matchHistory = analyzeMatchHistory(props.tab.matchHistory.games, props.tab.puuid)
@@ -627,7 +686,7 @@ defineExpose({
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   border-radius: 4px;
-  background-color: #000000ed;
+  background-color: #202020dd;
   padding: 16px;
 
   .ranked {
@@ -640,7 +699,7 @@ defineExpose({
   align-items: center;
   height: 140px;
   box-sizing: border-box;
-  padding: 20px 32px;
+  padding: 20px 20px 12px 20px;
 }
 
 .player-header-simplified {
@@ -680,6 +739,10 @@ defineExpose({
       margin-left: 6px;
       color: #858585;
     }
+
+    @media (max-width: 1182px) {
+      width: 764px;
+    }
   }
 
   .header-simplified-actions {
@@ -697,12 +760,31 @@ defineExpose({
   .content {
     display: flex;
   }
+
+  .show-on-smaller-screen {
+    display: none;
+    padding: 0px 12px;
+
+    @media (max-width: 1182px) {
+      display: flex;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+  }
+
+  @media (max-width: 1182px) {
+    width: 764px;
+  }
 }
 
 .content .left {
   position: relative;
   flex: 1;
   padding: 12px 0 12px 12px;
+
+  @media (max-width: 1182px) {
+    display: none;
+  }
 }
 
 .left-content-item {
