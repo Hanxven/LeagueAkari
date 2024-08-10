@@ -31,12 +31,12 @@
             <LcuImage
               v-if="cf.ongoingChampionSelections?.[tab.id]"
               class="tab-icon"
-              :src="championIcon(cf.ongoingChampionSelections?.[tab.id])"
+              :src="championIconUrl(cf.ongoingChampionSelections?.[tab.id])"
             />
             <LcuImage
               v-else-if="tab.data.summoner"
               class="tab-icon"
-              :src="tab.data.summoner ? profileIcon(tab.data.summoner.profileIconId) : undefined"
+              :src="tab.data.summoner ? profileIconUrl(tab.data.summoner.profileIconId) : undefined"
             />
             <span class="tab-title" :class="{ 'temporary-tab': tab.isTemporary }">{{
               tabNames[tab.id]
@@ -111,7 +111,7 @@
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
-import { championIcon, profileIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl, profileIconUrl } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { summonerName } from '@shared/utils/name'

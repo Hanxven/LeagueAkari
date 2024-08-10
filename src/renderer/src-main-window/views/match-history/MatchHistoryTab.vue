@@ -20,7 +20,7 @@
         <div class="header-simplified-inner">
           <LcuImage
             class="small-profile-icon"
-            :src="tab.summoner ? profileIcon(tab.summoner.profileIconId) : undefined"
+            :src="tab.summoner ? profileIconUrl(tab.summoner.profileIconId) : undefined"
           />
           <span class="small-game-name">{{ tab.summoner?.gameName }}</span>
           <span class="small-tag-line">#{{ tab.summoner?.tagLine }}</span>
@@ -75,7 +75,7 @@
             <div class="profile-image">
               <LcuImage
                 class="profile-image-icon"
-                :src="tab.summoner ? profileIcon(tab.summoner.profileIconId) : undefined"
+                :src="tab.summoner ? profileIconUrl(tab.summoner.profileIconId) : undefined"
               />
               <div class="profile-image-lv" v-if="tab.summoner">
                 {{ tab.summoner.summonerLevel }}
@@ -280,7 +280,7 @@
                     <NPopover v-for="c of frequentlyUsedChampions" :key="c.id">
                       <template #trigger>
                         <div class="champion-slot">
-                          <LcuImage style="width: 100%; height: 100%" :src="championIcon(c.id)" />
+                          <LcuImage style="width: 100%; height: 100%" :src="championIconUrl(c.id)" />
                           <div class="champion-used-count">{{ c.count }}</div>
                         </div>
                       </template>
@@ -307,7 +307,7 @@
                 >
                   <LcuImage
                     style="width: 18px; height: 18px"
-                    :src="profileIcon(p.targetProfileIconId)"
+                    :src="profileIconUrl(p.targetProfileIconId)"
                   />
                   <div class="name-and-tag" @click="() => handleToSummoner(p.targetPuuid)">
                     <span class="game-name">{{ p.targetGameName }}</span>
@@ -348,7 +348,7 @@ import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
-import { championIcon, profileIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl, profileIconUrl } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { laNotification } from '@shared/renderer/notification'
 import { analyzeMatchHistory, analyzeMatchHistoryPlayers } from '@shared/utils/analysis'

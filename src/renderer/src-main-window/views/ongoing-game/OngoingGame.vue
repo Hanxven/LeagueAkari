@@ -85,7 +85,7 @@
                     )
                   "
                   class="image"
-                  :src="championIcon(cf.ongoingChampionSelections?.[p] || -1)"
+                  :src="championIconUrl(cf.ongoingChampionSelections?.[p] || -1)"
                 />
                 <div class="name">
                   {{
@@ -171,7 +171,7 @@ import {
   OngoingPlayer,
   useCoreFunctionalityStore
 } from '@shared/renderer/modules/core-functionality/store'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'

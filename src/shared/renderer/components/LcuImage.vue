@@ -1,7 +1,6 @@
 <template>
   <img
     @dragstart.prevent
-    v-bind="$attrs"
     v-if="url"
     :src="url"
     class="lcu-image"

@@ -85,7 +85,7 @@ import {
   setStrawberryDifficulty
 } from '@shared/renderer/http-api/loadouts'
 import { setPlayerSlotsStrawberry1, setStrawberryMapId } from '@shared/renderer/http-api/lobby'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useLobbyStore } from '@shared/renderer/modules/lcu-state-sync/lobby'
@@ -144,7 +144,7 @@ const renderLabel: SelectRenderLabel = (option) => {
     },
     [
       h(LcuImage, {
-        src: championIcon(option.value as number),
+        src: championIconUrl(option.value as number),
         style: {
           width: '18px',
           height: '18px'

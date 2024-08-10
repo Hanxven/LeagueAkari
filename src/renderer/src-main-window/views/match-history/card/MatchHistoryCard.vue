@@ -8,7 +8,7 @@
         <div class="player" v-for="p of participants" :key="p.participantId">
           <LcuImage
             class="image"
-            :src="championIcon(p.championId)"
+            :src="championIconUrl(p.championId)"
             :title="gameData.champions[p.championId]?.name"
           />
           <div
@@ -73,11 +73,11 @@
       <div class="info">
         <div class="stats">
           <div class="champion">
-            <LcuImage
+            <ChampionIcon
               class="champion-icon"
-              :src="championIcon(self.participant.championId)"
+              :champion-id="self.participant.championId"
               :title="gameData.champions[self.participant.championId]?.name"
-            ></LcuImage>
+            ></ChampionIcon>
             <div class="champion-level">{{ self.participant.stats.champLevel }}</div>
           </div>
           <template v-if="game.gameMode === 'CHERRY' || game.gameMode === 'STRAWBERRY'">
@@ -253,11 +253,12 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import AugmentDisplay from '@shared/renderer/components/widgets/AugmentDisplay.vue'
+import ChampionIcon from '@shared/renderer/components/widgets/ChampionIcon.vue'
 import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
@@ -504,7 +505,8 @@ const emits = defineEmits<{
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 120px;
+  width: 112px;
+  flex-shrink: 0;
   box-sizing: border-box;
   font-size: 12px;
   color: rgb(159, 159, 159);

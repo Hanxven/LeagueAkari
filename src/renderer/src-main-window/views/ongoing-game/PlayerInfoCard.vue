@@ -1,7 +1,7 @@
 <template>
   <div class="player-info-card" :class="playerTypeClass">
     <div class="header-line">
-      <LcuImage class="avatar" :src="championId ? championIcon(championId) : championIcon(-1)" />
+      <LcuImage class="avatar" :src="championId ? championIconUrl(championId) : championIconUrl(-1)" />
       <div class="header-line-right-side">
         <div class="summoner-name-line">
           <span
@@ -111,7 +111,7 @@
               class="favorite"
               v-for="c of analysis.champions.filter((c) => c.cherryCount).slice(0, 3)"
             >
-              <LcuImage class="image" :src="championIcon(c.championId)"></LcuImage>
+              <LcuImage class="image" :src="championIconUrl(c.championId)"></LcuImage>
               <div class="label" title="前四率">前四率</div>
               <div class="label" title="前四率">
                 {{ Math.round((c.top4 / (c.cherryCount || 1)) * 100) }} %
@@ -122,7 +122,7 @@
               class="favorite"
               v-if="analysis.champions.filter((c) => c.cherryCount).length === 0"
             >
-              <LcuImage class="image" :src="championIcon(-1)"></LcuImage>
+              <LcuImage class="image" :src="championIconUrl(-1)"></LcuImage>
               <div class="label" title="无对局">无对局</div>
               <div class="label" title="无对局">无对局</div>
               <div class="count">0 场</div>
@@ -130,7 +130,7 @@
           </template>
           <template v-else>
             <div class="favorite" v-for="c of analysis.champions.slice(0, 3)">
-              <LcuImage class="image" :src="championIcon(c.championId)"></LcuImage>
+              <LcuImage class="image" :src="championIconUrl(c.championId)"></LcuImage>
               <div class="label" title="平均 KDA">{{ c.kda.toFixed(2) }}</div>
               <div class="label" title="英雄胜率">
                 {{ Math.round((c.win / (c.count || 1)) * 100) }} %
@@ -138,7 +138,7 @@
               <div class="count">{{ c.count }} 场</div>
             </div>
             <div class="favorite" v-if="analysis.champions.length === 0">
-              <LcuImage class="image" :src="championIcon(-1)"></LcuImage>
+              <LcuImage class="image" :src="championIconUrl(-1)"></LcuImage>
               <div class="label" title="无对局">无对局</div>
               <div class="label" title="无对局">无对局</div>
               <div class="count">0 场</div>
@@ -181,7 +181,7 @@
             "
             :key="m.data.game.gameId"
           >
-            <LcuImage class="image" :src="championIcon(m.data.selfParticipant.championId)" />
+            <LcuImage class="image" :src="championIconUrl(m.data.selfParticipant.championId)" />
             <div style="width: 56px">
               <div
                 class="mode"
@@ -229,7 +229,7 @@ import {
   MatchHistoryGameWithState,
   SavedPlayerInfo
 } from '@shared/renderer/modules/core-functionality/store'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'

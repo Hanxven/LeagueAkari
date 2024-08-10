@@ -24,7 +24,7 @@
 <script lang="ts" setup>
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
 import { useMediaQuery } from '@vueuse/core'
@@ -110,7 +110,7 @@ const columns: DataTableColumns<any> = [
         [
           h(LcuImage, {
             class: [styles.image],
-            src: championIcon(row.id)
+            src: championIconUrl(row.id)
           }),
           h(
             'div',
@@ -319,7 +319,7 @@ const countersColumn: DataTableColumn<any> = {
         position.counters.slice(0, 3).map((c: any) => {
           return h(LcuImage, {
             style: { width: '18px', height: '18px' },
-            src: championIcon(c.champion_id)
+            src: championIconUrl(c.champion_id)
           })
         })
       )

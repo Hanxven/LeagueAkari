@@ -2,7 +2,7 @@
   <div class="player-card">
     <div class="profile">
       <PositionBottom class="profile-position" />
-      <LcuImage class="profile-image" :src="championIcon(4)" />
+      <LcuImage class="profile-image" :src="championIconUrl(4)" />
       <div class="profile-name">
         <span class="game-name">泉此方 x 柊镜</span>
         <span class="tag-line">#Kagami</span>
@@ -33,25 +33,25 @@
     <div class="mastery">
       <span class="mastery-label">高成就点</span>
       <div class="mastery-items">
-        <LcuImage class="mastery-image" :src="championIcon(4)" />
-        <LcuImage class="mastery-image" :src="championIcon(4)" />
-        <LcuImage class="mastery-image" :src="championIcon(4)" />
-        <LcuImage class="mastery-image" :src="championIcon(4)" />
-        <LcuImage class="mastery-image" :src="championIcon(4)" />
-        <LcuImage class="mastery-image" :src="championIcon(4)" />
-        <LcuImage class="mastery-image" :src="championIcon(4)" />
+        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
+        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
+        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
+        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
+        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
+        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
+        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
       </div>
     </div>
     <div class="recently-used-champions">
       <span class="r-label">近期使用</span>
       <div class="r-champions">
-        <LcuImage class="r-champion-image" :src="championIcon(4)" />
-        <LcuImage class="r-champion-image" :src="championIcon(4)" />
-        <LcuImage class="r-champion-image" :src="championIcon(4)" />
-        <LcuImage class="r-champion-image" :src="championIcon(4)" />
-        <LcuImage class="r-champion-image" :src="championIcon(4)" />
-        <LcuImage class="r-champion-image" :src="championIcon(4)" />
-        <LcuImage class="r-champion-image" :src="championIcon(4)" />
+        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
+        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
+        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
+        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
+        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
+        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
+        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
       </div>
     </div>
     <div class="match-history">
@@ -61,7 +61,7 @@
             class="match-history-item"
             style="height: 28px; background-color: red; margin-bottom: 2px"
           >
-            <LcuImage class="image" :src="championIcon(1)" />
+            <LcuImage class="image" :src="championIconUrl(1)" />
             <div style="width: 56px">
               <div class="mode">测试模式</div>
               <div class="time">03 26 一</div>
@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { ChartData, ChartOptions } from 'chart.js'
 import { NVirtualList } from 'naive-ui'
 import { Radar } from 'vue-chartjs'

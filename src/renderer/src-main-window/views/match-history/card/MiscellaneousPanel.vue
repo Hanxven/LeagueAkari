@@ -22,7 +22,7 @@
           style="height: 20px; width: 20px"
           v-for="b of t.bans"
           :key="b.championId"
-          :src="championIcon(b.championId)"
+          :src="championIconUrl(b.championId)"
         />
       </div>
     </div>
@@ -48,7 +48,7 @@ import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { Game, Participant, Player } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
@@ -76,7 +76,7 @@ const tableWidth = computed(() => {
 
 const championDisplay = (championId: number) => {
   return h('div', { style: { display: 'flex' } }, [
-    h(LcuImage, { style: { height: '20px', width: '20px' }, src: championIcon(championId || -1) }),
+    h(LcuImage, { style: { height: '20px', width: '20px' }, src: championIconUrl(championId || -1) }),
     h('span', { style: { 'margin-left': '2px' } }, gameData.champions[championId].name)
   ])
 }
@@ -292,7 +292,7 @@ const columns = computed(() => {
         return h('div', { style: { display: 'flex' } }, [
           h(LcuImage, {
             style: { height: '20px', width: '20px' },
-            src: championIcon(p.championId || -1)
+            src: championIconUrl(p.championId || -1)
           }),
           h(
             'span',

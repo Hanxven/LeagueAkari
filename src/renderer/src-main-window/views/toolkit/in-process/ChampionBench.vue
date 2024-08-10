@@ -20,7 +20,7 @@
         <LcuImage
           class="champion-image"
           style="border-radius: 50%; cursor: default"
-          :src="championIcon(selfChampionId || -1)"
+          :src="championIconUrl(selfChampionId || -1)"
         />
       </div>
       <NDivider vertical />
@@ -32,7 +32,7 @@
           :class="{
             'champion-image-invalid': !cs.currentPickableChampions.has(c.championId)
           }"
-          :src="championIcon(c.championId)"
+          :src="championIconUrl(c.championId)"
           @click="() => handleBenchSwap(c.championId)"
         />
         <div
@@ -49,7 +49,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { benchSwap, reroll } from '@shared/renderer/http-api/champ-select'

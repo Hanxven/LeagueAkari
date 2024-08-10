@@ -19,7 +19,7 @@
     >
     <div class="champions">
       <LcuImage
-        :src="championIcon(c)"
+        :src="championIconUrl(c)"
         class="champion"
         :title="gameData.champions[c]?.name"
         :class="{
@@ -41,7 +41,7 @@
 <script lang="ts" setup>
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
@@ -149,7 +149,7 @@ const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
     },
     [
       h(LcuImage, {
-        src: championIcon(option.value as number),
+        src: championIconUrl(option.value as number),
         style: { width: '18px', height: '18px' }
       }),
       h('span', { style: { 'margin-left': '4px', 'font-size': '13px' } }, option.label)
@@ -185,7 +185,7 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
     },
     [
       h(LcuImage, {
-        src: championIcon(option.value as number),
+        src: championIconUrl(option.value as number),
         style: { width: '18px', height: '18px' }
       }),
       h('span', { style: { 'margin-left': '4px', 'font-size': '13px' } }, option.label),

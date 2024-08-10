@@ -1,7 +1,7 @@
-export function profileIcon(iconId: number) {
+export function profileIconUrl(iconId: number) {
   return `/lol-game-data/assets/v1/profile-icons/${iconId}.jpg`
 }
 
-export function championIcon(champId: number) {
+export function championIconUrl(champId: number) {
   return `/lol-game-data/assets/v1/champion-icons/${champId}.png`
 }

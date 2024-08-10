@@ -18,7 +18,7 @@
                 balanced: selfChampionWithBalance?.overallBalance === 'balanced'
               }"
               style="border-radius: 50%; cursor: default"
-              :src="championIcon(selfChampionWithBalance?.championId || -1)"
+              :src="championIconUrl(selfChampionWithBalance?.championId || -1)"
             />
           </template>
           <div class="raw-popover">
@@ -85,7 +85,7 @@
                 nerfed: c.overallBalance === 'nerfed',
                 balanced: c.overallBalance === 'balanced'
               }"
-              :src="championIcon(c.championId)"
+              :src="championIconUrl(c.championId)"
               @click="() => handleBenchSwap(c.championId)"
             />
           </template>
@@ -114,7 +114,7 @@
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { benchSwap, reroll } from '@shared/renderer/http-api/champ-select'
 import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'

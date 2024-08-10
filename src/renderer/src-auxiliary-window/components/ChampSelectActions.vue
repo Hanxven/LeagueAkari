@@ -11,25 +11,25 @@
         </template>
         <template v-if="a[0].completed">
           <div class="solution completed" v-if="a[0].type === 'pick'">
-            <LcuImage class="image" :src="championIcon(a[0].championId)" />
+            <LcuImage class="image" :src="championIconUrl(a[0].championId)" />
             <span class="label">已选择</span>
           </div>
           <div class="solution completed" v-else-if="a[0].type === 'vote'">
-            <LcuImage class="image" :src="championIcon(a[0].championId)" />
+            <LcuImage class="image" :src="championIconUrl(a[0].championId)" />
             <span class="label">已投票</span>
           </div>
           <div class="solution completed" v-else-if="a[0].type === 'ban'">
-            <LcuImage class="image" :src="championIcon(a[0].championId)" />
+            <LcuImage class="image" :src="championIconUrl(a[0].championId)" />
             <span class="label">已禁用</span>
           </div>
         </template>
         <template v-else>
           <div class="solution" v-if="as.upcomingPick && as.upcomingPick.action.id === a[0].id">
-            <LcuImage class="image" :src="championIcon(as.upcomingPick.championId)" />
+            <LcuImage class="image" :src="championIconUrl(as.upcomingPick.championId)" />
             <span class="label">自动选择</span>
           </div>
           <div class="solution" v-if="as.upcomingBan && as.upcomingBan.action.id === a[0].id">
-            <LcuImage class="image" :src="championIcon(as.upcomingBan.championId)" />
+            <LcuImage class="image" :src="championIconUrl(as.upcomingBan.championId)" />
             <span class="label">自动禁用</span>
           </div>
         </template>
@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
 import { Action } from '@shared/types/lcu/champ-select'
 import { NCard, NTimeline, NTimelineItem } from 'naive-ui'

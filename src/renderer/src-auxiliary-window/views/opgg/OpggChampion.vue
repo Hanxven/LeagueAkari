@@ -6,7 +6,7 @@
       <div class="card-area" v-if="info">
         <div class="card-content">
           <div class="first-line" :title="info.id === 893 ? '兔兔好可爱' : ''">
-            <LcuImage class="image" :src="championIcon(info.id)" />
+            <ChampionIcon ring round class="image" :champion-id="info.id" />
             <div class="name-tier">
               <div class="name">
                 {{ gameData.champions[info.id]?.name || '-' }}
@@ -65,7 +65,7 @@
             style="margin-right: 8px; /* a little adjustment for a better looking */"
             :rail-style="
               ({ checked }) => ({
-                backgroundColor: checked ? '#4ebc5d' : '#d75a5a'
+                backgroundColor: checked ? '#2a947d' : '#d75a5a'
               })
             "
           >
@@ -76,7 +76,7 @@
         <div class="card-content" v-if="!isCountersExpanded">
           <div class="counters" v-if="info && info.position">
             <div class="counter" v-for="c of info.position.counters">
-              <LcuImage class="image" :src="championIcon(c.champion_id)" />
+              <LcuImage class="image" :src="championIconUrl(c.champion_id)" />
               <div class="win-rate" title="胜率">
                 {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
               </div>
@@ -93,7 +93,7 @@
                 (a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1)
               )"
             >
-              <LcuImage class="image" :src="championIcon(c.champion_id)" />
+              <LcuImage class="image" :src="championIconUrl(c.champion_id)" />
               <div class="win-rate" title="胜率" :class="{ win: c.win / (c.play || 1) > 0.5 }">
                 {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
               </div>
@@ -222,7 +222,7 @@
           >
             <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
             <div class="image-name">
-              <LcuImage class="image" :src="championIcon(s.champion_id)" />
+              <LcuImage class="image" :src="championIconUrl(s.champion_id)" />
               <span>{{ gameData.champions[s.champion_id]?.name || s.champion_id }}</span>
             </div>
             <div class="desc">
@@ -593,12 +593,12 @@
 <script setup lang="ts">
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import AugmentDisplay from '@shared/renderer/components/widgets/AugmentDisplay.vue'
+import ChampionIcon from '@shared/renderer/components/widgets/ChampionIcon.vue'
 import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
 import { getMySelections, setMySummonerSpells } from '@shared/renderer/http-api/champ-select'
-import { chatSend } from '@shared/renderer/http-api/chat'
 import {
   getPerkInventory,
   getPerkPages,
@@ -606,7 +606,7 @@ import {
   putCurrentPage,
   putPage
 } from '@shared/renderer/http-api/perks'
-import { championIcon } from '@shared/renderer/modules/game-data'
+import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
