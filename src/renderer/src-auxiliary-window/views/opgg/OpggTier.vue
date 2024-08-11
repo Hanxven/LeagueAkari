@@ -35,7 +35,7 @@ import {
   NDataTable,
   NInput
 } from 'naive-ui'
-import { computed, h, ref, useCssModule, watchEffect } from 'vue'
+import { computed, h, ref, useCssModule } from 'vue'
 
 const props = defineProps<{
   championId?: number
@@ -389,10 +389,6 @@ const combinedColumns = computed(() => {
   }
 
   return columns
-})
-
-watchEffect(() => {
-  console.log('isLargeEnoughToShow', isLargeEnoughToShow.value)
 })
 
 const filterText = ref('')

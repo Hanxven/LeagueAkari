@@ -108,9 +108,17 @@
         v-if="data && data.data.summoner_spells && data.data.summoner_spells.length"
       >
         <div class="card-title">
-          召唤师技能<NCheckbox size="small" v-model:checked="isSummonerSpellsExpanded"
-            >展示全部</NCheckbox
-          >
+          召唤师技能
+          <div>
+            <NRadioGroup v-model:value="flashPosition" size="small" style="margin-right: 12px">
+              <NFlex style="gap: 4px;">
+                <NRadio value="d" title="闪现位置默认在 D">D 闪</NRadio>
+                <NRadio value="f" title="闪现位置默认在 F">F 闪</NRadio>
+                <NRadio value="auto" title="根据当前闪现的位置决定">自动</NRadio>
+              </NFlex>
+            </NRadioGroup>
+            <NCheckbox size="small" v-model:checked="isSummonerSpellsExpanded">展示全部</NCheckbox>
+          </div>
         </div>
         <div class="card-content">
           <div
@@ -599,6 +607,7 @@ import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
 import { getMySelections, setMySummonerSpells } from '@shared/renderer/http-api/champ-select'
+import { chatSend } from '@shared/renderer/http-api/chat'
 import {
   getPerkInventory,
   getPerkPages,
@@ -608,13 +617,18 @@ import {
 } from '@shared/renderer/http-api/perks'
 import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
+import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
+import { useLocalStorage } from '@vueuse/core'
 import {
   NButton,
   NCheckbox,
+  NFlex,
   NIcon,
+  NRadio,
+  NRadioGroup,
   NScrollbar,
   NSpin,
   NSwitch,
@@ -637,6 +651,7 @@ const props = defineProps<{
 
 const gameflow = useGameflowStore()
 const lc = useLcuConnectionStore()
+const chat = useChatStore()
 
 const positionTextMap = {
   TOP: '上单',
@@ -726,6 +741,8 @@ const isPrismItemsExpanded = ref(false)
 const isCoreItemsExpanded = ref(false)
 const isLastItemsExpanded = ref(false)
 
+const flashPosition = useLocalStorage('opgg-flash-position', 'auto')
+
 watchEffect(() => {
   if (!props.data) {
     isSummonerSpellsExpanded.value = false
@@ -762,15 +779,17 @@ const gameData = useGameDataStore()
 
 if (import.meta.env.DEV) {
   watchEffect(() => {
-    console.log('OPGG Component: ', props.data, props.champion, info.value)
+    console.debug('OPGG Component: ', props.data, props.champion, info.value)
   })
 
   watchEffect(() => {
-    console.log('OPGG Component: Info', info.value)
+    console.debug('OPGG Component: Info', info.value)
   })
 }
 
 const message = useMessage()
+
+const SUMMONER_SPELL_FLASH_ID = 4
 
 const handleSetSummonerSpells = async (ids: number[]) => {
   try {
@@ -779,9 +798,24 @@ const handleSetSummonerSpells = async (ids: number[]) => {
     const [oldSpell1Id, oldSpell2Id] = [selection.spell1Id, selection.spell2Id]
     let [newSpell1Id, newSpell2Id] = ids
 
-    // 需要尽可能保持原有的技能位置, 俗话说的好, D 闪都是白银, 我们要避免成为白银——如果你曾经是 F 闪玩家的话...
-    if (newSpell1Id === oldSpell2Id || newSpell2Id === oldSpell1Id) {
-      ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
+    // 有闪现的情况且不为 auto 时, 优先按照偏好闪现位置, 否则强制按照 auto
+    if (
+      flashPosition.value !== 'auto' &&
+      (newSpell1Id === SUMMONER_SPELL_FLASH_ID || newSpell2Id === SUMMONER_SPELL_FLASH_ID)
+    ) {
+      if (newSpell2Id === SUMMONER_SPELL_FLASH_ID) {
+        if (flashPosition.value === 'd') {
+          ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
+        }
+      } else if (newSpell1Id === SUMMONER_SPELL_FLASH_ID) {
+        if (flashPosition.value === 'f') {
+          ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
+        }
+      }
+    } else {
+      if (newSpell1Id === oldSpell2Id || newSpell2Id === oldSpell1Id) {
+        ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
+      }
     }
 
     await setMySummonerSpells({
@@ -789,6 +823,14 @@ const handleSetSummonerSpells = async (ids: number[]) => {
       spell2Id: newSpell2Id
     })
     message.success('请求已发送')
+
+    if (chat.conversations.championSelect) {
+      chatSend(
+        chat.conversations.championSelect.id,
+        `[League Akari] 已设置召唤师技能: ${gameData.summonerSpells[newSpell1Id]?.name} | ${gameData.summonerSpells[newSpell2Id]?.name}`,
+        'celebration'
+      )
+    }
   } catch (error) {
     console.warn(error)
     message.warning(`设置召唤师技能失败: ${(error as any).message}`)
@@ -804,10 +846,12 @@ const handleSetRunes = async (r: {
 }) => {
   try {
     const inventory = (await getPerkInventory()).data
+    let addedNew = false
+    const positionName = props.position ? positionTextMap[props.position.toUpperCase()] || '' : ''
 
     if (inventory.canAddCustomPage) {
       const { data: added } = await postPerkPage({
-        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}`,
+        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
         isEditable: true,
         primaryStyleId: r.primary_page_id.toString()
       })
@@ -815,12 +859,13 @@ const handleSetRunes = async (r: {
         id: added.id,
         isRecommendationOverride: false,
         isTemporary: false,
-        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}`,
+        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
         primaryStyleId: r.primary_page_id,
         selectedPerkIds: [...r.primary_rune_ids, ...r.secondary_rune_ids, ...r.stat_mod_ids],
         subStyleId: r.secondary_page_id
       })
       await putCurrentPage(added.id)
+      addedNew = true
     } else {
       const pages = (await getPerkPages()).data
       if (!pages.length) {
@@ -832,7 +877,7 @@ const handleSetRunes = async (r: {
         id: page1.id,
         isRecommendationOverride: false,
         isTemporary: false,
-        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}`,
+        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
         primaryStyleId: r.primary_page_id,
         selectedPerkIds: [...r.primary_rune_ids, ...r.secondary_rune_ids, ...r.stat_mod_ids],
         subStyleId: r.secondary_page_id
@@ -841,6 +886,14 @@ const handleSetRunes = async (r: {
     }
 
     message.success('请求已发送')
+
+    if (chat.conversations.championSelect) {
+      chatSend(
+        chat.conversations.championSelect.id,
+        `[League Akari] 已${addedNew ? '添加' : '替换'}符文页: ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+        'celebration'
+      )
+    }
   } catch (error) {
     console.warn(error)
     message.warning(`设置符文配法失败: ${(error as any).message}`)

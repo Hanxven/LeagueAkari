@@ -164,6 +164,16 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       return 'hide'
     })
 
+    const auxWindowOpggShowTiming = computed(() => {
+      switch (this._lcu.gameflow.phase) {
+        case 'ChampSelect':
+          return 'show'
+      }
+
+      return 'normal'
+    })
+
+    // normally show & hide
     this.autoDisposeReaction(
       () => auxWindowIndicatorShowTiming.get(),
       (timing) => {
@@ -175,6 +185,20 @@ export class AuxWindowModule extends MobxBasedBasicModule {
           this.showWindow()
         } else {
           this.hideWindow()
+        }
+      }
+    )
+
+    // shows only in champ select and never hides
+    this.autoDisposeReaction(
+      () => auxWindowOpggShowTiming.get(),
+      (timing) => {
+        if (this.state.currentFunctionality !== 'opgg') {
+          return
+        }
+
+        if (timing === 'show') {
+          this.showWindow()
         }
       }
     )
