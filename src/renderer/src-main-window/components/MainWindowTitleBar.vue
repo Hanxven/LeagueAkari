@@ -130,6 +130,14 @@
     </div>
 
     <div class="traffic">
+      <div
+        v-if="aux.settings.enabled"
+        title="小窗口"
+        class="traffic-button minimize"
+        @click="handleShowAuxWindow"
+      >
+        <NIcon><WindowNew20FilledIcon /></NIcon>
+      </div>
       <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
         <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
       </div>
@@ -139,7 +147,9 @@
         @click="handleMaximize"
       >
         <NIcon
-          ><Maximize20RegularIcon v-if="mw.windowState === 'normal'" /><CarbonIcon v-else />
+          ><Maximize20RegularIcon v-if="mw.windowState === 'normal'" /><WindowMultiple16FilledIcon
+            v-else
+          />
         </NIcon>
       </div>
       <div title="关闭" class="traffic-button close" @click="handleClose">
@@ -155,18 +165,19 @@ import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
 import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
+import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
+import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useLoginStore } from '@shared/renderer/modules/lcu-state-sync/login'
 import { mainWindowRendererModule as mwm } from '@shared/renderer/modules/main-window'
 import { useMainWindowStore } from '@shared/renderer/modules/main-window/store'
 import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
+import { Hourglass as HourglassIcon, Queued as QueuedIcon, Time as TimeIcon } from '@vicons/carbon'
 import {
-  Carbon as CarbonIcon,
-  Hourglass as HourglassIcon,
-  Queued as QueuedIcon,
-  Time as TimeIcon
-} from '@vicons/carbon'
+  WindowMultiple16Filled as WindowMultiple16FilledIcon,
+  WindowNew20Filled as WindowNew20FilledIcon
+} from '@vicons/fluent'
 import {
   DividerShort20Regular as DividerShort20RegularIcon,
   Maximize20Regular as Maximize20RegularIcon
@@ -191,7 +202,7 @@ const mw = useMainWindowStore()
 const respawnTimer = useRespawnTimerStore()
 const autoGameflow = useAutoGameflowStore()
 const login = useLoginStore()
-const lc = useLcuConnectionStore()
+const aux = useAuxiliaryWindowStore()
 const au = useAutoUpdateStore()
 
 const willAcceptIn = ref(0)
@@ -237,6 +248,10 @@ watch(
   },
   { immediate: true }
 )
+
+const handleShowAuxWindow = () => {
+  awm.show()
+}
 
 const handleMinimize = async () => {
   await mwm.minimize()

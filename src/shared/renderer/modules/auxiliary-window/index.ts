@@ -87,6 +87,10 @@ export class AuxWindowRendererModule extends StateSyncModule {
   getFunctionality() {
     return this.call('get-functionality')
   }
+
+  show() {
+    return this.call('show')
+  }
 }
 
 export const auxiliaryWindowRendererModule = new AuxWindowRendererModule()
