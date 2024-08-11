@@ -827,7 +827,7 @@ const handleSetSummonerSpells = async (ids: number[]) => {
     if (chat.conversations.championSelect) {
       chatSend(
         chat.conversations.championSelect.id,
-        `[League Akari] 已设置召唤师技能: ${gameData.summonerSpells[newSpell1Id]?.name} | ${gameData.summonerSpells[newSpell2Id]?.name}`,
+        `[League Akari] 已设置召唤师技能: [OP.GG] ${gameData.summonerSpells[newSpell1Id]?.name} | ${gameData.summonerSpells[newSpell2Id]?.name}`,
         'celebration'
       )
     }
@@ -890,7 +890,7 @@ const handleSetRunes = async (r: {
     if (chat.conversations.championSelect) {
       chatSend(
         chat.conversations.championSelect.id,
-        `[League Akari] 已${addedNew ? '添加' : '替换'}符文页: ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+        `[League Akari] 已${addedNew ? '添加' : '替换'}符文页: [OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
         'celebration'
       )
     }

@@ -2,7 +2,7 @@ import { GtimgHeroListJs, Hero } from '@shared/external-data-source/gtimg'
 import { ChampBalanceMapV1 } from '@shared/external-data-source/normalized/champ-balance'
 import { AvailableServersMap } from '@shared/external-data-source/sgp'
 import { defineStore } from 'pinia'
-import { computed, shallowRef, watchEffect } from 'vue'
+import { computed, shallowRef } from 'vue'
 
 export const useExternalDataSourceStore = defineStore('module:external-data-source', () => {
   const balanceData = shallowRef<{
@@ -29,10 +29,6 @@ export const useExternalDataSourceStore = defineStore('module:external-data-sour
     } catch (error) {
       return {}
     }
-  })
-
-  watchEffect(() => {
-    console.log('heroListMap', heroListMap.value)
   })
 
   const sgpAvailability = shallowRef({
