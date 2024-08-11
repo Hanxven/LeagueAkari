@@ -75,7 +75,12 @@
         </div>
         <div class="card-content" v-if="!isCountersExpanded">
           <div class="counters" v-if="info && info.position">
-            <div class="counter" v-for="c of info.position.counters">
+            <div
+              class="counter"
+              v-for="c of info.position.counters"
+              :key="c.champion_id"
+              @click="() => emits('showChampion', c.champion_id)"
+            >
               <LcuImage class="image" :src="championIconUrl(c.champion_id)" />
               <div class="win-rate" title="胜率">
                 {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
@@ -89,9 +94,11 @@
           <div class="counters" v-if="data && data.data.counters && data.data.counters.length">
             <div
               class="counter"
+              @click="() => emits('showChampion', c.champion_id)"
               v-for="c of data.data.counters.toSorted(
                 (a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1)
               )"
+              :key="c.champion_id"
             >
               <LcuImage class="image" :src="championIconUrl(c.champion_id)" />
               <div class="win-rate" title="胜率" :class="{ win: c.win / (c.play || 1) > 0.5 }">
@@ -111,7 +118,7 @@
           召唤师技能
           <div>
             <NRadioGroup v-model:value="flashPosition" size="small" style="margin-right: 12px">
-              <NFlex style="gap: 4px;">
+              <NFlex style="gap: 4px">
                 <NRadio value="d" title="闪现位置默认在 D">D 闪</NRadio>
                 <NRadio value="f" title="闪现位置默认在 F">F 闪</NRadio>
                 <NRadio value="auto" title="根据当前闪现的位置决定">自动</NRadio>
@@ -229,7 +236,7 @@
             v-for="(s, i) of data.data.synergies.slice(0, isSynergiesExpanded ? Infinity : 4)"
           >
             <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
-            <div class="image-name">
+            <div class="image-name" @click="() => emits('showChampion', s.champion_id)">
               <LcuImage class="image" :src="championIconUrl(s.champion_id)" />
               <span>{{ gameData.champions[s.champion_id]?.name || s.champion_id }}</span>
             </div>
@@ -647,6 +654,10 @@ const props = defineProps<{
   loading?: boolean
   champion?: any
   data?: any
+}>()
+
+const emits = defineEmits<{
+  (e: 'showChampion', championId: number): void
 }>()
 
 const gameflow = useGameflowStore()
@@ -1159,6 +1170,12 @@ const handleSetRunes = async (r: {
     flex-direction: column;
     align-items: center;
     width: 46px;
+    cursor: pointer;
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: brightness(1.2);
+    }
 
     .image {
       width: 32px;
@@ -1348,6 +1365,12 @@ const handleSetRunes = async (r: {
     align-items: center;
     font-size: 12px;
     gap: 4px;
+    cursor: pointer;
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: brightness(1.2);
+    }
 
     .image {
       width: 24px;

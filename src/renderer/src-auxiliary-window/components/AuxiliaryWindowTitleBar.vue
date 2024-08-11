@@ -1,7 +1,12 @@
 <template>
   <div class="title-bar" :class="{ blurred: aw.focusState === 'blurred' }">
     <div class="text-area">
-      <div class="shortcut" v-if="!isInIndicatorView" @click="handleBackToIndicatorView">
+      <div
+        title="League Akari 的小窗口"
+        class="shortcut"
+        v-if="!isInIndicatorView"
+        @click="handleBackToIndicatorView"
+      >
         <NIcon class="shortcut-icon"><ArrowBackIosFilledIcon /></NIcon>
         <span class="shortcut-text">小窗</span>
       </div>
@@ -10,6 +15,7 @@
           class="shortcut"
           v-for="shortcut of shortcuts"
           :key="shortcut.routeName"
+          :title="shortcut.description"
           @click="() => router.replace({ name: shortcut.routeName })"
         >
           <span class="shortcut-text">{{ shortcut.label }}</span>
@@ -70,6 +76,7 @@ watchEffect(() => {
 const shortcuts = [
   {
     label: 'OP.GG',
+    description: '集成的 OP.GG',
     routeName: 'opgg'
   }
 ]

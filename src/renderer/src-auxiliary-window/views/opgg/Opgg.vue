@@ -89,6 +89,7 @@
       />
       <OpggChampion
         v-show="currentTab === 'champion'"
+        @show-champion="(id) => handleToChampion(id)"
         :data="champion"
         :champion="championItem"
         :loading="isLoading"
