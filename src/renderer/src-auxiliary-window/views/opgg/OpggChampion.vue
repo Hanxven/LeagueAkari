@@ -610,7 +610,14 @@
         >
           <span style="font-size: 13px">将当前装备导入到出装方案中</span>
           <div style="width: 76px">
-            <NButton size="tiny" type="primary" secondary @click="handleAddToItemSet">导入</NButton>
+            <NButton
+              size="tiny"
+              type="primary"
+              secondary
+              @click="handleAddToItemSet"
+              :disabled="lc.state !== 'connected'"
+              >导入</NButton
+            >
           </div>
         </div>
       </div>
