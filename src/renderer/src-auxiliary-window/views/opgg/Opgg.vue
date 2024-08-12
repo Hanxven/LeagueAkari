@@ -129,6 +129,7 @@ import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watchEffect }
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
+import { MODE_TEXT, POSITION_TEXT, REGION_TEXT, TIER_TEXT } from './text'
 
 const currentTab = ref('tier')
 const gameflow = useGameflowStore()
@@ -239,7 +240,7 @@ const loadVersionsData = async () => {
     }
 
     message.warning(`获取版本数据失败: ${(error as any).message}`)
-    console.error(error)
+    am.logger.warn(`[OP.GG] 获取版本数据失败: ${(error as any).message}`, error)
   } finally {
     isLoadingVersions.value = false
   }
@@ -266,8 +267,8 @@ const loadTierData = async () => {
       return
     }
 
-    message.warning(`获取数据失败: ${(error as any).message}`)
-    console.error(error)
+    message.warning(`获取 tier 数据失败: ${(error as any).message}`)
+    am.logger.warn(`[OP.GG] 获取 tier 数据失败: ${(error as any).message}`, error)
   } finally {
     isLoadingTier.value = false
   }
@@ -301,7 +302,7 @@ const loadChampionData = async () => {
     }
 
     message.warning(`获取英雄数据失败: ${(error as any).message}`)
-    console.error(error)
+    am.logger.warn(`[OP.GG] 获取英雄数据失败: ${(error as any).message}`, error)
   } finally {
     isLoadingChampion.value = false
   }
@@ -368,55 +369,55 @@ const championItem = computed(() => {
 })
 
 const modeOptions = [
-  { label: '排位', value: 'ranked' },
-  { label: '大乱斗', value: 'aram' },
-  { label: '斗魂竞技场', value: 'arena' },
-  { label: '极限闪击', value: 'nexus_blitz' },
-  { label: '无限火力', value: 'urf' }
+  { label: MODE_TEXT['ranked'], value: 'ranked' },
+  { label: MODE_TEXT['aram'], value: 'aram' },
+  { label: MODE_TEXT['arena'], value: 'arena' },
+  { label: MODE_TEXT['nexus_blitz'], value: 'nexus_blitz' },
+  { label: MODE_TEXT['urf'], value: 'urf' }
 ]
 
 const positionOptions = computed(() => [
-  { label: '上单', value: 'top' },
-  { label: '打野', value: 'jungle' },
-  { label: '中单', value: 'mid' },
-  { label: '下路', value: 'adc' },
-  { label: '辅助', value: 'support' },
-  { label: '无', value: 'none', disabled: mode.value === 'ranked' }
+  { label: POSITION_TEXT['top'], value: 'top' },
+  { label: POSITION_TEXT['jungle'], value: 'jungle' },
+  { label: POSITION_TEXT['mid'], value: 'mid' },
+  { label: POSITION_TEXT['adc'], value: 'adc' },
+  { label: POSITION_TEXT['support'], value: 'support' },
+  { label: POSITION_TEXT['none'], value: 'none', disabled: mode.value === 'ranked' }
 ])
 
 const regionOptions = [
-  { label: '全球', value: 'global' },
-  { label: '北美', value: 'na' },
-  { label: '欧洲西', value: 'euw' },
-  { label: '韩国', value: 'kr' },
-  { label: '巴西', value: 'br' },
-  { label: '欧洲东北', value: 'eune' },
-  { label: '日本', value: 'jp' },
-  { label: '拉丁美洲北', value: 'lan' },
-  { label: '拉丁美洲南', value: 'las' },
-  { label: '大洋洲', value: 'oce' },
-  { label: '土耳其', value: 'tr' },
-  { label: '俄罗斯', value: 'ru' },
-  { label: '新加坡', value: 'sg' },
-  { label: '印尼', value: 'id' },
-  { label: '菲律宾', value: 'ph' },
-  { label: '泰国', value: 'th' },
-  { label: '越南', value: 'vn' },
-  { label: '台湾', value: 'tw' },
-  { label: '中东', value: 'me' }
+  { label: REGION_TEXT['global'], value: 'global' },
+  { label: REGION_TEXT['na'], value: 'na' },
+  { label: REGION_TEXT['euw'], value: 'euw' },
+  { label: REGION_TEXT['kr'], value: 'kr' },
+  { label: REGION_TEXT['br'], value: 'br' },
+  { label: REGION_TEXT['eune'], value: 'eune' },
+  { label: REGION_TEXT['jp'], value: 'jp' },
+  { label: REGION_TEXT['lan'], value: 'lan' },
+  { label: REGION_TEXT['las'], value: 'las' },
+  { label: REGION_TEXT['oce'], value: 'oce' },
+  { label: REGION_TEXT['tr'], value: 'tr' },
+  { label: REGION_TEXT['ru'], value: 'ru' },
+  { label: REGION_TEXT['sg'], value: 'sg' },
+  { label: REGION_TEXT['id'], value: 'id' },
+  { label: REGION_TEXT['ph'], value: 'ph' },
+  { label: REGION_TEXT['th'], value: 'th' },
+  { label: REGION_TEXT['vn'], value: 'vn' },
+  { label: REGION_TEXT['tw'], value: 'tw' },
+  { label: REGION_TEXT['me'], value: 'me' }
 ]
 
 const tierOptions = [
-  { label: '全部段位', value: 'all' },
-  { label: '黄金 -', value: 'ibsg' },
-  { label: '黄金 +', value: 'gold_plus' },
-  { label: '铂金 +', value: 'platinum_plus' },
-  { label: '翡翠 +', value: 'emerald_plus' },
-  { label: '钻石 +', value: 'diamond_plus' },
-  { label: '大师', value: 'master' },
-  { label: '大师 +', value: 'master_plus' },
-  { label: '宗师', value: 'grandmaster' },
-  { label: '王者', value: 'challenger' }
+  { label: TIER_TEXT['all'], value: 'all' },
+  { label: TIER_TEXT['ibsg'], value: 'ibsg' },
+  { label: TIER_TEXT['gold_plus'], value: 'gold_plus' },
+  { label: TIER_TEXT['platinum_plus'], value: 'platinum_plus' },
+  { label: TIER_TEXT['emerald_plus'], value: 'emerald_plus' },
+  { label: TIER_TEXT['diamond_plus'], value: 'diamond_plus' },
+  { label: TIER_TEXT['master'], value: 'master' },
+  { label: TIER_TEXT['master_plus'], value: 'master_plus' },
+  { label: TIER_TEXT['grandmaster'], value: 'grandmaster' },
+  { label: TIER_TEXT['challenger'], value: 'challenger' }
 ]
 
 const versionOptions = computed(() => {
@@ -448,7 +449,7 @@ const automation = useStableComputed(() => {
 
 watchDebounced(
   automation,
-  (atm) => {
+  async (atm) => {
     if (!atm) {
       return
     }
@@ -493,6 +494,8 @@ watchDebounced(
         mode.value = 'urf'
         break
     }
+
+    await loadAll()
 
     // 排除 PVE 模式的英雄
     if (atm.championId && !maybePveChampion(atm.championId)) {

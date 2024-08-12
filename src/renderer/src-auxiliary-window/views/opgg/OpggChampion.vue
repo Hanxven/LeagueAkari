@@ -15,7 +15,7 @@
                 {{ tierText }}
               </div>
               <div class="position" v-if="props.position && props.position !== 'none'">
-                {{ positionTextMap[props.position.toUpperCase()] || props.position }}
+                {{ POSITION_TEXT[props.position] || props.position }}
               </div>
             </div>
             <div class="prop-groups">
@@ -601,6 +601,19 @@
           </div>
         </div>
       </div>
+      <!-- inline styled :( -->
+      <div class="card-area" v-if="isAbleToAddToItemSet">
+        <div class="card-title">导入到配装方案</div>
+        <div
+          class="card-content"
+          style="display: flex; align-items: center; justify-content: space-between; height: 38px"
+        >
+          <span style="font-size: 13px">将当前装备导入到出装方案中</span>
+          <div style="width: 76px">
+            <NButton size="tiny" type="primary" secondary @click="handleAddToItemSet">导入</NButton>
+          </div>
+        </div>
+      </div>
     </NScrollbar>
   </div>
 </template>
@@ -615,6 +628,7 @@ import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDispl
 import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
 import { getMySelections, setMySummonerSpells } from '@shared/renderer/http-api/champ-select'
 import { chatSend } from '@shared/renderer/http-api/chat'
+import { getItemSets, putItemSets } from '@shared/renderer/http-api/item-sets'
 import {
   getPerkInventory,
   getPerkPages,
@@ -622,11 +636,13 @@ import {
   putCurrentPage,
   putPage
 } from '@shared/renderer/http-api/perks'
+import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
 import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
 import { useLocalStorage } from '@vueuse/core'
 import {
@@ -644,6 +660,8 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
+
+import { MODE_TEXT, POSITION_TEXT, TIER_TEXT } from './text'
 
 const props = defineProps<{
   region?: string
@@ -663,14 +681,6 @@ const emits = defineEmits<{
 const gameflow = useGameflowStore()
 const lc = useLcuConnectionStore()
 const chat = useChatStore()
-
-const positionTextMap = {
-  TOP: '上单',
-  JUNGLE: '打野',
-  MID: '中单',
-  ADC: '下路',
-  SUPPORT: '辅助'
-}
 
 const info = computed(() => {
   if (!props.champion) {
@@ -840,10 +850,10 @@ const handleSetSummonerSpells = async (ids: number[]) => {
         chat.conversations.championSelect.id,
         `[League Akari] 已设置召唤师技能: [OP.GG] ${gameData.summonerSpells[newSpell1Id]?.name} | ${gameData.summonerSpells[newSpell2Id]?.name}`,
         'celebration'
-      )
+      ).catch(() => {})
     }
   } catch (error) {
-    console.warn(error)
+    am.logger.warn(`[OP.GG] 设置召唤师技能失败: ${(error as any).message}`, error)
     message.warning(`设置召唤师技能失败: ${(error as any).message}`)
   }
 }
@@ -858,7 +868,8 @@ const handleSetRunes = async (r: {
   try {
     const inventory = (await getPerkInventory()).data
     let addedNew = false
-    const positionName = props.position ? positionTextMap[props.position.toUpperCase()] || '' : ''
+    const positionName =
+      props.position && props.position !== 'none' ? POSITION_TEXT[props.position] || '' : ''
 
     if (inventory.canAddCustomPage) {
       const { data: added } = await postPerkPage({
@@ -906,8 +917,183 @@ const handleSetRunes = async (r: {
       )
     }
   } catch (error) {
-    console.warn(error)
+    am.logger.warn(`[OP.GG] 设置符文配法失败: ${(error as any).message}`, error)
     message.warning(`设置符文配法失败: ${(error as any).message}`)
+  }
+}
+
+const isAbleToAddToItemSet = computed(() => {
+  if (!props.data) {
+    return false
+  }
+
+  let result = false
+
+  if (props.data.data.boots && props.data.data.boots.length) {
+    result = true
+  }
+
+  if (props.data.data.starter_items && props.data.data.starter_items.length) {
+    result = true
+  }
+
+  if (props.data.data.core_items && props.data.data.core_items.length) {
+    result = true
+  }
+
+  if (props.data.data.last_items && props.data.data.last_items.length) {
+    result = true
+  }
+
+  if (props.data.data.prism_items && props.data.data.prism_items.length) {
+    result = true
+  }
+
+  return result
+})
+
+// 防止添加一大堆重复内容
+const toItemSetsUid = (traits: {
+  championId: number
+  mode?: string
+  region?: string
+  tier?: number
+  position?: string
+  version?: string
+}) => {
+  return `akari1-${traits.championId}-${traits.mode || '_'}-${traits.region || '_'}-${traits.tier || '_'}-${traits.position || '_'}-${traits.version || '_'}`
+}
+
+// 11 - SR, 12 - HA, 30 - RoW, 21 - NB
+const mapIds = {
+  ranked: 11,
+  aram: 12,
+  arena: 30,
+  nexus_blitz: 21,
+  urf: 11
+}
+
+const summoner = useSummonerStore()
+const handleAddToItemSet = async () => {
+  if (!props.data) {
+    return
+  }
+
+  try {
+    const itemGroups: Array<{ title: string; items: number[] }> = []
+    const positionName =
+      props.position && props.position !== 'none' ? POSITION_TEXT[props.position] || '' : ''
+
+    const newUid = toItemSetsUid({
+      championId: props.champion.id,
+      mode: props.mode,
+      region: props.region,
+      tier: info.value?.tier,
+      position: props.position,
+      version: props.version
+    })
+
+    const { itemSets: previousItemSets } = (await getItemSets(summoner.me?.accountId)).data
+
+    const index = previousItemSets.findIndex((i) => i.uid === newUid)
+    if (index !== -1) {
+      previousItemSets.splice(index, 1)
+    }
+
+    if (props.data.data.starter_items && props.data.data.starter_items.length) {
+      props.data.data.starter_items.slice(0, 3).forEach((s: any, i: number) => {
+        itemGroups.push({
+          title: `初始装备 #${i + 1} | 出场率 ${(s.pick_rate * 100).toFixed(2)}%`,
+          items: s.ids
+        })
+      })
+    }
+
+    if (props.data.data.boots && props.data.data.boots.length) {
+      itemGroups.push({
+        title: `鞋子 (按出场率排序)`,
+        items: props.data.data.boots.reduce((acc: number[], cur: any) => {
+          acc.push(...cur.ids)
+          return acc
+        }, [])
+      })
+    }
+
+    if (props.data.data.prism_items && props.data.data.prism_items.length) {
+      itemGroups.push({
+        title: `棱彩阶装备 (按出场率排序)`,
+        items: props.data.data.prism_items.reduce((acc: number[], cur: any) => {
+          acc.push(...cur.ids)
+          return acc
+        }, [])
+      })
+    }
+
+    if (props.data.data.core_items && props.data.data.core_items.length) {
+      props.data.data.core_items.slice(0, 4).forEach((s: any, i: number) => {
+        itemGroups.push({
+          title: `核心装备 #${i + 1} | 出场率 ${(s.pick_rate * 100).toFixed(2)}%`,
+          items: s.ids
+        })
+      })
+    }
+
+    if (props.data.data.last_items && props.data.data.last_items.length) {
+      itemGroups.push({
+        title: `最后一件 (按出场率排序)`,
+        items: props.data.data.last_items.reduce((acc: number[], cur: any) => {
+          acc.push(...cur.ids)
+          return acc
+        }, [])
+      })
+    }
+
+    await putItemSets(
+      [
+        {
+          uid: newUid,
+          title: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${props.mode === 'arena' || props.mode === 'nexus_blitz' ? ` ${MODE_TEXT[props.mode]}` : ''}`,
+          sortrank: 0,
+          type: 'custom',
+          map: 'any',
+          mode: 'any',
+          blocks: itemGroups.map((g) => ({
+            type: g.title,
+            items: g.items.map((i) => ({
+              id: i.toString(),
+              count: 1
+            }))
+          })),
+          associatedChampions: [props.champion.id],
+          associatedMaps:
+            props.mode === 'arena' || props.mode === 'nexus_blitz'
+              ? []
+              : [props.mode ? mapIds[props.mode] : mapIds['ranked']],
+          preferredItemSlots: []
+        },
+        ...previousItemSets
+      ],
+      summoner.me?.accountId
+    )
+
+    // normally will never reach here
+    if (!itemGroups.length) {
+      message.warning(`没有物品可以添加到物品集`)
+      return
+    }
+
+    message.success('请求已发送')
+
+    if (chat.conversations.championSelect) {
+      chatSend(
+        chat.conversations.championSelect.id,
+        `[League Akari] 已添加装备方案: [OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+        'celebration'
+      ).catch(() => {})
+    }
+  } catch (error) {
+    am.logger.warn(`[OP.GG] 添加到物品集失败: ${(error as any).message}`, error)
+    message.warning(`添加到装备方案失败: ${(error as any).message}`)
   }
 }
 </script>
