@@ -16,17 +16,6 @@
         </ControlItem>
         <ControlItem
           class="control-item-margin"
-          label="仅限同步自选模式"
-          label-description="仅当模式是同步自选模式时生效。这些模式通常需要所有玩家同时选择英雄，如匹配模式"
-        >
-          <NSwitch
-            @update:value="(v) => asm.setOnlySimulMode(v)"
-            :value="as.settings.onlySimulMode"
-            size="small"
-          ></NSwitch>
-        </ControlItem>
-        <ControlItem
-          class="control-item-margin"
           label="提前预选"
           label-description="预选即将自动选用的英雄"
         >

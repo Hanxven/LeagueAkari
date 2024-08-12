@@ -1,10 +1,11 @@
 import { is } from '@electron-toolkit/utils'
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
 import { BrowserWindow, Rectangle, screen, shell } from 'electron'
-import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
+import { comparer, computed, makeAutoObservable, observable } from 'mobx'
 import { join } from 'path'
 
 import icon from '../../../../resources/LA_ICON.ico?asset'
+import opggIcon from '../../../../resources/OPGG_ICON.ico?asset'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { AppModule } from './app'
 import { LcuConnectionModule } from './lcu-connection'
@@ -63,7 +64,7 @@ class AuxiliaryWindowState {
   /**
    * 根据小窗充当的功能，记录功能窗口的位置
    */
-  functionalityBounds: Record<string, Rectangle> = {}
+  functionalityBounds: Record<string, Partial<Rectangle>> = {}
 
   /**
    * 小窗口当前充当的功能
@@ -103,14 +104,16 @@ class AuxiliaryWindowState {
     this.currentFunctionality = f
   }
 
-  setFunctionalityBounds(fb: Record<string, Rectangle>) {
+  setFunctionalityBounds(fb: Record<string, Partial<Rectangle>>) {
     this.functionalityBounds = fb
   }
 }
 
 export class AuxWindowModule extends MobxBasedBasicModule {
-  public state = new AuxiliaryWindowState()
+  static WINDOW_OPGG_DEFAULT_WIDTH = 526
+  static WINDOW_OPGG_DEFAULT_HEIGHT = 720
 
+  public state = new AuxiliaryWindowState()
   private _lcm: LcuConnectionModule
   private _lcu: LcuSyncModule
   private _logModule: LogModule
@@ -361,19 +364,19 @@ export class AuxWindowModule extends MobxBasedBasicModule {
         )
         this._w?.setTitle('Mini Akari')
         this._w?.setBounds(bounds)
-
+        this._w?.setIcon(icon)
         break
       case 'opgg':
         if (bounds) {
           bounds = {
             ...bounds,
-            width: Math.max(bounds.width || 0, AuxWindowModule.WINDOW_OPGG_BASE_WIDTH),
-            height: Math.max(bounds.height || 0, AuxWindowModule.WINDOW_OPGG_BASE_HEIGHT)
+            width: Math.max(bounds.width || 0, AuxWindowModule.WINDOW_OPGG_DEFAULT_WIDTH),
+            height: Math.max(bounds.height || 0, AuxWindowModule.WINDOW_OPGG_DEFAULT_HEIGHT)
           }
         } else {
           bounds = {
-            width: AuxWindowModule.WINDOW_OPGG_BASE_WIDTH,
-            height: AuxWindowModule.WINDOW_OPGG_BASE_HEIGHT
+            width: AuxWindowModule.WINDOW_OPGG_DEFAULT_WIDTH,
+            height: AuxWindowModule.WINDOW_OPGG_DEFAULT_HEIGHT
           }
         }
 
@@ -383,6 +386,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
         )
         this._w?.setTitle('OP.GG Akari')
         this._w?.setBounds(bounds)
+        this._w?.setIcon(opggIcon)
         break
       default:
         this._w?.setTitle('Vanished Akari')

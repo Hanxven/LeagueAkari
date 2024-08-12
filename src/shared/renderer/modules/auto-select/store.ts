@@ -31,8 +31,6 @@ export const useAutoSelectStore = defineStore('module:auto-select', () => {
   const settings = reactive({
     normalModeEnabled: false,
 
-    onlySimulMode: true,
-
     expectedChampions: markRaw({
       top: [],
       middle: [],

@@ -5,7 +5,6 @@ import { lcuSyncModule as lcu } from '../lcu-state-sync'
 
 class AutoSelectSettings {
   normalModeEnabled: boolean = false
-  onlySimulMode: boolean = false
   expectedChampions: Record<string, number[]> = {
     top: [],
     jungle: [],
@@ -33,10 +32,6 @@ class AutoSelectSettings {
 
   setNormalModeEnabled(value: boolean) {
     this.normalModeEnabled = value
-  }
-
-  setOnlySimulMode(value: boolean) {
-    this.onlySimulMode = value
   }
 
   setExpectedChampions(value: Record<string, number[]>) {
@@ -147,10 +142,6 @@ export class AutoSelectState {
     const a = this.champSelectActionInfo
 
     if (!a || !a.pick.length) {
-      return null
-    }
-
-    if (!a.session.hasSimultaneousPicks && this.settings.onlySimulMode) {
       return null
     }
 

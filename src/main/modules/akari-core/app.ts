@@ -477,11 +477,6 @@ export class AppModule extends MobxBasedBasicModule {
       (s) => (this._asm.state.settings.completed = s)
     )
     await _toNewSettings(
-      'autoSelect.onlySimulMode',
-      'auto-select/only-simul-mode',
-      (s) => (this._asm.state.settings.onlySimulMode = s)
-    )
-    await _toNewSettings(
       'autoSelect.grabDelay',
       'auto-select/grab-delay-seconds',
       (s) => (this._asm.state.settings.grabDelaySeconds = s)

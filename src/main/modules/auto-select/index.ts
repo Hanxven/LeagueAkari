@@ -158,26 +158,29 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     )
 
     // for logging only
-    const positionInfo = computed(() => {
-      if (!this.state.champSelectActionInfo) {
-        return null
-      }
+    const positionInfo = computed(
+      () => {
+        if (!this.state.champSelectActionInfo) {
+          return null
+        }
 
-      if (!this.state.settings.normalModeEnabled || !this.state.settings.banEnabled) {
-        return null
-      }
+        if (!this.state.settings.normalModeEnabled || !this.state.settings.banEnabled) {
+          return null
+        }
 
-      const position = this.state.champSelectActionInfo.memberMe.assignedPosition
+        const position = this.state.champSelectActionInfo.memberMe.assignedPosition
 
-      const championsBan = this.state.settings.bannedChampions
-      const championsPick = this.state.settings.expectedChampions
+        const championsBan = this.state.settings.bannedChampions
+        const championsPick = this.state.settings.expectedChampions
 
-      return {
-        position,
-        ban: championsBan,
-        pick: championsPick
-      }
-    }, { equals: comparer.structural })
+        return {
+          position,
+          ban: championsBan,
+          pick: championsPick
+        }
+      },
+      { equals: comparer.structural }
+    )
 
     this.autoDisposeReaction(
       () => positionInfo.get(),
@@ -411,12 +414,6 @@ export class AutoSelectModule extends MobxBasedBasicModule {
       'normal-mode-enabled',
       () => this.state.settings.normalModeEnabled,
       (s) => this.state.settings.setNormalModeEnabled(s)
-    )
-
-    this.simpleSettingSync(
-      'only-simul-mode',
-      () => this.state.settings.onlySimulMode,
-      (s) => this.state.settings.setOnlySimulMode(s)
     )
 
     this.simpleSettingSync(

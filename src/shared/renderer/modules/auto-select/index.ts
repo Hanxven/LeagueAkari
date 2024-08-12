@@ -23,7 +23,6 @@ export class AutoSelectRendererModule extends StateSyncModule {
     this.simpleSync('upcoming-grab', (s) => (store.upcomingGrab = s))
 
     this.simpleSync('settings/normal-mode-enabled', (s) => (store.settings.normalModeEnabled = s))
-    this.simpleSync('settings/only-simul-mode', (s) => (store.settings.onlySimulMode = s))
     this.simpleSync(
       'settings/expected-champions-multi',
       (s) => (store.settings.expectedChampions = markRaw(s))
@@ -53,10 +52,6 @@ export class AutoSelectRendererModule extends StateSyncModule {
 
   setNormalModeEnabled(value: boolean) {
     return this.call('set-setting/normal-mode-enabled', value)
-  }
-
-  setOnlySimulMode(value: boolean) {
-    return this.call('set-setting/only-simul-mode', value)
   }
 
   setExpectedChampions(value: Record<string, number[]>) {
