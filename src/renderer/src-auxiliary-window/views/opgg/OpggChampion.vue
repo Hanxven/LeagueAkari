@@ -566,7 +566,7 @@
       </div>
       <div class="card-area" v-if="data && data.data.starter_items && data.data.last_items.length">
         <div class="card-title">
-          最后一件<NCheckbox
+          装备<NCheckbox
             v-if="data.data.last_items.length > 8"
             size="small"
             v-model:checked="isLastItemsExpanded"
@@ -1047,7 +1047,7 @@ const handleAddToItemSet = async () => {
 
     if (props.data.data.last_items && props.data.data.last_items.length) {
       itemGroups.push({
-        title: `最后一件 (按出场率排序)`,
+        title: `装备 (按出场率排序)`,
         items: props.data.data.last_items.reduce((acc: number[], cur: any) => {
           acc.push(...cur.ids)
           return acc
