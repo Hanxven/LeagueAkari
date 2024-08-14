@@ -418,6 +418,26 @@
           </div>
         </div>
       </div>
+      <!-- inline styled :( -->
+      <div class="card-area" v-if="isAbleToAddToItemSet">
+        <div class="card-title">导入到配装方案</div>
+        <div
+          class="card-content"
+          style="display: flex; align-items: center; justify-content: space-between; height: 38px"
+        >
+          <span style="font-size: 13px">将当前所有装备导入到自定义出装方案中</span>
+          <div style="width: 76px; display: flex; justify-content: center">
+            <NButton
+              size="tiny"
+              type="primary"
+              secondary
+              @click="handleAddToItemSet"
+              :disabled="lc.state !== 'connected'"
+              >导入</NButton
+            >
+          </div>
+        </div>
+      </div>
       <div
         class="card-area"
         v-if="data && data.data.starter_items && data.data.starter_items.length"
@@ -598,26 +618,6 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- inline styled :( -->
-      <div class="card-area" v-if="isAbleToAddToItemSet">
-        <div class="card-title">导入到配装方案</div>
-        <div
-          class="card-content"
-          style="display: flex; align-items: center; justify-content: space-between; height: 38px"
-        >
-          <span style="font-size: 13px">将当前装备导入到出装方案中</span>
-          <div style="width: 76px">
-            <NButton
-              size="tiny"
-              type="primary"
-              secondary
-              @click="handleAddToItemSet"
-              :disabled="lc.state !== 'connected'"
-              >导入</NButton
-            >
           </div>
         </div>
       </div>
@@ -964,7 +964,7 @@ const toItemSetsUid = (traits: {
   championId: number
   mode?: string
   region?: string
-  tier?: number
+  tier?: string
   position?: string
   version?: string
 }) => {
@@ -995,7 +995,7 @@ const handleAddToItemSet = async () => {
       championId: props.champion.id,
       mode: props.mode,
       region: props.region,
-      tier: info.value?.tier,
+      tier: props.tier,
       position: props.position,
       version: props.version
     })

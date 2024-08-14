@@ -15,7 +15,12 @@
       </NButton>
       <NTabs class="tabs" v-model:value="currentTab" type="segment" size="small">
         <NTab title="梯队" name="tier" tab="梯队" />
-        <NTab title="英雄" name="champion" tab="英雄" :disabled="!championId" />
+        <NTab
+          title="英雄"
+          name="champion"
+          :tab="championId ? gameData.champions[championId]?.name || '无' : '无'"
+          :disabled="!championId"
+        />
       </NTabs>
     </div>
     <div class="filters">
@@ -120,6 +125,7 @@ import {
 import { useStableComputed } from '@shared/renderer/compositions/useStableComputed'
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
+import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { maybePveChampion } from '@shared/types/lcu/game-data'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
@@ -159,6 +165,8 @@ const renderLabel: SelectRenderLabel = (option) => {
     option.label as string
   )
 }
+
+const gameData = useGameDataStore()
 
 const championId = ref<number | null>(null)
 const mode = ref<ModeType>(savedPreferences.value.mode as ModeType)

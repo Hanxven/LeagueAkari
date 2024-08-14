@@ -1,4 +1,5 @@
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
+import { formatError } from '@shared/utils/errors'
 
 import { useAppStore } from './store'
 
@@ -84,15 +85,7 @@ export class AppRendererModule extends StateSyncModule {
   }
 
   private _stringifyError(data: any) {
-    if (data instanceof Error) {
-      return {
-        message: data.message,
-        stack: data.stack,
-        name: data.name
-      }
-    }
-
-    return data
+    return formatError(data)
   }
 
   get logger() {

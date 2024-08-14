@@ -222,28 +222,28 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
           this._lcu.chat.conversations.customGame.id,
           `[League Akari] 自动匹配已取消`,
           'celebration'
-        ).catch()
+        ).catch(() => {})
         return
       } else if (cancel === 'waiting-for-invitee') {
         chatSend(
           this._lcu.chat.conversations.customGame.id,
           `[League Akari] 自动匹配已取消，等待被邀请者`,
           'celebration'
-        ).catch()
+        ).catch(() => {})
         return
       } else if (cancel === 'not-the-leader') {
         chatSend(
           this._lcu.chat.conversations.customGame.id,
           `[League Akari] 自动匹配已取消，当前不是房间房主`,
           'celebration'
-        ).catch()
+        ).catch(() => {})
         return
       } else if (cancel === 'waiting-for-penalty-time') {
         chatSend(
           this._lcu.chat.conversations.customGame.id,
           `[League Akari] 自动匹配已取消，等待秒退计时器`,
           'celebration'
-        ).catch()
+        ).catch(() => {})
         return
       }
 
@@ -252,7 +252,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
         this._lcu.chat.conversations.customGame.id,
         `[League Akari] 将在 ${Math.abs(time).toFixed()} 秒后自动匹配`,
         'celebration'
-      ).catch()
+      ).catch(() => {})
     }
   }
 

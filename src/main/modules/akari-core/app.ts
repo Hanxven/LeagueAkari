@@ -212,19 +212,20 @@ export class AppModule extends MobxBasedBasicModule {
       return this._logModule.openLogDir()
     })
 
-    this.onCall('renderer-log', (level: string, message: string, data?: any) => {
+    // details 为字符串，已经在渲染进程被序列化了
+    this.onCall('renderer-log', (level: string, message: string, details?: string) => {
       switch (level) {
         case 'info':
-          this._rLogger.info(`${message} ${data ? JSON.stringify(data) : ''}`)
+          this._rLogger.info(`${message} ${details ? details : ''}`)
           break
         case 'warn':
-          this._rLogger.warn(`${message} ${data ? JSON.stringify(data) : ''}`)
+          this._rLogger.warn(`${message} ${details ? details : ''}`)
           break
         case 'error':
-          this._rLogger.error(`${message} ${data ? JSON.stringify(data) : ''}`)
+          this._rLogger.error(`${message} ${details ? details : ''}`)
           break
         case 'debug':
-          this._rLogger.debug(`${message} ${data ? JSON.stringify(data) : ''}`)
+          this._rLogger.debug(`${message} ${details ? details : ''}`)
           break
       }
     })

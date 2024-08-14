@@ -227,7 +227,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
           }
 
           if (texts.length) {
-            chatSend(id, `[League Akari] ${texts.join(', ')}`, 'celebration').catch()
+            chatSend(id, `[League Akari] ${texts.join(', ')}`, 'celebration').catch(() => {})
           }
         }
       }
