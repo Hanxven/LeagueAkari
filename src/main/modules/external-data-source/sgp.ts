@@ -466,12 +466,12 @@ export class SgpEds {
   }
 
   private _setupMethodCall() {
-    this._edsm.onCall('supported-sgp-servers', () => {
+    this._edsm.onCall('sgp/supported-sgp-servers', () => {
       return this._sgp.supportedSgpServers()
     })
 
     this._edsm.onCall(
-      'get-match-history-lcu-format',
+      'sgp/get-match-history-lcu-format',
       async (
         playerPuuid: string,
         start: number,
@@ -484,7 +484,7 @@ export class SgpEds {
     )
 
     this._edsm.onCall(
-      'get-match-history',
+      'sgp/get-match-history',
       async (
         playerPuuid: string,
         start: number,
@@ -496,15 +496,15 @@ export class SgpEds {
       }
     )
 
-    this._edsm.onCall('get-summoner', async (puuid: string, sgpServerId?: string) => {
+    this._edsm.onCall('sgp/get-summoner', async (puuid: string, sgpServerId?: string) => {
       return this.getSummoner(puuid, sgpServerId)
     })
 
-    this._edsm.onCall('get-summoner-lcu-format', async (puuid: string, sgpServerId?: string) => {
+    this._edsm.onCall('sgp/get-summoner-lcu-format', async (puuid: string, sgpServerId?: string) => {
       return this.getSummonerLcuFormat(puuid, sgpServerId)
     })
 
-    this._edsm.onCall('get-ranked-stats', async (puuid: string, sgpServerId?: string) => {
+    this._edsm.onCall('sgp/get-ranked-stats', async (puuid: string, sgpServerId?: string) => {
       return this.getRankedStats(puuid, sgpServerId)
     })
   }

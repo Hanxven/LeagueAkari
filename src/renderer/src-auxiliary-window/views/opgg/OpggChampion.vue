@@ -644,6 +644,7 @@ import {
   putPage
 } from '@shared/renderer/http-api/perks'
 import { appRendererModule as am } from '@shared/renderer/modules/app'
+import { externalDataSourceRendererModule as edsm } from '@shared/renderer/modules/external-data-source'
 import { championIconUrl } from '@shared/renderer/modules/game-data'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
 import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
@@ -960,6 +961,7 @@ const isAbleToAddToItemSet = computed(() => {
 })
 
 // 防止添加一大堆重复内容
+// akari1 用于标记为本软件生成的装备集
 const toItemSetsUid = (traits: {
   championId: number
   mode?: string
@@ -980,6 +982,9 @@ const mapIds = {
   urf: 11
 }
 
+// 写文件的方案还是通过 LCU API 的 custom
+const ADDING_STRATEGY: 'write-to-file' | 'lcu-api' = 'write-to-file'
+
 const summoner = useSummonerStore()
 const handleAddToItemSet = async () => {
   if (!props.data) {
@@ -999,13 +1004,6 @@ const handleAddToItemSet = async () => {
       position: props.position,
       version: props.version
     })
-
-    const { itemSets: previousItemSets } = (await getItemSets(summoner.me?.accountId)).data
-
-    const index = previousItemSets.findIndex((i) => i.uid === newUid)
-    if (index !== -1) {
-      previousItemSets.splice(index, 1)
-    }
 
     if (props.data.data.starter_items && props.data.data.starter_items.length) {
       props.data.data.starter_items.slice(0, 3).forEach((s: any, i: number) => {
@@ -1055,13 +1053,13 @@ const handleAddToItemSet = async () => {
       })
     }
 
-    await putItemSets(
-      [
+    if (ADDING_STRATEGY === 'write-to-file') {
+      await edsm.opgg.writeItemSetsToDisk([
         {
           uid: newUid,
           title: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${props.mode === 'arena' || props.mode === 'nexus_blitz' ? ` ${MODE_TEXT[props.mode]}` : ''}`,
           sortrank: 0,
-          type: 'custom',
+          type: 'global',
           map: 'any',
           mode: 'any',
           blocks: itemGroups.map((g) => ({
@@ -1071,25 +1069,68 @@ const handleAddToItemSet = async () => {
               count: 1
             }))
           })),
-          associatedChampions: [props.champion.id],
-          associatedMaps:
-            props.mode === 'arena' || props.mode === 'nexus_blitz'
-              ? []
-              : [props.mode ? mapIds[props.mode] : mapIds['ranked']],
+          associatedChampions: [],
+          associatedMaps: [],
           preferredItemSlots: []
-        },
-        ...previousItemSets
-      ],
-      summoner.me?.accountId
-    )
+        }
+      ])
 
-    // normally will never reach here
-    if (!itemGroups.length) {
-      message.warning(`没有物品可以添加到物品集`)
-      return
+      message.success('已写入到文件中')
+    } else {
+      const { itemSets: previousItemSets } = (await getItemSets(summoner.me?.accountId)).data
+
+      const index = previousItemSets.findIndex((i) => i.uid === newUid)
+      if (index !== -1) {
+        previousItemSets.splice(index, 1)
+      }
+
+      // 即使清空过多的由 akari 生成的装备集
+      if (previousItemSets.length > 16) {
+        const akariCount = previousItemSets.filter((i) => i.uid.startsWith('akari1')).length
+        let needToDelete = Math.min(previousItemSets.length - 16, akariCount)
+
+        for (let i = previousItemSets.length - 1; i >= 0; i--) {
+          if (previousItemSets[i].uid.startsWith('akari1')) {
+            previousItemSets.splice(i, 1)
+            needToDelete--
+          }
+
+          if (needToDelete === 0) {
+            break
+          }
+        }
+      }
+
+      await putItemSets(
+        [
+          {
+            uid: newUid,
+            title: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${props.mode === 'arena' || props.mode === 'nexus_blitz' ? ` ${MODE_TEXT[props.mode]}` : ''}`,
+            sortrank: 0,
+            type: 'custom',
+            map: 'any',
+            mode: 'any',
+            blocks: itemGroups.map((g) => ({
+              type: g.title,
+              items: g.items.map((i) => ({
+                id: i.toString(),
+                count: 1
+              }))
+            })),
+            associatedChampions: [props.champion.id],
+            associatedMaps:
+              props.mode === 'arena' || props.mode === 'nexus_blitz'
+                ? []
+                : [props.mode ? mapIds[props.mode] : mapIds['ranked']],
+            preferredItemSlots: []
+          },
+          ...previousItemSets
+        ],
+        summoner.me?.accountId
+      )
+
+      message.success('请求已发送')
     }
-
-    message.success('请求已发送')
 
     if (chat.conversations.championSelect) {
       chatSend(

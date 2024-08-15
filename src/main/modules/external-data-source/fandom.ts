@@ -67,7 +67,7 @@ export class BalanceEds {
   }
 
   private _setupStateSync() {
-    this._edsm.simpleSync('balance/data', () => this.state.data)
+    this._edsm.simpleSync('fandom/balance-data', () => this.state.data)
   }
 
   private _handleUpdateBalanceData() {

@@ -1,13 +1,6 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
-  "include": [
-    "electron.vite.config.*",
-    "src/main/**/*",
-    "src/preload/*",
-    "src/shared/**/*",
-    "src/shared/external-data-source/normalized/index.ts",
-    "champ-balance.ts"
-  ],
+  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/*", "src/shared/**/*"],
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["ESNext"],
