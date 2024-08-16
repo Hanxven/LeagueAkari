@@ -292,7 +292,6 @@ const emits = defineEmits<{
     justify-content: space-between;
     flex-shrink: 0;
     box-sizing: border-box;
-    border-right: 1px solid rgb(43, 43, 43);
 
     :deep(.n-menu-item) {
       --n-item-height: 32px;
@@ -320,11 +319,11 @@ const emits = defineEmits<{
         transition: all 0.3s ease;
 
         &:hover:not(.disabled) {
-          background-color: rgb(67, 67, 67);
+          background-color: rgba(255, 255, 255, 0.12);
         }
 
         &:active:not(.disabled) {
-          background-color: rgb(55, 55, 55);
+          background-color: rgba(255, 255, 255, 0.05);
         }
       }
 

@@ -708,7 +708,7 @@ defineExpose({
   right: 0;
   height: 64px;
   z-index: 1;
-  background-color: rgba(36, 36, 36, 0.8);
+  background-color: rgba(#202020, 0.8);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(8px);
 

@@ -1076,6 +1076,14 @@ const handleAddToItemSet = async () => {
       ])
 
       message.success('已写入到文件中')
+
+      if (chat.conversations.championSelect) {
+        chatSend(
+          chat.conversations.championSelect.id,
+          `[League Akari] 已写入到装备方案: [OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+          'celebration'
+        ).catch(() => {})
+      }
     } else {
       const { itemSets: previousItemSets } = (await getItemSets(summoner.me?.accountId)).data
 
@@ -1130,14 +1138,14 @@ const handleAddToItemSet = async () => {
       )
 
       message.success('请求已发送')
-    }
 
-    if (chat.conversations.championSelect) {
-      chatSend(
-        chat.conversations.championSelect.id,
-        `[League Akari] 已添加装备方案: [OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
-        'celebration'
-      ).catch(() => {})
+      if (chat.conversations.championSelect) {
+        chatSend(
+          chat.conversations.championSelect.id,
+          `[League Akari] 已添加装备方案: [OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+          'celebration'
+        ).catch(() => {})
+      }
     }
   } catch (error) {
     am.logger.warn(`[OP.GG] 添加到物品集失败: ${(error as any).message}`, error)

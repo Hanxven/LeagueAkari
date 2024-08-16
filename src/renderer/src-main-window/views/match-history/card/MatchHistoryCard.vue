@@ -82,30 +82,30 @@
           </div>
           <template v-if="game.gameMode === 'CHERRY' || game.gameMode === 'STRAWBERRY'">
             <div class="summoner-spells">
-              <AugmentDisplay :augment-id="self.participant.stats.playerAugment1" :size="24" />
-              <AugmentDisplay :augment-id="self.participant.stats.playerAugment2" :size="24" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment1" :size="22" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment2" :size="22" />
             </div>
             <div class="summoner-spells">
-              <AugmentDisplay :augment-id="self.participant.stats.playerAugment3" :size="24" />
-              <AugmentDisplay :augment-id="self.participant.stats.playerAugment4" :size="24" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment3" :size="22" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment4" :size="22" />
             </div>
             <div class="summoner-spells" v-if="game.gameMode === 'STRAWBERRY'">
-              <AugmentDisplay :augment-id="self.participant.stats.playerAugment5" :size="24" />
-              <AugmentDisplay :augment-id="self.participant.stats.playerAugment6" :size="24" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment5" :size="22" />
+              <AugmentDisplay :augment-id="self.participant.stats.playerAugment6" :size="22" />
             </div>
           </template>
           <template v-else>
             <div class="summoner-spells">
-              <SummonerSpellDisplay :spell-id="self.participant.spell1Id" :size="24" />
-              <SummonerSpellDisplay :spell-id="self.participant.spell2Id" :size="24" />
+              <SummonerSpellDisplay :spell-id="self.participant.spell1Id" :size="22" />
+              <SummonerSpellDisplay :spell-id="self.participant.spell2Id" :size="22" />
             </div>
             <div
               class="perks"
               v-if="self.participant.stats.perkPrimaryStyle && self.participant.stats.perkSubStyle"
             >
-              <PerkDisplay :perk-id="self.participant.stats.perk0" :size="24" />
+              <PerkDisplay :perk-id="self.participant.stats.perk0" :size="22" />
               <!-- It should be 'perkstyle', but I still use class name 'perk' here. -->
-              <PerkstyleDisplay :size="24" :perkstyle-id="self.participant.stats.perkSubStyle" />
+              <PerkstyleDisplay :size="22" :perkstyle-id="self.participant.stats.perkSubStyle" />
             </div>
           </template>
 
@@ -137,13 +137,13 @@
           </div>
         </div>
         <div class="items">
-          <ItemDisplay :size="24" :item-id="self.participant.stats.item0" />
-          <ItemDisplay :size="24" :item-id="self.participant.stats.item1" />
-          <ItemDisplay :size="24" :item-id="self.participant.stats.item2" />
-          <ItemDisplay :size="24" :item-id="self.participant.stats.item3" />
-          <ItemDisplay :size="24" :item-id="self.participant.stats.item4" />
-          <ItemDisplay :size="24" :item-id="self.participant.stats.item5" />
-          <ItemDisplay :size="24" is-trinket :item-id="self.participant.stats.item6" />
+          <ItemDisplay :size="22" :item-id="self.participant.stats.item0" />
+          <ItemDisplay :size="22" :item-id="self.participant.stats.item1" />
+          <ItemDisplay :size="22" :item-id="self.participant.stats.item2" />
+          <ItemDisplay :size="22" :item-id="self.participant.stats.item3" />
+          <ItemDisplay :size="22" :item-id="self.participant.stats.item4" />
+          <ItemDisplay :size="22" :item-id="self.participant.stats.item5" />
+          <ItemDisplay :size="22" is-trinket :item-id="self.participant.stats.item6" />
         </div>
       </div>
       <div class="summary" v-if="self.summary && game.gameMode !== 'STRAWBERRY'">
@@ -407,7 +407,7 @@ const composedResultClass = computed(() => {
 const formattedModeText = computed(() => {
   return props.game.gameMode === 'PRACTICETOOL'
     ? '训练模式'
-    : gameData.queues[props.game.queueId]?.name ?? props.game.queueId
+    : (gameData.queues[props.game.queueId]?.name ?? props.game.queueId)
 })
 
 const isModalShow = ref(false)
@@ -481,7 +481,7 @@ const emits = defineEmits<{
   padding: 0px 0px 0px 12px;
   border-radius: 4px;
   box-sizing: border-box;
-  background-color: rgb(45, 45, 45);
+  background-color: #28344e;
   width: 740px;
   height: 96px;
   overflow: hidden;
@@ -569,8 +569,8 @@ const emits = defineEmits<{
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 50px;
-    width: 24px;
+    height: 46px;
+    width: 22px;
     gap: 2px;
   }
 
@@ -750,6 +750,7 @@ const emits = defineEmits<{
 
 .win {
   border-left: 6px solid rgb(0, 105, 203);
+  background-color: rgb(30, 39, 58);
 
   .game {
     .mode {
@@ -766,12 +767,13 @@ const emits = defineEmits<{
   }
 
   .show-more {
-    background-color: rgb(0, 105, 203);
+    background-color: #2f436e;
   }
 }
 
 .lose {
   border-left: 6px solid rgb(158, 48, 1);
+  background-color: rgb(65, 39, 43);
 
   .game {
     .mode {
@@ -784,12 +786,13 @@ const emits = defineEmits<{
   }
 
   .show-more {
-    background-color: rgb(158, 48, 1);
+    background-color: rgb(112, 60, 71);
   }
 }
 
 .remake {
   border-left: 6px solid rgb(139, 139, 139);
+  background-color: rgb(54, 54, 54);
 
   .game {
     .mode {

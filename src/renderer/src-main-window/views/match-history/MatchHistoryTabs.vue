@@ -16,7 +16,7 @@
           :key="tab.id"
           :tab="tabNames[tab.id]"
           :name="tab.id"
-          :closable="tab.id !== summoner.me?.puuid"
+          :closable="tab.data.puuid !== summoner.me?.puuid"
           :draggable="true"
           @dragover.prevent
           @dragstart="() => handleDragStart(tab.id)"
@@ -354,7 +354,7 @@ const handleShowMenu = (e: PointerEvent, puuid: string) => {
   display: flex;
   max-width: 100%;
   z-index: 5;
-  border-bottom: 1px solid #2b2b2b;
+  // border-bottom: 1px solid #2b2b2b;
 
   :deep(.n-tabs-tab) {
     --n-tab-padding: 4px 8px;

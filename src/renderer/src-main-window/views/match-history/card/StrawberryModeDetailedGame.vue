@@ -218,8 +218,8 @@ table {
 
 .champion {
   position: relative;
-  height: 34px;
-  width: 34px;
+  height: 32px;
+  width: 32px;
 }
 
 .champion-icon {

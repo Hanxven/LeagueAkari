@@ -320,8 +320,8 @@ table {
 
 .champion {
   position: relative;
-  height: 40px;
-  width: 40px;
+  height: 32px;
+  width: 32px;
 }
 
 .champion-icon {

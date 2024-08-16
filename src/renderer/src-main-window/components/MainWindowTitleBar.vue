@@ -323,7 +323,7 @@ const autoUpdateTaskShow = useCompleteVisibility(autoUpdateTaskEl, titleBarItems
   position: relative;
   height: var(--title-bar-height);
   align-items: center;
-  background-color: rgb(31, 31, 31);
+  background-color: var(--background-color-primary);
   z-index: 100000000; // header must be on top
   -webkit-app-region: drag;
 }
