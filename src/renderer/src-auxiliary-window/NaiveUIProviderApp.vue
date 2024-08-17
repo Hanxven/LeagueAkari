@@ -3,8 +3,9 @@
     :theme-overrides="themeOverrides"
     :theme="darkTheme"
     :locale="zhCN"
+    abstract
+    inline-theme-disabled
     :date-locale="dateZhCN"
-    id="naive-ui-config-provider"
   >
     <NMessageProvider :container-style="{ top: 'calc(var(--title-bar-height) + 12px)' }">
       <NNotificationProvider placement="bottom-right">

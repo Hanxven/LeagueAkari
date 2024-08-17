@@ -118,7 +118,7 @@ import { summonerName } from '@shared/utils/name'
 import { rsoPlatformText } from '@shared/utils/rso-platforms'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
 import { NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
-import { computed, reactive, ref, watch, watchEffect } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
@@ -367,6 +367,10 @@ const handleShowMenu = (e: PointerEvent, puuid: string) => {
     --n-tab-gap: 2px;
   }
 
+  :deep(.n-tabs .n-tabs-nav.n-tabs-nav--card-type .n-tabs-tab.tab-outer) {
+    transition: background-color 0.3s;
+  }
+
   :deep(.n-tabs .n-tabs-nav.n-tabs-nav--card-type .n-tabs-tab.tab-outer:hover) {
     background-color: rgba(255, 255, 255, 0.075);
   }
@@ -385,7 +389,7 @@ const handleShowMenu = (e: PointerEvent, puuid: string) => {
   }
 
   .search-zone {
-    width: 100px;
+    width: 120px;
     vertical-align: bottom;
   }
 
@@ -396,20 +400,23 @@ const handleShowMenu = (e: PointerEvent, puuid: string) => {
     gap: 4px;
     box-sizing: border-box;
     font-size: 12px;
-    width: 100%;
-    height: 26px;
+    height: 22px;
     outline: none;
-    border-left: none;
-    border-right: none;
-    border-top: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
-    background-color: rgb(46, 46, 46);
+    border: none;
+    border-radius: 2px;
+    width: 108px;
+    background-color: rgba(255, 255, 255, 0.06);
+    margin: 2px auto;
     color: rgb(99, 226, 183);
     cursor: pointer;
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: rgb(67, 67, 67);
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    &:active {
+      background-color: rgba(255, 255, 255, 0.1);
     }
   }
 }

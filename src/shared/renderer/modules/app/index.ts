@@ -27,6 +27,7 @@ export class AppRendererModule extends StateSyncModule {
     this.simpleSync('settings/use-wmic', (s) => (store.settings.useWmic = s))
     this.simpleSync('settings/is-in-kyoko-mode', (s) => (store.settings.isInKyokoMode = s))
     this.simpleSync('is-administrator', (s) => (store.isAdministrator = s))
+    this.simpleSync('base-config', (s) => (store.baseConfig = s))
 
     this.getAppVersion().then((v) => (store.version = v))
   }
@@ -49,6 +50,10 @@ export class AppRendererModule extends StateSyncModule {
 
   setInKyokoMode(value: boolean) {
     return this.call('set-setting/is-in-kyoko-mode', value)
+  }
+
+  setDisableHardwareAcceleration(value: boolean) {
+    return this.call('base-config/disable-hardware-acceleration', value)
   }
 
   private async _migrateFromLocalStorage() {

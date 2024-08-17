@@ -263,6 +263,15 @@
             <div class="left-content-item" v-if="analysis.matchHistory">
               <div class="left-content-item-title">总览 (本页)</div>
               <div class="left-content-item-content">
+                <div class="stat-item" v-if="app.settings.isInKyokoMode" title="Akari's insight">
+                  <span class="stat-item-label">Akari Score</span>
+                  <span class="stat-item-content" :class="{ 'n-a': analysis.akariScore === null }">
+                    <template v-if="analysis.akariScore !== null">
+                      <LeagueAkariSpan bold :text="analysis.akariScore.total.toFixed(2)" />
+                    </template>
+                    <template v-else>N/A</template>
+                  </span>
+                </div>
                 <div class="stat-item">
                   <span class="stat-item-label">平均 KDA</span>
                   <span class="stat-item-content">{{
@@ -401,12 +410,18 @@
 <script setup lang="ts">
 import CopyableText from '@shared/renderer/components/CopyableText.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
+import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
+import { useAppStore } from '@shared/renderer/modules/app/store'
 import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
 import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
 import { championIconUrl, profileIconUrl } from '@shared/renderer/modules/game-data'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { laNotification } from '@shared/renderer/notification'
-import { analyzeMatchHistory, analyzeMatchHistoryPlayers } from '@shared/utils/analysis'
+import {
+  analyzeMatchHistory,
+  analyzeMatchHistoryPlayers,
+  calculateAkariScore
+} from '@shared/utils/analysis'
 import { summonerName } from '@shared/utils/name'
 import { Edit20Filled as EditIcon } from '@vicons/fluent'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
@@ -454,7 +469,8 @@ const analysis = computed(() => {
 
   return {
     matchHistory: matchHistory,
-    playerRelationship: players
+    playerRelationship: players,
+    akariScore: matchHistory ? calculateAkariScore(matchHistory) : null
   }
 })
 
@@ -466,6 +482,7 @@ const rightEl = ref()
 const mh = useMatchHistoryTabsStore()
 const cf = useCoreFunctionalityStore()
 const gameData = useGameDataStore()
+const app = useAppStore()
 
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
   mh.setMatchHistoryExpand(props.tab.id, gameId, expand)
@@ -589,7 +606,7 @@ const sgpTagOptions = computed(() => {
 const handleChangeSgpTag = async (queueFilter: number | string) => {
   const r = await mhm.fetchTabMatchHistory(
     props.tab.id,
-    props.tab.matchHistory.page,
+    1,
     props.tab.matchHistory.pageSize,
     queueFilter
   )
@@ -686,11 +703,11 @@ defineExpose({
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   border-radius: 4px;
-  background-color: #202020dd;
+  background-color: #202020;
   padding: 16px;
 
   .ranked {
-    background-color: #f4f4f420;
+    background-color: #f4f4f40e;
   }
 }
 
@@ -708,9 +725,9 @@ defineExpose({
   right: 0;
   height: 64px;
   z-index: 1;
-  background-color: rgba(#202020, 0.8);
+  background-color: rgba(#202020, 0.95);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
 
   .header-simplified-inner {
     display: flex;
@@ -938,6 +955,10 @@ defineExpose({
     font-size: 13px;
     color: #fff;
     text-align: right;
+
+    &.n-a {
+      filter: brightness(0.6);
+    }
   }
 
   .stat-item-content-champions {

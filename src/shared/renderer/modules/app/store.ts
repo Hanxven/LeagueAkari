@@ -1,6 +1,6 @@
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { defineStore } from 'pinia'
-import { VNode, reactive, ref } from 'vue'
+import { VNode, reactive, ref, shallowRef } from 'vue'
 
 export interface TitleBarTask {
   id: string // module id
@@ -20,6 +20,7 @@ export const useAppStore = defineStore('core:app', () => {
     closeStrategy: 'unset' as MainWindowCloseStrategy,
     isInKyokoMode: false
   })
+  const baseConfig = shallowRef<any | null>(null)
 
   const titleBarTasks = ref<TitleBarTask[]>([])
 
@@ -27,6 +28,7 @@ export const useAppStore = defineStore('core:app', () => {
     isAdministrator,
     version,
     settings,
-    titleBarTasks
+    titleBarTasks,
+    baseConfig
   }
 })

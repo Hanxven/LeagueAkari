@@ -98,6 +98,21 @@
         />
       </ControlItem>
     </NCard>
+    <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">其他</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="禁用硬件加速"
+        label-description="禁用硬件加速，可能会解决一些渲染问题，如字体模糊"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="app.baseConfig?.disableHardwareAcceleration ?? false"
+          @update:value="(val: boolean) => handleDisableHardwareAcceleration(val)"
+        />
+      </ControlItem>
+    </NCard>
   </NScrollbar>
 </template>
 
@@ -109,7 +124,7 @@ import { autoUpdateRendererModule as aum } from '@shared/renderer/modules/auto-u
 import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
 import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
 import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip } from 'naive-ui'
+import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip, useDialog } from 'naive-ui'
 
 const app = useAppStore()
 const lc = useLcuConnectionStore()
@@ -125,6 +140,19 @@ const updateDownloadSource = [
   { label: 'Gitee', value: 'gitee' },
   { label: 'Github', value: 'github' }
 ]
+
+const dialog = useDialog()
+const handleDisableHardwareAcceleration = (val: boolean) => {
+  dialog.warning({
+    title: `${val ? '启用' : '禁用'}硬件加速`,
+    content: '是否确认更改硬件加速设置？将重启应用以应用更改',
+    positiveText: '退出',
+    negativeText: '取消',
+    onPositiveClick: async () => {
+      await am.setDisableHardwareAcceleration(val)
+    }
+  })
+}
 </script>
 
 <style lang="less" scoped>

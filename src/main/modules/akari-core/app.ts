@@ -3,7 +3,9 @@ import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-m
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { AxiosRequestConfig } from 'axios'
 import { BrowserWindow, app, protocol, session, shell } from 'electron'
-import { makeAutoObservable, runInAction } from 'mobx'
+import { makeAutoObservable, observable, runInAction } from 'mobx'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { Readable } from 'node:stream'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
@@ -35,6 +37,11 @@ class AppSettings {
   closeStrategy: MainWindowCloseStrategy = 'unset'
 
   /**
+   * 禁用硬件加速
+   */
+  disableHardwareAcceleration: boolean = false
+
+  /**
    * 是否位于调试模式，更多不稳定功能将被启用
    */
   isInKyokoMode: boolean = false
@@ -55,6 +62,10 @@ class AppSettings {
     this.isInKyokoMode = b
   }
 
+  setDisableHardwareAcceleration(b: boolean) {
+    this.disableHardwareAcceleration = b
+  }
+
   constructor() {
     makeAutoObservable(this)
   }
@@ -67,8 +78,12 @@ export class AppState {
   ready: boolean = false
   isQuitting = false
 
+  baseConfig: Record<string, any> | null = null
+
   constructor() {
-    makeAutoObservable(this, {})
+    makeAutoObservable(this, {
+      baseConfig: observable.ref
+    })
   }
 
   setElevated(b: boolean) {
@@ -81,6 +96,10 @@ export class AppState {
 
   setQuitting(b: boolean) {
     this.isQuitting = b
+  }
+
+  setBaseConfig(config: Record<string, any> | null) {
+    this.baseConfig = config
   }
 }
 
@@ -195,6 +214,7 @@ export class AppModule extends MobxBasedBasicModule {
 
   private _setupStateSync() {
     this.simpleSync('is-administrator', () => this.state.isAdministrator)
+    this.simpleSync('base-config', () => this.state.baseConfig)
   }
 
   private _setupMethodCall() {
@@ -210,6 +230,14 @@ export class AppModule extends MobxBasedBasicModule {
 
     this.onCall('open-in-explorer/logs', () => {
       return this._logModule.openLogDir()
+    })
+
+    this.onCall('base-config/disable-hardware-acceleration', (b: boolean) => {
+      const config = this.state.baseConfig || {}
+      config.disableHardwareAcceleration = b
+      this.writeBaseConfig(config)
+      app.relaunch()
+      app.exit()
     })
 
     // details 为字符串，已经在渲染进程被序列化了
@@ -356,6 +384,34 @@ export class AppModule extends MobxBasedBasicModule {
         }
       }
     ])
+  }
+
+  readBaseConfig() {
+    const path = join(app.getPath('userData'), 'base-config.json')
+
+    if (!existsSync(path)) {
+      return null
+    }
+
+    try {
+      const jsonFile = readFileSync(path, 'utf-8')
+      const config = JSON.parse(jsonFile)
+
+      if (typeof config !== 'object') {
+        return null
+      }
+
+      this.state.setBaseConfig(config)
+      return config
+    } catch (error) {
+      return null
+    }
+  }
+
+  writeBaseConfig(config: Record<string, any>) {
+    const path = join(app.getPath('userData'), 'base-config.json')
+    const json = JSON.stringify(config)
+    writeFileSync(path, json, 'utf-8')
   }
 
   private async _migrateSettingsFromLegacyVersion(all: Record<string, string>) {

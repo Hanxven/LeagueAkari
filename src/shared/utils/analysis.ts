@@ -297,6 +297,7 @@ export interface MatchHistoryGamesAnalysis {
   // 补兵占比 (包括野怪和小兵)
   csShareToTop: number
   csShareOfTeam: number
+  csPerMinute: number
 
   // 经济占比
   goldShareToTop: number
@@ -342,6 +343,7 @@ export interface MatchHistoryGamesAnalysisSummary {
 
   averageCsShareToTop: number
   averageCsShareOfTeam: number
+  averageCsPerMinute: number
 
   averageGoldShareToTop: number
   averageGoldShareOfTeam: number
@@ -363,6 +365,7 @@ export interface MatchHistoryGamesAnalysisAll {
   games: Record<number, MatchHistoryGamesAnalysis>
   summary: MatchHistoryGamesAnalysisSummary
   champions: Record<number, MatchHistoryChampionAnalysis>
+  akariScore: AkariScore
 }
 
 /**
@@ -462,6 +465,9 @@ export function analyzeMatchHistory(
       // 补兵占比 (包括野怪和小兵)
       csShareToTop: 0,
       csShareOfTeam: 0,
+      csPerMinute:
+        (watashi.stats.totalMinionsKilled + watashi.stats.neutralMinionsKilled) /
+        (game.gameDuration / 60),
 
       // 经济占比
       goldShareToTop: 0,
@@ -711,6 +717,7 @@ export function analyzeMatchHistory(
 
     averageCsShareToTop: 0,
     averageCsShareOfTeam: 0,
+    averageCsPerMinute: 0,
 
     averageGoldShareToTop: 0,
     averageGoldShareOfTeam: 0,
@@ -752,6 +759,7 @@ export function analyzeMatchHistory(
 
   let totalCsShareToTop = 0
   let totalCsShareOfTeam = 0
+  let totalCsPerMinute = 0
 
   let totalGoldShareToTop = 0
   let totalGoldShareOfTeam = 0
@@ -792,6 +800,7 @@ export function analyzeMatchHistory(
 
     totalCsShareToTop += analysis.csShareToTop
     totalCsShareOfTeam += analysis.csShareOfTeam
+    totalCsPerMinute += analysis.csPerMinute
 
     totalGoldShareToTop += analysis.goldShareToTop
     totalGoldShareOfTeam += analysis.goldShareOfTeam
@@ -851,6 +860,7 @@ export function analyzeMatchHistory(
 
   summary.averageCsShareToTop = totalCsShareToTop / (gameAnalyses.length || 1)
   summary.averageCsShareOfTeam = totalCsShareOfTeam / (gameAnalyses.length || 1)
+  summary.averageCsPerMinute = totalCsPerMinute / (gameAnalyses.length || 1)
 
   summary.averageGoldShareToTop = totalGoldShareToTop / (gameAnalyses.length || 1)
   summary.averageGoldShareOfTeam = totalGoldShareOfTeam / (gameAnalyses.length || 1)
@@ -858,13 +868,15 @@ export function analyzeMatchHistory(
   return {
     games: gamesAnalysisMap,
     summary: summary,
-    champions: champions
+    champions: champions,
+    akariScore: calculateAkariScore({ games: gamesAnalysisMap, summary, champions })
   }
 }
 
 export interface MatchHistoryGamesAnalysisTeamSide {
   averageWinRate: number
   averageKda: number
+  averageAkariScore: number
 }
 
 export function analyzeTeamMatchHistory(
@@ -876,15 +888,58 @@ export function analyzeTeamMatchHistory(
 
   let totalWinRate = 0
   let totalKda = 0
+  let totalAkariScore = 0
 
   for (const analysis of analyses) {
     totalWinRate += analysis.summary.winRate
     totalKda += analysis.summary.averageKda
+    totalAkariScore += analysis.akariScore.total
   }
 
   return {
     averageWinRate: totalWinRate / analyses.length,
-    averageKda: totalKda / analyses.length
+    averageKda: totalKda / analyses.length,
+    averageAkariScore: totalAkariScore / analyses.length
+  }
+}
+
+export interface AkariScore {
+  kdaScore: number
+  winRateScore: number
+  dmgScore: number
+  dmgTakenScore: number
+  csScore: number
+  goldScore: number
+  participationScore: number
+  total: number
+}
+
+// 非卖品
+export function calculateAkariScore(analyses: {
+  games: Record<number, MatchHistoryGamesAnalysis>
+  summary: MatchHistoryGamesAnalysisSummary
+  champions: Record<number, MatchHistoryChampionAnalysis>
+}): AkariScore {
+  const kdaScore = Math.sqrt(analyses.summary.averageKda) * 0.68
+  const winRateScore = (analyses.summary.winRate - 0.5) * 16
+  const dmgScore = analyses.summary.averageDamageShareToTop * 10.0
+  const dmgTakenScore = analyses.summary.averageDamageTakenShareToTop * 6.0
+  const csScore =
+    analyses.summary.averageCsPerMinute *
+    Math.max(Math.min(0.04 * analyses.summary.averageCsPerMinute, 0.4), 0.1)
+  const goldScore = analyses.summary.averageGoldShareToTop * 4.0
+  const participationScore = analyses.summary.averageKillParticipationRate * 4
+
+  return {
+    kdaScore,
+    winRateScore,
+    dmgScore,
+    dmgTakenScore,
+    csScore,
+    goldScore,
+    participationScore,
+    total:
+      kdaScore + winRateScore + dmgScore + dmgTakenScore + csScore + goldScore + participationScore
   }
 }
 

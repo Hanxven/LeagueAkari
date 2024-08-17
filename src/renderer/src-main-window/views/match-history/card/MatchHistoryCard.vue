@@ -805,7 +805,7 @@ const emits = defineEmits<{
   }
 
   .show-more {
-    background-color: rgb(150, 150, 150);
+    background-color: rgb(121, 121, 121);
   }
 }
 

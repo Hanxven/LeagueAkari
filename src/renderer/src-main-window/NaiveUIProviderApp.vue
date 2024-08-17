@@ -4,7 +4,8 @@
     :theme="darkTheme"
     :locale="zhCN"
     :date-locale="dateZhCN"
-    id="naive-ui-config-provider"
+    abstract
+    inline-theme-disabled
   >
     <!-- 需要给一个相对于 Title Bar 的偏移量 -->
     <NMessageProvider :container-style="{ top: 'calc(var(--title-bar-height) + 12px)' }">
@@ -18,6 +19,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-ignore
 import {
   GlobalThemeOverrides,
   NConfigProvider,
@@ -44,5 +46,3 @@ const themeOverrides: GlobalThemeOverrides = {
   }
 }
 </script>
-
-<style></style>

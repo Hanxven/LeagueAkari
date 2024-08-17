@@ -34,6 +34,16 @@ if (!gotTheLock) {
 
 appModule.registerAkariProtocolAsPrivileged()
 
+const baseConfig = appModule.readBaseConfig()
+if (
+  baseConfig &&
+  baseConfig.disableHardwareAcceleration &&
+  baseConfig.disableHardwareAcceleration === true
+) {
+  logger.info('禁用硬件加速')
+  app.disableHardwareAcceleration()
+}
+
 app.whenReady().then(async () => {
   electronApp.setAppUserModelId(AKARI_USER_MODEL_ID)
   appModule.state.setReady(true)

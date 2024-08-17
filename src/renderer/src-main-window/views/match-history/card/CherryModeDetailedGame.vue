@@ -1,7 +1,13 @@
 <template>
   <div class="detailed-game-card">
     <DefineDetailedTable v-slot="{ participants, aggregateTeamStats }">
-      <table class="team">
+      <table
+        class="team"
+        :class="{
+          win: participants[0].stats.win,
+          lose: !participants[0].stats.win
+        }"
+      >
         <thead class="team-header">
           <tr>
             <th class="header-info">
@@ -284,10 +290,6 @@ table {
   }
 }
 
-.self {
-  background-color: #474747;
-}
-
 .info {
   display: flex;
   align-items: center;
@@ -432,15 +434,30 @@ table {
 
 .team {
   width: 100%;
+
+  &.win {
+    background-color: rgb(30, 39, 58);
+  }
+
+  &.lose {
+    background-color: rgb(65, 39, 43);
+  }
 }
 
 .participant {
   height: 40px;
+
+  .win &.self {
+    background-color: rgb(44, 57, 86);
+  }
+
+  .lose &.self {
+    background-color: rgb(90, 53, 59);
+  }
 }
 
 .divider {
   background-color: rgb(76, 76, 76);
   height: 1px;
-  margin: 4px 0px;
 }
 </style>

@@ -323,7 +323,6 @@ const autoUpdateTaskShow = useCompleteVisibility(autoUpdateTaskEl, titleBarItems
   position: relative;
   height: var(--title-bar-height);
   align-items: center;
-  background-color: var(--background-color-primary);
   z-index: 100000000; // header must be on top
   -webkit-app-region: drag;
 }
@@ -345,7 +344,11 @@ const autoUpdateTaskShow = useCompleteVisibility(autoUpdateTaskEl, titleBarItems
   height: 100%;
   display: flex;
   flex: 1;
+  gap: 4px;
   overflow: hidden;
+  box-sizing: border-box;
+  padding: 4px 0 4px 0;
+  margin-left: 4px;
 
   .title-bar-item {
     display: flex;
@@ -353,6 +356,7 @@ const autoUpdateTaskShow = useCompleteVisibility(autoUpdateTaskEl, titleBarItems
     justify-content: center;
     transition: all 0.3s ease;
     flex-shrink: 0;
+    border-radius: 4px;
     -webkit-app-region: no-drag;
   }
 
@@ -414,6 +418,7 @@ const autoUpdateTaskShow = useCompleteVisibility(autoUpdateTaskEl, titleBarItems
   .title-bar-item .text {
     margin-left: 4px;
     font-size: 12px;
+    line-height: 12px;
     z-index: 5;
   }
 
