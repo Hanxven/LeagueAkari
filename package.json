@@ -22,7 +22,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "@types/luaparse": "^0.2.12",
-    "axios": "^1.7.3",
+    "axios": "^1.7.4",
     "axios-retry": "^4.5.0",
     "dayjs": "^1.11.12",
     "lodash": "^4.17.21",
