@@ -1,6 +1,6 @@
 import { is } from '@electron-toolkit/utils'
 import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
-import { BrowserWindow, Event, app, shell } from 'electron'
+import { BrowserWindow, Event, app, dialog, shell } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
 import { join } from 'node:path'
 
@@ -247,7 +247,19 @@ export class MainWindowModule extends MobxBasedBasicModule {
     this._w.on('page-title-updated', (e) => e.preventDefault())
 
     this._w.webContents.setWindowOpenHandler((details) => {
-      shell.openExternal(details.url)
+      const response = dialog.showMessageBoxSync({
+        type: 'question',
+        buttons: ['是', '否'],
+        defaultId: 0,
+        title: '确认',
+        message: `将跳转到外部链接 ${new URL(details.url).origin}`,
+        detail: details.url
+      })
+
+      if (response === 0) {
+        shell.openExternal(details.url)
+      }
+
       return { action: 'deny' }
     })
 

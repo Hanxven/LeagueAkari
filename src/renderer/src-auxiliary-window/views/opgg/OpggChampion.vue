@@ -420,22 +420,36 @@
       </div>
       <!-- inline styled :( -->
       <div class="card-area" v-if="isAbleToAddToItemSet">
-        <div class="card-title">导入到配装方案</div>
-        <div
-          class="card-content"
-          style="display: flex; align-items: center; justify-content: space-between; height: 38px"
-        >
-          <span style="font-size: 13px">将当前所有装备导入到自定义出装方案中</span>
-          <div style="width: 76px; display: flex; justify-content: center">
-            <NButton
-              size="tiny"
-              type="primary"
-              secondary
-              @click="handleAddToItemSet"
-              :disabled="lc.state !== 'connected'"
-              >导入</NButton
-            >
+        <div class="card-title">方案应用</div>
+        <div class="card-content">
+          <div
+            style="display: flex; align-items: center; justify-content: space-between; height: 38px"
+          >
+            <span style="font-size: 13px">导入当前装备方案</span>
+            <div style="width: 76px; display: flex; justify-content: center">
+              <NButton
+                size="tiny"
+                type="primary"
+                secondary
+                @click="handleAddToItemSet"
+                :disabled="lc.state !== 'connected'"
+                >导入</NButton
+              >
+            </div>
           </div>
+          <!-- <div
+            style="display: flex; align-items: center; justify-content: space-between; height: 38px"
+          >
+            <span style="font-size: 13px">自动应用出场率最高的方案</span>
+            <div style="width: 76px; display: flex; justify-content: center">
+              <NCheckbox
+                size="small"
+                type="primary"
+                secondary
+                v-model:checked="autoApply"
+              ></NCheckbox>
+            </div>
+          </div> -->
         </div>
       </div>
       <div
@@ -669,7 +683,7 @@ import {
 } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
 
-import { MODE_TEXT, POSITION_TEXT, TIER_TEXT } from './text'
+import { MODE_TEXT, POSITION_TEXT } from './text'
 
 const props = defineProps<{
   region?: string

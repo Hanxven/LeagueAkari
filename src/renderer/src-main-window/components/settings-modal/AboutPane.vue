@@ -12,7 +12,7 @@
       </div>
       <div class="about-para">
         <LeagueAkariSpan bold @click="() => handleClickEasterEgg()" /> (Version {{ app.version }})
-        是一个免费且开源的应用软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖
+        是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖
         <a target="_blank" href="https://riot-api-libraries.readthedocs.io/en/latest/lcu.html"
           >League Client Update (LCU)</a
         >。
@@ -37,7 +37,7 @@
             src="https://img.shields.io/github/stars/Hanxven/LeagueAkari"
         /></a>
       </div>
-      <div class="divider"></div>
+      <div class="divider" />
       <NCard size="small">
         <ControlItem
           class="control-item-margin"

@@ -914,7 +914,7 @@ export interface AkariScore {
   total: number
 }
 
-// 非卖品
+// 非卖品, 仅限内部评判使用
 export function calculateAkariScore(analyses: {
   games: Record<number, MatchHistoryGamesAnalysis>
   summary: MatchHistoryGamesAnalysisSummary

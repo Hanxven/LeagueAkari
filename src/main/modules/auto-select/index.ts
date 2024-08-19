@@ -30,7 +30,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     this._mwm = this.manager.getModule('main-window')
 
     await this._setupSettingsSync()
-    this._setupStateSync()
+    await this._setupStateSync()
     this._handleAutoPickBan()
     this._handleBenchMode()
 
@@ -320,7 +320,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
               `取消了即将进行的英雄交换, 目标: ${this.state.upcomingGrab.championId}`
             )
 
-            this._notifyInChat('cancel', this.state.upcomingGrab.championId)
+            this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
             if (this.state.upcomingGrab) {
               clearTimeout(this._grabTimerId!)
               this._grabTimerId = null
@@ -353,7 +353,9 @@ export class AutoSelectModule extends MobxBasedBasicModule {
             this._logger.info(`目标交换英雄: ${c}`)
 
             this.state.setUpcomingGrab(c, Date.now() + waitTime)
-            this._notifyInChat('select', this.state.upcomingGrab!.championId, waitTime)
+            this._notifyInChat('select', this.state.upcomingGrab!.championId, waitTime).catch(
+              () => {}
+            )
             this._grabTimerId = setTimeout(() => this._trySwap(), waitTime)
             break
           }
