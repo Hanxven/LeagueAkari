@@ -12,6 +12,7 @@
       >
         <NTab
           v-for="tab of mh.tabs"
+          @mousedown="(event) => handleMouseDown(event, tab.id)"
           @contextmenu="(event) => handleShowMenu(event, tab.id)"
           :key="tab.id"
           :tab="tabNames[tab.id]"
@@ -317,6 +318,12 @@ const dropdownOptions = reactive([
     disabled: computed(() => !mh.canCloseOtherTabs(menuProps.id))
   }
 ])
+
+const handleMouseDown = (event, tabId) => {
+  if (event.button === 1) {
+    mh.closeTab(tabId);
+  }
+}
 
 const handleMenuSelect = (action: string) => {
   switch (action) {
