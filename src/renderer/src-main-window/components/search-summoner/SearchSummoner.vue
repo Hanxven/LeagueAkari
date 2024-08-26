@@ -120,8 +120,8 @@ const inputEl = ref()
 
 const isNoSearchResult = ref(false)
 
-const bySummonerIdResult = ref<SummonerInfo[]>()
-const byNameResult = ref<SummonerInfo>()
+const bySummonerIdResult = ref<SummonerInfo>()
+const byNameResult = ref<SummonerInfo[]>()
 const byPuuidResult = ref<SummonerInfo>()
 
 const eds = useExternalDataSourceStore()
