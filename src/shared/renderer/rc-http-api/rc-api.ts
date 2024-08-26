@@ -48,7 +48,7 @@ export async function getPlayerAccountAlias(gameName: string, tagLine: string) {
     throw new Error('No player found')
   }
 
-  return result.data[0]
+  return result.data
 }
 
 export async function getPlayerAccountNameset(puuid: string) {

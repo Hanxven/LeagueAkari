@@ -27,15 +27,18 @@
         >
       </div>
       <div class="summoners-area">
-        <SummonerCard
-          class="card"
-          v-if="byNameResult"
-          condition="name"
-          :summoner="byNameResult"
-          :search-text="searchText"
-          :sgp-server-id="searchSgpServerId"
-          @to-summoner="handleToSummoner"
-        />
+        <template v-if="byNameResult && byNameResult.length">
+          <SummonerCard
+            v-for="(summoner, index) in byNameResult"
+            :key="index"
+            class="card"
+            condition="name"
+            :summoner="summoner"
+            :search-text="searchText"
+            :sgp-server-id="searchSgpServerId"
+            @to-summoner="handleToSummoner"
+          />
+        </template>
         <SummonerCard
           class="card"
           v-if="bySummonerIdResult"
@@ -63,13 +66,13 @@
       >
         {{
           isCrossServer
-            ? '输入召唤师名称或 PUUID，开始精确搜索'
-            : '输入召唤师名称、ID 或 PUUID，开始精确搜索'
+            ? '输入召唤师名称或 PUUID，开始搜索'
+            : '输入召唤师名称、ID 或 PUUID，开始搜索'
         }}
         <template v-if="summoner.newIdSystemEnabled">
-          <span :class="{ 'need-tag': isTagNeeded }" class="need-tag-hint"
-            >召唤师名称查询需满足格式 [名称]#[TAG]</span
-          >
+          <span :class="{ 'need-tag': isTagNeeded }" class="need-tag-hint">
+            召唤师名称查询满足格式 [名称]#[TAG] 可精确搜索
+          </span>
         </template>
       </div>
     </div>
@@ -117,7 +120,7 @@ const inputEl = ref()
 
 const isNoSearchResult = ref(false)
 
-const bySummonerIdResult = ref<SummonerInfo>()
+const bySummonerIdResult = ref<SummonerInfo[]>()
 const byNameResult = ref<SummonerInfo>()
 const byPuuidResult = ref<SummonerInfo>()
 
@@ -206,40 +209,45 @@ const handleSearch = async () => {
   const inferredTypes = inferType(inputText.value)
   const tasks: Promise<void>[] = []
 
+  const fetchCrossServerSummoner = async (name, tag, puuid = null) => {
+    try {
+      const alias = puuid
+        ? await edsm.sgp.getSummonerLcuFormat(puuid, currentSgpServer.value)
+        : (await getPlayerAccountAlias(name, tag))[0]
+      const summoner = await edsm.sgp.getSummonerLcuFormat(alias.puuid, currentSgpServer.value)
+      summoner.gameName = alias.game_name
+      summoner.tagLine = alias.tag_line
+      return summoner
+    } catch (error) {
+      if (!puuid) console.warn(`跨服查找失败`, error)
+      return null
+    }
+  }
+
   for (const type of inferredTypes) {
     if (type.type === 'name') {
       tasks.push(
         (async () => {
-          if (type.isWithTagLine) {
-            const [name, tag] = resolveSummonerName(type.value)
-
-            try {
-              if (isCrossServer.value) {
-                const a = await getPlayerAccountAlias(name, tag)
-                const p = await edsm.sgp.getSummonerLcuFormat(a.puuid, currentSgpServer.value)
-                p.gameName = a.alias.game_name
-                p.tagLine = a.alias.tag_line
-                byNameResult.value = p
-              } else {
-                const summoner2 = await getSummonerAlias(name, tag)
-                if (summoner2) {
-                  byNameResult.value = summoner2
+          try {
+            if (type.isWithTagLine) {
+              const [name, tag] = resolveSummonerName(type.value)
+              const summoner = isCrossServer.value
+                ? await fetchCrossServerSummoner(name, tag)
+                : await getSummonerAlias(name, tag)
+              if (summoner) byNameResult.value.push(summoner)
+            } else if (summoner.newIdSystemEnabled) {
+                const accounts = await getPlayerAccountAlias(type.value)
+                for (const account of accounts) {
+                  const summoner = await fetchCrossServerSummoner(account.alias.game_name, account.alias.tag_line, account.puuid)
+                  if (summoner) byNameResult.value.push(summoner)
                 }
               }
-            } catch (error) {
-              console.warn(`查找名称+TagLine ${type.value}`, error)
+            else {
+                const summoner2 = await getSummonerByName(type.value)
+                byNameResult.value.push(summoner2.data)
             }
-          } else {
-            if (summoner.newIdSystemEnabled) {
-              return
-            }
-
-            try {
-              const summoner2 = await getSummonerByName(type.value)
-              byNameResult.value = summoner2.data
-            } catch (error) {
-              console.warn(`查找名称 ${type.value}`, error)
-            }
+          } catch (error) {
+            console.warn(`查找名称 ${type.value}`, error)
           }
         })()
       )
@@ -283,13 +291,13 @@ const handleSearch = async () => {
     }
   }
 
-  byNameResult.value = undefined
+  byNameResult.value = []
   bySummonerIdResult.value = undefined
   byPuuidResult.value = undefined
 
   await Promise.allSettled(tasks)
 
-  if (byNameResult.value || bySummonerIdResult.value || byPuuidResult.value) {
+  if (byNameResult.value.length || bySummonerIdResult.value || byPuuidResult.value) {
     isNoSearchResult.value = false
   } else {
     isNoSearchResult.value = true
