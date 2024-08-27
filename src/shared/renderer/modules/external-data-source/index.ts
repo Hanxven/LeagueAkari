@@ -3,7 +3,7 @@ import {
   SgpRankedStats,
   SgpSummoner,
   SpectatorData
-} from '@shared/external-data-source/sgp/types'
+} from '@shared/data-sources/sgp/types'
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
 import { MatchHistory } from '@shared/types/lcu/match-history'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -103,7 +103,7 @@ export class ExternalDataSourceRendererModule extends StateSyncModule {
   opgg = new OpggEdsRenderer(this)
 
   constructor() {
-    super('external-data-source')
+    super('data-sources')
   }
 
   override async setup() {

@@ -1,5 +1,5 @@
-import { FandomWikiChampBalanceDataSource } from '@shared/external-data-source/fandom/champ-balance'
-import { ChampBalanceMapV1 } from '@shared/external-data-source/normalized/champ-balance'
+import { FandomWikiChampBalanceDataSource } from '@shared/data-sources/fandom/champ-balance'
+import { ChampBalanceMapV1 } from '@shared/data-sources/normalized/champ-balance'
 import { formatError } from '@shared/utils/errors'
 import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
 

@@ -1,5 +1,5 @@
-import { AvailableServersMap, SgpApi } from '@shared/external-data-source/sgp'
-import { SgpMatchHistoryLol, SgpSummoner } from '@shared/external-data-source/sgp/types'
+import { AvailableServersMap, SgpApi } from '@shared/data-sources/sgp'
+import { SgpMatchHistoryLol, SgpSummoner } from '@shared/data-sources/sgp/types'
 import { MatchHistory } from '@shared/types/lcu/match-history'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { formatError } from '@shared/utils/errors'

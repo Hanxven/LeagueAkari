@@ -82,7 +82,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this._lcm2 = this.manager.getModule('league-client')
     this._mwm = this.manager.getModule('main-window')
     this._pm = this.manager.getModule('win-platform')
-    this._edsm = this.manager.getModule('external-data-source')
+    this._edsm = this.manager.getModule('data-sources')
 
     await this._setupSettingsSync()
     this._setupStateSync()

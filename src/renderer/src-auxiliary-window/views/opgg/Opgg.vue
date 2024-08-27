@@ -163,7 +163,7 @@
 
 <script lang="ts" setup>
 import OpggIcon from '@auxiliary-window/assets/icon/OpggIcon.vue'
-import { OpggDataSource } from '@shared/external-data-source/opgg'
+import { OpggDataSource } from '@shared/data-sources/opgg'
 import {
   ModeType,
   OpggARAMChampionSummary,
@@ -174,7 +174,7 @@ import {
   PositionType,
   RegionType,
   TierType
-} from '@shared/external-data-source/opgg/types'
+} from '@shared/data-sources/opgg/types'
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { useStableComputed } from '@shared/renderer/compositions/useStableComputed'
 import { getMySelections, setMySummonerSpells } from '@shared/renderer/http-api/champ-select'

@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { SpectatorData } from '@shared/external-data-source/sgp/types'
+import { SpectatorData } from '@shared/data-sources/sgp/types'
 import { externalDataSourceRendererModule as edsm } from '@shared/renderer/modules/external-data-source'
 import { watchEffect } from 'vue'
 

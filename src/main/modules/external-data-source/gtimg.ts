@@ -1,5 +1,5 @@
 import { TimeoutTask } from '@main/utils/timer'
-import { Gtimg, GtimgHeroListJs } from '@shared/external-data-source/gtimg'
+import { Gtimg, GtimgHeroListJs } from '@shared/data-sources/gtimg'
 import { formatError } from '@shared/utils/errors'
 import { makeAutoObservable, observable } from 'mobx'
 

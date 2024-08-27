@@ -1,10 +1,10 @@
-import { GtimgHeroListJs, Hero } from '@shared/external-data-source/gtimg'
-import { ChampBalanceMapV1 } from '@shared/external-data-source/normalized/champ-balance'
-import { AvailableServersMap } from '@shared/external-data-source/sgp'
+import { GtimgHeroListJs, Hero } from '@shared/data-sources/gtimg'
+import { ChampBalanceMapV1 } from '@shared/data-sources/normalized/champ-balance'
+import { AvailableServersMap } from '@shared/data-sources/sgp'
 import { defineStore } from 'pinia'
 import { computed, shallowRef } from 'vue'
 
-export const useExternalDataSourceStore = defineStore('module:external-data-source', () => {
+export const useExternalDataSourceStore = defineStore('module:data-sources', () => {
   const balanceData = shallowRef<{
     dataSource: string
     map: ChampBalanceMapV1

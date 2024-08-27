@@ -631,7 +631,13 @@ const frequentlyUsedChampions = computed(() => {
 
   return Object.values(a.champions)
     .filter((c) => c.count >= FREQUENT_USE_CHAMPION_THRESHOLD)
-    .sort((a, b) => b.count - a.count)
+    .sort((a, b) => {
+      if (a.count !== b.count) {
+        return b.count - a.count
+      }
+
+      return b.win - a.win
+    })
 })
 
 const recentlyTeammates = computed(() => {
@@ -651,7 +657,13 @@ const recentlyTeammates = computed(() => {
       const lose = a.games.filter((g) => !g.win).length
       return { ...a, win, lose }
     })
-    .sort((a, b) => b.games.length - a.games.length)
+    .sort((a, b) => {
+      if (a.games.length !== b.games.length) {
+        return b.games.length - a.games.length
+      }
+
+      return b.win - a.win
+    })
 
   return teammates
 })
