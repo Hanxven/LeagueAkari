@@ -7,6 +7,7 @@
           class="control-item-margin"
           label="开启"
           label-description="在常规的模式中启用。如匹配模式，排位模式等任何非随机英雄的模式"
+          :label-width="200"
         >
           <NSwitch
             @update:value="(v) => asm.setNormalModeEnabled(v)"
@@ -18,6 +19,7 @@
           class="control-item-margin"
           label="提前预选"
           label-description="预选即将自动选用的英雄"
+          :label-width="200"
         >
           <NSwitch
             type="pick"
@@ -30,6 +32,7 @@
           class="control-item-margin"
           label="无视队友预选"
           label-description="开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突"
+          :label-width="200"
         >
           <NSwitch
             @update:value="(v) => asm.setSelectTeammateIntendedChampion(v)"
@@ -41,6 +44,7 @@
           class="control-item-margin"
           label="选择策略"
           label-description="立即锁定或只是亮出"
+          :label-width="200"
         >
           <NSwitch
             @update:value="(v) => asm.setCompleted(v)"
@@ -52,7 +56,7 @@
             <template #unchecked>亮出</template></NSwitch
           >
         </ControlItem>
-        <ControlItem class="control-item-margin" label="意向英雄">
+        <ControlItem class="control-item-margin" label="意向英雄" :label-width="200">
           <template #labelDescription>
             <div style="margin-bottom: 8px">将根据预设列表选择英雄</div>
             <div style="margin-bottom: 8px">
@@ -151,6 +155,7 @@
           class="control-item-margin"
           label="开启"
           label-description="随机分配英雄的模式，如极地大乱斗"
+          :label-width="200"
         >
           <NSwitch
             @update:value="(v) => asm.setBenchModeEnabled(v)"
@@ -158,7 +163,7 @@
             size="small"
           ></NSwitch>
         </ControlItem>
-        <ControlItem class="control-item-margin" label="选用最低累积时间 (s)">
+        <ControlItem class="control-item-margin" label="选用最低累积时间 (s)" :label-width="200">
           <template #labelDescription>
             目标英雄出现在英雄选择台上的累计时间需达到此值才会执行交换操作，单位为秒
             <NTooltip>
@@ -180,7 +185,7 @@
             @update:value="(v) => asm.setGrabDelaySeconds(v || 0)"
           />
         </ControlItem>
-        <ControlItem class="control-item-margin" label="期望英雄">
+        <ControlItem class="control-item-margin" label="期望英雄" :label-width="200">
           <OrderedChampionList
             type="pick"
             :champions="as.settings.benchExpectedChampions"
@@ -194,6 +199,7 @@
           class="control-item-margin"
           label="开启"
           label-description="自动执行英雄的禁用操作"
+          :label-width="200"
         >
           <NSwitch
             @update:value="(v) => asm.setBanEnabled(v)"
@@ -205,6 +211,7 @@
           class="control-item-margin"
           label="无视队友预选"
           label-description="开启后将不会考虑队友的预选英雄"
+          :label-width="200"
         >
           <NSwitch
             @update:value="(v) => asm.setBanTeammateIntendedChampion(v)"
@@ -212,7 +219,7 @@
             size="small"
           ></NSwitch>
         </ControlItem>
-        <ControlItem class="control-item-margin" label="意向英雄">
+        <ControlItem class="control-item-margin" label="意向英雄" :label-width="200">
           <template #labelDescription>
             <div style="margin-bottom: 8px">将根据预设列表禁用英雄</div>
             <div style="margin-bottom: 8px">

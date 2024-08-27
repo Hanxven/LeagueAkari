@@ -7,6 +7,7 @@
           class="control-item-margin"
           label="自动接受对局开启"
           label-description="当匹配到玩家时，自动确认"
+          :label-width="200"
         >
           <NSwitch
             :value="agf.settings.autoAcceptEnabled"
@@ -18,6 +19,7 @@
           class="control-item-margin"
           label="自动接受对局延时 (s)"
           label-description="在可接受时延迟执行接受操作的时间，单位为秒"
+          :label-width="200"
         >
           <NInputNumber
             style="width: 80px"
@@ -34,6 +36,7 @@
           class="control-item-margin"
           label="自动点赞开启"
           label-description="在游戏结束时，自动点赞一位队友。若不存在可点赞的玩家，将跳过点赞阶段"
+          :label-width="200"
         >
           <NSwitch
             :value="agf.settings.autoHonorEnabled"
@@ -45,6 +48,7 @@
           class="control-item-margin"
           label="点赞选择策略"
           label-description="这将决定具体给哪位玩家点赞"
+          :label-width="200"
         >
           <NRadioGroup
             size="small"
@@ -66,7 +70,7 @@
           </NRadioGroup>
         </ControlItem>
         <div class="divider"></div>
-        <ControlItem class="control-item-margin" label="自动回到房间">
+        <ControlItem class="control-item-margin" label="自动回到房间" :label-width="200">
           <template #labelDescription>
             对局结束时回到房间。可能需要先启用
             <span style="font-weight: bold">自动点赞</span> 以跳过点赞投票阶段
@@ -82,6 +86,7 @@
           class="control-item-margin"
           label="自动匹配对局"
           label-description="在可匹配对局时，将自动开始匹配对局"
+          :label-width="200"
         >
           <NSwitch
             :value="agf.settings.autoSearchMatchEnabled"
@@ -93,6 +98,7 @@
           class="control-item-margin"
           label="最低人数"
           :label-description="`自动开始匹配需满足人数达到 ${agf.settings.autoSearchMatchMinimumMembers} 人`"
+          :label-width="200"
         >
           <NInputNumber
             :value="agf.settings.autoSearchMatchMinimumMembers"
@@ -107,6 +113,7 @@
           class="control-item-margin"
           label="等待邀请中成员"
           label-description="自动开启匹配将等待所有被邀请的玩家做出回应"
+          :label-width="200"
         >
           <NSwitch
             :value="agf.settings.autoSearchMatchWaitForInvitees"
@@ -118,6 +125,7 @@
           class="control-item-margin"
           label="匹配前等待时间 (s)"
           label-description="在可匹配对局时，预留的等待时间，单位为秒"
+          :label-width="200"
         >
           <NInputNumber
             style="width: 80px"
@@ -132,6 +140,7 @@
           class="control-item-margin"
           label="停止匹配策略"
           label-description="在某些情况下，自动停止匹配状态。当自动匹配开启时，将会重新开始匹配"
+          :label-width="200"
         >
           <NRadioGroup
             :value="agf.settings.autoSearchMatchRematchStrategy"
@@ -156,6 +165,7 @@
               : `在超过该时间后，将停止匹配，单位为秒`
           "
           :disabled="agf.settings.autoSearchMatchRematchStrategy !== 'fixed-duration'"
+          :label-width="200"
         >
           <NInputNumber
             :disabled="agf.settings.autoSearchMatchRematchStrategy !== 'fixed-duration'"

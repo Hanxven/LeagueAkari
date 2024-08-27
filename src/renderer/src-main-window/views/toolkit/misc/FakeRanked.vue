@@ -5,6 +5,7 @@
       class="control-item-margin"
       label="立即使生效"
       label-description="立即修改聊天卡片状态，在下一次客户端启动前有效"
+      :label-width="200"
     >
       <NButton
         size="tiny"
@@ -14,29 +15,29 @@
         >修改</NButton
       >
     </ControlItem>
-    <ControlItem class="control-item-margin" label="队列">
+    <ControlItem class="control-item-margin" label="队列" :label-width="200">
       <NSelect
         :options="queueOptions"
-        style="max-width: 180px"
+        style="width: 180px"
         v-model:value="state.queue"
         size="tiny"
       ></NSelect>
     </ControlItem>
-    <ControlItem class="control-item-margin" label="段位">
+    <ControlItem class="control-item-margin" label="段位" :label-width="200">
       <NSelect
         :options="tierOptions"
-        style="max-width: 180px"
+        style="width: 180px"
         v-model:value="state.tier"
         size="tiny"
       ></NSelect>
     </ControlItem>
-    <ControlItem class="control-item-margin" label="分级">
+    <ControlItem class="control-item-margin" label="分级" :label-width="200">
       <NSelect
         :options="divisionOptions"
         :disabled="
           state.tier === 'MASTER' || state.tier === 'GRANDMASTER' || state.tier === 'CHALLENGER'
         "
-        style="max-width: 180px"
+        style="width: 180px"
         v-model:value="state.division"
         size="tiny"
       ></NSelect>

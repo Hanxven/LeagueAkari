@@ -7,6 +7,8 @@ import { externalDataSourceRendererModule } from '@shared/renderer/modules/exter
 import { lcuConnectionRendererModule } from '@shared/renderer/modules/lcu-connection'
 import { lcuSyncRendererModule } from '@shared/renderer/modules/lcu-state-sync'
 
+import { opggRendererModule } from './opgg'
+
 const manager = new LeagueAkariRendererModuleManager()
 
 export async function setupLeagueAkariModules() {
@@ -17,6 +19,7 @@ export async function setupLeagueAkariModules() {
   manager.use(appRendererModule)
   manager.use(lcuConnectionRendererModule)
   manager.use(externalDataSourceRendererModule)
+  manager.use(opggRendererModule)
 
   await manager.setup()
 }

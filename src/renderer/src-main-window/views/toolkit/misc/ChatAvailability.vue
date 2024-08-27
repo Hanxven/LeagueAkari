@@ -5,6 +5,7 @@
       class="control-item-margin"
       label="状态"
       label-description="展示或设置当前聊天状态。部分状态仅在特定情况下可用"
+      :label-width="200"
     >
       <NRadioGroup
         size="small"
@@ -29,8 +30,8 @@
 
 <script setup lang="ts">
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
 import { AvailabilityType, changeAvailability } from '@shared/renderer/http-api/chat'
+import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
 import { laNotification } from '@shared/renderer/notification'
 import { NCard, NFlex, NRadio, NRadioGroup } from 'naive-ui'
 

@@ -128,7 +128,6 @@
         >
       </div>
     </div>
-
     <div class="traffic">
       <div
         v-if="aux.settings.enabled"
@@ -464,7 +463,6 @@ const autoUpdateTaskShow = useCompleteVisibility(autoUpdateTaskEl, titleBarItems
     height: 100%;
     width: 45px;
     font-size: 14px;
-    cursor: pointer;
     transition: all 0.3s;
     -webkit-app-region: no-drag;
 

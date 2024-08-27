@@ -119,7 +119,7 @@
           <div class="buttons-container">
             <NButton
               secondary
-              class="square-refresh-button"
+              class="square-button"
               title="标记"
               @click="() => handleTagPlayer()"
               v-if="!isSelf"
@@ -130,7 +130,7 @@
             </NButton>
             <NButton
               secondary
-              class="square-refresh-button"
+              class="square-button"
               title="刷新"
               :loading="isSomethingLoading"
               @click="() => handleRefresh()"
@@ -1040,7 +1040,7 @@ defineExpose({
   justify-content: flex-end;
 }
 
-.square-refresh-button {
+.square-button {
   width: 42px;
   height: 42px;
 }

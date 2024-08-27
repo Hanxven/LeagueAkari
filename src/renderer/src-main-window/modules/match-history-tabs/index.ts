@@ -27,7 +27,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
   private _storageModule!: StorageRendererModule
 
   constructor() {
-    super('match-history-tabs', true)
+    super('match-history-tabs-fe', true)
   }
 
   override async setup() {

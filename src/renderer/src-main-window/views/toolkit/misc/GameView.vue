@@ -6,6 +6,7 @@
       class="control-item-margin"
       label="游戏 ID"
       label-description="按照游戏的 ID 拉取并查看对局"
+      :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px">
         <NInputNumber :show-button="false" v-model:value="gameId" size="tiny" />

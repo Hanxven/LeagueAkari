@@ -10,6 +10,7 @@
       label="开启"
       class="control-item-margin"
       label-description="在游戏中使用 Delete 键"
+      :label-width="200"
     >
       <NSwitch
         :disabled="!app.isAdministrator"
@@ -23,10 +24,11 @@
       label="文本行"
       class="control-item-margin"
       label-description="自定义模拟键盘在游戏中发送输入，按行分配，空行将被忽略"
+      :label-width="200"
     >
       <NInput
         :disabled="!app.isAdministrator"
-        style="max-width: 360px; font-family: monospace"
+        style="width: 360px; font-family: monospace"
         type="textarea"
         :value="cks.settings.text"
         :autosize="{ maxRows: 4, minRows: 3 }"

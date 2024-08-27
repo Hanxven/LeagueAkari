@@ -47,6 +47,7 @@
       class="control-item-margin"
       label="选择召唤师背景"
       label-description="查找目标英雄或皮肤"
+      :label-width="200"
     >
       <NButton
         size="tiny"
@@ -60,6 +61,7 @@
       class="control-item-margin"
       label="切换为上赛季旗帜"
       label-description="锁定为上赛季旗帜"
+      :label-width="200"
     >
       <NButton
         :disabled="lc.state !== 'connected'"
@@ -77,6 +79,7 @@
           : '卸下头像框'
       "
       label="卸下头像框"
+      :label-width="200"
     >
       <NButton
         :disabled="lc.state !== 'connected'"
@@ -86,7 +89,12 @@
         >执行</NButton
       >
     </ControlItem>
-    <ControlItem class="control-item-margin" label-description="卸下所有勋章" label="卸下所有勋章">
+    <ControlItem
+      class="control-item-margin"
+      label-description="卸下所有勋章"
+      label="卸下所有勋章"
+      :label-width="200"
+    >
       <NButton
         :disabled="lc.state !== 'connected'"
         @click="handleRemoveTokens"

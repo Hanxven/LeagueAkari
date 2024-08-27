@@ -116,16 +116,7 @@
       >
         <div class="card-title">
           召唤师技能
-          <div>
-            <NRadioGroup v-model:value="flashPosition" size="small" style="margin-right: 12px">
-              <NFlex style="gap: 4px">
-                <NRadio value="d" title="闪现位置默认在 D">D 闪</NRadio>
-                <NRadio value="f" title="闪现位置默认在 F">F 闪</NRadio>
-                <NRadio value="auto" title="根据当前闪现的位置决定">自动</NRadio>
-              </NFlex>
-            </NRadioGroup>
-            <NCheckbox size="small" v-model:checked="isSummonerSpellsExpanded">展示全部</NCheckbox>
-          </div>
+          <NCheckbox size="small" v-model:checked="isSummonerSpellsExpanded">展示全部</NCheckbox>
         </div>
         <div class="card-content">
           <div
@@ -149,7 +140,7 @@
               </div>
               <div class="buttons">
                 <NButton
-                  @click="() => handleSetSummonerSpells(s.ids)"
+                  @click="() => emits('setSummonerSpells', s.ids)"
                   size="tiny"
                   type="primary"
                   secondary
@@ -213,7 +204,7 @@
               </div>
               <div class="buttons">
                 <NButton
-                  @click="() => handleSetRunes(r)"
+                  @click="() => emits('setRunes', r)"
                   size="tiny"
                   type="primary"
                   :disabled="lc.state !== 'connected'"
@@ -647,16 +638,8 @@ import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
-import { getMySelections, setMySummonerSpells } from '@shared/renderer/http-api/champ-select'
 import { chatSend } from '@shared/renderer/http-api/chat'
 import { getItemSets, putItemSets } from '@shared/renderer/http-api/item-sets'
-import {
-  getPerkInventory,
-  getPerkPages,
-  postPerkPage,
-  putCurrentPage,
-  putPage
-} from '@shared/renderer/http-api/perks'
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { externalDataSourceRendererModule as edsm } from '@shared/renderer/modules/external-data-source'
 import { championIconUrl } from '@shared/renderer/modules/game-data'
@@ -697,7 +680,17 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  (e: 'showChampion', championId: number): void
+  showChampion: [championId: number]
+  setSummonerSpells: [ids: number[]]
+  setRunes: [
+    runes: {
+      primary_page_id: number
+      secondary_page_id: number
+      primary_rune_ids: number[]
+      secondary_rune_ids: number[]
+      stat_mod_ids: number[]
+    }
+  ]
 }>()
 
 const gameflow = useGameflowStore()
@@ -784,8 +777,6 @@ const isPrismItemsExpanded = ref(false)
 const isCoreItemsExpanded = ref(false)
 const isLastItemsExpanded = ref(false)
 
-const flashPosition = useLocalStorage('opgg-flash-position', 'auto')
-
 watchEffect(() => {
   if (!props.data) {
     isSummonerSpellsExpanded.value = false
@@ -831,118 +822,6 @@ if (import.meta.env.DEV) {
 }
 
 const message = useMessage()
-
-const SUMMONER_SPELL_FLASH_ID = 4
-
-const handleSetSummonerSpells = async (ids: number[]) => {
-  try {
-    const selection = (await getMySelections()).data
-
-    const [oldSpell1Id, oldSpell2Id] = [selection.spell1Id, selection.spell2Id]
-    let [newSpell1Id, newSpell2Id] = ids
-
-    // 有闪现的情况且不为 auto 时, 优先按照偏好闪现位置, 否则强制按照 auto
-    if (
-      flashPosition.value !== 'auto' &&
-      (newSpell1Id === SUMMONER_SPELL_FLASH_ID || newSpell2Id === SUMMONER_SPELL_FLASH_ID)
-    ) {
-      if (newSpell2Id === SUMMONER_SPELL_FLASH_ID) {
-        if (flashPosition.value === 'd') {
-          ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
-        }
-      } else if (newSpell1Id === SUMMONER_SPELL_FLASH_ID) {
-        if (flashPosition.value === 'f') {
-          ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
-        }
-      }
-    } else {
-      if (newSpell1Id === oldSpell2Id || newSpell2Id === oldSpell1Id) {
-        ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
-      }
-    }
-
-    await setMySummonerSpells({
-      spell1Id: newSpell1Id,
-      spell2Id: newSpell2Id
-    })
-    message.success('请求已发送')
-
-    if (chat.conversations.championSelect) {
-      chatSend(
-        chat.conversations.championSelect.id,
-        `[League Akari] 已设置召唤师技能: [OP.GG] ${gameData.summonerSpells[newSpell1Id]?.name} | ${gameData.summonerSpells[newSpell2Id]?.name}`,
-        'celebration'
-      ).catch(() => {})
-    }
-  } catch (error) {
-    am.logger.warn(`[OP.GG] 设置召唤师技能失败: ${(error as any).message}`, error)
-    message.warning(`设置召唤师技能失败: ${(error as any).message}`)
-  }
-}
-
-const handleSetRunes = async (r: {
-  primary_page_id: number
-  secondary_page_id: number
-  primary_rune_ids: number[]
-  secondary_rune_ids: number[]
-  stat_mod_ids: number[]
-}) => {
-  try {
-    const inventory = (await getPerkInventory()).data
-    let addedNew = false
-    const positionName =
-      props.position && props.position !== 'none' ? POSITION_TEXT[props.position] || '' : ''
-
-    if (inventory.canAddCustomPage) {
-      const { data: added } = await postPerkPage({
-        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
-        isEditable: true,
-        primaryStyleId: r.primary_page_id.toString()
-      })
-      await putPage({
-        id: added.id,
-        isRecommendationOverride: false,
-        isTemporary: false,
-        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
-        primaryStyleId: r.primary_page_id,
-        selectedPerkIds: [...r.primary_rune_ids, ...r.secondary_rune_ids, ...r.stat_mod_ids],
-        subStyleId: r.secondary_page_id
-      })
-      await putCurrentPage(added.id)
-      addedNew = true
-    } else {
-      const pages = (await getPerkPages()).data
-      if (!pages.length) {
-        return
-      }
-
-      const page1 = pages[0]
-      await putPage({
-        id: page1.id,
-        isRecommendationOverride: false,
-        isTemporary: false,
-        name: `[OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
-        primaryStyleId: r.primary_page_id,
-        selectedPerkIds: [...r.primary_rune_ids, ...r.secondary_rune_ids, ...r.stat_mod_ids],
-        subStyleId: r.secondary_page_id
-      })
-      await putCurrentPage(page1.id)
-    }
-
-    message.success('请求已发送')
-
-    if (chat.conversations.championSelect) {
-      chatSend(
-        chat.conversations.championSelect.id,
-        `[League Akari] 已${addedNew ? '添加' : '替换'}符文页: [OP.GG] ${gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
-        'celebration'
-      )
-    }
-  } catch (error) {
-    am.logger.warn(`[OP.GG] 设置符文配法失败: ${(error as any).message}`, error)
-    message.warning(`设置符文配法失败: ${(error as any).message}`)
-  }
-}
 
 const isAbleToAddToItemSet = computed(() => {
   if (!props.data) {

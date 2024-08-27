@@ -12,6 +12,7 @@
       class="control-item-margin"
       label="目标召唤师"
       label-description="通过 PUUID 或召唤师名称观战，前提是玩家正在可观战的对局中"
+      :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px">
         <NDropdown

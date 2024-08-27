@@ -1,16 +1,21 @@
 <template>
-  <div class="opgg-panel">
+  <div class="opgg-panel" ref="opggPanelEl">
     <div class="tabs-area">
       <a href="https://op.gg" title="转到 OP.GG" target="_blank"><OpggIcon class="opgg-icon" /></a>
       <NButton
         secondary
-        class="square-refresh-button"
+        class="square-button"
         title="刷新"
         :loading="isLoading"
         @click="() => loadAll()"
       >
         <template #icon>
           <NIcon><RefreshIcon /></NIcon>
+        </template>
+      </NButton>
+      <NButton secondary class="square-button" title="设置" @click="isSettingsLayerShow = true">
+        <template #icon>
+          <NIcon><SettingsIcon /></NIcon>
         </template>
       </NButton>
       <NTabs class="tabs" v-model:value="currentTab" type="segment" size="small">
@@ -103,8 +108,56 @@
         :tier="tier"
         :mode="mode"
         :version="version || undefined"
+        @set-runes="setRunes"
+        @set-spells="setSummonerSpells"
       />
     </div>
+    <Transition name="fade">
+      <div
+        class="settings-overlay"
+        v-if="isSettingsLayerShow"
+        @click.self="isSettingsLayerShow = false"
+      >
+        <div class="header">
+          <span class="title">设置</span>
+          <div class="close-btn" @click="isSettingsLayerShow = false" title="关闭">
+            <NIcon class="close-icon"><CloseIcon /></NIcon>
+          </div>
+        </div>
+        <div class="items">
+          <ControlItem
+            class="control-item-margin"
+            style="justify-content: space-between"
+            label="闪现位置偏好"
+            label-description="设置召唤师技能时，若存在闪现技能，优先选择的位置"
+            :label-width="300"
+          >
+            <NRadioGroup size="small" v-model:value="flashPosition">
+              <NFlex style="gap: 4px" :vertical="isSmallWidth">
+                <NRadio value="d" title="闪现位置默认在 D">D</NRadio>
+                <NRadio value="f" title="闪现位置默认在 F">F</NRadio>
+                <NRadio value="auto" title="根据当前闪现的位置决定">自动</NRadio>
+              </NFlex>
+            </NRadioGroup>
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            style="justify-content: space-between"
+            label="自动应用"
+            :label-width="300"
+            v-if="false"
+          >
+            <template #labelDescription>
+              <div>
+                在锁定英雄时，自动应用出场率最高的召唤师技能组、出场率最高的符文以及精简的装备方案
+              </div>
+              <div class="settings-aux-window-only">⚠️ 仅在小窗口启用时生效</div>
+            </template>
+            <NSwitch size="small" v-model:checked="autoApplySpellsAndRunesAndItems" />
+          </ControlItem>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -122,15 +175,42 @@ import {
   RegionType,
   TierType
 } from '@shared/external-data-source/opgg/types'
+import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import { useStableComputed } from '@shared/renderer/compositions/useStableComputed'
+import { getMySelections, setMySummonerSpells } from '@shared/renderer/http-api/champ-select'
+import { chatSend } from '@shared/renderer/http-api/chat'
+import {
+  getPerkInventory,
+  getPerkPages,
+  postPerkPage,
+  putCurrentPage,
+  putPage
+} from '@shared/renderer/http-api/perks'
 import { appRendererModule as am } from '@shared/renderer/modules/app'
 import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
+import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
 import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
 import { maybePveChampion } from '@shared/types/lcu/game-data'
-import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
-import { useLocalStorage, watchDebounced } from '@vueuse/core'
-import { NButton, NIcon, NSelect, NTab, NTabs, SelectRenderLabel, useMessage } from 'naive-ui'
+import {
+  Close as CloseIcon,
+  RefreshSharp as RefreshIcon,
+  Settings as SettingsIcon
+} from '@vicons/ionicons5'
+import { useLocalStorage, useMediaQuery, watchDebounced } from '@vueuse/core'
+import {
+  NButton,
+  NFlex,
+  NIcon,
+  NRadio,
+  NRadioGroup,
+  NSelect,
+  NSwitch,
+  NTab,
+  NTabs,
+  SelectRenderLabel,
+  useMessage
+} from 'naive-ui'
 import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watchEffect } from 'vue'
 
 import OpggChampion from './OpggChampion.vue'
@@ -140,6 +220,8 @@ import { MODE_TEXT, POSITION_TEXT, REGION_TEXT, TIER_TEXT } from './text'
 const currentTab = ref('tier')
 const gameflow = useGameflowStore()
 const champSelect = useChampSelectStore()
+
+const opggPanelEl = ref<HTMLElement>()
 
 const savedPreferences = useLocalStorage('opgg-preferences', {
   mode: 'ranked',
@@ -153,6 +235,8 @@ onErrorCaptured((error, instance, info) => {
   am.logger.warn(`Component OP.GG error: ${info}`, error)
   return false
 })
+
+const isSmallWidth = useMediaQuery('(max-width: 572px)')
 
 const renderLabel: SelectRenderLabel = (option) => {
   return h(
@@ -195,6 +279,7 @@ const message = useMessage()
 const isLoadingVersions = ref(false)
 const isLoadingChampion = ref(false)
 const isLoadingTier = ref(false)
+const isSettingsLayerShow = ref(false)
 
 const isLoading = computed(
   () => isLoadingVersions.value || isLoadingChampion.value || isLoadingTier.value
@@ -512,10 +597,128 @@ watchDebounced(
   },
   { immediate: true, debounce: 500 }
 )
-</script>
 
+const chat = useChatStore()
+
+const autoApplySpellsAndRunesAndItems = useLocalStorage('opgg-auto-apply', false)
+const flashPosition = useLocalStorage('opgg-flash-position', 'auto')
+
+const SUMMONER_SPELL_FLASH_ID = 4
+
+const setSummonerSpells = async (ids: number[]) => {
+  try {
+    const selection = (await getMySelections()).data
+
+    const [oldSpell1Id, oldSpell2Id] = [selection.spell1Id, selection.spell2Id]
+    let [newSpell1Id, newSpell2Id] = ids
+
+    // 有闪现的情况且不为 auto 时, 优先按照偏好闪现位置, 否则强制按照 auto
+    if (
+      flashPosition.value !== 'auto' &&
+      (newSpell1Id === SUMMONER_SPELL_FLASH_ID || newSpell2Id === SUMMONER_SPELL_FLASH_ID)
+    ) {
+      if (newSpell2Id === SUMMONER_SPELL_FLASH_ID) {
+        if (flashPosition.value === 'd') {
+          ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
+        }
+      } else if (newSpell1Id === SUMMONER_SPELL_FLASH_ID) {
+        if (flashPosition.value === 'f') {
+          ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
+        }
+      }
+    } else {
+      if (newSpell1Id === oldSpell2Id || newSpell2Id === oldSpell1Id) {
+        ;[newSpell1Id, newSpell2Id] = [newSpell2Id, newSpell1Id]
+      }
+    }
+
+    await setMySummonerSpells({
+      spell1Id: newSpell1Id,
+      spell2Id: newSpell2Id
+    })
+    message.success('请求已发送')
+
+    if (chat.conversations.championSelect) {
+      chatSend(
+        chat.conversations.championSelect.id,
+        `[League Akari] 已设置召唤师技能: [OP.GG] ${gameData.summonerSpells[newSpell1Id]?.name} | ${gameData.summonerSpells[newSpell2Id]?.name}`,
+        'celebration'
+      ).catch(() => {})
+    }
+  } catch (error) {
+    am.logger.warn(`[OP.GG] 设置召唤师技能失败: ${(error as any).message}`, error)
+    message.warning(`设置召唤师技能失败: ${(error as any).message}`)
+  }
+}
+
+const setRunes = async (r: {
+  primary_page_id: number
+  secondary_page_id: number
+  primary_rune_ids: number[]
+  secondary_rune_ids: number[]
+  stat_mod_ids: number[]
+}) => {
+  try {
+    const inventory = (await getPerkInventory()).data
+    let addedNew = false
+    const positionName =
+      position.value && position.value !== 'none' ? POSITION_TEXT[position.value] || '' : ''
+
+    if (inventory.canAddCustomPage) {
+      const { data: added } = await postPerkPage({
+        name: `[OP.GG] ${gameData.champions[championId?.value || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+        isEditable: true,
+        primaryStyleId: r.primary_page_id.toString()
+      })
+      await putPage({
+        id: added.id,
+        isRecommendationOverride: false,
+        isTemporary: false,
+        name: `[OP.GG] ${gameData.champions[championId?.value || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+        primaryStyleId: r.primary_page_id,
+        selectedPerkIds: [...r.primary_rune_ids, ...r.secondary_rune_ids, ...r.stat_mod_ids],
+        subStyleId: r.secondary_page_id
+      })
+      await putCurrentPage(added.id)
+      addedNew = true
+    } else {
+      const pages = (await getPerkPages()).data
+      if (!pages.length) {
+        return
+      }
+
+      const page1 = pages[0]
+      await putPage({
+        id: page1.id,
+        isRecommendationOverride: false,
+        isTemporary: false,
+        name: `[OP.GG] ${gameData.champions[championId?.value || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+        primaryStyleId: r.primary_page_id,
+        selectedPerkIds: [...r.primary_rune_ids, ...r.secondary_rune_ids, ...r.stat_mod_ids],
+        subStyleId: r.secondary_page_id
+      })
+      await putCurrentPage(page1.id)
+    }
+
+    message.success('请求已发送')
+
+    if (chat.conversations.championSelect) {
+      chatSend(
+        chat.conversations.championSelect.id,
+        `[League Akari] 已${addedNew ? '添加' : '替换'}符文页: [OP.GG] ${gameData.champions[championId?.value || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+        'celebration'
+      )
+    }
+  } catch (error) {
+    am.logger.warn(`[OP.GG] 设置符文配法失败: ${(error as any).message}`, error)
+    message.warning(`设置符文配法失败: ${(error as any).message}`)
+  }
+}
+</script>
+z
 <style lang="less" scoped>
 .opgg-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -536,7 +739,7 @@ watchDebounced(
     width: 32px;
   }
 
-  .square-refresh-button {
+  .square-button {
     width: 32px;
     height: 32px;
   }
@@ -552,5 +755,99 @@ watchDebounced(
     height: 0;
     overflow: auto;
   }
+
+  .settings-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #202020d8;
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    padding: 24px 36px;
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .title {
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+      }
+
+      .close-btn {
+        display: flex;
+        height: 36px;
+        width: 36px;
+        cursor: pointer;
+        font-size: 22px;
+        background-color: rgba(255, 255, 255, 0.04);
+        border-radius: 4px;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        &:active {
+          background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        &:hover .close-icon {
+          transform: rotateZ(180deg);
+        }
+      }
+
+      .close-icon {
+        transition: transform 0.3s;
+        margin: auto;
+      }
+    }
+
+    .items {
+      margin-top: 24px;
+    }
+  }
+}
+
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
+.settings-aux-window-only {
+  font-size: 12px;
+  font-weight: bold;
+  color: #62deb4;
+}
+
+.fade-enter-active {
+  transition: opacity 0.2s;
+}
+
+.fade-leave-active {
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    filter 0.3s;
+}
+
+.fade-enter-from {
+  opacity: 0;
+}
+
+.fade-leave-to {
+  transform: scale(1.02);
+  filter: blur(4px);
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
 }
 </style>

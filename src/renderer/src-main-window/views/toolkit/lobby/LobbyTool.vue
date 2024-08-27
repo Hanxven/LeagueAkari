@@ -5,6 +5,7 @@
       class="control-item-margin"
       label="添加人机"
       label-description="在当前自定义或训练房间中添加人机"
+      :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
         <NSelect
@@ -35,6 +36,7 @@
       class="control-item-margin"
       label="创建队列房间"
       label-description="创建一个指定队列 ID 的房间，受制于服务器是否开启目标队列"
+      :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px">
         <NSelect
@@ -59,7 +61,7 @@
         >
       </div>
     </ControlItem>
-    <ControlItem class="control-item-margin" label="创建 5v5 训练房间">
+    <ControlItem class="control-item-margin" label="创建 5v5 训练房间" :label-width="200">
       <NFlex>
         <NButton
           @click="handleCreatePractice5v5"

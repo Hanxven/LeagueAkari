@@ -3,7 +3,7 @@
     <div class="inner-wrapper">
       <NCard size="small">
         <template #header><span class="card-header-title">自动回复</span></template>
-        <ControlItem label="开启" class="control-item-margin">
+        <ControlItem label="开启" class="control-item-margin" :label-width="200">
           <NSwitch
             @update:value="(v) => arm.setEnabled(v)"
             :value="ar.settings.enabled"
@@ -14,6 +14,7 @@
           label="仅在离开时"
           class="control-item-margin"
           label-description="仅在游戏状态为离开时，自动回复才会生效"
+          :label-width="200"
         >
           <NSwitch
             @update:value="(v) => arm.setEnableOnAway(v)"
@@ -25,10 +26,11 @@
           label="回复内容"
           class="control-item-margin"
           label-description="将作为自动回复的内容词"
+          :label-width="200"
         >
           <NInput
             :status="ar.settings.text.length === 0 && ar.settings.enabled ? 'warning' : 'success'"
-            style="max-width: 360px"
+            style="max-width: 360px; width: 360px;"
             :value="ar.settings.text"
             @update:value="(text) => arm.setText(text)"
             size="tiny"

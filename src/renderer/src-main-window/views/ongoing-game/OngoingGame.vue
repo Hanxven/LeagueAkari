@@ -111,7 +111,11 @@
         <span style="font-size: 13px; margin-bottom: 12px; display: block"
           >在英雄选择中或游戏内发送 KDA 简报已启用，在设置 -> 战绩 -> KDA 简报 中配置通用选项。
         </span>
-        <ControlItem label="发送这些玩家的简报" label-description="只发送这些玩家的简报">
+        <ControlItem
+          label="发送这些玩家的简报"
+          label-description="只发送这些玩家的简报"
+          :label-width="200"
+        >
           <div
             v-for="(team, index) of teams"
             :key="index"
@@ -160,7 +164,6 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants/common'
 import ControlItem from '@shared/renderer/components/ControlItem.vue'
 import LcuImage from '@shared/renderer/components/LcuImage.vue'
 import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'

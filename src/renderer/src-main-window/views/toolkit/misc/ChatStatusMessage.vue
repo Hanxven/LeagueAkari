@@ -1,7 +1,7 @@
 <template>
   <NCard size="small">
     <template #header><span class="card-header-title">聊天签名</span></template>
-    <ControlItem label="设置聊天签名" class="control-item-margin">
+    <ControlItem label="设置聊天签名" class="control-item-margin" :label-width="200">
       <NButton
         :loading="isSetting"
         @click="handleSetChatStatusMessage"
@@ -15,9 +15,10 @@
       label="文本行"
       class="control-item-margin"
       label-description="聊天状态文本。设置空值则为删除"
+      :label-width="200"
     >
       <NInput
-        style="max-width: 360px; font-family: monospace"
+        style="width: 360px; font-family: monospace"
         type="textarea"
         v-model:value="text"
         :autosize="{ maxRows: 3, minRows: 1 }"

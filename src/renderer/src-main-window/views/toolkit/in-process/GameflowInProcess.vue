@@ -5,6 +5,7 @@
       class="control-item-margin"
       label="英雄选择秒退"
       label-description="立即退出当前英雄选择阶段，但不会关闭客户端"
+      :label-width="200"
     >
       <NButton
         type="warning"
@@ -18,6 +19,7 @@
       class="control-item-margin"
       label="退出结算页面"
       label-description="立即退出结算界面。适用于由于客户端原因无法退出结算页面的情况"
+      :label-width="200"
     >
       <NButton type="primary" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="tiny"
         >回到房间</NButton
@@ -27,6 +29,7 @@
       class="control-item-margin"
       label="退出当前房间"
       label-description="立即退出当前房间"
+      :label-width="200"
     >
       <NButton :disabled="gameflow.phase !== 'Lobby'" @click="deleteLobby" size="tiny"
         >退出房间</NButton

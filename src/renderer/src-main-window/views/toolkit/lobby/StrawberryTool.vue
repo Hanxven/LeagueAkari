@@ -9,6 +9,7 @@
         class="control-item-margin"
         label="设置为当前英雄"
         label-description="你可以尝试尝试其他英雄"
+        :label-width="200"
       >
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
           <NSelect
@@ -29,7 +30,12 @@
           >
         </div>
       </ControlItem>
-      <ControlItem class="control-item-margin" label="选择地图" label-description="目前可用的地图">
+      <ControlItem
+        class="control-item-margin"
+        label="选择地图"
+        label-description="目前可用的地图"
+        :label-width="200"
+      >
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
           <NSelect
             style="width: 180px"
@@ -53,6 +59,7 @@
         class="control-item-margin"
         label="设置难度"
         label-description="目前预设的难度包括 [故事]、[困难] 和 [极难], 目前无法设置未解锁的难度等级"
+        :label-width="200"
       >
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
           <NSelect
