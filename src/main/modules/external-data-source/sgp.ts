@@ -460,8 +460,22 @@ export class SgpEds {
       const { data } = await this._sgp.getRankedStatsTencent(sgpServerId, puuid)
       return data
     } catch (error) {
-      console.log(error)
-      return null
+      this._edsm.logger.warn(`获取排位信息失败: ${formatError(error)}`)
+      throw error
+    }
+  }
+
+  async getSpectatorGameflow(puuid: string, sgpServerId?: string) {
+    if (!sgpServerId) {
+      sgpServerId = this._getSgpServerIdFromLcuAuth()
+    }
+
+    try {
+      const { data } = await this._sgp.getSpectatorGameflowByPuuid(sgpServerId, puuid)
+      return data
+    } catch (error) {
+      this._edsm.logger.warn(`获取观战信息失败: ${formatError(error)}`)
+      throw error
     }
   }
 
@@ -500,12 +514,19 @@ export class SgpEds {
       return this.getSummoner(puuid, sgpServerId)
     })
 
-    this._edsm.onCall('sgp/get-summoner-lcu-format', async (puuid: string, sgpServerId?: string) => {
-      return this.getSummonerLcuFormat(puuid, sgpServerId)
-    })
+    this._edsm.onCall(
+      'sgp/get-summoner-lcu-format',
+      async (puuid: string, sgpServerId?: string) => {
+        return this.getSummonerLcuFormat(puuid, sgpServerId)
+      }
+    )
 
     this._edsm.onCall('sgp/get-ranked-stats', async (puuid: string, sgpServerId?: string) => {
       return this.getRankedStats(puuid, sgpServerId)
+    })
+
+    this._edsm.onCall('sgp/get-spectator-gameflow', async (puuid: string, sgpServerId?: string) => {
+      return this.getSpectatorGameflow(puuid, sgpServerId)
     })
   }
 

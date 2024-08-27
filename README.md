@@ -145,7 +145,7 @@ League Akari 的实现参考了许多现有的优秀开源项目，这些项目�
 
 # 5. FAQ - 常见问题及回答
 
-[参见 FAQ.md](https://github.com/Hanxven/LeagueAkari/blob/main/FAQ.md 'FAQ')
+[常见问题及解答](https://hanxven.github.io/LeagueAkari/faq.html 'FAQ')
 
 # 6. 免责声明
 

@@ -33,6 +33,13 @@ export class LeagueAkariIpc {
       return {
         success: false,
         error: {
+          response: error.response
+            ? {
+                status: error.response.status,
+                statusText: error.response.statusText,
+                data: error.response.data
+              }
+            : null,
           code: error.code,
           message: error.message,
           stack: error.stack,

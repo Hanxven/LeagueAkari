@@ -123,9 +123,9 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           this.state.queryState,
           this.state.settings.ongoingAnalysisEnabled,
           this.state.queueFilter,
-          this.state.settings.matchHistorySource
+          this.state.settings.useSgpApi
         ] as const,
-      async ([state, s, queueFilter, src]) => {
+      async ([state, s, queueFilter, useSgpApi]) => {
         if (state === 'unavailable' || !s) {
           this.sendEvent('clear/ongoing-players')
           this.state.clearOngoingVars()
@@ -140,7 +140,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
         let queue = -1
         if (
-          src === 'sgp' &&
+          useSgpApi &&
           queueFilter &&
           CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(queueFilter)
         ) {
@@ -817,19 +817,19 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           return
         }
 
-        const useSgpApi =
-          this.state.settings.matchHistorySource === 'sgp' &&
+        const sgpApiAvailable =
+          this.state.settings.useSgpApi &&
           this._edsm.sgp.state.availability.currentSgpServerSupported
 
         this._logger.info(
-          `Use API: ${useSgpApi ? 'SGP' : 'LCU'}, 加载玩家信息 MatchHistory: ${puuid}`
+          `Use API: ${sgpApiAvailable ? 'SGP' : 'LCU'}, 加载玩家信息 MatchHistory: ${puuid}`
         )
 
         try {
           const matchHistory = await this._playerAnalysisFetchLimiter
             .add(
               async () => {
-                if (useSgpApi) {
+                if (sgpApiAvailable) {
                   return await this._edsm.sgp.getMatchHistoryLcuFormat(
                     puuid,
                     0,
@@ -857,7 +857,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
           const withDetailedFields = matchHistory.games.games.map((g) => ({
             game: g,
-            isDetailed: useSgpApi // SGP API 会返回详细战绩。倒是 LCU API 会多做一步无用的提取
+            isDetailed: sgpApiAvailable // SGP API 会返回详细战绩。倒是 LCU API 会多做一步无用的提取
           }))
 
           withDetailedFields.forEach((g) => {
@@ -1192,9 +1192,9 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     )
 
     this.simpleSettingSync(
-      'match-history-source',
-      () => this.state.settings.matchHistorySource,
-      (s) => this.state.settings.setMatchHistorySource(s)
+      'use-sgp-api',
+      () => this.state.settings.useSgpApi,
+      (s) => this.state.settings.setUseSgpApi(s)
     )
 
     await this.loadSettings()

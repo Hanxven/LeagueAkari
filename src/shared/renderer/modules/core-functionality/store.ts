@@ -157,8 +157,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     // 延迟加载时间
     delaySecondsBeforeLoading: 0,
 
-    // 对局来源
-    matchHistorySource: 'lcu'
+    useSgpApi: true
   })
 
   return {

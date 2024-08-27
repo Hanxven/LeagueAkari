@@ -33,7 +33,7 @@ class CoreFunctionalitySettings {
 
   delaySecondsBeforeLoading: number = 0
 
-  matchHistorySource: 'lcu' | 'sgp' = 'sgp'
+  useSgpApi: boolean = true
 
   constructor() {
     makeAutoObservable(this)
@@ -87,8 +87,8 @@ class CoreFunctionalitySettings {
     this.delaySecondsBeforeLoading = value
   }
 
-  setMatchHistorySource(value: 'lcu' | 'sgp') {
-    this.matchHistorySource = value
+  setUseSgpApi(value: boolean) {
+    this.useSgpApi = value
   }
 }
 

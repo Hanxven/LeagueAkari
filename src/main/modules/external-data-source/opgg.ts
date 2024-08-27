@@ -1,13 +1,5 @@
 import { formatError } from '@shared/utils/errors'
-import {
-  existsSync,
-  mkdir,
-  mkdirSync,
-  readdirSync,
-  statSync,
-  unlinkSync,
-  writeFileSync
-} from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { ExternalDataSourceModule } from '.'

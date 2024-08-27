@@ -1,7 +1,8 @@
 import {
   SgpMatchHistoryLol,
   SgpRankedStats,
-  SgpSummoner
+  SgpSummoner,
+  SpectatorData
 } from '@shared/external-data-source/sgp/types'
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
 import { MatchHistory } from '@shared/types/lcu/match-history'
@@ -55,6 +56,13 @@ class SgpEdsRenderer {
 
   getRankedStats(puuid: string, sgpServerId?: string): Promise<SgpRankedStats> {
     return this._edsm.call('sgp/get-ranked-stats', puuid, sgpServerId)
+  }
+
+  getSpectatorGameflow(
+    playerPuuid: string,
+    sgpServerId?: string
+  ): Promise<SpectatorData> {
+    return this._edsm.call('sgp/get-spectator-gameflow', playerPuuid, sgpServerId)
   }
 }
 

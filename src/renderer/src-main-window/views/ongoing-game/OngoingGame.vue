@@ -12,7 +12,7 @@
       v-if="!isIdle && !cf.isWaitingForDelay && cf.settings.ongoingAnalysisEnabled"
       class="ongoing-game-inner"
     >
-      <div class="header" v-if="cf.settings.matchHistorySource === 'sgp'">
+      <div class="header" v-if="cf.settings.useSgpApi">
         <NSelect
           style="width: 180px"
           size="small"

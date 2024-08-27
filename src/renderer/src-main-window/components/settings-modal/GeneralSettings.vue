@@ -45,17 +45,17 @@
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">数据源</span></template>
-      <ControlItem class="control-item-margin" label="首选数据源" :label-width="320">
+      <ControlItem class="control-item-margin" label="使用 SGP API" :label-width="320">
         <template #labelDescription>
           <div>
-            部分接口将首选从指定位置获取数据。使用 SGP 接口可获得更多特性的支持，包括：
+            部分接口将首选从 SGP API 获取数据。使用 SGP 接口可获得更多特性的支持，包括：
             <div style="margin-left: 12px; font-weight: bold; color: #63e2b7">
               · 战绩页面可按照队列进行全局筛选
             </div>
             <div style="margin-left: 12px; font-weight: bold; color: #63e2b7">· 更稳定的客户端</div>
             若当前服务器的 SGP 接口不在支持范围内，则使用 LCU API
           </div>
-          <template v-if="cf.settings.matchHistorySource === 'sgp' && lc.state === 'connected'">
+          <template v-if="cf.settings.useSgpApi && lc.state === 'connected'">
             <div
               v-if="eds.sgpAvailability.currentSgpServerSupported"
               style="color: #63e2b7; font-weight: bold"
@@ -81,12 +81,10 @@
             </div>
           </template>
         </template>
-        <NSelect
-          style="width: 160px"
-          size="tiny"
-          :value="cf.settings.matchHistorySource"
-          @update:value="(val) => cfm.setMatchHistorySource(val)"
-          :options="matchHistorySourceOptions"
+        <NSwitch
+          size="small"
+          :value="cf.settings.useSgpApi"
+          @update:value="(val) => cfm.setUseSgpApi(val)"
         />
       </ControlItem>
     </NCard>

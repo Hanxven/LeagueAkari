@@ -119,7 +119,7 @@
         @click.self="isSettingsLayerShow = false"
       >
         <div class="header">
-          <span class="title">设置</span>
+          <span class="title">小窗 OP.GG 设置</span>
           <div class="close-btn" @click="isSettingsLayerShow = false" title="关闭">
             <NIcon class="close-icon"><CloseIcon /></NIcon>
           </div>

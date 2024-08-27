@@ -704,3 +704,72 @@ export interface SgpSummoner {
   privacy: string
   expToNextLevel: number
 }
+
+
+export interface SpectatorData {
+  reconnectDelay: number
+  gameName: string
+  game: SpectatorGameflowSession
+  playerCredentials: SpectatorPlayerCredentials
+}
+
+interface SpectatorPlayerCredentials {
+  gameId: number
+  queueId: number
+  playerId: number
+  puuid: string
+  serverPort: number
+  championId: number
+  lastSelectedSkinIndex: number
+  summonerId: number
+  observer: boolean
+  gameVersion: string
+  gameMode: string
+  observerEncryptionKey: string
+  observerServerIp: string
+  observerServerPort: number
+  queueType: string
+  gameCreateDate: number
+}
+
+interface SpectatorGameflowSession {
+  id: number
+  gameState: string
+  queueTypeName: string
+  name: string
+  pickTurn: number
+  mapId: number
+  gameMode: string
+  maxNumPlayers: number
+  gameType: string
+  gameQueueConfigId: number
+  spectatorDelay: number
+  gameVersion: string
+  teamOne: SpectatorGameflowSessionTeam[]
+  teamTwo: SpectatorGameflowSessionTeam[]
+  playerChampionSelections: SpectatorGameflowSessionPlayerChampionSelection[]
+  bannedChampions: any[]
+  observers: any[]
+}
+
+interface SpectatorGameflowSessionPlayerChampionSelection {
+  summonerInternalName: string
+  championId: number
+  selectedSkinIndex: number
+  spell1Id: number
+  spell2Id: number
+}
+
+interface SpectatorGameflowSessionTeam {
+  puuid: string
+  summonerId: number
+  lastSelectedSkinIndex: number
+  teamOwner: boolean
+  profileIconId: number
+  teamParticipantId: number
+  championId: number
+  selectedRole: string
+  selectedPosition: string
+  summonerName: string
+  summonerInternalName: string
+}

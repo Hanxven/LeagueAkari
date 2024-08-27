@@ -6,7 +6,8 @@ import {
   SgpGameSummaryLol,
   SgpMatchHistoryLol,
   SgpRankedStats,
-  SgpSummoner
+  SgpSummoner,
+  SpectatorData
 } from './types'
 
 // can only be imported like this
@@ -171,6 +172,21 @@ export class SgpApi {
       `/summoner-ledge/v1/regions/${platformId.toLowerCase()}/summoners/puuids`,
       [puuid],
       { baseURL: sgpServer.server }
+    )
+  }
+
+  async getSpectatorGameflowByPuuid(platformId: string, puuid: string) {
+    if (!this._jwtToken) {
+      throw new Error('jwt token is not set')
+    }
+
+    const sgpServer = this._getSgpServerId(platformId)
+
+    return this._http.get<SpectatorData>(
+      `/gsm/v1/ledge/spectator/region/${platformId}/puuid/${puuid}`,
+      {
+        baseURL: sgpServer.server
+      }
     )
   }
 }

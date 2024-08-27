@@ -116,11 +116,13 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
 
     // 在切换数据源后清除一些状态
     watch(
-      () => cf.settings.matchHistorySource,
-      () => {
-        mh.tabs.forEach((t) => {
-          t.data.matchHistory.queueFilter = -1
-        })
+      () => cf.settings.useSgpApi,
+      (y) => {
+        if (!y) {
+          mh.tabs.forEach((t) => {
+            t.data.matchHistory.queueFilter = -1
+          })
+        }
       }
     )
   }
@@ -389,10 +391,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
             tab.data.detailedGamesCache.set(g.gameId, markRaw(g))
           })
         } else {
-          if (
-            cf.settings.matchHistorySource === 'sgp' &&
-            eds.sgpAvailability.currentSgpServerSupported
-          ) {
+          if (cf.settings.useSgpApi && eds.sgpAvailability.currentSgpServerSupported) {
             matchHistory = await edsm.sgp.getMatchHistoryLcuFormat(
               puuid,
               (page - 1) * pageSize,
