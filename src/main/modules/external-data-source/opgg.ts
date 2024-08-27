@@ -1,5 +1,13 @@
 import { formatError } from '@shared/utils/errors'
-import { existsSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdir,
+  mkdirSync,
+  readdirSync,
+  statSync,
+  unlinkSync,
+  writeFileSync
+} from 'node:fs'
 import { join } from 'node:path'
 
 import { ExternalDataSourceModule } from '.'
@@ -7,7 +15,7 @@ import { ExternalDataSourceModule } from '.'
 export class OpggEds {
   constructor(private _edsm: ExternalDataSourceModule) {}
 
-  static FIXED_PREFIX = 'akari1'
+  static FIXED_ITEM_SET_PREFIX = 'akari1'
 
   async setup() {
     this._edsm.onCall('opgg/write-item-sets-to-disk', (itemSets: any[], clearPrevious) => {
@@ -24,36 +32,31 @@ export class OpggEds {
 
       const path = join(installDir, '..', 'Game', 'Config', 'Global', 'Recommended')
 
-      // 存在且是目录
       if (existsSync(path)) {
-        try {
-          const stat = statSync(path)
-
-          if (!stat.isDirectory()) {
-            throw new Error(`The path ${path} is not a directory`)
-          }
-
-          // 清空之前的文件, 这些文件以 akari1 开头
-          if (clearPrevious) {
-            const files = readdirSync(path)
-            const akariFiles = files.filter((file) => file.startsWith(OpggEds.FIXED_PREFIX))
-
-            for (const file of akariFiles) {
-              unlinkSync(join(path, file))
-            }
-          }
-
-          for (const itemSet of itemSets) {
-            const fileName = `${itemSet.uid}.json`
-            const filePath = join(path, fileName)
-
-            this._edsm.logger.info(`写入物品集到文件 ${filePath}`)
-
-            writeFileSync(filePath, JSON.stringify(itemSet), { encoding: 'utf-8' })
-          }
-        } catch (error) {
-          throw error
+        if (!statSync(path).isDirectory()) {
+          throw new Error(`The path ${path} is not a directory`)
         }
+      } else {
+        mkdirSync(path, { recursive: true })
+      }
+
+      // 清空之前的文件, 这些文件以 `akari1` 开头
+      if (clearPrevious) {
+        const files = readdirSync(path)
+        const akariFiles = files.filter((file) => file.startsWith(OpggEds.FIXED_ITEM_SET_PREFIX))
+
+        for (const file of akariFiles) {
+          unlinkSync(join(path, file))
+        }
+      }
+
+      for (const itemSet of itemSets) {
+        const fileName = `${itemSet.uid}.json`
+        const filePath = join(path, fileName)
+
+        this._edsm.logger.info(`写入物品集到文件 ${filePath}`)
+
+        writeFileSync(filePath, JSON.stringify(itemSet), { encoding: 'utf-8' })
       }
     } catch (error) {
       this._edsm.logger.error(`写入物品集到本地文件失败 ${formatError(error)}`)
