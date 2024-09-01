@@ -78,7 +78,7 @@ export class BalanceEds {
         }
 
         return {
-          gameMode: this._lcu.gameflow.session.map.gameMode,
+          queueGameMode: this._lcu.gameflow.session.gameData.queue.gameMode,
           queueType: this._lcu.gameflow.session.gameData.queue.type
         }
       },
@@ -92,7 +92,7 @@ export class BalanceEds {
           return
         }
 
-        this._updateBalanceData(info.gameMode, info.queueType)
+        this._updateBalanceData(info.queueGameMode, info.queueType)
       },
       { fireImmediately: true }
     )

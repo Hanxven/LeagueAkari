@@ -127,12 +127,20 @@ const cs = useChampSelectStore()
 const eds = useExternalDataSourceStore()
 const gameflow = useGameflowStore()
 
+const modes = new Map<string, string>([
+  ['ARAM', 'aram'],
+  ['ONEFORALL', 'ofa'],
+  ['URF', 'urf'],
+  ['CHERRY', 'ar'],
+  ['ULTBOOK', 'usb']
+])
+
 const gameMode = computed(() => {
   if (!gameflow.session) {
     return null
   }
 
-  return gameflow.session.map.gameMode
+  return gameflow.session.gameData.queue.gameMode
 })
 
 const getBalanceData = (id: number) => {
@@ -140,7 +148,13 @@ const getBalanceData = (id: number) => {
     return null
   }
 
-  return eds.balanceData.map[id]?.balance['aram'] || null
+  const fandomModes = modes.get(gameMode.value)
+
+  if (!fandomModes) {
+    return null
+  }
+
+  return eds.balanceData.map[id]?.balance[fandomModes] || null
 }
 
 const BALANCE_TYPES: Record<

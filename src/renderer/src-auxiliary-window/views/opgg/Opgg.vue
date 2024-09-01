@@ -110,6 +110,7 @@
         :version="version || undefined"
         @set-runes="setRunes"
         @set-spells="setSummonerSpells"
+        @set-summoner-spells="setSummonerSpells"
       />
     </div>
     <Transition name="fade">

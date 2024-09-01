@@ -43,12 +43,7 @@ export interface ChampBalanceInfoV1 {
 }
 
 export interface ChampBalanceModeMapV1 {
-  ar?: ChampModeBalanceV1
-  aram?: ChampModeBalanceV1
-  nb?: ChampModeBalanceV1
-  ofa?: ChampModeBalanceV1
-  urf?: ChampModeBalanceV1
-  usb?: ChampModeBalanceV1
+  [key: string]: ChampModeBalanceV1
 }
 
 export interface ChampModeBalanceV1 {

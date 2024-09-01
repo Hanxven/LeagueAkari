@@ -1,7 +1,9 @@
 <template>
   <!-- <OngoingGameNew /> -->
   <!-- <ChampionIcon :champion-id="4" /> -->
-  <SpectateStatus />
+  <div style="width: 256px">
+    <SpectateStatus />
+  </div>
 </template>
 
 <script lang="ts" setup>

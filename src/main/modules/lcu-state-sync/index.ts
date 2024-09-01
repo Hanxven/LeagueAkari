@@ -28,7 +28,7 @@ import { LcuEvent } from '@shared/types/lcu/event'
 import { BallotLegacy } from '@shared/types/lcu/honorV2'
 import { formatError } from '@shared/utils/errors'
 import { isAxiosError } from 'axios'
-import { comparer, computed, runInAction } from 'mobx'
+import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
 import PQueue from 'p-queue'
 
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
@@ -45,7 +45,34 @@ import { LoginState } from './login'
 import { MatchmakingState } from './matchmaking'
 import { SummonerState } from './summoner'
 
+interface SyncProgress {
+  currentTask: string
+  finishedTasks: number
+  totalTasks: number
+}
+
+class LcuSyncModuleState {
+  isInitialized = false
+
+  progress: SyncProgress | null = null
+
+  constructor() {
+    makeAutoObservable(this, {
+      progress: observable.ref
+    })
+  }
+
+  setInitialized(value: boolean) {
+    this.isInitialized = value
+  }
+
+  setProgress(p: SyncProgress | null) {
+    this.progress = p
+  }
+}
+
 export class LcuSyncModule extends MobxBasedBasicModule {
+  public state = new LcuSyncModuleState()
   public gameflow = new GameflowState()
   public chat = new ChatState()
   public honor = new HonorState()
@@ -64,6 +91,11 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   private _logger: AppLogger
   private _lcm: LcuConnectionModule
   private _mwm: MainWindowModule
+
+  private _taskQueue: {
+    task: () => Promise<any>
+    name: string
+  }[] = []
 
   private _gameDataLimiter = new PQueue({
     concurrency: 3
