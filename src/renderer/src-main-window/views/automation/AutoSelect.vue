@@ -185,6 +185,18 @@
             @update:value="(v) => asm.setGrabDelaySeconds(v || 0)"
           />
         </ControlItem>
+        <ControlItem
+          class="control-item-margin"
+          label="优先选择首位"
+          label-description="开启此项后，将始终选用期望列表中第一个可用的英雄"
+          :label-width="200"
+        >
+          <NSwitch
+            @update:value="(v) => asm.setBenchSelectFirstAvailableChampion(v)"
+            :value="as.settings.benchSelectFirstAvailableChampion"
+            size="small"
+          ></NSwitch>
+        </ControlItem>
         <ControlItem class="control-item-margin" label="期望英雄" :label-width="200">
           <OrderedChampionList
             type="pick"

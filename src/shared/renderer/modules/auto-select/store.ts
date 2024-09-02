@@ -56,6 +56,9 @@ export const useAutoSelectStore = defineStore('module:auto-select', () => {
     // 选择的延迟，单位秒
     grabDelaySeconds: 1,
 
+    // 始终选用最早可用的英雄
+    benchSelectFirstAvailableChampion: false,
+
     // 自动 ban
     banEnabled: false,
 

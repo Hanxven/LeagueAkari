@@ -549,6 +549,11 @@ export class AuxWindowModule extends MobxBasedBasicModule {
 
     this._w.on('page-title-updated', (e) => e.preventDefault())
 
+    this._w.on('close', (e) => {
+      e.preventDefault()
+      this.hideWindow()
+    })
+
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       this._w.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/auxiliary-window.html`)
     } else {

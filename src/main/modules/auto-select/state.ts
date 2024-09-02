@@ -17,6 +17,7 @@ class AutoSelectSettings {
   showIntent: boolean = false
   completed: boolean = false
   benchModeEnabled: boolean = false
+  benchSelectFirstAvailableChampion: boolean = false
   benchExpectedChampions: number[] = []
   grabDelaySeconds: number = 1
   banEnabled: boolean = false
@@ -60,6 +61,10 @@ class AutoSelectSettings {
 
   setGrabDelaySeconds(value: number) {
     this.grabDelaySeconds = value
+  }
+
+  setBenchSelectFirstAvailableChampion(value: boolean) {
+    this.benchSelectFirstAvailableChampion = value
   }
 
   setBanEnabled(value: boolean) {

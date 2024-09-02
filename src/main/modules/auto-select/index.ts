@@ -275,9 +275,10 @@ export class AutoSelectModule extends MobxBasedBasicModule {
         [
           simplifiedCsSession.get(),
           this.state.settings.benchExpectedChampions,
-          this.state.settings.benchModeEnabled
+          this.state.settings.benchModeEnabled,
+          this.state.settings.benchSelectFirstAvailableChampion
         ] as const,
-      ([s, e, o], [ps]) => {
+      ([s, e, o, p], [ps]) => {
         if (!s) {
           if (ps) {
             benchChampions.clear()
@@ -329,37 +330,39 @@ export class AutoSelectModule extends MobxBasedBasicModule {
           }
         }
 
-        // 如果手上已经有一个期望的了，那么直接返回
-        const selfChampionId = s.myTeam.find((v) => v.cellId === s.localPlayerCellId)?.championId
-        if (selfChampionId && e.includes(selfChampionId)) {
+        const pickableChampions = e.filter(
+          (c) => this._lcu.champSelect.currentPickableChampions.has(c) && benchChampions.has(c)
+        )
+
+        if (pickableChampions.length === 0) {
           return
         }
 
-        // 寻找一个想要抢选的英雄，按照期望列表顺序遍历，排在前面的优先级更高
-        for (const c of e) {
-          // 很想要，但不能选，假装它不存在
-          if (!this._lcu.champSelect.currentPickableChampions.has(c)) {
-            continue
-          }
-          // 找到了一个用于目标
-          if (benchChampions.has(c)) {
-            // 单位：ms
-            const waitTime = Math.max(
-              this.state.settings.grabDelaySeconds * 1e3 -
-                (now - benchChampions.get(c)!.lastTimeOnBench),
-              0
-            )
+        const selfChampionId = s.myTeam.find((v) => v.cellId === s.localPlayerCellId)?.championId
 
-            this._logger.info(`目标交换英雄: ${c}`)
-
-            this.state.setUpcomingGrab(c, Date.now() + waitTime)
-            this._notifyInChat('select', this.state.upcomingGrab!.championId, waitTime).catch(
-              () => {}
-            )
-            this._grabTimerId = setTimeout(() => this._trySwap(), waitTime)
-            break
+        if (selfChampionId) {
+          if (p) {
+            if (pickableChampions[0] === selfChampionId) {
+              return
+            }
+          } else {
+            if (selfChampionId && e.includes(selfChampionId)) {
+              return
+            }
           }
         }
+
+        const newTarget = pickableChampions[0]
+        const waitTime = Math.max(
+          this.state.settings.grabDelaySeconds * 1e3 -
+            (now - benchChampions.get(newTarget)!.lastTimeOnBench),
+          0
+        )
+
+        this._logger.info(`目标交换英雄: ${newTarget}`)
+        this.state.setUpcomingGrab(newTarget, Date.now() + waitTime)
+        this._notifyInChat('select', this.state.upcomingGrab!.championId, waitTime).catch(() => {})
+        this._grabTimerId = setTimeout(() => this._trySwap(), waitTime)
       },
       { equals: comparer.structural }
     )
@@ -446,6 +449,12 @@ export class AutoSelectModule extends MobxBasedBasicModule {
       'bench-mode-enabled',
       () => this.state.settings.benchModeEnabled,
       (s) => this.state.settings.setBenchModeEnabled(s)
+    )
+
+    this.simpleSettingSync(
+      'bench-select-first-available-champion',
+      () => this.state.settings.benchSelectFirstAvailableChampion,
+      (s) => this.state.settings.setBenchSelectFirstAvailableChampion(s)
     )
 
     this.simpleSettingSync(

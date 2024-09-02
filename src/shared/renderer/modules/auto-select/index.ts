@@ -1,4 +1,5 @@
 import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
+import { set } from 'lodash'
 import { markRaw } from 'vue'
 
 import { useAutoSelectStore } from './store'
@@ -39,6 +40,10 @@ export class AutoSelectRendererModule extends StateSyncModule {
       (s) => (store.settings.benchExpectedChampions = s)
     )
     this.simpleSync('settings/grab-delay-seconds', (s) => (store.settings.grabDelaySeconds = s))
+    this.simpleSync(
+      'settings/bench-select-first-available-champion',
+      (s) => (store.settings.benchSelectFirstAvailableChampion = s)
+    )
     this.simpleSync('settings/ban-enabled', (s) => (store.settings.banEnabled = s))
     this.simpleSync(
       'settings/banned-champions-multi',
@@ -72,6 +77,10 @@ export class AutoSelectRendererModule extends StateSyncModule {
 
   setBenchModeEnabled(value: boolean) {
     return this.call('set-setting/bench-mode-enabled', value)
+  }
+
+  setBenchSelectFirstAvailableChampion(value: boolean) {
+    return this.call('set-setting/bench-select-first-available-champion', value)
   }
 
   setBenchExpectedChampions(value: number[]) {
