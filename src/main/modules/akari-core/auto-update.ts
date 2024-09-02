@@ -253,7 +253,11 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
     try {
       const { data } = await this._http.get<FileInfo>(LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL)
 
-      const { data: announcement } = await this._http.get<string>(data.download_url)
+      const { data: announcement } = await this._http.get<string>(data.download_url, {
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      })
 
       const lastReadSha = await this._ss.get('last-read-announcement-sha', '')
 

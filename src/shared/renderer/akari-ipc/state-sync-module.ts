@@ -1,3 +1,6 @@
+import { Paths } from '@shared/utils/types'
+import { set } from 'lodash'
+
 import { LeagueAkariRendererModule } from './renderer-akari-module'
 
 type SimpleStateSetter = (value: any) => any
@@ -13,5 +16,10 @@ export class StateSyncModule extends LeagueAkariRendererModule {
   async simpleSync(resName: string, setter: SimpleStateSetter) {
     this.onEvent(`state-update/${resName}`, setter)
     setter(await this.call(`state-get/${resName}`))
+  }
+
+  async sync<T extends object>(resPath: Paths<T>, obj: T) {
+    this.onEvent(`update-dot-prop/${resPath}`, (value) => set(obj, resPath, value))
+    set(obj, resPath, await this.call(`get-dot-prop/${resPath}`))
   }
 }

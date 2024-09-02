@@ -1,5 +1,7 @@
 import { SettingService, StorageModule } from '@main/modules/akari-core/storage'
-import { IReactionOptions, IReactionPublic, reaction } from 'mobx'
+import { Paths } from '@shared/utils/types'
+import { get } from 'lodash'
+import { IReactionOptions, IReactionPublic, reaction, toJS } from 'mobx'
 
 import { LeagueAkariModule } from '../akari-module'
 
@@ -68,6 +70,23 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
       this.sendEvent(`state-update/${resName}`, newValue)
     })
     this.onCall(`state-get/${resName}`, () => getter())
+  }
+
+  /**
+   * 使用 mobx 监听一个 dot-prop 路径的变化，并在变化时推送更新，要求这个资源路径是一个可序列化的对象。
+   * @param resPath 资源路径，如 `someState.nested.value`
+   * @param obj 一个 mobx 对象
+   */
+  sync<T>(resPath: Paths<T>, obj: T, mobxToJs = false) {
+    this.autoDisposeReaction(
+      () => get(obj, resPath),
+      (newValue) => {
+        this.sendEvent(`update-dot-prop/${resPath}`, mobxToJs ? toJS(newValue) : newValue)
+      }
+    )
+    this.onCall(`get-dot-prop/${resPath}`, () =>
+      mobxToJs ? toJS(get(obj, resPath)) : get(obj, resPath)
+    )
   }
 
   /**
