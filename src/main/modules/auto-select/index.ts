@@ -1,4 +1,4 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import { action, benchSwap, pickOrBan } from '@main/http-api/champ-select'
 import { chatSend } from '@main/http-api/chat'
 import { formatError } from '@shared/utils/errors'

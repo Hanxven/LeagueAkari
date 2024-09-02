@@ -1,4 +1,4 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import {
   LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL,
   LEAGUE_AKARI_GITEE_CHECK_UPDATES_URL,

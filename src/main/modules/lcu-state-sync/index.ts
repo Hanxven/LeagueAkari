@@ -1,4 +1,4 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import {
   getBannableChampIds,
   getChampSelectSession,

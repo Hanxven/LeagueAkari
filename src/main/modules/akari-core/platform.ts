@@ -1,4 +1,4 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import SendInputWorker from '@main/workers/send-input?nodeWorker'
 import { Menu, MenuItem, Notification, Tray, app } from 'electron'
 import { GlobalKeyboardListener } from 'node-global-key-listener'

@@ -1,4 +1,4 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 import { Metadata } from '@main/db/entities/Metadata'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'

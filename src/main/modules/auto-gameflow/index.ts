@@ -1,4 +1,4 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import { chatSend } from '@main/http-api/chat'
 import { honor } from '@main/http-api/honor-v2'
 import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'

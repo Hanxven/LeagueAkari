@@ -1,4 +1,4 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import { chatSend } from '@main/http-api/chat'
 import { ChatMessage } from '@shared/types/lcu/chat'
 import { LcuEvent } from '@shared/types/lcu/event'

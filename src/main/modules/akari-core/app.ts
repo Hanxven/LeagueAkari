@@ -1,5 +1,5 @@
 import { optimizer } from '@electron-toolkit/utils'
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { AxiosRequestConfig } from 'axios'
 import { BrowserWindow, app, protocol, session, shell } from 'electron'

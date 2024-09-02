@@ -1,4 +1,4 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
 import { getPlayerChampionMasteryTopN } from '@main/http-api/champion-mastery'

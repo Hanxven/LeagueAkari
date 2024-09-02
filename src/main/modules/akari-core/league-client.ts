@@ -1,4 +1,4 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/modules/mobx-based-basic-module'
+import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import { makeAutoObservable, observable } from 'mobx'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
