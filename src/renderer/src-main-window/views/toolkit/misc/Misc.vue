@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useAppStore } from '@renderer-shared/modules/app/store'
 import { NScrollbar } from 'naive-ui'
 
 import AvailabilityCheck from './AvailabilityCheck.vue'

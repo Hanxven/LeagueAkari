@@ -39,10 +39,10 @@
 </template>
 
 <script setup lang="ts">
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
-import { championIconUrl } from '@shared/renderer/modules/game-data'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useAutoSelectStore } from '@renderer-shared/modules/auto-select/store'
+import { championIconUrl } from '@renderer-shared/modules/game-data'
+import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
 import { Action } from '@shared/types/lcu/champ-select'
 import { NCard, NTimeline, NTimelineItem } from 'naive-ui'
 import { computed } from 'vue'
@@ -150,4 +150,4 @@ const getTimelineTypeByAction = (action: Action) => {
   }
 }
 </style>
-@shared/renderer/modules/auto-select/store@shared/renderer/modules/lcu-state-sync/champ-select@shared/renderer/modules/lcu-state-sync/summoner
+@renderer-shared/modules/auto-select/store@renderer-shared/modules/lcu-state-sync/champ-select@renderer-shared/modules/lcu-state-sync/summoner

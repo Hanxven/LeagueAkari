@@ -183,9 +183,9 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { autoGameflowRendererModule as am } from '@shared/renderer/modules/auto-gameflow'
-import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { autoGameflowRendererModule as am } from '@renderer-shared/modules/auto-gameflow'
+import { useAutoGameflowStore } from '@renderer-shared/modules/auto-gameflow/store'
 import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
 
 const agf = useAutoGameflowStore()

@@ -111,12 +111,12 @@
 </template>
 
 <script setup lang="ts">
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { benchSwap, reroll } from '@shared/renderer/http-api/champ-select'
-import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
-import { championIconUrl } from '@shared/renderer/modules/game-data'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { benchSwap, reroll } from '@renderer-shared/http-api/champ-select'
+import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
+import { championIconUrl } from '@renderer-shared/modules/game-data'
+import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
 import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
@@ -521,4 +521,4 @@ const handleReroll = async (grabBack = false) => {
   color: rgb(145, 145, 145);
 }
 </style>
-@shared/renderer/modules/external-data-source/store@shared/renderer/modules/lcu-state-sync/champ-select@shared/renderer/modules/lcu-state-sync/gameflow
+@renderer-shared/modules/external-data-source/store@renderer-shared/modules/lcu-state-sync/champ-select@renderer-shared/modules/lcu-state-sync/gameflow

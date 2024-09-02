@@ -22,10 +22,10 @@
 </template>
 
 <script lang="ts" setup>
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
-import { championIconUrl } from '@shared/renderer/modules/game-data'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
+import { championIconUrl } from '@renderer-shared/modules/game-data'
+import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
 import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
 import { useMediaQuery } from '@vueuse/core'
 import {

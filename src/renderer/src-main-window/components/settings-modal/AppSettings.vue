@@ -117,13 +117,13 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { appRendererModule as am } from '@shared/renderer/modules/app'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { autoUpdateRendererModule as aum } from '@shared/renderer/modules/auto-update'
-import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
-import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { appRendererModule as am } from '@renderer-shared/modules/app'
+import { useAppStore } from '@renderer-shared/modules/app/store'
+import { autoUpdateRendererModule as aum } from '@renderer-shared/modules/auto-update'
+import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
+import { lcuConnectionRendererModule as lcm } from '@renderer-shared/modules/lcu-connection'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip, useDialog } from 'naive-ui'
 
 const app = useAppStore()

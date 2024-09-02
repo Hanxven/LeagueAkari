@@ -407,15 +407,15 @@
 </template>
 
 <script setup lang="ts">
-import CopyableText from '@shared/renderer/components/CopyableText.vue'
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
-import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
-import { championIconUrl, profileIconUrl } from '@shared/renderer/modules/game-data'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
-import { laNotification } from '@shared/renderer/notification'
+import CopyableText from '@renderer-shared/components/CopyableText.vue'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { useAppStore } from '@renderer-shared/modules/app/store'
+import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
+import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
+import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
+import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { laNotification } from '@renderer-shared/notification'
 import {
   analyzeMatchHistory,
   analyzeMatchHistoryPlayers,

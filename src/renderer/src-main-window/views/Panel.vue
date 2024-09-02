@@ -83,9 +83,9 @@
 </template>
 
 <script setup lang="ts">
-import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
-import { UxCommandLine, useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { leagueClientRendererModule as lcm2 } from '@shared/renderer/modules/league-client'
+import { lcuConnectionRendererModule as lcm } from '@renderer-shared/modules/lcu-connection'
+import { UxCommandLine, useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { leagueClientRendererModule as lcm2 } from '@renderer-shared/modules/league-client'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import {
   AiStatus as AiStatusIcon,

@@ -30,8 +30,8 @@
 </template>
 
 <script setup lang="ts">
-import { getGame } from '@shared/renderer/http-api/match-history'
-import { laNotification } from '@shared/renderer/notification'
+import { getGame } from '@renderer-shared/http-api/match-history'
+import { laNotification } from '@renderer-shared/notification'
 import { Game } from '@shared/types/lcu/match-history'
 import { AxiosError } from 'axios'
 import { NButton, NModal } from 'naive-ui'

@@ -1,4 +1,4 @@
-import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
+import { StateSyncModule } from '@renderer-shared/akari-ipc/state-sync-module'
 
 export class OpggRendererModule extends StateSyncModule {
   constructor() {

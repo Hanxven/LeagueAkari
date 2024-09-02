@@ -39,13 +39,13 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { earlyExit } from '@shared/renderer/http-api/gameflow'
-import { playAgain } from '@shared/renderer/http-api/lobby'
-import { deleteLobby } from '@shared/renderer/http-api/lobby'
-import { dodge } from '@shared/renderer/http-api/login'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { laNotification } from '@shared/renderer/notification'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { earlyExit } from '@renderer-shared/http-api/gameflow'
+import { playAgain } from '@renderer-shared/http-api/lobby'
+import { deleteLobby } from '@renderer-shared/http-api/lobby'
+import { dodge } from '@renderer-shared/http-api/login'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
+import { laNotification } from '@renderer-shared/notification'
 import { NButton, NCard } from 'naive-ui'
 import { computed } from 'vue'
 

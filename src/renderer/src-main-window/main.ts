@@ -1,4 +1,4 @@
-import { appRendererModule as am } from '@shared/renderer/modules/app'
+import { appRendererModule as am } from '@renderer-shared/modules/app'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'

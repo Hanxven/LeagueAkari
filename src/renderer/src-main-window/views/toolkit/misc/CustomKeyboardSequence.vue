@@ -41,11 +41,11 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { customKeyboardSequenceRendererModule as cksm } from '@shared/renderer/modules/custom-keyboard-sequence'
-import { useCustomKeyboardSequenceStore } from '@shared/renderer/modules/custom-keyboard-sequence/store'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { useAppStore } from '@renderer-shared/modules/app/store'
+import { customKeyboardSequenceRendererModule as cksm } from '@renderer-shared/modules/custom-keyboard-sequence'
+import { useCustomKeyboardSequenceStore } from '@renderer-shared/modules/custom-keyboard-sequence/store'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { NCard, NInput, NSwitch } from 'naive-ui'
 
 const cks = useCustomKeyboardSequenceStore()

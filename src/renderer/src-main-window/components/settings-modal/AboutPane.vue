@@ -128,11 +128,11 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { autoUpdateRendererModule as aum } from '@shared/renderer/modules/auto-update'
-import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { useAppStore } from '@renderer-shared/modules/app/store'
+import { autoUpdateRendererModule as aum } from '@renderer-shared/modules/auto-update'
+import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
 import dayjs from 'dayjs'
 import { NButton, NCard, NFlex, NScrollbar, NStep, NSteps, useMessage } from 'naive-ui'
 import { computed, h, inject } from 'vue'

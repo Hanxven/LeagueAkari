@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
-import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
+import { auxiliaryWindowRendererModule as awm } from '@renderer-shared/modules/auxiliary-window'
+import { useAuxiliaryWindowStore } from '@renderer-shared/modules/auxiliary-window/store'
 import { watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -65,4 +65,4 @@ window.sw = (width: number, height: number) => {
   }
 }
 </style>
-@shared/renderer/modules/lcu-state-sync/gameflow
+@renderer-shared/modules/lcu-state-sync/gameflow

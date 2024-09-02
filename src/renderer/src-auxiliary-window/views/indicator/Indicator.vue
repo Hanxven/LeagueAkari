@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { onActivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 

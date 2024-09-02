@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import {
   addBot,
   createPractice5x5,
@@ -91,11 +91,11 @@ import {
   getAvailableBots,
   getEligiblePartyQueues,
   getEligibleSelfQueues
-} from '@shared/renderer/http-api/lobby'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { laNotification } from '@shared/renderer/notification'
+} from '@renderer-shared/http-api/lobby'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
+import { laNotification } from '@renderer-shared/notification'
 import { AvailableBot, QueueEligibility } from '@shared/types/lcu/lobby'
 import { NButton, NCard, NFlex, NInput, NSelect, useMessage } from 'naive-ui'
 import { computed, reactive, ref, shallowRef } from 'vue'

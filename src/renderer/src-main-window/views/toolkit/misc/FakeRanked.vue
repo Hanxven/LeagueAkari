@@ -46,10 +46,10 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { changeRanked } from '@shared/renderer/http-api/chat'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { laNotification } from '@shared/renderer/notification'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { changeRanked } from '@renderer-shared/http-api/chat'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { laNotification } from '@renderer-shared/notification'
 import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
 import { reactive } from 'vue'
 

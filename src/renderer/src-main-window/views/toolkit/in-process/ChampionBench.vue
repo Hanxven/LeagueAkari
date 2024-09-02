@@ -48,12 +48,12 @@
 </template>
 
 <script setup lang="ts">
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { championIconUrl } from '@shared/renderer/modules/game-data'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { benchSwap, reroll } from '@shared/renderer/http-api/champ-select'
-import { laNotification } from '@shared/renderer/notification'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { championIconUrl } from '@renderer-shared/modules/game-data'
+import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
+import { benchSwap, reroll } from '@renderer-shared/http-api/champ-select'
+import { laNotification } from '@renderer-shared/notification'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { NButton, NCard, NDivider } from 'naive-ui'
 import { computed, ref } from 'vue'

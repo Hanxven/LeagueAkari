@@ -65,11 +65,11 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { quit } from '@shared/renderer/http-api/process-control'
-import { checkAvailability, newSummonerName } from '@shared/renderer/http-api/summoner'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { laNotification } from '@shared/renderer/notification'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { quit } from '@renderer-shared/http-api/process-control'
+import { checkAvailability, newSummonerName } from '@renderer-shared/http-api/summoner'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { laNotification } from '@renderer-shared/notification'
 import { NButton, NCard, NInput, NPopconfirm, useMessage } from 'naive-ui'
 import { h, reactive, ref, watch } from 'vue'
 

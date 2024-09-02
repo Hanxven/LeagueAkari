@@ -14,10 +14,10 @@
 </template>
 
 <script setup lang="ts">
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
-import { championIconUrl } from '@shared/renderer/modules/game-data'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useAutoSelectStore } from '@renderer-shared/modules/auto-select/store'
+import { championIconUrl } from '@renderer-shared/modules/game-data'
+import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { useIntervalFn } from '@vueuse/core'
 import { NCard, NFlex } from 'naive-ui'
@@ -66,4 +66,4 @@ watch(
   border-radius: 2px;
 }
 </style>
-@shared/renderer/modules/auto-select/store@shared/renderer/modules/lcu-state-sync/champ-select
+@renderer-shared/modules/auto-select/store@renderer-shared/modules/lcu-state-sync/champ-select

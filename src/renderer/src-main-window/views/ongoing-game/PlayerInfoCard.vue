@@ -223,14 +223,14 @@
 </template>
 
 <script setup lang="ts">
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { appRendererModule as am } from '@shared/renderer/modules/app'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { appRendererModule as am } from '@renderer-shared/modules/app'
 import {
   MatchHistoryGameWithState,
   SavedPlayerInfo
-} from '@shared/renderer/modules/core-functionality/store'
-import { championIconUrl } from '@shared/renderer/modules/game-data'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
+} from '@renderer-shared/modules/core-functionality/store'
+import { championIconUrl } from '@renderer-shared/modules/game-data'
+import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'

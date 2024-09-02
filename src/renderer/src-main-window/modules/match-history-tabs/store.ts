@@ -1,5 +1,5 @@
-import { useTabs } from '@shared/renderer/compositions/useTabs'
-import { SavedPlayerInfo } from '@shared/renderer/modules/core-functionality/store'
+import { useTabs } from '@renderer-shared/compositions/useTabs'
+import { SavedPlayerInfo } from '@renderer-shared/modules/core-functionality/store'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'

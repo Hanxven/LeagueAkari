@@ -36,9 +36,9 @@
 </template>
 
 <script setup lang="ts">
-import { autoUpdateRendererModule as aum } from '@shared/renderer/modules/auto-update'
-import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
-import { markdownIt } from '@shared/renderer/utils/markdown'
+import { autoUpdateRendererModule as aum } from '@renderer-shared/modules/auto-update'
+import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
+import { markdownIt } from '@renderer-shared/utils/markdown'
 import dayjs from 'dayjs'
 import { NButton, NModal, NScrollbar } from 'naive-ui'
 import { computed, useCssModule } from 'vue'
@@ -168,4 +168,4 @@ const handleRead = () => {
   margin-bottom: 12px;
 }
 </style>
-@shared/renderer/modules/app/store
+@renderer-shared/modules/app/store

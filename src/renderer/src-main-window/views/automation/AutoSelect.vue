@@ -331,9 +331,9 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { autoSelectRendererModule as asm } from '@shared/renderer/modules/auto-select'
-import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { autoSelectRendererModule as asm } from '@renderer-shared/modules/auto-select'
+import { useAutoSelectStore } from '@renderer-shared/modules/auto-select/store'
 import { NCard, NInputNumber, NScrollbar, NSwitch, NTooltip } from 'naive-ui'
 
 import OrderedChampionList from '@main-window/components/OrderedChampionListNew.vue'

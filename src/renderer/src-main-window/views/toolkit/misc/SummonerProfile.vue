@@ -107,19 +107,19 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { updatePlayerPreferences } from '@shared/renderer/http-api/challenges'
-import { getMe } from '@shared/renderer/http-api/chat'
-import { getChampDetails } from '@shared/renderer/http-api/game-data'
-import { getRegalia, updateRegalia } from '@shared/renderer/http-api/regalia'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { updatePlayerPreferences } from '@renderer-shared/http-api/challenges'
+import { getMe } from '@renderer-shared/http-api/chat'
+import { getChampDetails } from '@renderer-shared/http-api/game-data'
+import { getRegalia, updateRegalia } from '@renderer-shared/http-api/regalia'
 import {
   setSummonerBackgroundAugments,
   setSummonerBackgroundSkin
-} from '@shared/renderer/http-api/summoner'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
+} from '@renderer-shared/http-api/summoner'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { ChampSkin } from '@shared/types/lcu/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'

@@ -87,13 +87,13 @@
 
 <script setup lang="ts">
 import LoungeOperations from '@auxiliary-window/components/LoungeOperations.vue'
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { deleteSearchMatch } from '@shared/renderer/http-api/lobby'
-import { accept, decline } from '@shared/renderer/http-api/matchmaking'
-import { autoGameflowRendererModule as agfm } from '@shared/renderer/modules/auto-gameflow'
-import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { useMatchmakingStore } from '@shared/renderer/modules/lcu-state-sync/matchmaking'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { deleteSearchMatch } from '@renderer-shared/http-api/lobby'
+import { accept, decline } from '@renderer-shared/http-api/matchmaking'
+import { autoGameflowRendererModule as agfm } from '@renderer-shared/modules/auto-gameflow'
+import { useAutoGameflowStore } from '@renderer-shared/modules/auto-gameflow/store'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
+import { useMatchmakingStore } from '@renderer-shared/modules/lcu-state-sync/matchmaking'
 import { GetSearch } from '@shared/types/lcu/matchmaking'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton } from 'naive-ui'
@@ -281,4 +281,4 @@ const formatMatchmakingSearchText = (search: GetSearch) => {
   gap: 4px;
 }
 </style>
-@shared/renderer/modules/auto-gameflow@shared/renderer/modules/auto-gameflow/store@shared/renderer/modules/lcu-state-sync/gameflow@shared/renderer/modules/lcu-state-sync/matchmaking
+@renderer-shared/modules/auto-gameflow@renderer-shared/modules/auto-gameflow/store@renderer-shared/modules/lcu-state-sync/gameflow@renderer-shared/modules/lcu-state-sync/matchmaking

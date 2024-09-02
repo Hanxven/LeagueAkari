@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import ChampionIcon from '@shared/renderer/components/widgets/ChampionIcon.vue'
+import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { ref } from 'vue'
 
 import SpectateStatus from '../match-history/widgets/SpectateStatus.vue'

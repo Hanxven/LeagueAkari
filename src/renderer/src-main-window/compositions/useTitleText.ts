@@ -1,4 +1,4 @@
-import { useAppStore } from '@shared/renderer/modules/app/store'
+import { useAppStore } from '@renderer-shared/modules/app/store'
 import { computed } from 'vue'
 
 export function useTitleText(debugIdentifier = 'rabi') {

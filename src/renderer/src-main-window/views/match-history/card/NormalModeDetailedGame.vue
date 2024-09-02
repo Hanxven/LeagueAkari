@@ -184,12 +184,12 @@
 </template>
 
 <script setup lang="ts">
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import ItemDisplay from '@shared/renderer/components/widgets/ItemDisplay.vue'
-import PerkDisplay from '@shared/renderer/components/widgets/PerkDisplay.vue'
-import PerkstyleDisplay from '@shared/renderer/components/widgets/PerkstyleDisplay.vue'
-import SummonerSpellDisplay from '@shared/renderer/components/widgets/SummonerSpellDisplay.vue'
-import { championIconUrl } from '@shared/renderer/modules/game-data'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
+import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
+import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
+import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { championIconUrl } from '@renderer-shared/modules/game-data'
 import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'

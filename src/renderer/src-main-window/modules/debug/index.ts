@@ -1,7 +1,7 @@
 import { RadixEventEmitter } from '@shared/event-emitter'
-import { StateSyncModule } from '@shared/renderer/akari-ipc/state-sync-module'
-import { gameClientRequest, request as lcuRequest } from '@shared/renderer/http-api/common'
-import { request as rcRequest } from '@shared/renderer/rc-http-api/common'
+import { StateSyncModule } from '@renderer-shared/akari-ipc/state-sync-module'
+import { gameClientRequest, request as lcuRequest } from '@renderer-shared/http-api/common'
+import { request as rcRequest } from '@renderer-shared/rc-http-api/common'
 import { watch } from 'vue'
 
 import { router } from '@main-window/routes'

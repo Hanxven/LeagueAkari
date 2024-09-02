@@ -7,7 +7,8 @@
     "src/renderer/src-auxiliary-window/**/*",
     "src/renderer/src-auxiliary-window/**/*.vue",
     "src/preload/*.d.ts",
-    "src/shared/**/*"
+    "src/shared/**/*",
+    "src/renderer-shared/**/*"
   ],
   "compilerOptions": {
     "target": "ESNext",
@@ -17,7 +18,8 @@
     "paths": {
       "@main-window/*": ["src/renderer/src-main-window/*"],
       "@auxiliary-window/*": ["src/renderer/src-auxiliary-window/*"],
-      "@shared/*": ["src/shared/*"]
+      "@shared/*": ["src/shared/*"],
+      "@renderer-shared/*": ["src/renderer-shared/*"]
     },
     "noUnusedLocals": false,
     "noUnusedParameters": false

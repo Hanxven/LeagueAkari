@@ -30,9 +30,9 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { setChatStatusMessage } from '@shared/renderer/http-api/chat'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { setChatStatusMessage } from '@renderer-shared/http-api/chat'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { NButton, NCard, NInput, useMessage } from 'naive-ui'
 import { ref } from 'vue'
 

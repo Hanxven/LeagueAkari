@@ -84,18 +84,18 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { getStrawberryHub } from '@shared/renderer/http-api/game-data'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { getStrawberryHub } from '@renderer-shared/http-api/game-data'
 import {
   getAccountScopeLoadouts,
   setStrawberryDifficulty
-} from '@shared/renderer/http-api/loadouts'
-import { setPlayerSlotsStrawberry1, setStrawberryMapId } from '@shared/renderer/http-api/lobby'
-import { championIconUrl } from '@shared/renderer/modules/game-data'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
-import { useLobbyStore } from '@shared/renderer/modules/lcu-state-sync/lobby'
+} from '@renderer-shared/http-api/loadouts'
+import { setPlayerSlotsStrawberry1, setStrawberryMapId } from '@renderer-shared/http-api/lobby'
+import { championIconUrl } from '@renderer-shared/modules/game-data'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { useLobbyStore } from '@renderer-shared/modules/lcu-state-sync/lobby'
 import { AccountScopeLoadouts, ChampionSimple, StrawberryHub } from '@shared/types/lcu/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NSelect, SelectRenderLabel, useMessage } from 'naive-ui'

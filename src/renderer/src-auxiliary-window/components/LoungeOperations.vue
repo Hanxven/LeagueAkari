@@ -28,9 +28,9 @@
 </template>
 
 <script setup lang="ts">
-import { autoGameflowRendererModule as agfm } from '@shared/renderer/modules/auto-gameflow'
-import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { autoGameflowRendererModule as agfm } from '@renderer-shared/modules/auto-gameflow'
+import { useAutoGameflowStore } from '@renderer-shared/modules/auto-gameflow/store'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { NCard, NFlex, NSwitch } from 'naive-ui'
 import { computed } from 'vue'
 
@@ -67,4 +67,4 @@ const formatDelayText = (d: number) => {
   }
 }
 </style>
-@shared/renderer/modules/auto-gameflow@shared/renderer/modules/auto-gameflow/store@shared/renderer/modules/lcu-state-sync/gameflow
+@renderer-shared/modules/auto-gameflow@renderer-shared/modules/auto-gameflow/store@renderer-shared/modules/lcu-state-sync/gameflow

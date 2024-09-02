@@ -1,4 +1,4 @@
-import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
+import { auxiliaryWindowRendererModule as awm } from '@renderer-shared/modules/auxiliary-window'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({

@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { NButton, NCard, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'
 

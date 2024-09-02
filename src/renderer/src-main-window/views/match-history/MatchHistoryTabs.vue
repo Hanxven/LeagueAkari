@@ -109,12 +109,12 @@
 </template>
 
 <script setup lang="ts">
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
-import { championIconUrl, profileIconUrl } from '@shared/renderer/modules/game-data'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
+import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { summonerName } from '@shared/utils/name'
 import { rsoPlatformText } from '@shared/utils/rso-platforms'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'

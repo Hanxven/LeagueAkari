@@ -337,16 +337,16 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
-import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
-import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality'
-import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
-import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { respawnTimerRendererModule as rtm } from '@shared/renderer/modules/respawn-timer'
-import { useRespawnTimerStore } from '@shared/renderer/modules/respawn-timer/store'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { useAppStore } from '@renderer-shared/modules/app/store'
+import { auxiliaryWindowRendererModule as awm } from '@renderer-shared/modules/auxiliary-window'
+import { useAuxiliaryWindowStore } from '@renderer-shared/modules/auxiliary-window/store'
+import { coreFunctionalityRendererModule as cfm } from '@renderer-shared/modules/core-functionality'
+import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
+import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { respawnTimerRendererModule as rtm } from '@renderer-shared/modules/respawn-timer'
+import { useRespawnTimerStore } from '@renderer-shared/modules/respawn-timer/store'
 import {
   NButton,
   NCard,

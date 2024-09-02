@@ -82,12 +82,12 @@ import {
   getSummonerAlias,
   getSummonerByName,
   getSummonerByPuuid
-} from '@shared/renderer/http-api/summoner'
-import { externalDataSourceRendererModule as edsm } from '@shared/renderer/modules/external-data-source'
-import { useExternalDataSourceStore } from '@shared/renderer/modules/external-data-source/store'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
-import { getPlayerAccountAlias, getPlayerAccountNameset } from '@shared/renderer/rc-http-api/rc-api'
+} from '@renderer-shared/http-api/summoner'
+import { externalDataSourceRendererModule as edsm } from '@renderer-shared/modules/external-data-source'
+import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
+import { getPlayerAccountAlias, getPlayerAccountNameset } from '@renderer-shared/rc-http-api/rc-api'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { inferType, resolveSummonerName } from '@shared/utils/identity'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'

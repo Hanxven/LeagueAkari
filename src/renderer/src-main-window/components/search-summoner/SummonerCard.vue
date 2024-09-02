@@ -61,10 +61,10 @@
 </template>
 
 <script setup lang="ts">
-import CopyableText from '@shared/renderer/components/CopyableText.vue'
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
-import { laNotification } from '@shared/renderer/notification'
+import CopyableText from '@renderer-shared/components/CopyableText.vue'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { getSummonerByPuuid } from '@renderer-shared/http-api/summoner'
+import { laNotification } from '@renderer-shared/notification'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NCard } from 'naive-ui'

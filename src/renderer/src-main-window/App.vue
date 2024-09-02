@@ -14,13 +14,13 @@
 
 <script setup lang="ts">
 import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
-import { useKeyboardCombo } from '@shared/renderer/compositions/useKeyboardCombo'
-import { appRendererModule as am } from '@shared/renderer/modules/app'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
-import { useCoreFunctionalityStore } from '@shared/renderer/modules/core-functionality/store'
-import { setupNaiveUiNotificationEvents } from '@shared/renderer/notification'
-import { greeting } from '@shared/renderer/utils/greeting'
+import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
+import { appRendererModule as am } from '@renderer-shared/modules/app'
+import { useAppStore } from '@renderer-shared/modules/app/store'
+import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
+import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
+import { setupNaiveUiNotificationEvents } from '@renderer-shared/notification'
+import { greeting } from '@renderer-shared/utils/greeting'
 import {
   ArcElement,
   BarElement,

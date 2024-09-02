@@ -42,9 +42,9 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { autoReplyRendererModule as arm } from '@shared/renderer/modules/auto-reply'
-import { useAutoReplyStore } from '@shared/renderer/modules/auto-reply/store'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { autoReplyRendererModule as arm } from '@renderer-shared/modules/auto-reply'
+import { useAutoReplyStore } from '@renderer-shared/modules/auto-reply/store'
 import { NCard, NInput, NScrollbar, NSwitch } from 'naive-ui'
 
 const ar = useAutoReplyStore()

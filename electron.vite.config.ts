@@ -59,7 +59,8 @@ export default defineConfig({
     },
     resolve: {
       alias: {
-        '@shared': resolve('src/shared')
+        '@shared': resolve('src/shared'),
+        '@renderer-shared': resolve('src/renderer-shared')
       }
     }
   },
@@ -68,7 +69,8 @@ export default defineConfig({
       alias: {
         '@main-window': resolve('src/renderer/src-main-window'),
         '@auxiliary-window': resolve('src/renderer/src-auxiliary-window'),
-        '@shared': resolve('src/shared')
+        '@shared': resolve('src/shared'),
+        '@renderer-shared': resolve('src/renderer-shared')
       }
     },
     plugins: [

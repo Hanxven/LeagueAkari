@@ -178,14 +178,14 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import CopyableText from '@shared/renderer/components/CopyableText.vue'
-import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { appRendererModule as am } from '@shared/renderer/modules/app'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { mainWindowRendererModule as mwm } from '@shared/renderer/modules/main-window'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import CopyableText from '@renderer-shared/components/CopyableText.vue'
+import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { appRendererModule as am } from '@renderer-shared/modules/app'
+import { useAppStore } from '@renderer-shared/modules/app/store'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
+import { mainWindowRendererModule as mwm } from '@renderer-shared/modules/main-window'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
 import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
 import {

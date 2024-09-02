@@ -164,21 +164,21 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import LeagueAkariSpan from '@shared/renderer/components/LeagueAkariSpan.vue'
-import { useKeepAliveScrollPositionMemo } from '@shared/renderer/compositions/useKeepAliveScrollPositionMemo'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { useKeepAliveScrollPositionMemo } from '@renderer-shared/compositions/useKeepAliveScrollPositionMemo'
+import { useAppStore } from '@renderer-shared/modules/app/store'
+import { coreFunctionalityRendererModule as cfm } from '@renderer-shared/modules/core-functionality'
 import {
   OngoingPlayer,
   useCoreFunctionalityStore
-} from '@shared/renderer/modules/core-functionality/store'
-import { championIconUrl } from '@shared/renderer/modules/game-data'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
+} from '@renderer-shared/modules/core-functionality/store'
+import { championIconUrl } from '@renderer-shared/modules/game-data'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { Game } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'

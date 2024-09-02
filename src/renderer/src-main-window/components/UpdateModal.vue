@@ -43,8 +43,8 @@
 </template>
 
 <script setup lang="ts">
-import { useAutoUpdateStore } from '@shared/renderer/modules/auto-update/store'
-import { markdownIt } from '@shared/renderer/utils/markdown'
+import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
+import { markdownIt } from '@renderer-shared/utils/markdown'
 import { NModal, NScrollbar } from 'naive-ui'
 import { computed, useCssModule } from 'vue'
 
@@ -170,4 +170,4 @@ const props = defineProps<{
   margin-bottom: 12px;
 }
 </style>
-@shared/renderer/modules/app/store
+@renderer-shared/modules/app/store

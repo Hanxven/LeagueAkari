@@ -176,22 +176,22 @@ import {
   RegionType,
   TierType
 } from '@shared/data-sources/opgg/types'
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { useStableComputed } from '@shared/renderer/compositions/useStableComputed'
-import { getMySelections, setMySummonerSpells } from '@shared/renderer/http-api/champ-select'
-import { chatSend } from '@shared/renderer/http-api/chat'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { useStableComputed } from '@renderer-shared/compositions/useStableComputed'
+import { getMySelections, setMySummonerSpells } from '@renderer-shared/http-api/champ-select'
+import { chatSend } from '@renderer-shared/http-api/chat'
 import {
   getPerkInventory,
   getPerkPages,
   postPerkPage,
   putCurrentPage,
   putPage
-} from '@shared/renderer/http-api/perks'
-import { appRendererModule as am } from '@shared/renderer/modules/app'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
-import { useChatStore } from '@shared/renderer/modules/lcu-state-sync/chat'
-import { useGameDataStore } from '@shared/renderer/modules/lcu-state-sync/game-data'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+} from '@renderer-shared/http-api/perks'
+import { appRendererModule as am } from '@renderer-shared/modules/app'
+import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
+import { useChatStore } from '@renderer-shared/modules/lcu-state-sync/chat'
+import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { maybePveChampion } from '@shared/types/lcu/game-data'
 import {
   Close as CloseIcon,

@@ -42,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import { auxiliaryWindowRendererModule as awm } from '@shared/renderer/modules/auxiliary-window'
-import { useAuxiliaryWindowStore } from '@shared/renderer/modules/auxiliary-window/store'
+import { auxiliaryWindowRendererModule as awm } from '@renderer-shared/modules/auxiliary-window'
+import { useAuxiliaryWindowStore } from '@renderer-shared/modules/auxiliary-window/store'
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
 import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/fluent'
 import { Close as CloseIcon } from '@vicons/ionicons5'

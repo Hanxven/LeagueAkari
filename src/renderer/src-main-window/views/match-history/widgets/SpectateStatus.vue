@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { SpectatorData } from '@shared/data-sources/sgp/types'
-import { externalDataSourceRendererModule as edsm } from '@shared/renderer/modules/external-data-source'
+import { externalDataSourceRendererModule as edsm } from '@renderer-shared/modules/external-data-source'
 import { watchEffect } from 'vue'
 
 const props = defineProps<{

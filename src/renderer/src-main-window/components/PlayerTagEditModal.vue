@@ -31,14 +31,14 @@ t <template>
 </template>
 
 <script setup lang="ts">
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { getSummonerByPuuid } from '@shared/renderer/http-api/summoner'
-import { coreFunctionalityRendererModule as cfm } from '@shared/renderer/modules/core-functionality'
-import { SavedPlayerInfo } from '@shared/renderer/modules/core-functionality/store'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
-import { storageRendererModule as sm } from '@shared/renderer/modules/storage'
-import { laNotification } from '@shared/renderer/notification'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { getSummonerByPuuid } from '@renderer-shared/http-api/summoner'
+import { coreFunctionalityRendererModule as cfm } from '@renderer-shared/modules/core-functionality'
+import { SavedPlayerInfo } from '@renderer-shared/modules/core-functionality/store'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
+import { storageRendererModule as sm } from '@renderer-shared/modules/storage'
+import { laNotification } from '@renderer-shared/notification'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NButton, NInput, NModal } from 'naive-ui'

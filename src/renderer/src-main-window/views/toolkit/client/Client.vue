@@ -160,14 +160,14 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { quit } from '@shared/renderer/http-api/process-control'
-import { killUx, launchUx, restartUx } from '@shared/renderer/http-api/riotclient'
-import { useAppStore } from '@shared/renderer/modules/app/store'
-import { lcuConnectionRendererModule as lcm } from '@shared/renderer/modules/lcu-connection'
-import { useLcuConnectionStore } from '@shared/renderer/modules/lcu-connection/store'
-import { leagueClientRendererModule as lcm2 } from '@shared/renderer/modules/league-client'
-import { useLeagueClientStore } from '@shared/renderer/modules/league-client/store'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { quit } from '@renderer-shared/http-api/process-control'
+import { killUx, launchUx, restartUx } from '@renderer-shared/http-api/riotclient'
+import { useAppStore } from '@renderer-shared/modules/app/store'
+import { lcuConnectionRendererModule as lcm } from '@renderer-shared/modules/lcu-connection'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { leagueClientRendererModule as lcm2 } from '@renderer-shared/modules/league-client'
+import { useLeagueClientStore } from '@renderer-shared/modules/league-client/store'
 import { NButton, NCard, NInputNumber, NScrollbar, NSwitch, useDialog } from 'naive-ui'
 import { ref } from 'vue'
 

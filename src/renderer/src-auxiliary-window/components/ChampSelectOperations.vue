@@ -51,14 +51,14 @@
 </template>
 
 <script setup lang="ts">
-import { useCountdownSeconds } from '@shared/renderer/compositions/useCountdown'
-import { dodge } from '@shared/renderer/http-api/login'
-import { autoGameflowRendererModule as agfm } from '@shared/renderer/modules/auto-gameflow'
-import { useAutoGameflowStore } from '@shared/renderer/modules/auto-gameflow/store'
-import { autoSelectRendererModule as asm } from '@shared/renderer/modules/auto-select'
-import { useAutoSelectStore } from '@shared/renderer/modules/auto-select/store'
-import { useChampSelectStore } from '@shared/renderer/modules/lcu-state-sync/champ-select'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
+import { useCountdownSeconds } from '@renderer-shared/compositions/useCountdown'
+import { dodge } from '@renderer-shared/http-api/login'
+import { autoGameflowRendererModule as agfm } from '@renderer-shared/modules/auto-gameflow'
+import { useAutoGameflowStore } from '@renderer-shared/modules/auto-gameflow/store'
+import { autoSelectRendererModule as asm } from '@renderer-shared/modules/auto-select'
+import { useAutoSelectStore } from '@renderer-shared/modules/auto-select/store'
+import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
 import { NButton, NCard, NFlex, NPopconfirm, NSwitch } from 'naive-ui'
 import { computed } from 'vue'

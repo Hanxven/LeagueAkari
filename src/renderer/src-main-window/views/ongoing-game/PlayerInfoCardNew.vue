@@ -78,8 +78,8 @@
 </template>
 
 <script setup lang="ts">
-import LcuImage from '@shared/renderer/components/LcuImage.vue'
-import { championIconUrl } from '@shared/renderer/modules/game-data'
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { championIconUrl } from '@renderer-shared/modules/game-data'
 import { ChartData, ChartOptions } from 'chart.js'
 import { NVirtualList } from 'naive-ui'
 import { Radar } from 'vue-chartjs'

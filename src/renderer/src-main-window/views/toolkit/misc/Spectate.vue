@@ -45,14 +45,14 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@shared/renderer/components/ControlItem.vue'
-import { getFriends } from '@shared/renderer/http-api/chat'
-import { deleteLobby } from '@shared/renderer/http-api/lobby'
-import { launchSpectator } from '@shared/renderer/http-api/spectator'
-import { getSummonerAlias, getSummonerByName } from '@shared/renderer/http-api/summoner'
-import { useGameflowStore } from '@shared/renderer/modules/lcu-state-sync/gameflow'
-import { useSummonerStore } from '@shared/renderer/modules/lcu-state-sync/summoner'
-import { laNotification } from '@shared/renderer/notification'
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { getFriends } from '@renderer-shared/http-api/chat'
+import { deleteLobby } from '@renderer-shared/http-api/lobby'
+import { launchSpectator } from '@renderer-shared/http-api/spectator'
+import { getSummonerAlias, getSummonerByName } from '@renderer-shared/http-api/summoner'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
+import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
+import { laNotification } from '@renderer-shared/notification'
 import { Friend } from '@shared/types/lcu/chat'
 import { resolveSummonerName } from '@shared/utils/identity'
 import { summonerName } from '@shared/utils/name'
