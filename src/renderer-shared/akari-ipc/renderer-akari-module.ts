@@ -75,7 +75,7 @@ export class LeagueAkariRendererModule {
   /**
    * 取消注册
    */
-  dismantle(): void | Promise<void> {
+  dispose(): void | Promise<void> {
     this._eventMap.clear()
     this._setManager(null)
   }

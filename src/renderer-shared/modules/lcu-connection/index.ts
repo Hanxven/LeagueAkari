@@ -17,10 +17,11 @@ export class LcuConnectionRendererModule extends StateSyncModule {
     const store = useLcuConnectionStore()
 
     this.simpleSync('settings/auto-connect', (s) => (store.settings.autoConnect = s))
-    this.simpleSync('state', (s) => (store.state = s))
-    this.simpleSync('auth', (a) => (store.auth = a))
-    this.simpleSync('connecting-client', (a) => (store.connectingClient = a))
-    this.simpleSync('launched-clients', (a) => (store.launchedClients = a))
+
+    this.sync(store, this.id, 'state')
+    this.sync(store, this.id, 'auth')
+    this.sync(store, this.id, 'connectingClient')
+    this.sync(store, this.id, 'launchedClients')
   }
 
   gameClientRequest(config: object) {

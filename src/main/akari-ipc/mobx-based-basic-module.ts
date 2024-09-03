@@ -1,6 +1,6 @@
 import { SettingService, StorageModule } from '@main/modules/akari-core/storage'
 import { Paths } from '@shared/utils/types'
-import { get } from 'lodash'
+import { get, set } from 'lodash'
 import { IReactionOptions, IReactionPublic, reaction, toJS } from 'mobx'
 
 import { LeagueAkariModule } from './akari-module'
@@ -17,6 +17,12 @@ type SimpleStateSetter = (
   value: any,
   s: SettingService
 ) => boolean | void | undefined | Promise<boolean | void | undefined>
+
+type StateSetter = (
+  value: any,
+  defaultBehavior: () => void, // 原本提供的默认设置行为
+  ss: SettingService
+) => void | Promise<boolean>
 
 /**
  * 实现了一些基于 Mobx 的简单状态管理封装，该模块依赖于 `storage` 模块。
@@ -77,14 +83,17 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
    * @param resPath 资源路径，如 `someState.nested.value`
    * @param obj 一个 mobx 对象
    */
-  sync<T>(resPath: Paths<T>, obj: T, mobxToJs = false) {
+  sync<T extends object>(obj: T, stateId: string, resPath: Paths<T>, mobxToJs = false) {
     this.autoDisposeReaction(
       () => get(obj, resPath),
       (newValue) => {
-        this.sendEvent(`update-dot-prop/${resPath}`, mobxToJs ? toJS(newValue) : newValue)
+        this.sendEvent(
+          `update-dot-prop/${stateId}/${resPath}`,
+          mobxToJs ? toJS(newValue) : newValue
+        )
       }
     )
-    this.onCall(`get-dot-prop/${resPath}`, () =>
+    this.onCall(`get-dot-prop/${stateId}/${resPath}`, () =>
       mobxToJs ? toJS(get(obj, resPath)) : get(obj, resPath)
     )
   }
@@ -105,6 +114,35 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
     this._settingsToSync.push(_readSettingFirst())
     this.simpleSync(`settings/${settingName}`, getter)
     this.onCall(`set-setting/${settingName}`, (value) => _wrappedSetter(value))
+  }
+
+  /**
+   * settingSync(this.state.settings, 'some.setting.path', (value) => this.state.settings.setSomeSettingPath(value))
+   */
+  settingSync<T extends object>(
+    obj: T,
+    settingModuleId: string,
+    resPath: Paths<T>,
+    setter?: StateSetter,
+    mobxToJs = false
+  ) {
+    const _defaultSetter = async (value: any) => {
+      set(obj, resPath, value)
+      await this._ss.set(resPath, value)
+    }
+
+    const _wrappedSetter = async (value: any) => {
+      if (setter) {
+        await setter(value, () => _defaultSetter(value), this._ss)
+      } else {
+        await _defaultSetter(value)
+      }
+    }
+    const _readSettingFirst = async () =>
+      _wrappedSetter(await this._ss.get(resPath, () => get(obj, resPath)))
+    this._settingsToSync.push(_readSettingFirst())
+    this.sync(obj, settingModuleId, resPath, mobxToJs)
+    this.onCall(`set-setting/${settingModuleId}/${resPath}`, (value) => _wrappedSetter(value))
   }
 
   /**
@@ -130,8 +168,8 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
     }
   }
 
-  override async dismantle() {
-    await super.dismantle()
+  override async dispose() {
+    await super.dispose()
     this._disposers.forEach((fn) => fn())
     this._disposers.clear()
   }

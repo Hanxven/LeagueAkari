@@ -18,10 +18,10 @@ export class AutoSelectRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAutoSelectStore()
 
-    this.simpleSync('champ-select-action-info/member-me', (s) => (store.memberMe = s))
-    this.simpleSync('upcoming-pick', (s) => (store.upcomingPick = s))
-    this.simpleSync('upcoming-ban', (s) => (store.upcomingBan = s))
-    this.simpleSync('upcoming-grab', (s) => (store.upcomingGrab = s))
+    this.sync(store, 'auto-select', 'upcomingBan')
+    this.sync(store, 'auto-select', 'upcomingPick')
+    this.sync(store, 'auto-select', 'upcomingGrab')
+    this.sync(store, 'auto-select', 'memberMe')
 
     this.simpleSync('settings/normal-mode-enabled', (s) => (store.settings.normalModeEnabled = s))
     this.simpleSync(

@@ -30,7 +30,7 @@
           :key="c.championId"
           class="champion-image"
           :class="{
-            'champion-image-invalid': !cs.currentPickableChampions.has(c.championId)
+            'champion-image-invalid': !cs.currentPickableChampionIds.has(c.championId)
           }"
           :src="championIconUrl(c.championId)"
           @click="() => handleBenchSwap(c.championId)"
@@ -101,7 +101,7 @@ const handleBenchSwap = async (championId: number) => {
     return
   }
 
-  if (!cs.currentPickableChampions.has(championId)) {
+  if (!cs.currentPickableChampionIds.has(championId)) {
     return
   }
 

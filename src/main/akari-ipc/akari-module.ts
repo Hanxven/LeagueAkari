@@ -92,7 +92,7 @@ export class LeagueAkariModule {
   /**
    * 停止服务
    */
-  dismantle(): void | Promise<void> {
+  dispose(): void | Promise<void> {
     this._methodMap.clear()
   }
 }

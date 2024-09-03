@@ -18,8 +18,25 @@ export class StateSyncModule extends LeagueAkariRendererModule {
     setter(await this.call(`state-get/${resName}`))
   }
 
-  async sync<T extends object>(resPath: Paths<T>, obj: T) {
-    this.onEvent(`update-dot-prop/${resPath}`, (value) => set(obj, resPath, value))
-    set(obj, resPath, await this.call(`get-dot-prop/${resPath}`))
+  /**
+   *
+   * @param obj 目标对象
+   * @param stateId 状态内部标识符
+   * @param resPath 来自主进程状态路径
+   * @param targetPath 目标设置路径 (若不提供, 则同主进程状态路径)
+   */
+  async sync<T extends object>(obj: T, stateId: string, resPath: Paths<T>, targetPath?: string) {
+    this.onEvent(`update-dot-prop/${stateId}/${resPath}`, (value) =>
+      set(obj, targetPath === undefined ? resPath : targetPath, value)
+    )
+    try {
+      set(
+        obj,
+        targetPath === undefined ? resPath : targetPath,
+        await this.call(`get-dot-prop/${stateId}/${resPath}`)
+      )
+    } catch (error) {
+      console.error(`Failed to get initial state of ${resPath} from ${stateId}`, error)
+    }
   }
 }

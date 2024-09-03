@@ -1,4 +1,3 @@
-import { LeagueAkariRendererModuleManager } from '@renderer-shared/akari-ipc/renderer-module-manager'
 import { StateSyncModule } from '@renderer-shared/akari-ipc/state-sync-module'
 
 import { useChampSelectStore } from './champ-select'
@@ -30,82 +29,64 @@ export class LcuSyncRendererModule extends StateSyncModule {
 
   private _syncLcuGameflow() {
     const gameflow = useGameflowStore()
-    this.simpleSync('lcu/gameflow/phase', (s) => (gameflow.phase = s))
-    this.simpleSync('lcu/gameflow/session', (s) => (gameflow.session = s))
+
+    this.sync(gameflow, `${this.id}/gameflow`, 'session')
+    this.sync(gameflow, `${this.id}/gameflow`, 'phase')
   }
 
   private _syncLcuSummoner() {
     const summoner = useSummonerStore()
 
-    this.simpleSync('lcu/summoner/me', (s) => (summoner.me = s))
+    this.sync(summoner, `${this.id}/summoner`, 'me')
   }
 
   private _syncLcuLobby() {
     const lobby = useLobbyStore()
 
-    this.simpleSync('lcu/lobby/lobby', (s) => (lobby.lobby = s))
+    this.sync(lobby, `${this.id}/lobby`, 'lobby')
   }
 
   private _syncLcuChat() {
     const chat = useChatStore()
 
-    this.simpleSync('lcu/chat/me', (s) => (chat.me = s))
-
-    this.simpleSync(
-      'lcu/chat/conversations/champ-select',
-      (s) => (chat.conversations.championSelect = s)
-    )
-
-    this.simpleSync('lcu/chat/conversations/post-game', (s) => (chat.conversations.postGame = s))
-    this.simpleSync(
-      'lcu/chat/conversations/custom-game',
-      (s) => (chat.conversations.customGame = s)
-    )
+    this.sync(chat, `${this.id}/chat`, 'me')
+    this.sync(chat, `${this.id}/chat`, 'conversations.championSelect')
+    this.sync(chat, `${this.id}/chat`, 'conversations.postGame')
+    this.sync(chat, `${this.id}/chat`, 'conversations.customGame')
   }
 
   private _syncLcuChampSelect() {
     const champSelect = useChampSelectStore()
 
-    this.simpleSync('lcu/champ-select/session', (s) => (champSelect.session = s))
-
-    this.simpleSync('lcu/champ-select/pickable-champion-ids', (s: number[]) => {
-      champSelect.currentPickableChampions.clear()
-      s.forEach((c) => champSelect.currentPickableChampions.add(c))
-    })
-
-    this.simpleSync('lcu/champ-select/bannable-champion-ids', (s: number[]) => {
-      champSelect.currentBannableChampions.clear()
-      s.forEach((c) => champSelect.currentBannableChampions.add(c))
-    })
-
-    this.simpleSync('lcu/champ-select/current-champion', (s: number) => {
-      champSelect.currentChampion = s
-    })
+    this.sync(champSelect, `${this.id}/champSelect`, 'session')
+    this.sync(champSelect, `${this.id}/champSelect`, 'currentPickableChampionIds')
+    this.sync(champSelect, `${this.id}/champSelect`, 'currentBannableChampionIds')
+    this.sync(champSelect, `${this.id}/champSelect`, 'currentChampion')
   }
 
   private _syncLcuGameData() {
     const gameData = useGameDataStore()
 
-    this.simpleSync('lcu/game-data/augments', (s) => (gameData.augments = s))
-    this.simpleSync('lcu/game-data/champions', (s) => (gameData.champions = s))
-    this.simpleSync('lcu/game-data/items', (s) => (gameData.items = s))
-    this.simpleSync('lcu/game-data/perks', (s) => (gameData.perks = s))
-    this.simpleSync('lcu/game-data/perkstyles', (s) => (gameData.perkstyles = s))
-    this.simpleSync('lcu/game-data/queues', (s) => (gameData.queues = s))
-    this.simpleSync('lcu/game-data/summoner-spells', (s) => (gameData.summonerSpells = s))
+    this.sync(gameData, `${this.id}/gameData`, 'augments')
+    this.sync(gameData, `${this.id}/gameData`, 'champions')
+    this.sync(gameData, `${this.id}/gameData`, 'items')
+    this.sync(gameData, `${this.id}/gameData`, 'perks')
+    this.sync(gameData, `${this.id}/gameData`, 'perkstyles')
+    this.sync(gameData, `${this.id}/gameData`, 'queues')
+    this.sync(gameData, `${this.id}/gameData`, 'summonerSpells')
   }
 
   private _syncLcuLogin() {
     const login = useLoginStore()
 
-    this.simpleSync('lcu/login/login-queue-state', (s) => (login.loginQueueState = s))
+    this.sync(login, `${this.id}/login`, 'loginQueueState')
   }
 
   private _syncLcuMatchmaking() {
     const matchmaking = useMatchmakingStore()
 
-    this.simpleSync('lcu/matchmaking/ready-check', (s) => (matchmaking.readyCheck = s))
-    this.simpleSync('lcu/matchmaking/search', (s) => (matchmaking.search = s))
+    this.sync(matchmaking, `${this.id}/matchmaking`, 'readyCheck')
+    this.sync(matchmaking, `${this.id}/matchmaking`, 'search')
   }
 }
 

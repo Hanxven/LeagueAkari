@@ -15,8 +15,9 @@ export class MainWindowRendererModule extends StateSyncModule {
 
   private _syncMainState() {
     const store = useMainWindowStore()
-    this.simpleSync('state', (s) => (store.windowState = s))
-    this.simpleSync('focus', (s) => (store.focusState = s))
+
+    this.sync(store, this.id, 'windowState')
+    this.sync(store, this.id, 'focusState')
   }
 
   onAskClose(callback: () => void) {

@@ -330,9 +330,13 @@ export class AutoSelectModule extends MobxBasedBasicModule {
           }
         }
 
-        const pickableChampions = e.filter(
-          (c) => this._lcu.champSelect.currentPickableChampions.has(c) && benchChampions.has(c)
+        // 期望列表中, 实际可选用的英雄
+        const availableExpectedChampions = e.filter((c) =>
+          this._lcu.champSelect.currentPickableChampionIds.has(c)
         )
+
+        // 实际上现在可以选用的英雄
+        const pickableChampions = availableExpectedChampions.filter((c) => benchChampions.has(c))
 
         if (pickableChampions.length === 0) {
           return
@@ -342,7 +346,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
 
         if (selfChampionId) {
           if (p) {
-            if (pickableChampions[0] === selfChampionId) {
+            if (availableExpectedChampions[0] === selfChampionId) {
               return
             }
           } else {
@@ -491,16 +495,10 @@ export class AutoSelectModule extends MobxBasedBasicModule {
   }
 
   private async _setupStateSync() {
-    this.simpleSync('champ-select-action-info/member-me', () => {
-      if (this.state.champSelectActionInfo) {
-        return this.state.champSelectActionInfo.memberMe
-      }
-
-      return null
-    })
-    this.simpleSync('upcoming-pick', () => this.state.upcomingPick)
-    this.simpleSync('upcoming-ban', () => this.state.upcomingBan)
-    this.simpleSync('upcoming-grab', () => this.state.upcomingGrab)
+    this.sync(this.state, this.id, 'upcomingBan')
+    this.sync(this.state, this.id, 'upcomingPick')
+    this.sync(this.state, this.id, 'upcomingGrab')
+    this.sync(this.state, this.id, 'memberMe')
   }
 }
 

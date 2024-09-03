@@ -26,10 +26,11 @@ export class AppRendererModule extends StateSyncModule {
     this.simpleSync('settings/close-strategy', (s) => (store.settings.closeStrategy = s))
     this.simpleSync('settings/use-wmic', (s) => (store.settings.useWmic = s))
     this.simpleSync('settings/is-in-kyoko-mode', (s) => (store.settings.isInKyokoMode = s))
-    this.simpleSync('is-administrator', (s) => (store.isAdministrator = s))
-    this.simpleSync('base-config', (s) => (store.baseConfig = s))
 
     this.getAppVersion().then((v) => (store.version = v))
+
+    this.sync(store, this.id, 'isAdministrator')
+    this.sync(store, this.id, 'baseConfig')
   }
 
   getAppVersion() {

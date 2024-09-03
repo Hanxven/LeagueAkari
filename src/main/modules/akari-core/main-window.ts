@@ -10,9 +10,9 @@ import { AuxWindowModule } from './auxiliary-window'
 import { AppLogger, LogModule } from './log'
 
 class MainWindowState {
-  state: 'normal' | 'maximized' | 'minimized' = 'normal'
+  windowState: 'normal' | 'maximized' | 'minimized' = 'normal'
 
-  focus: 'focused' | 'blurred' = 'focused'
+  focusState: 'focused' | 'blurred' = 'focused'
 
   ready: boolean = false
 
@@ -26,12 +26,12 @@ class MainWindowState {
     })
   }
 
-  setState(s: 'normal' | 'maximized' | 'minimized') {
-    this.state = s
+  setWindowState(s: 'normal' | 'maximized' | 'minimized') {
+    this.windowState = s
   }
 
-  setFocus(f: 'focused' | 'blurred' = 'focused') {
-    this.focus = f
+  setFocusState(f: 'focused' | 'blurred' = 'focused') {
+    this.focusState = f
   }
 
   setShow(show: boolean) {
@@ -119,7 +119,7 @@ export class MainWindowModule extends MobxBasedBasicModule {
 
   private _handleCloseMainWindow(event: Event) {
     if (this._willClose) {
-      this._awm.closeWindow()
+      this._awm.closeWindow(true)
       return
     }
 
@@ -205,39 +205,39 @@ export class MainWindowModule extends MobxBasedBasicModule {
     })
 
     if (this._w.isMaximized()) {
-      this.state.setState('maximized')
+      this.state.setWindowState('maximized')
     } else if (this._w.isMinimized()) {
-      this.state.setState('minimized')
+      this.state.setWindowState('minimized')
     } else {
-      this.state.setState('normal')
+      this.state.setWindowState('normal')
     }
 
     this._w.on('maximize', () => {
-      this.state.setState('maximized')
+      this.state.setWindowState('maximized')
     })
 
     this._w.on('unmaximize', () => {
-      this.state.setState('normal')
+      this.state.setWindowState('normal')
     })
 
     this._w.on('minimize', () => {
-      this.state.setState('minimized')
+      this.state.setWindowState('minimized')
     })
 
     this._w.on('minimize', () => {
-      this.state.setState('minimized')
+      this.state.setWindowState('minimized')
     })
 
     this._w.on('restore', () => {
-      this.state.setState('normal')
+      this.state.setWindowState('normal')
     })
 
     this._w.on('focus', () => {
-      this.state.setFocus('focused')
+      this.state.setFocusState('focused')
     })
 
     this._w.on('blur', () => {
-      this.state.setFocus('blurred')
+      this.state.setFocusState('blurred')
     })
 
     this._w.on('close', (event) => {
@@ -273,8 +273,8 @@ export class MainWindowModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.simpleSync('state', () => this.state.state)
-    this.simpleSync('focus', () => this.state.focus)
+    this.sync(this.state, this.id, 'windowState')
+    this.sync(this.state, this.id, 'focusState')
   }
 
   private _setupMethodCall() {

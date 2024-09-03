@@ -50,7 +50,7 @@ export class LeagueAkariRendererModuleManager {
     }
   }
 
-  dismantle() {
+  dispose() {
     this._offHandle?.()
   }
 

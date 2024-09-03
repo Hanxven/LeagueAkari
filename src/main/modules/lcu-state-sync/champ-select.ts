@@ -6,30 +6,30 @@ export class ChampSelectState {
 
   currentChampion: number | null = 0
 
-  currentPickableChampionArray: number[] = []
+  currentPickableChampionIdArray: number[] = []
 
-  currentBannableChampionArray: number[] = []
+  currentBannableChampionIdArray: number[] = []
 
   selfSummoner: ChampSelectSummoner | null = null
 
   constructor() {
     makeAutoObservable(this, {
       session: observable.struct,
-      currentPickableChampionArray: observable.struct,
-      currentBannableChampionArray: observable.struct,
+      currentPickableChampionIdArray: observable.struct,
+      currentBannableChampionIdArray: observable.struct,
       selfSummoner: observable.struct
     })
   }
 
-  get currentPickableChampions() {
+  get currentPickableChampionIds() {
     const set = new Set<number>()
-    this.currentPickableChampionArray.forEach((c) => set.add(c))
+    this.currentPickableChampionIdArray.forEach((c) => set.add(c))
     return set
   }
 
-  get currentBannableChampions() {
+  get currentBannableChampionIds() {
     const set = new Set<number>()
-    this.currentBannableChampionArray.forEach((c) => set.add(c))
+    this.currentBannableChampionIdArray.forEach((c) => set.add(c))
     return set
   }
 
@@ -38,11 +38,11 @@ export class ChampSelectState {
   }
 
   setCurrentPickableChampionArray(array: number[]) {
-    this.currentPickableChampionArray = array
+    this.currentPickableChampionIdArray = array
   }
 
   setCurrentBannableChampionArray(array: number[]) {
-    this.currentBannableChampionArray = array
+    this.currentBannableChampionIdArray = array
   }
 
   setSelfSummoner(s: ChampSelectSummoner | null) {

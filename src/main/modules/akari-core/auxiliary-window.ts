@@ -48,9 +48,9 @@ class AuxiliaryWindowSettings {
 }
 
 class AuxiliaryWindowState {
-  state: 'normal' | 'minimized' = 'normal'
+  windowState: 'normal' | 'minimized' = 'normal'
 
-  focus: 'focused' | 'blurred' = 'focused'
+  focusState: 'focused' | 'blurred' = 'focused'
 
   isShow: boolean = true
 
@@ -80,12 +80,12 @@ class AuxiliaryWindowState {
     })
   }
 
-  setState(s: 'normal' | 'minimized') {
-    this.state = s
+  setWindowState(s: 'normal' | 'minimized') {
+    this.windowState = s
   }
 
-  setFocus(f: 'focused' | 'blurred' = 'focused') {
-    this.focus = f
+  setFocusState(f: 'focused' | 'blurred' = 'focused') {
+    this.focusState = f
   }
 
   setShow(show: boolean) {
@@ -121,6 +121,8 @@ export class AuxWindowModule extends MobxBasedBasicModule {
   private _appModule: AppModule
 
   private _w: BrowserWindow | null = null
+
+  private _isForceClose = false
 
   static INITIAL_SHOW = false
   static WINDOW_BASE_WIDTH = 300
@@ -272,9 +274,9 @@ export class AuxWindowModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.simpleSync('state', () => this.state.state)
-    this.simpleSync('focus', () => this.state.focus)
-    this.simpleSync('is-show', () => this.state.isShow)
+    this.sync(this.state, this.id, 'windowState')
+    this.sync(this.state, this.id, 'focusState')
+    this.sync(this.state, this.id, 'isShow')
   }
 
   private _setupMethodCall() {
@@ -402,8 +404,9 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     }
   }
 
-  closeWindow() {
+  closeWindow(force = false) {
     if (this._w) {
+      this._isForceClose = true
       this._w.close()
       this._w = null
 
@@ -491,29 +494,29 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     })
 
     if (this._w.isMinimized()) {
-      this.state.setState('minimized')
+      this.state.setWindowState('minimized')
     } else {
-      this.state.setState('normal')
+      this.state.setWindowState('normal')
     }
 
     this._w.on('unmaximize', () => {
-      this.state.setState('normal')
+      this.state.setWindowState('normal')
     })
 
     this._w.on('minimize', () => {
-      this.state.setState('minimized')
+      this.state.setWindowState('minimized')
     })
 
     this._w.on('restore', () => {
-      this.state.setState('normal')
+      this.state.setWindowState('normal')
     })
 
     this._w.on('focus', () => {
-      this.state.setFocus('focused')
+      this.state.setFocusState('focused')
     })
 
     this._w.on('blur', () => {
-      this.state.setFocus('blurred')
+      this.state.setFocusState('blurred')
     })
 
     this._w.on('show', () => {
@@ -550,6 +553,11 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this._w.on('page-title-updated', (e) => e.preventDefault())
 
     this._w.on('close', (e) => {
+      if (this._isForceClose) {
+        this._isForceClose = false
+        return
+      }
+
       e.preventDefault()
       this.hideWindow()
     })

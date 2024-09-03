@@ -22,11 +22,12 @@ export class AutoUpdateRendererModule extends StateSyncModule {
       (s) => (store.settings.autoDownloadUpdates = s)
     )
     this.simpleSync('settings/download-source', (s) => (store.settings.downloadSource = s))
-    this.simpleSync('is-checking-updates', (s) => (store.isCheckingUpdates = s))
-    this.simpleSync('new-updates', (s) => (store.newUpdates = s))
-    this.simpleSync('update-progress-info', (s) => (store.updateProgressInfo = s))
-    this.simpleSync('last-check-at', (s) => (store.lastCheckAt = s))
-    this.simpleSync('current-announcement', (s) => (store.currentAnnouncement = s))
+
+    this.sync(store, this.id, 'isCheckingUpdates')
+    this.sync(store, this.id, 'newUpdates')
+    this.sync(store, this.id, 'updateProgressInfo')
+    this.sync(store, this.id, 'lastCheckAt')
+    this.sync(store, this.id, 'currentAnnouncement')
   }
 
   checkUpdates() {

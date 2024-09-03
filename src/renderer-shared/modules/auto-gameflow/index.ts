@@ -49,13 +49,13 @@ export class AutoGameflowRendererModule extends StateSyncModule {
       (s) => (store.settings.autoSearchMatchRematchFixedDuration = s)
     )
 
-    this.simpleSync('will-accept', (s) => (store.willAccept = s))
-    this.simpleSync('will-accept-at', (s) => (store.willAcceptAt = s))
-    this.simpleSync('will-search-match', (s) => (store.willSearchMatch = s))
-    this.simpleSync('will-search-match-at', (s) => (store.willSearchMatchAt = s))
-    this.simpleSync('activity-start-status', (s) => (store.activityStartStatus = s))
-    this.simpleSync('will-dodge-at', (s) => (store.willDodgeAt = s))
-    this.simpleSync('will-dodge-at-last-second', (s) => (store.willDodgeAtLastSecond = s))
+    this.sync(store, this.id, 'willAccept')
+    this.sync(store, this.id, 'willAcceptAt')
+    this.sync(store, this.id, 'willSearchMatch')
+    this.sync(store, this.id, 'willSearchMatchAt')
+    this.sync(store, this.id, 'activityStartStatus')
+    this.sync(store, this.id, 'willDodgeAt')
+    this.sync(store, this.id, 'willDodgeAtLastSecond')
   }
 
   async setAutoHonorEnabled(value: boolean) {

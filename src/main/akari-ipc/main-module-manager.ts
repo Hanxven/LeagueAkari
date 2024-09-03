@@ -100,9 +100,9 @@ export class LeagueAkariModuleManager {
     }
   }
 
-  async dismantle() {
+  async dispose() {
     for (const [_, m] of this._modules) {
-      await m.module.dismantle()
+      await m.module.dispose()
     }
 
     this._ipcMainDisposers.forEach((fn) => fn())

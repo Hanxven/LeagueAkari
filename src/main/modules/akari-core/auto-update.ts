@@ -106,9 +106,9 @@ interface UpdateProgressInfo {
 export class AutoUpdateState {
   settings = new AutoUpdateSettings()
 
-  isCheckingUpdate: boolean = false
+  isCheckingUpdates: boolean = false
   lastCheckAt: Date | null = null
-  newUpdates = observable.box<NewUpdates | null>(null, {
+  newUpdatesV = observable.box<NewUpdates | null>(null, {
     equals: (a, b) => {
       if (a === null && b === null) {
         return true
@@ -122,6 +122,10 @@ export class AutoUpdateState {
     }
   })
 
+  get newUpdates() {
+    return this.newUpdatesV.get()
+  }
+
   updateProgressInfo: UpdateProgressInfo | null = null
 
   currentAnnouncement: CurrentAnnouncement | null
@@ -134,11 +138,11 @@ export class AutoUpdateState {
   }
 
   setCheckingUpdates(isCheckingUpdates: boolean) {
-    this.isCheckingUpdate = isCheckingUpdates
+    this.isCheckingUpdates = isCheckingUpdates
   }
 
   setNewUpdates(updates: NewUpdates | null) {
-    this.newUpdates.set(updates)
+    this.newUpdatesV.set(updates)
   }
 
   setCurrentAnnouncement(announcement: CurrentAnnouncement | null) {
@@ -232,7 +236,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
     )
 
     this.autoDisposeReaction(
-      () => [this.state.settings.autoDownloadUpdates, this.state.newUpdates.get()] as const,
+      () => [this.state.settings.autoDownloadUpdates, this.state.newUpdates] as const,
       ([yes, newUpdates]) => {
         if (yes && newUpdates) {
           this._startUpdateProcess(newUpdates.downloadUrl, newUpdates.releaseVersion)
@@ -307,7 +311,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
    * 尝试加载更新信息
    */
   private async _updateReleaseUpdatesInfo() {
-    if (this.state.isCheckingUpdate) {
+    if (this.state.isCheckingUpdates) {
       return 'is-checking-updates'
     }
 
@@ -811,20 +815,20 @@ Try {
   private _setupMethodCall() {
     this.onCall('check-updates', async () => {
       const updateType = this._updateReleaseUpdatesInfo()
-      if (this.state.newUpdates.get() && this.state.settings.autoDownloadUpdates) {
+      if (this.state.newUpdates && this.state.settings.autoDownloadUpdates) {
         await this._startUpdateProcess(
-          this.state.newUpdates.get()!.downloadUrl,
-          this.state.newUpdates.get()!.filename
+          this.state.newUpdates.downloadUrl,
+          this.state.newUpdates.filename
         )
       }
       return updateType
     })
 
     this.onCall('start-update', async () => {
-      if (this.state.newUpdates.get()) {
+      if (this.state.newUpdates) {
         await this._startUpdateProcess(
-          this.state.newUpdates.get()!.downloadUrl,
-          this.state.newUpdates.get()!.filename
+          this.state.newUpdates.downloadUrl,
+          this.state.newUpdates.filename
         )
       }
     })
@@ -849,11 +853,11 @@ Try {
   }
 
   private _setupStateSync() {
-    this.simpleSync('is-checking-updates', () => this.state.isCheckingUpdate)
-    this.simpleSync('new-updates', () => toJS(this.state.newUpdates.get()))
-    this.simpleSync('update-progress-info', () => this.state.updateProgressInfo)
-    this.simpleSync('last-check-at', () => this.state.lastCheckAt)
-    this.simpleSync('current-announcement', () => this.state.currentAnnouncement)
+    this.sync(this.state, this.id, 'isCheckingUpdates')
+    this.sync(this.state, this.id, 'newUpdates')
+    this.sync(this.state, this.id, 'updateProgressInfo')
+    this.sync(this.state, this.id, 'lastCheckAt')
+    this.sync(this.state, this.id, 'currentAnnouncement')
   }
 }
 

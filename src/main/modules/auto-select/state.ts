@@ -134,9 +134,17 @@ export class AutoSelectState {
       session: lcu.champSelect.session,
       memberMe,
       isActingNow: lcu.champSelect.selfSummoner.isActingNow,
-      currentPickables: lcu.champSelect.currentPickableChampions,
-      currentBannables: lcu.champSelect.currentBannableChampions
+      currentPickables: lcu.champSelect.currentPickableChampionIds,
+      currentBannables: lcu.champSelect.currentBannableChampionIds
     }
+  }
+
+  get memberMe() {
+    if (!this.champSelectActionInfo) {
+      return null
+    }
+
+    return this.champSelectActionInfo.memberMe
   }
 
   get upcomingPick() {

@@ -19,13 +19,16 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useCoreFunctionalityStore()
 
-    this.simpleSync('is-in-endgame-phase', (s) => (store.isInEndgamePhase = s))
-    this.simpleSync('ongoing-game-info', (s) => (store.ongoingGameInfo = s))
-    this.simpleSync('query-state', (s) => (store.queryState = s))
-    this.simpleSync('ongoing-champion-selections', (s) => (store.ongoingChampionSelections = s))
-    this.simpleSync('ongoing-pre-made-teams', (s) => (store.ongoingPreMadeTeams = s))
-    this.simpleSync('ongoing-teams', (s) => (store.ongoingTeams = s))
-    this.simpleSync('send-list', (s) => (store.sendList = s))
+    this.sync(store, this.id, 'isInEndgamePhase')
+    this.sync(store, this.id, 'ongoingGameInfo')
+    this.sync(store, this.id, 'queryState')
+    this.sync(store, this.id, 'ongoingChampionSelections')
+    this.sync(store, this.id, 'ongoingPreMadeTeams')
+    this.sync(store, this.id, 'ongoingTeams')
+    this.sync(store, this.id, 'sendList')
+    this.sync(store, this.id, 'queueFilter')
+    this.sync(store, this.id, 'isWaitingForDelay')
+    this.sync(store, this.id, 'ongoingPlayerAnalysis')
 
     this.simpleSync(
       'settings/auto-route-on-game-start',
@@ -60,9 +63,6 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
       'settings/delay-seconds-before-loading',
       (s) => (store.settings.delaySecondsBeforeLoading = s)
     )
-    this.simpleSync('is-waiting-for-delay', (s) => (store.isWaitingForDelay = s))
-    this.simpleSync('ongoing-player-analysis', (s) => (store.ongoingPlayerAnalysis = s))
-    this.simpleSync('queue-filter', (s) => (store.queueFilter = s))
   }
 
   /**

@@ -43,7 +43,9 @@
               tabNames[tab.id]
             }}</span>
             <NIcon
-              v-if="tab.id !== summoner.me?.puuid && tab.data.summoner?.privacy === 'PRIVATE'"
+              v-if="
+                tab.data.puuid !== summoner.me?.puuid && tab.data.summoner?.privacy === 'PRIVATE'
+              "
               title="隐藏生涯"
               class="privacy-private-icon"
               ><WarningAltFilledIcon
@@ -321,7 +323,7 @@ const dropdownOptions = reactive([
 
 const handleMouseDown = (event, tabId) => {
   if (event.button === 1) {
-    mh.closeTab(tabId);
+    mh.closeTab(tabId)
   }
 }
 

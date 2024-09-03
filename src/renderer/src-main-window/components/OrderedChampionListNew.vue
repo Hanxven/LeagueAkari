@@ -26,8 +26,8 @@
           [styles['not-pickable']]:
             gameflow.phase === 'ChampSelect' &&
             (type === 'pick'
-              ? !champSelect.currentPickableChampions.has(c)
-              : !champSelect.currentBannableChampions.has(c))
+              ? !champSelect.currentPickableChampionIds.has(c)
+              : !champSelect.currentBannableChampionIds.has(c))
         }"
         v-for="c of champions.slice(0, maxShow)"
         :key="c"
@@ -81,9 +81,14 @@ const gameflow = useGameflowStore()
 const champSelect = useChampSelectStore()
 
 const championOptions = computed(() => {
-  const sorted = Object.values(gameData.champions).sort((a, b) =>
-    a.name.localeCompare(b.name, 'zh-Hans-CN')
-  )
+  const sorted = Object.values(gameData.champions).sort((a, b) => {
+    // 以防有人看不到, 决定将空英雄放在最前面
+    if (a.id === -1 || b.id === -1) {
+      return -1
+    }
+
+    return a.name.localeCompare(b.name, 'zh-Hans-CN')
+  })
 
   return sorted
     .filter((b) => {
@@ -133,9 +138,9 @@ const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
   let pickable = true
   if (gameflow.phase === 'ChampSelect') {
     if (props.type === 'pick') {
-      pickable = champSelect.currentPickableChampions.has(option.value as number)
+      pickable = champSelect.currentPickableChampionIds.has(option.value as number)
     } else {
-      pickable = champSelect.currentBannableChampions.has(option.value as number)
+      pickable = champSelect.currentBannableChampionIds.has(option.value as number)
     }
   }
 
@@ -161,9 +166,9 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
   let pickable = true
   if (gameflow.phase === 'ChampSelect') {
     if (props.type === 'pick') {
-      pickable = champSelect.currentPickableChampions.has(option.value as number)
+      pickable = champSelect.currentPickableChampionIds.has(option.value as number)
     } else {
-      pickable = champSelect.currentBannableChampions.has(option.value as number)
+      pickable = champSelect.currentBannableChampionIds.has(option.value as number)
     }
   }
 

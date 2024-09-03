@@ -1011,16 +1011,16 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.simpleSync('is-in-endgame-phase', () => this.state.isInEndgamePhase)
-    this.simpleSync('ongoing-game-info', () => this.state.ongoingGameInfo)
-    this.simpleSync('query-state', () => this.state.queryState)
-    this.simpleSync('ongoing-champion-selections', () => this.state.ongoingChampionSelections)
-    this.simpleSync('ongoing-pre-made-teams', () => this.state.ongoingPreMadeTeams)
-    this.simpleSync('ongoing-teams', () => this.state.ongoingTeams)
-    this.simpleSync('send-list', () => toJS(this.state.sendList))
-    this.simpleSync('is-waiting-for-delay', () => this.state.isWaitingForDelay)
-    this.simpleSync('ongoing-player-analysis', () => this.state.ongoingPlayerAnalysis)
-    this.simpleSync('queue-filter', () => this.state.queueFilter)
+    this.sync(this.state, this.id, 'isInEndgamePhase')
+    this.sync(this.state, this.id, 'queryState')
+    this.sync(this.state, this.id, 'ongoingGameInfo')
+    this.sync(this.state, this.id, 'ongoingChampionSelections')
+    this.sync(this.state, this.id, 'ongoingPreMadeTeams')
+    this.sync(this.state, this.id, 'ongoingTeams')
+    this.sync(this.state, this.id, 'sendList', true)
+    this.sync(this.state, this.id, 'isWaitingForDelay')
+    this.sync(this.state, this.id, 'ongoingPlayerAnalysis')
+    this.sync(this.state, this.id, 'queueFilter')
   }
 
   private _setupMethodCall() {

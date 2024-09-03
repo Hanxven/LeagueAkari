@@ -147,6 +147,8 @@ export class AppModule extends MobxBasedBasicModule {
     this._setupStateSync()
     await this._initializeApp()
 
+    await this._migrateSettingsToDotProps()
+
     this._logger.info('初始化完成')
   }
 
@@ -213,8 +215,8 @@ export class AppModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.simpleSync('is-administrator', () => this.state.isAdministrator)
-    this.simpleSync('base-config', () => this.state.baseConfig)
+    this.sync(this.state, this.id, 'isAdministrator')
+    this.sync(this.state, this.id, 'baseConfig')
   }
 
   private _setupMethodCall() {
@@ -414,6 +416,7 @@ export class AppModule extends MobxBasedBasicModule {
     writeFileSync(path, json, 'utf-8')
   }
 
+  // from v1.1.x -> v1.2.x
   private async _migrateSettingsFromLegacyVersion(all: Record<string, string>) {
     let migrated = false
     const _toNewSettings = async (
@@ -605,6 +608,14 @@ export class AppModule extends MobxBasedBasicModule {
     }
 
     return false
+  }
+
+  // from v1.2.x -> v1.2.5
+  private async _migrateSettingsToDotProps() {
+    const isInPropsStage = await this._sm.settings.get('akari.dotPropsStage', false)
+    if (isInPropsStage) {
+      return
+    }
   }
 }
 

@@ -80,7 +80,7 @@
             <LcuImage
               class="champion-image"
               :class="{
-                'champion-image-invalid': !cs.currentPickableChampions.has(c.championId),
+                'champion-image-invalid': !cs.currentPickableChampionIds.has(c.championId),
                 buffed: c.overallBalance === 'buffed',
                 nerfed: c.overallBalance === 'nerfed',
                 balanced: c.overallBalance === 'balanced'
@@ -378,7 +378,7 @@ const handleBenchSwap = async (championId: number) => {
     return
   }
 
-  if (!cs.currentPickableChampions.has(championId)) {
+  if (!cs.currentPickableChampionIds.has(championId)) {
     return
   }
 
