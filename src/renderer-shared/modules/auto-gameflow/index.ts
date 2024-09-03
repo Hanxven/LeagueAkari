@@ -16,46 +16,46 @@ export class AutoGameflowRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAutoGameflowStore()
 
-    this.simpleSync('settings/auto-honor-enabled', (s) => (store.settings.autoHonorEnabled = s))
-    this.simpleSync('settings/auto-honor-strategy', (s) => (store.settings.autoHonorStrategy = s))
-    this.simpleSync('settings/play-again-enabled', (s) => (store.settings.playAgainEnabled = s))
-    this.simpleSync('settings/auto-accept-enabled', (s) => (store.settings.autoAcceptEnabled = s))
-    this.simpleSync(
+    this.getterSync('settings/auto-honor-enabled', (s) => (store.settings.autoHonorEnabled = s))
+    this.getterSync('settings/auto-honor-strategy', (s) => (store.settings.autoHonorStrategy = s))
+    this.getterSync('settings/play-again-enabled', (s) => (store.settings.playAgainEnabled = s))
+    this.getterSync('settings/auto-accept-enabled', (s) => (store.settings.autoAcceptEnabled = s))
+    this.getterSync(
       'settings/auto-accept-delay-seconds',
       (s) => (store.settings.autoAcceptDelaySeconds = s)
     )
-    this.simpleSync(
+    this.getterSync(
       'settings/auto-search-match-enabled',
       (s) => (store.settings.autoSearchMatchEnabled = s)
     )
-    this.simpleSync(
+    this.getterSync(
       'settings/auto-search-match-delay-seconds',
       (s) => (store.settings.autoSearchMatchDelaySeconds = s)
     )
-    this.simpleSync(
+    this.getterSync(
       'settings/auto-search-match-minimum-members',
       (s) => (store.settings.autoSearchMatchMinimumMembers = s)
     )
-    this.simpleSync(
+    this.getterSync(
       'settings/auto-search-match-wait-for-invitees',
       (s) => (store.settings.autoSearchMatchWaitForInvitees = s)
     )
-    this.simpleSync(
+    this.getterSync(
       'settings/auto-search-match-rematch-strategy',
       (s) => (store.settings.autoSearchMatchRematchStrategy = s)
     )
-    this.simpleSync(
+    this.getterSync(
       'settings/auto-search-match-rematch-fixed-duration',
       (s) => (store.settings.autoSearchMatchRematchFixedDuration = s)
     )
 
-    this.sync(store, this.id, 'willAccept')
-    this.sync(store, this.id, 'willAcceptAt')
-    this.sync(store, this.id, 'willSearchMatch')
-    this.sync(store, this.id, 'willSearchMatchAt')
-    this.sync(store, this.id, 'activityStartStatus')
-    this.sync(store, this.id, 'willDodgeAt')
-    this.sync(store, this.id, 'willDodgeAtLastSecond')
+    this.dotPropSync(store, this.id, 'willAccept')
+    this.dotPropSync(store, this.id, 'willAcceptAt')
+    this.dotPropSync(store, this.id, 'willSearchMatch')
+    this.dotPropSync(store, this.id, 'willSearchMatchAt')
+    this.dotPropSync(store, this.id, 'activityStartStatus')
+    this.dotPropSync(store, this.id, 'willDodgeAt')
+    this.dotPropSync(store, this.id, 'willDodgeAtLastSecond')
   }
 
   async setAutoHonorEnabled(value: boolean) {

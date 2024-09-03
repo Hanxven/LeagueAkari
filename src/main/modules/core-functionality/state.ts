@@ -327,6 +327,10 @@ export class CoreFunctionalityState {
     this.queueFilter = value
   }
 
+  setSendList(newObj: Record<string | number, boolean>) {
+    this.sendList = newObj
+  }
+
   /**
    * 当前游戏的进行状态简化，用于区分 League Akari 的几个主要阶段
    *
@@ -381,7 +385,7 @@ export class CoreFunctionalityState {
       ongoingChampionSelections: computed.struct,
       ongoingGameInfo: computed.struct,
       ongoingTeams: computed.struct,
-      sendList: observable.shallow,
+      sendList: observable.ref,
       ongoingPreMadeTeams: observable.struct,
       ongoingPlayerAnalysis: observable.struct
     })

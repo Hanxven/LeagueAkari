@@ -534,12 +534,24 @@ const pageSizeOptions = [
     value: 20
   },
   {
+    label: '30 项',
+    value: 30
+  },
+  {
+    label: '40 项',
+    value: 40
+  },
+  {
     label: '50 项',
     value: 50
   },
   {
     label: '100 项',
     value: 100
+  },
+  {
+    label: '200 项',
+    value: 200
   }
 ]
 

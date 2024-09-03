@@ -19,47 +19,47 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useCoreFunctionalityStore()
 
-    this.sync(store, this.id, 'isInEndgamePhase')
-    this.sync(store, this.id, 'ongoingGameInfo')
-    this.sync(store, this.id, 'queryState')
-    this.sync(store, this.id, 'ongoingChampionSelections')
-    this.sync(store, this.id, 'ongoingPreMadeTeams')
-    this.sync(store, this.id, 'ongoingTeams')
-    this.sync(store, this.id, 'sendList')
-    this.sync(store, this.id, 'queueFilter')
-    this.sync(store, this.id, 'isWaitingForDelay')
-    this.sync(store, this.id, 'ongoingPlayerAnalysis')
+    this.dotPropSync(store, this.id, 'isInEndgamePhase')
+    this.dotPropSync(store, this.id, 'ongoingGameInfo')
+    this.dotPropSync(store, this.id, 'queryState')
+    this.dotPropSync(store, this.id, 'ongoingChampionSelections')
+    this.dotPropSync(store, this.id, 'ongoingPreMadeTeams')
+    this.dotPropSync(store, this.id, 'ongoingTeams')
+    this.dotPropSync(store, this.id, 'sendList')
+    this.dotPropSync(store, this.id, 'queueFilter')
+    this.dotPropSync(store, this.id, 'isWaitingForDelay')
+    this.dotPropSync(store, this.id, 'ongoingPlayerAnalysis')
 
-    this.simpleSync(
+    this.getterSync(
       'settings/auto-route-on-game-start',
       (s) => (store.settings.autoRouteOnGameStart = s)
     )
-    this.simpleSync(
+    this.getterSync(
       'settings/ongoing-analysis-enabled',
       (s) => (store.settings.ongoingAnalysisEnabled = s)
     )
-    this.simpleSync('settings/fetch-after-game', (s) => (store.settings.fetchAfterGame = s))
-    this.simpleSync('settings/fetch-detailed-game', (s) => (store.settings.fetchDetailedGame = s))
-    this.simpleSync(
+    this.getterSync('settings/fetch-after-game', (s) => (store.settings.fetchAfterGame = s))
+    this.getterSync('settings/fetch-detailed-game', (s) => (store.settings.fetchDetailedGame = s))
+    this.getterSync(
       'settings/match-history-load-count',
       (s) => (store.settings.matchHistoryLoadCount = s)
     )
-    this.simpleSync(
+    this.getterSync(
       'settings/pre-made-team-threshold',
       (s) => (store.settings.preMadeTeamThreshold = s)
     )
-    this.simpleSync('settings/send-kda-in-game', (s) => (store.settings.sendKdaInGame = s))
-    this.simpleSync(
+    this.getterSync('settings/send-kda-in-game', (s) => (store.settings.sendKdaInGame = s))
+    this.getterSync(
       'settings/send-kda-in-game-with-pre-made-teams',
       (s) => (store.settings.sendKdaInGameWithPreMadeTeams = s)
     )
-    this.simpleSync('settings/send-kda-threshold', (s) => (store.settings.sendKdaThreshold = s))
-    this.simpleSync(
+    this.getterSync('settings/send-kda-threshold', (s) => (store.settings.sendKdaThreshold = s))
+    this.getterSync(
       'settings/player-analysis-fetch-concurrency',
       (s) => (store.settings.playerAnalysisFetchConcurrency = s)
     )
-    this.simpleSync('settings/use-sgp-api', (s) => (store.settings.useSgpApi = s))
-    this.simpleSync(
+    this.getterSync('settings/use-sgp-api', (s) => (store.settings.useSgpApi = s))
+    this.getterSync(
       'settings/delay-seconds-before-loading',
       (s) => (store.settings.delaySecondsBeforeLoading = s)
     )
@@ -136,7 +136,7 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
   }
 
   setSendPlayer(puuid: string, send: boolean) {
-    return this.call('update/send-list', puuid, send)
+    return this.call('set-send-list', puuid, send)
   }
 
   setAutoRouteOnGameStart(value: boolean) {

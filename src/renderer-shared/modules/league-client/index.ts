@@ -17,12 +17,12 @@ export class LeagueClientRendererModule extends StateSyncModule {
   private _setupStateSync() {
     const store = useLeagueClientStore()
 
-    this.simpleSync(
+    this.getterSync(
       'settings/fix-window-method-a-options',
       (s) => (store.settings.fixWindowMethodAOptions = s)
     )
 
-    this.simpleSync(
+    this.getterSync(
       'settings/terminate-game-client-on-alt-f4',
       (s) => (store.settings.terminateGameClientOnAltF4 = s)
     )

@@ -16,11 +16,11 @@ export class RespawnTimerRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useRespawnTimerStore()
 
-    this.simpleSync('settings/enabled', (s) => (store.settings.enabled = s))
+    this.getterSync('settings/enabled', (s) => (store.settings.enabled = s))
 
-    this.sync(store, this.id, 'isDead')
-    this.sync(store, this.id, 'timeLeft')
-    this.sync(store, this.id, 'totalTime')
+    this.dotPropSync(store, this.id, 'isDead')
+    this.dotPropSync(store, this.id, 'timeLeft')
+    this.dotPropSync(store, this.id, 'totalTime')
   }
 
   setEnabled(value: boolean) {

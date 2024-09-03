@@ -18,38 +18,38 @@ export class AutoSelectRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAutoSelectStore()
 
-    this.sync(store, 'auto-select', 'upcomingBan')
-    this.sync(store, 'auto-select', 'upcomingPick')
-    this.sync(store, 'auto-select', 'upcomingGrab')
-    this.sync(store, 'auto-select', 'memberMe')
+    this.dotPropSync(store, 'auto-select', 'upcomingBan')
+    this.dotPropSync(store, 'auto-select', 'upcomingPick')
+    this.dotPropSync(store, 'auto-select', 'upcomingGrab')
+    this.dotPropSync(store, 'auto-select', 'memberMe')
 
-    this.simpleSync('settings/normal-mode-enabled', (s) => (store.settings.normalModeEnabled = s))
-    this.simpleSync(
+    this.getterSync('settings/normal-mode-enabled', (s) => (store.settings.normalModeEnabled = s))
+    this.getterSync(
       'settings/expected-champions-multi',
       (s) => (store.settings.expectedChampions = markRaw(s))
     )
-    this.simpleSync(
+    this.getterSync(
       'settings/select-teammate-intended-champion',
       (s) => (store.settings.selectTeammateIntendedChampion = s)
     )
-    this.simpleSync('settings/show-intent', (s) => (store.settings.showIntent = s))
-    this.simpleSync('settings/completed', (s) => (store.settings.completed = s))
-    this.simpleSync('settings/bench-mode-enabled', (s) => (store.settings.benchModeEnabled = s))
-    this.simpleSync(
+    this.getterSync('settings/show-intent', (s) => (store.settings.showIntent = s))
+    this.getterSync('settings/completed', (s) => (store.settings.completed = s))
+    this.getterSync('settings/bench-mode-enabled', (s) => (store.settings.benchModeEnabled = s))
+    this.getterSync(
       'settings/bench-expected-champions',
       (s) => (store.settings.benchExpectedChampions = s)
     )
-    this.simpleSync('settings/grab-delay-seconds', (s) => (store.settings.grabDelaySeconds = s))
-    this.simpleSync(
+    this.getterSync('settings/grab-delay-seconds', (s) => (store.settings.grabDelaySeconds = s))
+    this.getterSync(
       'settings/bench-select-first-available-champion',
       (s) => (store.settings.benchSelectFirstAvailableChampion = s)
     )
-    this.simpleSync('settings/ban-enabled', (s) => (store.settings.banEnabled = s))
-    this.simpleSync(
+    this.getterSync('settings/ban-enabled', (s) => (store.settings.banEnabled = s))
+    this.getterSync(
       'settings/banned-champions-multi',
       (s) => (store.settings.bannedChampions = markRaw(s))
     )
-    this.simpleSync(
+    this.getterSync(
       'settings/ban-teammate-intended-champion',
       (s) => (store.settings.banTeammateIntendedChampion = s)
     )

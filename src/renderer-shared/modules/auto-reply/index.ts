@@ -16,9 +16,9 @@ export class AutoReplyRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAutoReplyStore()
 
-    this.simpleSync('settings/enabled', (s) => (store.settings.enabled = s))
-    this.simpleSync('settings/enable-on-away', (s) => (store.settings.enableOnAway = s))
-    this.simpleSync('settings/text', (s) => (store.settings.text = s))
+    this.getterSync('settings/enabled', (s) => (store.settings.enabled = s))
+    this.getterSync('settings/enable-on-away', (s) => (store.settings.enableOnAway = s))
+    this.getterSync('settings/text', (s) => (store.settings.text = s))
   }
 
   setEnabled(enabled: boolean) {

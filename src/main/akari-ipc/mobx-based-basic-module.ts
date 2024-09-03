@@ -67,23 +67,23 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
   }
 
   /**
-   * 使用 mobx 监听一个简单资源的变化，并在变化时推送更新，要求这个资源是一个可序列化的对象。
+   * 通过提供一个 getter 监听资源
    * @param resName 资源名称
    * @param getter 资源 getter
    */
-  simpleSync(resName: string, getter: SimpleStateGetter) {
+  getterSync(resName: string, getter: SimpleStateGetter, mobxToJs = false) {
     this.autoDisposeReaction(getter, (newValue) => {
-      this.sendEvent(`state-update/${resName}`, newValue)
+      this.sendEvent(`update-getter/${resName}`, mobxToJs ? toJS(newValue) : newValue)
     })
-    this.onCall(`state-get/${resName}`, () => getter())
+    this.onCall(`get-getter/${resName}`, () => (mobxToJs ? toJS(getter()) : getter()))
   }
 
   /**
-   * 使用 mobx 监听一个 dot-prop 路径的变化，并在变化时推送更新，要求这个资源路径是一个可序列化的对象。
+   * 通过提供一个 dotPropPath 监听资源
    * @param resPath 资源路径，如 `someState.nested.value`
    * @param obj 一个 mobx 对象
    */
-  sync<T extends object>(obj: T, stateId: string, resPath: Paths<T>, mobxToJs = false) {
+  dotPropSync<T extends object>(obj: T, stateId: string, resPath: Paths<T>, mobxToJs = false) {
     this.autoDisposeReaction(
       () => get(obj, resPath),
       (newValue) => {
@@ -112,7 +112,7 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
     }
     const _readSettingFirst = async () => _wrappedSetter(await this._ss.get(settingName, getter()))
     this._settingsToSync.push(_readSettingFirst())
-    this.simpleSync(`settings/${settingName}`, getter)
+    this.getterSync(`settings/${settingName}`, getter)
     this.onCall(`set-setting/${settingName}`, (value) => _wrappedSetter(value))
   }
 
@@ -141,7 +141,7 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
     const _readSettingFirst = async () =>
       _wrappedSetter(await this._ss.get(resPath, () => get(obj, resPath)))
     this._settingsToSync.push(_readSettingFirst())
-    this.sync(obj, settingModuleId, resPath, mobxToJs)
+    this.dotPropSync(obj, settingModuleId, resPath, mobxToJs)
     this.onCall(`set-setting/${settingModuleId}/${resPath}`, (value) => _wrappedSetter(value))
   }
 

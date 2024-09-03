@@ -274,9 +274,9 @@ export class AuxWindowModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.sync(this.state, this.id, 'windowState')
-    this.sync(this.state, this.id, 'focusState')
-    this.sync(this.state, this.id, 'isShow')
+    this.dotPropSync(this.state, this.id, 'windowState')
+    this.dotPropSync(this.state, this.id, 'focusState')
+    this.dotPropSync(this.state, this.id, 'isShow')
   }
 
   private _setupMethodCall() {

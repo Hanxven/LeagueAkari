@@ -16,8 +16,8 @@ export class CustomKeyboardSequenceRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useCustomKeyboardSequenceStore()
 
-    this.simpleSync('settings/enabled', (s) => (store.settings.enabled = s))
-    this.simpleSync('settings/text', (s) => (store.settings.text = s))
+    this.getterSync('settings/enabled', (s) => (store.settings.enabled = s))
+    this.getterSync('settings/text', (s) => (store.settings.text = s))
   }
 
   setEnabled(enabled: boolean) {

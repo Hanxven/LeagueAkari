@@ -16,7 +16,7 @@ class SgpEdsRenderer {
   async setup() {
     const store = useExternalDataSourceStore()
 
-    await this._edsm.simpleSync('sgp/availability', (s) => (store.sgpAvailability = s))
+    await this._edsm.getterSync('sgp/availability', (s) => (store.sgpAvailability = s))
   }
 
   getMatchHistoryLcuFormat(
@@ -72,7 +72,7 @@ class BalanceEdsRenderer {
   async setup() {
     const store = useExternalDataSourceStore()
 
-    this._edsm.simpleSync('fandom/balance-data', (s) => (store.balanceData = s))
+    this._edsm.getterSync('fandom/balance-data', (s) => (store.balanceData = s))
   }
 }
 
@@ -82,7 +82,7 @@ export class GtimgEdsRenderer {
   async setup() {
     const store = useExternalDataSourceStore()
 
-    this._edsm.simpleSync('gtimg/hero-list', (s) => (store.heroList = s))
+    this._edsm.getterSync('gtimg/hero-list', (s) => (store.heroList = s))
   }
 }
 
@@ -103,7 +103,7 @@ export class ExternalDataSourceRendererModule extends StateSyncModule {
   opgg = new OpggEdsRenderer(this)
 
   constructor() {
-    super('data-sources')
+    super('external-data-source')
   }
 
   override async setup() {

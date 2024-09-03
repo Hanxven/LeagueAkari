@@ -136,6 +136,7 @@ export class MainWindowModule extends MobxBasedBasicModule {
       }
 
       this.sendEvent('close-asking')
+      this.restoreAndFocus()
     } else {
       this._willClose = true
       this._w?.close()
@@ -273,8 +274,8 @@ export class MainWindowModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.sync(this.state, this.id, 'windowState')
-    this.sync(this.state, this.id, 'focusState')
+    this.dotPropSync(this.state, this.id, 'windowState')
+    this.dotPropSync(this.state, this.id, 'focusState')
   }
 
   private _setupMethodCall() {

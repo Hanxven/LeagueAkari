@@ -123,7 +123,7 @@ export class SgpEds {
   }
 
   private _handleUpdateSupportedInfo() {
-    this._edsm.simpleSync('sgp/availability', () => this.state.availability)
+    this._edsm.getterSync('sgp/availability', () => this.state.availability)
 
     this._edsm.autoDisposeReaction(
       () => this._lc.state.auth,

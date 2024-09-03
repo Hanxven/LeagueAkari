@@ -18,15 +18,15 @@ export class AuxWindowRendererModule extends StateSyncModule {
 
     store.currentFunctionality = await this.getFunctionality()
 
-    this.simpleSync('settings/is-pinned', (s) => (store.settings.isPinned = s))
-    this.simpleSync('settings/opacity', (s) => (store.settings.opacity = s))
-    this.simpleSync('settings/enabled', (s) => (store.settings.enabled = s))
-    this.simpleSync('settings/show-skin-selector', (s) => (store.settings.showSkinSelector = s))
-    this.simpleSync('settings/zoom-factor', (s) => (store.settings.zoomFactor = s))
+    this.getterSync('settings/is-pinned', (s) => (store.settings.isPinned = s))
+    this.getterSync('settings/opacity', (s) => (store.settings.opacity = s))
+    this.getterSync('settings/enabled', (s) => (store.settings.enabled = s))
+    this.getterSync('settings/show-skin-selector', (s) => (store.settings.showSkinSelector = s))
+    this.getterSync('settings/zoom-factor', (s) => (store.settings.zoomFactor = s))
 
-    this.sync(store, this.id, 'isShow')
-    this.sync(store, this.id, 'windowState')
-    this.sync(store, this.id, 'focusState')
+    this.dotPropSync(store, this.id, 'isShow')
+    this.dotPropSync(store, this.id, 'windowState')
+    this.dotPropSync(store, this.id, 'focusState')
   }
 
   setSize(width: number, height: number) {

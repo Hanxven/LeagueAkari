@@ -16,18 +16,18 @@ export class AutoUpdateRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAutoUpdateStore()
 
-    this.simpleSync('settings/auto-check-updates', (s) => (store.settings.autoCheckUpdates = s))
-    this.simpleSync(
+    this.getterSync('settings/auto-check-updates', (s) => (store.settings.autoCheckUpdates = s))
+    this.getterSync(
       'settings/auto-download-updates',
       (s) => (store.settings.autoDownloadUpdates = s)
     )
-    this.simpleSync('settings/download-source', (s) => (store.settings.downloadSource = s))
+    this.getterSync('settings/download-source', (s) => (store.settings.downloadSource = s))
 
-    this.sync(store, this.id, 'isCheckingUpdates')
-    this.sync(store, this.id, 'newUpdates')
-    this.sync(store, this.id, 'updateProgressInfo')
-    this.sync(store, this.id, 'lastCheckAt')
-    this.sync(store, this.id, 'currentAnnouncement')
+    this.dotPropSync(store, this.id, 'isCheckingUpdates')
+    this.dotPropSync(store, this.id, 'newUpdates')
+    this.dotPropSync(store, this.id, 'updateProgressInfo')
+    this.dotPropSync(store, this.id, 'lastCheckAt')
+    this.dotPropSync(store, this.id, 'currentAnnouncement')
   }
 
   checkUpdates() {

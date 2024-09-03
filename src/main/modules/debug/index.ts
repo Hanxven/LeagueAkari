@@ -33,7 +33,7 @@ export class DebugModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.simpleSync(
+    this.getterSync(
       'settings/send-all-native-lcu-events',
       () => this.state.settings.sendAllNativeLcuEvents
     )

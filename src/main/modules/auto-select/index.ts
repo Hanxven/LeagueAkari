@@ -495,10 +495,10 @@ export class AutoSelectModule extends MobxBasedBasicModule {
   }
 
   private async _setupStateSync() {
-    this.sync(this.state, this.id, 'upcomingBan')
-    this.sync(this.state, this.id, 'upcomingPick')
-    this.sync(this.state, this.id, 'upcomingGrab')
-    this.sync(this.state, this.id, 'memberMe')
+    this.dotPropSync(this.state, this.id, 'upcomingBan')
+    this.dotPropSync(this.state, this.id, 'upcomingPick')
+    this.dotPropSync(this.state, this.id, 'upcomingGrab')
+    this.dotPropSync(this.state, this.id, 'memberMe')
   }
 }
 

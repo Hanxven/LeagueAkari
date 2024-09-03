@@ -108,7 +108,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     }[]
   >([])
 
-  const sendList = ref<Record<string | number, boolean>>({})
+  const sendList = ref<Record<string, boolean>>({})
 
   const queryState = ref<'unavailable' | 'in-game' | 'champ-select'>('unavailable')
   const ongoingTeams = shallowRef<Record<string, number[]> | null>(null)

@@ -37,7 +37,7 @@ export class GtimgEds {
   }
 
   private _setupStateSync() {
-    this._edsm.simpleSync('gtimg/hero-list', () => this.state.heroList)
+    this._edsm.getterSync('gtimg/hero-list', () => this.state.heroList)
   }
 
   private _handleUpdate() {

@@ -82,7 +82,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this._lcm2 = this.manager.getModule('league-client')
     this._mwm = this.manager.getModule('main-window')
     this._pm = this.manager.getModule('win-platform')
-    this._edsm = this.manager.getModule('data-sources')
+    this._edsm = this.manager.getModule('external-data-source')
 
     await this._setupSettingsSync()
     this._setupStateSync()
@@ -1011,16 +1011,16 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.sync(this.state, this.id, 'isInEndgamePhase')
-    this.sync(this.state, this.id, 'queryState')
-    this.sync(this.state, this.id, 'ongoingGameInfo')
-    this.sync(this.state, this.id, 'ongoingChampionSelections')
-    this.sync(this.state, this.id, 'ongoingPreMadeTeams')
-    this.sync(this.state, this.id, 'ongoingTeams')
-    this.sync(this.state, this.id, 'sendList', true)
-    this.sync(this.state, this.id, 'isWaitingForDelay')
-    this.sync(this.state, this.id, 'ongoingPlayerAnalysis')
-    this.sync(this.state, this.id, 'queueFilter')
+    this.dotPropSync(this.state, this.id, 'isInEndgamePhase')
+    this.dotPropSync(this.state, this.id, 'queryState')
+    this.dotPropSync(this.state, this.id, 'ongoingGameInfo')
+    this.dotPropSync(this.state, this.id, 'ongoingChampionSelections')
+    this.dotPropSync(this.state, this.id, 'ongoingPreMadeTeams')
+    this.dotPropSync(this.state, this.id, 'ongoingTeams')
+    this.dotPropSync(this.state, this.id, 'sendList')
+    this.dotPropSync(this.state, this.id, 'isWaitingForDelay')
+    this.dotPropSync(this.state, this.id, 'ongoingPlayerAnalysis')
+    this.dotPropSync(this.state, this.id, 'queueFilter')
   }
 
   private _setupMethodCall() {
@@ -1028,9 +1028,10 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       return toJS(this.state.ongoingPlayers)
     })
 
-    this.onCall('update/send-list', (puuid: string, send: boolean) => {
+    this.onCall('set-send-list', (puuid: string, send: boolean) => {
+      console.log('hello', puuid, send)
       if (this.state.sendList[puuid] !== undefined) {
-        runInAction(() => (this.state.sendList[puuid] = send))
+        this.state.setSendList({ ...this.state.sendList, [puuid]: send })
       }
     })
 

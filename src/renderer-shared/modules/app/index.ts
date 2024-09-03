@@ -19,18 +19,18 @@ export class AppRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAppStore()
 
-    this.simpleSync(
+    this.getterSync(
       'settings/show-free-software-declaration',
       (s) => (store.settings.showFreeSoftwareDeclaration = s)
     )
-    this.simpleSync('settings/close-strategy', (s) => (store.settings.closeStrategy = s))
-    this.simpleSync('settings/use-wmic', (s) => (store.settings.useWmic = s))
-    this.simpleSync('settings/is-in-kyoko-mode', (s) => (store.settings.isInKyokoMode = s))
+    this.getterSync('settings/close-strategy', (s) => (store.settings.closeStrategy = s))
+    this.getterSync('settings/use-wmic', (s) => (store.settings.useWmic = s))
+    this.getterSync('settings/is-in-kyoko-mode', (s) => (store.settings.isInKyokoMode = s))
 
     this.getAppVersion().then((v) => (store.version = v))
 
-    this.sync(store, this.id, 'isAdministrator')
-    this.sync(store, this.id, 'baseConfig')
+    this.dotPropSync(store, this.id, 'isAdministrator')
+    this.dotPropSync(store, this.id, 'baseConfig')
   }
 
   getAppVersion() {

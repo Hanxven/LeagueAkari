@@ -13,9 +13,9 @@ export class StateSyncModule extends LeagueAkariRendererModule {
    * await 将会等待主进程返回的结果
    * 如果需要提前加载，则需要异步等待
    */
-  async simpleSync(resName: string, setter: SimpleStateSetter) {
-    this.onEvent(`state-update/${resName}`, setter)
-    setter(await this.call(`state-get/${resName}`))
+  async getterSync(resName: string, setter: SimpleStateSetter) {
+    this.onEvent(`update-getter/${resName}`, setter)
+    setter(await this.call(`get-getter/${resName}`))
   }
 
   /**
@@ -25,7 +25,12 @@ export class StateSyncModule extends LeagueAkariRendererModule {
    * @param resPath 来自主进程状态路径
    * @param targetPath 目标设置路径 (若不提供, 则同主进程状态路径)
    */
-  async sync<T extends object>(obj: T, stateId: string, resPath: Paths<T>, targetPath?: string) {
+  async dotPropSync<T extends object>(
+    obj: T,
+    stateId: string,
+    resPath: Paths<T>,
+    targetPath?: string
+  ) {
     this.onEvent(`update-dot-prop/${stateId}/${resPath}`, (value) =>
       set(obj, targetPath === undefined ? resPath : targetPath, value)
     )

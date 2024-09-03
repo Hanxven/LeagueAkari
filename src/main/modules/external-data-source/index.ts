@@ -47,13 +47,13 @@ export class ExternalDataSourceModule extends MobxBasedBasicModule {
   }
 
   constructor() {
-    super('data-sources')
+    super('external-data-source')
   }
 
   override async setup() {
     await super.setup()
 
-    this._logger = this.manager.getModule<LogModule>('log').createLogger('data-sources')
+    this._logger = this.manager.getModule<LogModule>('log').createLogger('external-data-source')
     this._lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
 
     await this._balance.setup()
