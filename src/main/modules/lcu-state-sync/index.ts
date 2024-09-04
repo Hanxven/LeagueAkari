@@ -128,13 +128,15 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   }
 
   private _syncLcuGameData() {
-    this.dotPropSync(this.gameData, `${this.id}/gameData`, 'augments')
-    this.dotPropSync(this.gameData, `${this.id}/gameData`, 'champions')
-    this.dotPropSync(this.gameData, `${this.id}/gameData`, 'items')
-    this.dotPropSync(this.gameData, `${this.id}/gameData`, 'perks')
-    this.dotPropSync(this.gameData, `${this.id}/gameData`, 'perkstyles')
-    this.dotPropSync(this.gameData, `${this.id}/gameData`, 'queues')
-    this.dotPropSync(this.gameData, `${this.id}/gameData`, 'summonerSpells')
+    this.propSync('gameData', this.gameData, [
+      'champions',
+      'items',
+      'perks',
+      'perkstyles',
+      'queues',
+      'summonerSpells',
+      'augments'
+    ])
 
     this.autoDisposeReaction(
       () => this._lcm.state.state,
@@ -267,7 +269,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   }
 
   private _syncLcuHonor() {
-    this.dotPropSync(this.honor, `${this.id}/honor`, 'ballot')
+    this.propSync('honor', this.honor, 'ballot')
 
     this.autoDisposeReaction(
       () => this._lcm.state.state,
@@ -307,10 +309,12 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   }
 
   private _syncLcuChampSelect() {
-    this.dotPropSync(this.champSelect,  `${this.id}/champSelect`, 'session')
-    this.dotPropSync(this.champSelect,  `${this.id}/champSelect`, 'currentPickableChampionIds')
-    this.dotPropSync(this.champSelect,  `${this.id}/champSelect`, 'currentBannableChampionIds')
-    this.dotPropSync(this.champSelect,  `${this.id}/champSelect`, 'currentChampion')
+    this.propSync('champSelect', this.champSelect, [
+      'session',
+      'currentPickableChampionIds',
+      'currentBannableChampionIds',
+      'currentChampion'
+    ])
 
     this.autoDisposeReaction(
       () => this._lcm.state.state,
@@ -531,10 +535,12 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   }
 
   private _syncLcuChat() {
-    this.dotPropSync(this.chat, `${this.id}/chat`, 'me')
-    this.dotPropSync(this.chat, `${this.id}/chat`, 'conversations.postGame')
-    this.dotPropSync(this.chat, `${this.id}/chat`, 'conversations.customGame')
-    this.dotPropSync(this.chat, `${this.id}/chat`, 'conversations.championSelect')
+    this.propSync('chat', this.chat, [
+      'me',
+      'participants.postGame',
+      'participants.customGame',
+      'participants.championSelect'
+    ])
 
     const d1 = this._lcm.lcuEventBus.on<LcuEvent<Conversation>>(
       '/lol-chat/v1/conversations/:id',
@@ -724,8 +730,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   }
 
   private _syncLcuMatchmaking() {
-    this.dotPropSync(this.matchmaking, `${this.id}/matchmaking`, 'readyCheck')
-    this.dotPropSync(this.matchmaking, `${this.id}/matchmaking`, 'search')
+    this.propSync('matchmaking', this.matchmaking, ['readyCheck', 'search'])
 
     const d1 = this._lcm.lcuEventBus.on('/lol-matchmaking/v1/ready-check', (event) => {
       this.matchmaking.setReadyCheck(event.data)
@@ -740,8 +745,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   }
 
   private _syncLcuGameflow() {
-    this.dotPropSync(this.gameflow, `${this.id}/gameflow`, 'session')
-    this.dotPropSync(this.gameflow, `${this.id}/gameflow`, 'phase')
+    this.propSync('gameflow', this.gameflow, ['phase', 'session'])
 
     // 立即初始化
     this.autoDisposeReaction(
@@ -785,7 +789,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   }
 
   private _syncLcuLobby() {
-    this.dotPropSync(this.lobby, `${this.id}/lobby`, 'lobby')
+    this.propSync('lobby', this.lobby, 'lobby')
 
     const d1 = this._lcm.lcuEventBus.on('/lol-lobby/v2/lobby', (event) => {
       this.lobby.setLobby(event.data)
@@ -818,7 +822,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   }
 
   private _syncLcuLogin() {
-    this.dotPropSync(this.login, `${this.id}/login`, 'loginQueueState')
+    this.propSync('login', this.login, 'loginQueueState')
 
     const d1 = this._lcm.lcuEventBus.on('/lol-login/v1/login-queue-state', (event) => {
       this.login.setLoginQueueState(event.data)
@@ -865,7 +869,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
     let retryCount = 0
     let timerId: NodeJS.Timeout | null = null
 
-    this.dotPropSync(this.summoner, `${this.id}/summoner`, 'me')
+    this.propSync('summoner', this.summoner, 'me')
 
     /**
      * 个人信息获取十分关键，因此必须优先获取，以实现后续功能
@@ -918,7 +922,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   }
 
   private _syncLcuEntitlements() {
-    this.dotPropSync(this.entitlements, `${this.id}/entitlements`, 'token')
+    this.propSync('entitlements', this.entitlements, 'token')
 
     this.autoDisposeReaction(
       () => this._lcm.state.state,

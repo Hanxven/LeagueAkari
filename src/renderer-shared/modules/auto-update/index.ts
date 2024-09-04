@@ -23,11 +23,7 @@ export class AutoUpdateRendererModule extends StateSyncModule {
     )
     this.getterSync('settings/download-source', (s) => (store.settings.downloadSource = s))
 
-    this.dotPropSync(store, this.id, 'isCheckingUpdates')
-    this.dotPropSync(store, this.id, 'newUpdates')
-    this.dotPropSync(store, this.id, 'updateProgressInfo')
-    this.dotPropSync(store, this.id, 'lastCheckAt')
-    this.dotPropSync(store, this.id, 'currentAnnouncement')
+    this.stateSync('state', store)
   }
 
   checkUpdates() {

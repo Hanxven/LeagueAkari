@@ -71,13 +71,13 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.dotPropSync(this.state, this.id, 'willAccept')
-    this.dotPropSync(this.state, this.id, 'willAcceptAt')
-    this.dotPropSync(this.state, this.id, 'willSearchMatch')
-    this.dotPropSync(this.state, this.id, 'willSearchMatchAt')
-    this.dotPropSync(this.state, this.id, 'activityStartStatus')
-    this.dotPropSync(this.state, this.id, 'willDodgeAt')
-    this.dotPropSync(this.state, this.id, 'willDodgeAtLastSecond')
+    this.propSync('state', this.state, 'willAccept')
+    this.propSync('state', this.state, 'willAcceptAt')
+    this.propSync('state', this.state, 'willSearchMatch')
+    this.propSync('state', this.state, 'willSearchMatchAt')
+    this.propSync('state', this.state, 'activityStartStatus')
+    this.propSync('state', this.state, 'willDodgeAt')
+    this.propSync('state', this.state, 'willDodgeAtLastSecond')
   }
 
   private async _setupSettingsSync() {

@@ -141,9 +141,7 @@ export class RespawnTimerModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.dotPropSync(this.state, this.id, 'isDead')
-    this.dotPropSync(this.state, this.id, 'timeLeft')
-    this.dotPropSync(this.state, this.id, 'totalTime')
+    this.propSync('state', this.state, ['isDead', 'timeLeft', 'totalTime'])
   }
 }
 

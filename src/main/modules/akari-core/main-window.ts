@@ -274,8 +274,8 @@ export class MainWindowModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.dotPropSync(this.state, this.id, 'windowState')
-    this.dotPropSync(this.state, this.id, 'focusState')
+    this.propSync('state', this.state, ['windowState', 'focusState'])
+    // this.propSync('state', this.state, 'focusState')
   }
 
   private _setupMethodCall() {

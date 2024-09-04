@@ -16,8 +16,7 @@ export class MainWindowRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useMainWindowStore()
 
-    this.dotPropSync(store, this.id, 'windowState')
-    this.dotPropSync(store, this.id, 'focusState')
+    this.stateSync('state', store)
   }
 
   onAskClose(callback: () => void) {

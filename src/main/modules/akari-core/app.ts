@@ -215,8 +215,7 @@ export class AppModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.dotPropSync(this.state, this.id, 'isAdministrator')
-    this.dotPropSync(this.state, this.id, 'baseConfig')
+    this.propSync('state', this.state, ['isAdministrator', 'baseConfig'])
   }
 
   private _setupMethodCall() {

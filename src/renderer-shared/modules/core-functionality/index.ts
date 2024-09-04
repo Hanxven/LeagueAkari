@@ -19,16 +19,7 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useCoreFunctionalityStore()
 
-    this.dotPropSync(store, this.id, 'isInEndgamePhase')
-    this.dotPropSync(store, this.id, 'ongoingGameInfo')
-    this.dotPropSync(store, this.id, 'queryState')
-    this.dotPropSync(store, this.id, 'ongoingChampionSelections')
-    this.dotPropSync(store, this.id, 'ongoingPreMadeTeams')
-    this.dotPropSync(store, this.id, 'ongoingTeams')
-    this.dotPropSync(store, this.id, 'sendList')
-    this.dotPropSync(store, this.id, 'queueFilter')
-    this.dotPropSync(store, this.id, 'isWaitingForDelay')
-    this.dotPropSync(store, this.id, 'ongoingPlayerAnalysis')
+    this.stateSync('state', store)
 
     this.getterSync(
       'settings/auto-route-on-game-start',

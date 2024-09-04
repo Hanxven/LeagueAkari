@@ -853,11 +853,13 @@ Try {
   }
 
   private _setupStateSync() {
-    this.dotPropSync(this.state, this.id, 'isCheckingUpdates')
-    this.dotPropSync(this.state, this.id, 'newUpdates')
-    this.dotPropSync(this.state, this.id, 'updateProgressInfo')
-    this.dotPropSync(this.state, this.id, 'lastCheckAt')
-    this.dotPropSync(this.state, this.id, 'currentAnnouncement')
+    this.propSync('state', this.state, [
+      'isCheckingUpdates',
+      'newUpdates',
+      'updateProgressInfo',
+      'lastCheckAt',
+      'currentAnnouncement'
+    ])
   }
 }
 

@@ -18,10 +18,7 @@ export class AutoSelectRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAutoSelectStore()
 
-    this.dotPropSync(store, 'auto-select', 'upcomingBan')
-    this.dotPropSync(store, 'auto-select', 'upcomingPick')
-    this.dotPropSync(store, 'auto-select', 'upcomingGrab')
-    this.dotPropSync(store, 'auto-select', 'memberMe')
+    this.stateSync('state', store)
 
     this.getterSync('settings/normal-mode-enabled', (s) => (store.settings.normalModeEnabled = s))
     this.getterSync(

@@ -24,6 +24,11 @@ type StateSetter = (
   ss: SettingService
 ) => void | Promise<boolean>
 
+interface RegisteredState {
+  object: object
+  props: Map<string, { mobxToJs: boolean }>
+}
+
 /**
  * 实现了一些基于 Mobx 的简单状态管理封装，该模块依赖于 `storage` 模块。
  */
@@ -32,6 +37,8 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
   protected _sm: StorageModule
   protected _ss: SettingService
   protected _settingsToSync: Promise<void>[] = []
+
+  private _registeredStatePaths = new Map<string, RegisteredState>()
 
   /**
    * an alias for this._sm
@@ -56,6 +63,29 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
     } catch (error) {
       throw new Error('MobxBasedModule requires StorageModule')
     }
+
+    this.onCall('get-initial-state-props', (stateId: string) => {
+      if (!this._registeredStatePaths.has(stateId)) {
+        throw new Error(`No registered state for ${stateId}`)
+      }
+
+      return Array.from(this._registeredStatePaths.get(stateId)!.props.keys())
+    })
+
+    this.onCall('get-initial-state-prop', (stateId: string, propPath: string) => {
+      if (!this._registeredStatePaths.has(stateId)) {
+        throw new Error(`No registered state for ${stateId}`)
+      }
+
+      if (!this._registeredStatePaths.get(stateId)!.props.has(propPath)) {
+        throw new Error(`No registered prop path ${propPath} for ${stateId}`)
+      }
+
+      const item = this._registeredStatePaths.get(stateId)!
+      const prop = item.props.get(propPath)!
+
+      return prop.mobxToJs ? toJS(get(item.object, propPath)) : get(item.object, propPath)
+    })
   }
 
   /**
@@ -78,24 +108,37 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
     this.onCall(`get-getter/${resName}`, () => (mobxToJs ? toJS(getter()) : getter()))
   }
 
-  /**
-   * 通过提供一个 dotPropPath 监听资源
-   * @param resPath 资源路径，如 `someState.nested.value`
-   * @param obj 一个 mobx 对象
-   */
-  dotPropSync<T extends object>(obj: T, stateId: string, resPath: Paths<T>, mobxToJs = false) {
-    this.autoDisposeReaction(
-      () => get(obj, resPath),
-      (newValue) => {
-        this.sendEvent(
-          `update-dot-prop/${stateId}/${resPath}`,
-          mobxToJs ? toJS(newValue) : newValue
-        )
+  propSync<T extends object>(
+    stateId: string,
+    obj: T,
+    propPath: Paths<T> | Paths<T>[],
+    mobxToJs = false
+  ) {
+    if (!this._registeredStatePaths.has(stateId)) {
+      this._registeredStatePaths.set(stateId, {
+        object: obj,
+        props: new Map()
+      })
+    }
+
+    const paths = Array.isArray(propPath) ? propPath : [propPath]
+
+    for (const path of paths) {
+      if (this._registeredStatePaths.get(stateId)!.props.has(path)) {
+        throw new Error(`Prop path ${path} already registered for ${stateId}`)
       }
-    )
-    this.onCall(`get-dot-prop/${stateId}/${resPath}`, () =>
-      mobxToJs ? toJS(get(obj, resPath)) : get(obj, resPath)
-    )
+
+      this._registeredStatePaths.get(stateId)!.props.set(path, {
+        mobxToJs
+      })
+
+      this.autoDisposeReaction(
+        () => get(obj, path),
+        (newValue) => {
+          this.sendEvent(`update-state-prop/${stateId}`, path, mobxToJs ? toJS(newValue) : newValue)
+        }
+      )
+    }
   }
 
   /**
@@ -114,35 +157,6 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
     this._settingsToSync.push(_readSettingFirst())
     this.getterSync(`settings/${settingName}`, getter)
     this.onCall(`set-setting/${settingName}`, (value) => _wrappedSetter(value))
-  }
-
-  /**
-   * settingSync(this.state.settings, 'some.setting.path', (value) => this.state.settings.setSomeSettingPath(value))
-   */
-  settingSync<T extends object>(
-    obj: T,
-    settingModuleId: string,
-    resPath: Paths<T>,
-    setter?: StateSetter,
-    mobxToJs = false
-  ) {
-    const _defaultSetter = async (value: any) => {
-      set(obj, resPath, value)
-      await this._ss.set(resPath, value)
-    }
-
-    const _wrappedSetter = async (value: any) => {
-      if (setter) {
-        await setter(value, () => _defaultSetter(value), this._ss)
-      } else {
-        await _defaultSetter(value)
-      }
-    }
-    const _readSettingFirst = async () =>
-      _wrappedSetter(await this._ss.get(resPath, () => get(obj, resPath)))
-    this._settingsToSync.push(_readSettingFirst())
-    this.dotPropSync(obj, settingModuleId, resPath, mobxToJs)
-    this.onCall(`set-setting/${settingModuleId}/${resPath}`, (value) => _wrappedSetter(value))
   }
 
   /**
@@ -172,5 +186,6 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
     await super.dispose()
     this._disposers.forEach((fn) => fn())
     this._disposers.clear()
+    this._registeredStatePaths.clear()
   }
 }

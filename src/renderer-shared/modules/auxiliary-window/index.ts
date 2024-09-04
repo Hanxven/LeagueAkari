@@ -24,9 +24,7 @@ export class AuxWindowRendererModule extends StateSyncModule {
     this.getterSync('settings/show-skin-selector', (s) => (store.settings.showSkinSelector = s))
     this.getterSync('settings/zoom-factor', (s) => (store.settings.zoomFactor = s))
 
-    this.dotPropSync(store, this.id, 'isShow')
-    this.dotPropSync(store, this.id, 'windowState')
-    this.dotPropSync(store, this.id, 'focusState')
+    this.stateSync('state', store)
   }
 
   setSize(width: number, height: number) {

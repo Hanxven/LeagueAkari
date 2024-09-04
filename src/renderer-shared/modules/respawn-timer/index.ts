@@ -18,9 +18,7 @@ export class RespawnTimerRendererModule extends StateSyncModule {
 
     this.getterSync('settings/enabled', (s) => (store.settings.enabled = s))
 
-    this.dotPropSync(store, this.id, 'isDead')
-    this.dotPropSync(store, this.id, 'timeLeft')
-    this.dotPropSync(store, this.id, 'totalTime')
+    this.stateSync('state', store)
   }
 
   setEnabled(value: boolean) {

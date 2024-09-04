@@ -29,8 +29,7 @@ export class AppRendererModule extends StateSyncModule {
 
     this.getAppVersion().then((v) => (store.version = v))
 
-    this.dotPropSync(store, this.id, 'isAdministrator')
-    this.dotPropSync(store, this.id, 'baseConfig')
+    this.stateSync('state', store)
   }
 
   getAppVersion() {

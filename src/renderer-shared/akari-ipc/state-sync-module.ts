@@ -18,30 +18,31 @@ export class StateSyncModule extends LeagueAkariRendererModule {
     setter(await this.call(`get-getter/${resName}`))
   }
 
-  /**
-   *
-   * @param obj 目标对象
-   * @param stateId 状态内部标识符
-   * @param resPath 来自主进程状态路径
-   * @param targetPath 目标设置路径 (若不提供, 则同主进程状态路径)
-   */
-  async dotPropSync<T extends object>(
-    obj: T,
-    stateId: string,
-    resPath: Paths<T>,
-    targetPath?: string
-  ) {
-    this.onEvent(`update-dot-prop/${stateId}/${resPath}`, (value) =>
-      set(obj, targetPath === undefined ? resPath : targetPath, value)
+  async stateSync<T extends object>(stateId: string, obj: T) {
+    this.onEvent(`update-state-prop/${stateId}`, (path: string | string[], value) =>
+      set(obj, path, value)
     )
     try {
-      set(
-        obj,
-        targetPath === undefined ? resPath : targetPath,
-        await this.call(`get-dot-prop/${stateId}/${resPath}`)
-      )
+      const paths = (await this.call('get-initial-state-props', stateId)) as string[]
+      const jobs = paths
+        .toSorted((a, b) => b.length - a.length)
+        .map((path) => {
+          return async () => {
+            try {
+              const value = await this.call(`get-initial-state-prop`, stateId, path)
+              set(obj, path, value)
+            } catch (error) {
+              throw new Error(
+                `Failed to get initial state of ${path} from ${stateId}: ${(error as Error).message}`
+              )
+            }
+          }
+        })
+        .map((job) => job())
+
+      await Promise.all(jobs)
     } catch (error) {
-      console.error(`Failed to get initial state of ${resPath} from ${stateId}`, error)
+      console.error(`Failed to sync initial state of ${stateId}`, error)
     }
   }
 }

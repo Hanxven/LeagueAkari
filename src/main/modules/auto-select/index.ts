@@ -354,6 +354,8 @@ export class AutoSelectModule extends MobxBasedBasicModule {
               return
             }
           }
+        } else {
+          return
         }
 
         const newTarget = pickableChampions[0]
@@ -495,10 +497,10 @@ export class AutoSelectModule extends MobxBasedBasicModule {
   }
 
   private async _setupStateSync() {
-    this.dotPropSync(this.state, this.id, 'upcomingBan')
-    this.dotPropSync(this.state, this.id, 'upcomingPick')
-    this.dotPropSync(this.state, this.id, 'upcomingGrab')
-    this.dotPropSync(this.state, this.id, 'memberMe')
+    this.propSync('state', this.state, 'upcomingBan')
+    this.propSync('state', this.state, 'upcomingPick')
+    this.propSync('state', this.state, 'upcomingGrab')
+    this.propSync('state', this.state, 'memberMe')
   }
 }
 

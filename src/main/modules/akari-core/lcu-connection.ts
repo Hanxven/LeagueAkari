@@ -575,10 +575,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.dotPropSync(this.state, this.id, 'state')
-    this.dotPropSync(this.state, this.id, 'auth')
-    this.dotPropSync(this.state, this.id, 'launchedClients')
-    this.dotPropSync(this.state, this.id, 'connectingClient')
+    this.propSync('state', this.state, ['state', 'auth', 'launchedClients', 'connectingClient'])
   }
 }
 
