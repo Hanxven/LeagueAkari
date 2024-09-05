@@ -623,6 +623,17 @@ export class AuxWindowModule extends MobxBasedBasicModule {
 
   resetWindowPosition() {
     if (this._w) {
+      switch (this.state.currentFunctionality) {
+        case 'indicator':
+          this._w.setSize(AuxWindowModule.WINDOW_BASE_WIDTH, AuxWindowModule.WINDOW_BASE_HEIGHT)
+          break
+        case 'opgg':
+          this._w.setSize(
+            AuxWindowModule.WINDOW_OPGG_DEFAULT_WIDTH,
+            AuxWindowModule.WINDOW_OPGG_DEFAULT_HEIGHT
+          )
+      }
+
       const bounds = this._w.getBounds()
       const p = this._getCenteredRectangle(
         bounds.width * this.state.settings.zoomFactor,

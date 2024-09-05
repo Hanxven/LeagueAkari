@@ -1,5 +1,5 @@
 <template>
-  <NPopover :delay="300" :show-arrow="false">
+  <NPopover :delay="50" :show-arrow="false">
     <template #trigger>
       <div style="display: flex; flex-direction: column; align-items: center; font-size: 11px">
         <div>{{ totalDamage.toLocaleString() }}</div>

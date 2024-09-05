@@ -1,7 +1,7 @@
 <template>
   <NPopover
     v-if="itemId && gameData.items[itemId]"
-    :delay="300"
+    :delay="50"
     :scrollable="true"
     style="max-height: 50vh"
   >

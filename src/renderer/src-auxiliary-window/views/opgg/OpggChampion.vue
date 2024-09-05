@@ -141,7 +141,7 @@
               <div class="buttons">
                 <NButton
                   @click="() => emits('setSummonerSpells', s.ids)"
-                  size="small"
+                  size="tiny"
                   type="primary"
                   secondary
                   :disabled="gameflow.phase !== 'ChampSelect'"
@@ -205,7 +205,7 @@
               <div class="buttons">
                 <NButton
                   @click="() => emits('setRunes', r)"
-                  size="small"
+                  size="tiny"
                   type="primary"
                   :disabled="lc.state !== 'connected'"
                   secondary
@@ -419,7 +419,7 @@
             <span style="font-size: 13px">导入当前装备方案</span>
             <div style="width: 76px; display: flex; justify-content: center">
               <NButton
-                size="small"
+                size="tiny"
                 type="primary"
                 secondary
                 @click="handleAddToItemSet"

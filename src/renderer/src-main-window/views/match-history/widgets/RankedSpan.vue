@@ -1,6 +1,6 @@
 <template>
   <template v-if="showingRank">
-    <NPopover placement="bottom" :disabled="!simple && sortedRankedQueues.length <= 1">
+    <NPopover placement="bottom" :disabled="!simple && sortedRankedQueues.length <= 1" :delay="50">
       <template #trigger>
         <div v-bind="$attrs" class="summoner-rank">
           <img

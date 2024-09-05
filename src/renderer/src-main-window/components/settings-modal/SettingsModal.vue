@@ -70,6 +70,6 @@ const tabName = defineModel<string>('tabName', { default: 'basic' })
 <style lang="less" module>
 .settings-modal {
   width: 90%;
-  max-width: 768px;
+  max-width: 840px;
 }
 </style>

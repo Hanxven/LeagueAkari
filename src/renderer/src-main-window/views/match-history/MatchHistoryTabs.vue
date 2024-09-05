@@ -61,6 +61,7 @@
           :show-arrow="false"
           trigger="click"
           scrollable
+          :delay="50"
         >
           <template #trigger>
             <button quaternary class="search-button">

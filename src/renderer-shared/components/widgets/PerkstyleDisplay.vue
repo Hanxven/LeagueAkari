@@ -1,5 +1,5 @@
 <template>
-  <NPopover v-if="perkstyleId && gameData.perkstyles[perkstyleId]" :delay="300">
+  <NPopover v-if="perkstyleId && gameData.perkstyles[perkstyleId]" :delay="50">
     <template #trigger>
       <LcuImage
         :src="gameData.perkstyles[perkstyleId].iconPath"

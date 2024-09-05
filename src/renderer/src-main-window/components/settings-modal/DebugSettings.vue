@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar style="max-height: 60vh" trigger="none">
+  <NScrollbar style="max-height: 65vh" trigger="none">
     <NModal preset="card" size="small" v-model:show="editRuleModalShow" style="max-width: 500px">
       <template #header>添加</template>
       <template #footer>
@@ -63,7 +63,7 @@
         <template #labelDescription>
           打开 League Akari
           应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
-          <NPopover>
+          <NPopover :delay="50">
             <template #trigger>
               <span style="font-weight: bold; color: #fff; cursor: pointer">详情</span>
             </template>

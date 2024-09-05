@@ -106,6 +106,8 @@ const handleBackToIndicatorView = () => {
   height: 100%;
   flex: 1;
   transition: all 0.3s;
+  padding: 4px 4px 2px 4px;
+  box-sizing: border-box;
 
   .blurred & {
     filter: brightness(0.8);
@@ -118,18 +120,18 @@ const handleBackToIndicatorView = () => {
     gap: 2px;
     width: 64px;
     height: 100%;
-    background-color: rgb(41, 41, 41);
+    background-color: rgba(255, 255, 255, 0.08);
     -webkit-app-region: none;
     transition: all 0.3s;
     cursor: pointer;
-    border-radius: 2px;
+    border-radius: 4px;
 
     &:hover {
-      background-color: rgb(86, 86, 86);
+      background-color: rgba(255, 255, 255, 0.15);
     }
 
     &:active {
-      background-color: rgb(102, 102, 102);
+      background-color: rgba(255, 255, 255, 0.09);
     }
   }
 

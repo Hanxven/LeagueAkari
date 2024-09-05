@@ -21,7 +21,7 @@
             }}</span
           >
           <span class="tag self" v-if="isSelf">我</span>
-          <NPopover v-if="savedInfo && savedInfo.lastMetAt && !isSelf" placement="bottom">
+          <NPopover v-if="savedInfo && savedInfo.lastMetAt && !isSelf" placement="bottom" :delay="50">
             <template #trigger>
               <span
                 :title="`曾在 ${formattedRelativeTime} 遇见过，共遇见过 ${savedInfo.encounteredGames.length} 次`"
@@ -46,7 +46,7 @@
               </div>
             </div>
           </NPopover>
-          <NPopover v-if="savedInfo && !isSelf && savedInfo.tag" placement="bottom">
+          <NPopover v-if="savedInfo && !isSelf && savedInfo.tag" placement="bottom" :delay="50">
             <template #trigger>
               <span @click="() => emits('showSavedInfo', puuid)" class="tag tagged">已标记</span>
             </template>

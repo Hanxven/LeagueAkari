@@ -148,13 +148,13 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
    * @param value 新值
    * @param mobxToJs 是否转换为普通对象
    */
-  propUpdate<T extends object = any>(
+  propUpdateEvent<T extends object = any>(
     stateId: string,
     propPath: Paths<T>,
     value: any,
-    mobxToJs = false 
+    mobxToJs = false
   ) {
-    this.sendEvent(`update-s  tate-prop/${stateId}`, propPath, mobxToJs ? toJS(value) : value)
+    this.sendEvent(`update-state-prop/${stateId}`, propPath, mobxToJs ? toJS(value) : value)
   }
 
   /**

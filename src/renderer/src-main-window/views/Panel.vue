@@ -22,6 +22,7 @@
           scrollable
           :disabled="lc.state !== 'connected' && lc.launchedClients.length === 0"
           style="max-height: 240px"
+          :delay="50"
         >
           <template #trigger>
             <div

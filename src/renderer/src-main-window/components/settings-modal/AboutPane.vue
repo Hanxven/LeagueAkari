@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar style="max-height: 60vh" trigger="none">
+  <NScrollbar style="max-height: 65vh" trigger="none">
     <div style="padding: 16px 16px 8px">
       <div
         style="display: flex; justify-content: center; vertical-align: bottom; margin-bottom: 16px"

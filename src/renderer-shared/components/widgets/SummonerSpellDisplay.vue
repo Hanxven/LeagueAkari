@@ -1,5 +1,5 @@
 <template>
-  <NPopover v-if="spellId && gameData.summonerSpells[spellId]" :delay="300">
+  <NPopover v-if="spellId && gameData.summonerSpells[spellId]" :delay="50">
     <template #trigger>
       <LcuImage
         :src="gameData.summonerSpells[spellId].iconPath"

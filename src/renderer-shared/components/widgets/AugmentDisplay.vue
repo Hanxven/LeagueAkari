@@ -1,5 +1,5 @@
 <template>
-  <NPopover v-if="augmentId && gameData.augments[augmentId]" :delay="300">
+  <NPopover v-if="augmentId && gameData.augments[augmentId]" :delay="50">
     <template #trigger>
       <LcuImage
         :src="gameData.augments[augmentId].augmentSmallIconPath"

@@ -60,7 +60,7 @@
     <ControlItem
       class="control-item-margin"
       label="切换为上赛季旗帜"
-      label-description="锁定为上赛季旗帜"
+      label-description="切换为上赛季旗帜，可能会导致旗帜消失"
       :label-width="200"
     >
       <NButton

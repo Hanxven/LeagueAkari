@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar style="max-height: 60vh" trigger="none">
+  <NScrollbar style="max-height: 65vh" trigger="none">
     <NCard size="small">
       <template #header><span class="card-header-title">基础</span></template>
       <ControlItem
