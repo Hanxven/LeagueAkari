@@ -9,8 +9,8 @@
       :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px">
-        <NInputNumber :show-button="false" v-model:value="gameId" size="tiny" />
-        <NButton :disabled="!gameId" @click="handleInspect" size="tiny" type="primary"
+        <NInputNumber :show-button="false" v-model:value="gameId" size="small" />
+        <NButton :disabled="!gameId" @click="handleInspect" size="small" type="primary"
           >查看</NButton
         >
       </div>

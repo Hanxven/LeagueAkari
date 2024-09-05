@@ -34,7 +34,7 @@
         :autosize="{ maxRows: 4, minRows: 3 }"
         placeholder="提供文本行"
         @update:value="(text) => cksm.setText(text)"
-        size="tiny"
+        size="small"
       ></NInput>
     </ControlItem>
   </NCard>

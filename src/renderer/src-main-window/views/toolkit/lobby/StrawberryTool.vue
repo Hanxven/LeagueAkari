@@ -14,7 +14,7 @@
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
           <NSelect
             style="width: 180px"
-            size="tiny"
+            size="small"
             v-model:value="currentChampionId"
             filterable
             :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
@@ -23,7 +23,7 @@
           ></NSelect>
           <NButton
             @click="setChampion"
-            size="tiny"
+            size="small"
             :loading="isSettingChampion"
             :disabled="!currentChampionId"
             >设置英雄</NButton
@@ -39,7 +39,7 @@
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
           <NSelect
             style="width: 180px"
-            size="tiny"
+            size="small"
             v-model:value="currentMapUnionId"
             filterable
             :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
@@ -48,7 +48,7 @@
           ></NSelect>
           <NButton
             @click="setMap"
-            size="tiny"
+            size="small"
             :loading="isSettingMap"
             :disabled="!currentMapUnionId"
             >设置地图</NButton
@@ -64,7 +64,7 @@
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
           <NSelect
             style="width: 180px"
-            size="tiny"
+            size="small"
             v-model:value="currentDifficulty"
             filterable
             @update:show="doIfNotInitialized"
@@ -72,7 +72,7 @@
           ></NSelect>
           <NButton
             @click="setDifficulty"
-            size="tiny"
+            size="small"
             :loading="isSettingDifficulty"
             :disabled="!currentDifficulty"
             >设置难度</NButton

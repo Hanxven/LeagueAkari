@@ -45,15 +45,10 @@ import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
 
-withDefaults(
-  defineProps<{
-    augmentId?: number
-    size?: number
-  }>(),
-  {
-    size: 20
-  }
-)
+const { size = 20 } = defineProps<{
+  augmentId?: number
+  size?: number
+}>()
 
 const gameData = useGameDataStore()
 

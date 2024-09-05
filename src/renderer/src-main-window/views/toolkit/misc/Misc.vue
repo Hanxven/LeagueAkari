@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper">
     <div class="inner-wrapper">
       <AvailabilityCheck class="tool" v-if="app.settings.isInKyokoMode" />
       <SummonerProfile class="tool" />
@@ -27,7 +27,6 @@ import Spectate from './Spectate.vue'
 import SummonerProfile from './SummonerProfile.vue'
 
 const app = useAppStore()
-
 </script>
 
 <style lang="less" scoped>

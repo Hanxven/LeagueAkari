@@ -82,26 +82,23 @@
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    physicalDamage?: number
-    magicDamage?: number
-    trueDamage?: number
-    totalDamage?: number
-    baselineDamage?: number
-    width?: number
-    height?: number
-  }>(),
-  {
-    baselineDamage: 1,
-    magicDamage: 1,
-    physicalDamage: 1,
-    totalDamage: 1,
-    trueDamage: 1,
-    width: 52,
-    height: 6
-  }
-)
+const {
+  baselineDamage = 1,
+  magicDamage = 1,
+  physicalDamage = 1,
+  totalDamage = 1,
+  trueDamage = 1,
+  width = 52,
+  height = 6
+} = defineProps<{
+  physicalDamage?: number
+  magicDamage?: number
+  trueDamage?: number
+  totalDamage?: number
+  baselineDamage?: number
+  width?: number
+  height?: number
+}>()
 
 const INNER_WIDTH = 140
 
@@ -110,10 +107,10 @@ const calcMetricBar = (baseWidth: number) => {
     {
       type: 'physical',
       x: 0,
-      width: (props.physicalDamage / (props.baselineDamage || 1)) * baseWidth
+      width: (physicalDamage / (baselineDamage || 1)) * baseWidth
     },
-    { type: 'magic', x: 0, width: (props.magicDamage / (props.baselineDamage || 1)) * baseWidth },
-    { type: 'true', x: 0, width: (props.trueDamage / (props.baselineDamage || 1)) * baseWidth }
+    { type: 'magic', x: 0, width: (magicDamage / (baselineDamage || 1)) * baseWidth },
+    { type: 'true', x: 0, width: (trueDamage / (baselineDamage || 1)) * baseWidth }
   ].sort((d1, d2) => d2.width - d1.width)
 
   for (let i = 1; i < list.length; i++) {
@@ -124,7 +121,7 @@ const calcMetricBar = (baseWidth: number) => {
 }
 
 const ordered = computed(() => {
-  return calcMetricBar(props.width)
+  return calcMetricBar(width)
 })
 
 const orderedInner = computed(() => {

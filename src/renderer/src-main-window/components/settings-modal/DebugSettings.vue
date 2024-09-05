@@ -5,7 +5,7 @@
       <template #footer>
         <div class="right-side">
           <NButton
-            size="tiny"
+            size="small"
             type="primary"
             secondary
             :disabled="!editRuleValid"
@@ -17,7 +17,7 @@
         </div>
       </template>
       <NAutoComplete
-        ref="editRuleInputEl"
+        ref="edit-rule-input"
         placeholder="输入匹配规则，如 /path/:name/to"
         v-model:value="editRuleText"
         :options="options"
@@ -34,7 +34,7 @@
         label-description="Toggle DevTools"
         :label-width="320"
       >
-        <NButton size="tiny" secondary type="primary" @click="handleToggleDevtools"
+        <NButton size="small" secondary type="primary" @click="handleToggleDevtools"
           >Toggle Devtools</NButton
         >
       </ControlItem>
@@ -44,7 +44,7 @@
         label-description="刷新 League Akari 用户界面"
         :label-width="320"
       >
-        <NButton size="tiny" secondary type="primary" @click="handleReload">重新加载界面</NButton>
+        <NButton size="small" secondary type="primary" @click="handleReload">重新加载界面</NButton>
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
@@ -55,7 +55,7 @@
         label-description="打开 League Akari 日志文件所在目录"
         :label-width="320"
       >
-        <NButton size="tiny" secondary type="primary" @click="() => handleShowLogsDir()"
+        <NButton size="small" secondary type="primary" @click="() => handleShowLogsDir()"
           >日志目录</NButton
         >
       </ControlItem>
@@ -72,7 +72,7 @@
             <div style="font-size: 12px">NewUpdates/ - 即将进行的自动更新临时文件</div>
           </NPopover>
         </template>
-        <NButton size="tiny" secondary type="primary" @click="() => handleShowUserDataDir()"
+        <NButton size="small" secondary type="primary" @click="() => handleShowUserDataDir()"
           >应用目录</NButton
         >
       </ControlItem>
@@ -203,7 +203,7 @@ import {
   NSwitch,
   NTable
 } from 'naive-ui'
-import { computed, h, nextTick, ref, useCssModule, watch } from 'vue'
+import { computed, h, nextTick, ref, useCssModule, useTemplateRef, watch } from 'vue'
 
 import { debugRendererModule as dm } from '@main-window/modules/debug'
 import { useDebugStore } from '@main-window/modules/debug/store'
@@ -295,7 +295,7 @@ const printRulesArr = computed(() => {
 
 const editRuleModalShow = ref(false)
 const editRuleText = ref('')
-const editRuleInputEl = ref()
+const editRuleInputEl = useTemplateRef('edit-rule-input')
 
 watch(
   () => editRuleModalShow.value,

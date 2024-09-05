@@ -12,7 +12,7 @@
       >
         <NTab
           v-for="tab of mh.tabs"
-          @mousedown="(event) => handleMouseDown(event, tab.id)"
+          @mouseup="(event) => handleMouseUp(event, tab.id)"
           @contextmenu="(event) => handleShowMenu(event, tab.id)"
           :key="tab.id"
           :tab="tabNames[tab.id]"
@@ -92,7 +92,7 @@
           v-show="t.id === mh.currentTab.id"
           :is-self="mh.currentTab.data.puuid === summoner.me?.puuid"
           :tab="{ id: t.id, ...(t.data as TabState) }"
-          ref="tabsRef"
+          ref="tabs-ref"
         />
       </template>
       <div v-else class="tabs-placeholder">
@@ -121,7 +121,7 @@ import { summonerName } from '@shared/utils/name'
 import { rsoPlatformText } from '@shared/utils/rso-platforms'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
 import { NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
@@ -152,12 +152,12 @@ const handleTabChange = async (unionId: string) => {
   navigateToTab(puuid, sgpServerId)
 }
 
-const tabsRef = ref<any[]>()
+const tabsRef = useTemplateRef('tabs-ref')
 
 const handleRefresh = async (puuid: string) => {
   if (tabsRef.value) {
-    const tab = tabsRef.value.find((t) => t.puuid === puuid)
-    tab.refresh()
+    const tab = tabsRef.value.find((t) => t && t.puuid === puuid)
+    tab?.refresh()
   }
 }
 
@@ -321,9 +321,9 @@ const dropdownOptions = reactive([
   }
 ])
 
-const handleMouseDown = (event, tabId) => {
+const handleMouseUp = (event: PointerEvent, unionId: string) => {
   if (event.button === 1) {
-    mh.closeTab(tabId)
+    mh.closeTab(unionId)
   }
 }
 

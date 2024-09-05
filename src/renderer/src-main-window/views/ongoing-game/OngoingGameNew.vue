@@ -1,6 +1,6 @@
 <template>
   <div class="ongoing-game-page">
-    <NScrollbar x-scrollable ref="scrollRef">
+    <NScrollbar x-scrollable>
       <div class="inner-container">
         <div class="ongoing-header">
           <NSelect
@@ -90,7 +90,7 @@ const queueOptions = ref([
 
 .ongoing-header {
   position: sticky;
-  z-index: 10; 
+  z-index: 10;
   top: 0;
   display: flex;
   align-items: center;

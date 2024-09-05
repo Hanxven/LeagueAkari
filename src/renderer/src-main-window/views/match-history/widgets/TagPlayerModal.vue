@@ -7,12 +7,9 @@
 <script setup lang="ts">
 import { NModal } from 'naive-ui'
 
-withDefaults(
-  defineProps<{
-    show: boolean
-  }>(),
-  { show: false }
-)
+const { show = false } = defineProps<{
+  show: boolean
+}>()
 
 const emits = defineEmits<{
   (e: 'update:show', show: boolean)

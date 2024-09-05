@@ -19,13 +19,11 @@ export class StateSyncModule extends LeagueAkariRendererModule {
   }
 
   async stateSync<T extends object>(stateId: string, obj: T) {
-    this.onEvent(`update-state-prop/${stateId}`, (path: string | string[], value) =>
-      set(obj, path, value)
-    )
+    this.onEvent(`update-state-prop/${stateId}`, (path: string, value) => set(obj, path, value))
+
     try {
       const paths = (await this.call('get-initial-state-props', stateId)) as string[]
       const jobs = paths
-        .toSorted((a, b) => b.length - a.length)
         .map((path) => {
           return async () => {
             try {

@@ -11,7 +11,7 @@
         type="warning"
         :disabled="gameflow.phase !== 'ChampSelect'"
         @click="handleDodge"
-        size="tiny"
+        size="small"
         >秒退</NButton
       >
     </ControlItem>
@@ -21,7 +21,7 @@
       label-description="立即退出结算界面。适用于由于客户端原因无法退出结算页面的情况"
       :label-width="200"
     >
-      <NButton type="primary" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="tiny"
+      <NButton type="primary" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="small"
         >回到房间</NButton
       >
     </ControlItem>
@@ -31,7 +31,7 @@
       label-description="立即退出当前房间"
       :label-width="200"
     >
-      <NButton :disabled="gameflow.phase !== 'Lobby'" @click="deleteLobby" size="tiny"
+      <NButton :disabled="gameflow.phase !== 'Lobby'" @click="deleteLobby" size="small"
         >退出房间</NButton
       >
     </ControlItem>

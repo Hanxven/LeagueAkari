@@ -13,19 +13,16 @@ import { Copy as CopyIcon } from '@vicons/carbon'
 import { NIcon, useMessage } from 'naive-ui'
 import { useSlots } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    text?: string | number
-    showMessage?: boolean
-    prefix?: string
-    suffix?: string
-  }>(),
-  {
-    showMessage: true,
-    prefix: '',
-    suffix: ''
-  }
-)
+const {
+  showMessage = true,
+  prefix = '',
+  suffix = ''
+} = defineProps<{
+  text?: string | number
+  showMessage?: boolean
+  prefix?: string
+  suffix?: string
+}>()
 
 const emits = defineEmits<{
   (e: 'copy', text: string): void
@@ -38,8 +35,8 @@ const message = useMessage()
 const handleCopy = async () => {
   let text = ''
   if (slots.default) {
-    if (props.text) {
-      text = props.text.toString()
+    if (text) {
+      text = text.toString()
     } else {
       const nodes = slots.default()
       if (nodes[0] && typeof nodes[0].children === 'string') {
@@ -47,13 +44,13 @@ const handleCopy = async () => {
       }
     }
   } else {
-    text = props.text?.toString() || ''
+    text = text?.toString() || ''
   }
 
   try {
-    await navigator.clipboard.writeText(props.prefix + text + props.suffix)
+    await navigator.clipboard.writeText(prefix + text + suffix)
 
-    if (props.showMessage) {
+    if (showMessage) {
       message.success('已复制', {
         duration: 1000
       })

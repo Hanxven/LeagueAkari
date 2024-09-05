@@ -142,6 +142,22 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
   }
 
   /**
+   * 手动推送一个变化到渲染进程
+   * @param stateId 状态 ID
+   * @param propPath 属性路径
+   * @param value 新值
+   * @param mobxToJs 是否转换为普通对象
+   */
+  propUpdate<T extends object = any>(
+    stateId: string,
+    propPath: Paths<T>,
+    value: any,
+    mobxToJs = false 
+  ) {
+    this.sendEvent(`update-s  tate-prop/${stateId}`, propPath, mobxToJs ? toJS(value) : value)
+  }
+
+  /**
    * 简易的设置状态同步。默认值为 getter()，并在设置时推送更新。会在被 setup 时从存储模块中读取设置。
    * @param settingName 该模块的设置项目
    * @param getter 设置状态量的 getter

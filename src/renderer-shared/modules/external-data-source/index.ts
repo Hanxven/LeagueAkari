@@ -1,10 +1,10 @@
+import { StateSyncModule } from '@renderer-shared/akari-ipc/state-sync-module'
 import {
   SgpMatchHistoryLol,
   SgpRankedStats,
   SgpSummoner,
   SpectatorData
 } from '@shared/data-sources/sgp/types'
-import { StateSyncModule } from '@renderer-shared/akari-ipc/state-sync-module'
 import { MatchHistory } from '@shared/types/lcu/match-history'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 
@@ -58,10 +58,7 @@ class SgpEdsRenderer {
     return this._edsm.call('sgp/get-ranked-stats', puuid, sgpServerId)
   }
 
-  getSpectatorGameflow(
-    playerPuuid: string,
-    sgpServerId?: string
-  ): Promise<SpectatorData> {
+  getSpectatorGameflow(playerPuuid: string, sgpServerId?: string): Promise<SpectatorData> {
     return this._edsm.call('sgp/get-spectator-gameflow', playerPuuid, sgpServerId)
   }
 }

@@ -10,7 +10,7 @@
         <NInput
           placeholder="召唤师名称"
           style="width: 180px"
-          size="tiny"
+          size="small"
           @keyup.enter="handleCheckAvailability"
           v-model:value="availability.summonerName"
         ></NInput>
@@ -18,7 +18,7 @@
           :loading="availability.isCheckingSummonerName"
           :disabled="availability.summonerName.length === 0"
           @click="handleCheckAvailability"
-          size="tiny"
+          size="small"
           >检查</NButton
         >
         <Transition name="fade">
@@ -40,7 +40,7 @@
         <NInput
           placeholder="召唤师名称"
           style="width: 180px"
-          size="tiny"
+          size="small"
           @keyup.enter="popconfirmShow = true"
           v-model:value="newName"
         ></NInput>
@@ -52,7 +52,7 @@
           :positive-button-props="{ size: 'tiny' }"
         >
           <template #trigger>
-            <NButton :disabled="lc.state !== 'connected'" size="tiny">提交</NButton>
+            <NButton :disabled="lc.state !== 'connected'" size="small">提交</NButton>
           </template>
           <div style="font-size: 13px">
             该功能仅可在召唤师尚未创建 (即在初始玩家名称选择阶段) 时生效。<br />名称的长度仍然存在长度限制，通常为

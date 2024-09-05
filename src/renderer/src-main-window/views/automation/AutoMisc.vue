@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper">
     <div class="inner-wrapper">
       <NCard size="small">
         <template #header><span class="card-header-title">自动回复</span></template>
@@ -30,10 +30,10 @@
         >
           <NInput
             :status="ar.settings.text.length === 0 && ar.settings.enabled ? 'warning' : 'success'"
-            style="max-width: 360px; width: 360px;"
+            style="max-width: 360px; width: 360px"
             :value="ar.settings.text"
             @update:value="(text) => arm.setText(text)"
-            size="tiny"
+            size="small"
           ></NInput>
         </ControlItem>
       </NCard>

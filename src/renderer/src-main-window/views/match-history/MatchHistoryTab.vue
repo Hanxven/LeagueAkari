@@ -55,7 +55,7 @@
               tertiary
               class="header-button"
               title="刷新当前页"
-              size="tiny"
+              size="small"
               round
               :loading="isSomethingLoading"
               @click="() => handleRefresh()"
@@ -68,7 +68,7 @@
         </div>
       </div>
     </Transition>
-    <NScrollbar x-scrollable ref="scrollRef" @scroll="(e) => handleMainContentScroll(e)">
+    <NScrollbar x-scrollable ref="scroll" @scroll="(e) => handleMainContentScroll(e)">
       <div class="inner-container">
         <div class="profile">
           <div class="header-profile">
@@ -106,7 +106,7 @@
               <NButton
                 :focusable="false"
                 title="更多"
-                size="tiny"
+                size="small"
                 secondary
                 @click="isShowingRankedModal = true"
               >
@@ -143,7 +143,7 @@
         </div>
         <div class="show-on-smaller-screen">
           <NInputNumber
-            size="tiny"
+            size="small"
             placeholder=""
             style="width: 48px"
             v-model:value="inputtingPage"
@@ -154,7 +154,7 @@
             :show-button="false"
           />
           <NButton
-            size="tiny"
+            size="small"
             title="切换到上一页"
             @click="handleLoadPage(tab.matchHistory.page - 1)"
             :disabled="tab.matchHistory.page <= 1 || tab.loading.isLoadingMatchHistory"
@@ -163,7 +163,7 @@
           >
           <NButton
             title="切换到下一页"
-            size="tiny"
+            size="small"
             @click="() => handleLoadPage(tab.matchHistory.page + 1)"
             :disabled="tab.loading.isLoadingMatchHistory"
             secondary
@@ -174,7 +174,7 @@
             @update:value="handleChangePageSize"
             :disabled="tab.loading.isLoadingMatchHistory"
             class="page-select"
-            size="tiny"
+            size="small"
             style="width: 108px"
             :options="pageSizeOptions"
           ></NSelect>
@@ -182,7 +182,7 @@
             v-if="
               cf.settings.useSgpApi || eds.sgpAvailability.currentSgpServerId !== tab.sgpServerId
             "
-            size="tiny"
+            size="small"
             :value="tab.matchHistory.queueFilter"
             style="width: 160px"
             @update:value="handleChangeSgpTag"
@@ -196,7 +196,7 @@
               <div class="left-content-item-content">
                 <div style="display: flex; gap: 4px">
                   <NInputNumber
-                    size="tiny"
+                    size="small"
                     placeholder=""
                     style="flex: 1"
                     v-model:value="inputtingPage"
@@ -207,7 +207,7 @@
                     :show-button="false"
                   />
                   <NButton
-                    size="tiny"
+                    size="small"
                     title="切换到上一页"
                     @click="handleLoadPage(tab.matchHistory.page - 1)"
                     :disabled="tab.matchHistory.page <= 1 || tab.loading.isLoadingMatchHistory"
@@ -216,7 +216,7 @@
                   >
                   <NButton
                     title="切换到下一页"
-                    size="tiny"
+                    size="small"
                     @click="() => handleLoadPage(tab.matchHistory.page + 1)"
                     :disabled="tab.loading.isLoadingMatchHistory"
                     secondary
@@ -227,8 +227,8 @@
                     @update:value="handleChangePageSize"
                     :disabled="tab.loading.isLoadingMatchHistory"
                     class="page-select"
-                    size="tiny"
-                    style="width: 108px"
+                    size="small"
+                    style="width: 86px"
                     :options="pageSizeOptions"
                   ></NSelect>
                 </div>
@@ -237,7 +237,7 @@
                     cf.settings.useSgpApi ||
                     eds.sgpAvailability.currentSgpServerId !== tab.sgpServerId
                   "
-                  size="tiny"
+                  size="small"
                   :value="tab.matchHistory.queueFilter"
                   @update:value="handleChangeSgpTag"
                   :disabled="tab.loading.isLoadingMatchHistory"
@@ -381,7 +381,7 @@
               </div>
             </div>
           </div>
-          <div class="right" ref="rightEl">
+          <div class="right" ref="right">
             <MatchHistoryCard
               class="match-history-card-item"
               @set-show-detailed-game="handleToggleShowDetailedGame"
@@ -440,7 +440,7 @@ import {
   NSelect,
   NSpin
 } from 'naive-ui'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
@@ -449,22 +449,17 @@ import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-h
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import RankedDisplay from './widgets/RankedDisplay.vue'
 
-const props = withDefaults(
-  defineProps<{
-    tab: TabState & { id: string }
-    isSelf?: boolean
-  }>(),
-  {
-    isSelf: false
-  }
-)
+const { isSelf = false, tab } = defineProps<{
+  tab: TabState & { id: string }
+  isSelf?: boolean
+}>()
 
 // 1182px - is same in which defined in CSS
 const isSmallScreen = useMediaQuery(`(max-width: 1182px)`)
 
 const analysis = computed(() => {
-  const matchHistory = analyzeMatchHistory(props.tab.matchHistory.games, props.tab.puuid)
-  const players = analyzeMatchHistoryPlayers(props.tab.matchHistory.games, props.tab.puuid)
+  const matchHistory = analyzeMatchHistory(tab.matchHistory.games, tab.puuid)
+  const players = analyzeMatchHistoryPlayers(tab.matchHistory.games, tab.puuid)
 
   return {
     matchHistory: matchHistory,
@@ -475,8 +470,8 @@ const analysis = computed(() => {
 
 const eds = useExternalDataSourceStore()
 
-const scrollRef = ref()
-const rightEl = ref()
+const scrollRef = useTemplateRef('scroll')
+const rightEl = useTemplateRef('right')
 
 const mh = useMatchHistoryTabsStore()
 const cf = useCoreFunctionalityStore()
@@ -484,44 +479,44 @@ const gameData = useGameDataStore()
 const app = useAppStore()
 
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
-  mh.setMatchHistoryExpand(props.tab.id, gameId, expand)
+  mh.setMatchHistoryExpand(tab.id, gameId, expand)
 }
 
 const isShowingRankedModal = ref(false)
 
 const isSomethingLoading = computed(() => {
   return (
-    props.tab.loading.isLoadingMatchHistory ||
-    props.tab.loading.isLoadingRankedStats ||
-    props.tab.loading.isLoadingSummoner
+    tab.loading.isLoadingMatchHistory ||
+    tab.loading.isLoadingRankedStats ||
+    tab.loading.isLoadingSummoner
   )
 })
 
 const scrollToRightElTop = () => {
   const top = rightEl.value?.offsetTop
-  if (top < mainContentScrollTop.value) {
+  if (top && top < mainContentScrollTop.value) {
     scrollRef.value?.scrollTo({ top: top })
   }
 }
 
 const handleRefresh = async () => {
   try {
-    await mhm.fetchTabFullData(props.tab.id)
+    await mhm.fetchTabFullData(tab.id)
     scrollToRightElTop()
   } catch {
-    laNotification.warn('召唤师信息', `无法拉取用户 ${props.tab.id} 的信息`)
+    laNotification.warn('召唤师信息', `无法拉取用户 ${tab.id} 的信息`)
   }
 }
 
 const handleLoadPage = async (page?: number) => {
-  const r = await mhm.fetchTabMatchHistory(props.tab.id, page)
+  const r = await mhm.fetchTabMatchHistory(tab.id, page)
   scrollToRightElTop()
   return r
 }
 
-const inputtingPage = ref(props.tab.matchHistory.page)
+const inputtingPage = ref(tab.matchHistory.page)
 const handleInputBlur = () => {
-  inputtingPage.value = props.tab.matchHistory.page
+  inputtingPage.value = tab.matchHistory.page
 }
 
 const pageSizeOptions = [
@@ -550,23 +545,23 @@ const pageSizeOptions = [
     value: 100
   },
   {
-    label: '200 项',
+    label: '200 项', // DOM 压力爆炸
     value: 200
   }
 ]
 
 const handleChangePageSize = async (pageSize: number) => {
   const r = await mhm.fetchTabMatchHistory(
-    props.tab.id,
-    props.tab.matchHistory.page,
+    tab.id,
+    tab.matchHistory.page,
     pageSize,
-    props.tab.matchHistory.queueFilter
+    tab.matchHistory.queueFilter
   )
   return r
 }
 
 watch(
-  () => props.tab.matchHistory.page,
+  () => tab.matchHistory.page,
   (page) => {
     inputtingPage.value = page
   }
@@ -615,12 +610,7 @@ const sgpTagOptions = computed(() => {
 })
 
 const handleChangeSgpTag = async (queueFilter: number | string) => {
-  const r = await mhm.fetchTabMatchHistory(
-    props.tab.id,
-    1,
-    props.tab.matchHistory.pageSize,
-    queueFilter
-  )
+  const r = await mhm.fetchTabMatchHistory(tab.id, 1, tab.matchHistory.pageSize, queueFilter)
   return r
 }
 
@@ -629,7 +619,7 @@ const handleTagPlayer = async () => {
   isShowingTagEditModal.value = true
 }
 const handleTagEdited = (_puuid: string) => {
-  mhm.querySavedInfo(props.tab.id)
+  mhm.querySavedInfo(tab.id)
 }
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
@@ -683,7 +673,7 @@ const recentlyTeammates = computed(() => {
 const { navigateToTab } = mhm.useNavigateToTab()
 
 const handleToSummoner = (puuid: string) => {
-  const { sgpServerId } = mhm.parseUnionId(props.tab.id)
+  const { sgpServerId } = mhm.parseUnionId(tab.id)
   navigateToTab(puuid, sgpServerId)
 }
 
@@ -699,7 +689,7 @@ const shouldShowTinyHeader = computed(() => mainContentScrollTop.value > SHOW_TI
 watch(
   () => mh.currentTab?.id,
   () => {
-    if (mh.currentTab?.id === props.tab.puuid) {
+    if (mh.currentTab?.id === tab.puuid) {
       nextTick(() => {
         scrollRef.value?.scrollTo({ top: mainContentScrollTop.value })
       })
@@ -708,7 +698,7 @@ watch(
 )
 
 defineExpose({
-  puuid: props.tab.puuid,
+  puuid: tab.puuid,
   refresh: handleRefresh
 })
 </script>

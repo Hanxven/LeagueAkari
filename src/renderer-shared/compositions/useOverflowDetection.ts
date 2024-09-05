@@ -11,7 +11,7 @@ function getRect(element: HTMLElement) {
  * @param co 容器
  * @returns
  */
-export function useOverflowDetection<T extends HTMLElement | undefined>(
+export function useOverflowDetection<T extends HTMLElement | undefined | null>(
   el: MaybeRefOrGetter<T>,
   co: MaybeRefOrGetter<T>
 ) {
@@ -24,7 +24,10 @@ export function useOverflowDetection<T extends HTMLElement | undefined>(
   const overflowRight = ref(0)
   const overflowLeft = ref(0)
 
-  const update = (element: HTMLElement | undefined, container: HTMLElement | undefined) => {
+  const update = (
+    element: HTMLElement | undefined | null,
+    container: HTMLElement | undefined | null
+  ) => {
     if (!element || !container) {
       return
     }
@@ -65,7 +68,7 @@ export function useOverflowDetection<T extends HTMLElement | undefined>(
  * @param co 容器
  * @returns
  */
-export function useCompleteVisibility<T extends HTMLElement | undefined>(
+export function useCompleteVisibility<T extends HTMLElement | undefined | null>(
   el: MaybeRefOrGetter<T>,
   co: MaybeRefOrGetter<T>
 ) {

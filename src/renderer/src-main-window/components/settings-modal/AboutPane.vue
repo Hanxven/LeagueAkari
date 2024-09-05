@@ -47,7 +47,7 @@
         >
           <NFlex align="center">
             <NButton
-              size="tiny"
+              size="small"
               :loading="au.isCheckingUpdates"
               secondary
               type="primary"
@@ -55,7 +55,7 @@
               >检查更新</NButton
             >
             <NButton
-              size="tiny"
+              size="small"
               v-if="au.newUpdates"
               secondary
               @click="() => handleShowUpdateModal()"
@@ -119,7 +119,7 @@
             (processStatus.current === 1 && processStatus.status !== 'error')
           "
         >
-          <NButton size="tiny" secondary @click="() => aum.openDownloadDir()">打开目录</NButton>
+          <NButton size="small" secondary @click="() => aum.openDownloadDir()">打开目录</NButton>
         </ControlItem>
       </NCard>
       <div class="about-para copyright">© 2024 Hanxven. 本软件是开源软件，遵循 MIT 许可证。</div>

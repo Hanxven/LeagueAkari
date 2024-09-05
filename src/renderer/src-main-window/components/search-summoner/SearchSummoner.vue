@@ -6,7 +6,7 @@
           :get-show="() => inputText.length === 0"
           :options="autoCompleteOptions"
           @focus="() => generateCompleteOptions()"
-          ref="inputEl"
+          ref="input"
           class="search-input"
           placeholder="精确搜索"
           @select="handleApplyAutoCompletion"
@@ -101,7 +101,7 @@ import {
   NSelect,
   SelectOption
 } from 'naive-ui'
-import { VNodeChild, computed, h, nextTick, onMounted, ref, watchEffect } from 'vue'
+import { VNodeChild, computed, h, nextTick, onMounted, ref, useTemplateRef, watchEffect } from 'vue'
 
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
 
@@ -113,7 +113,7 @@ const inputText = ref('')
 const searchText = ref('')
 const searchSgpServerId = ref('')
 
-const inputEl = ref()
+const inputEl = useTemplateRef('input')
 
 const isNoSearchResult = ref(false)
 

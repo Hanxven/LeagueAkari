@@ -12,7 +12,7 @@
     <template #header><span class="card-header-title">应用声明</span></template>
     <template #footer>
       <NFlex justify="flex-end" align="center">
-        <NButton @click="() => emits('confirm', showAgainChecked)" size="tiny" type="primary"
+        <NButton @click="() => emits('confirm', showAgainChecked)" size="small" type="primary"
           >我已知晓</NButton
         >
         <NCheckbox v-model:checked="showAgainChecked" size="small" style="font-size: 12px"

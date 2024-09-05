@@ -41,7 +41,7 @@
           <NButton
             @click="() => handleReroll()"
             :disabled="rerollsRemaining === 0 || isRerolling"
-            size="tiny"
+            size="small"
             :title="`随机一次 (剩余 ${rerollsRemaining})`"
             circle
             secondary
@@ -57,7 +57,7 @@
             :title="`随机一次并立即取回 (剩余 ${rerollsRemaining})`"
             secondary
             circle
-            size="tiny"
+            size="small"
           >
             <template #icon>
               <NIcon><ShareIcon /></NIcon>

@@ -1,6 +1,6 @@
 <template>
   <video v-bind="$attrs" :loop :autoplay v-if="url" :src="url" class="lcu-video" />
-  <div v-else ref="placeholderEl" class="lcu-video-placeholder"></div>
+  <div v-else class="lcu-video-placeholder"></div>
 </template>
 
 <script lang="ts" setup>

@@ -1,4 +1,5 @@
-t <template>
+t
+<template>
   <NModal v-model:show="show" preset="card" style="max-width: 60vw">
     <template #header><span class="card-header-title">编辑玩家标记</span></template>
     <template v-if="summonerInfo">
@@ -19,13 +20,12 @@ t <template>
         :placeholder="`填写对 ${summonerName(summonerInfo?.gameName || summonerInfo?.displayName, summonerInfo?.tagLine, props.puuid)} 的标记内容`"
         type="textarea"
         :autosize="{ minRows: 3, maxRows: 4 }"
-        size="tiny"
-        ref="el"
+        ref="input"
       ></NInput>
     </div>
     <div style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 4px">
-      <NButton size="tiny" @click="show = false">取消</NButton>
-      <NButton size="tiny" type="primary" @click="() => handleSaveTag()">保存</NButton>
+      <NButton size="small" @click="show = false">取消</NButton>
+      <NButton size="small" type="primary" @click="() => handleSaveTag()">保存</NButton>
     </div>
   </NModal>
 </template>
@@ -42,7 +42,7 @@ import { laNotification } from '@renderer-shared/notification'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NButton, NInput, NModal } from 'naive-ui'
-import { nextTick, ref, shallowRef, watch } from 'vue'
+import { nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 const show = defineModel<boolean>('show', { default: false })
 
@@ -51,7 +51,7 @@ const savedInfo = shallowRef<SavedPlayerInfo | null>(null)
 
 const lc = useLcuConnectionStore()
 
-const el = ref()
+const inputEl = useTemplateRef('input')
 
 const emits = defineEmits<{
   (e: 'edited', puuid: string): void
@@ -92,7 +92,7 @@ watch([() => show.value, () => props.puuid], async ([sh, puuid]) => {
 watch([() => show.value, () => summonerInfo.value], ([s, u]) => {
   if (s) {
     if (s && u) {
-      nextTick(() => el.value?.focus())
+      nextTick(() => inputEl.value?.focus())
     }
   }
 })

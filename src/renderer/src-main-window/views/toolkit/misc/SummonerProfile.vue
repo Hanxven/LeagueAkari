@@ -13,12 +13,12 @@
           filterable
           :options="championOptions"
           v-model:value="currentChampionId"
-          size="tiny"
+          size="small"
           :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
         ></NSelect>
         <NButton
           type="primary"
-          size="tiny"
+          size="small"
           @click="handleApplyToProfile"
           :disabled="!currentSkinId"
           :loading="isProceeding"
@@ -31,7 +31,7 @@
         :options="skinOptions"
         :render-option="renderOption"
         v-model:value="currentSkinId"
-        size="tiny"
+        size="small"
         :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
       ></NSelect>
       <NSelect
@@ -40,7 +40,7 @@
         v-if="currentAugmentOptions.length >= 1"
         :options="currentAugmentOptions"
         v-model:value="currentAugmentId"
-        size="tiny"
+        size="small"
       ></NSelect>
     </NModal>
     <ControlItem
@@ -50,7 +50,7 @@
       :label-width="200"
     >
       <NButton
-        size="tiny"
+        size="small"
         type="primary"
         @click="isModalShow = true"
         :disabled="lc.state !== 'connected'"
@@ -67,7 +67,7 @@
         :disabled="lc.state !== 'connected'"
         @click="handleUpdatePr"
         :loading="isUpdating"
-        size="tiny"
+        size="small"
         >执行</NButton
       >
     </ControlItem>
@@ -85,7 +85,7 @@
         :disabled="lc.state !== 'connected'"
         @click="handleRemovePrestigeCrest"
         :loading="isRemovingPrestigeCrest"
-        size="tiny"
+        size="small"
         >执行</NButton
       >
     </ControlItem>
@@ -99,7 +99,7 @@
         :disabled="lc.state !== 'connected'"
         @click="handleRemoveTokens"
         :loading="isRemovingTokens"
-        size="tiny"
+        size="small"
         >执行</NButton
       >
     </ControlItem>

@@ -33,17 +33,11 @@ import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
 
-withDefaults(
-  defineProps<{
-    perkId?: number
-    size?: number
-    maxWidth?: number
-  }>(),
-  {
-    size: 20,
-    maxWidth: 400
-  }
-)
+const { size = 20, maxWidth = 400 } = defineProps<{
+  perkId?: number
+  size?: number
+  maxWidth?: number
+}>()
 
 const gameData = useGameDataStore()
 </script>

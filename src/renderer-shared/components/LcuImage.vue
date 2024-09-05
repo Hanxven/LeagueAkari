@@ -1,12 +1,6 @@
 <template>
-  <img
-    @dragstart.prevent
-    v-if="url"
-    :src="url"
-    class="lcu-image"
-    @error="handleError"
-  />
-  <div ref="placeholderEl" v-else class="lcu-image-placeholder"></div>
+  <img @dragstart.prevent v-if="url" :src="url" class="lcu-image" @error="handleError" />
+  <div v-else class="lcu-image-placeholder"></div>
 </template>
 
 <script lang="ts" setup>

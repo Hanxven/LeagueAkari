@@ -68,21 +68,16 @@ import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
 
-withDefaults(
-  defineProps<{
-    itemId?: number
-
-    // trinkets 有一些不一样的样式
-    isTrinket?: boolean
-    maxWidth?: number
-    size?: number
-  }>(),
-  {
-    isTrinket: false,
-    size: 20,
-    maxWidth: 400
-  }
-)
+const {
+  isTrinket = false,
+  size = 20,
+  maxWidth = 400
+} = defineProps<{
+  itemId?: number
+  isTrinket?: boolean
+  maxWidth?: number
+  size?: number
+}>()
 
 const gameData = useGameDataStore()
 </script>

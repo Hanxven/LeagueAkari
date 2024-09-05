@@ -8,7 +8,7 @@
       :label-width="200"
     >
       <NButton
-        size="tiny"
+        size="small"
         type="primary"
         :disabled="lc.state !== 'connected'"
         @click="() => handleSet()"
@@ -20,7 +20,7 @@
         :options="queueOptions"
         style="width: 180px"
         v-model:value="state.queue"
-        size="tiny"
+        size="small"
       ></NSelect>
     </ControlItem>
     <ControlItem class="control-item-margin" label="段位" :label-width="200">
@@ -28,7 +28,7 @@
         :options="tierOptions"
         style="width: 180px"
         v-model:value="state.tier"
-        size="tiny"
+        size="small"
       ></NSelect>
     </ControlItem>
     <ControlItem class="control-item-margin" label="分级" :label-width="200">
@@ -39,7 +39,7 @@
         "
         style="width: 180px"
         v-model:value="state.division"
-        size="tiny"
+        size="small"
       ></NSelect>
     </ControlItem>
   </NCard>

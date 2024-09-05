@@ -1011,16 +1011,17 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.propSync('state', this.state, 'isInEndgamePhase')
-    this.propSync('state', this.state, 'queryState')
-    this.propSync('state', this.state, 'ongoingGameInfo')
-    this.propSync('state', this.state, 'ongoingChampionSelections')
-    this.propSync('state', this.state, 'ongoingPreMadeTeams')
-    this.propSync('state', this.state, 'ongoingTeams')
-    this.propSync('state', this.state, 'sendList')
-    this.propSync('state', this.state, 'isWaitingForDelay')
-    this.propSync('state', this.state, 'ongoingPlayerAnalysis')
-    this.propSync('state', this.state, 'queueFilter')
+    this.propSync('state', this.state, [
+      'isInEndgamePhase',
+      'queryState',
+      'ongoingGameInfo',
+      'ongoingChampionSelections',
+      'ongoingTeams',
+      'sendList',
+      'isWaitingForDelay',
+      'ongoingPlayerAnalysis',
+      'queueFilter'
+    ])
   }
 
   private _setupMethodCall() {

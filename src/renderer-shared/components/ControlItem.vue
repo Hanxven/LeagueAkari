@@ -50,7 +50,7 @@ defineProps<{
   .label-description {
     color: rgb(198, 198, 198);
     transition: color 0.3s ease;
-    font-size: 12px;
+    font-size: 13px;
     margin-top: 2px;
   }
 

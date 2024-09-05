@@ -56,20 +56,17 @@ import {
 } from 'naive-ui'
 import { computed, h, ref, useCssModule } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    maxShow?: number
-    maxCount?: number
-    type?: 'pick' | 'ban'
-    allowEmpty?: boolean
-  }>(),
-  {
-    maxShow: 6,
-    maxCount: Infinity,
-    allowEmpty: false,
-    type: 'pick'
-  }
-)
+const {
+  maxShow = 6,
+  maxCount = Infinity,
+  allowEmpty = false,
+  type = 'pick'
+} = defineProps<{
+  maxShow?: number
+  maxCount?: number
+  type?: 'pick' | 'ban'
+  allowEmpty?: boolean
+}>()
 
 const show = defineModel<boolean>('show', { default: false })
 const champions = defineModel<number[]>('champions', { default: () => [] })
@@ -96,7 +93,7 @@ const championOptions = computed(() => {
         return false
       }
 
-      if (props.allowEmpty) {
+      if (allowEmpty) {
         return b.id !== 0
       }
 
@@ -137,7 +134,7 @@ const isNameMatch = (pattern: string, label: string, value?: number) => {
 const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
   let pickable = true
   if (gameflow.phase === 'ChampSelect') {
-    if (props.type === 'pick') {
+    if (type === 'pick') {
       pickable = champSelect.currentPickableChampionIds.has(option.value as number)
     } else {
       pickable = champSelect.currentBannableChampionIds.has(option.value as number)
@@ -165,7 +162,7 @@ const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
 const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
   let pickable = true
   if (gameflow.phase === 'ChampSelect') {
-    if (props.type === 'pick') {
+    if (type === 'pick') {
       pickable = champSelect.currentPickableChampionIds.has(option.value as number)
     } else {
       pickable = champSelect.currentBannableChampionIds.has(option.value as number)

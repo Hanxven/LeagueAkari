@@ -26,10 +26,10 @@
           type="primary"
           v-if="!au.currentAnnouncement || au.currentAnnouncement.isRead"
           @click="show = false"
-          size="tiny"
+          size="small"
           >关闭</NButton
         >
-        <NButton type="primary" v-else @click="handleRead" size="tiny">已读</NButton>
+        <NButton type="primary" v-else @click="handleRead" size="small">已读</NButton>
       </div>
     </div>
   </NModal>

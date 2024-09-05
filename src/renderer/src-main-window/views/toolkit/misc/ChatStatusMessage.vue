@@ -6,7 +6,7 @@
         :loading="isSetting"
         @click="handleSetChatStatusMessage"
         type="primary"
-        size="tiny"
+        size="small"
         :disabled="lc.state !== 'connected'"
         >设置</NButton
       >
@@ -23,7 +23,7 @@
         v-model:value="text"
         :autosize="{ maxRows: 3, minRows: 1 }"
         placeholder="提供文本"
-        size="tiny"
+        size="small"
       ></NInput>
     </ControlItem>
   </NCard>

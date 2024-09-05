@@ -10,24 +10,24 @@
       <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
         <NSelect
           style="width: 140px"
-          size="tiny"
+          size="small"
           v-model:value="botSettings.championId"
           @update:show="handleLoadAvailableBots"
           :options="availableBotOptions"
         ></NSelect>
         <NSelect
           style="width: 80px"
-          size="tiny"
+          size="small"
           v-model:value="botSettings.difficulty"
           :options="difficultyOptions"
         ></NSelect>
         <NSelect
           style="width: 100px"
-          size="tiny"
+          size="small"
           v-model:value="botSettings.team"
           :options="teamOptions"
         ></NSelect>
-        <NButton :disabled="gameflow.phase !== 'Lobby'" @click="handleAddBot" size="tiny"
+        <NButton :disabled="gameflow.phase !== 'Lobby'" @click="handleAddBot" size="small"
           >添加</NButton
         >
       </div>
@@ -43,7 +43,7 @@
           placeholder="选择或指定 ID"
           style="width: 180px"
           @update:show="handleLoadEligibleQueues"
-          size="tiny"
+          size="small"
           filterable
           tag
           v-model:value="queueLobbySettings.queueId"
@@ -56,7 +56,7 @@
             Number.isNaN(Number(queueLobbySettings.queueId))
           "
           @click="handleCreateQueueLobby"
-          size="tiny"
+          size="small"
           >创建</NButton
         >
       </div>
@@ -65,7 +65,7 @@
       <NFlex>
         <NButton
           @click="handleCreatePractice5v5"
-          size="tiny"
+          size="small"
           :disabled="lc.state !== 'connected'"
           :loading="isCreatingPractice5v5"
           >创建</NButton
@@ -75,7 +75,7 @@
           v-model:value="practice5v5LobbyName"
           @keyup.enter="handleCreatePractice5v5"
           style="width: 180px"
-          size="tiny"
+          size="small"
         />
       </NFlex>
     </ControlItem>

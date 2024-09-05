@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper">
     <div class="inner-wrapper">
       <NCard size="small">
         <template #header><span class="card-header-title">League Client</span></template>
@@ -11,7 +11,7 @@
         >
           <NButton
             :disabled="lc.state !== 'connected'"
-            size="tiny"
+            size="small"
             secondary
             type="warning"
             @click="handleDisconnect"
@@ -26,7 +26,7 @@
         >
           <NButton
             :disabled="lc.state !== 'connected'"
-            size="tiny"
+            size="small"
             secondary
             type="warning"
             @click="handleQuitClient"
@@ -65,7 +65,7 @@
           <div class="control" style="display: flex; gap: 4px; align-items: baseline">
             <NInputNumber
               style="width: 80px"
-              size="tiny"
+              size="small"
               :disabled="!app.isAdministrator || lc.state !== 'connected'"
               :show-button="false"
               :min="1"
@@ -82,10 +82,10 @@
               <template #prefix>W</template>
             </NInputNumber>
             <NInputNumber
-              ref="fixWindowInputButton2"
+              ref="input-2"
               style="width: 80px"
               :disabled="!app.isAdministrator || lc.state !== 'connected'"
-              size="tiny"
+              size="small"
               :show-button="false"
               :min="1"
               @update:value="
@@ -101,7 +101,7 @@
             </NInputNumber>
             <NButton
               :disabled="!app.isAdministrator || lc.state !== 'connected'"
-              size="tiny"
+              size="small"
               secondary
               type="warning"
               @click="handleFixWindowMethodA"
@@ -117,7 +117,7 @@
         >
           <NButton
             :disabled="lc.state !== 'connected'"
-            size="tiny"
+            size="small"
             secondary
             type="warning"
             @click="handleRestartUx"
@@ -134,7 +134,7 @@
             :disabled="lc.state !== 'connected'"
             type="warning"
             secondary
-            size="tiny"
+            size="small"
             @click="handleKillUx"
             >结束 UX 进程</NButton
           >
@@ -149,7 +149,7 @@
             :disabled="lc.state !== 'connected'"
             type="warning"
             secondary
-            size="tiny"
+            size="small"
             @click="handleLaunchUx"
             >启动 UX 进程</NButton
           >
@@ -169,7 +169,7 @@ import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/s
 import { leagueClientRendererModule as lcm2 } from '@renderer-shared/modules/league-client'
 import { useLeagueClientStore } from '@renderer-shared/modules/league-client/store'
 import { NButton, NCard, NInputNumber, NScrollbar, NSwitch, useDialog } from 'naive-ui'
-import { ref } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 
 const app = useAppStore()
 const lc = useLcuConnectionStore()
@@ -246,7 +246,7 @@ const handleLaunchUx = async () => {
   })
 }
 
-const fixWindowInputButton2 = ref()
+const fixWindowInputButton2 = useTemplateRef('input-2')
 
 const handleFixWindowMethodA = async () => {
   dialog.warning({

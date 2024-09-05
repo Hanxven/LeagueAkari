@@ -18,7 +18,7 @@
         }}</span>
         <NButton
           :disabled="!props.gameId || isNotFound"
-          size="tiny"
+          size="small"
           secondary
           v-if="isFailedToLoad"
           @click="() => handleReload()"

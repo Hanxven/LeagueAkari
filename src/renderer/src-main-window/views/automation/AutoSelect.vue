@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper">
     <div class="inner-wrapper">
       <NCard size="small">
         <template #header><span class="card-header-title">自动英雄选择 · 普通模式</span></template>
@@ -180,7 +180,7 @@
             style="width: 100px"
             placeholder="秒"
             :min="0"
-            size="tiny"
+            size="small"
             :value="as.settings.grabDelaySeconds"
             @update:value="(v) => asm.setGrabDelaySeconds(v || 0)"
           />

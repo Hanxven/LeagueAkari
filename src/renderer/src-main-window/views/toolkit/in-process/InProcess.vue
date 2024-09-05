@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar class="outer-wrapper" ref="el">
+  <NScrollbar class="outer-wrapper">
     <div class="inner-wrapper">
       <ChampionBench class="tool" />
       <GameflowInProcess class="tool" />

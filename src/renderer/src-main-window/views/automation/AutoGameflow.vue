@@ -28,7 +28,7 @@
             placeholder="秒"
             :min="0"
             :max="10"
-            size="tiny"
+            size="small"
           />
         </ControlItem>
         <div class="divider"></div>
@@ -105,7 +105,7 @@
             @update:value="(val) => am.setAutoSearchMatchMinimumMembers(val || 1)"
             :min="1"
             :max="99"
-            size="tiny"
+            size="small"
             style="width: 80px"
           />
         </ControlItem>
@@ -133,7 +133,7 @@
             @update:value="(value) => am.setAutoSearchMatchDelaySeconds(value || 0)"
             placeholder="秒"
             :min="0"
-            size="tiny"
+            size="small"
           />
         </ControlItem>
         <ControlItem
@@ -174,7 +174,7 @@
             @update:value="(value) => am.setAutoSearchMatchRematchFixedDuration(value || 2)"
             placeholder="秒"
             :min="1"
-            size="tiny"
+            size="small"
           />
         </ControlItem>
       </NCard>

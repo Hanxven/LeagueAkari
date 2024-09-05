@@ -35,7 +35,7 @@
         </NFlex>
       </NFlex>
     </NModal>
-    <div class="title-bar-items" ref="titleBarItemsContainer">
+    <div class="title-bar-items" ref="title-bar-items">
       <div
         v-if="au.updateProgressInfo"
         class="title-bar-item task-item auto-update relative"
@@ -46,7 +46,7 @@
             : '正在准备更新中'
         "
         @click="() => handleShowAboutSettings()"
-        ref="autoUpdateTaskEl"
+        ref="auto-update-task"
       >
         <template v-if="au.updateProgressInfo.phase === 'downloading'">
           <div
@@ -78,7 +78,7 @@
         class="title-bar-item task-item respawn-timer relative"
         :class="{ hide: !respawnTimerTaskShow }"
         title="距离重生时间"
-        ref="respawnTimerTaskEl"
+        ref="respawn-timer-task"
       >
         <div
           class="progress-mask"
@@ -92,7 +92,7 @@
         class="title-bar-item auto-gameflow-accept task-item relative"
         :class="{ hide: !autoAcceptTaskShow }"
         title="即将开启自动接受对局"
-        ref="autoAcceptTaskEl"
+        ref="auto-accept-task"
       >
         <NIcon class="icon"><TimeIcon /></NIcon>
         <span class="text">接受对局 {{ willAcceptIn.toFixed(1) }} s</span>
@@ -102,7 +102,7 @@
         class="title-bar-item auto-gameflow-search-match task-item relative"
         :class="{ hide: !autoSearchMatchTaskShow }"
         title="即将开启自动匹配"
-        ref="autoSearchMatchTaskEl"
+        ref="auto-search-match-task"
       >
         <NIcon class="icon"><TimeIcon /></NIcon>
         <span class="text">开启匹配 {{ willSearchMatchIn.toFixed(1) }} s</span>
@@ -112,7 +112,7 @@
         class="title-bar-item in-login-queue task-item relative"
         :class="{ hide: !queueTaskShow }"
         :title="`等待排队登录中 (${login.loginQueueState.approximateWaitTimeSeconds} / ${login.loginQueueState.maxDisplayedWaitTimeSeconds} s, ${login.loginQueueState.estimatedPositionInQueue} / ${login.loginQueueState.maxDisplayedPosition})`"
-        ref="queueTaskEl"
+        ref="queue-task"
       >
         <NIcon class="icon"><QueuedIcon /></NIcon>
         <span class="text" style="display: flex; gap: 6px; align-items: center"
@@ -187,7 +187,7 @@ import {
 } from '@vicons/material'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
-import { inject, ref, watch } from 'vue'
+import { inject, ref, useTemplateRef, watch } from 'vue'
 
 const app = useAppStore()
 
@@ -302,12 +302,12 @@ watch(
   }
 )
 
-const titleBarItemsContainer = ref<HTMLElement>()
-const respawnTimerTaskEl = ref<HTMLElement>()
-const autoAcceptTaskEl = ref<HTMLElement>()
-const autoSearchMatchTaskEl = ref<HTMLElement>()
-const queueTaskEl = ref<HTMLElement>()
-const autoUpdateTaskEl = ref<HTMLElement>()
+const titleBarItemsContainer = useTemplateRef('title-bar-items')
+const respawnTimerTaskEl = useTemplateRef('respawn-timer-task')
+const autoAcceptTaskEl = useTemplateRef('auto-accept-task')
+const autoSearchMatchTaskEl = useTemplateRef('auto-search-match-task')
+const queueTaskEl = useTemplateRef('queue-task')
+const autoUpdateTaskEl = useTemplateRef('auto-update-task')
 
 const respawnTimerTaskShow = useCompleteVisibility(respawnTimerTaskEl, titleBarItemsContainer)
 const autoAcceptTaskShow = useCompleteVisibility(autoAcceptTaskEl, titleBarItemsContainer)

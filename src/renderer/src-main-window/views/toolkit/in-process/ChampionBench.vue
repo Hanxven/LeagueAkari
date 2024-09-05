@@ -6,14 +6,14 @@
         <NButton
           @click="() => handleReroll()"
           :disabled="rerollsRemaining === 0 || isRerolling"
-          size="tiny"
+          size="small"
           type="primary"
           >重随 ({{ rerollsRemaining }})</NButton
         >
         <NButton
           :disabled="rerollsRemaining === 0 || isRerolling"
           @click="() => handleReroll(true)"
-          size="tiny"
+          size="small"
           title="进行一次重新随机，但立即拿回之前的英雄"
           >慈善</NButton
         >

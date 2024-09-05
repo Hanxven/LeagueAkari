@@ -1,5 +1,5 @@
 <template>
-  <div class="opgg-panel" ref="opggPanelEl">
+  <div class="opgg-panel" ref="opgg-panel">
     <div class="tabs-area">
       <a href="https://op.gg" title="转到 OP.GG" target="_blank"><OpggIcon class="opgg-icon" /></a>
       <NButton
@@ -164,18 +164,6 @@
 
 <script lang="ts" setup>
 import OpggIcon from '@auxiliary-window/assets/icon/OpggIcon.vue'
-import { OpggDataSource } from '@shared/data-sources/opgg'
-import {
-  ModeType,
-  OpggARAMChampionSummary,
-  OpggArenaChampionSummary,
-  OpggArenaModeChampion,
-  OpggNormalModeChampion,
-  OpggRankedChampionsSummary,
-  PositionType,
-  RegionType,
-  TierType
-} from '@shared/data-sources/opgg/types'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useStableComputed } from '@renderer-shared/compositions/useStableComputed'
 import { getMySelections, setMySummonerSpells } from '@renderer-shared/http-api/champ-select'
@@ -192,6 +180,18 @@ import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/cha
 import { useChatStore } from '@renderer-shared/modules/lcu-state-sync/chat'
 import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
+import { OpggDataSource } from '@shared/data-sources/opgg'
+import {
+  ModeType,
+  OpggARAMChampionSummary,
+  OpggArenaChampionSummary,
+  OpggArenaModeChampion,
+  OpggNormalModeChampion,
+  OpggRankedChampionsSummary,
+  PositionType,
+  RegionType,
+  TierType
+} from '@shared/data-sources/opgg/types'
 import { maybePveChampion } from '@shared/types/lcu/game-data'
 import {
   Close as CloseIcon,
@@ -212,7 +212,16 @@ import {
   SelectRenderLabel,
   useMessage
 } from 'naive-ui'
-import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watchEffect } from 'vue'
+import {
+  computed,
+  h,
+  onErrorCaptured,
+  onMounted,
+  ref,
+  shallowRef,
+  useTemplateRef,
+  watchEffect
+} from 'vue'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
@@ -222,7 +231,7 @@ const currentTab = ref('tier')
 const gameflow = useGameflowStore()
 const champSelect = useChampSelectStore()
 
-const opggPanelEl = ref<HTMLElement>()
+const opggPanelEl = useTemplateRef('opgg-panel')
 
 const savedPreferences = useLocalStorage('opgg-preferences', {
   mode: 'ranked',

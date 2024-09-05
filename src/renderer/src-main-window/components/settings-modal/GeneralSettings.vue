@@ -110,7 +110,7 @@
       >
         <NInputNumber
           :min="0"
-          size="tiny"
+          size="small"
           style="width: 100px"
           :max="60"
           :value="cf.settings.delaySecondsBeforeLoading"
@@ -137,7 +137,7 @@
       >
         <NInputNumber
           style="width: 100px"
-          size="tiny"
+          size="small"
           :min="2"
           :max="200"
           :value="cf.settings.matchHistoryLoadCount"
@@ -152,7 +152,7 @@
       >
         <NInputNumber
           style="width: 100px"
-          size="tiny"
+          size="small"
           :min="2"
           :value="cf.settings.preMadeTeamThreshold"
           @update:value="(val) => cfm.setPreMadeTeamThreshold(val || 3)"
@@ -166,7 +166,7 @@
       >
         <NInputNumber
           style="width: 100px"
-          size="tiny"
+          size="small"
           :min="1"
           :value="cf.settings.playerAnalysisFetchConcurrency"
           @update:value="(val) => cfm.setPlayerAnalysisFetchConcurrency(val || 10)"
@@ -224,7 +224,7 @@
       >
         <NInputNumber
           style="width: 100px"
-          size="tiny"
+          size="small"
           :min="1"
           :max="3"
           step="0.1"
@@ -238,7 +238,7 @@
         label-description="重新设置小窗口的位置，还原到默认主屏幕正中心"
         :label-width="320"
       >
-        <NButton size="tiny" type="warning" secondary @click="() => awm.resetWindowPosition()"
+        <NButton size="small" type="warning" secondary @click="() => awm.resetWindowPosition()"
           >重设</NButton
         >
       </ControlItem>
@@ -291,7 +291,7 @@
         <NInputNumber
           :disabled="!app.isAdministrator"
           style="width: 100px"
-          size="tiny"
+          size="small"
           :min="0"
           step="0.1"
           :value="cf.settings.sendKdaThreshold"
@@ -325,9 +325,9 @@
             placeholder="JavaScript 脚本路径"
             style="max-width: 240px"
             :disabled="!app.isAdministrator"
-            size="tiny"
+            size="small"
           />
-          <NButton secondary type="primary" :disabled="!app.isAdministrator" size="tiny"
+          <NButton secondary type="primary" :disabled="!app.isAdministrator" size="small"
             >浏览</NButton
           >
         </NFlex>

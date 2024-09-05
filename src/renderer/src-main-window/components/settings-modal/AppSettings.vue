@@ -10,7 +10,7 @@
       >
         <NSelect
           style="width: 160px"
-          size="tiny"
+          size="small"
           :value="app.settings.closeStrategy"
           @update:value="(val) => am.setCloseStrategy(val)"
           :options="closeStrategies"
@@ -52,7 +52,7 @@
         <NFlex align="center">
           <NSelect
             style="width: 160px"
-            size="tiny"
+            size="small"
             :value="au.settings.downloadSource"
             @update:value="(val) => aum.setDownloadSource(val)"
             :options="updateDownloadSource"

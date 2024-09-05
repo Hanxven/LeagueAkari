@@ -4,7 +4,7 @@
       ><span class="card-header-title"
         >观战<span v-if="gameflow.phase === 'Lobby'" style="color: yellow; font-size: 14px">
           (需要先退出当前房间)
-          <NButton size="tiny" secondary @click="() => deleteLobby()">退出房间</NButton></span
+          <NButton size="small" secondary @click="() => deleteLobby()">退出房间</NButton></span
         ></span
       ></template
     >
@@ -26,7 +26,7 @@
           <NInput
             placeholder="召唤师名称 / PUUID"
             style="width: 200px"
-            size="tiny"
+            size="small"
             :disabled="gameflow.phase !== 'None'"
             @keyup.enter="handleSpectate"
             v-model:value="spectator.summonerIdentity"
@@ -36,7 +36,7 @@
           :loading="spectator.isProcessing"
           :disabled="spectator.summonerIdentity.length === 0 || gameflow.phase !== 'None'"
           @click="handleSpectate"
-          size="tiny"
+          size="small"
           >调起观战</NButton
         >
       </div>
