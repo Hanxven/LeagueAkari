@@ -92,11 +92,6 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   private _lcm: LcuConnectionModule
   private _mwm: MainWindowModule
 
-  private _taskQueue: {
-    task: () => Promise<any>
-    name: string
-  }[] = []
-
   private _gameDataLimiter = new PQueue({
     concurrency: 3
   })
@@ -539,7 +534,10 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       'me',
       'participants.postGame',
       'participants.customGame',
-      'participants.championSelect'
+      'participants.championSelect',
+      'conversations.postGame',
+      'conversations.customGame',
+      'conversations.championSelect'
     ])
 
     const d1 = this._lcm.lcuEventBus.on<LcuEvent<Conversation>>(
@@ -574,6 +572,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
 
             if (event.eventType === 'Create') {
               runInAction(() => {
+                console.log('set it!')
                 this.chat.setConversationChampSelect(event.data)
                 this.chat.setParticipantsChampSelect([])
               })

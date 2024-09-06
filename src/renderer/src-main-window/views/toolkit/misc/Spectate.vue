@@ -4,7 +4,7 @@
       ><span class="card-header-title"
         >观战<span v-if="gameflow.phase === 'Lobby'" style="color: yellow; font-size: 14px">
           (需要先退出当前房间)
-          <NButton size="small" secondary @click="() => deleteLobby()">退出房间</NButton></span
+          <NButton size="tiny" secondary @click="() => deleteLobby()">退出房间</NButton></span
         ></span
       ></template
     >

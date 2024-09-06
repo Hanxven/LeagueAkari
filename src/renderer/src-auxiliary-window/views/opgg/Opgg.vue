@@ -648,6 +648,8 @@ const setSummonerSpells = async (ids: number[]) => {
     })
     message.success('请求已发送')
 
+    console.log(chat.conversations.championSelect)
+
     if (chat.conversations.championSelect) {
       chatSend(
         chat.conversations.championSelect.id,

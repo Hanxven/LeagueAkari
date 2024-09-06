@@ -278,29 +278,33 @@ export class AutoSelectModule extends MobxBasedBasicModule {
           this.state.settings.benchModeEnabled,
           this.state.settings.benchSelectFirstAvailableChampion
         ] as const,
-      ([s, e, o, p], [ps]) => {
-        if (!s) {
-          if (ps) {
+      ([session, expected, enabled, onlyFirst], [prevSession]) => {
+        if (!session) {
+          // session 被清空的情况, 区分一开始就没有的情况
+          if (prevSession) {
             benchChampions.clear()
           }
           return
         }
 
-        if (!s.benchEnabled) {
+        if (!session.benchEnabled) {
           return
         }
 
+        // Diff
         const now = Date.now()
-        // 对比变化并更新
         diffBenchAndUpdate(
-          ps?.benchChampions.map((c) => c.championId) || [],
-          s.benchChampions.map((c) => c.championId),
+          prevSession?.benchChampions.map((c) => c.championId) || [],
+          session.benchChampions.map((c) => c.championId),
           now
         )
 
-        if (!o) {
+        if (!enabled) {
           if (this.state.upcomingGrab) {
-            this._logger.info(`已取消即将进行的交换：ID：${this.state.upcomingGrab.championId}`)
+            this._logger.info(
+              `关闭了该功能, 取消即将进行的交换：ID：${this.state.upcomingGrab.championId}`
+            )
+            this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
             clearTimeout(this._grabTimerId!)
             this._grabTimerId = null
             this.state.setUpcomingGrab(null)
@@ -308,21 +312,49 @@ export class AutoSelectModule extends MobxBasedBasicModule {
           return
         }
 
-        // 对于有目标的情况，如果目标还存在期望列表中且还在选择台中，那么直接返回
-        // 如果不存在期望列表中了，那么找一个新的
-        if (this.state.upcomingGrab) {
-          if (
-            e.includes(this.state.upcomingGrab.championId) &&
-            benchChampions.has(this.state.upcomingGrab.championId)
-          ) {
-            return
-          } else {
-            this._logger.info(
-              `取消了即将进行的英雄交换, 目标: ${this.state.upcomingGrab.championId}`
-            )
+        // 当前会话中可选的英雄
+        const availableExpectedChampions = expected.filter((c) =>
+          this._lcu.champSelect.currentPickableChampionIds.has(c)
+        )
+        const pickableChampionsOnBench = availableExpectedChampions.filter((c) =>
+          benchChampions.has(c)
+        )
 
+        // 本次变更, 如果有即将进行的交换, 则根据情况判断是否应该取消
+        if (this.state.upcomingGrab) {
+          if (pickableChampionsOnBench.length === 0) {
+            this._logger.info(
+              `已无可选英雄, 取消即将进行的交换：ID：${this.state.upcomingGrab.championId}`
+            )
             this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
-            if (this.state.upcomingGrab) {
+            clearTimeout(this._grabTimerId!)
+            this._grabTimerId = null
+            this.state.setUpcomingGrab(null)
+            return
+          }
+
+          if (onlyFirst) {
+            // 对于 onlyFirst 的情况, 如果预计的英雄仍位于可选的第一位, 那么就返回
+            if (pickableChampionsOnBench[0] === this.state.upcomingGrab.championId) {
+              return
+            } else {
+              this._logger.info(
+                `已非首选英雄, 取消即将进行的交换：ID：${this.state.upcomingGrab.championId}`
+              )
+              this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
+              clearTimeout(this._grabTimerId!)
+              this._grabTimerId = null
+              this.state.setUpcomingGrab(null)
+            }
+          } else {
+            // 对于非 onlyFirst 的情况, 只要目标还在期望列表中，且仍在选择台中, 那么直接返回
+            if (pickableChampionsOnBench.includes(this.state.upcomingGrab.championId)) {
+              return
+            } else {
+              this._logger.info(
+                `已不在期望列表中, 取消即将进行的交换：ID：${this.state.upcomingGrab.championId}`
+              )
+              this._notifyInChat('cancel', this.state.upcomingGrab.championId).catch(() => {})
               clearTimeout(this._grabTimerId!)
               this._grabTimerId = null
               this.state.setUpcomingGrab(null)
@@ -330,35 +362,35 @@ export class AutoSelectModule extends MobxBasedBasicModule {
           }
         }
 
-        // 期望列表中, 实际可选用的英雄
-        const availableExpectedChampions = e.filter((c) =>
-          this._lcu.champSelect.currentPickableChampionIds.has(c)
-        )
-
-        // 实际上现在可以选用的英雄
-        const pickableChampions = availableExpectedChampions.filter((c) => benchChampions.has(c))
-
-        if (pickableChampions.length === 0) {
+        if (pickableChampionsOnBench.length === 0) {
           return
         }
 
-        const selfChampionId = s.myTeam.find((v) => v.cellId === s.localPlayerCellId)?.championId
+        const selfChampionId = session.myTeam.find(
+          (v) => v.cellId === session.localPlayerCellId
+        )?.championId
 
-        if (selfChampionId) {
-          if (p) {
-            if (availableExpectedChampions[0] === selfChampionId) {
-              return
-            }
-          } else {
-            if (selfChampionId && e.includes(selfChampionId)) {
-              return
-            }
+        if (!selfChampionId) {
+          return
+        }
+
+        if (onlyFirst) {
+          // 对于 onlyFirst, 如果手上的英雄优先级比较高, 那么没有必要再次选择
+          const indexInHand = availableExpectedChampions.indexOf(selfChampionId)
+          const indexInFirstPickable = availableExpectedChampions.indexOf(
+            pickableChampionsOnBench[0]
+          )
+          if (indexInHand < indexInFirstPickable) {
+            return
           }
         } else {
-          return
+          // 对于非 onlyFirst, 如果自己的英雄在期望列表中, 那么没有必要再次选择
+          if (availableExpectedChampions.includes(selfChampionId)) {
+            return
+          }
         }
 
-        const newTarget = pickableChampions[0]
+        const newTarget = pickableChampionsOnBench[0]
         const waitTime = Math.max(
           this.state.settings.grabDelaySeconds * 1e3 -
             (now - benchChampions.get(newTarget)!.lastTimeOnBench),

@@ -1016,6 +1016,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       'queryState',
       'ongoingGameInfo',
       'ongoingChampionSelections',
+      'ongoingPreMadeTeams',
       'ongoingTeams',
       'sendList',
       'isWaitingForDelay',

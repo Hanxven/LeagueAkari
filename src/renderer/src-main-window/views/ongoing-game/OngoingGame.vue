@@ -109,7 +109,7 @@
       >
         <template #header><span class="card-header-title">KDA 简报</span></template>
         <span style="font-size: 13px; margin-bottom: 12px; display: block"
-          >在英雄选择中或游戏内发送 KDA 简报已启用，在设置 -> 战绩 -> KDA 简报 中配置通用选项。
+          >在英雄选择中或游戏内发送 KDA 简报已启用，在设置 -> 通用 -> KDA 简报 中配置通用选项。
         </span>
         <ControlItem
           label="发送这些玩家的简报"

@@ -10,7 +10,7 @@
         positive-text="退出"
       >
         <template #trigger>
-          <NButton size="small" type="warning" secondary style="font-size: 10px">立即秒退</NButton>
+          <NButton size="tiny" type="warning" secondary style="font-size: 10px">立即秒退</NButton>
         </template>
         <span style="font-size: 12px">这将退出英雄选择阶段</span>
       </NPopconfirm>

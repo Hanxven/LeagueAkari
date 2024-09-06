@@ -19,7 +19,11 @@ export class StateSyncModule extends LeagueAkariRendererModule {
   }
 
   async stateSync<T extends object>(stateId: string, obj: T) {
-    this.onEvent(`update-state-prop/${stateId}`, (path: string, value) => set(obj, path, value))
+    this.onEvent(`update-state-prop/${stateId}`, (path: string, value) => {
+      // FOR DEBUGGING ONLY: uncomment the following line to see state changes
+      // console.log(this.id, stateId, path, value)
+      set(obj, path, value)
+    })
 
     try {
       const paths = (await this.call('get-initial-state-props', stateId)) as string[]
