@@ -12,7 +12,7 @@ const props = defineProps<{
 }>()
 
 watchEffect(async () => {
-  const res = await edsm.sgp.getSpectatorGameflow('d947ea9e-905f-57f0-8fe2-a38eabe070c0')
+  const res = await edsm.sgp.getSpectatorGameflow('58d32d08-aede-5bcf-adf3-c218c3025f62')
   console.log(res)
 })
 

@@ -22,14 +22,14 @@ export class StateSyncModule extends LeagueAkariRendererModule {
     try {
       const configList = (await this.call('get-state-props', stateId)) as {
         path: string
-        toRaw: boolean
+        raw: boolean
       }[]
       const jobs = configList
         .map((config) => {
           return async () => {
             try {
               const value = await this.call(`get-state-prop`, stateId, config.path)
-              set(obj, config.path, config.toRaw ? markRaw(value) : value)
+              set(obj, config.path, config.raw ? markRaw(value) : value)
             } catch (error) {
               throw new Error(
                 `Failed to get initial state of ${config} from ${stateId}: ${(error as Error).message}`
@@ -39,10 +39,10 @@ export class StateSyncModule extends LeagueAkariRendererModule {
         })
         .map((job) => job())
 
-      this.onEvent(`update-state-prop/${stateId}`, (path: string, value, toRaw: boolean) => {
+      this.onEvent(`update-state-prop/${stateId}`, (path: string, value, raw: boolean) => {
         // FOR DEBUGGING ONLY: uncomment the following line to see state changes
         // console.log(this.id, stateId, path, value)
-        set(obj, path, toRaw ? markRaw(value) : value)
+        set(obj, path, raw ? markRaw(value) : value)
       })
 
       await Promise.all(jobs)

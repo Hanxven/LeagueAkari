@@ -2,7 +2,7 @@
 
 ## 新增
 
-- 带有英雄选择台的模式，提供了一个设置项，将可以始终选择优先级列表最前面的英雄。([#87](https://github.com/Hanxven/LeagueAkari/issues/87))
+- [UNTESTED] 带有英雄选择台的模式，提供了一个设置项，将可以始终选择优先级列表最前面的英雄。([#87](https://github.com/Hanxven/LeagueAkari/issues/87))
 
 - 战绩页面的标签页现在可以通过鼠标中键关闭。([#85](https://github.com/Hanxven/LeagueAkari/pull/85))
 

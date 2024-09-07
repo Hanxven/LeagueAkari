@@ -18,7 +18,7 @@ type StateSetter = (
 
 interface RegisteredState {
   object: object
-  props: Map<string, { toRaw: boolean }>
+  props: Map<string, { raw: boolean }>
 }
 
 export type RegisteredSettingHandler = (
@@ -87,7 +87,7 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
       return Array.from(this._registeredStates.get(stateId)!.props.entries()).map(
         ([path, config]) => ({
           path,
-          toRaw: config.toRaw
+          raw: config.raw
         })
       )
     })
@@ -104,7 +104,7 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
       const item = this._registeredStates.get(stateId)!
       const prop = item.props.get(propPath)!
 
-      return prop.toRaw ? toJS(get(item.object, propPath)) : get(item.object, propPath)
+      return prop.raw ? toJS(get(item.object, propPath)) : get(item.object, propPath)
     })
 
     this.onCall('set-state-prop', (stateId: string, propPath: string, value: any) => {
@@ -202,18 +202,18 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
    * @param resName 资源名称
    * @param getter 资源 getter
    */
-  getterSync(resName: string, getter: SimpleStateGetter, toRaw = false) {
+  getterSync(resName: string, getter: SimpleStateGetter, raw = false) {
     this.reaction(getter, (newValue) => {
-      this.sendEvent(`update-getter/${resName}`, toRaw ? toJS(newValue) : newValue)
+      this.sendEvent(`update-getter/${resName}`, raw ? toJS(newValue) : newValue)
     })
-    this.onCall(`get-getter/${resName}`, () => (toRaw ? toJS(getter()) : getter()))
+    this.onCall(`get-getter/${resName}`, () => (raw ? toJS(getter()) : getter()))
   }
 
   propSync<T extends object>(
     stateId: string,
     obj: T,
     propPath: Paths<T> | Paths<T>[],
-    toRaw = false
+    raw = false
   ) {
     if (!this._registeredStates.has(stateId)) {
       this._registeredStates.set(stateId, {
@@ -235,7 +235,7 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
         throw new Error(`Prop path ${path} already registered for ${stateId}`)
       }
 
-      config.props.set(path, { toRaw })
+      config.props.set(path, { raw })
 
       this.reaction(
         () => get(obj, path),
@@ -243,8 +243,8 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
           this.sendEvent(
             `update-state-prop/${stateId}`,
             path,
-            toRaw ? toJS(newValue) : newValue,
-            toRaw
+            raw ? toJS(newValue) : newValue,
+            raw
           )
         }
       )
@@ -256,15 +256,15 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
    * @param stateId 状态 ID
    * @param propPath 属性路径
    * @param value 新值
-   * @param toRaw 是否转换为普通对象
+   * @param raw 是否转换为普通对象
    */
   propUpdateEvent<T extends object = any>(
     stateId: string,
     propPath: Paths<T>,
     value: any,
-    toRaw = false
+    raw = false
   ) {
-    this.sendEvent(`update-state-prop/${stateId}`, propPath, toRaw ? toJS(value) : value, toRaw)
+    this.sendEvent(`update-state-prop/${stateId}`, propPath, raw ? toJS(value) : value, raw)
   }
 
   /**

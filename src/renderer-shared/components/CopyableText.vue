@@ -16,7 +16,8 @@ import { useSlots } from 'vue'
 const {
   showMessage = true,
   prefix = '',
-  suffix = ''
+  suffix = '',
+  text: propText
 } = defineProps<{
   text?: string | number
   showMessage?: boolean
@@ -35,8 +36,8 @@ const message = useMessage()
 const handleCopy = async () => {
   let text = ''
   if (slots.default) {
-    if (text) {
-      text = text.toString()
+    if (propText) {
+      text = propText.toString()
     } else {
       const nodes = slots.default()
       if (nodes[0] && typeof nodes[0].children === 'string') {

@@ -111,18 +111,6 @@
         </ControlItem>
         <ControlItem
           class="control-item-margin"
-          label="等待邀请中成员"
-          label-description="自动开启匹配将等待所有被邀请的玩家做出回应"
-          :label-width="200"
-        >
-          <NSwitch
-            :value="agf.settings.autoMatchmakingWaitForInvitees"
-            @update:value="(val) => am.setAutoMatchmakingWaitForInvitees(val)"
-            size="small"
-          />
-        </ControlItem>
-        <ControlItem
-          class="control-item-margin"
           label="匹配前等待时间 (s)"
           label-description="在可匹配对局时，预留的等待时间，单位为秒"
           :label-width="200"
@@ -133,6 +121,18 @@
             @update:value="(value) => am.setAutoMatchmakingDelaySeconds(value || 0)"
             placeholder="秒"
             :min="0"
+            size="small"
+          />
+        </ControlItem>
+        <ControlItem
+          class="control-item-margin"
+          label="等待邀请中成员"
+          label-description="自动开启匹配将等待所有被邀请的玩家做出回应"
+          :label-width="200"
+        >
+          <NSwitch
+            :value="agf.settings.autoMatchmakingWaitForInvitees"
+            @update:value="(val) => am.setAutoMatchmakingWaitForInvitees(val)"
             size="small"
           />
         </ControlItem>
