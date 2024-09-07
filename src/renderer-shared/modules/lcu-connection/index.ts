@@ -16,8 +16,6 @@ export class LcuConnectionRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useLcuConnectionStore()
 
-    this.getterSync('settings/auto-connect', (s) => (store.settings.autoConnect = s))
-
     this.stateSync('state', store)
   }
 
@@ -38,7 +36,7 @@ export class LcuConnectionRendererModule extends StateSyncModule {
   }
 
   setAutoConnect(value: boolean) {
-    return this.call('set-setting/auto-connect', value)
+    return this.call('set-setting', 'auto-connect', value)
   }
 }
 

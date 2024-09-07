@@ -5,7 +5,7 @@
   >
     <NFlex align="center" class="control-item" style="gap: 4px">
       <NSelect
-        size="small"
+        size="tiny"
         :render-label="renderLabel"
         :render-tag="renderTag"
         style="flex: 1"
@@ -13,7 +13,7 @@
         :placeholder="`${skinOptions.length} 款皮肤可用`"
         :options="skinOptions"
       />
-      <NButton :loading="isSettingSkin" type="primary" size="small" secondary @click="handleSetSkin"
+      <NButton :loading="isSettingSkin" type="primary" size="tiny" secondary @click="handleSetSkin"
         >应用</NButton
       >
     </NFlex>

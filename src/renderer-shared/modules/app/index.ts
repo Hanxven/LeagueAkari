@@ -19,14 +19,6 @@ export class AppRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAppStore()
 
-    this.getterSync(
-      'settings/show-free-software-declaration',
-      (s) => (store.settings.showFreeSoftwareDeclaration = s)
-    )
-    this.getterSync('settings/close-strategy', (s) => (store.settings.closeStrategy = s))
-    this.getterSync('settings/use-wmic', (s) => (store.settings.useWmic = s))
-    this.getterSync('settings/is-in-kyoko-mode', (s) => (store.settings.isInKyokoMode = s))
-
     this.getAppVersion().then((v) => (store.version = v))
 
     this.stateSync('state', store)
@@ -37,19 +29,19 @@ export class AppRendererModule extends StateSyncModule {
   }
 
   setShowFreeSoftwareDeclaration(value: boolean) {
-    return this.call('set-setting/show-free-software-declaration', value)
+    return this.call('set-setting', 'showFreeSoftwareDeclaration', value)
   }
 
   setCloseStrategy(value: string) {
-    return this.call('set-setting/close-strategy', value)
+    return this.call('set-setting', 'closeStrategy', value)
   }
 
   setUseWmic(value: boolean) {
-    return this.call('set-setting/use-wmic', value)
+    return this.call('set-setting', 'useWmic', value)
   }
 
   setInKyokoMode(value: boolean) {
-    return this.call('set-setting/is-in-kyoko-mode', value)
+    return this.call('set-setting', 'isInKyokoMode', value)
   }
 
   setDisableHardwareAcceleration(value: boolean) {

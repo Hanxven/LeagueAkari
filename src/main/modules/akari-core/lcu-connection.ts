@@ -1,11 +1,16 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
+import {
+  MobxBasedBasicModule,
+  RegisteredSettingHandler
+} from '@main/akari-ipc/mobx-based-basic-module'
 import { UxCommandLine } from '@main/utils/ux-cmd'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
+import { Paths } from '@shared/utils/types'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
-import { comparer, computed, makeAutoObservable, observable } from 'mobx'
+import { set } from 'lodash'
+import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
 import http from 'node:http'
 import https from 'node:https'
 import PQueue from 'p-queue'
@@ -139,7 +144,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     this._lcm = this.manager.getModule<LeagueClientModule>('league-client')
 
     await this._migrateSettings()
-    await this._setupSettingsSync()
+    await this._setupSettings()
     this._setupStateSync()
     this._setupMethodCall()
     this._handleConnect()
@@ -169,7 +174,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
       return 'do-polling！'
     })
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => pollTiming.get(),
       (state) => {
         if (state === 'stop-it!') {
@@ -187,7 +192,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.connectingClient,
       (auth) => {
         if (!auth) {
@@ -199,7 +204,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     )
 
     // 自动连接 - 当客户端唯一时，自动连接到 LCU 客户端
-    this.autoDisposeReaction(
+    this.reaction(
       () => [this.state.settings.autoConnect, this.state.launchedClients] as const,
       async ([s, c]) => {
         if (s) {
@@ -212,7 +217,7 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
       }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => [this.state.auth, this.state.state] as const,
       ([a, s]) => {
         if (a) {
@@ -226,12 +231,25 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     )
   }
 
-  private async _setupSettingsSync() {
-    this.simpleSettingSync(
-      'auto-connect',
-      () => this.state.settings.autoConnect,
-      (s) => this.state.settings.setAutoConnect(s)
-    )
+  private async _setupSettings() {
+    this.registerSettings([
+      {
+        key: 'autoConnect',
+        defaultValue: this.state.settings.autoConnect
+      }
+    ])
+
+    const settings = await this.readSettings()
+    runInAction(() => {
+      settings.forEach((s) => set(this.state.settings, s.settingItem, s.value))
+    })
+
+    const defaultSetter: RegisteredSettingHandler = async (key, value, apply) => {
+      runInAction(() => set(this.state.settings, key, value))
+      await apply(key, value)
+    }
+
+    this.onSettingChange<Paths<typeof this.state.settings>>('autoConnect', defaultSetter)
   }
 
   private async _initWebSocket(auth: UxCommandLine) {
@@ -575,7 +593,13 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.propSync('state', this.state, ['state', 'auth', 'launchedClients', 'connectingClient'])
+    this.propSync('state', this.state, [
+      'state',
+      'auth',
+      'launchedClients',
+      'connectingClient',
+      'settings.autoConnect'
+    ])
   }
 }
 

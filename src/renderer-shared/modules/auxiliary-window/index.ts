@@ -18,12 +18,6 @@ export class AuxWindowRendererModule extends StateSyncModule {
 
     store.currentFunctionality = await this.getFunctionality()
 
-    this.getterSync('settings/is-pinned', (s) => (store.settings.isPinned = s))
-    this.getterSync('settings/opacity', (s) => (store.settings.opacity = s))
-    this.getterSync('settings/enabled', (s) => (store.settings.enabled = s))
-    this.getterSync('settings/show-skin-selector', (s) => (store.settings.showSkinSelector = s))
-    this.getterSync('settings/zoom-factor', (s) => (store.settings.zoomFactor = s))
-
     this.stateSync('state', store)
   }
 
@@ -48,11 +42,11 @@ export class AuxWindowRendererModule extends StateSyncModule {
   }
 
   setOpacity(opacity: number) {
-    return this.call('set-setting/opacity', opacity)
+    return this.call('set-setting', 'opacity', opacity)
   }
 
   setAlwaysOnTop(top: boolean) {
-    return this.call('set-setting/is-pinned', top)
+    return this.call('set-setting', 'isPinned', top)
   }
 
   resetWindowPosition() {
@@ -60,15 +54,15 @@ export class AuxWindowRendererModule extends StateSyncModule {
   }
 
   setEnabled(enabled: boolean) {
-    return this.call('set-setting/enabled', enabled)
+    return this.call('set-setting', 'enabled', enabled)
   }
 
   setShowSkinSelector(b: boolean) {
-    return this.call('set-setting/show-skin-selector', b)
+    return this.call('set-setting', 'showSkinSelector', b)
   }
 
   setZoomFactor(f: number) {
-    return this.call('set-setting/zoom-factor', f)
+    return this.call('set-setting', 'zoomFactor', f)
   }
 
   setWindowSize(width: number, height: number) {

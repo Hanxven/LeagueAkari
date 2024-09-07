@@ -44,7 +44,7 @@ const themeOverrides: GlobalThemeOverrides = {
     iconMargin: '0 4px 0 0'
   },
   Popover: {
-    color: '#313131fa'
+    color: '#1f1f1ffa'
   }
 }
 </script>

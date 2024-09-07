@@ -133,7 +133,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       'augments'
     ])
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       (state) => {
         if (state === 'connected') {
@@ -266,7 +266,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   private _syncLcuHonor() {
     this.propSync('honor', this.honor, 'ballot')
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {
@@ -311,7 +311,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       'currentChampion'
     ])
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {
@@ -335,7 +335,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
     )
 
     // 处理中场进入的情况，主动获取可用英雄列表
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {
@@ -384,7 +384,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
     )
 
     let isCellSummonerUpdated = false
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.champSelect.session,
       async (session) => {
         if (!isCellSummonerUpdated && session) {
@@ -423,7 +423,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       }
     })
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => selfSummonerExtracted.get(),
       (s) => {
         this._logger.info(`Self Summoner Cell: ${JSON.stringify(s)}`)
@@ -431,7 +431,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       { equals: comparer.structural }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       (state) => {
         if (state !== 'connected') {
@@ -442,7 +442,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {
@@ -572,7 +572,6 @@ export class LcuSyncModule extends MobxBasedBasicModule {
 
             if (event.eventType === 'Create') {
               runInAction(() => {
-                console.log('set it!')
                 this.chat.setConversationChampSelect(event.data)
                 this.chat.setParticipantsChampSelect([])
               })
@@ -652,7 +651,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       this.chat.setMe(null)
     })
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {
@@ -669,7 +668,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {
@@ -747,7 +746,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
     this.propSync('gameflow', this.gameflow, ['phase', 'session'])
 
     // 立即初始化
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {
@@ -759,7 +758,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {
@@ -794,7 +793,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       this.lobby.setLobby(event.data)
     })
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {
@@ -827,7 +826,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       this.login.setLoginQueueState(event.data)
     })
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {
@@ -850,7 +849,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => !!this.login.loginQueueState,
       (isQueueing) => {
         if (isQueueing) {
@@ -896,7 +895,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       }
     }
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => [this._lcm.state.state, this.login.loginQueueState] as const,
       ([state, queue]) => {
         if (state === 'connected' && !queue) {
@@ -923,7 +922,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   private _syncLcuEntitlements() {
     this.propSync('entitlements', this.entitlements, 'token')
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       async (state) => {
         if (state === 'connected') {

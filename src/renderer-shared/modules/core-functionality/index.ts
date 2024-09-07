@@ -20,40 +20,6 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
     const store = useCoreFunctionalityStore()
 
     this.stateSync('state', store)
-
-    this.getterSync(
-      'settings/auto-route-on-game-start',
-      (s) => (store.settings.autoRouteOnGameStart = s)
-    )
-    this.getterSync(
-      'settings/ongoing-analysis-enabled',
-      (s) => (store.settings.ongoingAnalysisEnabled = s)
-    )
-    this.getterSync('settings/fetch-after-game', (s) => (store.settings.fetchAfterGame = s))
-    this.getterSync('settings/fetch-detailed-game', (s) => (store.settings.fetchDetailedGame = s))
-    this.getterSync(
-      'settings/match-history-load-count',
-      (s) => (store.settings.matchHistoryLoadCount = s)
-    )
-    this.getterSync(
-      'settings/pre-made-team-threshold',
-      (s) => (store.settings.preMadeTeamThreshold = s)
-    )
-    this.getterSync('settings/send-kda-in-game', (s) => (store.settings.sendKdaInGame = s))
-    this.getterSync(
-      'settings/send-kda-in-game-with-pre-made-teams',
-      (s) => (store.settings.sendKdaInGameWithPreMadeTeams = s)
-    )
-    this.getterSync('settings/send-kda-threshold', (s) => (store.settings.sendKdaThreshold = s))
-    this.getterSync(
-      'settings/player-analysis-fetch-concurrency',
-      (s) => (store.settings.playerAnalysisFetchConcurrency = s)
-    )
-    this.getterSync('settings/use-sgp-api', (s) => (store.settings.useSgpApi = s))
-    this.getterSync(
-      'settings/delay-seconds-before-loading',
-      (s) => (store.settings.delaySecondsBeforeLoading = s)
-    )
   }
 
   /**
@@ -131,43 +97,43 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
   }
 
   setAutoRouteOnGameStart(value: boolean) {
-    return this.call('set-setting/auto-route-on-game-start', value)
+    return this.call('set-setting', 'autoRouteOnGameStart', value)
   }
 
   setFetchAfterGame(value: boolean) {
-    return this.call('set-setting/fetch-after-game', value)
+    return this.call('set-setting', 'fetchAfterGame', value)
   }
 
   setFetchDetailedGame(value: boolean) {
-    return this.call('set-setting/fetch-detailed-game', value)
+    return this.call('set-setting', 'fetchDetailedGame', value)
   }
 
   setMatchHistoryLoadCount(value: number) {
-    return this.call('set-setting/match-history-load-count', value)
+    return this.call('set-setting', 'matchHistoryLoadCount', value)
   }
 
   setPreMadeTeamThreshold(value: number) {
-    return this.call('set-setting/pre-made-team-threshold', value)
+    return this.call('set-setting', 'preMadeTeamThreshold', value)
   }
 
   setSendKdaInGame(value: boolean) {
-    return this.call('set-setting/send-kda-in-game', value)
+    return this.call('set-setting', 'sendKdaInGame', value)
   }
 
   setSendKdaInGameWithPreMadeTeams(value: boolean) {
-    return this.call('set-setting/send-kda-in-game-with-pre-made-teams', value)
+    return this.call('set-setting', 'sendKdaInGameWithPreMadeTeams', value)
   }
 
   setOngoingAnalysisEnabled(value: boolean) {
-    return this.call('set-setting/ongoing-analysis-enabled', value)
+    return this.call('set-setting', 'ongoingAnalysisEnabled', value)
   }
 
   setSendKdaThreshold(value: number) {
-    return this.call('set-setting/send-kda-threshold', value)
+    return this.call('set-setting', 'sendKdaThreshold', value)
   }
 
   setPlayerAnalysisFetchConcurrency(value: number) {
-    return this.call('set-setting/player-analysis-fetch-concurrency', value)
+    return this.call('set-setting', 'playerAnalysisFetchConcurrency', value)
   }
 
   saveSavedPlayer(player: object) {
@@ -175,15 +141,15 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
   }
 
   setDelaySecondsBeforeLoading(value: number) {
-    return this.call('set-setting/delay-seconds-before-loading', value)
+    return this.call('set-setting', 'delaySecondsBeforeLoading', value)
   }
 
   setMatchHistorySource(value: string) {
-    return this.call('set-setting/match-history-source', value)
+    return this.call('set-setting', 'matchHistorySource', value)
   }
 
   setUseSgpApi(value: string) {
-    return this.call('set-setting/use-sgp-api', value)
+    return this.call('set-setting', 'useSgpApi', value)
   }
 
   setQueueFilter(queueId: number | null) {

@@ -1,4 +1,7 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
+import {
+  MobxBasedBasicModule,
+  RegisteredSettingHandler
+} from '@main/akari-ipc/mobx-based-basic-module'
 import {
   LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL,
   LEAGUE_AKARI_GITEE_CHECK_UPDATES_URL,
@@ -6,9 +9,11 @@ import {
 } from '@shared/constants/common'
 import { FileInfo, GithubApiLatestRelease } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
+import { Paths } from '@shared/utils/types'
 import axios, { AxiosResponse } from 'axios'
 import { app, shell } from 'electron'
-import { comparer, makeAutoObservable, observable, toJS } from 'mobx'
+import { set } from 'lodash'
+import { comparer, makeAutoObservable, observable, runInAction } from 'mobx'
 import { extractFull } from 'node-7z'
 import cp from 'node:child_process'
 import fs from 'node:original-fs'
@@ -210,14 +215,14 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
     this._logger = this.manager.getModule<LogModule>('log').createLogger('auto-update')
 
     await this._migrateSettings()
-    await this._setupSettingsSync()
+    await this._setupSettings()
     this._setupMethodCall()
     this._setupStateSync()
     this._handlePeriodicCheck()
   }
 
   private _handlePeriodicCheck() {
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.settings.autoCheckUpdates,
       (sure) => {
         if (sure) {
@@ -235,7 +240,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
       { fireImmediately: true, delay: 3500 }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => [this.state.settings.autoDownloadUpdates, this.state.newUpdates] as const,
       ([yes, newUpdates]) => {
         if (yes && newUpdates) {
@@ -780,36 +785,45 @@ Try {
   }
 
   private async _migrateSettings() {
-    // 迁移 app/auto-check-updates 到 auto-update/auto-check-updates
+    // 迁移 app/auto-check-updates 到 auto-update/autoCheckUpdates
     if (await this._sm.settings.has('app/auto-check-updates')) {
       await this._sm.settings.set(
-        'auto-update/auto-check-updates',
+        'auto-update/autoCheckUpdates',
         await this._sm.settings.get('app/auto-check-updates', true)
       )
       this._sm.settings.remove('app/auto-check-updates')
     }
   }
 
-  private async _setupSettingsSync() {
-    this.simpleSettingSync(
-      'auto-check-updates',
-      () => this.state.settings.autoCheckUpdates,
-      (s) => this.state.settings.setAutoCheckUpdates(s)
-    )
+  private async _setupSettings() {
+    this.registerSettings([
+      {
+        key: 'autoCheckUpdates',
+        defaultValue: this.state.settings.autoCheckUpdates
+      },
+      {
+        key: 'autoDownloadUpdates',
+        defaultValue: this.state.settings.autoDownloadUpdates
+      },
+      {
+        key: 'downloadSource',
+        defaultValue: this.state.settings.downloadSource
+      }
+    ])
 
-    this.simpleSettingSync(
-      'auto-download-updates',
-      () => this.state.settings.autoDownloadUpdates,
-      (s) => this.state.settings.setAutoDownloadUpdates(s)
-    )
+    const settings = await this.readSettings()
+    runInAction(() => {
+      settings.forEach((s) => set(this.state.settings, s.settingItem, s.value))
+    })
 
-    this.simpleSettingSync(
-      'download-source',
-      () => this.state.settings.downloadSource,
-      (s) => this.state.settings.setDownloadSource(s)
-    )
+    const defaultSetter: RegisteredSettingHandler = async (key, value, apply) => {
+      runInAction(() => set(this.state.settings, key, value))
+      await apply(key, value)
+    }
 
-    await this.loadSettings()
+    this.onSettingChange<Paths<typeof this.state.settings>>('autoCheckUpdates', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('autoDownloadUpdates', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('downloadSource', defaultSetter)
   }
 
   private _setupMethodCall() {
@@ -858,7 +872,10 @@ Try {
       'newUpdates',
       'updateProgressInfo',
       'lastCheckAt',
-      'currentAnnouncement'
+      'currentAnnouncement',
+      'settings.autoCheckUpdates',
+      'settings.autoDownloadUpdates',
+      'settings.downloadSource'
     ])
   }
 }

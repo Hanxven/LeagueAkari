@@ -1,8 +1,14 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
+import {
+  MobxBasedBasicModule,
+  RegisteredSettingHandler
+} from '@main/akari-ipc/mobx-based-basic-module'
 import { chatSend } from '@main/http-api/chat'
 import { ChatMessage } from '@shared/types/lcu/chat'
 import { LcuEvent } from '@shared/types/lcu/event'
 import { formatError } from '@shared/utils/errors'
+import { Paths } from '@shared/utils/types'
+import { set } from 'lodash'
+import { runInAction } from 'mobx'
 
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
 import { AppLogger, LogModule } from '../akari-core/log'
@@ -30,7 +36,9 @@ export class AutoReplyModule extends MobxBasedBasicModule {
     this._lcm = this.manager.getModule('lcu-connection')
     this._logger = this.manager.getModule<LogModule>('log').createLogger('auto-reply')
 
-    await this._setupSettingsSync()
+    await this._setupSettings()
+
+    this._setupStateSync()
     this._handleAutoReply()
 
     this._logger.info('初始化完成')
@@ -63,24 +71,43 @@ export class AutoReplyModule extends MobxBasedBasicModule {
     )
   }
 
-  private async _setupSettingsSync() {
-    this.simpleSettingSync(
-      'enabled',
-      () => this.state.settings.enabled,
-      (s) => this.state.settings.setEnabled(s)
-    )
-    this.simpleSettingSync(
-      'enable-on-away',
-      () => this.state.settings.enableOnAway,
-      (s) => this.state.settings.setEnableOnAway(s)
-    )
-    this.simpleSettingSync(
-      'text',
-      () => this.state.settings.text,
-      (s) => this.state.settings.setText(s)
-    )
+  private _setupStateSync() {
+    this.propSync('state', this.state, [
+      'settings.enabled',
+      'settings.enableOnAway',
+      'settings.text'
+    ])
+  }
 
-    await this.loadSettings()
+  private async _setupSettings() {
+    this.registerSettings([
+      {
+        key: 'enabled',
+        defaultValue: this.state.settings.enabled
+      },
+      {
+        key: 'enableOnAway',
+        defaultValue: this.state.settings.enableOnAway
+      },
+      {
+        key: 'text',
+        defaultValue: this.state.settings.text
+      }
+    ])
+
+    const settings = await this.readSettings()
+    runInAction(() => {
+      settings.forEach((s) => set(this.state.settings, s.settingItem, s.value))
+    })
+
+    const defaultSetter: RegisteredSettingHandler = async (key, value, apply) => {
+      runInAction(() => set(this.state.settings, key, value))
+      await apply(key, value)
+    }
+
+    this.onSettingChange<Paths<typeof this.state.settings>>('enabled', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('enableOnAway', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('text', defaultSetter)
   }
 }
 

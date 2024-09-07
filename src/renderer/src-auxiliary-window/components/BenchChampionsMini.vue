@@ -7,6 +7,7 @@
           :show-arrow="false"
           :duration="100"
           :delay="300"
+          :keep-alive-on-hover="false"
           :disabled="!selfChampionWithBalance || !selfChampionWithBalance.balance.length"
         >
           <template #trigger>
@@ -41,7 +42,7 @@
           <NButton
             @click="() => handleReroll()"
             :disabled="rerollsRemaining === 0 || isRerolling"
-            size="small"
+            size="tiny"
             :title="`随机一次 (剩余 ${rerollsRemaining})`"
             circle
             secondary
@@ -57,7 +58,7 @@
             :title="`随机一次并立即取回 (剩余 ${rerollsRemaining})`"
             secondary
             circle
-            size="small"
+            size="tiny"
           >
             <template #icon>
               <NIcon><ShareIcon /></NIcon>
@@ -74,6 +75,7 @@
           :delay="300"
           v-for="c of benchChampionsWithBalance"
           :key="c.championId"
+          :keep-alive-on-hover="false"
           :disabled="!c.balance.length"
         >
           <template #trigger>

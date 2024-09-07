@@ -1,5 +1,10 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
-import { makeAutoObservable, observable } from 'mobx'
+import {
+  MobxBasedBasicModule,
+  RegisteredSettingHandler
+} from '@main/akari-ipc/mobx-based-basic-module'
+import { Paths } from '@shared/utils/types'
+import { set } from 'lodash'
+import { makeAutoObservable, observable, runInAction } from 'mobx'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
 import { queryUxCommandLine, queryUxCommandLineNative } from '../../utils/ux-cmd'
@@ -62,25 +67,42 @@ export class LeagueClientModule extends MobxBasedBasicModule {
     this._lcm = this.manager.getModule('lcu-connection')
     this._pm = this.manager.getModule('win-platform')
 
-    await this._setupSettingsSync()
+    await this._setupSettings()
+    this._setupStateSync()
     this._setupMethodCall()
     this._handleTerminateGameClientOnAltF4()
 
     this._logger.info('初始化完成')
   }
 
-  private async _setupSettingsSync() {
-    this.simpleSettingSync(
-      'fix-window-method-a-options',
-      () => this.settings.fixWindowMethodAOptions,
-      (s) => this.settings.setFixWindowMethodsAOptions(s)
-    )
+  private async _setupStateSync() {
+    this.propSync('settings', this.settings, ['fixWindowMethodAOptions', 'terminateGameClientOnAltF4'])
+  }
 
-    this.simpleSettingSync(
-      'terminate-game-client-on-alt-f4',
-      () => this.settings.terminateGameClientOnAltF4,
-      (s) => this.settings.setTerminateGameClientOnAltF4(s)
-    )
+  private async _setupSettings() {
+    this.registerSettings([
+      {
+        key: 'fixWindowMethodAOptions',
+        defaultValue: this.settings.fixWindowMethodAOptions
+      },
+      {
+        key: 'terminateGameClientOnAltF4',
+        defaultValue: this.settings.terminateGameClientOnAltF4
+      }
+    ])
+
+    const settings = await this.readSettings()
+    runInAction(() => {
+      settings.forEach((s) => set(this.settings, s.settingItem, s.value))
+    })
+
+    const defaultSetter: RegisteredSettingHandler = async (key, value, apply) => {
+      runInAction(() => set(this.settings, key, value))
+      await apply(key, value)
+    }
+
+    this.onSettingChange<Paths<typeof this.settings>>('fixWindowMethodAOptions', defaultSetter)
+    this.onSettingChange<Paths<typeof this.settings>>('terminateGameClientOnAltF4', defaultSetter)
   }
 
   private _setupMethodCall() {

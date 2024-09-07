@@ -1,5 +1,11 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
+import {
+  MobxBasedBasicModule,
+  RegisteredSettingHandler
+} from '@main/akari-ipc/mobx-based-basic-module'
 import { sleep } from '@shared/utils/sleep'
+import { Paths } from '@shared/utils/types'
+import { set } from 'lodash'
+import { runInAction } from 'mobx'
 
 import { LeagueClientModule } from '../akari-core/league-client'
 import { AppLogger, LogModule } from '../akari-core/log'
@@ -29,8 +35,9 @@ export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._lcm = this.manager.getModule('league-client')
 
-    await this._setupSettingsSync()
+    await this._setupSettings()
 
+    this._setupStateSync()
     this._handleCks()
 
     this._logger.info('初始化完成')
@@ -91,19 +98,34 @@ export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
     })
   }
 
-  private async _setupSettingsSync() {
-    this.simpleSettingSync(
-      'enabled',
-      () => this.state.settings.enabled,
-      (s) => this.state.settings.setEnabled(s)
-    )
-    this.simpleSettingSync(
-      'text',
-      () => this.state.settings.text,
-      (s) => this.state.settings.setText(s)
-    )
+  private _setupStateSync() {
+    this.propSync('state', this.state, ['settings.enabled', 'settings.text'])
+  }
 
-    await this.loadSettings()
+  private async _setupSettings() {
+    this.registerSettings([
+      {
+        key: 'enabled',
+        defaultValue: this.state.settings.enabled
+      },
+      {
+        key: 'text',
+        defaultValue: this.state.settings.text
+      }
+    ])
+
+    const settings = await this.readSettings()
+    runInAction(() => {
+      settings.forEach((s) => set(this.state.settings, s.settingItem, s.value))
+    })
+
+    const defaultSetter: RegisteredSettingHandler = async (key, value, apply) => {
+      runInAction(() => set(this.state.settings, key, value))
+      await apply(key, value)
+    }
+
+    this.onSettingChange<Paths<typeof this.state.settings>>('enabled', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('text', defaultSetter)
   }
 }
 

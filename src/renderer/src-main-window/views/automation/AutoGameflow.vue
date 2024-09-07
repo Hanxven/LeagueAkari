@@ -89,20 +89,20 @@
           :label-width="200"
         >
           <NSwitch
-            :value="agf.settings.autoSearchMatchEnabled"
-            @update:value="(val) => am.setAutoSearchMatchEnabled(val)"
+            :value="agf.settings.autoMatchmakingEnabled"
+            @update:value="(val) => am.setAutoMatchmakingEnabled(val)"
             size="small"
           />
         </ControlItem>
         <ControlItem
           class="control-item-margin"
           label="最低人数"
-          :label-description="`自动开始匹配需满足人数达到 ${agf.settings.autoSearchMatchMinimumMembers} 人`"
+          :label-description="`自动开始匹配需满足人数达到 ${agf.settings.autoMatchmakingMinimumMembers} 人`"
           :label-width="200"
         >
           <NInputNumber
-            :value="agf.settings.autoSearchMatchMinimumMembers"
-            @update:value="(val) => am.setAutoSearchMatchMinimumMembers(val || 1)"
+            :value="agf.settings.autoMatchmakingMinimumMembers"
+            @update:value="(val) => am.setAutoMatchmakingMinimumMembers(val || 1)"
             :min="1"
             :max="99"
             size="small"
@@ -116,8 +116,8 @@
           :label-width="200"
         >
           <NSwitch
-            :value="agf.settings.autoSearchMatchWaitForInvitees"
-            @update:value="(val) => am.setAutoSearchMatchWaitForInvitees(val)"
+            :value="agf.settings.autoMatchmakingWaitForInvitees"
+            @update:value="(val) => am.setAutoMatchmakingWaitForInvitees(val)"
             size="small"
           />
         </ControlItem>
@@ -129,8 +129,8 @@
         >
           <NInputNumber
             style="width: 80px"
-            :value="agf.settings.autoSearchMatchDelaySeconds"
-            @update:value="(value) => am.setAutoSearchMatchDelaySeconds(value || 0)"
+            :value="agf.settings.autoMatchmakingDelaySeconds"
+            @update:value="(value) => am.setAutoMatchmakingDelaySeconds(value || 0)"
             placeholder="秒"
             :min="0"
             size="small"
@@ -143,8 +143,8 @@
           :label-width="200"
         >
           <NRadioGroup
-            :value="agf.settings.autoSearchMatchRematchStrategy"
-            @update:value="(s) => am.setAutoSearchMatchRematchStrategy(s)"
+            :value="agf.settings.autoMatchmakingRematchStrategy"
+            @update:value="(s) => am.setAutoMatchmakingRematchStrategy(s)"
             size="small"
           >
             <NFlex>
@@ -160,18 +160,18 @@
           class="control-item-margin"
           label="退出匹配时间 (s)"
           :label-description="
-            agf.settings.autoSearchMatchRematchStrategy !== 'fixed-duration'
+            agf.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'
               ? `该选项仅当停止匹配策略为固定时间时生效`
               : `在超过该时间后，将停止匹配，单位为秒`
           "
-          :disabled="agf.settings.autoSearchMatchRematchStrategy !== 'fixed-duration'"
+          :disabled="agf.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'"
           :label-width="200"
         >
           <NInputNumber
-            :disabled="agf.settings.autoSearchMatchRematchStrategy !== 'fixed-duration'"
+            :disabled="agf.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'"
             style="width: 80px"
-            :value="agf.settings.autoSearchMatchRematchFixedDuration"
-            @update:value="(value) => am.setAutoSearchMatchRematchFixedDuration(value || 2)"
+            :value="agf.settings.autoMatchmakingRematchFixedDuration"
+            @update:value="(value) => am.setAutoMatchmakingRematchFixedDuration(value || 2)"
             placeholder="秒"
             :min="1"
             size="small"

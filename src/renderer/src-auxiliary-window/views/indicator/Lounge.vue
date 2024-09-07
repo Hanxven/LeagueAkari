@@ -48,15 +48,15 @@
           :loading="isCancelingSearching"
           type="warning"
           secondary
-          size="small"
+          size="tiny"
           @click="() => handleCancelSearching()"
-          ><template v-if="agf.settings.autoSearchMatchEnabled">停止匹配并取消自动匹配</template
+          ><template v-if="agf.settings.autoMatchmakingEnabled">停止匹配并取消自动匹配</template
           ><template v-else>停止匹配</template></NButton
         >
       </template>
       <template v-else-if="agf.willSearchMatch">
         <span class="main-text">匹配对局 {{ willSearchMatchIn.toFixed(1) }} s</span>
-        <NButton type="primary" secondary size="small" @click="() => handleCancelAutoSearchMatch()"
+        <NButton type="primary" secondary size="tiny" @click="() => handleCancelAutoSearchMatch()"
           >取消本次自动匹配</NButton
         >
       </template>
@@ -66,12 +66,12 @@
           :title="`${gameflow.session?.map.gameModeName || '模式中'} · ${gameflow.session?.map.name || '地图'}`"
           >{{ formatMapModeText() }}</span
         >
-        <template v-if="agf.settings.autoSearchMatchEnabled">
+        <template v-if="agf.settings.autoMatchmakingEnabled">
           <span class="sub-text" v-if="penaltyTime"
             >等待秒退计时器 {{ penaltyTime.toFixed() }} s</span
           >
           <span class="sub-text" v-else-if="agf.activityStartStatus === 'insufficient-members'"
-            >自动匹配需达到 {{ agf.settings.autoSearchMatchMinimumMembers }} 人</span
+            >自动匹配需达到 {{ agf.settings.autoMatchmakingMinimumMembers }} 人</span
           >
           <span class="sub-text" v-else-if="agf.activityStartStatus === 'waiting-for-invitees'"
             >正在等待受邀请的玩家</span
@@ -130,7 +130,7 @@ const handleDecline = () => decline()
 const handleCancelAutoAccept = () => agfm.cancelAutoAccept()
 
 const handleCancelAutoSearchMatch = async () => {
-  await agfm.setAutoSearchMatchEnabled(false)
+  await agfm.setAutoMatchmakingEnabled(false)
   agfm.cancelAutoSearchMatch()
 }
 
@@ -147,7 +147,7 @@ const handleCancelSearching = async () => {
     isCancelingSearching.value = false
   }
 
-  agfm.setAutoSearchMatchEnabled(false)
+  agfm.setAutoMatchmakingEnabled(false)
 }
 
 const penaltyTime = computed(() => {
@@ -215,8 +215,8 @@ const formatMatchmakingSearchText = (search: GetSearch) => {
     return `等待 ${formatNumber(search.lowPriorityData.penaltyTimeRemaining)} s (${formatNumber(search.lowPriorityData.penaltyTime)} s) `
   }
 
-  if (agf.settings.autoSearchMatchRematchStrategy === 'fixed-duration') {
-    return `${search.timeInQueue.toFixed(1)} s (最多 ${agf.settings.autoSearchMatchRematchFixedDuration.toFixed()} s) / ${search.estimatedQueueTime.toFixed(1)} s`
+  if (agf.settings.autoMatchmakingRematchStrategy === 'fixed-duration') {
+    return `${search.timeInQueue.toFixed(1)} s (最多 ${agf.settings.autoMatchmakingRematchFixedDuration.toFixed()} s) / ${search.estimatedQueueTime.toFixed(1)} s`
   }
 
   return `${search.timeInQueue.toFixed(1)} s / ${search.estimatedQueueTime.toFixed(1)} s`

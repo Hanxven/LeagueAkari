@@ -100,7 +100,7 @@ export class MainWindowModule extends MobxBasedBasicModule {
    */
   private async _handleChores() {
     // 保存窗口大小，一秒内只保存一次
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.windowSize,
       (size) => {
         size[0] = Math.max(size[0], MainWindowModule.WINDOW_MIN_SIZE[0])

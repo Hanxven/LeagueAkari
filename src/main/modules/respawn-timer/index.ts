@@ -1,5 +1,7 @@
 import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import { getPlayerList } from '@main/http-api/game-client'
+import { Paths } from '@shared/utils/types'
+import { set } from 'lodash'
 import { runInAction } from 'mobx'
 
 import { AppLogger, LogModule } from '../akari-core/log'
@@ -27,10 +29,10 @@ export class RespawnTimerModule extends MobxBasedBasicModule {
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._logger = this.manager.getModule<LogModule>('log').createLogger('respawn-timer')
 
-    await this._setupSettingsSync()
+    await this._setupSettings()
     this._setupStateSync()
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcu.gameflow.phase,
       (phase) => {
         if (phase === 'InProgress') {
@@ -50,25 +52,32 @@ export class RespawnTimerModule extends MobxBasedBasicModule {
     this._logger.info('初始化完成')
   }
 
-  private async _setupSettingsSync() {
-    this.simpleSettingSync(
+  private async _setupSettings() {
+    this.registerSettings([
+      {
+        key: 'enabled',
+        defaultValue: this.state.settings.enabled
+      }
+    ])
+
+    const settings = await this.readSettings()
+    runInAction(() => {
+      settings.forEach((s) => set(this.state.settings, s.settingItem, s.value))
+    })
+
+    this.onSettingChange<Paths<typeof this.state.settings>>(
       'enabled',
-      () => this.state.settings.enabled,
-      async (s, ss) => {
-        if (s && this._lcu.gameflow.phase === 'InProgress') {
+      async (key, value, apply) => {
+        if (value && this._lcu.gameflow.phase === 'InProgress') {
           this._startRespawnTimerPoll()
-        } else if (s === false) {
+        } else if (value === false) {
           this._stopRespawnTimerPoll()
         }
 
-        this.state.settings.setEnabled(s)
-        await ss.set('enabled', s)
-
-        return true
+        this.state.settings.setEnabled(value)
+        await apply(key, value)
       }
     )
-
-    await this.loadSettings()
   }
 
   private async _queryRespawnTime() {
@@ -141,7 +150,7 @@ export class RespawnTimerModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.propSync('state', this.state, ['isDead', 'timeLeft', 'totalTime'])
+    this.propSync('state', this.state, ['isDead', 'timeLeft', 'totalTime', 'settings.enabled'])
   }
 }
 

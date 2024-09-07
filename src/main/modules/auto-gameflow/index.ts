@@ -1,4 +1,7 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
+import {
+  MobxBasedBasicModule,
+  RegisteredSettingHandler
+} from '@main/akari-ipc/mobx-based-basic-module'
 import { chatSend } from '@main/http-api/chat'
 import { honor } from '@main/http-api/honor-v2'
 import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
@@ -7,7 +10,9 @@ import { accept } from '@main/http-api/matchmaking'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { TimeoutTask } from '@main/utils/timer'
 import { formatError } from '@shared/utils/errors'
-import { comparer, computed } from 'mobx'
+import { Paths } from '@shared/utils/types'
+import { set } from 'lodash'
+import { comparer, computed, runInAction } from 'mobx'
 
 import { LcuConnectionModule } from '../akari-core/lcu-connection'
 import { AppLogger, LogModule } from '../akari-core/log'
@@ -56,7 +61,8 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     this._lcm = this.manager.getModule('lcu-connection')
     this._mwm = this.manager.getModule('main-window')
 
-    await this._setupSettingsSync()
+    // await this._setupSettings()
+    await this._setupSettings()
 
     this._setupStateSync()
     this._setupMethodCall()
@@ -71,92 +77,123 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.propSync('state', this.state, 'willAccept')
-    this.propSync('state', this.state, 'willAcceptAt')
-    this.propSync('state', this.state, 'willSearchMatch')
-    this.propSync('state', this.state, 'willSearchMatchAt')
-    this.propSync('state', this.state, 'activityStartStatus')
-    this.propSync('state', this.state, 'willDodgeAt')
-    this.propSync('state', this.state, 'willDodgeAtLastSecond')
+    this.propSync('state', this.state, [
+      'willAccept',
+      'willAcceptAt',
+      'willSearchMatch',
+      'willSearchMatchAt',
+      'activityStartStatus',
+      'willDodgeAt',
+      'willDodgeAtLastSecond',
+      'settings.autoAcceptDelaySeconds',
+      'settings.autoAcceptEnabled',
+      'settings.autoHonorEnabled',
+      'settings.autoHonorStrategy',
+      'settings.autoMatchmakingDelaySeconds',
+      'settings.autoMatchmakingEnabled',
+      'settings.autoMatchmakingMinimumMembers',
+      'settings.autoMatchmakingRematchFixedDuration',
+      'settings.autoMatchmakingRematchStrategy',
+      'settings.autoMatchmakingWaitForInvitees',
+      'settings.playAgainEnabled'
+    ])
   }
 
-  private async _setupSettingsSync() {
-    this.simpleSettingSync(
-      'auto-honor-enabled',
-      () => this.state.settings.autoHonorEnabled,
-      (s) => this.state.settings.setAutoHonorEnabled(s)
+  private async _setupSettings() {
+    this.registerSettings([
+      {
+        key: 'autoHonorEnabled',
+        defaultValue: this.state.settings.autoHonorEnabled
+      },
+      {
+        key: 'autoHonorStrategy',
+        defaultValue: this.state.settings.autoHonorStrategy
+      },
+      {
+        key: 'playAgainEnabled',
+        defaultValue: this.state.settings.playAgainEnabled
+      },
+      {
+        key: 'autoAcceptEnabled',
+        defaultValue: this.state.settings.autoAcceptEnabled
+      },
+      {
+        key: 'autoAcceptDelaySeconds',
+        defaultValue: this.state.settings.autoAcceptDelaySeconds
+      },
+      {
+        key: 'autoMatchmakingEnabled',
+        defaultValue: this.state.settings.autoMatchmakingEnabled
+      },
+      {
+        key: 'autoMatchmakingDelaySeconds',
+        defaultValue: this.state.settings.autoMatchmakingDelaySeconds
+      },
+      {
+        key: 'autoMatchmakingMinimumMembers',
+        defaultValue: this.state.settings.autoMatchmakingMinimumMembers
+      },
+      {
+        key: 'autoMatchmakingWaitForInvitees',
+        defaultValue: this.state.settings.autoMatchmakingWaitForInvitees
+      },
+      {
+        key: 'autoMatchmakingRematchStrategy',
+        defaultValue: this.state.settings.autoMatchmakingRematchStrategy
+      },
+      {
+        key: 'autoMatchmakingRematchFixedDuration',
+        defaultValue: this.state.settings.autoMatchmakingRematchFixedDuration
+      }
+    ])
+
+    const settings = await this.readSettings()
+    runInAction(() => {
+      settings.forEach((s) => set(this.state.settings, s.settingItem, s.value))
+    })
+
+    const defaultSetter: RegisteredSettingHandler = async (key, value, apply) => {
+      runInAction(() => set(this.state.settings, key, value))
+      await apply(key, value)
+    }
+
+    this.onSettingChange<Paths<typeof this.state.settings>>('autoHonorEnabled', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('autoHonorStrategy', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('playAgainEnabled', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('autoAcceptDelaySeconds', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('autoMatchmakingEnabled', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'autoMatchmakingDelaySeconds',
+      defaultSetter
+    )
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'autoMatchmakingMinimumMembers',
+      defaultSetter
+    )
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'autoMatchmakingWaitForInvitees',
+      defaultSetter
+    )
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'autoMatchmakingRematchStrategy',
+      defaultSetter
+    )
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'autoMatchmakingRematchFixedDuration',
+      defaultSetter
     )
 
-    this.simpleSettingSync(
-      'auto-honor-strategy',
-      () => this.state.settings.autoHonorStrategy,
-      (s) => this.state.settings.setAutoHonorStrategy(s)
-    )
-
-    this.simpleSettingSync(
-      'play-again-enabled',
-      () => this.state.settings.playAgainEnabled,
-      (s) => this.state.settings.setPlayAgainEnabled(s)
-    )
-
-    this.simpleSettingSync(
-      'auto-accept-enabled',
-      () => this.state.settings.autoAcceptEnabled,
-      async (s, ss) => {
-        if (!s) {
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'autoAcceptEnabled',
+      (key, value, apply) => {
+        if (!value) {
           this.cancelAutoAccept('normal')
         }
 
-        this.state.settings.setAutoAcceptEnabled(s)
-        await ss.set('auto-accept-enabled', s)
-
-        return true
+        this.state.settings.setAutoAcceptEnabled(value)
+        return apply(key, value)
       }
     )
-
-    this.simpleSettingSync(
-      'auto-accept-delay-seconds',
-      () => this.state.settings.autoAcceptDelaySeconds,
-      (s) => this.state.settings.setAutoAcceptDelaySeconds(s)
-    )
-
-    this.simpleSettingSync(
-      'auto-search-match-enabled',
-      () => this.state.settings.autoSearchMatchEnabled,
-      (s) => this.state.settings.setAutoSearchMatchEnabled(s)
-    )
-
-    this.simpleSettingSync(
-      'auto-search-match-delay-seconds',
-      () => this.state.settings.autoSearchMatchDelaySeconds,
-      (s) => this.state.settings.setAutoSearchMatchDelaySeconds(s)
-    )
-
-    this.simpleSettingSync(
-      'auto-search-match-minimum-members',
-      () => this.state.settings.autoSearchMatchMinimumMembers,
-      (s) => this.state.settings.setAutoSearchMatchMinimumMembers(s)
-    )
-
-    this.simpleSettingSync(
-      'auto-search-match-wait-for-invitees',
-      () => this.state.settings.autoSearchMatchWaitForInvitees,
-      (s) => this.state.settings.setAutoSearchMatchWaitForInvitees(s)
-    )
-
-    this.simpleSettingSync(
-      'auto-search-match-rematch-strategy',
-      () => this.state.settings.autoSearchMatchRematchStrategy,
-      (s) => this.state.settings.setAutoSearchMatchRematchStrategy(s)
-    )
-
-    this.simpleSettingSync(
-      'auto-search-match-rematch-fixed-duration',
-      () => this.state.settings.autoSearchMatchRematchFixedDuration,
-      (s) => this.state.settings.setAutoSearchMatchRematchFixedDuration(s)
-    )
-
-    await this.loadSettings()
   }
 
   private _setupMethodCall() {
@@ -173,7 +210,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
 
   private _handleLogging() {
     // 监听 gameflow
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcu.gameflow.phase,
       (phase) => {
         this._logger.info(`游戏流阶段变化: ${phase}`)
@@ -303,7 +340,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   }
 
   private _handleAutoBallot() {
-    this.autoDisposeReaction(
+    this.reaction(
       () => [this._lcu.honor.ballot, this.state.settings.autoHonorEnabled] as const,
       async ([b, e]) => {
         // 新接口 GameId 可能是 0
@@ -385,8 +422,8 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   }
 
   private _handleAutoSearchMatch() {
-    this.autoDisposeReaction(
-      () => this.state.settings.autoSearchMatchEnabled,
+    this.reaction(
+      () => this.state.settings.autoMatchmakingEnabled,
       (enabled) => {
         if (!enabled) {
           this.cancelAutoSearchMatch('normal')
@@ -395,8 +432,8 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
-    this.autoDisposeReaction(
-      () => [this.state.activityStartStatus, this.state.settings.autoSearchMatchEnabled] as const,
+    this.reaction(
+      () => [this.state.activityStartStatus, this.state.settings.autoMatchmakingEnabled] as const,
       ([s, enabled]) => {
         if (!enabled) {
           this.cancelAutoSearchMatch('normal')
@@ -405,14 +442,14 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
 
         if (s === 'can-start-activity') {
           this._logger.info(
-            `现在将在 ${this.state.settings.autoSearchMatchDelaySeconds} 秒后开始匹配`
+            `现在将在 ${this.state.settings.autoMatchmakingDelaySeconds} 秒后开始匹配`
           )
           this.state.setSearchMatchAt(
-            Date.now() + this.state.settings.autoSearchMatchDelaySeconds * 1e3
+            Date.now() + this.state.settings.autoMatchmakingDelaySeconds * 1e3
           )
           this._autoSearchMatchTimerId = setTimeout(
             () => this._startMatchmaking(),
-            this.state.settings.autoSearchMatchDelaySeconds * 1e3
+            this.state.settings.autoMatchmakingDelaySeconds * 1e3
           )
 
           this._sendAutoSearchMatchInfoInChat()
@@ -444,7 +481,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     })
 
     let penaltyTime = 0
-    this.autoDisposeReaction(
+    this.reaction(
       () => Boolean(simplifiedSearchState.get()),
       (hasSearchState) => {
         if (hasSearchState) {
@@ -456,12 +493,12 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () =>
         [
           simplifiedSearchState.get(),
-          this.state.settings.autoSearchMatchRematchStrategy,
-          this.state.settings.autoSearchMatchRematchFixedDuration
+          this.state.settings.autoMatchmakingRematchStrategy,
+          this.state.settings.autoMatchmakingRematchFixedDuration
         ] as const,
       ([s, st, d]) => {
         if (st === 'never' || !s || s.searchState !== 'Searching') {
@@ -492,7 +529,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   }
 
   private _handleAutoAccept() {
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcu.gameflow.phase,
       (phase) => {
         if (!this.state.settings.autoAcceptEnabled) {
@@ -524,7 +561,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.settings.autoAcceptEnabled,
       (enabled) => {
         if (!enabled) {
@@ -545,7 +582,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   }
 
   private _handleAutoPlayAgain() {
-    this.autoDisposeReaction(
+    this.reaction(
       () => [this._lcu.gameflow.phase, this.state.settings.playAgainEnabled] as const,
       async ([phase, enabled]) => {
         if (
@@ -592,7 +629,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   }
 
   private _handleLastSecondDodge() {
-    this.autoDisposeReaction(
+    this.reaction(
       () => [Boolean(this._lcu.champSelect.session), this.state.willDodgeAtLastSecond] as const,
       ([hasSession, enabled]) => {
         if (!hasSession || !enabled) {
@@ -607,7 +644,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       { equals: comparer.shallow }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => [this._lcu.champSelect.session?.timer, this.state.willDodgeAtLastSecond] as const,
       ([timer, enabled]) => {
         if (timer && enabled) {

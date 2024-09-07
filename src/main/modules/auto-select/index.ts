@@ -1,8 +1,13 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
+import {
+  MobxBasedBasicModule,
+  RegisteredSettingHandler
+} from '@main/akari-ipc/mobx-based-basic-module'
 import { action, benchSwap, pickOrBan } from '@main/http-api/champ-select'
 import { chatSend } from '@main/http-api/chat'
 import { formatError } from '@shared/utils/errors'
-import { comparer, computed } from 'mobx'
+import { Paths } from '@shared/utils/types'
+import { set } from 'lodash'
+import { comparer, computed, runInAction } from 'mobx'
 
 import { AppLogger, LogModule } from '../akari-core/log'
 import { MainWindowModule } from '../akari-core/main-window'
@@ -29,7 +34,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._mwm = this.manager.getModule('main-window')
 
-    await this._setupSettingsSync()
+    await this._setupSettings()
     await this._setupStateSync()
     this._handleAutoPickBan()
     this._handleBenchMode()
@@ -38,7 +43,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
   }
 
   private _handleAutoPickBan() {
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.upcomingPick,
       async (pick) => {
         if (!pick) {
@@ -112,7 +117,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
       }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.upcomingBan,
       async (ban) => {
         if (!ban) {
@@ -136,21 +141,21 @@ export class AutoSelectModule extends MobxBasedBasicModule {
       }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.upcomingPick,
       (pick) => {
         this._logger.info(`Upcoming Pick - 即将进行的选择: ${JSON.stringify(pick)}`)
       }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.upcomingBan,
       (ban) => {
         this._logger.info(`Upcoming Ban - 即将进行的禁用: ${JSON.stringify(ban)}`)
       }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.upcomingGrab,
       (grab) => {
         this._logger.info(`Upcoming Grab - 即将进行的交换: ${JSON.stringify(grab)}`)
@@ -182,7 +187,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
       { equals: comparer.structural }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => positionInfo.get(),
       (info) => {
         if (info) {
@@ -193,7 +198,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
       }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcu.chat.conversations.championSelect?.id,
       (id) => {
         if (id && this._lcu.gameflow.phase === 'ChampSelect') {
@@ -270,7 +275,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
       return { benchEnabled, localPlayerCellId, benchChampions, myTeam }
     })
 
-    this.autoDisposeReaction(
+    this.reaction(
       () =>
         [
           simplifiedCsSession.get(),
@@ -405,7 +410,7 @@ export class AutoSelectModule extends MobxBasedBasicModule {
       { equals: comparer.structural }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcu.gameflow.phase,
       (phase) => {
         if (phase !== 'ChampSelect' && this.state.upcomingGrab) {
@@ -452,84 +457,113 @@ export class AutoSelectModule extends MobxBasedBasicModule {
     }
   }
 
-  private async _setupSettingsSync() {
-    this.simpleSettingSync(
-      'normal-mode-enabled',
-      () => this.state.settings.normalModeEnabled,
-      (s) => this.state.settings.setNormalModeEnabled(s)
-    )
+  private async _setupSettings() {
+    this.registerSettings([
+      {
+        key: 'normalModeEnabled',
+        defaultValue: this.state.settings.normalModeEnabled
+      },
+      {
+        key: 'expectedChampions',
+        defaultValue: this.state.settings.expectedChampions
+      },
+      {
+        key: 'selectTeammateIntendedChampion',
+        defaultValue: this.state.settings.selectTeammateIntendedChampion
+      },
+      {
+        key: 'showIntent',
+        defaultValue: this.state.settings.showIntent
+      },
+      {
+        key: 'completed',
+        defaultValue: this.state.settings.completed
+      },
+      {
+        key: 'benchModeEnabled',
+        defaultValue: this.state.settings.benchModeEnabled
+      },
+      {
+        key: 'benchSelectFirstAvailableChampion',
+        defaultValue: this.state.settings.benchSelectFirstAvailableChampion
+      },
+      {
+        key: 'benchExpectedChampions',
+        defaultValue: this.state.settings.benchExpectedChampions
+      },
+      {
+        key: 'grabDelaySeconds',
+        defaultValue: this.state.settings.grabDelaySeconds
+      },
+      {
+        key: 'banEnabled',
+        defaultValue: this.state.settings.banEnabled
+      },
+      {
+        key: 'bannedChampions',
+        defaultValue: this.state.settings.bannedChampions
+      },
+      {
+        key: 'banTeammateIntendedChampion',
+        defaultValue: this.state.settings.banTeammateIntendedChampion
+      }
+    ])
 
-    this.simpleSettingSync(
-      'expected-champions-multi',
-      () => this.state.settings.expectedChampions,
-      (s) => this.state.settings.setExpectedChampions(s)
-    )
+    const settings = await this.readSettings()
+    runInAction(() => {
+      settings.forEach((s) => set(this.state.settings, s.settingItem, s.value))
+    })
 
-    this.simpleSettingSync(
-      'select-teammate-intended-champion',
-      () => this.state.settings.selectTeammateIntendedChampion,
-      (s) => this.state.settings.setSelectTeammateIntendedChampion(s)
-    )
+    const defaultSetter: RegisteredSettingHandler = async (key, value, apply) => {
+      runInAction(() => set(this.state.settings, key, value))
+      await apply(key, value)
+    }
 
-    this.simpleSettingSync(
-      'show-intent',
-      () => this.state.settings.showIntent,
-      (s) => this.state.settings.setShowIntent(s)
+    this.onSettingChange<Paths<typeof this.state.settings>>('normalModeEnabled', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('expectedChampions', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'selectTeammateIntendedChampion',
+      defaultSetter
     )
-
-    this.simpleSettingSync(
-      'completed',
-      () => this.state.settings.completed,
-      (s) => this.state.settings.setCompleted(s)
+    this.onSettingChange<Paths<typeof this.state.settings>>('showIntent', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('completed', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('benchModeEnabled', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'benchSelectFirstAvailableChampion',
+      defaultSetter
     )
-
-    this.simpleSettingSync(
-      'bench-mode-enabled',
-      () => this.state.settings.benchModeEnabled,
-      (s) => this.state.settings.setBenchModeEnabled(s)
+    this.onSettingChange<Paths<typeof this.state.settings>>('benchExpectedChampions', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('grabDelaySeconds', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('banEnabled', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('bannedChampions', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'banTeammateIntendedChampion',
+      defaultSetter
     )
-
-    this.simpleSettingSync(
-      'bench-select-first-available-champion',
-      () => this.state.settings.benchSelectFirstAvailableChampion,
-      (s) => this.state.settings.setBenchSelectFirstAvailableChampion(s)
-    )
-
-    this.simpleSettingSync(
-      'bench-expected-champions',
-      () => this.state.settings.benchExpectedChampions,
-      (s) => this.state.settings.setBenchExpectedChampions(s)
-    )
-
-    this.simpleSettingSync(
-      'grab-delay-seconds',
-      () => this.state.settings.grabDelaySeconds,
-      (s) => this.state.settings.setGrabDelaySeconds(s)
-    )
-
-    this.simpleSettingSync(
-      'ban-enabled',
-      () => this.state.settings.banEnabled,
-      (s) => this.state.settings.setBanEnabled(s)
-    )
-
-    this.simpleSettingSync(
-      'banned-champions-multi',
-      () => this.state.settings.bannedChampions,
-      (s) => this.state.settings.setBannedChampions(s)
-    )
-
-    this.simpleSettingSync(
-      'ban-teammate-intended-champion',
-      () => this.state.settings.banTeammateIntendedChampion,
-      (s) => this.state.settings.setBanTeammateIntendedChampion(s)
-    )
-
-    await this.loadSettings()
   }
 
   private async _setupStateSync() {
-    this.propSync('state', this.state, ['upcomingBan', 'upcomingPick', 'upcomingGrab', 'memberMe'])
+    this.propSync('state', this.state, [
+      'upcomingBan',
+      'upcomingPick',
+      'upcomingGrab',
+      'memberMe',
+      'settings.banEnabled',
+      'settings.benchModeEnabled',
+      'settings.benchSelectFirstAvailableChampion',
+      'settings.completed',
+      'settings.grabDelaySeconds',
+      'settings.normalModeEnabled',
+      'settings.selectTeammateIntendedChampion',
+      'settings.showIntent',
+      'settings.banTeammateIntendedChampion'
+    ])
+    this.propSync(
+      'state',
+      this.state,
+      ['settings.expectedChampions', 'settings.benchExpectedChampions', 'settings.bannedChampions'],
+      true
+    )
   }
 }
 

@@ -16,16 +16,7 @@ export class LeagueClientRendererModule extends StateSyncModule {
 
   private _setupStateSync() {
     const store = useLeagueClientStore()
-
-    this.getterSync(
-      'settings/fix-window-method-a-options',
-      (s) => (store.settings.fixWindowMethodAOptions = s)
-    )
-
-    this.getterSync(
-      'settings/terminate-game-client-on-alt-f4',
-      (s) => (store.settings.terminateGameClientOnAltF4 = s)
-    )
+    this.stateSync('settings', store.settings)
   }
 
   fixWindowMethodA() {
@@ -33,7 +24,7 @@ export class LeagueClientRendererModule extends StateSyncModule {
   }
 
   setFixWindowMethodAOptions(option: { baseWidth: number; baseHeight: number }) {
-    return this.call('set-setting/fix-window-method-a-options', option)
+    return this.call('set-setting', 'fixWindowMethodAOptions', option)
   }
 
   getLaunchedClients(): Promise<UxCommandLine[]> {
@@ -41,7 +32,7 @@ export class LeagueClientRendererModule extends StateSyncModule {
   }
 
   setTerminateGameClientOnAltF4(value: boolean) {
-    return this.call('set-setting/terminate-game-client-on-alt-f4', value)
+    return this.call('set-setting', 'terminateGameClientOnAltF4', value)
   }
 
   terminateGameClient() {

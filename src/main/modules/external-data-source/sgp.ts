@@ -125,7 +125,7 @@ export class SgpEds {
   private _handleUpdateSupportedInfo() {
     this._edsm.getterSync('sgp/availability', () => this.state.availability)
 
-    this._edsm.autoDisposeReaction(
+    this._edsm.reaction(
       () => this._lc.state.auth,
       async (auth) => {
         if (!auth) {
@@ -531,7 +531,7 @@ export class SgpEds {
   }
 
   private _maintainSessionToken() {
-    this._edsm.autoDisposeReaction(
+    this._edsm.reaction(
       () => this._lcu.entitlements.token,
       (token) => {
         if (!token) {

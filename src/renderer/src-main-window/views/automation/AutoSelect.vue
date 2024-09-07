@@ -336,7 +336,7 @@ import { autoSelectRendererModule as asm } from '@renderer-shared/modules/auto-s
 import { useAutoSelectStore } from '@renderer-shared/modules/auto-select/store'
 import { NCard, NInputNumber, NScrollbar, NSwitch, NTooltip } from 'naive-ui'
 
-import OrderedChampionList from '@main-window/components/OrderedChampionListNew.vue'
+import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
 
 const as = useAutoSelectStore()
 

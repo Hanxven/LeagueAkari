@@ -15,13 +15,13 @@
     <NFlex align="center" class="control-item">
       <span class="label" style="flex: 1"
         >自动匹配 ({{
-          isCustomGame ? '模式不适用' : formatDelayText(agf.settings.autoSearchMatchDelaySeconds)
+          isCustomGame ? '模式不适用' : formatDelayText(agf.settings.autoMatchmakingDelaySeconds)
         }})</span
       >
       <NSwitch
         size="small"
-        :value="agf.settings.autoSearchMatchEnabled"
-        @update:value="(val) => agfm.setAutoSearchMatchEnabled(val)"
+        :value="agf.settings.autoMatchmakingEnabled"
+        @update:value="(val) => agfm.setAutoMatchmakingEnabled(val)"
       />
     </NFlex>
   </NCard>

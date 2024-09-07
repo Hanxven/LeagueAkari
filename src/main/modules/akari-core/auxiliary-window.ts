@@ -1,7 +1,12 @@
 import { is } from '@electron-toolkit/utils'
-import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
+import {
+  MobxBasedBasicModule,
+  RegisteredSettingHandler
+} from '@main/akari-ipc/mobx-based-basic-module'
+import { Paths } from '@shared/utils/types'
 import { BrowserWindow, Rectangle, dialog, screen, shell } from 'electron'
-import { comparer, computed, makeAutoObservable, observable } from 'mobx'
+import { set } from 'lodash'
+import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
 import { join } from 'path'
 
 import icon from '../../../../resources/LA_ICON.ico?asset'
@@ -146,7 +151,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this._appModule = this.manager.getModule<AppModule>('app')
     this._logger = this._logModule.createLogger('auxiliary-window')
 
-    await this._setupSettingsSync()
+    await this._setupSettings()
     await this._loadPreferences()
     this._setupStateSync()
     this._setupMethodCall()
@@ -179,7 +184,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     })
 
     // normally show & hide
-    this.autoDisposeReaction(
+    this.reaction(
       () => auxWindowIndicatorShowTiming.get(),
       (timing) => {
         if (this.state.currentFunctionality !== 'indicator') {
@@ -195,7 +200,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     )
 
     // shows only in champ select and never hides
-    this.autoDisposeReaction(
+    this.reaction(
       () => auxWindowOpggShowTiming.get(),
       (timing) => {
         if (this.state.currentFunctionality !== 'opgg') {
@@ -208,7 +213,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.bounds,
       (bounds) => {
         if (bounds) {
@@ -225,21 +230,21 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       { delay: 250, equals: comparer.shallow }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.currentFunctionality,
       (f) => {
         this._ss.set('functionality', f)
       }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.settings.zoomFactor,
       (f) => {
         this._w?.webContents.setZoomFactor(f)
       }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this.state.settings.opacity,
       (o) => {
         this._w?.setOpacity(o)
@@ -247,7 +252,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => [this.state.settings.enabled, this._appModule.state.ready] as const,
       ([enabled, ready]) => {
         if (!ready) {
@@ -263,7 +268,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       { fireImmediately: true, delay: 500, equals: comparer.shallow }
     )
 
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._lcm.state.state,
       (state) => {
         if (state !== 'connected') {
@@ -274,7 +279,16 @@ export class AuxWindowModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.propSync('state', this.state, ['windowState', 'focusState', 'isShow'])
+    this.propSync('state', this.state, [
+      'windowState',
+      'focusState',
+      'isShow',
+      'settings.enabled',
+      'settings.isPinned',
+      'settings.showSkinSelector',
+      'settings.zoomFactor',
+      'settings.opacity'
+    ])
   }
 
   private _setupMethodCall() {
@@ -576,40 +590,52 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     this.state.setFunctionality(await this._ss.get('functionality', 'indicator'))
   }
 
-  private async _setupSettingsSync() {
-    this.simpleSettingSync(
-      'opacity',
-      () => this.state.settings.opacity,
-      (s) => this.state.settings.setOpacity(s)
-    )
-    this.simpleSettingSync(
-      'enabled',
-      () => this.state.settings.enabled,
-      (s) => this.state.settings.setEnabled(s)
-    )
-    this.simpleSettingSync(
-      'is-pinned',
-      () => this.state.settings.isPinned,
-      async (s, ss) => {
-        this._w?.setAlwaysOnTop(s, 'normal')
-        this.state.settings.setPinned(s)
-        await ss.set('is-pinned', s)
+  private async _setupSettings() {
+    this.registerSettings([
+      {
+        key: 'opacity',
+        defaultValue: this.state.settings.opacity
+      },
+      {
+        key: 'enabled',
+        defaultValue: this.state.settings.enabled
+      },
+      {
+        key: 'isPinned',
+        defaultValue: this.state.settings.isPinned
+      },
+      {
+        key: 'showSkinSelector',
+        defaultValue: this.state.settings.showSkinSelector
+      },
+      {
+        key: 'zoomFactor',
+        defaultValue: this.state.settings.zoomFactor
+      }
+    ])
 
-        return true
+    const settings = await this.readSettings()
+    runInAction(() => {
+      settings.forEach((s) => set(this.state.settings, s.settingItem, s.value))
+    })
+
+    const defaultSetter: RegisteredSettingHandler = async (key, value, apply) => {
+      runInAction(() => set(this.state.settings, key, value))
+      await apply(key, value)
+    }
+
+    this.onSettingChange<Paths<typeof this.state.settings>>('opacity', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('enabled', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'isPinned',
+      async (key, value, apply) => {
+        this._w?.setAlwaysOnTop(value, 'normal')
+        runInAction(() => set(this.state.settings, key, value))
+        await apply(key, value)
       }
     )
-    this.simpleSettingSync(
-      'show-skin-selector',
-      () => this.state.settings.showSkinSelector,
-      (s) => this.state.settings.setShowSkinSelector(s)
-    )
-    this.simpleSettingSync(
-      'zoom-factor',
-      () => this.state.settings.zoomFactor,
-      (s) => this.state.settings.setZoomFactor(s)
-    )
-
-    await this.loadSettings()
+    this.onSettingChange<Paths<typeof this.state.settings>>('showSkinSelector', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('zoomFactor', defaultSetter)
   }
 
   private _getCenteredRectangle(width: number, height: number) {

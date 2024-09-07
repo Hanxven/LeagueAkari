@@ -63,7 +63,6 @@ export class PlatformModule extends MobxBasedBasicModule {
       this._gkl = null
     })
 
-    this._setupStateSync()
     this._setupMethodCall()
     this._handleAuxWindow()
 
@@ -71,7 +70,7 @@ export class PlatformModule extends MobxBasedBasicModule {
   }
 
   private _handleAuxWindow() {
-    this.autoDisposeReaction(
+    this.reaction(
       () => this._awm.state.settings.enabled,
       (e) => {
         if (e) {
@@ -209,8 +208,6 @@ export class PlatformModule extends MobxBasedBasicModule {
   sendInputString(str: string) {
     this._worker?.postMessage({ type: 'string', data: str })
   }
-
-  private _setupStateSync() {}
 
   private _setupMethodCall() {
     this.onCall('send-key', (key, pressed) => {

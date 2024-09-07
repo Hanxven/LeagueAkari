@@ -85,7 +85,7 @@ export class BalanceEds {
       { equals: comparer.structural }
     )
 
-    this._edsm.autoDisposeReaction(
+    this._edsm.reaction(
       () => gameInfo.get(),
       async (info) => {
         if (!info) {

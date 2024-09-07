@@ -20,13 +20,13 @@ class AutoGameflowSettings {
   autoAcceptEnabled: boolean = false
   autoAcceptDelaySeconds: number = 0
 
-  autoSearchMatchEnabled: boolean = false
-  autoSearchMaximumMatchDuration: number = 0
-  autoSearchMatchRematchStrategy: AutoSearchRematchStrategy = 'never'
-  autoSearchMatchRematchFixedDuration: number = 2
-  autoSearchMatchDelaySeconds: number = 5
-  autoSearchMatchMinimumMembers = 1 // 最低满足人数
-  autoSearchMatchWaitForInvitees: boolean = true // 等待邀请中的用户
+  autoMatchmakingEnabled: boolean = false
+  autoMatchmakingMaximumMatchDuration: number = 0
+  autoMatchmakingRematchStrategy: AutoSearchRematchStrategy = 'never'
+  autoMatchmakingRematchFixedDuration: number = 2
+  autoMatchmakingDelaySeconds: number = 5
+  autoMatchmakingMinimumMembers = 1 // 最低满足人数
+  autoMatchmakingWaitForInvitees: boolean = true // 等待邀请中的用户
 
   setAutoHonorEnabled(enabled: boolean) {
     this.autoHonorEnabled = enabled
@@ -48,28 +48,28 @@ class AutoGameflowSettings {
     this.autoAcceptDelaySeconds = seconds
   }
 
-  setAutoSearchMatchEnabled(enabled: boolean) {
-    this.autoSearchMatchEnabled = enabled
+  setAutoMatchmakingEnabled(enabled: boolean) {
+    this.autoMatchmakingEnabled = enabled
   }
 
-  setAutoSearchMatchDelaySeconds(seconds: number) {
-    this.autoSearchMatchDelaySeconds = seconds
+  setAutoMatchmakingDelaySeconds(seconds: number) {
+    this.autoMatchmakingDelaySeconds = seconds
   }
 
-  setAutoSearchMatchMinimumMembers(count: number) {
-    this.autoSearchMatchMinimumMembers = count
+  setAutoMatchmakingMinimumMembers(count: number) {
+    this.autoMatchmakingMinimumMembers = count
   }
 
-  setAutoSearchMatchWaitForInvitees(yes: boolean) {
-    this.autoSearchMatchWaitForInvitees = yes
+  setAutoMatchmakingWaitForInvitees(yes: boolean) {
+    this.autoMatchmakingWaitForInvitees = yes
   }
 
-  setAutoSearchMatchRematchStrategy(s: AutoSearchRematchStrategy) {
-    this.autoSearchMatchRematchStrategy = s
+  setAutoMatchmakingRematchStrategy(s: AutoSearchRematchStrategy) {
+    this.autoMatchmakingRematchStrategy = s
   }
 
-  setAutoSearchMatchRematchFixedDuration(seconds: number) {
-    this.autoSearchMatchRematchFixedDuration = seconds
+  setAutoMatchmakingRematchFixedDuration(seconds: number) {
+    this.autoMatchmakingRematchFixedDuration = seconds
   }
 
   constructor() {
@@ -138,14 +138,14 @@ export class AutoGameflowState {
       }
     }
 
-    if (this.settings.autoSearchMatchWaitForInvitees) {
+    if (this.settings.autoMatchmakingWaitForInvitees) {
       const hasPendingInvitation = lcu.lobby.lobby.invitations.some((i) => i.state === 'Pending')
       if (hasPendingInvitation) {
         return 'waiting-for-invitees'
       }
     }
 
-    if (lcu.lobby.lobby.members.length < this.settings.autoSearchMatchMinimumMembers) {
+    if (lcu.lobby.lobby.members.length < this.settings.autoMatchmakingMinimumMembers) {
       return 'insufficient-members'
     }
 

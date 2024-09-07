@@ -1,5 +1,5 @@
-import { Paths } from '@shared/utils/types'
 import { set } from 'lodash'
+import { markRaw } from 'vue'
 
 import { LeagueAkariRendererModule } from './renderer-akari-module'
 
@@ -19,32 +19,43 @@ export class StateSyncModule extends LeagueAkariRendererModule {
   }
 
   async stateSync<T extends object>(stateId: string, obj: T) {
-    this.onEvent(`update-state-prop/${stateId}`, (path: string, value) => {
-      // FOR DEBUGGING ONLY: uncomment the following line to see state changes
-      // console.log(this.id, stateId, path, value)
-      set(obj, path, value)
-    })
-
     try {
-      const paths = (await this.call('get-initial-state-props', stateId)) as string[]
-      const jobs = paths
-        .map((path) => {
+      const configList = (await this.call('get-state-props', stateId)) as {
+        path: string
+        toRaw: boolean
+      }[]
+      const jobs = configList
+        .map((config) => {
           return async () => {
             try {
-              const value = await this.call(`get-initial-state-prop`, stateId, path)
-              set(obj, path, value)
+              const value = await this.call(`get-state-prop`, stateId, config.path)
+              set(obj, config.path, config.toRaw ? markRaw(value) : value)
             } catch (error) {
               throw new Error(
-                `Failed to get initial state of ${path} from ${stateId}: ${(error as Error).message}`
+                `Failed to get initial state of ${config} from ${stateId}: ${(error as Error).message}`
               )
             }
           }
         })
         .map((job) => job())
 
+      this.onEvent(`update-state-prop/${stateId}`, (path: string, value, toRaw: boolean) => {
+        // FOR DEBUGGING ONLY: uncomment the following line to see state changes
+        // console.log(this.id, stateId, path, value)
+        set(obj, path, toRaw ? markRaw(value) : value)
+      })
+
       await Promise.all(jobs)
     } catch (error) {
       console.error(`Failed to sync initial state of ${stateId}`, error)
     }
+  }
+
+  async mutateProp(stateId: string, propPath: string, value: any) {
+    return this.call(`set-state-prop/${stateId}`, propPath, value)
+  }
+
+  async setSetting(settingItem: string, value: any) {
+    return this.call(`set-setting`, settingItem, value)
   }
 }

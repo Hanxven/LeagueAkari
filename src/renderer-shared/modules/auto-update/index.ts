@@ -16,13 +16,6 @@ export class AutoUpdateRendererModule extends StateSyncModule {
   private _syncMainState() {
     const store = useAutoUpdateStore()
 
-    this.getterSync('settings/auto-check-updates', (s) => (store.settings.autoCheckUpdates = s))
-    this.getterSync(
-      'settings/auto-download-updates',
-      (s) => (store.settings.autoDownloadUpdates = s)
-    )
-    this.getterSync('settings/download-source', (s) => (store.settings.downloadSource = s))
-
     this.stateSync('state', store)
   }
 
@@ -31,15 +24,15 @@ export class AutoUpdateRendererModule extends StateSyncModule {
   }
 
   setAutoCheckUpdates(enabled: boolean) {
-    return this.call('set-setting/auto-check-updates', enabled)
+    return this.call('set-setting', 'autoCheckUpdates', enabled)
   }
 
   setAutoDownloadUpdates(enabled: boolean) {
-    return this.call('set-setting/auto-download-updates', enabled)
+    return this.call('set-setting', 'autoDownloadUpdates', enabled)
   }
 
   setDownloadSource(source: string) {
-    return this.call('set-setting/download-source', source)
+    return this.call('set-setting', 'downloadSource', source)
   }
 
   setReadAnnouncement(sha: string) {

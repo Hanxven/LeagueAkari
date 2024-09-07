@@ -1,6 +1,10 @@
 import { optimizer } from '@electron-toolkit/utils'
-import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
+import {
+  MobxBasedBasicModule,
+  RegisteredSettingHandler
+} from '@main/akari-ipc/mobx-based-basic-module'
 import { MainWindowCloseStrategy } from '@shared/types/modules/app'
+import { Paths } from '@shared/utils/types'
 import { AxiosRequestConfig } from 'axios'
 import { BrowserWindow, app, protocol, session, shell } from 'electron'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
@@ -19,6 +23,7 @@ import { AuxWindowModule } from './auxiliary-window'
 import { LcuConnectionModule } from './lcu-connection'
 import { AppLogger, LogModule } from './log'
 import { MainWindowModule } from './main-window'
+import { set } from 'lodash'
 
 class AppSettings {
   /**
@@ -37,7 +42,7 @@ class AppSettings {
   closeStrategy: MainWindowCloseStrategy = 'unset'
 
   /**
-   * 禁用硬件加速
+   * 禁用硬件加速, 特殊设置项, 仅用于展示
    */
   disableHardwareAcceleration: boolean = false
 
@@ -141,7 +146,7 @@ export class AppModule extends MobxBasedBasicModule {
     this._lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
     this._aum = this.manager.getModule<AutoUpdateModule>('auto-update')
 
-    await this._setupSettingsSync()
+    await this._setupSettings()
     this._setupAkariProtocol()
     this._setupMethodCall()
     this._setupStateSync()
@@ -215,7 +220,15 @@ export class AppModule extends MobxBasedBasicModule {
   }
 
   private _setupStateSync() {
-    this.propSync('state', this.state, ['isAdministrator', 'baseConfig'])
+    this.propSync('state', this.state, [
+      'isAdministrator',
+      'baseConfig',
+      'settings.closeStrategy',
+      'settings.disableHardwareAcceleration',
+      'settings.isInKyokoMode',
+      'settings.showFreeSoftwareDeclaration',
+      'settings.useWmic'
+    ])
   }
 
   private _setupMethodCall() {
@@ -260,32 +273,43 @@ export class AppModule extends MobxBasedBasicModule {
     })
   }
 
-  private async _setupSettingsSync() {
-    this.simpleSettingSync(
-      'show-free-software-declaration',
-      () => this.state.settings.showFreeSoftwareDeclaration,
-      (s) => this.state.settings.setShowFreeSoftwareDeclaration(s)
-    )
+  private async _setupSettings() {
+    this.registerSettings([
+      {
+        key: 'showFreeSoftwareDeclaration',
+        defaultValue: this.state.settings.showFreeSoftwareDeclaration
+      },
+      {
+        key: 'closeStrategy',
+        defaultValue: this.state.settings.closeStrategy
+      },
+      {
+        key: 'useWmic',
+        defaultValue: this.state.settings.useWmic
+      },
+      {
+        key: 'isInKyokoMode',
+        defaultValue: this.state.settings.isInKyokoMode
+      }
+    ])
 
-    this.simpleSettingSync(
-      'close-strategy',
-      () => this.state.settings.closeStrategy,
-      (s) => this.state.settings.setCloseStrategy(s)
-    )
+    const settings = await this.readSettings()
+    runInAction(() => {
+      settings.forEach((s) => set(this.state.settings, s.settingItem, s.value))
+    })
 
-    this.simpleSettingSync(
-      'use-wmic',
-      () => this.state.settings.useWmic,
-      (s) => this.state.settings.setUseWmic(s)
-    )
+    const defaultSetter: RegisteredSettingHandler = async (key, value, apply) => {
+      runInAction(() => set(this.state.settings, key, value))
+      await apply(key, value)
+    }
 
-    this.simpleSettingSync(
-      'is-in-kyoko-mode',
-      () => this.state.settings.isInKyokoMode,
-      (b) => this.state.settings.setInKyokoMode(b)
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'showFreeSoftwareDeclaration',
+      defaultSetter
     )
-
-    await this.loadSettings()
+    this.onSettingChange<Paths<typeof this.state.settings>>('closeStrategy', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('useWmic', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('isInKyokoMode', defaultSetter)
   }
 
   private _setupAkariProtocol() {
@@ -611,7 +635,7 @@ export class AppModule extends MobxBasedBasicModule {
 
   // from v1.2.x -> v1.2.5
   private async _migrateSettingsToDotProps() {
-    const isInPropsStage = await this._sm.settings.get('akari.dotPropsStage', false)
+    const isInPropsStage = await this._sm.settings.get('akari.inDotPropsStage', false)
     if (isInPropsStage) {
       return
     }

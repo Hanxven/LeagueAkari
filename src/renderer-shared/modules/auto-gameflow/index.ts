@@ -15,85 +15,51 @@ export class AutoGameflowRendererModule extends StateSyncModule {
 
   private _syncMainState() {
     const store = useAutoGameflowStore()
-
-    this.getterSync('settings/auto-honor-enabled', (s) => (store.settings.autoHonorEnabled = s))
-    this.getterSync('settings/auto-honor-strategy', (s) => (store.settings.autoHonorStrategy = s))
-    this.getterSync('settings/play-again-enabled', (s) => (store.settings.playAgainEnabled = s))
-    this.getterSync('settings/auto-accept-enabled', (s) => (store.settings.autoAcceptEnabled = s))
-    this.getterSync(
-      'settings/auto-accept-delay-seconds',
-      (s) => (store.settings.autoAcceptDelaySeconds = s)
-    )
-    this.getterSync(
-      'settings/auto-search-match-enabled',
-      (s) => (store.settings.autoSearchMatchEnabled = s)
-    )
-    this.getterSync(
-      'settings/auto-search-match-delay-seconds',
-      (s) => (store.settings.autoSearchMatchDelaySeconds = s)
-    )
-    this.getterSync(
-      'settings/auto-search-match-minimum-members',
-      (s) => (store.settings.autoSearchMatchMinimumMembers = s)
-    )
-    this.getterSync(
-      'settings/auto-search-match-wait-for-invitees',
-      (s) => (store.settings.autoSearchMatchWaitForInvitees = s)
-    )
-    this.getterSync(
-      'settings/auto-search-match-rematch-strategy',
-      (s) => (store.settings.autoSearchMatchRematchStrategy = s)
-    )
-    this.getterSync(
-      'settings/auto-search-match-rematch-fixed-duration',
-      (s) => (store.settings.autoSearchMatchRematchFixedDuration = s)
-    )
-
     this.stateSync('state', store)
   }
 
   async setAutoHonorEnabled(value: boolean) {
-    return this.call('set-setting/auto-honor-enabled', value)
+    return this.call('set-setting', 'autoHonorEnabled', value)
   }
 
   async setAutoHonorStrategy(value: string) {
-    return this.call('set-setting/auto-honor-strategy', value)
+    return this.call('set-setting', 'autoHonorStrategy', value)
   }
 
   async setPlayAgainEnabled(value: boolean) {
-    return this.call('set-setting/play-again-enabled', value)
+    return this.call('set-setting', 'playAgainEnabled', value)
   }
 
   async setAutoAcceptEnabled(value: boolean) {
-    return this.call('set-setting/auto-accept-enabled', value)
+    return this.call('set-setting', 'autoAcceptEnabled', value)
   }
 
   async setAutoAcceptDelaySeconds(value: number) {
-    return this.call('set-setting/auto-accept-delay-seconds', value)
+    return this.call('set-setting', 'autoAcceptDelaySeconds', value)
   }
 
-  async setAutoSearchMatchEnabled(value: boolean) {
-    return this.call('set-setting/auto-search-match-enabled', value)
+  async setAutoMatchmakingEnabled(value: boolean) {
+    return this.call('set-setting', 'autoMatchmakingEnabled', value)
   }
 
-  async setAutoSearchMatchDelaySeconds(value: number) {
-    return this.call('set-setting/auto-search-match-delay-seconds', value)
+  async setAutoMatchmakingDelaySeconds(value: number) {
+    return this.call('set-setting', 'autoMatchmakingDelaySeconds', value)
   }
 
-  async setAutoSearchMatchMinimumMembers(value: number) {
-    return this.call('set-setting/auto-search-match-minimum-members', value)
+  async setAutoMatchmakingMinimumMembers(value: number) {
+    return this.call('set-setting', 'autoMatchmakingMinimumMembers', value)
   }
 
-  async setAutoSearchMatchWaitForInvitees(value: boolean) {
-    return this.call('set-setting/auto-search-match-wait-for-invitees', value)
+  async setAutoMatchmakingWaitForInvitees(value: boolean) {
+    return this.call('set-setting', 'autoMatchmakingWaitForInvitees', value)
   }
 
-  async setAutoSearchMatchRematchStrategy(value: string) {
-    return this.call('set-setting/auto-search-match-rematch-strategy', value)
+  async setAutoMatchmakingRematchStrategy(value: string) {
+    return this.call('set-setting', 'autoMatchmakingRematchStrategy', value)
   }
 
-  async setAutoSearchMatchRematchFixedDuration(value: number) {
-    return this.call('set-setting/auto-search-match-rematch-fixed-duration', value)
+  async setAutoMatchmakingRematchFixedDuration(value: number) {
+    return this.call('set-setting', 'autoMatchmakingRematchFixedDuration', value)
   }
 
   async cancelAutoAccept() {

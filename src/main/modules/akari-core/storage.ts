@@ -1,4 +1,3 @@
-import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 import { Metadata } from '@main/db/entities/Metadata'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
@@ -13,6 +12,7 @@ import path from 'node:path'
 import { DataSource, Equal, QueryRunner } from 'typeorm'
 
 import { AppLogger, LogModule } from './log'
+import { LeagueAkariModule } from '@main/akari-ipc/akari-module'
 
 interface EncounteredGameQueryDto {
   selfPuuid: string
@@ -308,7 +308,7 @@ export class SettingService {
   }
 }
 
-export class StorageModule extends MobxBasedBasicModule {
+export class StorageModule extends LeagueAkariModule {
   private _ds: DataSource
   private _logModule: LogModule
   private _logger: AppLogger

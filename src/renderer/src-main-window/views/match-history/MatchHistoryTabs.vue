@@ -30,9 +30,9 @@
           <div class="tab">
             <!-- 在进入游戏时，显示当前召唤师所选择的英雄的图标 -->
             <LcuImage
-              v-if="cf.ongoingChampionSelections?.[tab.id]"
+              v-if="cf.ongoingChampionSelections?.[tab.data.puuid]"
               class="tab-icon"
-              :src="championIconUrl(cf.ongoingChampionSelections?.[tab.id])"
+              :src="championIconUrl(cf.ongoingChampionSelections?.[tab.data.puuid])"
             />
             <LcuImage
               v-else-if="tab.data.summoner"

@@ -337,7 +337,12 @@
                 <div class="stat-item" v-if="frequentlyUsedChampions.length">
                   <span class="stat-item-label">英雄使用</span>
                   <div class="stat-item-content-champions">
-                    <NPopover v-for="c of frequentlyUsedChampions" :key="c.id" :delay="50">
+                    <NPopover
+                      v-for="c of frequentlyUsedChampions"
+                      :key="c.id"
+                      :delay="50"
+                      :keep-alive-on-hover="false"
+                    >
                       <template #trigger>
                         <div class="champion-slot">
                           <LcuImage
