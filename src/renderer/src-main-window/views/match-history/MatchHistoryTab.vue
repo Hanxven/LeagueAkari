@@ -484,7 +484,7 @@ const gameData = useGameDataStore()
 const app = useAppStore()
 
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
-  mh.setMatchHistoryExpand(tab.id, gameId, expand)
+  mhm.setMatchHistoryExpand(tab.id, gameId, expand)
 }
 
 const isShowingRankedModal = ref(false)

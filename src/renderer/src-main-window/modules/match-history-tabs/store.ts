@@ -3,7 +3,6 @@ import { SavedPlayerInfo } from '@renderer-shared/modules/core-functionality/sto
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
-import { GameRelationship, MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
 
@@ -46,6 +45,8 @@ export interface SummonerTabMatchHistory {
 
   /** 每页战绩的数量 */
   pageSize: number
+
+  source: 'sgp' | 'lcu' | 'none'
 
   queueFilter: number | string
 }
@@ -97,67 +98,10 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
     tabs
   } = useTabs<TabState>()
 
-  /** 创建一个新的 Tab 并自动进行初始化操作 */
-  const createTab = (unionId: string, options: { setCurrent?: boolean; pin?: boolean } = {}) => {
-    const tab = get(unionId)
-    if (tab) {
-      if (options.setCurrent) {
-        setCurrent(unionId)
-      }
-      return
-    }
-
-    // TODO 合并此文件内容到 Module, 重构之
-    const [sgpServerId, puuid] = unionId.split('/')
-
-    const newTab: TabState = {
-      puuid,
-      sgpServerId,
-      matchHistory: {
-        games: [],
-        _gamesMap: {},
-        page: 1,
-        pageSize: 20,
-        lastUpdate: Date.now(),
-        queueFilter: -1
-      },
-      detailedGamesCache: markRaw(new Map()),
-      loading: {
-        isLoadingSummoner: false,
-        isLoadingMatchHistory: false,
-        isLoadingRankedStats: false
-      }
-    }
-
-    add(unionId, newTab, options)
-
-    if (options.setCurrent) {
-      setCurrent(unionId)
-    }
-  }
-
-  const setMatchHistoryExpand = (unionId: string, gameId: number, expand: boolean) => {
-    const tab = get(unionId)
-
-    if (tab) {
-      const match = tab.data.matchHistory._gamesMap[gameId]
-      if (match) {
-        match.isExpanded = expand
-      }
-    }
-  }
-
-  const setQueueFilter = (puuid: string, queue: number) => {
-    const tab = get(puuid)
-    if (tab) {
-      tab.data.matchHistory.queueFilter = queue
-    }
-  }
-
   return {
     tabs,
     currentTab: current,
-    createTab,
+    addTab: add,
     getTab: get,
     closeTab: del,
     moveTab: move,
@@ -169,8 +113,6 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
     canCloseCurrentTab: canCloseCurrent,
     closeOtherTabs: closeOther,
     closeAllTemporaryTabs: closeAllTemporary,
-    closeAllTabs: closeAll,
-    setQueueFilter,
-    setMatchHistoryExpand
+    closeAllTabs: closeAll
   }
 })

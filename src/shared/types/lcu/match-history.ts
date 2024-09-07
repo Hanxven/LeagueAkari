@@ -54,7 +54,7 @@ export interface Participant {
   participantId: number
   spell1Id: number
   spell2Id: number
-  stats: Stats
+  stats: Stats & SgpFields
   teamId: number
   timeline: Timeline
 }
@@ -195,6 +195,26 @@ export interface Stats {
   wardsPlaced: number
   win: boolean
   playerSubteamId: number
+}
+
+// 如果当前的战绩数据是从 SGP 转换得到的, 那么会有这些字段
+interface SgpFields {
+  individualPosition: string
+  lane: string
+  teamPosition: string
+  pushPings: number
+  visionClearedPings: number
+  allInPings: number
+  assistMePings: number
+  basicPings: number
+  commandPings: number
+  dangerPings: number
+  enemyMissingPings: number
+  enemyVisionPings: number
+  getBackPings: number
+  holdPings: number
+  needVisionPings: number
+  onMyWayPings: number
 }
 
 export interface ParticipantIdentity {

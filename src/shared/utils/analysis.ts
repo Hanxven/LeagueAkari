@@ -921,7 +921,7 @@ export function calculateAkariScore(analyses: {
   champions: Record<number, MatchHistoryChampionAnalysis>
 }): AkariScore {
   const kdaScore = Math.sqrt(analyses.summary.averageKda) * 0.68
-  const winRateScore = (analyses.summary.winRate - 0.5) * 16
+  const winRateScore = (analyses.summary.winRate - 0.5) * 6
   const dmgScore = analyses.summary.averageDamageShareToTop * 10.0
   const dmgTakenScore = analyses.summary.averageDamageTakenShareToTop * 6.0
   const csScore =

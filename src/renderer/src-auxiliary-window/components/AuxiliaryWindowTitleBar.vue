@@ -69,10 +69,6 @@ const handlePin = (b: boolean) => {
 const route = useRoute()
 const router = useRouter()
 
-watchEffect(() => {
-  console.log(route)
-})
-
 const shortcuts = [
   {
     label: 'OP.GG',

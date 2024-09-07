@@ -221,7 +221,7 @@ watch(
     if (tab) {
       mh.setCurrentTab(unionId)
     } else {
-      mh.createTab(unionId, {
+      mhm.createTab(unionId, {
         setCurrent: true,
         pin: summoner.me?.puuid === r.puuid // 庆幸的是，puuid 是唯一的
       })

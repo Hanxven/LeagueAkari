@@ -1,4 +1,3 @@
-import { EMPTY_PUUID } from '@shared/constants/common'
 import { LeagueAkariRendererModule } from '@renderer-shared/akari-ipc/renderer-akari-module'
 import { getGame, getMatchHistory } from '@renderer-shared/http-api/match-history'
 import { getRankedStats } from '@renderer-shared/http-api/ranked'
@@ -12,13 +11,14 @@ import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summon
 import { StorageRendererModule } from '@renderer-shared/modules/storage'
 import { laNotification } from '@renderer-shared/notification'
 import { getPlayerAccountNameset } from '@renderer-shared/rc-http-api/rc-api'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import { MatchHistory } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { AxiosError } from 'axios'
 import { computed, markRaw, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { MatchHistoryGameTabCard, useMatchHistoryTabsStore } from './store'
+import { MatchHistoryGameTabCard, TabState, useMatchHistoryTabsStore } from './store'
 
 /**
  * 仅适用于主窗口战绩页面的渲染端模块
@@ -96,7 +96,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           if (mh.getTab(unionId)) {
             mh.setTabPinned(unionId, true)
           } else {
-            mh.createTab(unionId, { pin: true })
+            this.createTab(unionId, { pin: true })
             this.fetchTabFullData(unionId)
           }
         }
@@ -374,6 +374,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
         )
 
         let matchHistory: MatchHistory
+        let matchHistorySource: 'sgp' | 'lcu' = 'lcu'
         if (this._isCrossRegion(sgpServerId)) {
           if (!eds.sgpAvailability.supportedSgpServers.servers[sgpServerId]) {
             throw new Error('Unsupported sgp server')
@@ -386,6 +387,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
             queueFilter === -1 ? undefined : `q_${queueFilter}`,
             sgpServerId
           )
+          matchHistorySource = 'sgp'
 
           matchHistory.games.games.forEach((g) => {
             tab.data.detailedGamesCache.set(g.gameId, markRaw(g))
@@ -399,6 +401,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
               queueFilter === -1 ? undefined : `q_${queueFilter}`,
               sgpServerId
             )
+            matchHistorySource = 'sgp'
 
             matchHistory.games.games.forEach((g) => {
               tab.data.detailedGamesCache.set(g.gameId, markRaw(g))
@@ -425,7 +428,8 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           page,
           pageSize,
           lastUpdate: Date.now(),
-          queueFilter
+          queueFilter,
+          source: matchHistorySource
         }
 
         // 用于快速查找
@@ -601,6 +605,68 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
 
   toUnionId(sgpServerId: string, puuid: string) {
     return `${sgpServerId}/${puuid}`
+  }
+
+  /** 创建一个新的 Tab 并自动进行初始化操作 */
+  createTab(unionId: string, options: { setCurrent?: boolean; pin?: boolean } = {}) {
+    const store = useMatchHistoryTabsStore()
+
+    const tab = store.getTab(unionId)
+    if (tab) {
+      if (options.setCurrent) {
+        store.setCurrentTab(unionId)
+      }
+      return
+    }
+
+    const [sgpServerId, puuid] = unionId.split('/')
+
+    const newTab: TabState = {
+      puuid,
+      sgpServerId,
+      matchHistory: {
+        games: [],
+        source: 'none',
+        _gamesMap: {},
+        page: 1,
+        pageSize: 20,
+        lastUpdate: Date.now(),
+        queueFilter: -1
+      },
+      detailedGamesCache: markRaw(new Map()),
+      loading: {
+        isLoadingSummoner: false,
+        isLoadingMatchHistory: false,
+        isLoadingRankedStats: false
+      }
+    }
+
+    store.addTab(unionId, newTab, options)
+
+    if (options.setCurrent) {
+      store.setCurrentTab(unionId)
+    }
+  }
+
+  setMatchHistoryExpand(unionId: string, gameId: number, expand: boolean) {
+    const store = useMatchHistoryTabsStore()
+    const tab = store.getTab(unionId)
+
+    if (tab) {
+      const match = tab.data.matchHistory._gamesMap[gameId]
+      if (match) {
+        match.isExpanded = expand
+      }
+    }
+  }
+
+  setQueueFilter(puuid: string, queue: number) {
+    const store = useMatchHistoryTabsStore()
+    const tab = store.getTab(puuid)
+
+    if (tab) {
+      tab.data.matchHistory.queueFilter = queue
+    }
   }
 }
 
