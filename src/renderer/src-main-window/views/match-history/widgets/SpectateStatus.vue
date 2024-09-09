@@ -1,18 +1,22 @@
 <template>
   <div class="wrapper" v-if="data">
     <div class="queue">
-      <span>
-        进行中 ·
-        {{
-          gameData.queues[data.game.gameQueueConfigId]?.name || data.game.gameQueueConfigId
-        }}</span
-      >
+      <div class="ongoing-indicator"></div>
+      <div class="queue-name">
+        {{ gameData.queues[data.game.gameQueueConfigId]?.name || data.game.gameQueueConfigId }}
+      </div>
       <NButton
         class="launch-spectator"
         size="tiny"
         @click="handleSpectate"
         :disabled="!isSpectatorAvailable || !canSpectate"
-        >拉起观战</NButton
+      >
+        <template #icon>
+          <NIcon>
+            <PlayCircleFilledIcon />
+          </NIcon>
+        </template>
+        观战</NButton
       >
     </div>
     <div class="time">
@@ -24,7 +28,7 @@
     <DefineTeamSide v-slot="{ bans, players, name, id }">
       <div class="team">
         <div class="team-name">
-          <span>{{ name }}</span>
+          <span v-if="name">{{ name }}</span>
           <div class="bans" v-if="bans && bans.length">
             <span class="bans-hint">禁用</span>
             <LcuImage
@@ -52,11 +56,14 @@
               @click="() => emits('toSummoner', player.puuid)"
               :class="{ self: player.puuid === puuid }"
             >
-              {{
+              <span class="name">{{
                 updatedSummonerInfo[player.puuid]
-                  ? `${updatedSummonerInfo[player.puuid].gameName}#${updatedSummonerInfo[player.puuid].tagLine}`
+                  ? updatedSummonerInfo[player.puuid].gameName
                   : player.summonerName
-              }}
+              }}</span>
+              <span v-if="updatedSummonerInfo[player.puuid]" class="tag"
+                >#{{ updatedSummonerInfo[player.puuid].tagLine }}</span
+              >
             </div>
           </div>
         </div>
@@ -82,14 +89,14 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { externalDataSourceRendererModule as edsm } from '@renderer-shared/modules/external-data-source'
 import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
 import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { getPlayerAccountAlias, getPlayerAccountNameset } from '@renderer-shared/rc-http-api/rc-api'
+import { getPlayerAccountNameset } from '@renderer-shared/rc-http-api/rc-api'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
+import { PlayCircleFilled as PlayCircleFilledIcon } from '@vicons/material'
 import { createReusableTemplate, useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import dayjs from 'dayjs'
-import { NButton } from 'naive-ui'
+import { NButton, NIcon } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
@@ -129,6 +136,14 @@ const teams = computed(() => {
       team1: {
         id: 0,
         name: '全体',
+        players: data.game.teamOne
+      }
+    }
+  } else if (data.game.gameMode === 'TFT') {
+    return {
+      team1: {
+        id: 0,
+        name: '',
         players: data.game.teamOne
       }
     }
@@ -207,13 +222,41 @@ const handleSpectate = () => {
 }
 
 .queue {
-  font-size: 14px;
-  font-weight: bold;
   display: flex;
   align-items: center;
 
-  .launch-spectator {
-    margin-left: auto;
+  .ongoing-indicator {
+    width: 8px;
+    height: 8px;
+    background-color: #00ff00;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: indicator-pulse 4s infinite;
+  }
+
+  .queue-name {
+    font-size: 14px;
+    font-weight: bold;
+    flex: 1;
+    width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // .launch-spectator {
+  // }
+}
+
+@keyframes indicator-pulse {
+  0% {
+    box-shadow: 0 0 0 0 #00ff0066;
+  }
+  20% {
+    box-shadow: 0 0 0 10px #00ff0000;
+  }
+  100% {
+    box-shadow: 0 0 0 0 #00ff0000;
   }
 }
 
@@ -286,9 +329,14 @@ const handleSpectate = () => {
   .player-name {
     margin-left: 4px;
     font-size: 12px;
-    color: #d6d6d6;
     transition: filter 0.2s;
     cursor: pointer;
+
+    .tag {
+      font-size: 11px;
+      color: #858585;
+      margin-left: 2px;
+    }
 
     &.self {
       font-weight: bold;

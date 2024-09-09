@@ -113,7 +113,7 @@
       <NTable size="small" bordered>
         <tbody>
           <tr>
-            <td style="width: 50px">端口</td>
+            <td style="width: 80px">端口</td>
             <td><CopyableText :text="lc.auth?.port ?? '-'" /></td>
           </tr>
           <tr>
@@ -142,6 +142,18 @@
                   ? regionText[lc.auth.region] || lc.auth.region
                   : lc.auth?.region || '-'
               }}</CopyableText>
+            </td>
+          </tr>
+          <tr v-if="cf.settings.useSgpApi">
+            <td>SGP Server</td>
+            <td>
+              <CopyableText>
+                {{
+                  eds.sgpAvailability.supportedSgpServers.servers[
+                    eds.sgpAvailability.currentSgpServerId
+                  ].server
+                }}</CopyableText
+              >
             </td>
           </tr>
         </tbody>
@@ -183,6 +195,8 @@ import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { appRendererModule as am } from '@renderer-shared/modules/app'
 import { useAppStore } from '@renderer-shared/modules/app/store'
+import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
+import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { mainWindowRendererModule as mwm } from '@renderer-shared/modules/main-window'
@@ -214,6 +228,8 @@ const gameflow = useGameflowStore()
 const app = useAppStore()
 const debug = useDebugStore()
 const lc = useLcuConnectionStore()
+const eds = useExternalDataSourceStore()
+const cf = useCoreFunctionalityStore()
 
 const gameflowText = {
   Matchmaking: '正在匹配',

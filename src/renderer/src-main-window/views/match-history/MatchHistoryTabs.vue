@@ -15,7 +15,7 @@
           @mouseup="(event) => handleMouseUp(event, tab.id)"
           @contextmenu="(event) => handleShowMenu(event, tab.id)"
           :key="tab.id"
-          :tab="tabNames[tab.id]"
+          :tab="tab.id"
           :name="tab.id"
           :closable="tab.data.puuid !== summoner.me?.puuid"
           :draggable="true"
@@ -39,9 +39,13 @@
               class="tab-icon"
               :src="tab.data.summoner ? profileIconUrl(tab.data.summoner.profileIconId) : undefined"
             />
-            <span class="tab-title" :class="{ 'temporary-tab': tab.isTemporary }">{{
-              tabNames[tab.id]
-            }}</span>
+            <span class="tab-title-region-name" v-if="tabNames[tab.id]?.regionText">[{{
+              tabNames[tab.id].regionText
+            }}]</span>
+            <span class="tab-title-game-name">{{ tabNames[tab.id].gameName }}</span>
+            <span class="tab-title-tag-line" v-if="tabNames[tab.id]?.tagLine"
+              >#{{ tabNames[tab.id].tagLine }}</span
+            >
             <NIcon
               v-if="
                 tab.data.puuid !== summoner.me?.puuid && tab.data.summoner?.privacy === 'PRIVATE'
@@ -174,7 +178,14 @@ const matchHistoryRoute = computed(() => {
 })
 
 const tabNames = computed(() => {
-  const nameMap: Record<string, string> = {}
+  const nameMap: Record<
+    string,
+    {
+      gameName: string
+      tagLine: string | null
+      regionText: string | null
+    }
+  > = {}
 
   // 统计是否只有一种 sgpServerId
   const sgpServerIds = new Set<string>()
@@ -190,7 +201,11 @@ const tabNames = computed(() => {
       const n = summonerName(tab.data.summoner.gameName, tab.data.summoner.tagLine)
 
       if (onlyOneType) {
-        nameMap[tab.id] = n
+        nameMap[tab.id] = {
+          gameName: tab.data.summoner.gameName,
+          tagLine: tab.data.summoner.tagLine,
+          regionText: null
+        }
         return
       }
 
@@ -198,11 +213,19 @@ const tabNames = computed(() => {
       const { sgpServerId } = mhm.parseUnionId(tab.id)
       const s = rsoPlatformText[sgpServerId] || sgpServerId
 
-      nameMap[tab.id] = `${n} [${s}]`
+      nameMap[tab.id] = {
+        gameName: tab.data.summoner.gameName,
+        tagLine: tab.data.summoner.tagLine,
+        regionText: s
+      }
       return
     }
 
-    nameMap[tab.id] = tab.id
+    nameMap[tab.id] = {
+      gameName: tab.id,
+      tagLine: null,
+      regionText: null
+    }
   })
 
   return nameMap
@@ -437,9 +460,18 @@ const handleShowMenu = (e: PointerEvent, puuid: string) => {
   height: 0;
 }
 
+:deep(.n-tabs-tab.n-tabs-tab--active) {
+  .tab-title-tag-line {
+    margin-left: 4px;
+    font-size: 13px;
+    color: var(--n-tab-text-color-active);
+  }
+}
+
 .tab {
   display: flex;
   align-items: center;
+  line-height: normal;
 
   .tab-icon {
     width: 16px;
@@ -447,22 +479,29 @@ const handleShowMenu = (e: PointerEvent, puuid: string) => {
     border-radius: 2px;
   }
 
-  .tab-title {
+  .tab-title-region-name {
     margin-left: 4px;
     font-size: 13px;
+  }
+
+  .tab-title-game-name {
+    margin-left: 4px;
+    font-size: 13px;
+    font-weight: bold;
+  }
+
+  .tab-title-tag-line {
+    margin-left: 4px;
+    font-size: 13px;
+    color: #a8a8a8;
   }
 
   .privacy-private-icon {
     position: relative;
     top: 1px;
-    font-size: 12px;
+    font-size: 13px;
     margin-left: 4px;
     color: rgb(206, 52, 52);
-  }
-
-  .temporary-tab {
-    font-style: italic;
-    filter: brightness(0.9);
   }
 }
 
