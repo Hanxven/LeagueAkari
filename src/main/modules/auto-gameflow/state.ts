@@ -28,6 +28,8 @@ class AutoGameflowSettings {
   autoMatchmakingMinimumMembers = 1 // 最低满足人数
   autoMatchmakingWaitForInvitees: boolean = true // 等待邀请中的用户
 
+  dodgeAtLastSecondThreshold: number = 2
+
   setAutoHonorEnabled(enabled: boolean) {
     this.autoHonorEnabled = enabled
   }
@@ -70,6 +72,10 @@ class AutoGameflowSettings {
 
   setAutoMatchmakingRematchFixedDuration(seconds: number) {
     this.autoMatchmakingRematchFixedDuration = seconds
+  }
+
+  setDodgeAtLastSecondThreshold(threshold: number) {
+    this.dodgeAtLastSecondThreshold = threshold
   }
 
   constructor() {

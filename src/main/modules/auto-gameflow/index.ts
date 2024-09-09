@@ -44,11 +44,6 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   static PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT = 10000
   static PLAY_AGAIN_BUFFER_TIMEOUT = 1575
 
-  /**
-   * 虽说是一秒，但考虑到服务器延迟，实际上这里用 2 秒
-   */
-  static DODGE_MS_BEFORE_GAME_START = 2000
-
   constructor() {
     super('auto-gameflow')
   }
@@ -95,7 +90,8 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       'settings.autoMatchmakingRematchFixedDuration',
       'settings.autoMatchmakingRematchStrategy',
       'settings.autoMatchmakingWaitForInvitees',
-      'settings.playAgainEnabled'
+      'settings.playAgainEnabled',
+      'settings.dodgeAtLastSecondThreshold'
     ])
   }
 
@@ -144,6 +140,10 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       {
         key: 'autoMatchmakingRematchFixedDuration',
         defaultValue: this.state.settings.autoMatchmakingRematchFixedDuration
+      },
+      {
+        key: 'dodgeAtLastSecondThreshold',
+        defaultValue: this.state.settings.dodgeAtLastSecondThreshold
       }
     ])
 
@@ -182,16 +182,27 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       'autoMatchmakingRematchFixedDuration',
       defaultSetter
     )
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'dodgeAtLastSecondThreshold',
+      async (key, value, apply) => {
+        if (value < 0) {
+          value = 0
+        }
+
+        this.state.settings.setDodgeAtLastSecondThreshold(value)
+        await apply(key, value)
+      }
+    )
 
     this.onSettingChange<Paths<typeof this.state.settings>>(
       'autoAcceptEnabled',
-      (key, value, apply) => {
+      async (key, value, apply) => {
         if (!value) {
           this.cancelAutoAccept('normal')
         }
 
         this.state.settings.setAutoAcceptEnabled(value)
-        return apply(key, value)
+        await apply(key, value)
       }
     )
   }
@@ -621,8 +632,8 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     )
   }
 
-  private _adjustDodgeTimer(msLeft: number) {
-    const dodgeIn = Math.max(msLeft - AutoGameflowModule.DODGE_MS_BEFORE_GAME_START, 0)
+  private _adjustDodgeTimer(msLeft: number, threshold: number) {
+    const dodgeIn = Math.max(msLeft - threshold * 1e3, 0)
     this._logger.info(`时间校正：将在 ${dodgeIn} ms 后秒退`)
     this._dodgeTask.start(dodgeIn)
     this.state.setDodgeAt(Date.now() + dodgeIn)
@@ -645,14 +656,20 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     )
 
     this.reaction(
-      () => [this._lcu.champSelect.session?.timer, this.state.willDodgeAtLastSecond] as const,
-      ([timer, enabled]) => {
+      () =>
+        [
+          this._lcu.champSelect.session?.timer,
+          this.state.willDodgeAtLastSecond,
+          this.state.settings.dodgeAtLastSecondThreshold
+        ] as const,
+      ([timer, enabled, threshold]) => {
         if (timer && enabled) {
           if (timer.phase === 'FINALIZATION') {
-            this._adjustDodgeTimer(timer.adjustedTimeLeftInPhase)
+            this._adjustDodgeTimer(timer.adjustedTimeLeftInPhase, threshold)
           }
         }
-      }
+      },
+      { equals: comparer.shallow }
     )
   }
 }

@@ -73,6 +73,10 @@ export class AutoGameflowRendererModule extends StateSyncModule {
   async setDodgeAtLastSecond(value: boolean) {
     return this.call('set-dodge-at-last-second', value)
   }
+
+  async setDodgeAtLastSecondThreshold(value: number) {
+    return this.call('set-setting', 'dodgeAtLastSecondThreshold', value)
+  }
 }
 
 export const autoGameflowRendererModule = new AutoGameflowRendererModule()

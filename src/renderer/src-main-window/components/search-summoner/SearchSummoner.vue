@@ -62,7 +62,7 @@
         size="small"
       >
         {{
-          isCrossServer
+          isCrossRegion
             ? '输入召唤师名称或 PUUID，开始精确搜索'
             : '输入召唤师名称、ID 或 PUUID，开始精确搜索'
         }}
@@ -159,7 +159,7 @@ const sgpServerOptions = computed(() => {
 })
 
 // 跨区查询需要额外步骤
-const isCrossServer = computed(() => {
+const isCrossRegion = computed(() => {
   if (eds.sgpAvailability.currentRegion === 'TENCENT') {
     return eds.sgpAvailability.currentRsoPlatform !== currentSgpServer.value
   }
@@ -184,7 +184,7 @@ const isTagNeeded = computed(() => {
     return false
   }
 
-  if (!isCrossServer.value && !isNumeric(inputText.value)) {
+  if (!isCrossRegion.value && !isNumeric(inputText.value)) {
     const [name, tag] = resolveSummonerName(inputText.value)
     if (!name || !tag) {
       return true
@@ -214,7 +214,7 @@ const handleSearch = async () => {
             const [name, tag] = resolveSummonerName(type.value)
 
             try {
-              if (isCrossServer.value) {
+              if (isCrossRegion.value) {
                 const a = await getPlayerAccountAlias(name, tag)
                 const p = await edsm.sgp.getSummonerLcuFormat(a.puuid, currentSgpServer.value)
                 p.gameName = a.alias.game_name
@@ -249,7 +249,7 @@ const handleSearch = async () => {
       tasks.push(
         (async () => {
           try {
-            if (isCrossServer.value) {
+            if (isCrossRegion.value) {
               const summoner = await edsm.sgp.getSummonerLcuFormat(
                 type.value,
                 currentSgpServer.value

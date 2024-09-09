@@ -2,7 +2,7 @@
   <!-- <OngoingGameNew /> -->
   <!-- <ChampionIcon :champion-id="4" /> -->
   <div style="width: 256px">
-    <SpectateStatus />
+    <!-- <SpectateStatus /> -->
   </div>
 </template>
 

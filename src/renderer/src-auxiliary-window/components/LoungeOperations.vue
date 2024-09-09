@@ -23,7 +23,7 @@
                   : formatDelayText(agf.settings.autoMatchmakingDelaySeconds)
               }})</span
             >
-            <NIcon class="icon" ref="auto-matchmaking">
+            <NIcon class="icon">
               <ExpandMoreSharpIcon />
             </NIcon>
           </div>
@@ -76,9 +76,8 @@ import { autoGameflowRendererModule as am } from '@renderer-shared/modules/auto-
 import { useAutoGameflowStore } from '@renderer-shared/modules/auto-gameflow/store'
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { ExpandMoreSharp as ExpandMoreSharpIcon } from '@vicons/material'
-import { useElementHover } from '@vueuse/core'
 import { NCard, NFlex, NIcon, NInputNumber, NPopover, NSwitch } from 'naive-ui'
-import { computed, useTemplateRef, watchEffect } from 'vue'
+import { computed } from 'vue'
 
 const agf = useAutoGameflowStore()
 const gameflow = useGameflowStore()
@@ -97,13 +96,6 @@ const formatDelayText = (d: number) => {
   }
   return `${d.toFixed(1)} s`
 }
-
-const mEl = useTemplateRef('auto-matchmaking')
-const isMElHover = useElementHover(() => mEl.value?.$el)
-
-watchEffect(() => {
-  console.log(isMElHover.value)
-})
 </script>
 
 <style scoped lang="less">

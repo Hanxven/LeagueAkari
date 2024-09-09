@@ -474,7 +474,6 @@ export class SgpEds {
       const { data } = await this._sgp.getSpectatorGameflowByPuuid(sgpServerId, puuid)
       return data
     } catch (error) {
-      this._edsm.logger.warn(`获取观战信息失败: ${formatError(error)}`)
       throw error
     }
   }

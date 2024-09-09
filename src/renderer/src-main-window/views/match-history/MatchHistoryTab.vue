@@ -122,7 +122,7 @@
               class="square-button"
               title="标记"
               @click="() => handleTagPlayer()"
-              v-if="!isSelf"
+              v-if="!isSelf && isInSameRegion"
             >
               <template #icon>
                 <NIcon><EditIcon /></NIcon>
@@ -179,9 +179,7 @@
             :options="pageSizeOptions"
           ></NSelect>
           <NSelect
-            v-if="
-              cf.settings.useSgpApi || eds.sgpAvailability.currentSgpServerId !== tab.sgpServerId
-            "
+            v-if="isMustUseSgpApi"
             size="small"
             :value="tab.matchHistory.queueFilter"
             style="width: 160px"
@@ -259,8 +257,16 @@
                 <div class="left-content-item-content">{{ tab.savedInfo.tag }}</div>
               </NScrollbar>
             </div>
+            <div class="left-content-item" v-if="isMustUseSgpApi && spectatorData">
+              <SpectateStatus
+                :data="spectatorData"
+                :puuid="tab.puuid"
+                @to-summoner="(puuid) => handleToSummoner(puuid)"
+                @launch-spectator="handleLaunchSpectator"
+              />
+            </div>
             <div class="left-content-item" v-if="analysis.matchHistory">
-              <div class="left-content-item-title">总览 (本页)</div>
+              <div class="left-content-item-title">总览</div>
               <div class="left-content-item-content">
                 <div class="stat-item" v-if="app.settings.isInKyokoMode" title="Akari's insight">
                   <span class="stat-item-label">Akari Score</span>
@@ -415,12 +421,17 @@
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { appRendererModule as am } from '@renderer-shared/modules/app'
 import { useAppStore } from '@renderer-shared/modules/app/store'
 import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
+import { externalDataSourceRendererModule as edsm } from '@renderer-shared/modules/external-data-source'
 import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
 import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
+import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { leagueClientRendererModule as lcm } from '@renderer-shared/modules/league-client'
 import { laNotification } from '@renderer-shared/notification'
+import { SpectatorData } from '@shared/data-sources/sgp/types'
 import {
   analyzeMatchHistory,
   analyzeMatchHistoryPlayers,
@@ -434,7 +445,7 @@ import {
   NavigateBeforeOutlined as NavigateBeforeOutlinedIcon,
   NavigateNextOutlined as NavigateNextOutlinedIcon
 } from '@vicons/material'
-import { useMediaQuery } from '@vueuse/core'
+import { useIntervalFn, useMediaQuery } from '@vueuse/core'
 import {
   NButton,
   NIcon,
@@ -443,9 +454,10 @@ import {
   NPopover,
   NScrollbar,
   NSelect,
-  NSpin
+  NSpin,
+  useNotification
 } from 'naive-ui'
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
@@ -453,11 +465,30 @@ import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-h
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import RankedDisplay from './widgets/RankedDisplay.vue'
+import SpectateStatus from './widgets/SpectateStatus.vue'
 
 const { isSelf = false, tab } = defineProps<{
   tab: TabState & { id: string }
   isSelf?: boolean
 }>()
+
+const isMustUseSgpApi = computed(() => {
+  return cf.settings.useSgpApi || eds.sgpAvailability.currentSgpServerId !== tab.sgpServerId
+})
+
+const lc = useLcuConnectionStore()
+
+const isInSameRegion = computed(() => {
+  if (!lc.auth) {
+    return false
+  }
+
+  if (lc.auth.region === 'TENCENT') {
+    return lc.auth.rsoPlatformId === tab.sgpServerId
+  }
+
+  return lc.auth.region === tab.sgpServerId
+})
 
 // 1182px - is same in which defined in CSS
 const isSmallScreen = useMediaQuery(`(max-width: 1182px)`)
@@ -508,6 +539,7 @@ const handleRefresh = async () => {
   try {
     await mhm.fetchTabFullData(tab.id)
     scrollToRightElTop()
+    updateSpectatorData()
   } catch {
     laNotification.warn('召唤师信息', `无法拉取用户 ${tab.id} 的信息`)
   }
@@ -690,6 +722,68 @@ const handleMainContentScroll = (e: Event) => {
 
 const shouldShowTinyHeader = computed(() => mainContentScrollTop.value > SHOW_TINY_HEADER_THRESHOLD)
 
+// 从这里开始, 将逐渐移除对全局状态的依赖
+const UPDATE_SPECTATOR_DATA_INTERVAL = 120 * 1000 // 2 分钟
+const spectatorData = shallowRef<SpectatorData | null>(null)
+const updateSpectatorData = async () => {
+  if (!isMustUseSgpApi.value) {
+    return
+  }
+
+  try {
+    const data = await edsm.sgp.getSpectatorGameflow(tab.puuid, tab.sgpServerId)
+    spectatorData.value = data
+  } catch (error) {
+    if ((error as Error).name === 'AxiosError' && (error as any).response?.status === 404) {
+      spectatorData.value = null
+      return
+    }
+
+    am.logger.warn(`获取观战数据失败: ${tab.puuid} ${tab.sgpServerId}`, error)
+  }
+}
+const { resume: resumeSpectator, pause: pauseSpectator } = useIntervalFn(
+  updateSpectatorData,
+  UPDATE_SPECTATOR_DATA_INTERVAL,
+  { immediateCallback: true }
+)
+
+watch(
+  () => isMustUseSgpApi.value,
+  (use) => {
+    if (use) {
+      resumeSpectator()
+    } else {
+      pauseSpectator()
+    }
+  },
+  { immediate: true }
+)
+
+const notification = useNotification()
+
+const handleLaunchSpectator = async () => {
+  try {
+    await lcm.launchSpectator({
+      locale: 'zh_CN',
+      puuid: tab.puuid,
+      region: tab.sgpServerId
+    })
+    notification.success({
+      title: '观战',
+      content: '已调起进程。注意，调起观战可能会出现黑屏情况，若长时间黑屏，届时请手动结束进程',
+      duration: 4000
+    })
+  } catch (error) {
+    notification.warning({
+      title: '观战',
+      content: `无法调起客户端进程: ${(error as Error).message}`,
+      duration: 4000
+    })
+    am.logger.warn(`无法调起客户端进程: ${(error as Error).message}`, error)
+  }
+}
+
 // workaround: KeepAlive 下 Naive UI 滚动条复位问题
 watch(
   () => mh.currentTab?.id,
@@ -831,7 +925,7 @@ defineExpose({
   .left-content-item-title {
     font-size: 16px;
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
   }
 
   .left-content-item-content {
@@ -960,7 +1054,7 @@ defineExpose({
   gap: 8px;
 
   &:not(:last-child) {
-    margin-bottom: 2px;
+    margin-bottom: 4px;
   }
 
   .stat-item-label {
@@ -1016,6 +1110,7 @@ defineExpose({
 
   .name-and-tag {
     display: flex;
+    align-items: flex-end;
     cursor: pointer;
   }
 

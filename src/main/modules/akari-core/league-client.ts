@@ -3,11 +3,13 @@ import {
   RegisteredSettingHandler
 } from '@main/akari-ipc/mobx-based-basic-module'
 import { Paths } from '@shared/utils/types'
+import { spawn } from 'child_process'
 import { set } from 'lodash'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
 import { queryUxCommandLine, queryUxCommandLineNative } from '../../utils/ux-cmd'
+import { ExternalDataSourceModule } from '../external-data-source'
 import { AppModule } from './app'
 import { LcuConnectionModule } from './lcu-connection'
 import { AppLogger, LogModule } from './log'
@@ -42,6 +44,12 @@ class LcuClientSettings {
   }
 }
 
+export interface LaunchSpectatorConfig {
+  locale?: string
+  region: string
+  puuid: string
+}
+
 export class LeagueClientModule extends MobxBasedBasicModule {
   public settings = new LcuClientSettings()
 
@@ -49,6 +57,7 @@ export class LeagueClientModule extends MobxBasedBasicModule {
   private _appModule: AppModule
   private _lcm: LcuConnectionModule
   private _pm: PlatformModule
+  private _eds: ExternalDataSourceModule
 
   static LEAGUE_CLIENT_UX_PROCESS_NAME = 'LeagueClientUx.exe'
   static LEAGUE_GAME_CLIENT_PROCESS_NAME = 'League of Legends.exe'
@@ -66,6 +75,7 @@ export class LeagueClientModule extends MobxBasedBasicModule {
     this._appModule = this.manager.getModule('app')
     this._lcm = this.manager.getModule('lcu-connection')
     this._pm = this.manager.getModule('win-platform')
+    this._eds = this.manager.getModule('external-data-source')
 
     await this._setupSettings()
     this._setupStateSync()
@@ -76,7 +86,10 @@ export class LeagueClientModule extends MobxBasedBasicModule {
   }
 
   private async _setupStateSync() {
-    this.propSync('settings', this.settings, ['fixWindowMethodAOptions', 'terminateGameClientOnAltF4'])
+    this.propSync('settings', this.settings, [
+      'fixWindowMethodAOptions',
+      'terminateGameClientOnAltF4'
+    ])
   }
 
   private async _setupSettings() {
@@ -135,6 +148,10 @@ export class LeagueClientModule extends MobxBasedBasicModule {
     this.onCall('terminate-game-client', () => {
       this._terminateGameClient()
     })
+
+    this.onCall('launch-spectator', (config: LaunchSpectatorConfig) => {
+      return this._launchSpectator(config)
+    })
   }
 
   private _handleTerminateGameClientOnAltF4() {
@@ -171,6 +188,48 @@ export class LeagueClientModule extends MobxBasedBasicModule {
         toolkit.terminateProcess(pid)
       }, LeagueClientModule.TERMINATE_DELAY)
     })
+  }
+
+  private async _launchSpectator(config: LaunchSpectatorConfig) {
+    const {
+      playerCredentials: { observerServerIp, observerServerPort, observerEncryptionKey, gameId }
+    } = await this._eds.sgp.getSpectatorGameflow(config.puuid, config.region)
+
+    if (!this._lcm.lcuHttp) {
+      throw new Error('LCU not connected')
+    }
+
+    const { data: installDir } = await this._lcm.lcuHttp.request<{
+      gameExecutablePath: string
+      gameInstallRoot: string
+    }>({
+      url: '/lol-patch/v1/products/league_of_legends/install-location',
+      method: 'GET'
+    })
+
+    // 调起进程但不与其关联
+    const p = spawn(
+      installDir.gameExecutablePath,
+      [
+        `spectator ${observerServerIp}:${observerServerPort} ${observerEncryptionKey} ${gameId} ${config.region}`,
+        `-GameBaseDir=${installDir.gameInstallRoot}`,
+        `-Locale=${config.locale || 'zh-CN'}`
+      ],
+      {
+        cwd: installDir.gameInstallRoot,
+        detached: true
+      }
+    )
+
+    p.unref()
+
+    // p.stdout.on('data', (data) => {
+    //   console.log(data.toString())
+    // })
+
+    // p.stderr.on('data', (data) => {
+    //   console.log(data.toString())
+    // })
   }
 
   getLaunchedClients() {

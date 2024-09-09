@@ -35,6 +35,10 @@ export class LeagueClientRendererModule extends StateSyncModule {
     return this.call('set-setting', 'terminateGameClientOnAltF4', value)
   }
 
+  launchSpectator(config: { locale?: string; region: string; puuid: string }) {
+    return this.call('launch-spectator', config)
+  }
+
   terminateGameClient() {
     return this.call('terminate-game-client')
   }

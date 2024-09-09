@@ -23,6 +23,18 @@
         @update:value="(val) => agfm.setDodgeAtLastSecond(val)"
       />
     </NFlex>
+    <NFlex align="center" class="control-item" v-if="!isCustomGame">
+      <span class="label" style="flex: 1">最后一秒秒退阈值</span>
+      <NInputNumber
+        size="tiny"
+        :min="0"
+        :max="10"
+        :step="0.1"
+        style="width: 80px"
+        :value="agf.settings.dodgeAtLastSecondThreshold"
+        @update:value="(val) => agfm.setDodgeAtLastSecondThreshold(val || 2)"
+      />
+    </NFlex>
     <NFlex align="center" v-if="!isBenchMode" class="control-item">
       <span class="label" style="flex: 1">自动选择</span>
       <NSwitch
@@ -60,8 +72,8 @@ import { useAutoSelectStore } from '@renderer-shared/modules/auto-select/store'
 import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
-import { NButton, NCard, NFlex, NPopconfirm, NSwitch } from 'naive-ui'
-import { computed } from 'vue'
+import { NButton, NCard, NFlex, NInputNumber, NPopconfirm, NSwitch, useMessage } from 'naive-ui'
+import { computed, watchEffect } from 'vue'
 
 const gameflow = useGameflowStore()
 const as = useAutoSelectStore()
@@ -99,6 +111,18 @@ const dodgeAtLastSecondLabelText = computed(() => {
   }
 
   return '最后一秒秒退'
+})
+
+const message = useMessage()
+
+let isShownWarning = false
+watchEffect(() => {
+  if (agf.settings.dodgeAtLastSecondThreshold <= 1.5 && !isShownWarning) {
+    isShownWarning = true
+    message.warning(
+      `过低的阈值 (${agf.settings.dodgeAtLastSecondThreshold.toFixed(1)} s) 可能会导致秒退失败`
+    )
+  }
 })
 </script>
 

@@ -510,6 +510,7 @@ const emits = defineEmits<{
   box-sizing: border-box;
   font-size: 12px;
   color: rgb(159, 159, 159);
+  gap: 2px;
 
   .mode {
     font-weight: bold;
@@ -585,6 +586,7 @@ const emits = defineEmits<{
     align-items: center;
     justify-content: center;
     width: 100px;
+    gap: 2px;
   }
 
   .kda {
