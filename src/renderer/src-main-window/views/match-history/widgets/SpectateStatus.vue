@@ -5,19 +5,44 @@
       <div class="queue-name">
         {{ gameData.queues[data.game.gameQueueConfigId]?.name || data.game.gameQueueConfigId }}
       </div>
-      <NButton
-        class="launch-spectator"
-        size="tiny"
-        @click="handleSpectate"
-        :disabled="!isSpectatorAvailable || !canSpectate"
-      >
-        <template #icon>
-          <NIcon>
-            <PlayCircleFilledIcon />
-          </NIcon>
+      <NPopover :disabled="isCrossRegion">
+        <template #trigger>
+          <NButton
+            class="launch-spectator"
+            size="tiny"
+            @click="() => handleSpectate(false)"
+            :disabled="!isSpectatorAvailable || !canSpectate"
+          >
+            <template #icon>
+              <NIcon>
+                <PlayCircleFilledIcon />
+              </NIcon>
+            </template>
+            观战</NButton
+          >
         </template>
-        观战</NButton
-      >
+        <ControlItem label="使用 LCU API 观战 (可选)" :label-width="240">
+          <template #labelDescription>
+            <div>使用 LCU API 调起同大区观战流程，而非通过进程调用</div>
+            <div class="warn-text" v-if="gameflow.phase !== 'None'">
+              使用 LCU API 观战需要退出房间到空闲状态，当前不是空闲状态。请先退出房间
+            </div>
+          </template>
+          <NButton
+            class="launch-spectator"
+            size="tiny"
+            @click="() => handleSpectate(true)"
+            :disabled="!isSpectatorAvailable || !canSpectate || gameflow.phase !== 'None'"
+          >
+            <template #icon>
+              <NIcon>
+                <PlayCircleFilledIcon />
+              </NIcon>
+            </template>
+            LCU API 观战</NButton
+          >
+        </ControlItem>
+      </NPopover>
     </div>
     <div class="time">
       于 {{ dayjs(data.playerCredentials.gameCreateDate).format('MM-DD HH:mm:ss') }} 开始 ({{
@@ -88,22 +113,24 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
 import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { getPlayerAccountNameset } from '@renderer-shared/rc-http-api/rc-api'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
 import { PlayCircleFilled as PlayCircleFilledIcon } from '@vicons/material'
 import { createReusableTemplate, useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import dayjs from 'dayjs'
-import { NButton, NIcon } from 'naive-ui'
+import { NButton, NIcon, NPopover } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
 
 const emits = defineEmits<{
   toSummoner: [puuid: string]
-  launchSpectator: [puuid: string]
+  launchSpectator: [puuid: string, byLcuApi: boolean]
 }>()
 
 const [DefineTeamSide, TeamSide] = createReusableTemplate<{
@@ -113,7 +140,12 @@ const [DefineTeamSide, TeamSide] = createReusableTemplate<{
   id: number
 }>()
 
-const { data, puuid } = defineProps<{
+const {
+  data,
+  puuid,
+  isCrossRegion = false
+} = defineProps<{
+  isCrossRegion?: boolean
   puuid: string
   data: SpectatorData
 }>()
@@ -125,6 +157,8 @@ const canSpectate = computed(() => {
 const isTftMode = computed(() => {
   return data.game.gameMode === 'TFT'
 })
+
+const gameflow = useGameflowStore()
 
 const teams = computed(() => {
   if (!data) {
@@ -209,10 +243,10 @@ const { start } = useTimeoutFn(() => {
 
 // 防 呆 设 计
 const isSpectatorAvailable = ref(true)
-const handleSpectate = () => {
+const handleSpectate = (byLcuApi: boolean) => {
   isSpectatorAvailable.value = false
   start()
-  emits('launchSpectator', puuid)
+  emits('launchSpectator', puuid, byLcuApi)
 }
 </script>
 
@@ -368,5 +402,9 @@ const handleSpectate = () => {
   color: #d6d6d6;
   text-align: center;
   margin-top: 8px;
+}
+
+.warn-text {
+  color: yellow;
 }
 </style>

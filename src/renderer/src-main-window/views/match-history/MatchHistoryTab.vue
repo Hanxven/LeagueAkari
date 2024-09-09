@@ -257,8 +257,9 @@
                 <div class="left-content-item-content">{{ tab.savedInfo.tag }}</div>
               </NScrollbar>
             </div>
-            <div class="left-content-item" v-if="isMustUseSgpApi && spectatorData">
+            <div class="left-content-item" v-if="!isSelf && isMustUseSgpApi && spectatorData">
               <SpectateStatus
+                :is-cross-region="!isInSameRegion"
                 :data="spectatorData"
                 :puuid="tab.puuid"
                 @to-summoner="(puuid) => handleToSummoner(puuid)"
@@ -421,6 +422,7 @@
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { launchSpectator } from '@renderer-shared/http-api/spectator'
 import { appRendererModule as am } from '@renderer-shared/modules/app'
 import { useAppStore } from '@renderer-shared/modules/app/store'
 import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
@@ -762,18 +764,27 @@ watch(
 
 const notification = useNotification()
 
-const handleLaunchSpectator = async () => {
+const handleLaunchSpectator = async (_: string, byLcuApi: boolean) => {
   try {
-    await lcm.launchSpectator({
-      locale: 'zh_CN',
-      puuid: tab.puuid,
-      region: tab.sgpServerId
-    })
-    notification.success({
-      title: '观战',
-      content: '已调起进程。注意，调起观战可能会出现黑屏情况，若长时间黑屏，届时请手动结束进程',
-      duration: 4000
-    })
+    if (byLcuApi) {
+      await launchSpectator(tab.puuid)
+      notification.success({
+        title: '观战',
+        content: '已调起观战流程',
+        duration: 4000
+      })
+    } else {
+      await lcm.launchSpectator({
+        locale: 'zh_CN',
+        puuid: tab.puuid,
+        region: tab.sgpServerId
+      })
+      notification.success({
+        title: '观战',
+        content: '已调起进程。注意，调起观战可能会出现黑屏情况，若长时间黑屏，届时请手动结束进程',
+        duration: 4000
+      })
+    }
   } catch (error) {
     notification.warning({
       title: '观战',
