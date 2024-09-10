@@ -22,7 +22,11 @@ import {
 import { formatError } from '@shared/utils/errors'
 import { summonerName } from '@shared/utils/name'
 import { cancellableSleep, sleep } from '@shared/utils/sleep'
-import { calculateTogetherTimes, removeSubsets } from '@shared/utils/team-up-calc'
+import {
+  calculateTogetherTimes,
+  removeOverlappingSubsets,
+  removeSubsets
+} from '@shared/utils/team-up-calc'
 import { Paths } from '@shared/utils/types'
 import dayjs from 'dayjs'
 import { set } from 'lodash'
@@ -186,14 +190,15 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           Array.from(this.state.tempDetailedGames.values()),
           Array.from(this.state.ongoingPlayers.values()).map((p) => p.summoner),
           this.state.ongoingTeams,
-          this.state.queryState
+          this.state.queryState,
+          this.state.settings.preMadeTeamThreshold
         ] as const,
       () => {
         const result = this._analyzeTeamUp()
         if (result && this.state.queryState !== 'unavailable') {
           runInAction(() => (this.state.ongoingPreMadeTeams = result))
         } else {
-          runInAction(() => (this.state.ongoingPreMadeTeams = []))
+          runInAction(() => (this.state.ongoingPreMadeTeams = {}))
         }
       },
       { delay: 500 }
@@ -567,19 +572,24 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       .forEach((t) => texts.push(t))
 
     if (this.state.settings.sendKdaInGameWithPreMadeTeams) {
-      const subTeams = this.state.ongoingPreMadeTeams.filter((t) => {
-        if (teamSide === 'our') {
-          return t.team && t.team === selfTeam
-        } else {
-          return t.team && t.team !== selfTeam
-        }
-      })
+      const theirTeamKey = Object.keys(this.state.ongoingTeams).find((t) => t !== selfTeam)
 
-      const teamName = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+      if (teamSide === 'their' && !theirTeamKey) {
+        this._isSimulatingKeyboard = false
+        return
+      }
+
+      const subTeams =
+        teamSide === 'our'
+          ? this.state.ongoingPreMadeTeams[selfTeam]
+          : this.state.ongoingPreMadeTeams[theirTeamKey || 'akari~akari~'] // as empty key to dodge the error
+
+      const teamNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
       if (subTeams.length) {
         for (let i = 0; i < subTeams.length; i++) {
-          const identities = subTeams[i].players.map((p) => {
+          const group = subTeams[i]
+          const identities = group.map((p) => {
             return (
               this._lcu.gameData.champions[this.state.ongoingChampionSelections![p]]?.name ||
               this.state.ongoingPlayers[p]?.summoner?.gameName ||
@@ -589,7 +599,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           })
 
           texts.push(
-            `开黑${subTeams.length === 1 ? '' : '小队'}${subTeams.length === 1 ? '' : teamName[i] || i} ${identities.join(' ')}`
+            `开黑${subTeams.length === 1 ? '' : '小队'}${subTeams.length === 1 ? '' : teamNames[i] || i} ${identities.join(' ')}`
           )
         }
       }
@@ -704,7 +714,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
     const matches = Array.from(teamSides).map(([id /* sideId */, players]) => ({ id, players }))
 
-    // result 即为最终计算的组队情况，之后使用 `removeSubsets` 进行进一步化简，移除一些可能不关心的结果
+    // key: teamSide, values: { players: string[], times: number }[]
     const result = Object.entries(this.state.ongoingTeams).reduce(
       (obj, [team, teamPlayers]) => {
         obj[team] = calculateTogetherTimes(
@@ -724,14 +734,15 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       >
     )
 
-    const teams: { players: string[]; times: number; team: string; _id: number }[] = []
+    // teamSide -> players[][]
+    const combinedGroups: Record<string, string[][]> = {}
 
-    Object.entries(result).forEach(([team, preMade]) => {
-      teams.push(...preMade.map((t, i) => ({ ...t, team, _id: i })))
-    })
+    for (const [team, playerGroups] of Object.entries(result)) {
+      const groups = playerGroups.map((pg) => pg.players)
+      combinedGroups[team] = removeOverlappingSubsets(groups) as string[][]
+    }
 
-    // 去除一些不关心的子集，虽然这些子集可能具有更多的共同场次
-    return removeSubsets(teams, (team) => team.players)
+    return combinedGroups
   }
 
   private async _loadPlayerStats(

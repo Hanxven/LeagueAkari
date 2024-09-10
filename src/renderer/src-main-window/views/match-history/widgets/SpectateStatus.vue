@@ -86,7 +86,7 @@
                   ? updatedSummonerInfo[player.puuid].gameName
                   : player.summonerName
               }}</span>
-              <span v-if="updatedSummonerInfo[player.puuid]" class="tag"
+              <span v-if="updatedSummonerInfo[player.puuid]" class="tag-line"
                 >#{{ updatedSummonerInfo[player.puuid].tagLine }}</span
               >
             </div>
@@ -363,10 +363,10 @@ const handleSpectate = (byLcuApi: boolean) => {
   .player-name {
     margin-left: 4px;
     font-size: 12px;
-    transition: filter 0.2s;
+    transition: filter 0.3s;
     cursor: pointer;
 
-    .tag {
+    .tag-line {
       font-size: 11px;
       color: #858585;
       margin-left: 2px;

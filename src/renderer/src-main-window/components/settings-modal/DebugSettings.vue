@@ -144,7 +144,7 @@
               }}</CopyableText>
             </td>
           </tr>
-          <tr v-if="cf.settings.useSgpApi">
+          <tr v-if="cf.settings.useSgpApi && eds.sgpAvailability.currentSgpServerSupported">
             <td>SGP Server</td>
             <td>
               <CopyableText>

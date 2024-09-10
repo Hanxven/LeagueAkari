@@ -99,14 +99,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     gameId: number
   } | null>(null)
 
-  const ongoingPreMadeTeams = ref<
-    {
-      players: number[]
-      times: number
-      team: string
-      _id: number
-    }[]
-  >([])
+  const ongoingPreMadeTeams = shallowRef<Record<string, string[][]>>({})
 
   const sendList = ref<Record<string, boolean>>({})
 

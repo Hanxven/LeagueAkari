@@ -82,6 +82,51 @@ export class TeamUpGraph {
   }
 }
 
+type ElementKey = number | string
+
+/**
+ * 😡💢
+ */
+export class UnionFind {
+  private parent: Map<ElementKey, ElementKey>
+  private rank: Map<ElementKey, number>
+
+  constructor(elements: ElementKey[]) {
+    this.parent = new Map()
+    this.rank = new Map()
+    elements.forEach((element) => {
+      this.parent.set(element, element)
+      this.rank.set(element, 0)
+    })
+  }
+
+  find(element: ElementKey): ElementKey {
+    if (this.parent.get(element) !== element) {
+      this.parent.set(element, this.find(this.parent.get(element)!))
+    }
+    return this.parent.get(element)!
+  }
+
+  union(x: ElementKey, y: ElementKey) {
+    let rootX = this.find(x)
+    let rootY = this.find(y)
+
+    if (rootX !== rootY) {
+      let rankX = this.rank.get(rootX)!
+      let rankY = this.rank.get(rootY)!
+
+      if (rankX > rankY) {
+        this.parent.set(rootY, rootX)
+      } else if (rankX < rankY) {
+        this.parent.set(rootX, rootY)
+      } else {
+        this.parent.set(rootY, rootX)
+        this.rank.set(rootX, rankX + 1)
+      }
+    }
+  }
+}
+
 export function combinations(nums: string[]): string[][] {
   const res: string[][] = []
   _backtrack(nums, [], 0, res)
@@ -175,7 +220,7 @@ function isSuperset(set: Set<string>, subset: Set<string>) {
   return true
 }
 
-export function removeSubsets<T>(objects: T[], getter: (element: T) => (number | string)[]): T[] {
+export function removeSubsets<T>(objects: T[], getter: (element: T) => ElementKey[]): T[] {
   const sets = objects.map((obj) => new Set(getter(obj)))
 
   return objects.filter((_object, index) => {
@@ -189,4 +234,29 @@ export function removeSubsets<T>(objects: T[], getter: (element: T) => (number |
       return Array.from(currentSet).every((element) => otherSet.has(element))
     })
   })
+}
+
+export function removeOverlappingSubsets(keys: ElementKey[][]): ElementKey[][] {
+  const elements = new Set<ElementKey>()
+  keys.forEach((k) => k.forEach((el) => elements.add(el)))
+  const uf = new UnionFind(Array.from(elements))
+
+  keys.forEach((k) => {
+    for (let i = 0; i < k.length; i++) {
+      for (let j = i + 1; j < k.length; j++) {
+        uf.union(k[i], k[j])
+      }
+    }
+  })
+
+  const unionMap = new Map<ElementKey, Set<ElementKey>>()
+  keys.forEach((k) => {
+    const root = uf.find(k[0])
+    if (!unionMap.has(root)) {
+      unionMap.set(root, new Set<ElementKey>())
+    }
+    k.forEach((el) => unionMap.get(root)!.add(el))
+  })
+
+  return Array.from(unionMap.values()).map((set) => Array.from(set))
 }

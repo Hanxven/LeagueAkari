@@ -1,75 +1,14 @@
 <template>
   <div class="player-card">
-    <div class="profile">
-      <PositionBottom class="profile-position" />
-      <LcuImage class="profile-image" :src="championIconUrl(4)" />
-      <div class="profile-name">
-        <span class="game-name">泉此方 x 柊镜</span>
-        <span class="tag-line">#Kagami</span>
-      </div>
-    </div>
-    <div class="tags">
-      <div class="tag">10 连胜</div>
-      <div class="tag">标记的玩家</div>
-      <div class="tag">生涯不公开</div>
-      <div class="tag">3.48 KDA</div>
-    </div>
-    <div class="ranked-stats">
-      <div class="ranked-solo">
-        <span class="label">单双排位</span>
-        <div class="rank">
-          <img class="rank-medal" :src="rankedMedalMap['MASTER']" />
-          <span class="rank-name">海之眷顾 II</span>
+    <div class="player-info">
+      <div class="champion"></div>
+      <div class="name-group">
+        <div class="name-tag">
+          <span class="name">测试名称测试名称测试</span>
+          <span class="tag-line">#12345</span>
         </div>
+
       </div>
-      <div class="ranked-flex">
-        <span class="label">灵活排位</span>
-        <div class="rank">
-          <img class="rank-medal" :src="rankedMedalMap['MASTER']" />
-          <span class="rank-name">经验修补 III</span>
-        </div>
-      </div>
-    </div>
-    <div class="mastery">
-      <span class="mastery-label">高成就点</span>
-      <div class="mastery-items">
-        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
-        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
-        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
-        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
-        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
-        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
-        <LcuImage class="mastery-image" :src="championIconUrl(4)" />
-      </div>
-    </div>
-    <div class="recently-used-champions">
-      <span class="r-label">近期使用</span>
-      <div class="r-champions">
-        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
-        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
-        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
-        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
-        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
-        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
-        <LcuImage class="r-champion-image" :src="championIconUrl(4)" />
-      </div>
-    </div>
-    <div class="match-history">
-      <NVirtualList :items="items" style="height: 100%" :item-size="30">
-        <template #default="{ item }">
-          <div
-            class="match-history-item"
-            style="height: 28px; background-color: red; margin-bottom: 2px"
-          >
-            <LcuImage class="image" :src="championIconUrl(1)" />
-            <div style="width: 56px">
-              <div class="mode">测试模式</div>
-              <div class="time">03 26 一</div>
-            </div>
-            <span class="k-d-a">1/3/4</span>
-          </div>
-        </template>
-      </NVirtualList>
     </div>
     <!-- <div class="charts">
       <Radar :data="data" :options="options" />
@@ -186,157 +125,55 @@ const items = Array.from({ length: 100 }, (_, i) => ({
 .player-card {
   display: flex;
   flex-direction: column;
-  background-color: rgba(45, 104, 57, 0.429);
   box-sizing: border-box;
-  padding: 4px;
+  padding: 8px;
+  width: 240px;
+  height: 360px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  border: 1px dashed white;
 }
 
-.profile {
-  position: relative;
+.player-info {
   display: flex;
-  width: 100%;
 
-  .profile-position {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    bottom: 0px;
-    left: 8px;
+  .champion {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: #fff;
+    margin-right: 8px;
   }
 
-  .profile-name {
+  .name-group {
     display: flex;
-    margin-left: 4px;
-    align-items: flex-end;
+    flex-direction: column;
     flex: 1;
     width: 0;
 
-    .game-name {
-      font-size: 12px;
-      color: #fff;
+    .name-tag {
       overflow: hidden;
-      white-space: nowrap;
       text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: filter 0.3s;
+      cursor: pointer;
+
+      &:hover {
+        filter: brightness(1.2);
+      }
+    }
+
+    .name {
+      font-weight: bold;
+      font-size: 13px;
+      color: #e8e8e8;
     }
 
     .tag-line {
-      font-size: 11px;
-      color: #adadad;
-      margin-left: 4px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
-
-  .profile-image {
-    width: 24px;
-    height: 24px;
-  }
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  margin-top: 4px;
-
-  background-color: rgb(37, 103, 49);
-
-  .tag {
-    display: flex;
-    font-size: 10px;
-    background-color: rgb(145, 90, 39);
-    border-radius: 2px;
-    padding: 0 4px;
-  }
-}
-
-.ranked-stats {
-  display: flex;
-  margin-top: 4px;
-  gap: 2px;
-
-  .ranked-solo,
-  .ranked-flex {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 2px;
-  }
-
-  .label {
-    font-size: 11px;
-    color: #b3b3b3;
-  }
-
-  .rank {
-    display: flex;
-    align-items: center;
-    font-size: 12px;
-    color: #fff;
-
-    .rank-medal {
-      width: 16px;
-      height: 16px;
-      margin-right: 2px;
-    }
-
-    .rank-name {
       font-size: 12px;
-      color: #d3d3d3;
-      font-weight: bold;
+      color: #999;
+      margin-left: 4px;
     }
-  }
-}
-
-.mastery {
-  display: flex;
-  align-items: center;
-  margin-top: 4px;
-
-  .mastery-label {
-    font-size: 12px;
-    color: #d3d3d3;
-    margin-right: 4px;
-    vertical-align: middle;
-    flex: 1;
-  }
-
-  .mastery-items {
-    display: flex;
-    gap: 2px;
-  }
-
-  .mastery-image {
-    width: 18px;
-    height: 18px;
-  }
-}
-
-.recently-used-champions {
-  display: flex;
-  align-items: center;
-  margin-top: 4px;
-
-  .r-label {
-    font-size: 12px;
-    color: #d3d3d3;
-    margin-right: 4px;
-    vertical-align: middle;
-    flex: 1;
-  }
-
-  .r-champions {
-    display: flex;
-    gap: 2px;
-  }
-
-  .r-champion-image {
-    width: 18px;
-    height: 18px;
   }
 }
 
@@ -345,58 +182,5 @@ const items = Array.from({ length: 100 }, (_, i) => ({
   width: 100%;
   height: 0;
   justify-content: center;
-}
-
-.match-history {
-  flex: 1;
-  width: 100%;
-  height: 0;
-  margin-top: 4px;
-
-  .match-history-item {
-    display: flex;
-    align-items: center;
-    padding: 0 2px;
-    border-radius: 2px;
-    margin-right: 2px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-    .image {
-      height: 24px;
-      width: 24px;
-      margin-right: 4px;
-    }
-
-    .mode,
-    .time {
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-      font-size: 10px;
-      line-height: 12px;
-    }
-
-    .k-d-a {
-      font-size: 12px;
-      margin-left: 4px;
-    }
-  }
-
-  .match-history-item:hover {
-    filter: brightness(1.1);
-  }
-
-  .match-history-item.win {
-    background-color: rgba(46, 148, 47, 0.2);
-  }
-
-  .match-history-item.lose {
-    background-color: rgba(188, 53, 41, 0.2);
-  }
-
-  .match-history-item.remake {
-    background-color: rgba(255, 255, 255, 0.114);
-  }
 }
 </style>

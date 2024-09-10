@@ -177,12 +177,7 @@ export class CoreFunctionalityState {
   // 用于临时对局分析的游戏详情图
   tempDetailedGames = observable(new Map<number, Game>(), { deep: false })
 
-  ongoingPreMadeTeams: {
-    players: string[]
-    times: number
-    team: string
-    _id: number
-  }[] = []
+  ongoingPreMadeTeams: Record<string, string[][]> = {}
 
   get ongoingGameInfo() {
     if (!lcu.gameflow.session) {
@@ -313,7 +308,7 @@ export class CoreFunctionalityState {
   clearOngoingVars() {
     this.ongoingPlayers.clear()
     this.tempDetailedGames.clear()
-    this.ongoingPreMadeTeams = []
+    this.ongoingPreMadeTeams = {}
     this.ongoingPlayerAnalysis = null
     this.sendList = {}
     this.isWaitingForDelay = false

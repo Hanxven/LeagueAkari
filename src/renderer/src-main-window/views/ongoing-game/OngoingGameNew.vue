@@ -2,18 +2,6 @@
   <div class="ongoing-game-page">
     <NScrollbar x-scrollable>
       <div class="inner-container">
-        <div class="ongoing-header">
-          <NSelect
-            placeholder="队列"
-            style="width: 160px"
-            size="small"
-            :options="queueOptions"
-          ></NSelect>
-          <NRadioGroup class="view-type-btn-group" size="small" v-model:value="viewType">
-            <NRadioButton value="match-history">战绩</NRadioButton>
-            <NRadioButton value="chart">图表</NRadioButton>
-          </NRadioGroup>
-        </div>
         <div class="team-5x5">
           <PlayerInfoCardNew class="team-player-card" />
           <PlayerInfoCardNew class="team-player-card" />
@@ -74,14 +62,11 @@ const queueOptions = ref([
   height: 100%;
 }
 
-// 维持每个卡片元素的偶数宽度，= 4 * gap + 5 * 1fr
-@container-width: 1016px;
-
 .inner-container {
   position: relative;
   height: 100%;
-  width: @container-width;
   margin: 0 auto;
+  width: fit-content;
 
   .content {
     display: flex;
@@ -103,14 +88,8 @@ const queueOptions = ref([
 
 .team-5x5 {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-top: 4px;
   gap: 4px;
-
-  .team-player-card {
-    flex: 1;
-    height: 340px;
-    width: 0;
-  }
 }
 </style>

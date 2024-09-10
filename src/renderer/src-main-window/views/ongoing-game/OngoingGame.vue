@@ -54,7 +54,7 @@
         <OngoingTeam :team="team" :participants="teamPlayers" />
       </NCard>
       <NCard
-        v-if="cf.ongoingPreMadeTeams.length"
+        v-if="preMadeTeamArr.length"
         style="background-color: transparent; margin-bottom: 12px"
         size="small"
       >
@@ -62,7 +62,7 @@
         <div class="pre-made-team">
           <div
             class="group"
-            v-for="g of cf.ongoingPreMadeTeams"
+            v-for="g of preMadeTeamArr"
             :class="{
               blue: g.team === '100',
               red: g.team === '200',
@@ -70,8 +70,7 @@
             }"
           >
             <div class="team-side">
-              {{ formatTeamText(g.team) }} ({{ g.times }}
-              场对局)
+              {{ formatTeamText(g.team) }}
             </div>
             <div class="players">
               <div v-for="p of g.players" class="image-name-line">
@@ -297,6 +296,28 @@ const teams = computed(() => {
   })
 
   return teamsWithPlayers
+})
+
+const preMadeTeamArr = computed(() => {
+  if (!Object.keys(cf.ongoingPreMadeTeams).length) {
+    return []
+  }
+
+  const arr: { team: string; players: string[] }[] = []
+  Object.entries(cf.ongoingPreMadeTeams).forEach(([team, groups]) => {
+    if (!groups.length) {
+      return
+    }
+
+    groups.forEach((g) => {
+      arr.push({
+        team,
+        players: g
+      })
+    })
+  })
+
+  return arr
 })
 
 const [DefineOngoingTeam, OngoingTeam] = createReusableTemplate<{
