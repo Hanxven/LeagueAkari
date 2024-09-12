@@ -1,14 +1,15 @@
 import { LeagueAkariModuleManager } from '@main/akari-ipc/main-module-manager'
 
-import { appModule } from './akari-core/app'
-import { autoUpdateModule } from './akari-core/auto-update'
-import { auxWindowModule } from './akari-core/auxiliary-window'
-import { lcuConnectionModule } from './akari-core/lcu-connection'
-import { leagueClientModule } from './akari-core/league-client'
-import { logModule } from './akari-core/log'
-import { mainWindowModule } from './akari-core/main-window'
-import { winPlatformModule } from './akari-core/platform'
-import { storageModule } from './akari-core/storage'
+import { appModule } from './app'
+import { autoUpdateModule } from './auto-update'
+import { auxWindowModule } from './auxiliary-window'
+import { lcuConnectionModule } from './lcu-connection'
+import { leagueClientModule } from './league-client'
+import { logModule } from './log'
+import { mainWindowModule } from './main-window'
+import { settingsMigrateModule } from './settings-migrate'
+import { winPlatformModule } from './win-platform'
+import { storageModule } from './storage'
 import { autoGameflowModule } from './auto-gameflow'
 import { autoReplyModule } from './auto-reply'
 import { autoSelectModule } from './auto-select'
@@ -32,6 +33,7 @@ export async function setupLeagueAkariModules() {
   manager.use(mainWindowModule)
   manager.use(auxWindowModule)
   manager.use(lcuConnectionModule)
+  manager.use(settingsMigrateModule)
 
   // functionality modules
   manager.use(lcuSyncModule)

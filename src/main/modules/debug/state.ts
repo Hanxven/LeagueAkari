@@ -22,5 +22,3 @@ export class DebugState {
     makeAutoObservable(this)
   }
 }
-
-export const debugState = new DebugState()

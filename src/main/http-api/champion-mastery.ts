@@ -1,4 +1,4 @@
-import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
 import { PlayerChampionMastery } from '@shared/types/lcu/champion-mastery'
 
 // 在 sgp 层面，返回结果是全量的，即使指定了 count 参数

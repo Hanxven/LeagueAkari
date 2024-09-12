@@ -21,7 +21,7 @@ import {
 } from '@shared/utils/analysis'
 import { formatError } from '@shared/utils/errors'
 import { summonerName } from '@shared/utils/name'
-import { cancellableSleep, sleep } from '@shared/utils/sleep'
+import { sleep } from '@shared/utils/sleep'
 import { calculateTogetherTimes, removeOverlappingSubsets } from '@shared/utils/team-up-calc'
 import { Paths } from '@shared/utils/types'
 import dayjs from 'dayjs'
@@ -29,11 +29,11 @@ import { set } from 'lodash'
 import { comparer, computed, observable, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
 
-import { LcuConnectionModule } from '../akari-core/lcu-connection'
-import { LeagueClientModule } from '../akari-core/league-client'
-import { AppLogger, LogModule } from '../akari-core/log'
-import { MainWindowModule } from '../akari-core/main-window'
-import { PlatformModule } from '../akari-core/platform'
+import { LcuConnectionModule } from '../lcu-connection'
+import { LeagueClientModule } from '../league-client'
+import { AppLogger, LogModule } from '../log'
+import { MainWindowModule } from '../main-window'
+import { PlatformModule } from '../win-platform'
 import { ExternalDataSourceModule } from '../external-data-source'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { CoreFunctionalityState } from './state'
@@ -115,7 +115,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this.reaction(
       () => this.state.queryState,
       (s) => {
-        this._logger.info(`当前对局分析查询阶段: ${s}`)
+        this._logger.info(`当前对局分析查询阶段: ${JSON.stringify(s)}`)
       }
     )
   }
@@ -130,7 +130,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           this.state.settings.useSgpApi
         ] as const,
       async ([state, s, queueFilter, useSgpApi]) => {
-        if (state === 'unavailable' || !s) {
+        if (state.phase === 'unavailable' || !s) {
           this.sendEvent('clear/ongoing-players')
           this.state.clearOngoingVars()
           this._controller?.abort()
@@ -142,35 +142,20 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           this._controller = new AbortController()
         }
 
-        let queue = -1
+        let queue = queueFilter
         if (
-          useSgpApi &&
-          queueFilter &&
-          CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(queueFilter)
+          queue === -1 &&
+          state.gameInfo &&
+          CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(state.gameInfo.queueId)
         ) {
-          queue = queueFilter
+          queue = state.gameInfo.queueId
         }
 
         try {
-          if (state === 'champ-select') {
-            try {
-              // 15 毫秒的阈值
-              if (this.state.settings.delaySecondsBeforeLoading > 0.015) {
-                this.state.setWaitingForDelay(true)
-                await cancellableSleep(
-                  this.state.settings.delaySecondsBeforeLoading * 1e3,
-                  this._controller.signal
-                )
-              }
-            } catch {
-              /* the error type can only be AbortError */
-              return
-            } finally {
-              this.state.setWaitingForDelay(false)
-            }
-            await this._champSelectQuery(this._controller.signal, queue)
-          } else if (state === 'in-game') {
-            await this._inGameQuery(this._controller.signal, queue)
+          if (state.phase === 'champ-select') {
+            await this._champSelectQuery(this._controller.signal, queue, useSgpApi)
+          } else if (state.phase === 'in-game') {
+            await this._inGameQuery(this._controller.signal, queue, useSgpApi)
           }
         } catch (error) {
           this._mwm.notify.warn('core-functionality', '对局中', '无法加载对局中信息')
@@ -191,7 +176,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         ] as const,
       () => {
         const result = this._analyzeTeamUp()
-        if (result && this.state.queryState !== 'unavailable') {
+        if (result && this.state.queryState.phase !== 'unavailable') {
           runInAction(() => (this.state.ongoingPreMadeTeams = result))
         } else {
           runInAction(() => (this.state.ongoingPreMadeTeams = {}))
@@ -204,12 +189,13 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this.reaction(
       () =>
         [
+          Array.from(this.state.tempDetailedGames.values()),
           Array.from(this.state.ongoingPlayers.values()).map((p) => p.matchHistory),
           this.state.ongoingTeams,
           this.state.queryState
         ] as const,
-      ([_, teams, qs]) => {
-        if (qs === 'unavailable') {
+      ([_, __, teams, qs]) => {
+        if (qs.phase === 'unavailable') {
           runInAction(() => (this.state.ongoingPlayerAnalysis = null))
           return
         }
@@ -305,7 +291,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this.reaction(
       () => this.state.queryState,
       (s) => {
-        if (s === 'unavailable') {
+        if (s.phase === 'unavailable') {
           this._tagSendQueuedPlayers.clear()
           this._tagRemindingQueue.clear()
         }
@@ -404,7 +390,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         return
       }
 
-      if (this.state.queryState === 'in-game' && !this._lcm2.isGameClientForeground()) {
+      if (this.state.queryState.phase === 'in-game' && !this._lcm2.isGameClientForeground()) {
         return
       }
 
@@ -432,7 +418,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
   }
 
   private async _sendPlayerStatsInGame(teamSide: 'our' | 'their') {
-    if (!this.state.settings.sendKdaInGame || this.state.queryState === 'unavailable') {
+    if (!this.state.settings.sendKdaInGame || this.state.queryState.phase === 'unavailable') {
       return
     }
 
@@ -606,7 +592,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       return
     }
 
-    if (this.state.queryState === 'champ-select') {
+    if (this.state.queryState.phase === 'champ-select') {
       if (this._lcu.chat.conversations.championSelect) {
         for (let i = 0; i < texts.length; i++) {
           tasks.push(() => chatSend(this._lcu.chat.conversations.championSelect!.id, texts[i]))
@@ -616,7 +602,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           }
         }
       }
-    } else if (this.state.queryState === 'in-game') {
+    } else if (this.state.queryState.phase === 'in-game') {
       for (let i = 0; i < texts.length; i++) {
         tasks.push(async () => {
           this._pm.sendKey(13, true)
@@ -745,11 +731,12 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     signal: AbortSignal,
     puuid: string,
     queueFilter?: number,
+    useSgpApi = false,
     retries = 2
   ) {
     if (!this.state.ongoingPlayers.has(puuid)) {
       runInAction(() =>
-        this.state.ongoingPlayers.set(puuid, observable({ puuid }, {}, { deep: false }))
+        this.state.ongoingPlayers.set(puuid, observable({ puuid, useSgpApi }, {}, { deep: false }))
       )
       this.sendEvent('create/ongoing-player', puuid)
     }
@@ -793,7 +780,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           rsoPlatformId: auth.rsoPlatformId,
           selfPuuid: me.puuid,
           puuid: puuid,
-          queueType: this.state.ongoingGameInfo?.queueType === 'TFT' ? 'TFT' : undefined
+          queueType: this.state.ongoingGameInfo?.queueType === 'TFT' ? 'TFT' : undefined // TODO 暂不支持云顶的对局
         })
 
         if (savedInfo) {
@@ -823,14 +810,22 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         }
       }
 
-      const _loadMatchHistory = async () => {
-        if (player.matchHistory && player.matchHistoryQueue === queueFilter) {
+      const _loadMatchHistory = async (queueFilter = -1, useSgpApi = false) => {
+        if (
+          player.matchHistory &&
+          player.matchHistoryQueue === queueFilter &&
+          player.useSgpApi === useSgpApi
+        ) {
           return
         }
 
+        runInAction(() => {
+          player.matchHistoryQueue = queueFilter
+          player.useSgpApi = useSgpApi
+        })
+
         const sgpApiAvailable =
-          this.state.settings.useSgpApi &&
-          this._edsm.sgp.state.availability.currentSgpServerSupported
+          useSgpApi && this._edsm.sgp.state.availability.currentSgpServerSupported
 
         this._logger.info(
           `Use API: ${sgpApiAvailable ? 'SGP' : 'LCU'}, 加载玩家信息 MatchHistory: ${puuid}`
@@ -959,7 +954,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       await Promise.allSettled([
         _loadSavedInfo(),
         _loadRankedStats(),
-        _loadMatchHistory(),
+        _loadMatchHistory(queueFilter, useSgpApi),
         _loadChampionMastery()
       ])
     } catch (error) {
@@ -967,7 +962,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     }
   }
 
-  private async _champSelectQuery(signal: AbortSignal, queueFilter?: number) {
+  private async _champSelectQuery(signal: AbortSignal, queueFilter?: number, useSgpApi = false) {
     const session = this._lcu.champSelect.session
     if (!session) {
       return
@@ -984,13 +979,13 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     const visiblePlayerPuuids = [...m, ...t]
 
     const playerTasks = visiblePlayerPuuids.map((p) => {
-      return this._loadPlayerStats(signal, p.puuid, queueFilter)
+      return this._loadPlayerStats(signal, p.puuid, queueFilter, useSgpApi)
     })
 
     await Promise.allSettled(playerTasks)
   }
 
-  private async _inGameQuery(signal: AbortSignal, queueFilter?: number) {
+  private async _inGameQuery(signal: AbortSignal, queueFilter?: number, useSgpApi = false) {
     const session = this._lcu.gameflow.session
 
     if (!session) {
@@ -1008,7 +1003,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     const visiblePlayerPuuids = [...m, ...t]
 
     const playerTasks = visiblePlayerPuuids.map((p) => {
-      return this._loadPlayerStats(signal, p.puuid, queueFilter)
+      return this._loadPlayerStats(signal, p.puuid, queueFilter, useSgpApi)
     })
 
     await Promise.allSettled(playerTasks)
@@ -1031,7 +1026,6 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       'ongoingTeams',
       'ongoingPositionAssignments',
       'sendList',
-      'isWaitingForDelay',
       'ongoingPlayerAnalysis',
       'queueFilter',
       'settings.autoRouteOnGameStart',

@@ -3,10 +3,10 @@ import {
   MobxBasedBasicModule,
   RegisteredSettingHandler
 } from '@main/akari-ipc/mobx-based-basic-module'
-import { MainWindowCloseStrategy } from '@shared/types/modules/app'
 import { Paths } from '@shared/utils/types'
 import { AxiosRequestConfig } from 'axios'
 import { BrowserWindow, app, protocol, session, shell } from 'electron'
+import { set } from 'lodash'
 import { makeAutoObservable, observable, runInAction } from 'mobx'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -16,65 +16,14 @@ import toolkit from '../../native/laToolkitWin32x64.node'
 import { AutoGameflowModule } from '../auto-gameflow'
 import { AutoReplyModule } from '../auto-reply'
 import { AutoSelectModule } from '../auto-select'
+import { AutoUpdateModule } from '../auto-update'
+import { AuxWindowModule } from '../auxiliary-window'
 import { CoreFunctionalityModule } from '../core-functionality'
+import { LcuConnectionModule } from '../lcu-connection'
+import { AppLogger, LogModule } from '../log'
+import { MainWindowModule } from '../main-window'
 import { RespawnTimerModule } from '../respawn-timer'
-import { AutoUpdateModule } from './auto-update'
-import { AuxWindowModule } from './auxiliary-window'
-import { LcuConnectionModule } from './lcu-connection'
-import { AppLogger, LogModule } from './log'
-import { MainWindowModule } from './main-window'
-import { set } from 'lodash'
-
-class AppSettings {
-  /**
-   * 使用 WMIC 查询命令行，而不是默认的 NtQueryInformationProcess
-   */
-  useWmic: boolean = false
-
-  /**
-   * 输出前置声明
-   */
-  showFreeSoftwareDeclaration: boolean = true
-
-  /**
-   * 关闭应用的默认行为
-   */
-  closeStrategy: MainWindowCloseStrategy = 'unset'
-
-  /**
-   * 禁用硬件加速, 特殊设置项, 仅用于展示
-   */
-  disableHardwareAcceleration: boolean = false
-
-  /**
-   * 是否位于调试模式，更多不稳定功能将被启用
-   */
-  isInKyokoMode: boolean = false
-
-  setUseWmic(enabled: boolean) {
-    this.useWmic = enabled
-  }
-
-  setShowFreeSoftwareDeclaration(enabled: boolean) {
-    this.showFreeSoftwareDeclaration = enabled
-  }
-
-  setCloseStrategy(s: MainWindowCloseStrategy) {
-    this.closeStrategy = s
-  }
-
-  setInKyokoMode(b: boolean) {
-    this.isInKyokoMode = b
-  }
-
-  setDisableHardwareAcceleration(b: boolean) {
-    this.disableHardwareAcceleration = b
-  }
-
-  constructor() {
-    makeAutoObservable(this)
-  }
-}
+import { AppSettings } from './state'
 
 export class AppState {
   settings = new AppSettings()

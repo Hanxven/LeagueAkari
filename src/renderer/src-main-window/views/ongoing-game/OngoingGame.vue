@@ -25,6 +25,7 @@
             :pre-made-team-id="preMadeTeamInfo.players[player.puuid]"
             :current-highlighting-pre-made-team-id="currentHighlightingPreMadeTeamIdD"
             @show-game="handleShowGame"
+            @show-game-by-id="handleShowGameById"
             @to-summoner="handleToSummoner"
             @highlight="handleHighlightSubTeam"
           />
@@ -68,7 +69,7 @@ import { MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
 import { createReusableTemplate, refDebounced, useDebounceFn, useElementSize } from '@vueuse/core'
 import { NScrollbar } from 'naive-ui'
-import { computed, provide, reactive, ref, useTemplateRef, watchEffect } from 'vue'
+import { computed, provide, reactive, ref, useTemplateRef } from 'vue'
 
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
 
@@ -226,10 +227,6 @@ const handleHighlightSubTeam = (preMadeTeamId: string, highlight: boolean) => {
   }
 }
 
-watchEffect(() => {
-  console.log(currentHighlightingPreMadeTeamId.value)
-})
-
 const isStandaloneMatchHistoryCardShow = ref(false)
 const handleShowGame = (game: Game, puuid: string) => {
   showingGame.gameId = 0
@@ -257,31 +254,35 @@ const { width } = useElementSize(useTemplateRef('page-el'))
 //   console.log(width.value)
 // })
 const columnsNeed = computed(() => {
+  const teamColumns = Object.values(teams.value)
+    .map((t) => t.length)
+    .reduce((a, b) => Math.max(a, b), 0)
+
   if (width.value > 1990) {
-    return 8
+    return Math.min(8, teamColumns)
   }
 
   if (width.value > 1740) {
-    return 7
+    return Math.min(7, teamColumns)
   }
 
   if (width.value > 1500) {
-    return 6
+    return Math.min(6, teamColumns)
   }
 
   if (width.value > 1250) {
-    return 5
+    return Math.min(5, teamColumns)
   }
 
   if (width.value > 1010) {
-    return 4
+    return Math.min(4, teamColumns)
   }
 
   if (width.value > 760) {
-    return 3
+    return Math.min(3, teamColumns)
   }
 
-  return 2
+  return Math.min(2, teamColumns)
 })
 </script>
 

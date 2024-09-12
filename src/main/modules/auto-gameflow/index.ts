@@ -14,9 +14,9 @@ import { Paths } from '@shared/utils/types'
 import { set } from 'lodash'
 import { comparer, computed, runInAction } from 'mobx'
 
-import { LcuConnectionModule } from '../akari-core/lcu-connection'
-import { AppLogger, LogModule } from '../akari-core/log'
-import { MainWindowModule } from '../akari-core/main-window'
+import { LcuConnectionModule } from '../lcu-connection'
+import { AppLogger, LogModule } from '../log'
+import { MainWindowModule } from '../main-window'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { AutoGameflowState } from './state'
 

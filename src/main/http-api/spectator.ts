@@ -1,4 +1,4 @@
-import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
 
 export function launchSpectator(puuid: string) {
   return lcm.lcuRequest({

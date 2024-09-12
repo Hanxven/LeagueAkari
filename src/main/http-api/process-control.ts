@@ -1,4 +1,4 @@
-import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
 
 // 客户端似乎并未实装
 export function restart() {

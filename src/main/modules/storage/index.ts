@@ -11,7 +11,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { DataSource, Equal, QueryRunner } from 'typeorm'
 
-import { AppLogger, LogModule } from './log'
+import { AppLogger, LogModule } from '../log'
 import { LeagueAkariModule } from '@main/akari-ipc/akari-module'
 
 interface EncounteredGameQueryDto {

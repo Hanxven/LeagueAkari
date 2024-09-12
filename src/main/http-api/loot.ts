@@ -1,4 +1,4 @@
-import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
 import { LootCraftResponse, LootMap } from '@shared/types/lcu/loot'
 
 export function getLootMap() {

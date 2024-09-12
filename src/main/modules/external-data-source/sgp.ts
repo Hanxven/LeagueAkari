@@ -8,7 +8,7 @@ import fs from 'node:fs'
 
 import { ExternalDataSourceModule } from '.'
 import builtinSgpServersJson from '../../../../resources/builtin-config/external-data-source/mh-sgp-servers.json?commonjs-external&asset'
-import { LcuConnectionModule } from '../akari-core/lcu-connection'
+import { LcuConnectionModule } from '../lcu-connection'
 import { LcuSyncModule } from '../lcu-state-sync'
 
 export class SgpEdsState {

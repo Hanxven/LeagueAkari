@@ -10,73 +10,19 @@ import { sleep } from '@shared/utils/sleep'
 import { Paths } from '@shared/utils/types'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import { set } from 'lodash'
-import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
+import { comparer, computed, runInAction } from 'mobx'
 import http from 'node:http'
 import https from 'node:https'
 import PQueue from 'p-queue'
 import { WebSocket } from 'ws'
 
-import { AppModule } from './app'
-import { LeagueClientModule } from './league-client'
-import { AppLogger, LogModule } from './log'
-import { MainWindowModule } from './main-window'
+import { AppModule } from '../app'
+import { LeagueClientModule } from '../league-client'
+import { AppLogger, LogModule } from '../log'
+import { MainWindowModule } from '../main-window'
+import { LcuConnectionState } from './state'
 
 export type LcuConnectionStateType = 'connecting' | 'connected' | 'disconnected'
-
-class LcuConnectionSettings {
-  autoConnect = true
-
-  constructor() {
-    makeAutoObservable(this)
-  }
-
-  setAutoConnect(s: boolean) {
-    this.autoConnect = s
-  }
-}
-
-class LcuConnectionState {
-  settings = new LcuConnectionSettings()
-
-  state: LcuConnectionStateType = 'disconnected'
-
-  auth: UxCommandLine | null = null
-
-  launchedClients: UxCommandLine[] = []
-
-  connectingClient: UxCommandLine | null = null
-
-  constructor() {
-    makeAutoObservable(this, {
-      auth: observable.ref,
-      launchedClients: observable.struct,
-      connectingClient: observable.struct
-    })
-  }
-
-  setConnected(auth: UxCommandLine) {
-    this.state = 'connected'
-    this.auth = auth
-  }
-
-  setConnecting() {
-    this.state = 'connecting'
-    this.auth = null
-  }
-
-  setDisconnected() {
-    this.state = 'disconnected'
-    this.auth = null
-  }
-
-  setLaunchedClients(c: UxCommandLine[]) {
-    this.launchedClients = c
-  }
-
-  setConnectingClient(c: UxCommandLine | null) {
-    this.connectingClient = c
-  }
-}
 
 /**
  * 与 LCU 客户端的连接模块，特例模块

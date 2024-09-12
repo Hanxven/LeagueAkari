@@ -28,5 +28,3 @@ export class CustomKeyboardSequenceState {
     makeAutoObservable(this)
   }
 }
-
-export const customKeyboardSequenceState = new CustomKeyboardSequenceState()

@@ -38,5 +38,3 @@ export class RespawnTimerState {
     return self?.championId ?? null
   }
 }
-
-export const respawnTimerState = new RespawnTimerState()

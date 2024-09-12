@@ -1,4 +1,4 @@
-import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
 import { PlayerNotifications } from '@shared/types/lcu/player-notifications'
 
 export function createNotification(data: Partial<PlayerNotifications>) {

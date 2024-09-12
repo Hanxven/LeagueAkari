@@ -5,44 +5,16 @@ import {
 import { Paths } from '@shared/utils/types'
 import { spawn } from 'child_process'
 import { set } from 'lodash'
-import { makeAutoObservable, observable, runInAction } from 'mobx'
+import { runInAction } from 'mobx'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
 import { queryUxCommandLine, queryUxCommandLineNative } from '../../utils/ux-cmd'
+import { AppModule } from '../app'
 import { ExternalDataSourceModule } from '../external-data-source'
-import { AppModule } from './app'
-import { LcuConnectionModule } from './lcu-connection'
-import { AppLogger, LogModule } from './log'
-import { PlatformModule } from './platform'
-
-class LcuClientSettings {
-  /**
-   * 基于 Win32 API 的窗口调整方法
-   */
-  fixWindowMethodAOptions: {
-    baseWidth: number
-    baseHeight: number
-  } = {
-    baseWidth: 1600,
-    baseHeight: 900
-  }
-
-  terminateGameClientOnAltF4 = false
-
-  setFixWindowMethodsAOptions(option: { baseWidth: number; baseHeight: number }) {
-    this.fixWindowMethodAOptions = option
-  }
-
-  setTerminateGameClientOnAltF4(value: boolean) {
-    this.terminateGameClientOnAltF4 = value
-  }
-
-  constructor() {
-    makeAutoObservable(this, {
-      fixWindowMethodAOptions: observable.ref
-    })
-  }
-}
+import { LcuConnectionModule } from '../lcu-connection'
+import { AppLogger, LogModule } from '../log'
+import { PlatformModule } from '../win-platform'
+import { LcuClientSettings } from './state'
 
 export interface LaunchSpectatorConfig {
   locale?: string

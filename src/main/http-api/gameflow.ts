@@ -1,4 +1,4 @@
-import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
 import { GameflowPhase, GameflowSession } from '@shared/types/lcu/gameflow'
 
 export function getGameflowPhase() {

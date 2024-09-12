@@ -5,7 +5,7 @@ import { mkdirSync, rmSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { Logger, createLogger, format, transports } from 'winston'
 
-import { AppModule } from './app'
+import { AppModule } from '../app'
 
 export type AppLogger = {
   info: (message: any) => Logger

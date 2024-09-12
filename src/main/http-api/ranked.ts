@@ -1,4 +1,4 @@
-import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
 import { RankedStats } from '@shared/types/lcu/ranked'
 
 export function getCurrentRankedStats() {

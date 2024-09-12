@@ -7,10 +7,10 @@ import EventEmitter from 'node:events'
 import { Worker } from 'node:worker_threads'
 
 import icon from '../../../../resources/LA_ICON.ico?asset'
-import { AppModule } from './app'
-import { AuxWindowModule } from './auxiliary-window'
-import { AppLogger, LogModule } from './log'
-import { MainWindowModule } from './main-window'
+import { AuxWindowModule } from '../auxiliary-window'
+import { AppLogger, LogModule } from '../log'
+import { MainWindowModule } from '../main-window'
+import { AppModule } from '../app'
 
 export class PlatformModule extends MobxBasedBasicModule {
   private _worker: null | Worker = null

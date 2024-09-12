@@ -37,5 +37,3 @@ export class AutoReplyState {
     makeAutoObservable(this)
   }
 }
-
-export const autoReplyState = new AutoReplyState()

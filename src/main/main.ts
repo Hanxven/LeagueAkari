@@ -12,9 +12,9 @@ import { configure } from 'mobx'
 import EventEmitter from 'node:events'
 
 import { setupLeagueAkariModules } from './modules'
-import { appModule } from './modules/akari-core/app'
-import { logModule } from './modules/akari-core/log'
-import { mainWindowModule } from './modules/akari-core/main-window'
+import { appModule } from './modules/app'
+import { logModule } from './modules/log'
+import { mainWindowModule } from './modules/main-window'
 
 dayjs.extend(relativeTime)
 dayjs.extend(duration)

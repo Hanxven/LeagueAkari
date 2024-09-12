@@ -1,4 +1,4 @@
-import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
 import { AvailableBot, EogStatus, Lobby, LobbyMember } from '@shared/types/lcu/lobby'
 
 export function createCustomLobby(

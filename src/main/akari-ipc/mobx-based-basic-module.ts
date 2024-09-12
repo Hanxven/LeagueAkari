@@ -1,4 +1,4 @@
-import { SettingService, StorageModule } from '@main/modules/akari-core/storage'
+import { SettingService, StorageModule } from '@main/modules/storage'
 import { Paths } from '@shared/utils/types'
 import { get, set } from 'lodash'
 import { IReactionOptions, IReactionPublic, reaction, toJS } from 'mobx'
@@ -9,12 +9,6 @@ import { LeagueAkariModule } from './akari-module'
  * 对于简单的状态，通常是 ref 或者 structural 状态量
  */
 type SimpleStateGetter = () => any
-
-type StateSetter = (
-  value: any,
-  defaultBehavior: () => void, // 原本提供的默认设置行为
-  ss: SettingService
-) => void | Promise<boolean>
 
 interface RegisteredState {
   object: object
@@ -240,12 +234,7 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
       this.reaction(
         () => get(obj, path),
         (newValue) => {
-          this.sendEvent(
-            `update-state-prop/${stateId}`,
-            path,
-            raw ? toJS(newValue) : newValue,
-            raw
-          )
+          this.sendEvent(`update-state-prop/${stateId}`, path, raw ? toJS(newValue) : newValue, raw)
         }
       )
     }

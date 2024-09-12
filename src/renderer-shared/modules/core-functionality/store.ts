@@ -117,9 +117,19 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     }
   > | null>(null)
 
-  const queryState = ref<'unavailable' | 'in-game' | 'champ-select'>('unavailable')
+  const queryState = ref<{
+    phase: 'unavailable' | 'in-game' | 'champ-select'
+    gameInfo: {
+      queueId: number
+      queueType: string
+      gameId: number
+      gameMode: string
+    } | null
+  }>({
+    phase: 'unavailable',
+    gameInfo: null
+  })
   const isInEndgamePhase = ref(false)
-  const isWaitingForDelay = ref(false)
   const queueFilter = ref(-1)
 
   const ongoingPlayerAnalysis = shallowRef<{
@@ -175,13 +185,9 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     isInEndgamePhase,
     ongoingChampionSelections,
     ongoingPositionAssignments,
-    isWaitingForDelay,
-
     ongoingPlayerAnalysis,
     queueFilter,
-
     settings,
-
     sendList
   }
 })

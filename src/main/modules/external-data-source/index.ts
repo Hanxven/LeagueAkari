@@ -1,7 +1,7 @@
 import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 
-import { LcuConnectionModule } from '../akari-core/lcu-connection'
-import { AppLogger, LogModule } from '../akari-core/log'
+import { LcuConnectionModule } from '../lcu-connection'
+import { AppLogger, LogModule } from '../log'
 import { BalanceEds } from './fandom'
 import { GtimgEds } from './gtimg'
 import { OpggEds } from './opgg'

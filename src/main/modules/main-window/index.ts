@@ -1,51 +1,13 @@
 import { is } from '@electron-toolkit/utils'
 import { MobxBasedBasicModule } from '@main/akari-ipc/mobx-based-basic-module'
 import { BrowserWindow, Event, app, dialog, shell } from 'electron'
-import { makeAutoObservable, observable } from 'mobx'
 import { join } from 'node:path'
 
 import icon from '../../../../resources/LA_ICON.ico?asset'
-import { AppModule } from './app'
-import { AuxWindowModule } from './auxiliary-window'
-import { AppLogger, LogModule } from './log'
-
-class MainWindowState {
-  windowState: 'normal' | 'maximized' | 'minimized' = 'normal'
-
-  focusState: 'focused' | 'blurred' = 'focused'
-
-  ready: boolean = false
-
-  isShow: boolean = true
-
-  windowSize: [number, number] = MainWindowModule.WINDOW_DEFAULT_SIZE
-
-  constructor() {
-    makeAutoObservable(this, {
-      windowSize: observable.ref
-    })
-  }
-
-  setWindowState(s: 'normal' | 'maximized' | 'minimized') {
-    this.windowState = s
-  }
-
-  setFocusState(f: 'focused' | 'blurred' = 'focused') {
-    this.focusState = f
-  }
-
-  setShow(show: boolean) {
-    this.isShow = show
-  }
-
-  setReady(ready: boolean) {
-    this.ready = ready
-  }
-
-  setWindowSize(size: [number, number]) {
-    this.windowSize = size
-  }
-}
+import { AppModule } from '../app'
+import { AuxWindowModule } from '../auxiliary-window'
+import { AppLogger, LogModule } from '../log'
+import { MainWindowState } from './state'
 
 export class MainWindowModule extends MobxBasedBasicModule {
   private state = new MainWindowState()

@@ -11,8 +11,6 @@ export class AppRendererModule extends StateSyncModule {
   override async setup() {
     await super.setup()
 
-    await this._migrateFromLocalStorage()
-
     this._syncMainState()
   }
 
@@ -46,31 +44,6 @@ export class AppRendererModule extends StateSyncModule {
 
   setDisableHardwareAcceleration(value: boolean) {
     return this.call('base-config/disable-hardware-acceleration', value)
-  }
-
-  private async _migrateFromLocalStorage() {
-    const all: Record<string, string> = {}
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key) {
-        const item = localStorage.getItem(key)
-        if (item) {
-          all[key] = item
-        }
-      }
-    }
-
-    if (Object.keys(all).length === 0) {
-      return
-    }
-
-    try {
-      const ok = await this.call('migrate-settings-from-legacy-version', all)
-
-      if (ok) {
-        localStorage.clear()
-      }
-    } catch {}
   }
 
   openUserDataDirInExplorer() {

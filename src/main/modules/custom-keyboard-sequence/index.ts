@@ -7,9 +7,9 @@ import { Paths } from '@shared/utils/types'
 import { set } from 'lodash'
 import { runInAction } from 'mobx'
 
-import { LeagueClientModule } from '../akari-core/league-client'
-import { AppLogger, LogModule } from '../akari-core/log'
-import { PlatformModule } from '../akari-core/platform'
+import { LeagueClientModule } from '../league-client'
+import { AppLogger, LogModule } from '../log'
+import { PlatformModule } from '../win-platform'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { CustomKeyboardSequenceState } from './state'
 

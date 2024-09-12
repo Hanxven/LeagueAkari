@@ -12,14 +12,12 @@ import {
 import { parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
-import { lcuConnectionModule as lcm } from '../akari-core/lcu-connection'
+import { lcuConnectionModule as lcm } from '../lcu-connection'
 import { lcuSyncModule as lcu } from '../lcu-state-sync'
 
 class CoreFunctionalitySettings {
   fetchAfterGame: boolean = true
-
   ongoingAnalysisEnabled: boolean = true
-
   autoRouteOnGameStart: boolean = true
   preMadeTeamThreshold: number = 3
   fetchDetailedGame: boolean = true
@@ -27,13 +25,9 @@ class CoreFunctionalitySettings {
   sendKdaInGame: boolean = false
   sendKdaInGameWithPreMadeTeams: boolean = false
   sendKdaThreshold: number = 0
-
   useAuxiliaryWindow: boolean = true
-
   playerAnalysisFetchConcurrency: number = 3
-
   delaySecondsBeforeLoading: number = 0
-
   useSgpApi: boolean = true
 
   constructor() {
@@ -121,6 +115,11 @@ export interface OngoingPlayer {
   matchHistoryQueue?: number
 
   /**
+   * 是否使用 SGP API
+   */
+  useSgpApi: boolean
+
+  /**
    * 玩家英雄点数相关信息
    */
   championMastery?: PlayerChampionMastery
@@ -160,8 +159,7 @@ export class CoreFunctionalityState {
   /**
    * 对局分析的队列过滤
    *
-   * `-1` 为全部
-   * `null` 为当前队列，若不在支持范围内，则全部
+   * `-1` 为不限
    */
   queueFilter: number = -1
 
@@ -172,8 +170,6 @@ export class CoreFunctionalityState {
     players: Record<string, MatchHistoryGamesAnalysisAll>
     teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
   } | null = null
-
-  isWaitingForDelay = false
 
   // 用于临时对局分析的游戏详情图
   tempDetailedGames = observable(new Map<number, Game>(), { deep: false })
@@ -197,7 +193,7 @@ export class CoreFunctionalityState {
    * 当前进行的英雄选择
    */
   get ongoingChampionSelections() {
-    if (this.queryState === 'champ-select') {
+    if (this.queryState.phase === 'champ-select') {
       if (!lcu.champSelect.session) {
         return null
       }
@@ -216,7 +212,7 @@ export class CoreFunctionalityState {
       })
 
       return selections
-    } else if (this.queryState === 'in-game') {
+    } else if (this.queryState.phase === 'in-game') {
       if (!lcu.gameflow.session) {
         return null
       }
@@ -247,7 +243,7 @@ export class CoreFunctionalityState {
   }
 
   get ongoingPositionAssignments() {
-    if (this.queryState === 'champ-select') {
+    if (this.queryState.phase === 'champ-select') {
       if (!lcu.champSelect.session) {
         return null
       }
@@ -273,7 +269,7 @@ export class CoreFunctionalityState {
       })
 
       return assignments
-    } else if (this.queryState === 'in-game') {
+    } else if (this.queryState.phase === 'in-game') {
       if (!lcu.gameflow.session) {
         return null
       }
@@ -308,7 +304,7 @@ export class CoreFunctionalityState {
    * 当前对局的队伍分配
    */
   get ongoingTeams() {
-    if (this.queryState === 'champ-select') {
+    if (this.queryState.phase === 'champ-select') {
       if (!lcu.champSelect.session) {
         return null
       }
@@ -336,7 +332,7 @@ export class CoreFunctionalityState {
         })
 
       return teams
-    } else if (this.queryState === 'in-game') {
+    } else if (this.queryState.phase === 'in-game') {
       if (!lcu.gameflow.session) {
         return null
       }
@@ -370,11 +366,7 @@ export class CoreFunctionalityState {
     this.ongoingPreMadeTeams = {}
     this.ongoingPlayerAnalysis = null
     this.sendList = {}
-    this.isWaitingForDelay = false
-  }
-
-  setWaitingForDelay(value: boolean) {
-    this.isWaitingForDelay = value
+    this.queueFilter = -1
   }
 
   setQueueFilter(value: number) {
@@ -396,11 +388,26 @@ export class CoreFunctionalityState {
    */
   get queryState() {
     if (lcm.state.state !== 'connected') {
-      return 'unavailable'
+      return {
+        phase: 'unavailable',
+        gameInfo: null
+      }
     }
 
-    if (lcu.gameflow.phase === 'ChampSelect' && lcu.champSelect.session) {
-      return 'champ-select'
+    if (
+      lcu.gameflow.session &&
+      lcu.gameflow.session.phase === 'ChampSelect' &&
+      lcu.champSelect.session
+    ) {
+      return {
+        phase: 'champ-select',
+        gameInfo: {
+          queueId: lcu.gameflow.session.gameData.queue.id,
+          queueType: lcu.gameflow.session.gameData.queue.type,
+          gameId: lcu.gameflow.session.gameData.gameId,
+          gameMode: lcu.gameflow.session.gameData.queue.gameMode
+        }
+      }
     }
 
     if (
@@ -412,10 +419,21 @@ export class CoreFunctionalityState {
         lcu.gameflow.phase === 'EndOfGame' ||
         lcu.gameflow.phase === 'Reconnect')
     ) {
-      return 'in-game'
+      return {
+        phase: 'in-game',
+        gameInfo: {
+          queueId: lcu.gameflow.session.gameData.queue.id,
+          queueType: lcu.gameflow.session.gameData.queue.type,
+          gameId: lcu.gameflow.session.gameData.gameId,
+          gameMode: lcu.gameflow.session.gameData.queue.gameMode
+        }
+      }
     }
 
-    return 'unavailable'
+    return {
+      phase: 'unavailable',
+      gameInfo: null
+    }
   }
 
   /**
@@ -446,5 +464,3 @@ export class CoreFunctionalityState {
     })
   }
 }
-
-export const coreFunctionalityState = new CoreFunctionalityState()

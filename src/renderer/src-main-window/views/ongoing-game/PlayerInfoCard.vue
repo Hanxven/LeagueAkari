@@ -316,7 +316,7 @@
       </NPopover>
       <div class="tag self" v-if="isSelf">我</div>
     </div>
-    <div class="frequent-used-champions">
+    <div class="frequent-used-champions" v-if="frequentlyUsedChampions.length">
       <NPopover :keep-alive-on-hover="false" v-for="c of frequentlyUsedChampions" :delay="50">
         <template #trigger>
           <ChampionIcon

@@ -18,7 +18,6 @@ import { appRendererModule as am } from '@renderer-shared/modules/app'
 import { useAppStore } from '@renderer-shared/modules/app/store'
 import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
 import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
-import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
 import { setupNaiveUiNotificationEvents } from '@renderer-shared/notification'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
@@ -62,19 +61,20 @@ provide('app', {
   }
 })
 
-const champSelect = useChampSelectStore()
+watch(
+  () => cf.queryState,
+  (state) => {
+    if (!cf.settings.autoRouteOnGameStart || !cf.settings.ongoingAnalysisEnabled) {
+      return
+    }
 
-watch([() => cf.queryState, () => champSelect.session?.isSpectating], ([state, isSpectating]) => {
-  if (!cf.settings.autoRouteOnGameStart || !cf.settings.ongoingAnalysisEnabled || isSpectating) {
-    return
-  }
-
-  if (state === 'champ-select' || state === 'in-game') {
-    if (router.currentRoute.value.name !== 'ongoing-name') {
-      router.replace({ name: 'ongoing-game' })
+    if (state.phase === 'champ-select' || state.phase === 'in-game') {
+      if (router.currentRoute.value.name !== 'ongoing-name') {
+        router.replace({ name: 'ongoing-game' })
+      }
     }
   }
-})
+)
 
 const isShowingSettingModal = ref(false)
 const settingModelTab = ref('basic')

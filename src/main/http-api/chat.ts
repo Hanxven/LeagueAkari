@@ -1,4 +1,4 @@
-import { lcuConnectionModule as lcm } from '@main/modules/akari-core/lcu-connection'
+import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
 import { ChatMessage, ChatPerson, Conversation, Friend } from '@shared/types/lcu/chat'
 
 export function getFriends() {
