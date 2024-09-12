@@ -81,6 +81,10 @@ export class AuxWindowRendererModule extends StateSyncModule {
     return this.call('get-functionality')
   }
 
+  setAutoShow(b: boolean) {
+    return this.call('set-setting', 'autoShow', b)
+  }
+
   show() {
     return this.call('show')
   }

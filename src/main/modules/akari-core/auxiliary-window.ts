@@ -27,6 +27,8 @@ class AuxiliaryWindowSettings {
 
   isPinned = true
 
+  autoShow: boolean = true
+
   setOpacity(opacity: number) {
     this.opacity = opacity
   }
@@ -49,6 +51,10 @@ class AuxiliaryWindowSettings {
 
   setPinned(pinned: boolean) {
     this.isPinned = pinned
+  }
+
+  setAutoShow(autoShow: boolean) {
+    this.autoShow = autoShow
   }
 }
 
@@ -163,6 +169,10 @@ export class AuxWindowModule extends MobxBasedBasicModule {
 
   private _handleObservations() {
     const auxWindowIndicatorShowTiming = computed(() => {
+      if (!this.state.settings.autoShow) {
+        return 'ignore'
+      }
+
       switch (this._lcu.gameflow.phase) {
         case 'ChampSelect':
         case 'Lobby':
@@ -175,6 +185,10 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     })
 
     const auxWindowOpggShowTiming = computed(() => {
+      if (!this.state.settings.autoShow) {
+        return 'ignore'
+      }
+
       switch (this._lcu.gameflow.phase) {
         case 'ChampSelect':
           return 'show'
@@ -188,6 +202,10 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       () => auxWindowIndicatorShowTiming.get(),
       (timing) => {
         if (this.state.currentFunctionality !== 'indicator') {
+          return
+        }
+
+        if (timing === 'ignore') {
           return
         }
 
@@ -287,7 +305,8 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       'settings.isPinned',
       'settings.showSkinSelector',
       'settings.zoomFactor',
-      'settings.opacity'
+      'settings.opacity',
+      'settings.autoShow'
     ])
   }
 
@@ -611,6 +630,10 @@ export class AuxWindowModule extends MobxBasedBasicModule {
       {
         key: 'zoomFactor',
         defaultValue: this.state.settings.zoomFactor
+      },
+      {
+        key: 'autoShow',
+        defaultValue: this.state.settings.autoShow
       }
     ])
 
@@ -636,6 +659,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     )
     this.onSettingChange<Paths<typeof this.state.settings>>('showSkinSelector', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>('zoomFactor', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('autoShow', defaultSetter)
   }
 
   private _getCenteredRectangle(width: number, height: number) {

@@ -2,7 +2,6 @@ import {
   Game,
   Participant,
   ParticipantIdentity,
-  Player,
   isPveQueue
 } from '@shared/types/lcu/match-history'
 
@@ -351,6 +350,20 @@ export interface MatchHistoryGamesAnalysisSummary {
   win: number
   lose: number
   winRate: number
+
+  winningStreak: number
+  losingStreak: number
+
+  count: number
+
+  cherry: {
+    count: number
+    win: number
+    lose: number
+    first: number
+    winRate: number
+    top1Rate: number
+  }
 }
 
 export interface MatchHistoryChampionAnalysis {
@@ -359,6 +372,14 @@ export interface MatchHistoryChampionAnalysis {
   win: number
   lose: number
   winRate: number
+  cherry: {
+    count: number
+    win: number
+    lose: number
+    first: number
+    winRate: number
+    firstRate: number
+  }
 }
 
 export interface MatchHistoryGamesAnalysisAll {
@@ -392,6 +413,14 @@ export function analyzeMatchHistory(
 
   let win = 0
   let lose = 0
+  let cherryLost = 0
+  let cherryWin = 0
+  let cherryCount = 0
+  let cherryFirst = 0
+  let winningStreak = 0
+  let losingStreak = 0
+  let isOnWinningStreak = true
+  let isOnLosingStreak = true
 
   const champions: Record<number, MatchHistoryChampionAnalysis> = {}
 
@@ -414,6 +443,31 @@ export function analyzeMatchHistory(
       win++
     } else {
       lose++
+    }
+
+    if (isOnWinningStreak && watashi.stats.win) {
+      winningStreak++
+    } else {
+      isOnWinningStreak = false
+    }
+
+    if (isOnLosingStreak && !watashi.stats.win) {
+      losingStreak++
+    } else {
+      isOnLosingStreak = false
+    }
+
+    if (game.gameMode === 'CHERRY') {
+      cherryCount++
+      if (watashi.stats.subteamPlacement === 1) {
+        cherryFirst++
+      }
+
+      if (watashi.stats.win) {
+        cherryWin++
+      } else {
+        cherryLost++
+      }
     }
 
     const gameAnalysis: MatchHistoryGamesAnalysis = {
@@ -662,7 +716,15 @@ export function analyzeMatchHistory(
         count: 0,
         win: 0,
         lose: 0,
-        winRate: 0
+        winRate: 0,
+        cherry: {
+          count: 0,
+          win: 0,
+          lose: 0,
+          first: 0,
+          winRate: 0,
+          firstRate: 0
+        }
       }
     }
 
@@ -673,8 +735,24 @@ export function analyzeMatchHistory(
       champions[watashi.championId].lose++
     }
 
+    if (game.gameMode === 'CHERRY') {
+      champions[watashi.championId].cherry.count++
+      if (watashi.stats.win) {
+        champions[watashi.championId].cherry.win++
+      } else {
+        champions[watashi.championId].cherry.lose++
+      }
+
+      if (watashi.stats.subteamPlacement === 1) {
+        champions[watashi.championId].cherry.first++
+      }
+    }
+
     champions[watashi.championId].winRate =
       champions[watashi.championId].win / champions[watashi.championId].count
+
+    champions[watashi.championId].cherry.winRate =
+      champions[watashi.championId].cherry.win / champions[watashi.championId].cherry.count
 
     gameAnalyses.push([game.gameId, gameAnalysis])
   }
@@ -724,7 +802,21 @@ export function analyzeMatchHistory(
 
     winRate: win / (win + lose),
     win: win,
-    lose: lose
+    lose: lose,
+
+    winningStreak: winningStreak,
+    losingStreak: losingStreak,
+
+    count: detailedGames.length,
+
+    cherry: {
+      count: cherryCount,
+      win: cherryWin,
+      lose: cherryLost,
+      first: cherryFirst,
+      winRate: cherryWin / cherryCount,
+      top1Rate: cherryFirst / cherryCount
+    }
   }
 
   let totalDamageShareToTop = 0
@@ -912,6 +1004,7 @@ export interface AkariScore {
   goldScore: number
   participationScore: number
   total: number
+  good: boolean
 }
 
 // 非卖品, 仅限内部评判使用
@@ -921,14 +1014,17 @@ export function calculateAkariScore(analyses: {
   champions: Record<number, MatchHistoryChampionAnalysis>
 }): AkariScore {
   const kdaScore = Math.sqrt(analyses.summary.averageKda) * 0.68
-  const winRateScore = (analyses.summary.winRate - 0.5) * 6
+  const winRateScore = (analyses.summary.winRate - 0.5) * 4
   const dmgScore = analyses.summary.averageDamageShareToTop * 10.0
-  const dmgTakenScore = analyses.summary.averageDamageTakenShareToTop * 6.0
+  const dmgTakenScore = analyses.summary.averageDamageTakenShareToTop * 8.0
   const csScore =
     analyses.summary.averageCsPerMinute *
     Math.max(Math.min(0.04 * analyses.summary.averageCsPerMinute, 0.4), 0.1)
   const goldScore = analyses.summary.averageGoldShareToTop * 4.0
   const participationScore = analyses.summary.averageKillParticipationRate * 4
+
+  const total =
+    kdaScore + winRateScore + dmgScore + dmgTakenScore + csScore + goldScore + participationScore
 
   return {
     kdaScore,
@@ -938,8 +1034,8 @@ export function calculateAkariScore(analyses: {
     csScore,
     goldScore,
     participationScore,
-    total:
-      kdaScore + winRateScore + dmgScore + dmgTakenScore + csScore + goldScore + participationScore
+    total,
+    good: total >= 24
   }
 }
 

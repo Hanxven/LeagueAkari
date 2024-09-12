@@ -13,28 +13,15 @@
 </template>
 
 <script setup lang="ts">
-import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
 import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { appRendererModule as am } from '@renderer-shared/modules/app'
 import { useAppStore } from '@renderer-shared/modules/app/store'
 import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
 import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
+import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
 import { setupNaiveUiNotificationEvents } from '@renderer-shared/notification'
 import { greeting } from '@renderer-shared/utils/greeting'
-import {
-  ArcElement,
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Filler,
-  Legend,
-  LineElement,
-  LinearScale,
-  PointElement,
-  RadialLinearScale,
-  Title,
-  Tooltip
-} from 'chart.js'
+import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
 import { useNotification } from 'naive-ui'
 import { provide, ref, watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
@@ -44,20 +31,6 @@ import DeclarationModal from './components/DeclarationModal.vue'
 import MainWindowTitleBar from './components/MainWindowTitleBar.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
-
-ChartJS.register(
-  CategoryScale,
-  RadialLinearScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  PointElement,
-  LineElement,
-  Filler
-)
 
 setupNaiveUiNotificationEvents()
 
@@ -89,20 +62,19 @@ provide('app', {
   }
 })
 
-watch(
-  () => cf.queryState,
-  (state) => {
-    if (!cf.settings.autoRouteOnGameStart || !cf.settings.ongoingAnalysisEnabled) {
-      return
-    }
+const champSelect = useChampSelectStore()
 
-    if (state === 'champ-select' || state === 'in-game') {
-      if (router.currentRoute.value.name !== 'ongoing-name') {
-        router.replace({ name: 'ongoing-game' })
-      }
+watch([() => cf.queryState, () => champSelect.session?.isSpectating], ([state, isSpectating]) => {
+  if (!cf.settings.autoRouteOnGameStart || !cf.settings.ongoingAnalysisEnabled || isSpectating) {
+    return
+  }
+
+  if (state === 'champ-select' || state === 'in-game') {
+    if (router.currentRoute.value.name !== 'ongoing-name') {
+      router.replace({ name: 'ongoing-game' })
     }
   }
-)
+})
 
 const isShowingSettingModal = ref(false)
 const settingModelTab = ref('basic')

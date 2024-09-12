@@ -9,6 +9,7 @@ import {
   MatchHistoryGamesAnalysisAll,
   MatchHistoryGamesAnalysisTeamSide
 } from '@shared/utils/analysis'
+import { parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { lcuConnectionModule as lcm } from '../akari-core/lcu-connection'
@@ -203,13 +204,13 @@ export class CoreFunctionalityState {
 
       const selections: Record<string, number> = {}
       lcu.champSelect.session.myTeam.forEach((p) => {
-        if (p.puuid) {
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
           selections[p.puuid] = p.championId || p.championPickIntent
         }
       })
 
       lcu.champSelect.session.theirTeam.forEach((p) => {
-        if (p.puuid) {
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
           selections[p.puuid] = p.championId || p.championPickIntent
         }
       })
@@ -222,7 +223,7 @@ export class CoreFunctionalityState {
 
       const selections: Record<string, number> = {}
       lcu.gameflow.session.gameData.playerChampionSelections.forEach((p) => {
-        if (p.puuid) {
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
           selections[p.puuid] = p.championId
         }
       })
@@ -240,6 +241,64 @@ export class CoreFunctionalityState {
       })
 
       return selections
+    }
+
+    return null
+  }
+
+  get ongoingPositionAssignments() {
+    if (this.queryState === 'champ-select') {
+      if (!lcu.champSelect.session) {
+        return null
+      }
+
+      const assignments: Record<string, any> = {}
+
+      lcu.champSelect.session.myTeam.forEach((p) => {
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
+          assignments[p.puuid] = {
+            position: p.assignedPosition.toUpperCase(),
+            role: null
+          }
+        }
+      })
+
+      lcu.champSelect.session.theirTeam.forEach((p) => {
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
+          assignments[p.puuid] = {
+            position: p.assignedPosition.toUpperCase(),
+            role: null
+          }
+        }
+      })
+
+      return assignments
+    } else if (this.queryState === 'in-game') {
+      if (!lcu.gameflow.session) {
+        return null
+      }
+
+      const assignments: Record<string, any> = {}
+
+      lcu.gameflow.session.gameData.teamOne.forEach((p) => {
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
+          assignments[p.puuid] = {
+            position: p.selectedPosition,
+            role: parseSelectedRole(p.selectedRole)
+          }
+        }
+      })
+
+      lcu.gameflow.session.gameData.teamTwo.forEach((p) => {
+        if (p.puuid && p.puuid !== EMPTY_PUUID) {
+          assignments[p.puuid] = {
+            position: p.selectedPosition,
+            role: parseSelectedRole(p.selectedRole)
+          }
+        }
+      })
+
+      return assignments
     }
 
     return null
@@ -380,6 +439,7 @@ export class CoreFunctionalityState {
       ongoingChampionSelections: computed.struct,
       ongoingGameInfo: computed.struct,
       ongoingTeams: computed.struct,
+      ongoingPositionAssignments: computed.struct,
       sendList: observable.ref,
       ongoingPreMadeTeams: observable.struct,
       ongoingPlayerAnalysis: observable.struct

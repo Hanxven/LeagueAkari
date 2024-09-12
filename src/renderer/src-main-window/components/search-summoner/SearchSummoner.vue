@@ -199,6 +199,9 @@ const handleSearch = async () => {
   if (isSearching.value || !inputText.value) {
     return
   }
+
+  inputText.value = inputText.value.replace(/[\u0000-\u001F\u007F\u2000-\u206F\uFEFF]/g, '')
+
   isSearching.value = true
   searchText.value = inputText.value
   searchSgpServerId.value = currentSgpServer.value

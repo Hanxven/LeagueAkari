@@ -257,7 +257,7 @@
                 <div class="left-content-item-content">{{ tab.savedInfo.tag }}</div>
               </NScrollbar>
             </div>
-            <div class="left-content-item" v-if="!isSelf && isMustUseSgpApi && spectatorData">
+            <div class="left-content-item" v-if="isMustUseSgpApi && spectatorData">
               <SpectateStatus
                 :is-cross-region="!isInSameRegion"
                 :data="spectatorData"
@@ -431,6 +431,7 @@ import { useExternalDataSourceStore } from '@renderer-shared/modules/external-da
 import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { leagueClientRendererModule as lcm } from '@renderer-shared/modules/league-client'
 import { laNotification } from '@renderer-shared/notification'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
@@ -469,16 +470,20 @@ import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import RankedDisplay from './widgets/RankedDisplay.vue'
 import SpectateStatus from './widgets/SpectateStatus.vue'
 
-const { isSelf = false, tab } = defineProps<{
+const { tab } = defineProps<{
   tab: TabState & { id: string }
-  isSelf?: boolean
 }>()
 
 const isMustUseSgpApi = computed(() => {
   return cf.settings.useSgpApi || eds.sgpAvailability.currentSgpServerId !== tab.sgpServerId
 })
 
+const summoner = useSummonerStore()
 const lc = useLcuConnectionStore()
+
+const isSelf = computed(() => {
+  return summoner.me?.puuid === tab.puuid
+})
 
 const isInSameRegion = computed(() => {
   if (!lc.auth) {
@@ -1021,6 +1026,7 @@ defineExpose({
   .profile-name {
     display: flex;
     flex-direction: column;
+    gap: 4px;
     align-self: center;
     margin-left: 12px;
   }

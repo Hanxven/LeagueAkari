@@ -2,7 +2,11 @@ import { PlayerChampionMastery } from '@shared/types/lcu/champion-mastery'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
-import { MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
+import {
+  MatchHistoryGamesAnalysisAll,
+  MatchHistoryGamesAnalysisTeamSide
+} from '@shared/utils/analysis'
+import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
 import { reactive, ref, shallowRef, watchEffect } from 'vue'
 
@@ -103,16 +107,25 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
 
   const sendList = ref<Record<string, boolean>>({})
 
-  const queryState = ref<'unavailable' | 'in-game' | 'champ-select'>('unavailable')
   const ongoingTeams = shallowRef<Record<string, number[]> | null>(null)
-  const isInEndgamePhase = ref(false)
   const ongoingChampionSelections = shallowRef<Record<string | number, number> | null>(null)
+  const ongoingPositionAssignments = shallowRef<Record<
+    string,
+    {
+      position: string
+      role: ParsedRole | null
+    }
+  > | null>(null)
+
+  const queryState = ref<'unavailable' | 'in-game' | 'champ-select'>('unavailable')
+  const isInEndgamePhase = ref(false)
   const isWaitingForDelay = ref(false)
   const queueFilter = ref(-1)
 
-  const ongoingPlayerAnalysis = shallowRef<Record<string, MatchHistoryGamesAnalysisAll> | null>(
-    null
-  )
+  const ongoingPlayerAnalysis = shallowRef<{
+    players: Record<string, MatchHistoryGamesAnalysisAll>
+    teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
+  } | null>(null)
 
   watchEffect(() => {
     console.log('[DEBUG] 玩家战绩分析', ongoingPlayerAnalysis.value)
@@ -161,6 +174,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     queryState,
     isInEndgamePhase,
     ongoingChampionSelections,
+    ongoingPositionAssignments,
     isWaitingForDelay,
 
     ongoingPlayerAnalysis,

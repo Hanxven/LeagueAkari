@@ -192,6 +192,7 @@ export class LeagueClientModule extends MobxBasedBasicModule {
 
   private async _launchSpectator(config: LaunchSpectatorConfig) {
     const {
+      game: { gameMode },
       playerCredentials: { observerServerIp, observerServerPort, observerEncryptionKey, gameId }
     } = await this._eds.sgp.getSpectatorGameflow(config.puuid, config.region)
 
@@ -207,19 +208,21 @@ export class LeagueClientModule extends MobxBasedBasicModule {
       method: 'GET'
     })
 
+    const cmds = [
+      `spectator ${observerServerIp}:${observerServerPort} ${observerEncryptionKey} ${gameId} ${config.region}`,
+      `-GameBaseDir=${installDir.gameInstallRoot}`,
+      `-Locale=${config.locale || 'zh-CN'}`
+    ]
+
+    if (gameMode === 'TFT') {
+      cmds.push('-Product=TFT')
+    }
+
     // 调起进程但不与其关联
-    const p = spawn(
-      installDir.gameExecutablePath,
-      [
-        `spectator ${observerServerIp}:${observerServerPort} ${observerEncryptionKey} ${gameId} ${config.region}`,
-        `-GameBaseDir=${installDir.gameInstallRoot}`,
-        `-Locale=${config.locale || 'zh-CN'}`
-      ],
-      {
-        cwd: installDir.gameInstallRoot,
-        detached: true
-      }
-    )
+    const p = spawn(installDir.gameExecutablePath, cmds, {
+      cwd: installDir.gameInstallRoot,
+      detached: true
+    })
 
     p.unref()
 

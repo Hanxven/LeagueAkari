@@ -12,7 +12,8 @@ export const useAuxiliaryWindowStore = defineStore('module:auxiliary-window', ()
     enabled: true,
     showSkinSelector: true,
     zoomFactor: 1.0,
-    isPinned: true
+    isPinned: true,
+    autoShow: true,
   })
 
   return {

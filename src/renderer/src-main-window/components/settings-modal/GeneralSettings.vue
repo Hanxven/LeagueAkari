@@ -104,6 +104,18 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        label="自动弹出和关闭"
+        label-description="在游戏流程的部分阶段，自动弹出或关闭小窗口"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="aux.settings.autoShow"
+          @update:value="(val) => awm.setAutoShow(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         label="小窗口不透明度"
         label-description="小窗口的半透明状态"
         :label-width="320"

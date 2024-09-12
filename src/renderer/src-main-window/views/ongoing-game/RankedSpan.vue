@@ -90,7 +90,7 @@ const tierDivisionOrderMap = {
 // 无段位时，为空字符串
 const tierTextMap: Record<string, string> = {
   IRON: '坚韧黑铁',
-  BRONZE: '英勇黄铜', // 实际上应该是青铜，黄铜是 brass
+  BRONZE: '英勇黄铜',
   SILVER: '不屈白银',
   GOLD: '荣耀黄金',
   PLATINUM: '华贵铂金',

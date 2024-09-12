@@ -39,9 +39,9 @@
               class="tab-icon"
               :src="tab.data.summoner ? profileIconUrl(tab.data.summoner.profileIconId) : undefined"
             />
-            <span class="tab-title-region-name" v-if="tabNames[tab.id]?.regionText">[{{
-              tabNames[tab.id].regionText
-            }}]</span>
+            <span class="tab-title-region-name" v-if="tabNames[tab.id]?.regionText"
+              >[{{ tabNames[tab.id].regionText }}]</span
+            >
             <span class="tab-title-game-name">{{ tabNames[tab.id].gameName }}</span>
             <span class="tab-title-tag-line" v-if="tabNames[tab.id]?.tagLine"
               >#{{ tabNames[tab.id].tagLine }}</span
@@ -94,9 +94,8 @@
         <MatchHistoryTab
           v-for="t of mh.tabs"
           :key="t.id"
-          v-show="t.id === mh.currentTab.id"
-          :is-self="mh.currentTab.data.puuid === summoner.me?.puuid"
           :tab="{ id: t.id, ...(t.data as TabState) }"
+          v-show="t.id === mh.currentTab.id"
           ref="tabs-ref"
         />
       </template>

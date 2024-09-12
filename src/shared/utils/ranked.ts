@@ -20,10 +20,17 @@ export const queueTypeTextMap: Record<string, string> = {
   RANKED_TFT_DOUBLE_UP: '云顶之弈 (双人作战)'
 }
 
-// assignmentReason: PRIMARY, SECONDARY, FILL_SECONDARY, FILL_PRIMARY, AUTO_FILL
+export interface ParsedRole {
+  current: string
+  assignmentReason: string
+  primary: string
+  secondary: string
+}
+
+// assignmentReason: PRIMARY, SECONDARY, FILL_SECONDARY, FILL_PRIMARY, AUTOFILL
 // NONE, UNSELECTED
 // TOP, MIDDLE, JUNGLE, BOTTOM, UTILITY
-export function parseSelectedRole(role: string) {
+export function parseSelectedRole(role: string): ParsedRole {
   const segments = role.split('.')
   if (segments.length !== 4) {
     return {

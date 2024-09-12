@@ -4,7 +4,15 @@
       class="champion-icon-stretched"
       :src="championId ? `/lol-game-data/assets/v1/champion-icons/${championId}.png` : undefined"
     />
-    <div v-if="ring && round" class="ring"></div>
+    <div
+      v-if="ring"
+      class="ring"
+      :class="{ round: round }"
+      :style="{
+        borderColor: ringColor || '#2a947d',
+        borderWidth: `${ringWidth}px` || '2px'
+      }"
+    ></div>
   </div>
 </template>
 
@@ -16,6 +24,7 @@ defineProps<{
   round?: boolean
   ring?: boolean
   ringColor?: string
+  ringWidth?: number
 }>()
 </script>
 
@@ -47,9 +56,12 @@ defineProps<{
     left: 0;
     width: 100%;
     height: 100%;
-    border: 2px solid v-bind("ringColor || '#2a947d'");
-    border-radius: 50%;
+    border-style: solid;
     box-sizing: border-box;
+
+    &.round {
+      border-radius: 50%;
+    }
   }
 }
 </style>

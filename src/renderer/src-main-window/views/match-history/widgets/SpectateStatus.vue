@@ -94,6 +94,19 @@
         </div>
       </div>
     </DefineTeamSide>
+    <div
+      class="cherry-bans"
+      v-if="data.game.gameMode === 'CHERRY' && data.game.bannedChampions.length"
+    >
+      <span class="bans-hint">禁用</span>
+      <div class="bans-wrap">
+        <LcuImage
+          class="champion-icon"
+          v-for="ban of data.game.bannedChampions"
+          :src="championIconUrl(ban.championId)"
+        />
+      </div>
+    </div>
     <TeamSide
       v-if="teams && teams.team1 && teams.team1.players.length"
       :players="teams.team1.players"
@@ -124,7 +137,7 @@ import { PlayCircleFilled as PlayCircleFilledIcon } from '@vicons/material'
 import { createReusableTemplate, useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NButton, NIcon, NPopover } from 'naive-ui'
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch, watchEffect } from 'vue'
 
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
 
@@ -150,8 +163,9 @@ const {
   data: SpectatorData
 }>()
 
+// 将在日后更新
 const canSpectate = computed(() => {
-  return data.game.gameMode !== 'TFT'
+  return true
 })
 
 const isTftMode = computed(() => {
@@ -211,6 +225,7 @@ useIntervalFn(
 )
 
 const updatedSummonerInfo = shallowRef<Record<string, { gameName: string; tagLine: string }>>({})
+
 watch(
   () => data,
   async (d) => {
@@ -251,10 +266,6 @@ const handleSpectate = (byLcuApi: boolean) => {
 </script>
 
 <style lang="less" scoped>
-.wrapper {
-  width: 266px;
-}
-
 .queue {
   display: flex;
   align-items: center;
@@ -386,6 +397,26 @@ const handleSpectate = (byLcuApi: boolean) => {
 .champion-icon {
   width: 18px;
   height: 18px;
+}
+
+.cherry-bans {
+  display: flex;
+
+  .bans-wrap {
+    margin-left: auto;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    flex-wrap: wrap;
+    max-width: 160px;
+  }
+
+  .bans-hint {
+    margin-right: 2px;
+    font-weight: normal;
+    font-size: 10px;
+    color: #d6d6d6;
+  }
 }
 
 .operations {

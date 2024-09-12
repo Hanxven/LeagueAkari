@@ -5,7 +5,7 @@ import {
   SgpSummoner,
   SpectatorData
 } from '@shared/data-sources/sgp/types'
-import { MatchHistory } from '@shared/types/lcu/match-history'
+import { Game, MatchHistory } from '@shared/types/lcu/match-history'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 
 import { useExternalDataSourceStore } from './store'
@@ -52,6 +52,14 @@ class SgpEdsRenderer {
 
   getSummonerLcuFormat(playerPuuid: string, sgpServerId?: string): Promise<SummonerInfo> {
     return this._edsm.call('sgp/get-summoner-lcu-format', playerPuuid, sgpServerId)
+  }
+
+  getGameSummary(gameId: string, sgpServerId?: string) {
+    return this._edsm.call('sgp/get-game-summary', gameId, sgpServerId)
+  }
+
+  getGameSummaryLcuFormat(gameId: number, sgpServerId?: string): Promise<Game> {
+    return this._edsm.call('sgp/get-game-summary-lcu-format', gameId, sgpServerId)
   }
 
   getRankedStats(puuid: string, sgpServerId?: string): Promise<SgpRankedStats> {
@@ -110,10 +118,6 @@ export class ExternalDataSourceRendererModule extends StateSyncModule {
     await this.balance.setup()
     await this.gtimg.setup()
     await this.opgg.setup()
-
-    // FOR DEBUGGING
-    // @ts-ignore
-    window.sgp = this.sgp
   }
 }
 

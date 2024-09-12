@@ -22,11 +22,7 @@ import {
 import { formatError } from '@shared/utils/errors'
 import { summonerName } from '@shared/utils/name'
 import { cancellableSleep, sleep } from '@shared/utils/sleep'
-import {
-  calculateTogetherTimes,
-  removeOverlappingSubsets,
-  removeSubsets
-} from '@shared/utils/team-up-calc'
+import { calculateTogetherTimes, removeOverlappingSubsets } from '@shared/utils/team-up-calc'
 import { Paths } from '@shared/utils/types'
 import dayjs from 'dayjs'
 import { set } from 'lodash'
@@ -1033,6 +1029,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       'ongoingChampionSelections',
       'ongoingPreMadeTeams',
       'ongoingTeams',
+      'ongoingPositionAssignments',
       'sendList',
       'isWaitingForDelay',
       'ongoingPlayerAnalysis',

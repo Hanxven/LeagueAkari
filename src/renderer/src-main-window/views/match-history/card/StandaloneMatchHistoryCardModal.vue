@@ -31,6 +31,9 @@
 
 <script setup lang="ts">
 import { getGame } from '@renderer-shared/http-api/match-history'
+import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
+import { externalDataSourceRendererModule as edsm } from '@renderer-shared/modules/external-data-source'
+import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
 import { laNotification } from '@renderer-shared/notification'
 import { Game } from '@shared/types/lcu/match-history'
 import { AxiosError } from 'axios'
@@ -47,6 +50,13 @@ const props = defineProps<{
   selfPuuid?: string
 }>()
 
+const eds = useExternalDataSourceStore()
+const cf = useCoreFunctionalityStore()
+
+const willUseSgpApi = computed(() => {
+  return cf.settings.useSgpApi && eds.sgpAvailability.currentSgpServerSupported
+})
+
 const show = defineModel<boolean>('show', { default: false })
 
 const uncontrolledGame = shallowRef<Game | null>(null)
@@ -59,7 +69,7 @@ const showingGame = computed(() => {
   return props.game || uncontrolledGame.value || null
 })
 
-const fetchGame = async (gameId: number) => {
+const fetchGame = async (gameId: number, useSgpApi = false) => {
   if (isLoading.value) {
     return
   }
@@ -68,7 +78,9 @@ const fetchGame = async (gameId: number) => {
   isFailedToLoad.value = false
   isNotFound.value = false
   try {
-    const g = (await getGame(gameId)).data
+    const g = useSgpApi
+      ? await edsm.sgp.getGameSummaryLcuFormat(gameId)
+      : (await getGame(gameId)).data
     if (g.gameId === props.gameId) {
       uncontrolledGame.value = g
     }
@@ -99,8 +111,8 @@ const handleReload = async () => {
 }
 
 watch(
-  [() => props.game, () => props.gameId, () => props.selfPuuid],
-  ([game, gameId, _selfId]) => {
+  [() => props.game, () => props.gameId, () => props.selfPuuid, () => cf.settings.useSgpApi],
+  ([game, gameId, _selfId, useSgpApi]) => {
     if (game) {
       return
     }
@@ -108,7 +120,7 @@ watch(
     uncontrolledGame.value = null
 
     if (gameId) {
-      fetchGame(gameId)
+      fetchGame(gameId, useSgpApi)
       isExpanded.value = true
     } else {
       if (show.value) {
