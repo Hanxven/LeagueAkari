@@ -27,7 +27,6 @@ class CoreFunctionalitySettings {
   sendKdaThreshold: number = 0
   useAuxiliaryWindow: boolean = true
   playerAnalysisFetchConcurrency: number = 3
-  delaySecondsBeforeLoading: number = 0
   useSgpApi: boolean = true
 
   constructor() {
@@ -78,9 +77,6 @@ class CoreFunctionalitySettings {
     this.playerAnalysisFetchConcurrency = limit
   }
 
-  setDelaySecondsBeforeLoading(value: number) {
-    this.delaySecondsBeforeLoading = value
-  }
 
   setUseSgpApi(value: boolean) {
     this.useSgpApi = value
@@ -460,7 +456,8 @@ export class CoreFunctionalityState {
       ongoingPositionAssignments: computed.struct,
       sendList: observable.ref,
       ongoingPreMadeTeams: observable.struct,
-      ongoingPlayerAnalysis: observable.struct
+      ongoingPlayerAnalysis: observable.struct,
+      queryState: computed.struct
     })
   }
 }

@@ -29,13 +29,13 @@ import { set } from 'lodash'
 import { comparer, computed, observable, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
 
+import { ExternalDataSourceModule } from '../external-data-source'
 import { LcuConnectionModule } from '../lcu-connection'
+import { LcuSyncModule } from '../lcu-state-sync'
 import { LeagueClientModule } from '../league-client'
 import { AppLogger, LogModule } from '../log'
 import { MainWindowModule } from '../main-window'
 import { PlatformModule } from '../win-platform'
-import { ExternalDataSourceModule } from '../external-data-source'
-import { LcuSyncModule } from '../lcu-state-sync'
 import { CoreFunctionalityState } from './state'
 
 export class CoreFunctionalityModule extends MobxBasedBasicModule {
@@ -133,14 +133,19 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         if (state.phase === 'unavailable' || !s) {
           this.sendEvent('clear/ongoing-players')
           this.state.clearOngoingVars()
-          this._controller?.abort()
-          this._controller = null
+          if (this._controller) {
+            this._controller.abort()
+            this._controller = null
+          }
+
           return
         }
 
-        if (!this._controller) {
-          this._controller = new AbortController()
+        if (this._controller) {
+          this._controller.abort()
         }
+
+        this._controller = new AbortController()
 
         let queue = queueFilter
         if (
@@ -182,7 +187,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           runInAction(() => (this.state.ongoingPreMadeTeams = {}))
         }
       },
-      { delay: 500 }
+      { delay: 250 }
     )
 
     // Akari's Opinion
@@ -832,46 +837,50 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         )
 
         try {
-          const matchHistory = await this._playerAnalysisFetchLimiter
+          const games = await this._playerAnalysisFetchLimiter
             .add(
               async () => {
                 if (sgpApiAvailable) {
-                  return await this._edsm.sgp.getMatchHistoryLcuFormat(
+                  const result = await this._edsm.sgp.getMatchHistoryLcuFormat(
                     puuid,
                     0,
                     this.state.settings.matchHistoryLoadCount,
                     queueFilter && queueFilter !== -1 ? `q_${queueFilter}` : undefined
                   )
+                  return result.games.games
                 } else {
-                  return (
-                    await getMatchHistory(
-                      summonerInfo.data.puuid,
-                      0,
-                      this.state.settings.matchHistoryLoadCount - 1,
-                      retries
-                    )
-                  ).data
+                  const { data } = await getMatchHistory(
+                    summonerInfo.data.puuid,
+                    0,
+                    this.state.settings.matchHistoryLoadCount - 1,
+                    retries
+                  )
+
+                  const tasks = data.games.games.map(async (g) => {
+                    const { data: game } = await getGame(g.gameId) // LCU 会走缓存, 因此这里不限速
+                    return game
+                  })
+
+                  return await Promise.all(tasks)
                 }
               },
               { signal, priority: CoreFunctionalityModule.FETCH_PRIORITY.MATCH_HISTORY }
             )
             .catch((error) => this._handleAbortError(error))
 
-          if (!matchHistory) {
+          if (!games) {
             return
           }
 
-          const withDetailedFields = matchHistory.games.games.map((g) => ({
+          const withDetailedFields = games.map((g) => ({
             game: g,
-            isDetailed: sgpApiAvailable // SGP API 会返回详细战绩。倒是 LCU API 会多做一步无用的提取
+            isDetailed: true // 现在始终 true
           }))
 
-          withDetailedFields.forEach((g) => {
-            if (g.isDetailed) {
-              runInAction(() => {
-                this.state.tempDetailedGames.set(g.game.gameId, g.game)
-              })
-            }
+          runInAction(() => {
+            withDetailedFields.forEach((g) => {
+              this.state.tempDetailedGames.set(g.game.gameId, g.game)
+            })
           })
 
           runInAction(() => {
@@ -879,54 +888,6 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           })
 
           this.sendEvent('update/ongoing-player/match-history', puuid, withDetailedFields)
-
-          // 将详细信息加载到每个对局中，因为 LCU 需要多请求一步
-          const loadGameTasks: Promise<void>[] = []
-
-          for (let i = 0; i < player.matchHistory!.length; i++) {
-            const game = player.matchHistory![i]
-
-            if (game.isDetailed) {
-              return
-            }
-
-            const _loadGame = async () => {
-              if (this.state.tempDetailedGames.has(game.game.gameId)) {
-                runInAction(() => {
-                  game.isDetailed = true
-                  game.game = this.state.tempDetailedGames.get(game.game.gameId)!
-                })
-                return
-              }
-
-              try {
-                const g = await this._playerAnalysisFetchLimiter
-                  .add(() => getGame(game.game.gameId), {
-                    signal,
-                    priority: CoreFunctionalityModule.FETCH_PRIORITY.GAME
-                  })
-                  .catch((error) => this._handleAbortError(error))
-
-                if (!g) {
-                  return
-                }
-
-                runInAction(() => {
-                  game.isDetailed = true
-                  game.game = g.data
-                  this.state.tempDetailedGames.set(g.data.gameId, g.data)
-                })
-
-                this.sendEvent('update/ongoing-player/match-history/detailed-game', puuid, g.data)
-              } catch (error) {
-                this._logger.warn(`无法加载对局, ID: ${game.game.gameId} ${formatError(error)}`)
-                // throw error // it will not cause an error
-              }
-            }
-
-            loadGameTasks.push(_loadGame())
-            await Promise.allSettled(loadGameTasks)
-          }
         } catch (error) {
           this._logger.warn(`无法加载战绩, ID: ${puuid} ${formatError(error)}`)
         }
@@ -1036,7 +997,6 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       'settings.fetchAfterGame',
       'settings.playerAnalysisFetchConcurrency',
       'settings.ongoingAnalysisEnabled',
-      'settings.delaySecondsBeforeLoading',
       'settings.matchHistoryLoadCount',
       'settings.preMadeTeamThreshold',
       'settings.useSgpApi'
@@ -1128,10 +1088,6 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         defaultValue: this.state.settings.ongoingAnalysisEnabled
       },
       {
-        key: 'delaySecondsBeforeLoading',
-        defaultValue: this.state.settings.delaySecondsBeforeLoading
-      },
-      {
         key: 'matchHistoryLoadCount',
         defaultValue: this.state.settings.matchHistoryLoadCount
       },
@@ -1169,7 +1125,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           value = 0
         }
 
-        set(this.state.settings, key, value)
+        runInAction(() => set(this.state.settings, key, value))
         await apply(key, value)
       }
     )
@@ -1183,15 +1139,12 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
         this._playerAnalysisFetchLimiter.concurrency = value
 
-        set(this.state.settings, key, value)
+        runInAction(() => set(this.state.settings, key, value))
         await apply(key, value)
       }
     )
     this.onSettingChange<Paths<typeof this.state.settings>>('ongoingAnalysisEnabled', defaultSetter)
-    this.onSettingChange<Paths<typeof this.state.settings>>(
-      'delaySecondsBeforeLoading',
-      defaultSetter
-    )
+
     this.onSettingChange<Paths<typeof this.state.settings>>(
       'matchHistoryLoadCount',
       async (key, value, apply) => {
@@ -1200,7 +1153,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         }
 
         if (value < this.state.settings.preMadeTeamThreshold) {
-          this.state.settings.setPreMadeTeamThreshold(value)
+          runInAction(() => set(this.state.settings, key, value))
           await apply('preMadeTeamThreshold', value)
         }
 

@@ -140,10 +140,6 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
     return this.call('save/saved-player', player)
   }
 
-  setDelaySecondsBeforeLoading(value: number) {
-    return this.call('set-setting', 'delaySecondsBeforeLoading', value)
-  }
-
   setMatchHistorySource(value: string) {
     return this.call('set-setting', 'matchHistorySource', value)
   }

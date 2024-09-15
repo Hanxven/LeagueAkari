@@ -14,6 +14,7 @@ export interface Games {
 }
 
 export interface Game {
+  endOfGameResult: string
   gameCreation: number
   gameCreationDate: string
   gameDuration: number

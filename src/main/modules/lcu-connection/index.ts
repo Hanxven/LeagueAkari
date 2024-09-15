@@ -89,7 +89,6 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
     this._mwm = this.manager.getModule<MainWindowModule>('main-window')
     this._lcm = this.manager.getModule<LeagueClientModule>('league-client')
 
-    await this._migrateSettings()
     await this._setupSettings()
     this._setupStateSync()
     this._setupMethodCall()
@@ -258,16 +257,6 @@ export class LcuConnectionModule extends MobxBasedBasicModule {
       timeout: LcuConnectionModule.REQUEST_TIMEOUT_MS,
       proxy: false
     })
-  }
-
-  private async _migrateSettings() {
-    if (await this._sm.settings.has('app/auto-connect')) {
-      this._sm.settings.set(
-        'lcu-connection/auto-connect',
-        await this._sm.settings.get('app/auto-connect', true)
-      )
-      this._sm.settings.remove('app/auto-connect')
-    }
   }
 
   private async _connectToLcu(auth: UxCommandLine) {

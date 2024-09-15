@@ -11,16 +11,15 @@ import { set } from 'lodash'
 import { runInAction } from 'mobx'
 
 import { LcuConnectionModule } from '../lcu-connection'
+import { LcuSyncModule } from '../lcu-state-sync'
 import { AppLogger, LogModule } from '../log'
 import { MainWindowModule } from '../main-window'
-import { LcuSyncModule } from '../lcu-state-sync'
 import { AutoReplyState } from './state'
 
 export class AutoReplyModule extends MobxBasedBasicModule {
   public state = new AutoReplyState()
 
   private _logger: AppLogger
-  private _mwm: MainWindowModule
   private _lcu: LcuSyncModule
   private _lcm: LcuConnectionModule
 
@@ -31,7 +30,6 @@ export class AutoReplyModule extends MobxBasedBasicModule {
   override async setup() {
     await super.setup()
 
-    this._mwm = this.manager.getModule('main-window')
     this._lcu = this.manager.getModule('lcu-state-sync')
     this._lcm = this.manager.getModule('lcu-connection')
     this._logger = this.manager.getModule<LogModule>('log').createLogger('auto-reply')
@@ -63,7 +61,7 @@ export class AutoReplyModule extends MobxBasedBasicModule {
           try {
             await chatSend(fromId, this.state.settings.text)
           } catch (error) {
-            this._mwm.notify.warn('auto-reply', '自动回复', '无法发送信息')
+            this.sendEvent('error-send-failed', { error: formatError(error) })
             this._logger.warn(`尝试自动回复时出现错误 ${formatError(error)}`)
           }
         }

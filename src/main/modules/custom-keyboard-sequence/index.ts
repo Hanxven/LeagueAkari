@@ -20,7 +20,6 @@ export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
 
   private _logger: AppLogger
   private _pm: PlatformModule
-  private _lcu: LcuSyncModule
   private _lcm: LeagueClientModule
 
   constructor() {
@@ -32,7 +31,6 @@ export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {
 
     this._logger = this.manager.getModule<LogModule>('log').createLogger('log')
     this._pm = this.manager.getModule('win-platform')
-    this._lcu = this.manager.getModule('lcu-state-sync')
     this._lcm = this.manager.getModule('league-client')
 
     await this._setupSettings()

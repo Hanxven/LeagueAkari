@@ -114,7 +114,7 @@ export function useIdleState() {
       gameflow.phase === 'Matchmaking' ||
       gameflow.phase === 'ReadyCheck' ||
       gameflow.phase === 'WatchInProgress' ||
-      champSelect.session?.isSpectating ||
+      (champSelect.session && champSelect.session.isSpectating) ||
       lc.state !== 'connected'
     )
   })
@@ -221,11 +221,10 @@ export const PRE_MADE_TEAM_COLORS = {
   C: { foregroundColor: '#628aff', color: '#000' },
   D: { foregroundColor: '#17c1d6', color: '#000' },
   E: { foregroundColor: '#d4de17', color: '#000' },
-  F: { foregroundColor: '#b517b5', color: '#000' },
+  F: { foregroundColor: '#b517b5', color: '#ff' },
   G: { foregroundColor: '#48e5db', color: '#000' },
-  H: { foregroundColor: '#d63a17', color: '#000' }
+  H: { foregroundColor: '#d63a17', color: '#fff' }
 }
-
 
 export const FIXED_CARD_WIDTH = '240px'
 

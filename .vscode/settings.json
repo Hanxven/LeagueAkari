@@ -1,5 +1,11 @@
 {
-  "cSpell.words": ["Akari", "bannable", "gameflow", "pickable"],
+  "cSpell.words": [
+    "Akari",
+    "bannable",
+    "gameflow",
+    "pickable",
+    "premade"
+  ],
   "files.associations": {
     "xstring": "cpp",
     "algorithm": "cpp",

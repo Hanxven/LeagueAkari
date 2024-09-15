@@ -1,3 +1,4 @@
+import { LeagueAkariModule } from '@main/akari-ipc/akari-module'
 import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 import { Metadata } from '@main/db/entities/Metadata'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
@@ -12,7 +13,6 @@ import path from 'node:path'
 import { DataSource, Equal, QueryRunner } from 'typeorm'
 
 import { AppLogger, LogModule } from '../log'
-import { LeagueAkariModule } from '@main/akari-ipc/akari-module'
 
 interface EncounteredGameQueryDto {
   selfPuuid: string

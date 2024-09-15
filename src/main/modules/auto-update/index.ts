@@ -123,7 +123,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
         }
       })
 
-      const lastReadSha = await this._ss.get('last-read-announcement-sha', '')
+      const lastReadSha = await this._ss.get('lastReadAnnouncementSha', '')
 
       this.state.setCurrentAnnouncement({
         content: announcement,
@@ -705,7 +705,7 @@ Try {
     this.onCall('set-read', async (sha: string) => {
       if (this.state.currentAnnouncement) {
         this.state.setAnnouncementRead(true)
-        await this._ss.set('last-read-announcement-sha', sha)
+        await this._ss.set('lastReadAnnouncementSha', sha)
       }
 
       return

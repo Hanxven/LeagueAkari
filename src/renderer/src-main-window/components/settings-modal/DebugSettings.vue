@@ -67,9 +67,29 @@
             <template #trigger>
               <span style="font-weight: bold; color: #fff; cursor: pointer">详情</span>
             </template>
-            <div style="font-size: 12px">该目录下：</div>
-            <div style="font-size: 12px">LeagueAkari.db - 存储用户设置、已标记的玩家等信息</div>
-            <div style="font-size: 12px">NewUpdates/ - 即将进行的自动更新临时文件</div>
+            <table>
+              <colgroup>
+                <col style="width: 100px" />
+              </colgroup>
+              <tbody style="font-size: 12px">
+                <tr>
+                  <td>LeagueAkari.db</td>
+                  <td>存储用户设置、已标记的玩家等信息</td>
+                </tr>
+                <tr>
+                  <td>NewUpdates/</td>
+                  <td>即将进行的自动更新临时文件</td>
+                </tr>
+                <tr>
+                  <td>AkariConfig/</td>
+                  <td>一些可以替换的设置项文件</td>
+                </tr>
+                <tr>
+                  <td>base-config.json</td>
+                  <td>特殊配置文件</td>
+                </tr>
+              </tbody>
+            </table>
           </NPopover>
         </template>
         <NButton size="small" secondary type="primary" @click="() => handleShowUserDataDir()"

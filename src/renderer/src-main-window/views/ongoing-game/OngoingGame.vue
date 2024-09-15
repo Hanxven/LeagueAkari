@@ -32,7 +32,7 @@
         </div>
       </div>
     </DefineOngoingTeam>
-    <NScrollbar v-if="!isInIdleState" x-scrollable>
+    <NScrollbar v-if="!isInIdleState && cf.settings.ongoingAnalysisEnabled" x-scrollable>
       <div class="inner-container" :class="{ 'fit-content': columnsNeed >= 4 }">
         <OngoingTeam v-for="(players, team) of teams" :team="team" :key="team" :players="players" />
       </div>
@@ -44,9 +44,9 @@
           v-if="cf.settings.ongoingAnalysisEnabled"
           style="font-size: 14px; font-weight: normal; color: #666"
         >
-          <template v-if="lc.state !== 'connected'"> 未连接到客户端 </template>
+          <template v-if="lc.state !== 'connected'">未连接到客户端</template>
           <template v-else-if="champSelect.session?.isSpectating">等待观战延迟</template>
-          <template v-else="champSelect.session?.isSpectating"> 没有正在进行中的游戏 </template>
+          <template v-else>没有正在进行中的游戏</template>
         </div>
         <div v-else style="font-size: 14px; font-weight: normal; color: #666">对局分析已禁用</div>
       </div>

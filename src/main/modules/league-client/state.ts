@@ -14,7 +14,7 @@ export class LcuClientSettings {
 
   terminateGameClientOnAltF4 = false
 
-  setFixWindowMethodsAOptions(option: { baseWidth: number; baseHeight: number }) {
+  setFixWindowMethodAOptions(option: { baseWidth: number; baseHeight: number }) {
     this.fixWindowMethodAOptions = option
   }
 

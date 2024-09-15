@@ -373,6 +373,10 @@ const formattedResultText = computed(() => {
     return '-'
   }
 
+  if (props.game.endOfGameResult === 'Abort_AntiCheatExit') {
+    return `被终止`
+  }
+
   // 重开局
   if (self.value.participant.stats.gameEndedInEarlySurrender) {
     return `重开 (${self.value.participant.stats.win ? '胜利' : '失败'})`
@@ -392,6 +396,7 @@ const composedResultClass = computed(() => {
 
   if (
     props.game.gameMode === 'PRACTICETOOL' ||
+    props.game.endOfGameResult === 'Abort_AntiCheatExit' ||
     self.value.participant.stats.gameEndedInEarlySurrender
   ) {
     return { remake: true }

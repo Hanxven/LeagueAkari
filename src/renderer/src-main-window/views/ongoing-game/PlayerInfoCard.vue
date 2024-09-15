@@ -280,7 +280,7 @@
         :delay="50"
       >
         <template #trigger>
-          <div class="tag akari-loved">表现突出</div>
+          <div class="tag akari-loved">突出</div>
         </template>
         <div class="popover-text">该玩家在近期对局中表现优异</div>
       </NPopover>
@@ -314,15 +314,16 @@
           </div>
         </div>
       </NPopover>
-      <div class="tag self" v-if="isSelf">我</div>
+      <div class="tag self" v-if="isSelf">自己</div>
     </div>
     <div class="frequent-used-champions" v-if="frequentlyUsedChampions.length">
       <NPopover :keep-alive-on-hover="false" v-for="c of frequentlyUsedChampions" :delay="50">
         <template #trigger>
           <ChampionIcon
-            :ring-color="c.winRate >= 0.5 ? '#4cc69dc0' : '#ff6161c0'"
+            :ring-color="c.winRate >= 0.5 ? '#2368ca' : '#c94f4f'"
             :champion-id="c.id"
             ring
+            :ring-width="1"
             class="frequent-used-champion"
           />
         </template>
@@ -352,7 +353,7 @@
                 {{ gameData.queues[item.game.queueId]?.name || item.game.queueId }}
               </div>
               <div class="line2">
-                {{ dayjs(item.game.gameCreation).format('DD-MM HH:mm') }}
+                {{ dayjs(item.game.gameCreation).format('MM-DD HH:mm') }}
                 <span class="win-lose">{{ getWinResultText(item) }}</span>
               </div>
             </div>
@@ -497,6 +498,10 @@ const getWinLoseClassName = (match: SelfParticipantGame) => {
     return 'na'
   }
 
+  if (match.game.endOfGameResult === 'Abort_AntiCheatExit') {
+    return 'na'
+  }
+
   if (match.selfParticipant.stats.gameEndedInEarlySurrender) {
     return 'na'
   }
@@ -507,6 +512,10 @@ const getWinLoseClassName = (match: SelfParticipantGame) => {
 const getWinResultText = (match: SelfParticipantGame) => {
   if (match.game.gameMode === 'PRACTICETOOL') {
     return '—'
+  }
+
+  if (match.game.endOfGameResult === 'Abort_AntiCheatExit') {
+    return '终'
   }
 
   if (match.selfParticipant.stats.gameEndedInEarlySurrender) {
@@ -662,6 +671,7 @@ const matches = computed(() => {
 
     &.incomplete {
       flex: 1;
+      justify-content: center;
     }
 
     .assignment-reason {
@@ -749,7 +759,7 @@ const matches = computed(() => {
     }
 
     &.privacy-private {
-      background-color: #ca0000;
+      background-color: #870808;
     }
 
     &.winning-streak {
@@ -782,9 +792,9 @@ const matches = computed(() => {
   align-items: center;
 
   .frequent-used-champion {
-    width: 20px;
     height: 20px;
-    border-radius: 2px;
+    width: 20px;
+    border-radius: 1px;
   }
 }
 
@@ -815,7 +825,8 @@ const matches = computed(() => {
     }
 
     &.win {
-      border-left-color: #4cc69d;
+      border-left-color: #2368ca;
+      background-color: #2369ca30;
 
       .win-lose {
         color: #4cc69d;
@@ -823,7 +834,8 @@ const matches = computed(() => {
     }
 
     &.lose {
-      border-left-color: #ff6161;
+      border-left-color: #c94f4f;
+      background-color: #c94f4f30;
 
       .win-lose {
         color: #ff6161;

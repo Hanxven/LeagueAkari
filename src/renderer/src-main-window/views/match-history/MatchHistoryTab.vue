@@ -253,6 +253,17 @@
             </div>
             <div class="left-content-item tagged-player" v-if="!isSelf && tab.savedInfo?.tag">
               <div class="left-content-item-title">已被标记的玩家</div>
+              <div class="tagged-by-other-summoner" v-if="taggerSummoner">
+                <span class="left-span">标记自</span>
+                <LcuImage
+                  class="profile-icon"
+                  :src="profileIconUrl(taggerSummoner.profileIconId)"
+                />
+                <div class="name-and-tag" @click="() => handleToSummoner(taggerSummoner!.puuid)">
+                  <span class="game-name">{{ taggerSummoner.gameName }}</span>
+                  <span class="tag-line">#{{ taggerSummoner.tagLine }}</span>
+                </div>
+              </div>
               <NScrollbar class="tagged-player-n-scrollbar">
                 <div class="left-content-item-content">{{ tab.savedInfo.tag }}</div>
               </NScrollbar>
@@ -423,6 +434,7 @@ import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { launchSpectator } from '@renderer-shared/http-api/spectator'
+import { getSummonerByPuuid } from '@renderer-shared/http-api/summoner'
 import { appRendererModule as am } from '@renderer-shared/modules/app'
 import { useAppStore } from '@renderer-shared/modules/app/store'
 import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
@@ -435,6 +447,7 @@ import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summon
 import { leagueClientRendererModule as lcm } from '@renderer-shared/modules/league-client'
 import { laNotification } from '@renderer-shared/notification'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
 import {
   analyzeMatchHistory,
   analyzeMatchHistoryPlayers,
@@ -800,6 +813,23 @@ const handleLaunchSpectator = async (_: string, byLcuApi: boolean) => {
   }
 }
 
+const taggerSummoner = shallowRef<SummonerInfo | null>(null)
+const isTaggedByOtherSummoner = computed(() => {
+  return tab.savedInfo && summoner.me && tab.savedInfo.selfPuuid !== summoner.me.puuid
+})
+
+watch(
+  () => isTaggedByOtherSummoner.value,
+  async (isNotSame) => {
+    if (isNotSame) {
+      taggerSummoner.value = (await getSummonerByPuuid(tab.savedInfo!.selfPuuid)).data
+    } else {
+      taggerSummoner.value = null
+    }
+  },
+  { immediate: true }
+)
+
 // workaround: KeepAlive 下 Naive UI 滚动条复位问题
 watch(
   () => mh.currentTab?.id,
@@ -966,6 +996,57 @@ defineExpose({
   }
 }
 
+.left-content-item .tagged-by-other-summoner {
+  display: flex;
+  font-size: 12px;
+  color: #858585;
+  margin-bottom: 4px;
+
+  .left-span {
+    margin-right: 4px;
+  }
+
+  .profile-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+  }
+}
+
+.recently-played-item,
+.tagged-by-other-summoner {
+  .name-and-tag {
+    display: flex;
+    align-items: flex-end;
+    cursor: pointer;
+  }
+
+  .game-name {
+    font-size: 12px;
+    color: #fff;
+    margin-left: 4px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .tag-line {
+    font-size: 11px;
+    color: #858585;
+    margin-left: 2px;
+    transition: all 0.2s;
+  }
+
+  .name-and-tag:hover {
+    .game-name,
+    .tag-line {
+      filter: brightness(1.2);
+    }
+  }
+}
+
 .content .right {
   padding: 12px 12px;
 
@@ -1123,37 +1204,6 @@ defineExpose({
 
   &:not(:last-child) {
     margin-bottom: 4px;
-  }
-
-  .name-and-tag {
-    display: flex;
-    align-items: flex-end;
-    cursor: pointer;
-  }
-
-  .name-and-tag:hover {
-    .game-name,
-    .tag-line {
-      filter: brightness(1.2);
-    }
-  }
-
-  .game-name {
-    font-size: 12px;
-    color: #fff;
-    margin-left: 4px;
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: all 0.2s;
-  }
-
-  .tag-line {
-    font-size: 11px;
-    color: #858585;
-    margin-left: 2px;
-    transition: all 0.2s;
   }
 
   .win-or-lose {

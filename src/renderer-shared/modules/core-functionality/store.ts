@@ -33,11 +33,9 @@ export interface EncounteredGame {
  * 存储在本地的玩家信息
  */
 export interface SavedPlayerInfo {
-  summonerId: number
-
   puuid: string
 
-  selfSummonerId: number
+  selfPuuid: string
 
   tag: string
 
@@ -169,9 +167,6 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
 
     // 对局中战绩获取的最大并发限制
     playerAnalysisFetchConcurrency: 3,
-
-    // 延迟加载时间
-    delaySecondsBeforeLoading: 0,
 
     useSgpApi: true
   })

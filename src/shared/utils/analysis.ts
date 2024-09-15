@@ -404,6 +404,7 @@ export function analyzeMatchHistory(
     .filter((g) => g.isDetailed)
     .filter((g) => !queueType || queueType.includes(g.game.queueId))
     .filter((g) => !g.game.participants.some((p) => p.stats.gameEndedInEarlySurrender))
+    .filter(g => g.game.endOfGameResult !== 'Abort_AntiCheatExit')
     .filter((g) => g.game.gameType === 'MATCHED_GAME' && !isPveQueue(g.game.queueId))
     .map((g) => g.game)
 
