@@ -77,7 +77,6 @@ class CoreFunctionalitySettings {
     this.playerAnalysisFetchConcurrency = limit
   }
 
-
   setUseSgpApi(value: boolean) {
     this.useSgpApi = value
   }
@@ -408,12 +407,12 @@ export class CoreFunctionalityState {
 
     if (
       lcu.gameflow.session &&
-      (lcu.gameflow.phase === 'GameStart' ||
-        lcu.gameflow.phase === 'InProgress' ||
-        lcu.gameflow.phase === 'WaitingForStats' ||
-        lcu.gameflow.phase === 'PreEndOfGame' ||
-        lcu.gameflow.phase === 'EndOfGame' ||
-        lcu.gameflow.phase === 'Reconnect')
+      (lcu.gameflow.session.phase === 'GameStart' ||
+        lcu.gameflow.session.phase === 'InProgress' ||
+        lcu.gameflow.session.phase === 'WaitingForStats' ||
+        lcu.gameflow.session.phase === 'PreEndOfGame' ||
+        lcu.gameflow.session.phase === 'EndOfGame' ||
+        lcu.gameflow.session.phase === 'Reconnect')
     ) {
       return {
         phase: 'in-game',

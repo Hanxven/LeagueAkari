@@ -28,6 +28,7 @@ export const RANKED_MEDAL_MAP: Record<string, string> = {
   CHALLENGER: ChallengerMedal
 }
 
+
 export const POSITION_ASSIGNMENT_REASON = {
   FILL_SECONDARY: {
     name: '副选补位',
@@ -229,16 +230,3 @@ export const PRE_MADE_TEAM_COLORS = {
 export const FIXED_CARD_WIDTH = '240px'
 
 export const ONGOING_GAME_COMP_K = Symbol('AKARI_OGC_IJK') as InjectionKey<any>
-
-export const TIER_TEXT: Record<string, string> = {
-  IRON: '坚韧黑铁',
-  BRONZE: '英勇黄铜',
-  SILVER: '不屈白银',
-  GOLD: '荣耀黄金',
-  PLATINUM: '华贵铂金',
-  EMERALD: '流光翡翠',
-  DIAMOND: '璀璨钻石',
-  MASTER: '超凡大师',
-  GRANDMASTER: '傲世宗师',
-  CHALLENGER: '最强王者'
-}

@@ -3,7 +3,9 @@
     class="player-card"
     :class="{
       dimming:
-        currentHighlightingPreMadeTeamId && currentHighlightingPreMadeTeamId !== preMadeTeamId
+        currentHighlightingPreMadeTeamId && currentHighlightingPreMadeTeamId !== preMadeTeamId,
+      highlighting:
+        currentHighlightingPreMadeTeamId && currentHighlightingPreMadeTeamId === preMadeTeamId
     }"
     :style="{
       width: `${FIXED_CARD_WIDTH}px`
@@ -32,56 +34,66 @@
           >
           <span class="tag-line">#{{ summoner?.tagLine || '—' }}</span>
         </div>
-        <div class="ranked">
-          <template v-if="queueType !== 'CHERRY'">
-            <div
-              class="ranked-item"
-              title="单排 / 双排"
-              v-if="rankedSoloFlex.solo && rankedSoloFlex.solo.tier && rankedSoloFlex.solo !== 'NA'"
-            >
-              <img class="image" :src="RANKED_MEDAL_MAP[rankedSoloFlex.solo.tier]" alt="rank" />
-              <span class="text">{{
-                rankedSoloFlex.solo.division && rankedSoloFlex.solo.division !== 'NA'
-                  ? `${TIER_TEXT[rankedSoloFlex.solo.tier]} ${rankedSoloFlex.solo.division}`
-                  : `${TIER_TEXT[rankedSoloFlex.solo.tier]}`
-              }}</span>
-            </div>
-            <div class="ranked-item unranked" title="单排 / 双排" v-else>
-              <span class="text">未定级</span>
-            </div>
-            <div
-              class="ranked-item"
-              title="灵活组排"
-              v-if="rankedSoloFlex.flex && rankedSoloFlex.flex.tier && rankedSoloFlex.flex !== 'NA'"
-            >
-              <img class="image" :src="RANKED_MEDAL_MAP[rankedSoloFlex.flex.tier]" alt="rank" />
-              <span class="text">{{
-                rankedSoloFlex.flex.division && rankedSoloFlex.flex.division !== 'NA'
-                  ? `${TIER_TEXT[rankedSoloFlex.flex.tier]} ${rankedSoloFlex.flex.division}`
-                  : `${TIER_TEXT[rankedSoloFlex.flex.tier]}`
-              }}</span>
-            </div>
-            <div class="ranked-item unranked" title="灵活组排" v-else>
-              <span class="text">未定级</span>
+        <NPopover :disabled="!rankedStats" :delay="50">
+          <template #trigger>
+            <div class="ranked">
+              <template v-if="queueType !== 'CHERRY'">
+                <div
+                  class="ranked-item"
+                  title="单排 / 双排"
+                  v-if="
+                    rankedSoloFlex.solo && rankedSoloFlex.solo.tier && rankedSoloFlex.solo !== 'NA'
+                  "
+                >
+                  <img class="image" :src="RANKED_MEDAL_MAP[rankedSoloFlex.solo.tier]" alt="rank" />
+                  <span class="text">{{
+                    rankedSoloFlex.solo.division && rankedSoloFlex.solo.division !== 'NA'
+                      ? `${TIER_TEXT[rankedSoloFlex.solo.tier]} ${rankedSoloFlex.solo.division}`
+                      : `${TIER_TEXT[rankedSoloFlex.solo.tier]}`
+                  }}</span>
+                </div>
+                <div class="ranked-item unranked" title="单排 / 双排" v-else>
+                  <span class="text">未定级</span>
+                </div>
+                <div
+                  class="ranked-item"
+                  title="灵活组排"
+                  v-if="
+                    rankedSoloFlex.flex && rankedSoloFlex.flex.tier && rankedSoloFlex.flex !== 'NA'
+                  "
+                >
+                  <img class="image" :src="RANKED_MEDAL_MAP[rankedSoloFlex.flex.tier]" alt="rank" />
+                  <span class="text">{{
+                    rankedSoloFlex.flex.division && rankedSoloFlex.flex.division !== 'NA'
+                      ? `${TIER_TEXT[rankedSoloFlex.flex.tier]} ${rankedSoloFlex.flex.division}`
+                      : `${TIER_TEXT[rankedSoloFlex.flex.tier]}`
+                  }}</span>
+                </div>
+                <div class="ranked-item unranked" title="灵活组排" v-else>
+                  <span class="text">未定级</span>
+                </div>
+              </template>
+              <template v-else>
+                <div
+                  class="ranked-item cherry"
+                  title="灵活组排"
+                  v-if="rankedSoloFlex.cherry && rankedSoloFlex.cherry.ratedRating"
+                >
+                  <span class="text"
+                    >斗魂竞技场
+                    <span style="font-weight: bold">{{ rankedSoloFlex.cherry.ratedRating }}</span>
+                    分</span
+                  >
+                </div>
+                <div class="ranked-item unranked cherry" title="灵活组排" v-else>
+                  <span class="text">未定级</span>
+                </div>
+              </template>
             </div>
           </template>
-          <template v-else>
-            <div
-              class="ranked-item cherry"
-              title="灵活组排"
-              v-if="rankedSoloFlex.cherry && rankedSoloFlex.cherry.ratedRating"
-            >
-              <span class="text"
-                >斗魂竞技场
-                <span style="font-weight: bold">{{ rankedSoloFlex.cherry.ratedRating }}</span>
-                分</span
-              >
-            </div>
-            <div class="ranked-item unranked cherry" title="灵活组排" v-else>
-              <span class="text">未定级</span>
-            </div>
-          </template>
-        </div>
+          <RankedTable v-if="rankedStats" :rankedStats="rankedStats" />
+          <div v-else>FOR PLACEHOLDER</div>
+        </NPopover>
       </div>
     </div>
     <div class="stats">
@@ -188,6 +200,7 @@
       </div>
     </div>
     <div class="tags">
+      <div class="tag self" v-if="isSelf">自己</div>
       <NPopover v-if="savedInfo && !isSelf && savedInfo.tag" :delay="50" style="max-height: 240px">
         <template #trigger>
           <div class="tag tagged">已标记</div>
@@ -234,22 +247,34 @@
           <div class="tag have-met">遇到过</div>
         </template>
         <div class="popover-text have-met-popover">
-          <div>
+          <div style="margin-bottom: 4px">
             {{
               `曾在 ${dayjs(savedInfo.lastMetAt).locale('zh-cn').fromNow()} 遇见过，共遇见过 ${savedInfo.encounteredGames.length} 次`
             }}
           </div>
-          <div class="encountered-games">
-            <div
-              class="encountered-game"
-              v-for="game of savedInfo.encounteredGames"
-              :key="game.gameId"
-              @click="() => emits('showGameById', game.gameId, puuid)"
-            >
-              <span class="date">{{ dayjs(game.updateAt).format('MM-DD HH:mm') }}</span>
-              <span class="game-id">{{ game.gameId }}</span>
-            </div>
-          </div>
+          <table class="encountered-game-table">
+            <colgroup>
+              <col class="game-id-col" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>对局 ID</th>
+                <th>记载日期</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in savedInfo.encounteredGames" :key="item.gameId">
+                <td class="game-id-td" @click="() => emits('showGameById', item.gameId, puuid)">
+                  {{ item.gameId }}
+                </td>
+                <td>
+                  {{ dayjs(item.updateAt).format('MM-DD HH:mm:ss') }} ({{
+                    dayjs(item.updateAt).locale('zh-cn').fromNow()
+                  }})
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </NPopover>
       <NPopover
@@ -328,7 +353,6 @@
           </div>
         </div>
       </NPopover>
-      <div class="tag self" v-if="isSelf">自己</div>
     </div>
     <div class="frequent-used-champions" v-if="frequentlyUsedChampions.length">
       <NPopover :keep-alive-on-hover="false" v-for="c of frequentlyUsedChampions" :delay="50">
@@ -398,11 +422,13 @@ import {
   withSelfParticipantMatchHistory
 } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
+import { TIER_TEXT } from '@shared/utils/ranked'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NPopover, NVirtualList } from 'naive-ui'
 import { computed, useTemplateRef, watch, watchEffect } from 'vue'
 
+import RankedTable from '@main-window/components/RankedTable.vue'
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
 
 import {
@@ -410,8 +436,7 @@ import {
   FIXED_CARD_WIDTH,
   POSITION_ASSIGNMENT_REASON,
   PRE_MADE_TEAM_COLORS,
-  RANKED_MEDAL_MAP,
-  TIER_TEXT
+  RANKED_MEDAL_MAP
 } from './ongoing-game-utils'
 
 const { puuid, analysis, matchHistory, position, preMadeTeamId, rankedStats } = defineProps<{
@@ -574,6 +599,10 @@ const matches = computed(() => {
 
   &.dimming {
     filter: brightness(0.3);
+  }
+
+  &.highlighting {
+    filter: brightness(1.2);
   }
 }
 
@@ -924,26 +953,31 @@ const matches = computed(() => {
   width: fit-content;
 }
 
-.encountered-games {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  margin-top: 4px;
+.encountered-game-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid #ffffff40;
+  font-size: 12px;
+  color: #d4d4d4;
 
-  .encountered-game {
-    display: flex;
-    gap: 4px;
-    font-size: 12px;
+  th,
+  td {
+    border: 1px solid #ffffff40;
+    padding: 0 8px;
+    text-align: center;
+  }
+
+  .game-id-col {
+    width: 120px;
+  }
+
+  .game-id-td:hover {
+    color: #ffffff;
+  }
+
+  .game-id-td {
+    transition: color 0.2s;
     cursor: pointer;
-
-    .date {
-      margin-right: 4px;
-    }
-
-    .game-id {
-      color: #999;
-      font-weight: bold;
-    }
   }
 }
 

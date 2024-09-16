@@ -7,12 +7,15 @@
     />
     <NModal v-model:show="isShowingRankedModal">
       <div class="ranked-modal">
-        <RankedDisplay
-          v-for="r of tab.rankedStats?.queueMap"
-          :key="r.queueType"
-          class="ranked"
-          :ranked-entry="r"
-        />
+        <div class="blocks">
+          <RankedDisplay
+            v-for="r of tab.rankedStats?.queueMap"
+            :key="r.queueType"
+            class="ranked"
+            :ranked-entry="r"
+          />
+        </div>
+        <RankedTable v-if="tab.rankedStats" :ranked-stats="tab.rankedStats" />
       </div>
     </NModal>
     <Transition name="fade">
@@ -477,7 +480,7 @@ import {
   NavigateBeforeOutlined as NavigateBeforeOutlinedIcon,
   NavigateNextOutlined as NavigateNextOutlinedIcon
 } from '@vicons/material'
-import { useIntervalFn, useMediaQuery } from '@vueuse/core'
+import { useIntervalFn, useMediaQuery, useScroll } from '@vueuse/core'
 import {
   NButton,
   NIcon,
@@ -492,6 +495,7 @@ import {
 import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
+import RankedTable from '@main-window/components/RankedTable.vue'
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
 import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
 
@@ -543,7 +547,7 @@ const analysis = computed(() => {
 
 const eds = useExternalDataSourceStore()
 
-const scrollRef = useTemplateRef('scroll')
+const scrollEl = useTemplateRef('scroll')
 const rightEl = useTemplateRef('right')
 
 const mh = useMatchHistoryTabsStore()
@@ -568,7 +572,7 @@ const isSomethingLoading = computed(() => {
 const scrollToRightElTop = () => {
   const top = rightEl.value?.offsetTop
   if (top && top < mainContentScrollTop.value) {
-    scrollRef.value?.scrollTo({ top: top })
+    scrollEl.value?.scrollTo({ top: top })
   }
 }
 
@@ -851,15 +855,18 @@ watch(
 watch(
   () => mh.currentTab?.id,
   () => {
-    if (mh.currentTab?.id === tab.puuid) {
+    if (mh.currentTab?.id === tab.id) {
       nextTick(() => {
-        scrollRef.value?.scrollTo({ top: mainContentScrollTop.value })
+        scrollEl.value?.scrollTo({ top: mainContentScrollTop.value })
       })
     }
-  }
+  },
+  { immediate: true }
 )
 
 defineExpose({
+  id: tab.id,
+  sgpServerId: tab.sgpServerId,
   puuid: tab.puuid,
   refresh: handleRefresh
 })
@@ -874,12 +881,19 @@ defineExpose({
 }
 
 .ranked-modal {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
   border-radius: 4px;
   background-color: #202020;
   padding: 16px;
+
+  .blocks {
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
 
   .ranked {
     background-color: #f4f4f40e;

@@ -1,7 +1,7 @@
 <template>
   <div v-if="rankedEntry" class="ranked-wrapper" :class="{ small: small }">
     <div class="ranked-type">
-      {{ queueTypeTextMap[rankedEntry.queueType] || rankedEntry.queueType }}
+      {{ QUEUE_TYPE_TEXT[rankedEntry.queueType] || rankedEntry.queueType }}
     </div>
     <div class="ranked-display">
       <img
@@ -46,7 +46,7 @@
 
 <script lang="ts" setup>
 import { RankedEntry } from '@shared/types/lcu/ranked'
-import { queueTypeTextMap, tierTextMap } from '@shared/utils/ranked'
+import { QUEUE_TYPE_TEXT, TIER_TEXT } from '@shared/utils/ranked'
 import { computed } from 'vue'
 
 import RankedBronze from '@main-window/assets/ranked-icons-large/bronze.png'
@@ -108,7 +108,7 @@ const formatTier = computed(() => {
     return ''
   }
 
-  const tier = tierTextMap[props.rankedEntry.tier] || props.rankedEntry.tier
+  const tier = TIER_TEXT[props.rankedEntry.tier] || props.rankedEntry.tier
 
   if (tier === '' || tier === 'NA') {
     return '未定级'
@@ -129,7 +129,7 @@ const formatPreviousTier = computed(() => {
   }
 
   const tier =
-    tierTextMap[props.rankedEntry.previousSeasonHighestTier] ||
+    TIER_TEXT[props.rankedEntry.previousSeasonHighestTier] ||
     props.rankedEntry.previousSeasonHighestTier
 
   if (tier === '' || tier === 'NA') {

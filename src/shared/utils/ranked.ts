@@ -1,4 +1,4 @@
-export const tierTextMap: Record<string, string> = {
+export const TIER_TEXT: Record<string, string> = {
   IRON: '坚韧黑铁',
   BRONZE: '英勇黄铜',
   SILVER: '不屈白银',
@@ -11,7 +11,7 @@ export const tierTextMap: Record<string, string> = {
   CHALLENGER: '最强王者'
 }
 
-export const queueTypeTextMap: Record<string, string> = {
+export const QUEUE_TYPE_TEXT: Record<string, string> = {
   RANKED_SOLO_5x5: '单排 / 双排',
   RANKED_FLEX_SR: '灵活组排',
   CHERRY: '斗魂竞技场',
