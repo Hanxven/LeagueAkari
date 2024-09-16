@@ -225,17 +225,31 @@
         </div>
       </NPopover>
       <NPopover
-        :keep-alive-on-hover="false"
         v-if="savedInfo && savedInfo.lastMetAt && !isSelf"
         :delay="50"
+        scrollable
+        style="max-height: 240px"
       >
         <template #trigger>
           <div class="tag have-met">遇到过</div>
         </template>
-        <div class="popover-text">
-          {{
-            `曾在 ${dayjs(savedInfo.lastMetAt).locale('zh-cn').fromNow()} 遇见过，共遇见过 ${savedInfo.encounteredGames.length} 次`
-          }}
+        <div class="popover-text have-met-popover">
+          <div>
+            {{
+              `曾在 ${dayjs(savedInfo.lastMetAt).locale('zh-cn').fromNow()} 遇见过，共遇见过 ${savedInfo.encounteredGames.length} 次`
+            }}
+          </div>
+          <div class="encountered-games">
+            <div
+              class="encountered-game"
+              v-for="game of savedInfo.encounteredGames"
+              :key="game.gameId"
+              @click="() => emits('showGameById', game.gameId, puuid)"
+            >
+              <span class="date">{{ dayjs(game.updateAt).format('MM-DD HH:mm') }}</span>
+              <span class="game-id">{{ game.gameId }}</span>
+            </div>
+          </div>
         </div>
       </NPopover>
       <NPopover
@@ -903,6 +917,34 @@ const matches = computed(() => {
 .popover-text {
   font-size: 12px;
   max-width: 200px;
+}
+
+.popover-text.have-met-popover {
+  max-width: unset;
+  width: fit-content;
+}
+
+.encountered-games {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 4px;
+
+  .encountered-game {
+    display: flex;
+    gap: 4px;
+    font-size: 12px;
+    cursor: pointer;
+
+    .date {
+      margin-right: 4px;
+    }
+
+    .game-id {
+      color: #999;
+      font-weight: bold;
+    }
+  }
 }
 
 .tagged-text {

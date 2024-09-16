@@ -45,7 +45,6 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useAppStore } from '@renderer-shared/modules/app/store'
 import { customKeyboardSequenceRendererModule as cksm } from '@renderer-shared/modules/custom-keyboard-sequence'
 import { useCustomKeyboardSequenceStore } from '@renderer-shared/modules/custom-keyboard-sequence/store'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { NCard, NInput, NSwitch } from 'naive-ui'
 
 const cks = useCustomKeyboardSequenceStore()

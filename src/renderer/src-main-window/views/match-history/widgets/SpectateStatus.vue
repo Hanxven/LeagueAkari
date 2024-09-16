@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper" v-if="data">
     <div class="queue">
-      <div class="ongoing-indicator"></div>
+      <IndicatorPulse style="margin-right: 8px" />
       <div class="queue-name">
         {{ gameData.queues[data.game.gameQueueConfigId]?.name || data.game.gameQueueConfigId }}
       </div>
@@ -137,9 +137,11 @@ import { PlayCircleFilled as PlayCircleFilledIcon } from '@vicons/material'
 import { createReusableTemplate, useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NButton, NIcon, NPopover } from 'naive-ui'
-import { computed, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
+
+import IndicatorPulse from './IndicatorPulse.vue'
 
 const emits = defineEmits<{
   toSummoner: [puuid: string]
@@ -249,7 +251,8 @@ watch(
         } catch {}
       }
     }
-  }
+  },
+  { immediate: true }
 )
 
 const { start } = useTimeoutFn(() => {
@@ -270,15 +273,6 @@ const handleSpectate = (byLcuApi: boolean) => {
   display: flex;
   align-items: center;
 
-  .ongoing-indicator {
-    width: 8px;
-    height: 8px;
-    background-color: #00ff00;
-    border-radius: 50%;
-    margin-right: 8px;
-    animation: indicator-pulse 4s infinite;
-  }
-
   .queue-name {
     font-size: 14px;
     font-weight: bold;
@@ -287,21 +281,6 @@ const handleSpectate = (byLcuApi: boolean) => {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  // .launch-spectator {
-  // }
-}
-
-@keyframes indicator-pulse {
-  0% {
-    box-shadow: 0 0 0 0 #00ff0066;
-  }
-  20% {
-    box-shadow: 0 0 0 10px #00ff0000;
-  }
-  100% {
-    box-shadow: 0 0 0 0 #00ff0000;
   }
 }
 

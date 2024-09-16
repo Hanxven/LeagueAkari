@@ -43,6 +43,14 @@
     "PBE": {
       "name": "PBE",
       "server": "https://usw2-red.pp.sgp.pvp.net"
+    },
+    "PH2": {
+      "name": "菲律宾",
+      "server": "https://apse1-red.pp.sgp.pvp.net"
+    },
+    "VN2": {
+      "name": "越南",
+      "server": "https://apse1-red.pp.sgp.pvp.net"
     }
   },
   "groups": [
@@ -64,6 +72,12 @@
     ],
     [
       "PBE"
+    ],
+    [
+      "PH2"
+    ],
+    [
+      "VN2"
     ]
   ]
 }

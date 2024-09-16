@@ -9,7 +9,7 @@
             <ChampionIcon ring round class="image" :champion-id="info.id" />
             <div class="name-tier">
               <div class="name">
-                {{ gameData.champions[info.id]?.name || '-' }}
+                {{ gameData.champions[info.id]?.name || info.id }}
               </div>
               <div class="tier" :class="[[`tier-${info.tier}`]]">
                 {{ tierText }}

@@ -9,9 +9,9 @@ import { Paths } from '@shared/utils/types'
 import { set } from 'lodash'
 import { comparer, computed, runInAction } from 'mobx'
 
+import { LcuSyncModule } from '../lcu-state-sync'
 import { AppLogger, LogModule } from '../log'
 import { MainWindowModule } from '../main-window'
-import { LcuSyncModule } from '../lcu-state-sync'
 import { AutoSelectState } from './state'
 
 export class AutoSelectModule extends MobxBasedBasicModule {
@@ -385,7 +385,8 @@ export class AutoSelectModule extends MobxBasedBasicModule {
           const indexInFirstPickable = availableExpectedChampions.indexOf(
             pickableChampionsOnBench[0]
           )
-          if (indexInHand < indexInFirstPickable) {
+
+          if (indexInHand !== -1 && indexInHand < indexInFirstPickable) {
             return
           }
         } else {

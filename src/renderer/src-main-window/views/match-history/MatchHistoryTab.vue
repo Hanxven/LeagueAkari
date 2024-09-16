@@ -82,12 +82,28 @@
               </div>
             </div>
             <div class="profile-name">
-              <CopyableText
-                class="game-name"
-                :class="{ 'long-name': tab.summoner && tab.summoner.gameName.length >= 12 }"
-                :text="summonerName(tab.summoner?.gameName, tab.summoner?.tagLine, '-')"
-                >{{ tab.summoner?.gameName || '-' }}</CopyableText
-              >
+              <div class="game-name-line">
+                <CopyableText
+                  class="game-name"
+                  :class="{ 'long-name': tab.summoner && tab.summoner.gameName.length >= 12 }"
+                  :text="summonerName(tab.summoner?.gameName, tab.summoner?.tagLine, '-')"
+                  >{{ tab.summoner?.gameName || '-' }}</CopyableText
+                >
+                <NPopover v-if="spectatorData && isSmallScreen" display-directive="show">
+                  <template #trigger>
+                    <IndicatorPulse />
+                  </template>
+                  <div style="width: 256px">
+                    <SpectateStatus
+                      :is-cross-region="!isInSameRegion"
+                      :data="spectatorData"
+                      :puuid="tab.puuid"
+                      @to-summoner="(puuid) => handleToSummoner(puuid)"
+                      @launch-spectator="handleLaunchSpectator"
+                    />
+                  </div>
+                </NPopover>
+              </div>
               <span class="tag-line">#{{ tab.summoner?.tagLine || '-' }}</span>
             </div>
           </div>
@@ -480,6 +496,7 @@ import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/matc
 import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
+import IndicatorPulse from './widgets/IndicatorPulse.vue'
 import RankedDisplay from './widgets/RankedDisplay.vue'
 import SpectateStatus from './widgets/SpectateStatus.vue'
 
@@ -1110,6 +1127,12 @@ defineExpose({
     gap: 4px;
     align-self: center;
     margin-left: 12px;
+
+    .game-name-line {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
   }
 
   .profile-name .game-name {

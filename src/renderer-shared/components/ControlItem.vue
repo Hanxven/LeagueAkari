@@ -1,6 +1,6 @@
 <template>
   <div class="control-item">
-    <div class="label-area" :style="{ 'max-width': labelWidth ? `${labelWidth}px` : 'unset' }">
+    <div class="label-area" :style="{ 'width': labelWidth ? `${labelWidth}px` : 'unset' }">
       <div v-if="$slots.label" class="label">
         <slot name="label" :disabled="disabled"></slot>
       </div>
@@ -29,6 +29,7 @@ defineProps<{
 .control-item {
   display: flex;
   align-items: center;
+  width: fit-content;
 
   .label-area {
     flex-grow: 1;

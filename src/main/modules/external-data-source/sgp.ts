@@ -54,7 +54,7 @@ export class SgpEds {
   private _sgp = new SgpApi()
 
   static TENCENT_REGION = 'TENCENT'
-  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v3.json'
+  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v4.json'
 
   constructor(private _edsm: ExternalDataSourceModule) {}
 
