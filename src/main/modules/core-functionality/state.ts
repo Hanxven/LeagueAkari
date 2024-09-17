@@ -106,7 +106,7 @@ export interface OngoingPlayer {
   /**
    * 当前战绩使用的队列
    */
-  matchHistoryQueue?: number
+  matchHistoryQueue: number | null
 
   /**
    * 是否使用 SGP API

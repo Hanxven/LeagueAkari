@@ -128,6 +128,12 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     gameInfo: null
   })
   const isInEndgamePhase = ref(false)
+
+  /**
+   * -1 当前游戏队列
+   * -2 所有队列
+   * 其他值: 指定队列
+   */
   const queueFilter = ref(-1)
 
   const ongoingPlayerAnalysis = shallowRef<{

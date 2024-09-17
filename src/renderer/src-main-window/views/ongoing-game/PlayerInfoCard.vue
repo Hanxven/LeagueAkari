@@ -315,13 +315,19 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
-        v-if="analysis && analysis.akariScore.good"
+        v-if="analysis && (analysis.akariScore.good || analysis.akariScore.great)"
         :delay="50"
       >
         <template #trigger>
-          <div class="tag akari-loved">优异</div>
+          <div class="tag akari-loved" v-if="analysis.akariScore.great">非常突出</div>
+          <div class="tag akari-loved" v-else-if="analysis.akariScore.good">优异</div>
         </template>
-        <div class="popover-text">该玩家在近期对局中表现优异</div>
+        <div class="popover-text" v-if="analysis.akariScore.great">
+          该玩家的水平可能远超当前分段
+        </div>
+        <div class="popover-text" v-else-if="analysis.akariScore.good">
+          该玩家在近期对局中表现优异
+        </div>
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
@@ -393,7 +399,7 @@
       </NPopover>
     </div>
     <div class="win-lose-blocks" v-if="winLoseBlocks.length">
-      <div class="win-lose-block" v-for="block in winLoseBlocks" :class="block"></div>
+      <div class="win-lose-block" v-for="block in winLoseBlocks.slice(0, 40)" :class="block"></div>
     </div>
     <div class="match-history">
       <NVirtualList style="height: 100%" :item-size="32" :items="matches" v-if="matches.length">
@@ -464,25 +470,30 @@ import {
   RANKED_MEDAL_MAP
 } from './ongoing-game-utils'
 
-const { puuid, analysis, matchHistory, position, preMadeTeamId, rankedStats } = defineProps<{
-  puuid: string
-  championId?: number
-  isSelf?: boolean
-  preMadeTeamId?: string
-  currentHighlightingPreMadeTeamId?: string | null
-  team?: string
-  queueType?: string
-  position?: {
-    position: string
-    role: ParsedRole | null
-  }
-  summoner?: SummonerInfo
-  rankedStats?: RankedStats
-  championMastery?: Record<number, Mastery>
-  matchHistory?: MatchHistoryGameWithState[]
-  analysis?: MatchHistoryGamesAnalysisAll
-  savedInfo?: SavedPlayerInfo
-}>()
+const { puuid, analysis, matchHistory, position, preMadeTeamId, summoner, rankedStats } =
+  defineProps<{
+    puuid: string
+    championId?: number
+    isSelf?: boolean
+    preMadeTeamId?: string
+    currentHighlightingPreMadeTeamId?: string | null
+    team?: string
+    queueType?: string
+    position?: {
+      position: string
+      role: ParsedRole | null
+    }
+    summoner?: SummonerInfo
+    rankedStats?: RankedStats
+    championMastery?: Record<number, Mastery>
+    matchHistory?: MatchHistoryGameWithState[]
+    analysis?: MatchHistoryGamesAnalysisAll
+    savedInfo?: SavedPlayerInfo
+  }>()
+
+watchEffect(() => {
+  console.log(analysis, summoner?.gameName)
+})
 
 const emits = defineEmits<{
   toSummoner: [puuid: string]

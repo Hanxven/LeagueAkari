@@ -131,20 +131,29 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
     this._controller = new AbortController()
 
-    let queue = queueFilter
-    if (
-      queue === -1 &&
-      state.gameInfo &&
-      CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(state.gameInfo.queueId)
-    ) {
-      queue = state.gameInfo.queueId
+    let queueId: number | null = null
+
+    // 定义 -1 为当前游戏队列 (如果支持)
+    if (queueFilter === -1) {
+      if (
+        state.gameInfo &&
+        CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(state.gameInfo.queueId)
+      ) {
+        queueId = state.gameInfo.queueId
+      }
+    } else if (queueFilter === -2) {
+      queueId = null
+    } else {
+      if (CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(queueFilter)) {
+        queueId = queueFilter
+      }
     }
 
     try {
       if (state.phase === 'champ-select') {
-        await this._champSelectQuery(this._controller.signal, queue, useSgpApi)
+        await this._champSelectQuery(this._controller.signal, queueId, useSgpApi)
       } else if (state.phase === 'in-game') {
-        await this._inGameQuery(this._controller.signal, queue, useSgpApi)
+        await this._inGameQuery(this._controller.signal, queueId, useSgpApi)
       }
     } catch (error) {
       this._mwm.notify.warn('core-functionality', '对局中', '无法加载对局中信息')
@@ -743,13 +752,16 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
   private async _loadPlayerStats(
     signal: AbortSignal,
     puuid: string,
-    queueFilter?: number,
-    useSgpApi = false,
+    queueId: number | null,
+    useSgpApi = true,
     retries = 2
   ) {
     if (!this.state.ongoingPlayers.has(puuid)) {
       runInAction(() =>
-        this.state.ongoingPlayers.set(puuid, observable({ puuid, useSgpApi }, {}, { deep: false }))
+        this.state.ongoingPlayers.set(
+          puuid,
+          observable({ puuid, useSgpApi, matchHistoryQueue: null }, {}, { deep: false })
+        )
       )
       this.sendEvent('create/ongoing-player', puuid)
     }
@@ -823,22 +835,26 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         }
       }
 
-      const _loadMatchHistory = async (queueFilter = -1, useSgpApi = false) => {
+      const _loadMatchHistory = async (queueId: number | null, useSgpApi = true) => {
         if (
           player.matchHistory &&
-          player.matchHistoryQueue === queueFilter &&
+          player.matchHistoryQueue === queueId &&
           player.useSgpApi === useSgpApi
         ) {
           return
         }
 
-        runInAction(() => {
-          player.matchHistoryQueue = queueFilter
-          player.useSgpApi = useSgpApi
-        })
-
         const sgpApiAvailable =
           useSgpApi && this._edsm.sgp.state.availability.currentSgpServerSupported
+
+        runInAction(() => {
+          if (sgpApiAvailable) {
+            player.matchHistoryQueue = queueId
+          } else {
+            player.matchHistoryQueue = null
+          }
+          player.useSgpApi = useSgpApi
+        })
 
         this._logger.info(
           `Use API: ${sgpApiAvailable ? 'SGP' : 'LCU'}, 加载玩家信息 MatchHistory: ${puuid}`
@@ -853,7 +869,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
                     puuid,
                     0,
                     this.state.settings.matchHistoryLoadCount,
-                    queueFilter && queueFilter !== -1 ? `q_${queueFilter}` : undefined
+                    queueId !== null ? `q_${queueId}` : undefined
                   )
                   return result.games.games
                 } else {
@@ -935,7 +951,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       await Promise.allSettled([
         _loadSavedInfo(),
         _loadRankedStats(),
-        _loadMatchHistory(queueFilter, useSgpApi),
+        _loadMatchHistory(queueId, useSgpApi),
         _loadChampionMastery()
       ])
     } catch (error) {
@@ -943,7 +959,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     }
   }
 
-  private async _champSelectQuery(signal: AbortSignal, queueFilter?: number, useSgpApi = false) {
+  private async _champSelectQuery(signal: AbortSignal, queueId: number | null, useSgpApi = true) {
     const session = this._lcu.champSelect.session
     if (!session) {
       return
@@ -960,13 +976,13 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     const visiblePlayerPuuids = [...m, ...t]
 
     const playerTasks = visiblePlayerPuuids.map((p) => {
-      return this._loadPlayerStats(signal, p.puuid, queueFilter, useSgpApi)
+      return this._loadPlayerStats(signal, p.puuid, queueId, useSgpApi)
     })
 
     await Promise.allSettled(playerTasks)
   }
 
-  private async _inGameQuery(signal: AbortSignal, queueFilter?: number, useSgpApi = false) {
+  private async _inGameQuery(signal: AbortSignal, queueId: number | null, useSgpApi = true) {
     const session = this._lcu.gameflow.session
 
     if (!session) {
@@ -984,7 +1000,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     const visiblePlayerPuuids = [...m, ...t]
 
     const playerTasks = visiblePlayerPuuids.map((p) => {
-      return this._loadPlayerStats(signal, p.puuid, queueFilter, useSgpApi)
+      return this._loadPlayerStats(signal, p.puuid, queueId, useSgpApi)
     })
 
     await Promise.allSettled(playerTasks)
@@ -1061,15 +1077,34 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     /**
      * 设置战绩队列筛选，仅限使用 SGP 服务器时有效
      */
-    this.onCall('set-queue-filter', (queueId: number) => {
-      this.state.setQueueFilter(queueId)
+    this.onCall('set-queue-filter', (queueFilter: number) => {
+      this.state.setQueueFilter(queueFilter)
     })
 
     /**
      * 刷新对局分析的所有当前内容
      */
     this.onCall('refresh', () => {
-      // TODO
+      if (
+        this.state.queryState.phase === 'unavailable' ||
+        !this.state.settings.ongoingAnalysisEnabled
+      ) {
+        return
+      }
+
+      this.sendEvent('clear/ongoing-players')
+      runInAction(() => {
+        this.state.ongoingPlayers.clear()
+        this.state.tempDetailedGames.clear()
+        this.state.ongoingPreMadeTeams = {}
+        this.state.ongoingPlayerAnalysis = null
+      })
+
+      this._loadAllPlayers(
+        this.state.queryState,
+        this.state.queueFilter,
+        this.state.settings.useSgpApi
+      )
     })
   }
 

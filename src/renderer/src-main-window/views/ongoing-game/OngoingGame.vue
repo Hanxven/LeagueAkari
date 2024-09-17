@@ -51,6 +51,25 @@
     </DefineOngoingTeam>
     <NScrollbar v-if="!isInIdleState && cf.settings.ongoingAnalysisEnabled" x-scrollable>
       <div class="inner-container" :class="{ 'fit-content': columnsNeed >= 4 }">
+        <div class="header-controls">
+          <NSelect
+            :options="orderOptions"
+            placeholder="排序方式"
+            size="small"
+            v-model:value="orderBy"
+            class="order-selector"
+          />
+          <NSelect
+            v-if="canUseSgpApi"
+            :options="queueOptions"
+            :value="cf.queueFilter"
+            @update:value="(val) => cfm.setQueueFilter(val)"
+            placeholder="队列筛选"
+            size="small"
+            class="queue-selector"
+          />
+          <NButton @click="() => cfm.refresh()" size="small" type="primary">刷新</NButton>
+        </div>
         <OngoingTeam
           v-for="(players, team) of teams"
           :team="team"
@@ -81,10 +100,12 @@
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { coreFunctionalityRendererModule as cfm } from '@renderer-shared/modules/core-functionality'
 import {
   OngoingPlayer,
   useCoreFunctionalityStore
 } from '@renderer-shared/modules/core-functionality/store'
+import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
@@ -95,8 +116,8 @@ import {
   MatchHistoryGamesAnalysisTeamSide
 } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
-import { createReusableTemplate, refDebounced, useDebounceFn, useElementSize } from '@vueuse/core'
-import { NScrollbar } from 'naive-ui'
+import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
+import { NButton, NScrollbar, NSelect } from 'naive-ui'
 import { computed, provide, reactive, ref, useTemplateRef } from 'vue'
 
 import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
@@ -109,7 +130,9 @@ import {
   PRE_MADE_TEAMS,
   TEAM_NAMES,
   TeamMeta,
-  useIdleState
+  useIdleState,
+  useOrderOptions,
+  useQueueOptions
 } from './ongoing-game-utils'
 
 const cf = useCoreFunctionalityStore()
@@ -117,10 +140,15 @@ const lc = useLcuConnectionStore()
 const gameflow = useGameflowStore()
 const champSelect = useChampSelectStore()
 const summoner = useSummonerStore()
+const eds = useExternalDataSourceStore()
 
 const isInIdleState = useIdleState()
 
-const orderBy = ref<'akari-score' | 'kda' | 'win-rate' | 'default'>('kda')
+const orderBy = ref<'akari-score' | 'kda' | 'win-rate' | 'default'>('default')
+
+const canUseSgpApi = computed(() => {
+  return cf.settings.useSgpApi && eds.sgpAvailability.currentSgpServerSupported
+})
 
 const teams = computed(() => {
   if (!cf.ongoingTeams || !cf.ongoingPlayers) {
@@ -264,7 +292,9 @@ const currentHighlightingPreMadeTeamIdD = refDebounced<string | null>(
   currentHighlightingPreMadeTeamId,
   200
 )
-useDebounceFn(() => {})
+
+const orderOptions = useOrderOptions()
+const queueOptions = useQueueOptions()
 
 const handleHighlightSubTeam = (preMadeTeamId: string, highlight: boolean) => {
   if (highlight) {
@@ -350,6 +380,18 @@ const columnsNeed = computed(() => {
 
   &.fit-content {
     width: fit-content;
+  }
+}
+
+.header-controls {
+  display: flex;
+  justify-content: flex-end;
+  // margin-bottom: 8px; // maybe it's unnecessary
+  gap: 8px;
+
+  .queue-selector,
+  .order-selector {
+    width: 160px;
   }
 }
 

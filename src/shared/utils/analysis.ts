@@ -1,9 +1,4 @@
-import {
-  Game,
-  Participant,
-  ParticipantIdentity,
-  isPveQueue
-} from '@shared/types/lcu/match-history'
+import { Game, Participant, ParticipantIdentity, isPveQueue } from '@shared/types/lcu/match-history'
 
 const WIN_RATE_TEAM_THRESHOLD = 0.9418
 
@@ -404,7 +399,7 @@ export function analyzeMatchHistory(
     .filter((g) => g.isDetailed)
     .filter((g) => !queueType || queueType.includes(g.game.queueId))
     .filter((g) => !g.game.participants.some((p) => p.stats.gameEndedInEarlySurrender))
-    .filter(g => g.game.endOfGameResult !== 'Abort_AntiCheatExit')
+    .filter((g) => g.game.endOfGameResult !== 'Abort_AntiCheatExit')
     .filter((g) => g.game.gameType === 'MATCHED_GAME' && !isPveQueue(g.game.queueId))
     .map((g) => g.game)
 
@@ -1006,6 +1001,7 @@ export interface AkariScore {
   participationScore: number
   total: number
   good: boolean
+  great: boolean
 }
 
 // 非卖品, 仅限内部评判使用
@@ -1016,7 +1012,7 @@ export function calculateAkariScore(analyses: {
 }): AkariScore {
   const kdaScore = Math.sqrt(analyses.summary.averageKda) * 1.44
   const winRateScore = (analyses.summary.winRate - 0.5) * 4
-  const dmgScore = analyses.summary.averageDamageShareToTop * 10.0
+  const dmgScore = analyses.summary.averageDamageDealtToChampionShareToTop * 10.0
   const dmgTakenScore = analyses.summary.averageDamageTakenShareToTop * 8.0
   const csScore =
     analyses.summary.averageCsPerMinute *
@@ -1036,7 +1032,8 @@ export function calculateAkariScore(analyses: {
     goldScore,
     participationScore,
     total,
-    good: total >= 25.0
+    good: total >= 25.0,
+    great: total >= 28.0
   }
 }
 

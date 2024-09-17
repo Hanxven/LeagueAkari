@@ -93,6 +93,10 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
     })
   }
 
+  refresh() {
+    return this.call('refresh')
+  }
+
   setSendPlayer(puuid: string, send: boolean) {
     return this.call('set-send-list', puuid, send)
   }
@@ -149,8 +153,8 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
     return this.call('set-setting', 'useSgpApi', value)
   }
 
-  setQueueFilter(queueId: number | null) {
-    return this.call('set-queue-filter', queueId)
+  setQueueFilter(queueFilter: number) {
+    return this.call('set-queue-filter', queueFilter)
   }
 }
 

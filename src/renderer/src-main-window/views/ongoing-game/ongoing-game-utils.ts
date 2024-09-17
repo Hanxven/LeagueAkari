@@ -62,8 +62,12 @@ export function useQueueOptions() {
   return computed(() => {
     return [
       {
-        label: '所有队列',
+        label: '优先当前队列',
         value: -1
+      },
+      {
+        label: '全部队列',
+        value: -2
       },
       {
         label: gameData.queues[420]?.name || 'Ranked Solo/Duo',
@@ -100,6 +104,27 @@ export function useQueueOptions() {
       }
     ]
   })
+}
+
+export function useOrderOptions() {
+  return [
+    {
+      label: '默认',
+      value: 'default'
+    },
+    {
+      label: '胜率',
+      value: 'win-rate'
+    },
+    {
+      label: 'KDA',
+      value: 'kda'
+    },
+    {
+      label: 'Akari 😼',
+      value: 'akari-score'
+    }
+  ]
 }
 
 export function useIdleState() {
