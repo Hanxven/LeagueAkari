@@ -34,13 +34,12 @@
           >
           <span class="tag-line">#{{ summoner?.tagLine || '—' }}</span>
         </div>
-        <NPopover :disabled="!rankedStats" :delay="50">
+        <NPopover :delay="50">
           <template #trigger>
             <div class="ranked">
               <template v-if="queueType !== 'CHERRY'">
                 <div
                   class="ranked-item"
-                  title="单排 / 双排"
                   v-if="
                     rankedSoloFlex.solo && rankedSoloFlex.solo.tier && rankedSoloFlex.solo !== 'NA'
                   "
@@ -52,12 +51,11 @@
                       : `${TIER_TEXT[rankedSoloFlex.solo.tier]}`
                   }}</span>
                 </div>
-                <div class="ranked-item unranked" title="单排 / 双排" v-else>
+                <div class="ranked-item unranked" v-else>
                   <span class="text">未定级</span>
                 </div>
                 <div
                   class="ranked-item"
-                  title="灵活组排"
                   v-if="
                     rankedSoloFlex.flex && rankedSoloFlex.flex.tier && rankedSoloFlex.flex !== 'NA'
                   "
@@ -69,14 +67,13 @@
                       : `${TIER_TEXT[rankedSoloFlex.flex.tier]}`
                   }}</span>
                 </div>
-                <div class="ranked-item unranked" title="灵活组排" v-else>
+                <div class="ranked-item unranked" v-else>
                   <span class="text">未定级</span>
                 </div>
               </template>
               <template v-else>
                 <div
                   class="ranked-item cherry"
-                  title="灵活组排"
                   v-if="rankedSoloFlex.cherry && rankedSoloFlex.cherry.ratedRating"
                 >
                   <span class="text"
@@ -85,14 +82,14 @@
                     分</span
                   >
                 </div>
-                <div class="ranked-item unranked cherry" title="灵活组排" v-else>
+                <div class="ranked-item unranked cherry" v-else>
                   <span class="text">未定级</span>
                 </div>
               </template>
             </div>
           </template>
           <RankedTable v-if="rankedStats" :rankedStats="rankedStats" />
-          <div v-else>FOR PLACEHOLDER</div>
+          <div v-else style="font-size: 12px">暂无数据</div>
         </NPopover>
       </div>
     </div>
@@ -222,7 +219,10 @@
             预组队 {{ preMadeTeamId }}
           </div>
         </template>
-        <div class="popover-text">推测该玩家位于 {{ preMadeTeamId }} 小队中</div>
+        <div class="popover-text">
+          这些玩家在数场对局中都位于同一个阵营，推测他们可能是一支固定的小队。为了区分，将其命名为小队
+          {{ preMadeTeamId }}
+        </div>
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
@@ -319,7 +319,7 @@
         :delay="50"
       >
         <template #trigger>
-          <div class="tag akari-loved">突出</div>
+          <div class="tag akari-loved">优异</div>
         </template>
         <div class="popover-text">该玩家在近期对局中表现优异</div>
       </NPopover>
@@ -349,6 +349,7 @@
             <div>经济: {{ analysis.akariScore.goldScore.toFixed(2) }}</div>
             <div>补兵: {{ analysis.akariScore.csScore.toFixed(2) }}</div>
             <div>参团: {{ analysis.akariScore.participationScore.toFixed(2) }}</div>
+            <div>KDA: {{ analysis.akariScore.kdaScore.toFixed(2) }}</div>
             <div>胜率: {{ analysis.akariScore.winRateScore.toFixed(2) }}</div>
           </div>
         </div>
@@ -365,11 +366,34 @@
             class="frequent-used-champion"
           />
         </template>
-        <div class="popover-text">
-          <div style="font-weight: bold">{{ gameData.champions[c.id]?.name || c.id }}</div>
-          <div>近期选用了 {{ c.count }} 次，胜率为 {{ (c.winRate * 100).toFixed() }} %</div>
+        <div class="champion-stats">
+          <div class="champion-line">
+            <ChampionIcon ring :ring-width="1" round class="champion-icon" :champion-id="c.id" />
+            <div class="champion-name">{{ gameData.champions[c.id]?.name || c.id }}</div>
+          </div>
+          <div class="recent-plays">
+            近期 {{ c.count }} 场，胜率为 {{ (c.winRate * 100).toFixed() }} %
+          </div>
+          <template v-if="championMastery && championMastery[c.id]">
+            <div class="mastery-points">
+              <span class="level">{{ championMastery[c.id].championLevel }} 级</span>
+              <span class="points"
+                >{{ championMastery[c.id].championPoints.toLocaleString() }} 成就点数</span
+              >
+            </div>
+            <div class="milestones">
+              <span
+                class="milestone"
+                v-for="m of toSortedMilestoneGrades(championMastery[c.id].milestoneGrades)"
+                >{{ m }}</span
+              >
+            </div>
+          </template>
         </div>
       </NPopover>
+    </div>
+    <div class="win-lose-blocks" v-if="winLoseBlocks.length">
+      <div class="win-lose-block" v-for="block in winLoseBlocks" :class="block"></div>
     </div>
     <div class="match-history">
       <NVirtualList style="height: 100%" :item-size="32" :items="matches" v-if="matches.length">
@@ -412,6 +436,7 @@ import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useAppStore } from '@renderer-shared/modules/app/store'
 import { SavedPlayerInfo } from '@renderer-shared/modules/core-functionality/store'
 import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { Mastery } from '@shared/types/lcu/champion-mastery'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -453,6 +478,7 @@ const { puuid, analysis, matchHistory, position, preMadeTeamId, rankedStats } = 
   }
   summoner?: SummonerInfo
   rankedStats?: RankedStats
+  championMastery?: Record<number, Mastery>
   matchHistory?: MatchHistoryGameWithState[]
   analysis?: MatchHistoryGamesAnalysisAll
   savedInfo?: SavedPlayerInfo
@@ -501,8 +527,6 @@ const rankedSoloFlex = computed(() => {
     }
   }
 
-  // console.log(rankedStats)
-
   const result: Record<string, any> = {}
 
   const solo = rankedStats.queueMap['RANKED_SOLO_5x5']
@@ -531,6 +555,49 @@ const rankedSoloFlex = computed(() => {
 
   return result
 })
+
+const MILESTONE_ORDER = [
+  'S+',
+  'S',
+  'S-',
+  'A+',
+  'A',
+  'A-',
+  'B+',
+  'B',
+  'B-',
+  'C+',
+  'C',
+  'C-',
+  'D+',
+  'D',
+  'D-'
+]
+
+const toSortedMilestoneGrades = (arr: string[]) => {
+  const deduplicated = Array.from(new Set(arr))
+
+  const newArr = deduplicated.toSorted((a, b) => {
+    const aIndex = MILESTONE_ORDER.indexOf(a)
+    const bIndex = MILESTONE_ORDER.indexOf(b)
+
+    if (aIndex === -1 && bIndex === -1) {
+      return 0
+    }
+
+    if (aIndex === -1) {
+      return 1
+    }
+
+    if (bIndex === -1) {
+      return -1
+    }
+
+    return aIndex - bIndex
+  })
+
+  return newArr
+}
 
 const getWinLoseClassName = (match: SelfParticipantGame) => {
   if (match.game.gameMode === 'PRACTICETOOL') {
@@ -579,6 +646,24 @@ const matches = computed(() => {
 
   return withSelfParticipantMatchHistory(matchHistory, puuid)
 })
+
+const winLoseBlocks = computed(() => {
+  if (!matchHistory) {
+    return []
+  }
+
+  return matches.value.map((match) => {
+    if (
+      match.game.gameMode === 'PRACTICETOOL' ||
+      match.game.endOfGameResult === 'Abort_AntiCheatExit' ||
+      match.selfParticipant.stats.gameEndedInEarlySurrender
+    ) {
+      return 'na'
+    }
+
+    return match.selfParticipant.stats.win ? 'win' : 'lose'
+  })
+})
 </script>
 
 <style lang="less" scoped>
@@ -593,7 +678,6 @@ const matches = computed(() => {
   border: 1px solid #ffffff40;
   background-color: #11111180;
   width: v-bind(FIXED_CARD_WIDTH);
-  gap: 4px;
 
   transition: filter 0.2s;
 
@@ -608,6 +692,7 @@ const matches = computed(() => {
 
 .player-info {
   display: flex;
+  margin-bottom: 4px;
 
   .profile-icon {
     position: relative;
@@ -701,6 +786,7 @@ const matches = computed(() => {
 .stats {
   display: flex;
   align-items: center;
+  margin-bottom: 4px;
 
   .position-info {
     display: flex;
@@ -776,6 +862,7 @@ const matches = computed(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  margin-bottom: 4px;
 
   .tag {
     font-size: 11px;
@@ -830,14 +917,39 @@ const matches = computed(() => {
   display: flex;
   gap: 4px;
   width: 100%;
-  height: 28px;
   box-sizing: border-box;
   align-items: center;
+  margin-bottom: 4px;
 
   .frequent-used-champion {
     height: 20px;
     width: 20px;
     border-radius: 1px;
+  }
+}
+
+.win-lose-blocks {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 4px;
+  height: 2px;
+
+  .win-lose-block {
+    flex: 1;
+    height: 100%;
+    background-color: #ffffff40;
+  }
+
+  .win {
+    background-color: #2368ca;
+  }
+
+  .lose {
+    background-color: #c94f4f;
+  }
+
+  .na {
+    background-color: #c0c0c0;
   }
 }
 
@@ -951,6 +1063,65 @@ const matches = computed(() => {
 .popover-text.have-met-popover {
   max-width: unset;
   width: fit-content;
+}
+
+.champion-stats {
+  max-width: 260px;
+
+  .champion-line {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    align-items: center;
+    margin-bottom: 4px;
+
+    .champion-icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    .champion-name {
+      font-size: 12px;
+      color: #e8e8e8;
+      font-weight: bold;
+    }
+  }
+
+  .recent-plays {
+    font-size: 12px;
+  }
+
+  .mastery-points {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-top: 4px;
+
+    .level {
+      border-radius: 2px;
+      background-color: #b94ecf;
+      font-size: 11px;
+      padding: 0 4px;
+    }
+
+    .points {
+      font-size: 12px;
+    }
+  }
+
+  .milestones {
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+
+    .milestone {
+      border-radius: 2px;
+      background-color: #4e82cf;
+      font-size: 11px;
+      padding: 0 4px;
+    }
+  }
 }
 
 .encountered-game-table {

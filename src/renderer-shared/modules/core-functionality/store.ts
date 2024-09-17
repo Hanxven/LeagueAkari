@@ -1,4 +1,4 @@
-import { PlayerChampionMastery } from '@shared/types/lcu/champion-mastery'
+import { Mastery } from '@shared/types/lcu/champion-mastery'
 import { Game } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -74,7 +74,7 @@ export interface OngoingPlayer {
   /**
    * 玩家英雄点数相关信息
    */
-  championMastery?: PlayerChampionMastery
+  championMastery?: Record<number, Mastery>
 
   /**
    * 记录的玩家信息

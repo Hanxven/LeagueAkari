@@ -5,7 +5,7 @@ export interface PlayerChampionMastery {
   summonerId: number
 }
 
-interface Mastery {
+export interface Mastery {
   championId: number
   championLevel: number
   championPoints: number
@@ -15,7 +15,7 @@ interface Mastery {
   highestGrade: string
   lastPlayTime: number
   markRequiredForNextLevel: number
-  milestoneGrades: any[]
+  milestoneGrades: string[]
   nextSeasonMilestone: NextSeasonMilestone
   puuid: string
   tokensEarned: number

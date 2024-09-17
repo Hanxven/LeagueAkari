@@ -4,7 +4,7 @@ import {
 } from '@main/akari-ipc/mobx-based-basic-module'
 import { EncounteredGame } from '@main/db/entities/EncounteredGame'
 import { SavedPlayer } from '@main/db/entities/SavedPlayers'
-import { getPlayerChampionMasteryTopN } from '@main/http-api/champion-mastery'
+import { getPlayerChampionMastery } from '@main/http-api/champion-mastery'
 import { chatSend } from '@main/http-api/chat'
 import { getGame, getMatchHistory } from '@main/http-api/match-history'
 import { getRankedStats } from '@main/http-api/ranked'
@@ -120,6 +120,38 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     )
   }
 
+  private async _loadAllPlayers(
+    state: typeof this.state.queryState,
+    queueFilter: number,
+    useSgpApi: boolean
+  ) {
+    if (this._controller) {
+      this._controller.abort()
+    }
+
+    this._controller = new AbortController()
+
+    let queue = queueFilter
+    if (
+      queue === -1 &&
+      state.gameInfo &&
+      CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(state.gameInfo.queueId)
+    ) {
+      queue = state.gameInfo.queueId
+    }
+
+    try {
+      if (state.phase === 'champ-select') {
+        await this._champSelectQuery(this._controller.signal, queue, useSgpApi)
+      } else if (state.phase === 'in-game') {
+        await this._inGameQuery(this._controller.signal, queue, useSgpApi)
+      }
+    } catch (error) {
+      this._mwm.notify.warn('core-functionality', '对局中', '无法加载对局中信息')
+      this._logger.warn(`加载对局中信息时发生错误:  ${formatError(error)}, in ${state}`)
+    }
+  }
+
   private _handleOngoingAnalyzing() {
     this.reaction(
       () =>
@@ -141,31 +173,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           return
         }
 
-        if (this._controller) {
-          this._controller.abort()
-        }
-
-        this._controller = new AbortController()
-
-        let queue = queueFilter
-        if (
-          queue === -1 &&
-          state.gameInfo &&
-          CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(state.gameInfo.queueId)
-        ) {
-          queue = state.gameInfo.queueId
-        }
-
-        try {
-          if (state.phase === 'champ-select') {
-            await this._champSelectQuery(this._controller.signal, queue, useSgpApi)
-          } else if (state.phase === 'in-game') {
-            await this._inGameQuery(this._controller.signal, queue, useSgpApi)
-          }
-        } catch (error) {
-          this._mwm.notify.warn('core-functionality', '对局中', '无法加载对局中信息')
-          this._logger.warn(`加载对局中信息时发生错误:  ${formatError(error)}, in ${state}`)
-        }
+        await this._loadAllPlayers(state, queueFilter, useSgpApi)
       },
       { equals: comparer.shallow, fireImmediately: true }
     )
@@ -900,15 +908,27 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
         this._logger.info(`加载玩家信息 ChampionMastery: ${puuid}`)
         const mastery = await this._playerAnalysisFetchLimiter
-          .add(() => getPlayerChampionMasteryTopN(puuid, 3), {
+          .add(() => getPlayerChampionMastery(puuid), {
             signal,
             priority: CoreFunctionalityModule.FETCH_PRIORITY.CHAMPION_MASTERY
           })
           .catch((error) => this._handleAbortError(error))
 
         if (mastery) {
-          runInAction(() => (player.championMastery = mastery.data))
-          this.sendEvent('update/ongoing-player/champion-mastery', puuid, mastery.data)
+          const simplified = mastery.data
+            .map((m) => ({
+              championId: m.championId,
+              championLevel: m.championLevel,
+              championPoints: m.championPoints,
+              milestoneGrades: m.milestoneGrades
+            }))
+            .reduce((obj, cur) => {
+              obj[cur.championId] = cur
+              return obj
+            }, {} as any)
+
+          runInAction(() => (player.championMastery = simplified))
+          this.sendEvent('update/ongoing-player/champion-mastery', puuid, simplified)
         }
       }
 

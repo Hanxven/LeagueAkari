@@ -53,6 +53,7 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
     this.onEvent('update/ongoing-player/champion-mastery', (puuid, mastery) => {
       if (store.ongoingPlayers[puuid]) {
         store.ongoingPlayers[puuid].championMastery = markRaw(mastery)
+        console.log('mastery', puuid, mastery)
       }
     })
 

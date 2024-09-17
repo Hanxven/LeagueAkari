@@ -28,7 +28,6 @@ export const RANKED_MEDAL_MAP: Record<string, string> = {
   CHALLENGER: ChallengerMedal
 }
 
-
 export const POSITION_ASSIGNMENT_REASON = {
   FILL_SECONDARY: {
     name: '副选补位',
@@ -115,7 +114,9 @@ export function useIdleState() {
       gameflow.phase === 'Matchmaking' ||
       gameflow.phase === 'ReadyCheck' ||
       gameflow.phase === 'WatchInProgress' ||
-      (champSelect.session && champSelect.session.isSpectating) ||
+      (gameflow.phase !== 'InProgress' &&
+        champSelect.session &&
+        champSelect.session.isSpectating) ||
       lc.state !== 'connected'
     )
   })

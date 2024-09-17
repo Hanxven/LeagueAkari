@@ -1014,7 +1014,7 @@ export function calculateAkariScore(analyses: {
   summary: MatchHistoryGamesAnalysisSummary
   champions: Record<number, MatchHistoryChampionAnalysis>
 }): AkariScore {
-  const kdaScore = Math.sqrt(analyses.summary.averageKda) * 0.68
+  const kdaScore = Math.sqrt(analyses.summary.averageKda) * 1.44
   const winRateScore = (analyses.summary.winRate - 0.5) * 4
   const dmgScore = analyses.summary.averageDamageShareToTop * 10.0
   const dmgTakenScore = analyses.summary.averageDamageTakenShareToTop * 8.0
@@ -1036,7 +1036,7 @@ export function calculateAkariScore(analyses: {
     goldScore,
     participationScore,
     total,
-    good: total >= 24
+    good: total >= 25.0
   }
 }
 

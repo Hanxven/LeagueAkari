@@ -146,7 +146,7 @@ const queueOptions = [
     value: 'RANKED_SOLO_5x5'
   },
   {
-    label: '灵活组排',
+    label: '灵活排位',
     value: 'RANKED_FLEX_SR'
   },
   {
@@ -154,7 +154,7 @@ const queueOptions = [
     value: 'RANKED_TFT'
   },
   {
-    label: '灵活组排 3x3',
+    label: '灵活排位 3x3',
     value: 'RANKED_FLEX_TT'
   },
   {

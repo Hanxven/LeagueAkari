@@ -6,9 +6,25 @@
       :self-puuid="showingGame.selfPuuid"
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
-    <DefineOngoingTeam v-slot="{ players, team }">
+    <DefineOngoingTeam v-slot="{ players, team, teamAnalysis }">
       <div class="team-wrapper">
-        <div class="team-title">{{ formatTeamText(team).name }}</div>
+        <div class="team-header">
+          <span class="title">{{ formatTeamText(team).name }}</span>
+          <div class="analysis" v-if="teamAnalysis && players.length > 1">
+            <span
+              title="队伍平均胜率"
+              class="win-rate"
+              :class="{
+                'gte-55': teamAnalysis.averageWinRate >= 0.55,
+                'gt-45-lt-55':
+                  teamAnalysis.averageWinRate > 0.45 && teamAnalysis.averageWinRate < 0.55,
+                'lte-45': teamAnalysis.averageWinRate <= 0.45
+              }"
+              >{{ (teamAnalysis.averageWinRate * 100).toFixed() }} %</span
+            >
+            <span title="队伍平均 KDA">{{ teamAnalysis.averageKda.toFixed(2) }}</span>
+          </div>
+        </div>
         <div class="team">
           <PlayerInfoCard
             v-for="{ player, analysis, position } of players"
@@ -20,6 +36,7 @@
             :summoner="player.summoner"
             :ranked-stats="player.rankedStats"
             :saved-info="player.savedInfo"
+            :champion-mastery="player.championMastery"
             :analysis="analysis"
             :position="position"
             :pre-made-team-id="preMadeTeamInfo.players[player.puuid]"
@@ -34,7 +51,13 @@
     </DefineOngoingTeam>
     <NScrollbar v-if="!isInIdleState && cf.settings.ongoingAnalysisEnabled" x-scrollable>
       <div class="inner-container" :class="{ 'fit-content': columnsNeed >= 4 }">
-        <OngoingTeam v-for="(players, team) of teams" :team="team" :key="team" :players="players" />
+        <OngoingTeam
+          v-for="(players, team) of teams"
+          :team="team"
+          :team-analysis="cf.ongoingPlayerAnalysis?.teams[team]"
+          :key="team"
+          :players="players"
+        />
       </div>
     </NScrollbar>
     <div v-else class="no-ongoing-game">
@@ -45,7 +68,9 @@
           style="font-size: 14px; font-weight: normal; color: #666"
         >
           <template v-if="lc.state !== 'connected'">未连接到客户端</template>
-          <template v-else-if="champSelect.session?.isSpectating">等待观战延迟</template>
+          <template v-else-if="champSelect.session && champSelect.session.isSpectating"
+            >等待观战延迟</template
+          >
           <template v-else>没有正在进行中的游戏</template>
         </div>
         <div v-else style="font-size: 14px; font-weight: normal; color: #666">对局分析已禁用</div>
@@ -65,7 +90,10 @@ import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/cha
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { Game } from '@shared/types/lcu/match-history'
-import { MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
+import {
+  MatchHistoryGamesAnalysisAll,
+  MatchHistoryGamesAnalysisTeamSide
+} from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
 import { createReusableTemplate, refDebounced, useDebounceFn, useElementSize } from '@vueuse/core'
 import { NScrollbar } from 'naive-ui'
@@ -92,6 +120,8 @@ const summoner = useSummonerStore()
 
 const isInIdleState = useIdleState()
 
+const orderBy = ref<'akari-score' | 'kda' | 'win-rate' | 'default'>('kda')
+
 const teams = computed(() => {
   if (!cf.ongoingTeams || !cf.ongoingPlayers) {
     return {}
@@ -116,32 +146,48 @@ const teams = computed(() => {
 
     const ps = players.filter((p) => cf.ongoingPlayers[p]).map((p) => cf.ongoingPlayers[p])
     if (ps.length) {
-      teamMap[team] = ps.map((player) => {
-        const data: {
-          player: OngoingPlayer
-          analysis?: MatchHistoryGamesAnalysisAll
-          position: {
-            position: string
-            role: ParsedRole | null
+      teamMap[team] = ps
+        .map((player) => {
+          const data: {
+            player: OngoingPlayer
+            analysis?: MatchHistoryGamesAnalysisAll
+            position: {
+              position: string
+              role: ParsedRole | null
+            }
+          } = {
+            player,
+            position: {
+              position: 'NONE',
+              role: null
+            }
           }
-        } = {
-          player,
-          position: {
-            position: 'NONE',
-            role: null
+
+          if (cf.ongoingPlayerAnalysis && cf.ongoingPlayerAnalysis.players[player.puuid]) {
+            data.analysis = cf.ongoingPlayerAnalysis.players[player.puuid]
           }
-        }
 
-        if (cf.ongoingPlayerAnalysis && cf.ongoingPlayerAnalysis.players[player.puuid]) {
-          data.analysis = cf.ongoingPlayerAnalysis.players[player.puuid]
-        }
+          if (cf.ongoingPositionAssignments && cf.ongoingPositionAssignments[player.puuid]) {
+            data.position = cf.ongoingPositionAssignments[player.puuid]
+          }
 
-        if (cf.ongoingPositionAssignments && cf.ongoingPositionAssignments[player.puuid]) {
-          data.position = cf.ongoingPositionAssignments[player.puuid]
-        }
+          return data
+        })
+        .toSorted((a, b) => {
+          if (orderBy.value === 'akari-score') {
+            return (b.analysis?.akariScore.total || 0) - (a.analysis?.akariScore.total || 0)
+          }
 
-        return data
-      })
+          if (orderBy.value === 'kda') {
+            return (b.analysis?.summary.averageKda || 0) - (a.analysis?.summary.averageKda || 0)
+          }
+
+          if (orderBy.value === 'win-rate') {
+            return (b.analysis?.summary.winRate || 0) - (a.analysis?.summary.winRate || 0)
+          }
+
+          return 0
+        })
     }
   })
 
@@ -197,6 +243,7 @@ const [DefineOngoingTeam, OngoingTeam] = createReusableTemplate<{
     analysis?: MatchHistoryGamesAnalysisAll
     position?: { position: string; role: ParsedRole | null }
   }[]
+  teamAnalysis?: MatchHistoryGamesAnalysisTeamSide
   team: string
 }>({ inheritAttrs: false })
 
@@ -235,10 +282,10 @@ const handleShowGame = (game: Game, puuid: string) => {
   isStandaloneMatchHistoryCardShow.value = true
 }
 
-const handleShowGameById = (id: number, selfId: string) => {
+const handleShowGameById = (id: number, selfPuuid: string) => {
   showingGame.game = null
   showingGame.gameId = id
-  showingGame.selfPuuid = selfId
+  showingGame.selfPuuid = selfPuuid
   isStandaloneMatchHistoryCardShow.value = true
 }
 
@@ -317,16 +364,50 @@ const columnsNeed = computed(() => {
   height: 16px;
 }
 
-.team-title {
-  font-size: 18px;
-  font-weight: bold;
+.team-header {
+  display: flex;
   margin-bottom: 8px;
+  align-items: flex-end;
+
+  .title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 8px;
+  }
+
+  .analysis {
+    display: flex;
+    gap: 8px;
+  }
+
+  .win-rate {
+    font-weight: bold;
+  }
+
+  .win-rate.gte-55 {
+    color: #4cc69d;
+  }
+
+  &.win-rate.gt-45-lt-55 {
+    color: #dcdcdc;
+  }
+
+  &.win-rate.lte-45 {
+    color: #ff6161;
+  }
 }
 
 .team-wrapper {
   &:not(:last-child) {
     margin-bottom: 16px;
   }
+}
+
+.team-side-analysis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 .no-ongoing-game {

@@ -13,7 +13,7 @@ export const TIER_TEXT: Record<string, string> = {
 
 export const QUEUE_TYPE_TEXT: Record<string, string> = {
   RANKED_SOLO_5x5: '单排 / 双排',
-  RANKED_FLEX_SR: '灵活组排',
+  RANKED_FLEX_SR: '灵活排位',
   CHERRY: '斗魂竞技场',
   RANKED_TFT: '云顶之弈',
   RANKED_TFT_TURBO: '云顶之弈 (狂暴模式)',
