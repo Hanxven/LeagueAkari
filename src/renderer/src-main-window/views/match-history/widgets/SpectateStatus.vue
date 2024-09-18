@@ -79,6 +79,8 @@
             <div
               class="player-name"
               @click="() => emits('toSummoner', player.puuid)"
+              @mouseup.prevent="(event) => handleMouseUp(event, player.puuid)"
+              @mousedown="handleMouseDown"
               :class="{ self: player.puuid === puuid }"
             >
               <span class="name">{{
@@ -144,7 +146,7 @@ import PositionIcon from '@main-window/components/icons/position-icons/PositionI
 import IndicatorPulse from './IndicatorPulse.vue'
 
 const emits = defineEmits<{
-  toSummoner: [puuid: string]
+  toSummoner: [puuid: string, newTab?: boolean]
   launchSpectator: [puuid: string, byLcuApi: boolean]
 }>()
 
@@ -254,6 +256,18 @@ watch(
   },
   { immediate: true }
 )
+
+const handleMouseDown = (event: MouseEvent) => {
+  if (event.button === 1) {
+    event.preventDefault()
+  }
+}
+
+const handleMouseUp = (event: MouseEvent, puuid: string) => {
+  if (event.button === 1) {
+    emits('toSummoner', puuid, false)
+  }
+}
 
 const { start } = useTimeoutFn(() => {
   isSpectatorAvailable.value = true

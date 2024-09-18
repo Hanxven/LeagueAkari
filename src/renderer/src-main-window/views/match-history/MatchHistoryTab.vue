@@ -292,7 +292,7 @@
                 :is-cross-region="!isInSameRegion"
                 :data="spectatorData"
                 :puuid="tab.puuid"
-                @to-summoner="(puuid) => handleToSummoner(puuid)"
+                @to-summoner="(puuid, newTab) => handleToSummoner(puuid, newTab)"
                 @launch-spectator="handleLaunchSpectator"
               />
             </div>
@@ -414,7 +414,12 @@
                     style="width: 18px; height: 18px"
                     :src="profileIconUrl(p.targetProfileIconId)"
                   />
-                  <div class="name-and-tag" @click="() => handleToSummoner(p.targetPuuid)">
+                  <div
+                    class="name-and-tag"
+                    @click="() => handleToSummoner(p.targetPuuid)"
+                    @mouseup.prevent="(event) => handleMouseUp(event, p.targetPuuid)"
+                    @mousedown="handleMouseDown"
+                  >
                     <span class="game-name">{{ p.targetGameName }}</span>
                     <span class="tag-line">#{{ p.targetTagLine }}</span>
                   </div>
@@ -428,7 +433,7 @@
               class="match-history-card-item"
               @set-show-detailed-game="handleToggleShowDetailedGame"
               @load-detailed-game="(gameId) => mhm.fetchTabDetailedGame(tab.puuid, gameId)"
-              @to-summoner="(puuid) => handleToSummoner(puuid)"
+              @to-summoner="(puuid, newTab) => handleToSummoner(puuid, newTab)"
               :self-puuid="tab.puuid"
               :is-detailed="g.isDetailed"
               :is-loading="g.isLoading"
@@ -750,9 +755,27 @@ const recentlyTeammates = computed(() => {
 
 const { navigateToTab } = mhm.useNavigateToTab()
 
-const handleToSummoner = (puuid: string) => {
-  const { sgpServerId } = mhm.parseUnionId(tab.id)
-  navigateToTab(puuid, sgpServerId)
+const handleToSummoner = (puuid: string, newTab = true) => {
+  if (newTab) {
+    const { sgpServerId } = mhm.parseUnionId(tab.id)
+    navigateToTab(puuid, sgpServerId)
+  } else {
+    const unionId = mhm.toUnionId(tab.sgpServerId, puuid)
+    mhm.createTab(unionId)
+    mhm.fetchTabFullData(unionId)
+  }
+}
+
+const handleMouseDown = (event: MouseEvent) => {
+  if (event.button === 1) {
+    event.preventDefault()
+  }
+}
+
+const handleMouseUp = (event: MouseEvent, puuid: string) => {
+  if (event.button === 1) {
+    handleToSummoner(puuid, false)
+  }
 }
 
 const SHOW_TINY_HEADER_THRESHOLD = 160

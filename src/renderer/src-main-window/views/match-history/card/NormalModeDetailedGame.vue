@@ -49,6 +49,8 @@
                     <span
                       class="name-span"
                       @click="() => emits('toSummoner', p.identity.player.puuid)"
+                      @mouseup.prevent="(event) => handleMouseUp(event, p.identity.player.puuid)"
+                      @mousedown="handleMouseDown"
                       :title="
                         summonerName(
                           p.identity.player.gameName || p.identity.player.summonerName,
@@ -209,7 +211,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  (e: 'toSummoner', puuid: string): void
+  toSummoner: [puuid: string, newTab?: boolean]
 }>()
 
 const match = computed(() => {
@@ -276,6 +278,18 @@ const match = computed(() => {
     recordStats: recordStats
   }
 })
+
+const handleMouseDown = (event: MouseEvent) => {
+  if (event.button === 1) {
+    event.preventDefault()
+  }
+}
+
+const handleMouseUp = (event: MouseEvent, puuid: string) => {
+  if (event.button === 1) {
+    emits('toSummoner', puuid, false)
+  }
+}
 </script>
 
 <style lang="less" scoped>

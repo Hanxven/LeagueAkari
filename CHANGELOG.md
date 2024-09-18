@@ -4,7 +4,7 @@
 
 - [UNTESTED] 带有英雄选择台的模式，提供了一个设置项，将可以始终选择优先级列表最前面的英雄。([#87](https://github.com/Hanxven/LeagueAkari/issues/87))
 
-- 战绩页面的标签页现在可以通过鼠标中键关闭。([#85](https://github.com/Hanxven/LeagueAkari/pull/85))
+- 战绩页面的标签页现在可以通过鼠标中键关闭和打开。([#85](https://github.com/Hanxven/LeagueAkari/pull/85)，([#110](https://github.com/Hanxven/LeagueAkari/issues/110)))
 
 - [TODO] 提供了一个选项，同大区内标记的玩家将可见与其他账户。
 
@@ -19,6 +19,8 @@
 - 添加了一个设置项，位于 `应用` -> `其他` -> `禁用硬件加速`，可选择是否禁用硬件加速。适用于界面渲染模糊的情况，但也会显著降低性能。
 
 - 补全对局分析的刷新按钮和队列筛选按钮。
+
+- [TODO] KDA 发送设置发送列表的组件复原。
 
 ## 调整
 

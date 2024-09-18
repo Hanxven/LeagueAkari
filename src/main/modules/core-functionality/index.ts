@@ -49,7 +49,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     GAME: 73
   } as const
 
-  static QUEUE_FILTER_QUEUES = new Set([-1, 420, 430, 440, 450, 1700, 490, 1900, 900])
+  static QUEUE_FILTER_QUEUES = new Set([420, 430, 440, 450, 1700, 490, 1900, 900])
 
   static SEND_INTERVAL = 65
 
@@ -133,15 +133,16 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
     let queueId: number | null = null
 
-    // 定义 -1 为当前游戏队列 (如果支持)
-    if (queueFilter === -1) {
+    // 定义 -10 为当前游戏队列 (如果支持)
+    if (queueFilter === -10) {
       if (
         state.gameInfo &&
         CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(state.gameInfo.queueId)
       ) {
         queueId = state.gameInfo.queueId
       }
-    } else if (queueFilter === -2) {
+    } else if (queueFilter === -20) {
+      // 定义为 -20 为当前队列
       queueId = null
     } else {
       if (CoreFunctionalityModule.QUEUE_FILTER_QUEUES.has(queueFilter)) {

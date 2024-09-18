@@ -43,6 +43,8 @@
                     "
                     class="name"
                     @click="() => emits('toSummoner', p.identity.player.puuid)"
+                    @mouseup.prevent="(event) => handleMouseUp(event, p.identity.player.puuid)"
+                    @mousedown="handleMouseDown"
                   >
                     {{
                       summonerName(
@@ -110,11 +112,11 @@
 </template>
 
 <script setup lang="ts">
-import { EMPTY_PUUID } from '@shared/constants/common'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import { championIconUrl } from '@renderer-shared/modules/game-data'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game, Participant, ParticipantIdentity } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
@@ -132,7 +134,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  (e: 'toSummoner', puuid: string): void
+  toSummoner: [puuid: string, newTab?: boolean]
 }>()
 
 type ParticipantWithIdentity = Participant & { isSelf: boolean; identity: ParticipantIdentity }
@@ -170,6 +172,18 @@ const match = computed(() => {
     recordStats
   }
 })
+
+const handleMouseDown = (event: MouseEvent) => {
+  if (event.button === 1) {
+    event.preventDefault()
+  }
+}
+
+const handleMouseUp = (event: MouseEvent, puuid: string) => {
+  if (event.button === 1) {
+    emits('toSummoner', puuid, false)
+  }
+}
 </script>
 
 <style lang="less" scoped>

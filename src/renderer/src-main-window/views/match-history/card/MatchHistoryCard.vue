@@ -21,6 +21,8 @@
             class="name"
             :class="{ self: p.isSelf }"
             @click="() => emits('toSummoner', p.identity.player.puuid)"
+            @mouseup.prevent="(event) => handleMouseUp(event, p.identity.player.puuid)"
+            @mousedown="handleMouseDown"
           >
             {{
               summonerName(
@@ -227,21 +229,21 @@
           :game="game"
           :self-puuid="selfPuuid"
           v-if="game.gameMode === 'CHERRY'"
-          @to-summoner="(puuid) => emits('toSummoner', puuid)"
+          @to-summoner="(puuid, newTab) => emits('toSummoner', puuid, newTab)"
         />
         <StrawberryModeDetailedGame
           class="detailed-game"
           :game="game"
           :self-puuid="selfPuuid"
           v-else-if="game.gameMode === 'STRAWBERRY'"
-          @to-summoner="(puuid) => emits('toSummoner', puuid)"
+          @to-summoner="(puuid, newTab) => emits('toSummoner', puuid, newTab)"
         />
         <NormalNodeDetailedGame
           class="detailed-game"
           v-else
           :game="game"
           :self-puuid="selfPuuid"
-          @to-summoner="(puuid) => emits('toSummoner', puuid)"
+          @to-summoner="(puuid, newTab) => emits('toSummoner', puuid, newTab)"
         />
       </template>
       <div v-else-if="isLoading" class="loading">加载中...</div>
@@ -284,6 +286,12 @@ const props = defineProps<{
   isExpanded: boolean
   isDetailed: boolean
   game: Game
+}>()
+
+const emits = defineEmits<{
+  setShowDetailedGame: [gameId: number, expand: boolean]
+  loadDetailedGame: [gameId: number]
+  toSummoner: [puuid: string, newTab?: boolean]
 }>()
 
 const [DefineSubTeam, SubTeam] = createReusableTemplate<{
@@ -464,6 +472,18 @@ const handleShowMiscellaneous = () => {
   isModalShow.value = true
 }
 
+const handleMouseDown = (event: MouseEvent) => {
+  if (event.button === 1) {
+    event.preventDefault()
+  }
+}
+
+const handleMouseUp = (event: MouseEvent, puuid: string) => {
+  if (event.button === 1) {
+    emits('toSummoner', puuid, false)
+  }
+}
+
 const gameData = useGameDataStore()
 
 const handleToggleShowDetailedGame = () => {
@@ -472,12 +492,6 @@ const handleToggleShowDetailedGame = () => {
   }
   emits('setShowDetailedGame', props.game.gameId, !props.isExpanded)
 }
-
-const emits = defineEmits<{
-  (e: 'setShowDetailedGame', gameId: number, expand: boolean): void
-  (e: 'loadDetailedGame', gameId: number): void
-  (e: 'toSummoner', puuid: string): void
-}>()
 </script>
 
 <style lang="less" scoped>

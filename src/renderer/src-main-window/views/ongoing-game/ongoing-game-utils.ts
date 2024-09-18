@@ -63,11 +63,11 @@ export function useQueueOptions() {
     return [
       {
         label: '优先当前队列',
-        value: -1
+        value: -10
       },
       {
         label: '全部队列',
-        value: -2
+        value: -20
       },
       {
         label: gameData.queues[420]?.name || 'Ranked Solo/Duo',
@@ -121,7 +121,7 @@ export function useOrderOptions() {
       value: 'kda'
     },
     {
-      label: 'Akari 😼',
+      label: '综合',
       value: 'akari-score'
     }
   ]

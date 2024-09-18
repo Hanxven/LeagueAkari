@@ -160,7 +160,8 @@ export class CoreFunctionalityState {
   /**
    * 对局分析的队列过滤
    *
-   * `-1` 为不限
+   * `-10` 优先当前队列
+   * `-20` 所有队列
    */
   queueFilter: number = -1
 
@@ -367,7 +368,7 @@ export class CoreFunctionalityState {
     this.ongoingPreMadeTeams = {}
     this.ongoingPlayerAnalysis = null
     this.sendList = {}
-    this.queueFilter = -1
+    this.queueFilter = -10
   }
 
   setQueueFilter(value: number) {

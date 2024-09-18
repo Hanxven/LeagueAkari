@@ -981,7 +981,6 @@ const winLoseBlocks = computed(() => {
     background-color: #ffffff10;
     border-radius: 2px;
     padding-left: 8px;
-    border-left: 4px solid;
     transition: filter 0.3s;
     cursor: pointer;
     margin-bottom: 2px;
@@ -991,7 +990,6 @@ const winLoseBlocks = computed(() => {
     }
 
     &.win {
-      border-left-color: #2368ca;
       background-color: #2369ca30;
 
       .win-lose {

@@ -12,7 +12,7 @@
       >
         <NTab
           v-for="tab of mh.tabs"
-          @mouseup="(event) => handleMouseUp(event, tab.id)"
+          @mouseup.prevent="(event) => handleMouseUp(event, tab.id)"
           @contextmenu="(event) => handleShowMenu(event, tab.id)"
           :key="tab.id"
           :tab="tab.id"
