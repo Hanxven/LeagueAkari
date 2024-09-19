@@ -15,10 +15,8 @@
               title="队伍平均胜率"
               class="win-rate"
               :class="{
-                'gte-55': teamAnalysis.averageWinRate >= 0.55,
-                'gt-45-lt-55':
-                  teamAnalysis.averageWinRate > 0.45 && teamAnalysis.averageWinRate < 0.55,
-                'lte-45': teamAnalysis.averageWinRate <= 0.45
+                'gte-50': teamAnalysis.averageWinRate >= 0.5,
+                'lt-50': teamAnalysis.averageWinRate < 0.5
               }"
               >{{ (teamAnalysis.averageWinRate * 100).toFixed() }} %</span
             >
@@ -412,7 +410,7 @@ const columnsNeed = computed(() => {
   align-items: flex-end;
 
   .title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     margin-right: 8px;
   }
@@ -426,15 +424,11 @@ const columnsNeed = computed(() => {
     font-weight: bold;
   }
 
-  .win-rate.gte-55 {
+  .win-rate.gte-50 {
     color: #4cc69d;
   }
 
-  &.win-rate.gt-45-lt-55 {
-    color: #dcdcdc;
-  }
-
-  &.win-rate.lte-45 {
+  &.win-rate.lt-50 {
     color: #ff6161;
   }
 }

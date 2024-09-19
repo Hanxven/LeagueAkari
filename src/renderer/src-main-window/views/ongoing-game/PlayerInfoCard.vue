@@ -98,11 +98,11 @@
         <NPopover :keep-alive-on-hover="false" :disabled="!analysis" :delay="50">
           <template #trigger>
             <div
-              class="win-rate-cherry gte-55"
+              class="win-rate-cherry gte-53"
               :class="{
-                'gte-55': analysis.summary.winRate >= 0.55,
-                'gt-45-lt-55': analysis.summary.winRate > 0.45 && analysis.summary.winRate < 0.55,
-                'lte-45': analysis.summary.winRate <= 0.45
+                'gte-53': analysis.summary.winRate >= 0.53,
+                'gt-47-lt-53': analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
+                'lte-47': analysis.summary.winRate <= 0.47
               }"
               title="前四率 & 第一率"
               v-if="analysis"
@@ -126,13 +126,13 @@
         <NPopover :keep-alive-on-hover="false" :disabled="!analysis">
           <template #trigger>
             <div
+              v-if="analysis"
               class="win-rate"
               :class="{
-                'gte-55': analysis.summary.winRate >= 0.55,
-                'gt-45-lt-55': analysis.summary.winRate > 0.45 && analysis.summary.winRate < 0.55,
-                'lte-45': analysis.summary.winRate <= 0.45
+                'gte-53': analysis.summary.winRate >= 0.53,
+                'gt-47-lt-53': analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
+                'lte-47': analysis.summary.winRate <= 0.47
               }"
-              v-if="analysis"
             >
               {{ (analysis.summary.winRate * 100).toFixed() }} %
             </div>
@@ -855,15 +855,15 @@ const winLoseBlocks = computed(() => {
     }
   }
 
-  .gte-55 {
+  .gte-53 {
     color: #4cc69d;
   }
 
-  .gt-45-lt-55 {
+  .gt-47-lt-53 {
     color: #dcdcdc;
   }
 
-  .lte-45 {
+  .lte-47 {
     color: #ff6161;
   }
 
