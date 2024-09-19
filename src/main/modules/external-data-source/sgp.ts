@@ -570,7 +570,12 @@ export class SgpEds {
           return
         }
 
-        this._edsm.logger.info(`更新 Entitlements Token: ${JSON.stringify(token)}`)
+        const copiedToken = structuredClone(token)
+
+        copiedToken.accessToken = copiedToken.accessToken.slice(0, 8) + '...'
+        copiedToken.token = copiedToken.token.slice(0, 8) + '...'
+
+        this._edsm.logger.info(`更新 Entitlements Token: ${JSON.stringify(copiedToken)}`)
 
         this._sgp.setJwtToken(token.accessToken)
       },

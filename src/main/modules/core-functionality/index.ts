@@ -1046,7 +1046,6 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     })
 
     this.onCall('set-send-list', (puuid: string, send: boolean) => {
-      console.log('hello', puuid, send)
       if (this.state.sendList[puuid] !== undefined) {
         this.state.setSendList({ ...this.state.sendList, [puuid]: send })
       }

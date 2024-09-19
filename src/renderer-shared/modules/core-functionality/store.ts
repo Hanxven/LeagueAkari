@@ -105,7 +105,7 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
 
   const sendList = ref<Record<string, boolean>>({})
 
-  const ongoingTeams = shallowRef<Record<string, number[]> | null>(null)
+  const ongoingTeams = shallowRef<Record<string, string[]> | null>(null)
   const ongoingChampionSelections = shallowRef<Record<string | number, number> | null>(null)
   const ongoingPositionAssignments = shallowRef<Record<
     string,

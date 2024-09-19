@@ -112,7 +112,7 @@
                 >(第一 {{ analysis.summary.cherry.top1Rate.toFixed() }} %)</span
               >
             </div>
-            <div v-else class="win-rate" title="胜率">— %</div>
+            <div v-else class="win-rate">— %</div>
           </template>
           <div class="popover-text" v-if="analysis">
             在近期 {{ analysis.summary.count }} 场对局中，该玩家的胜率为
@@ -132,12 +132,11 @@
                 'gt-45-lt-55': analysis.summary.winRate > 0.45 && analysis.summary.winRate < 0.55,
                 'lte-45': analysis.summary.winRate <= 0.45
               }"
-              title="胜率"
               v-if="analysis"
             >
               {{ (analysis.summary.winRate * 100).toFixed() }} %
             </div>
-            <div class="win-rate" v-else title="胜率">— %</div>
+            <div class="win-rate" v-else>— %</div>
           </template>
           <div class="popover-text" v-if="analysis">
             在近期 {{ analysis.summary.count }} 场对局中，该玩家的胜率为
@@ -147,7 +146,7 @@
       </template>
       <NPopover :keep-alive-on-hover="false" :disabled="!analysis" :delay="50">
         <template #trigger>
-          <div class="kda" title="KDA">{{ analysis?.summary.averageKda.toFixed(2) || '—' }}</div>
+          <div class="kda">{{ analysis?.summary.averageKda.toFixed(2) || '—' }}</div>
         </template>
         <div class="popover-text" v-if="analysis">
           在近期 {{ analysis.summary.count }} 场对局中，该玩家的平均 KDA 是
@@ -457,7 +456,7 @@ import { TIER_TEXT } from '@shared/utils/ranked'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NPopover, NVirtualList } from 'naive-ui'
-import { computed, useTemplateRef, watch, watchEffect } from 'vue'
+import { computed, onDeactivated, useTemplateRef, watch, watchEffect } from 'vue'
 
 import RankedTable from '@main-window/components/RankedTable.vue'
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
@@ -510,10 +509,17 @@ watch(preMadeTagElHovering, (h) => {
   }
 })
 
+// 以防路由时高亮状态未清除
+onDeactivated(() => {
+  if (preMadeTeamId) {
+    emits('highlight', preMadeTeamId, false)
+  }
+})
+
 const gameData = useGameDataStore()
 const app = useAppStore()
 
-const FREQUENT_USED_CHAMPIONS_COUNT = 9
+const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 
 const frequentlyUsedChampions = computed(() => {
   if (!analysis) {
@@ -524,7 +530,7 @@ const frequentlyUsedChampions = computed(() => {
     .toSorted((a, b) => {
       return b.count - a.count
     })
-    .slice(0, FREQUENT_USED_CHAMPIONS_COUNT)
+    .slice(0, FREQUENT_USED_CHAMPIONS_MAX_COUNT)
 
   return truncated
 })
@@ -909,13 +915,12 @@ const winLoseBlocks = computed(() => {
     }
 
     &.losing-streak {
-      background-color: #ffffff50;
       background-color: #893b3b;
     }
 
     &.akari-loved {
       color: #ffffff;
-      background-color: #dc50af;
+      background-color: #b81b86;
     }
 
     &.self {

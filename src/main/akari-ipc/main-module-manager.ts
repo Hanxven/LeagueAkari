@@ -1,4 +1,4 @@
-import { WebContents } from 'electron'
+import { webContents } from 'electron'
 
 import { LeagueAkariModule } from './akari-module'
 import { LeagueAkariIpc } from './main-ipc'
@@ -6,7 +6,7 @@ import { LeagueAkariIpc } from './main-ipc'
 type ModuleInfo = {
   id: string
   module: LeagueAkariModule
-  subscribers: Set<WebContents>
+  subscribers: Set<number>
 }
 
 /**
@@ -64,10 +64,10 @@ export class LeagueAkariModuleManager {
         }
 
         event.sender.on('destroyed', () => {
-          this._modules.get(moduleId)?.subscribers.delete(event.sender)
+          this._modules.get(moduleId)?.subscribers.delete(event.sender.id)
         })
 
-        this._modules.get(moduleId)?.subscribers.add(event.sender)
+        this._modules.get(moduleId)?.subscribers.add(event.sender.id)
       }
     )
 
@@ -80,7 +80,7 @@ export class LeagueAkariModuleManager {
           throw new Error(`No module of ID ${moduleId}`)
         }
 
-        this._modules.get(moduleId)?.subscribers.delete(event.sender)
+        this._modules.get(moduleId)?.subscribers.delete(event.sender.id)
       }
     )
 
@@ -116,10 +116,14 @@ export class LeagueAkariModuleManager {
    * @param args 事件参数
    */
   sendEvent(moduleId: string, eventName: string, ...args: any[]) {
-    this._modules
-      .get(moduleId)
-      ?.subscribers?.forEach((w) =>
-        LeagueAkariIpc.sendEvent(w, 'module-manager/event', moduleId, eventName, ...args)
-      )
+    this._modules.get(moduleId)?.subscribers?.forEach((id) => {
+      const w = webContents.fromId(id)
+
+      if (!w) {
+        throw new Error(`No webContents of ID ${id}`)
+      }
+
+      LeagueAkariIpc.sendEvent(w, 'module-manager/event', moduleId, eventName, ...args)
+    })
   }
 }

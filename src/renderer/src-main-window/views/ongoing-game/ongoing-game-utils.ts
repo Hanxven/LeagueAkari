@@ -62,7 +62,7 @@ export function useQueueOptions() {
   return computed(() => {
     return [
       {
-        label: '优先当前队列',
+        label: '当前队列',
         value: -10
       },
       {
@@ -109,19 +109,19 @@ export function useQueueOptions() {
 export function useOrderOptions() {
   return [
     {
-      label: '默认',
+      label: '楼层顺序',
       value: 'default'
     },
     {
-      label: '胜率',
+      label: '胜率降序',
       value: 'win-rate'
     },
     {
-      label: 'KDA',
+      label: 'KDA 降序',
       value: 'kda'
     },
     {
-      label: '综合',
+      label: '综合降序',
       value: 'akari-score'
     }
   ]

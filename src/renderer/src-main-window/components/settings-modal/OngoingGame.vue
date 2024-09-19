@@ -140,24 +140,33 @@
         />
       </ControlItem>
       <ControlItem
-        v-if="false"
+        v-if="cf.ongoingTeams"
         :disabled="!app.isAdministrator"
         class="control-item-margin"
-        label="使用自定义 JavaScript 脚本"
-        label-description="使用自定义脚本生成发送的文本内容。须注意自定义脚本的安全性，应仅从可信来源获取脚本"
+        label="仅发送这些玩家"
+        label-description="KDA 简报仅发送以下玩家的数据"
         :label-width="320"
       >
-        <NFlex>
-          <NInput
-            placeholder="JavaScript 脚本路径"
-            style="max-width: 240px"
-            :disabled="!app.isAdministrator"
+        <div
+          v-for="(playerPuuids, team) of cf.ongoingTeams"
+          :key="team"
+          style="display: flex; flex-wrap: wrap; margin-bottom: 4px"
+        >
+          <NCheckbox
             size="small"
-          />
-          <NButton secondary type="primary" :disabled="!app.isAdministrator" size="small"
-            >浏览</NButton
+            v-for="puuid of playerPuuids"
+            :key="puuid"
+            :checked="cf.sendList[puuid]"
+            @update:checked="(val) => cfm.setSendPlayer(puuid, val)"
+            >{{
+              summonerName(
+                summoners[puuid]?.gameName || summoners[puuid]?.displayName,
+                summoners[puuid]?.tagLine,
+                puuid.slice(0, 6)
+              )
+            }}</NCheckbox
           >
-        </NFlex>
+        </div>
       </ControlItem>
     </NCard>
   </NScrollbar>
@@ -174,9 +183,12 @@ import { useExternalDataSourceStore } from '@renderer-shared/modules/external-da
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { respawnTimerRendererModule as rtm } from '@renderer-shared/modules/respawn-timer'
 import { useRespawnTimerStore } from '@renderer-shared/modules/respawn-timer/store'
+import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { summonerName } from '@shared/utils/name'
 import {
   NButton,
   NCard,
+  NCheckbox,
   NFlex,
   NInput,
   NInputNumber,
@@ -185,6 +197,7 @@ import {
   NSlider,
   NSwitch
 } from 'naive-ui'
+import { computed } from 'vue'
 
 const rt = useRespawnTimerStore()
 const cf = useCoreFunctionalityStore()
@@ -193,10 +206,14 @@ const app = useAppStore()
 const eds = useExternalDataSourceStore()
 const lc = useLcuConnectionStore()
 
-const matchHistorySourceOptions = [
-  { label: 'SGP', value: 'sgp' },
-  { label: 'LCU', value: 'lcu' }
-]
+const summoners = computed(() => {
+  const obj: Record<string, SummonerInfo | undefined> = {}
+  Object.entries(cf.ongoingPlayers).forEach(([puuid, player]) => {
+    obj[puuid] = player.summoner
+  })
+
+  return obj
+})
 </script>
 
 <style lang="less" scoped>
