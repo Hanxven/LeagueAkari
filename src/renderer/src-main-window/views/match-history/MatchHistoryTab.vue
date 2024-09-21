@@ -485,7 +485,7 @@ import {
   NavigateBeforeOutlined as NavigateBeforeOutlinedIcon,
   NavigateNextOutlined as NavigateNextOutlinedIcon
 } from '@vicons/material'
-import { useIntervalFn, useMediaQuery, useScroll } from '@vueuse/core'
+import { useIntervalFn, useMediaQuery } from '@vueuse/core'
 import {
   NButton,
   NIcon,

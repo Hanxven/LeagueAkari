@@ -5,14 +5,17 @@
         class="team"
         :class="{
           win: participants[0].stats.win,
-          lose: !participants[0].stats.win
+          lose: !participants[0].stats.win,
+          na:
+            participants[0].stats.gameEndedInEarlySurrender ||
+            game.endOfGameResult === 'Abort_AntiCheatExit'
         }"
       >
         <thead class="team-header">
           <tr>
             <th class="header-info">
               {{ participants[0].stats.win ? '胜利' : '失败' }} ({{
-                teamId === 100 ? '蓝色方' : '红色方'
+                teamId === 100 ? '蓝队' : '红队'
               }})
             </th>
             <th class="header-kda">KDA</th>
@@ -467,6 +470,10 @@ table {
   &.lose {
     background-color: rgb(65, 39, 43);
   }
+
+  &.na {
+    background-color: rgb(56, 56, 56);
+  }
 }
 
 .participant {
@@ -478,6 +485,10 @@ table {
 
   .lose &.self {
     background-color: rgb(90, 53, 59);
+  }
+
+  .na &.self {
+    background-color: rgb(76, 76, 76);
   }
 }
 

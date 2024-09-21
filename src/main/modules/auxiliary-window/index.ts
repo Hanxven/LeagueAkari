@@ -332,7 +332,7 @@ export class AuxWindowModule extends MobxBasedBasicModule {
     }
   }
 
-  closeWindow(force = false) {
+  closeWindow(_force = false) {
     if (this._w) {
       this._isForceClose = true
       this._w.close()

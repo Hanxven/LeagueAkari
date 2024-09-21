@@ -10,6 +10,8 @@ export class ChampSelectState {
 
   currentBannableChampionIdArray: number[] = []
 
+  disabledChampionIdArray: number[] = []
+
   selfSummoner: ChampSelectSummoner | null = null
 
   constructor() {
@@ -17,6 +19,7 @@ export class ChampSelectState {
       session: observable.struct,
       currentPickableChampionIdArray: observable.struct,
       currentBannableChampionIdArray: observable.struct,
+      disabledChampionIdArray: observable.struct,
       selfSummoner: observable.struct
     })
   }
@@ -30,6 +33,12 @@ export class ChampSelectState {
   get currentBannableChampionIds() {
     const set = new Set<number>()
     this.currentBannableChampionIdArray.forEach((c) => set.add(c))
+    return set
+  }
+
+  get disabledChampionIds() {
+    const set = new Set<number>()
+    this.disabledChampionIdArray.forEach((c) => set.add(c))
     return set
   }
 
@@ -51,5 +60,9 @@ export class ChampSelectState {
 
   setCurrentChampion(c: number | null) {
     this.currentChampion = c
+  }
+
+  setDisabledChampionIds(ids: number[]) {
+    this.disabledChampionIdArray = ids
   }
 }

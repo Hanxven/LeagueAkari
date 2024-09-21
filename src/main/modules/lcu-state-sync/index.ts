@@ -4,6 +4,7 @@ import {
   getChampSelectSession,
   getChampSelectSummoner,
   getCurrentChamp,
+  getDisabledChampions,
   getPickableChampIds
 } from '@main/http-api/champ-select'
 import { getConversations, getMe, getParticipants } from '@main/http-api/chat'
@@ -308,6 +309,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       'session',
       'currentPickableChampionIds',
       'currentBannableChampionIds',
+      'disabledChampionIds',
       'currentChampion'
     ])
 
@@ -466,6 +468,31 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
+    this.reaction(
+      () => this._lcm.state.state,
+      async (state) => {
+        if (state === 'connected') {
+          try {
+            const c = (await getDisabledChampions()).data
+            this.champSelect.setDisabledChampionIds(c)
+            this._logger.info(`已被禁用的英雄: ${c}`)
+            console.log(c)
+          } catch (error) {
+            if (isAxiosError(error) && error.response?.status === 404) {
+              this.champSelect.setDisabledChampionIds([])
+              this._logger.info(`已被禁用的英雄: 无`)
+              return
+            }
+
+            throw error
+          }
+        } else {
+          this.champSelect.setDisabledChampionIds([])
+        }
+      },
+      { fireImmediately: true }
+    )
+
     const d1 = this._lcm.lcuEventBus.on('/lol-champ-select/v1/session', (event) => {
       if (event.eventType === 'Delete') {
         this.champSelect.setSession(null)
@@ -481,7 +508,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
         if (event.eventType === 'Delete') {
           this.champSelect.setCurrentPickableChampionArray([])
         } else {
-          this._logger.info(`更新可选用英雄列表, 共 ${event.data.length} 个`)
+          this._logger.info(`更新可选用英雄列表, 共 ${event.data?.length} 个`)
           this.champSelect.setCurrentPickableChampionArray(event.data)
         }
       }
@@ -493,7 +520,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
         if (event.eventType === 'Delete') {
           this.champSelect.setCurrentBannableChampionArray([])
         } else {
-          this._logger.info(`更新可禁用英雄列表, 共 ${event.data.length} 个`)
+          this._logger.info(`更新可禁用英雄列表, 共 ${event.data?.length} 个`)
           this.champSelect.setCurrentBannableChampionArray(event.data)
         }
       }
@@ -522,11 +549,23 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       }
     )
 
+    const d6 = this._lcm.lcuEventBus.on('/lol-champ-select/v1/disabled-champion-ids', (event) => {
+      this._logger.info(`被禁用的英雄: ${event.data?.length}`)
+      console.log(event)
+
+      if (event.eventType === 'Delete') {
+        this.champSelect.disabledChampionIdArray = []
+      } else {
+        this.champSelect.disabledChampionIdArray = event.data
+      }
+    })
+
     this._disposers.add(d1)
     this._disposers.add(d2)
     this._disposers.add(d3)
     this._disposers.add(d4)
     this._disposers.add(d5)
+    this._disposers.add(d6)
   }
 
   private _syncLcuChat() {

@@ -36,7 +36,7 @@
             >
               <NIcon class="icon"><ApplicationIcon /></NIcon>
               <div class="label" v-if="lc.auth">
-                {{ regionText[lc.auth.region] || lc.auth.region }}
+                {{ REGION_NAME[lc.auth.region] || lc.auth.region }}
               </div>
               <div class="label" v-else>客户端</div>
             </div>
@@ -58,10 +58,10 @@
                 style="vertical-align: text-bottom"
                 ><CubeSharpIcon
               /></NIcon>
-              {{ regionText[c.region] || c.region }}</span
+              {{ REGION_NAME[c.region] || c.region }}</span
             >
             <span class="rso" title="区服">{{
-              rsoPlatformText[c.rsoPlatformId] || c.rsoPlatformId
+              RSO_PLATFORM_NAME[c.rsoPlatformId] || c.rsoPlatformId
             }}</span>
             <span class="pid" title="Process ID">{{ c.pid }}</span>
             <span class="connected-indicator" v-if="c.connected"></span>
@@ -87,7 +87,7 @@
 import { lcuConnectionRendererModule as lcm } from '@renderer-shared/modules/lcu-connection'
 import { UxCommandLine, useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { leagueClientRendererModule as lcm2 } from '@renderer-shared/modules/league-client'
-import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
+import { REGION_NAME, RSO_PLATFORM_NAME } from '@shared/utils/rso-platforms'
 import {
   AiStatus as AiStatusIcon,
   AppSwitcher as AppSwitcherIcon,

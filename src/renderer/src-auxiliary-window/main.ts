@@ -1,3 +1,4 @@
+import { appRendererModule as am } from '@renderer-shared/modules/app'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'
@@ -8,7 +9,7 @@ import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'
 import './assets/css/styles.less'
-import { setupLeagueAkariModules } from './modules'
+import { setupLeagueAkariRendererModules } from './modules'
 import { router } from './routes'
 
 dayjs.extend(relativeTime)
@@ -19,9 +20,13 @@ app.use(router)
 app.use(createPinia())
 
 try {
-  await setupLeagueAkariModules()
+  await setupLeagueAkariRendererModules()
 } catch (error) {
   console.error('League Akari 无法正确加载：', error)
 } finally {
+  app.config.errorHandler = (err, instance, info) => {
+    am.logger.error(info, err)
+    console.error('Vue Error:', err, instance, info)
+  }
   app.mount('#app')
 }

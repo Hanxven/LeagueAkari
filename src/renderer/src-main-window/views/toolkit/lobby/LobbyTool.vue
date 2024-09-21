@@ -259,11 +259,11 @@ const positionOptions = [
 const teamOptions = [
   {
     value: '100',
-    label: '蓝色方'
+    label: '蓝队'
   },
   {
     value: '200',
-    label: '红色方'
+    label: '红队'
   }
 ]
 

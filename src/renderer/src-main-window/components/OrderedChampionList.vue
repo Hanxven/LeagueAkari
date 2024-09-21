@@ -58,7 +58,6 @@ import { computed, h, ref, useCssModule } from 'vue'
 
 const {
   maxShow = 6,
-  maxCount = Infinity,
   allowEmpty = false,
   type = 'pick'
 } = defineProps<{
@@ -78,10 +77,15 @@ const gameflow = useGameflowStore()
 const champSelect = useChampSelectStore()
 
 const championOptions = computed(() => {
-  const sorted = Object.values(gameData.champions).sort((a, b) => {
+  const sorted = Object.values(gameData.champions).toSorted((a, b) => {
     // 以防有人看不到, 决定将空英雄放在最前面
     if (a.id === -1 || b.id === -1) {
       return -1
+    }
+
+    // 只要是 PVE 英雄，直接放在最后面以防止失误选择
+    if (maybePveChampion(a.id) || maybePveChampion(b.id)) {
+      return 1
     }
 
     return a.name.localeCompare(b.name, 'zh-Hans-CN')
@@ -89,7 +93,8 @@ const championOptions = computed(() => {
 
   return sorted
     .filter((b) => {
-      if (maybePveChampion(b.id)) {
+      // 这个值只会在进入英雄选择阶段才会更新
+      if (champSelect.disabledChampionIds.has(b.id)) {
         return false
       }
 
@@ -101,7 +106,7 @@ const championOptions = computed(() => {
     })
     .map((b) => ({
       value: b.id,
-      label: b.name
+      label: maybePveChampion(b.id) ? `${b.name} (PVE)` : b.name
     }))
 })
 

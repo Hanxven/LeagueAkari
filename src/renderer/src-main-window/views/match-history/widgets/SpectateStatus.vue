@@ -204,13 +204,13 @@ const teams = computed(() => {
   return {
     team1: {
       id: 100,
-      name: '蓝色方',
+      name: '蓝队',
       players: data.game.teamOne,
       bans: data.game.bannedChampions.filter((ban) => ban.teamId === 100)
     },
     team2: {
       id: 200,
-      name: '红色方',
+      name: '红队',
       players: data.game.teamTwo,
       bans: data.game.bannedChampions.filter((ban) => ban.teamId === 200)
     }

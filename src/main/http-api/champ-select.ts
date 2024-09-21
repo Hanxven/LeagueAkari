@@ -92,6 +92,13 @@ export function getCurrentChamp() {
   })
 }
 
+export function getDisabledChampions() {
+  return lcm.lcuRequest<number[]>({
+    url: '/lol-champ-select/v1/disabled-champion-ids',
+    method: 'GET'
+  })
+}
+
 export function getChampSelectSummoner(cellId: number) {
   return lcm.lcuRequest<ChampSelectSummoner>({
     url: `/lol-champ-select/v1/summoners/${cellId}`,

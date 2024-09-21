@@ -90,7 +90,7 @@ import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summon
 import { getPlayerAccountAlias, getPlayerAccountNameset } from '@renderer-shared/rc-http-api/rc-api'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { inferType, resolveSummonerName } from '@shared/utils/identity'
-import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
+import { REGION_NAME, RSO_PLATFORM_NAME } from '@shared/utils/rso-platforms'
 import { Close as CloseIcon } from '@vicons/carbon'
 import {
   AutoCompleteOption,
@@ -152,7 +152,7 @@ const sgpServerOptions = computed(() => {
 
   return thatGroup
     .map((s) => ({
-      label: eds.sgpAvailability.currentRsoPlatform ? rsoPlatformText[s] || s : regionText[s] || s,
+      label: eds.sgpAvailability.currentRsoPlatform ? RSO_PLATFORM_NAME[s] || s : REGION_NAME[s] || s,
       value: s
     }))
     .toSorted((a, b) => a.label.localeCompare(b.label))

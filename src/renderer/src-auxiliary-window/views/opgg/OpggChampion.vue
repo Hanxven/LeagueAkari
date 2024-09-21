@@ -649,7 +649,6 @@ import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-d
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
-import { useLocalStorage } from '@vueuse/core'
 import {
   NButton,
   NCheckbox,

@@ -96,7 +96,12 @@ import { championIconUrl } from '@renderer-shared/modules/game-data'
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
 import { useLobbyStore } from '@renderer-shared/modules/lcu-state-sync/lobby'
-import { AccountScopeLoadouts, ChampionSimple, StrawberryHub } from '@shared/types/lcu/game-data'
+import {
+  AccountScopeLoadouts,
+  ChampionSimple,
+  StrawberryHub,
+  maybePveChampion
+} from '@shared/types/lcu/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NSelect, SelectRenderLabel, useMessage } from 'naive-ui'
 import { h, onMounted, shallowRef, watchEffect } from 'vue'
@@ -167,7 +172,7 @@ const strawberryChampions = computed(() => {
   const otherChampions: ChampionSimple[] = []
 
   Object.values(gameData.champions).forEach((c) => {
-    if (c.id >= 3000 && c.id < 4000) {
+    if (maybePveChampion(c.id)) {
       strawberryChampions.push(c)
     } else {
       otherChampions.push(c)

@@ -53,7 +53,6 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
     this.onEvent('update/ongoing-player/champion-mastery', (puuid, mastery) => {
       if (store.ongoingPlayers[puuid]) {
         store.ongoingPlayers[puuid].championMastery = markRaw(mastery)
-        console.log('mastery', puuid, mastery)
       }
     })
 
@@ -155,6 +154,10 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
 
   setQueueFilter(queueFilter: number) {
     return this.call('set-queue-filter', queueFilter)
+  }
+
+  setOrderPlayerBy(orderBy: string) {
+    return this.call('set-setting', 'orderPlayerBy', orderBy)
   }
 }
 

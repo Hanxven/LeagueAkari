@@ -1,4 +1,4 @@
-export const rsoPlatformText = {
+export const RSO_PLATFORM_NAME = {
   HN10: '黑色玫瑰',
   HN1: '艾欧尼亚',
   HN0: '体验',
@@ -46,7 +46,7 @@ export const rsoPlatformText = {
   TJ101: '联盟五区'
 } as const
 
-export const regionText = {
+export const REGION_NAME = {
   TENCENT: '腾讯',
   PBE: 'PBE',
   BR1: '巴西',

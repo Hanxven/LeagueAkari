@@ -1,6 +1,6 @@
 export const MODE_TEXT = {
   ranked: '排位',
-  aram: '大乱斗',
+  aram: '极地大乱斗',
   arena: '斗魂竞技场',
   nexus_blitz: '极限闪击',
   urf: '无限火力'

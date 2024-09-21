@@ -70,7 +70,7 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
       this._sm = this.manager.getModule('storage')
       this._ss = this._sm.settings.with(this.id)
     } catch (error) {
-      throw new Error('MobxBasedModule requires StorageModule')
+      throw new Error('MobxBasedBasicModule requires StorageModule')
     }
 
     this.onCall('get-state-props', (stateId: string) => {
@@ -78,12 +78,14 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
         throw new Error(`No registered state for ${stateId}`)
       }
 
-      return Array.from(this._registeredStates.get(stateId)!.props.entries()).map(
+      const props = Array.from(this._registeredStates.get(stateId)!.props.entries()).map(
         ([path, config]) => ({
           path,
           raw: config.raw
         })
       )
+
+      return props
     })
 
     this.onCall('get-state-prop', (stateId: string, propPath: string) => {
@@ -98,7 +100,8 @@ export class MobxBasedBasicModule extends LeagueAkariModule {
       const item = this._registeredStates.get(stateId)!
       const prop = item.props.get(propPath)!
 
-      return prop.raw ? toJS(get(item.object, propPath)) : get(item.object, propPath)
+      const value = prop.raw ? toJS(get(item.object, propPath)) : get(item.object, propPath)
+      return value
     })
 
     this.onCall('set-state-prop', (stateId: string, propPath: string, value: any) => {

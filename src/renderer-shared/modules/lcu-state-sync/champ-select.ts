@@ -8,6 +8,7 @@ export const useChampSelectStore = defineStore('lcu:champ-select', () => {
   // 当前英雄选择会话中可以选择的英雄列表，取决于自己是否拥有、或者是否是服务器热禁用
   const currentPickableChampionIds = shallowRef(new Set<number>())
   const currentBannableChampionIds = shallowRef(new Set<number>())
+  const disabledChampionIds = shallowRef(new Set<number>())
 
   const currentChampion = ref<number | null>(null)
 
@@ -15,6 +16,7 @@ export const useChampSelectStore = defineStore('lcu:champ-select', () => {
     session,
     currentPickableChampionIds,
     currentBannableChampionIds,
+    disabledChampionIds,
     currentChampion
   }
 })

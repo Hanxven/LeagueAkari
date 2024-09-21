@@ -166,7 +166,6 @@ import { useAutoGameflowStore } from '@renderer-shared/modules/auto-gameflow/sto
 import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
 import { auxiliaryWindowRendererModule as awm } from '@renderer-shared/modules/auxiliary-window'
 import { useAuxiliaryWindowStore } from '@renderer-shared/modules/auxiliary-window/store'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useLoginStore } from '@renderer-shared/modules/lcu-state-sync/login'
 import { mainWindowRendererModule as mwm } from '@renderer-shared/modules/main-window'
 import { useMainWindowStore } from '@renderer-shared/modules/main-window/store'

@@ -149,7 +149,7 @@
             <td>
               <CopyableText :text="lc.auth?.rsoPlatformId ?? '-'">{{
                 (lc.auth?.rsoPlatformId
-                  ? rsoPlatformText[lc.auth.rsoPlatformId] || lc.auth.rsoPlatformId
+                  ? RSO_PLATFORM_NAME[lc.auth.rsoPlatformId] || lc.auth.rsoPlatformId
                   : lc.auth?.rsoPlatformId) || '-'
               }}</CopyableText>
             </td>
@@ -159,7 +159,7 @@
             <td>
               <CopyableText :text="lc.auth?.region ?? '-'">{{
                 lc.auth?.region
-                  ? regionText[lc.auth.region] || lc.auth.region
+                  ? REGION_NAME[lc.auth.region] || lc.auth.region
                   : lc.auth?.region || '-'
               }}</CopyableText>
             </td>
@@ -221,7 +221,7 @@ import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/s
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { mainWindowRendererModule as mwm } from '@renderer-shared/modules/main-window'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
-import { regionText, rsoPlatformText } from '@shared/utils/rso-platforms'
+import { REGION_NAME, RSO_PLATFORM_NAME } from '@shared/utils/rso-platforms'
 import {
   DataTableColumn,
   NAutoComplete,

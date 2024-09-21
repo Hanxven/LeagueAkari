@@ -122,10 +122,10 @@ import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-d
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { summonerName } from '@shared/utils/name'
-import { rsoPlatformText } from '@shared/utils/rso-platforms'
+import { RSO_PLATFORM_NAME } from '@shared/utils/rso-platforms'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
 import { NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
-import { computed, reactive, ref, useTemplateRef, watch } from 'vue'
+import { computed, reactive, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
@@ -140,7 +140,6 @@ const lc = useLcuConnectionStore()
 const route = useRoute()
 const router = useRouter()
 
-// 当前登录的用户信息
 const summoner = useSummonerStore()
 
 const cf = useCoreFunctionalityStore()
@@ -197,8 +196,6 @@ const tabNames = computed(() => {
 
   mh.tabs.forEach((tab) => {
     if (tab.data.summoner) {
-      const n = summonerName(tab.data.summoner.gameName, tab.data.summoner.tagLine)
-
       if (onlyOneType) {
         nameMap[tab.id] = {
           gameName: tab.data.summoner.gameName,
@@ -210,7 +207,7 @@ const tabNames = computed(() => {
 
       // TODO: 目前只支持腾讯服务器, 所以固定为 rso-platforms.ts 中的文本
       const { sgpServerId } = mhm.parseUnionId(tab.id)
-      const s = rsoPlatformText[sgpServerId] || sgpServerId
+      const s = RSO_PLATFORM_NAME[sgpServerId] || sgpServerId
 
       nameMap[tab.id] = {
         gameName: tab.data.summoner.gameName,

@@ -8,7 +8,7 @@
         currentHighlightingPreMadeTeamId && currentHighlightingPreMadeTeamId === preMadeTeamId
     }"
     :style="{
-      width: `${FIXED_CARD_WIDTH}px`
+      width: `${FIXED_CARD_WIDTH_PX_LITERAL}px`
     }"
   >
     <div class="player-info">
@@ -397,9 +397,6 @@
         </div>
       </NPopover>
     </div>
-    <div class="win-lose-blocks" v-if="winLoseBlocks.length">
-      <div class="win-lose-block" v-for="block in winLoseBlocks.slice(0, 40)" :class="block"></div>
-    </div>
     <div class="match-history">
       <NVirtualList style="height: 100%" :item-size="32" :items="matches" v-if="matches.length">
         <template #default="{ item }">
@@ -456,14 +453,14 @@ import { TIER_TEXT } from '@shared/utils/ranked'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NPopover, NVirtualList } from 'naive-ui'
-import { computed, onDeactivated, useTemplateRef, watch, watchEffect } from 'vue'
+import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
 import RankedTable from '@main-window/components/RankedTable.vue'
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
 
 import {
   CHINESE_NUMBERS,
-  FIXED_CARD_WIDTH,
+  FIXED_CARD_WIDTH_PX_LITERAL,
   POSITION_ASSIGNMENT_REASON,
   PRE_MADE_TEAM_COLORS,
   RANKED_MEDAL_MAP
@@ -489,10 +486,6 @@ const { puuid, analysis, matchHistory, position, preMadeTeamId, summoner, ranked
     analysis?: MatchHistoryGamesAnalysisAll
     savedInfo?: SavedPlayerInfo
   }>()
-
-watchEffect(() => {
-  console.log(analysis, summoner?.gameName)
-})
 
 const emits = defineEmits<{
   toSummoner: [puuid: string]
@@ -663,24 +656,6 @@ const matches = computed(() => {
 
   return withSelfParticipantMatchHistory(matchHistory, puuid)
 })
-
-const winLoseBlocks = computed(() => {
-  if (!matchHistory) {
-    return []
-  }
-
-  return matches.value.map((match) => {
-    if (
-      match.game.gameMode === 'PRACTICETOOL' ||
-      match.game.endOfGameResult === 'Abort_AntiCheatExit' ||
-      match.selfParticipant.stats.gameEndedInEarlySurrender
-    ) {
-      return 'na'
-    }
-
-    return match.selfParticipant.stats.win ? 'win' : 'lose'
-  })
-})
 </script>
 
 <style lang="less" scoped>
@@ -694,7 +669,7 @@ const winLoseBlocks = computed(() => {
   box-sizing: border-box;
   border: 1px solid #ffffff40;
   background-color: #11111180;
-  width: v-bind(FIXED_CARD_WIDTH);
+  width: v-bind(FIXED_CARD_WIDTH_PX_LITERAL);
 
   transition: filter 0.2s;
 
@@ -944,38 +919,13 @@ const winLoseBlocks = computed(() => {
   }
 }
 
-.win-lose-blocks {
-  display: flex;
-  gap: 2px;
-  margin-bottom: 4px;
-  height: 2px;
-
-  .win-lose-block {
-    flex: 1;
-    height: 100%;
-    background-color: #ffffff40;
-  }
-
-  .win {
-    background-color: #2368ca;
-  }
-
-  .lose {
-    background-color: #c94f4f;
-  }
-
-  .na {
-    background-color: #c0c0c0;
-  }
-}
-
 .match-history {
   display: flex;
   flex: 1;
   width: 100%;
   height: 0;
   gap: 2px;
-  // border: 1px dashed white;
+  margin-top: 4px; // 再补一点间距, 合计 8px
 
   .match-item {
     display: flex;
@@ -995,7 +945,7 @@ const winLoseBlocks = computed(() => {
     }
 
     &.win {
-      background-color: #2369ca30;
+      background-color: #2369ca40;
 
       .win-lose {
         color: #4cc69d;
@@ -1003,8 +953,7 @@ const winLoseBlocks = computed(() => {
     }
 
     &.lose {
-      border-left-color: #c94f4f;
-      background-color: #c94f4f30;
+      background-color: #c94f4f40;
 
       .win-lose {
         color: #ff6161;

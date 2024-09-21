@@ -1036,7 +1036,8 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       'settings.ongoingAnalysisEnabled',
       'settings.matchHistoryLoadCount',
       'settings.preMadeTeamThreshold',
-      'settings.useSgpApi'
+      'settings.useSgpApi',
+      'settings.orderPlayerBy'
     ])
   }
 
@@ -1153,6 +1154,10 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
       {
         key: 'useSgpApi',
         defaultValue: this.state.settings.useSgpApi
+      },
+      {
+        key: 'orderPlayerBy',
+        defaultValue: this.state.settings.orderPlayerBy
       }
     ])
 
@@ -1218,6 +1223,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     )
     this.onSettingChange<Paths<typeof this.state.settings>>('preMadeTeamThreshold', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>('useSgpApi', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('orderPlayerBy', defaultSetter)
   }
 }
 

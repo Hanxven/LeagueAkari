@@ -1,3 +1,13 @@
+# v1.2.6 DRAFT
+
+## ROADMAP
+
+- [TODO] 提供了一个选项，同大区内标记的玩家将可见与其他账户。
+
+- [TODO] 现在可以导出和导入部分内容。
+
+- [TODO] 使用内置新端点判断禁用的英雄，而非 >= 3000。
+
 # v1.2.5 DRAFT
 
 ## 新增
@@ -5,10 +15,6 @@
 - 带有英雄选择台的模式，提供了一个设置项，将可以始终选择优先级列表最前面的英雄。([#87](https://github.com/Hanxven/LeagueAkari/issues/87))
 
 - 战绩页面的标签页现在可以通过鼠标中键关闭和打开。([#85](https://github.com/Hanxven/LeagueAkari/pull/85)，[#110](https://github.com/Hanxven/LeagueAkari/issues/110))
-
-- [TODO] 提供了一个选项，同大区内标记的玩家将可见与其他账户。
-
-- [TODO] 现在可以导出和导入部分内容。
 
 - 对局页面重构，现在将展示更详细的内容。
 

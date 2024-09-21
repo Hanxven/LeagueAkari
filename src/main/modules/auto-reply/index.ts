@@ -13,7 +13,6 @@ import { runInAction } from 'mobx'
 import { LcuConnectionModule } from '../lcu-connection'
 import { LcuSyncModule } from '../lcu-state-sync'
 import { AppLogger, LogModule } from '../log'
-import { MainWindowModule } from '../main-window'
 import { AutoReplyState } from './state'
 
 export class AutoReplyModule extends MobxBasedBasicModule {

@@ -192,7 +192,6 @@ import {
   RegionType,
   TierType
 } from '@shared/data-sources/opgg/types'
-import { maybePveChampion } from '@shared/types/lcu/game-data'
 import {
   Close as CloseIcon,
   RefreshSharp as RefreshIcon,
@@ -230,8 +229,6 @@ import { MODE_TEXT, POSITION_TEXT, REGION_TEXT, TIER_TEXT } from './text'
 const currentTab = ref('tier')
 const gameflow = useGameflowStore()
 const champSelect = useChampSelectStore()
-
-const opggPanelEl = useTemplateRef('opgg-panel')
 
 const savedPreferences = useLocalStorage('opgg-preferences', {
   mode: 'ranked',
@@ -601,7 +598,7 @@ watchDebounced(
     await loadAll()
 
     // 排除 PVE 模式的英雄
-    if (atm.championId && !maybePveChampion(atm.championId)) {
+    if (atm.championId && !champSelect.disabledChampionIds.has(atm.championId)) {
       handleToChampion(atm.championId)
     }
   },

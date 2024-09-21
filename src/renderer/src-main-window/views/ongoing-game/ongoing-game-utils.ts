@@ -154,11 +154,11 @@ export interface TeamMeta {
 
 export const TEAM_NAMES: Record<string, TeamMeta> = {
   '100': {
-    name: '蓝色方',
+    name: '蓝队',
     side: 100
   },
   '200': {
-    name: '红色方',
+    name: '红队',
     side: 200
   },
   our: {
@@ -170,19 +170,19 @@ export const TEAM_NAMES: Record<string, TeamMeta> = {
     side: -1
   },
   'our-1': {
-    name: '我方 (蓝色方)',
+    name: '我方 (蓝队)',
     side: 100
   },
   'our-2': {
-    name: '我方 (红色方)',
+    name: '我方 (红队)',
     side: 200
   },
   'their-1': {
-    name: '敌方 (蓝色方)',
+    name: '敌方 (蓝队)',
     side: 100
   },
   'their-2': {
-    name: '敌方 (红色方)',
+    name: '敌方 (红队)',
     side: 200
   }
 }
@@ -253,6 +253,6 @@ export const PRE_MADE_TEAM_COLORS = {
   H: { foregroundColor: '#d63a17', color: '#fff' }
 }
 
-export const FIXED_CARD_WIDTH = '240px'
+export const FIXED_CARD_WIDTH_PX_LITERAL = '240px'
 
 export const ONGOING_GAME_COMP_K = Symbol('AKARI_OGC_IJK') as InjectionKey<any>

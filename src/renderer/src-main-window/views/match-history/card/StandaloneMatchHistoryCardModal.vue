@@ -107,11 +107,11 @@ const handleReload = async () => {
   if (!props.gameId || props.game) {
     return
   }
-  await fetchGame(props.gameId)
+  await fetchGame(props.gameId, willUseSgpApi.value)
 }
 
 watch(
-  [() => props.game, () => props.gameId, () => props.selfPuuid, () => cf.settings.useSgpApi],
+  [() => props.game, () => props.gameId, () => props.selfPuuid, () => willUseSgpApi.value],
   ([game, gameId, _selfId, useSgpApi]) => {
     if (game) {
       return

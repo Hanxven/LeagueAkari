@@ -187,11 +187,8 @@ import { useRespawnTimerStore } from '@renderer-shared/modules/respawn-timer/sto
 import {
   NButton,
   NCard,
-  NFlex,
-  NInput,
   NInputNumber,
   NScrollbar,
-  NSelect,
   NSlider,
   NSwitch
 } from 'naive-ui'

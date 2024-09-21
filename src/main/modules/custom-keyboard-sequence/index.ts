@@ -10,7 +10,6 @@ import { runInAction } from 'mobx'
 import { LeagueClientModule } from '../league-client'
 import { AppLogger, LogModule } from '../log'
 import { PlatformModule } from '../win-platform'
-import { LcuSyncModule } from '../lcu-state-sync'
 import { CustomKeyboardSequenceState } from './state'
 
 export class CustomKeyboardSequenceModule extends MobxBasedBasicModule {

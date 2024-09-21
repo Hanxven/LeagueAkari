@@ -63,7 +63,6 @@ export class AppModule extends MobxBasedBasicModule {
   private _logModule: LogModule
   private _logger: AppLogger
   private _rLogger: AppLogger
-  private _mwm: MainWindowModule
   private _afgm: AutoGameflowModule
   private _arm: AutoReplyModule
   private _cfm: CoreFunctionalityModule
@@ -86,7 +85,6 @@ export class AppModule extends MobxBasedBasicModule {
     this._logModule = this.manager.getModule<LogModule>('log')
     this._logger = this._logModule.createLogger('app')
     this._rLogger = this._logModule.createLogger('renderer')
-    this._mwm = this.manager.getModule<MainWindowModule>('main-window')
     this._afgm = this.manager.getModule<AutoGameflowModule>('auto-gameflow')
     this._arm = this.manager.getModule<AutoReplyModule>('auto-reply')
     this._cfm = this.manager.getModule<CoreFunctionalityModule>('core-functionality')

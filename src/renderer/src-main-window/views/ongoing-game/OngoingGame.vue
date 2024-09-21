@@ -10,7 +10,7 @@
       <div class="team-wrapper">
         <div class="team-header">
           <span class="title">{{ formatTeamText(team).name }}</span>
-          <div class="analysis" v-if="teamAnalysis && players.length > 1">
+          <div class="analysis" v-if="teamAnalysis && players.length >= 1">
             <span
               title="队伍平均胜率"
               class="win-rate"
@@ -21,6 +21,12 @@
               >{{ (teamAnalysis.averageWinRate * 100).toFixed() }} %</span
             >
             <span title="队伍平均 KDA">{{ teamAnalysis.averageKda.toFixed(2) }}</span>
+            <span
+              title="队伍平均 Akari Score"
+              style="color: #ff65ce"
+              v-if="app.settings.isInKyokoMode"
+              >{{ teamAnalysis.averageAkariScore.toFixed(2) }}</span
+            >
           </div>
         </div>
         <div class="team">
@@ -54,7 +60,8 @@
             :options="orderOptions"
             placeholder="排序方式"
             size="small"
-            v-model:value="orderBy"
+            :value="cf.settings.orderPlayerBy"
+            @update:value="(val) => cfm.setOrderPlayerBy(val)"
             class="order-selector"
           />
           <NSelect
@@ -98,6 +105,7 @@
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { useAppStore } from '@renderer-shared/modules/app/store'
 import { coreFunctionalityRendererModule as cfm } from '@renderer-shared/modules/core-functionality'
 import {
   OngoingPlayer,
@@ -123,7 +131,7 @@ import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/matc
 import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMatchHistoryCardModal.vue'
 import PlayerInfoCard from './PlayerInfoCard.vue'
 import {
-  FIXED_CARD_WIDTH,
+  FIXED_CARD_WIDTH_PX_LITERAL,
   ONGOING_GAME_COMP_K,
   PRE_MADE_TEAMS,
   TEAM_NAMES,
@@ -139,17 +147,16 @@ const gameflow = useGameflowStore()
 const champSelect = useChampSelectStore()
 const summoner = useSummonerStore()
 const eds = useExternalDataSourceStore()
+const app = useAppStore()
 
 const isInIdleState = useIdleState()
-
-const orderBy = ref<'akari-score' | 'kda' | 'win-rate' | 'default'>('default')
 
 const canUseSgpApi = computed(() => {
   return cf.settings.useSgpApi && eds.sgpAvailability.currentSgpServerSupported
 })
 
 const teams = computed(() => {
-  if (!cf.ongoingTeams || !cf.ongoingPlayers) {
+  if (!cf.ongoingTeams || !Object.keys(cf.ongoingPlayers).length) {
     return {}
   }
 
@@ -200,15 +207,15 @@ const teams = computed(() => {
           return data
         })
         .toSorted((a, b) => {
-          if (orderBy.value === 'akari-score') {
+          if (cf.settings.orderPlayerBy === 'akari-score') {
             return (b.analysis?.akariScore.total || 0) - (a.analysis?.akariScore.total || 0)
           }
 
-          if (orderBy.value === 'kda') {
+          if (cf.settings.orderPlayerBy === 'kda') {
             return (b.analysis?.summary.averageKda || 0) - (a.analysis?.summary.averageKda || 0)
           }
 
-          if (orderBy.value === 'win-rate') {
+          if (cf.settings.orderPlayerBy === 'win-rate') {
             return (b.analysis?.summary.winRate || 0) - (a.analysis?.summary.winRate || 0)
           }
 
@@ -396,7 +403,7 @@ const columnsNeed = computed(() => {
 .team {
   display: grid;
   margin-top: 4px;
-  grid-template-columns: repeat(v-bind(columnsNeed), v-bind(FIXED_CARD_WIDTH));
+  grid-template-columns: repeat(v-bind(columnsNeed), v-bind(FIXED_CARD_WIDTH_PX_LITERAL));
   gap: 8px 4px;
 }
 

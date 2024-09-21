@@ -8,7 +8,7 @@ import {
 } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
-import { reactive, ref, shallowRef, watchEffect } from 'vue'
+import { reactive, ref, shallowRef } from 'vue'
 
 // copied from main process
 export interface EncounteredGame {
@@ -141,10 +141,6 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
     teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
   } | null>(null)
 
-  watchEffect(() => {
-    console.log('[DEBUG] 玩家战绩分析', ongoingPlayerAnalysis.value)
-  })
-
   // 战绩加载功能
   const settings = reactive({
     fetchAfterGame: true,
@@ -161,6 +157,9 @@ export const useCoreFunctionalityStore = defineStore('module:core-functionality'
 
     // 拉取分页大小
     matchHistoryLoadCount: 20,
+
+    // 排序玩家的方式
+    orderPlayerBy: 'default',
 
     // 允许在游戏内发送对局 KDA 信息
     sendKdaInGame: false,

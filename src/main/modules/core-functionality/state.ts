@@ -26,6 +26,7 @@ class CoreFunctionalitySettings {
   sendKdaThreshold: number = 0
   useAuxiliaryWindow: boolean = true
   playerAnalysisFetchConcurrency: number = 3
+  orderPlayerBy: 'win-rate' | 'kda' | 'default' | 'akari-score' = 'default'
   useSgpApi: boolean = true
 
   constructor() {
@@ -78,6 +79,10 @@ class CoreFunctionalitySettings {
 
   setUseSgpApi(value: boolean) {
     this.useSgpApi = value
+  }
+
+  setOrderPlayerBy(value: 'win-rate' | 'kda' | 'default' | 'akari-score') {
+    this.orderPlayerBy = value
   }
 }
 

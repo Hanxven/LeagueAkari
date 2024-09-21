@@ -6,7 +6,7 @@ import { LeagueAkariRendererModule } from './renderer-akari-module'
 type SimpleStateSetter = (value: any) => any
 
 /**
- * 用于与主进程 MobxBasedModule 通信
+ * 用于与主进程 MobxBasedBasicModule 通信
  */
 export class StateSyncModule extends LeagueAkariRendererModule {
   /**
@@ -19,6 +19,12 @@ export class StateSyncModule extends LeagueAkariRendererModule {
   }
 
   async stateSync<T extends object>(stateId: string, obj: T) {
+    this.onEvent(`update-state-prop/${stateId}`, (path: string, value, raw: boolean) => {
+      // FOR DEBUGGING ONLY: uncomment the following line to see state changes
+      // console.log(this.id, stateId, path, value)
+      set(obj, path, raw ? markRaw(value) : value)
+    })
+
     try {
       const configList = (await this.call('get-state-props', stateId)) as {
         path: string
@@ -39,15 +45,10 @@ export class StateSyncModule extends LeagueAkariRendererModule {
         })
         .map((job) => job())
 
-      this.onEvent(`update-state-prop/${stateId}`, (path: string, value, raw: boolean) => {
-        // FOR DEBUGGING ONLY: uncomment the following line to see state changes
-        // console.log(this.id, stateId, path, value)
-        set(obj, path, raw ? markRaw(value) : value)
-      })
-
       await Promise.all(jobs)
     } catch (error) {
       console.error(`Failed to sync initial state of ${stateId}`, error)
+      throw error
     }
   }
 

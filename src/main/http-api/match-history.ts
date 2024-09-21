@@ -34,7 +34,7 @@ export function getGame(gameId: number, maxRetries = 3) {
       url: `/lol-match-history/v1/games/${gameId}`,
       method: 'GET'
     },
-    (maxRetries = 3)
+    maxRetries
   )
 }
 
