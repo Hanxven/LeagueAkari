@@ -135,7 +135,8 @@ export class AutoSelectState {
       memberMe,
       isActingNow: lcu.champSelect.selfSummoner.isActingNow,
       currentPickables: lcu.champSelect.currentPickableChampionIds,
-      currentBannables: lcu.champSelect.currentBannableChampionIds
+      currentBannables: lcu.champSelect.currentBannableChampionIds,
+      disabledChampions: lcu.champSelect.disabledChampionIds
     }
   }
 
@@ -226,7 +227,7 @@ export class AutoSelectState {
     }
 
     const pickables = expectedChampions.filter(
-      (c) => !unpickables.has(c) && a.currentPickables.has(c)
+      (c) => !unpickables.has(c) && a.currentPickables.has(c) && !a.disabledChampions.has(c)
     )
 
     if (!pickables.length) {
@@ -296,7 +297,8 @@ export class AutoSelectState {
 
     const bannables = bannedChampions.filter(
       (c) =>
-        (c == -1 && !a.session.isCustomGame) || (!unbannables.has(c) && a.currentBannables.has(c))
+        (c == -1 && !a.session.isCustomGame) ||
+        (!unbannables.has(c) && a.currentBannables.has(c) && !a.disabledChampions.has(c))
     )
 
     if (!bannables.length) {

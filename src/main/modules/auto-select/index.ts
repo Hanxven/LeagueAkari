@@ -318,8 +318,10 @@ export class AutoSelectModule extends MobxBasedBasicModule {
         }
 
         // 当前会话中可选的英雄
-        const availableExpectedChampions = expected.filter((c) =>
-          this._lcu.champSelect.currentPickableChampionIds.has(c)
+        const availableExpectedChampions = expected.filter(
+          (c) =>
+            this._lcu.champSelect.currentPickableChampionIds.has(c) &&
+            !this._lcu.champSelect.disabledChampionIds.has(c)
         )
         const pickableChampionsOnBench = availableExpectedChampions.filter((c) =>
           benchChampions.has(c)
