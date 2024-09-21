@@ -12,7 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import { auxiliaryWindowRendererModule as awm } from '@renderer-shared/modules/auxiliary-window'
 import { useAuxiliaryWindowStore } from '@renderer-shared/modules/auxiliary-window/store'
 import { useRouter } from 'vue-router'
 
@@ -47,4 +46,3 @@ switch (am.currentFunctionality) {
   }
 }
 </style>
-@renderer-shared/modules/lcu-state-sync/gameflow

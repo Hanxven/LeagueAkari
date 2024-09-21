@@ -6,7 +6,7 @@
 
 - [TODO] 现在可以导出和导入部分内容。
 
-- [TODO] 使用内置新端点判断禁用的英雄，而非 >= 3000。
+- [TODO] New language added: English.
 
 # v1.2.5 DRAFT
 

@@ -211,16 +211,7 @@ import {
   SelectRenderLabel,
   useMessage
 } from 'naive-ui'
-import {
-  computed,
-  h,
-  onErrorCaptured,
-  onMounted,
-  ref,
-  shallowRef,
-  useTemplateRef,
-  watchEffect
-} from 'vue'
+import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watchEffect } from 'vue'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'

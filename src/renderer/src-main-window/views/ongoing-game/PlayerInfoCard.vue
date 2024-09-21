@@ -402,7 +402,7 @@
         <template #default="{ item }">
           <div
             class="match-item"
-            :class="[getWinLoseClassName(item)]"
+            :class="getWinLoseClassName(item)"
             :key="item.game.gameId"
             @click="
               () =>

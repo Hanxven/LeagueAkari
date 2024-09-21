@@ -346,7 +346,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
               try {
                 const pickables = (await getPickableChampIds()).data
                 this.champSelect.setCurrentPickableChampionArray(pickables)
-                this._logger.info(`更新可选用英雄列表, 共 ${pickables.length} 个`)
+                this._logger.info(`加载可选用英雄列表, 共 ${pickables.length} 个`)
               } catch (error) {
                 if (isAxiosError(error) && error.response?.status === 404) {
                   this.champSelect.setCurrentPickableChampionArray([])
@@ -361,7 +361,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
               try {
                 const bannables = (await getBannableChampIds()).data
                 this.champSelect.setCurrentBannableChampionArray(bannables)
-                this._logger.info(`更新可禁用英雄列表, 共 ${bannables.length} 个`)
+                this._logger.info(`加载可禁用英雄列表, 共 ${bannables.length} 个`)
               } catch (error) {
                 if (isAxiosError(error) && error.response?.status === 404) {
                   this.champSelect.setCurrentBannableChampionArray([])
@@ -476,7 +476,6 @@ export class LcuSyncModule extends MobxBasedBasicModule {
             const c = (await getDisabledChampions()).data
             this.champSelect.setDisabledChampionIds(c)
             this._logger.info(`已被禁用的英雄: ${c}`)
-            console.log(c)
           } catch (error) {
             if (isAxiosError(error) && error.response?.status === 404) {
               this.champSelect.setDisabledChampionIds([])
@@ -514,6 +513,23 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       }
     )
 
+    // 额外的检查步骤, 下同
+    // 在后面的时机再次检查一下是否存在数据
+    this.reaction(
+      () => this.gameflow.phase,
+      async (phase) => {
+        if (
+          phase === 'ChampSelect' &&
+          this.champSelect.currentPickableChampionIdArray.length === 0
+        ) {
+          const { data } = await getPickableChampIds()
+          if (data.length) {
+            this.champSelect.setCurrentPickableChampionArray(data)
+          }
+        }
+      }
+    )
+
     const d3 = this._lcm.lcuEventBus.on<LcuEvent<number[]>>(
       '/lol-champ-select/v1/bannable-champion-ids',
       (event) => {
@@ -526,6 +542,20 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       }
     )
 
+    this.reaction(
+      () => this.gameflow.phase,
+      async (phase) => {
+        if (
+          phase === 'ChampSelect' &&
+          this.champSelect.currentPickableChampionIdArray.length === 0
+        ) {
+          const { data } = await getBannableChampIds()
+          if (data.length) {
+            this.champSelect.setCurrentBannableChampionArray(data)
+          }
+        }
+      }
+    )
     const d4 = this._lcm.lcuEventBus.on<LcuEvent<ChampSelectSummoner>>(
       '/lol-champ-select/v1/summoners/*',
       (event) => {
@@ -551,12 +581,11 @@ export class LcuSyncModule extends MobxBasedBasicModule {
 
     const d6 = this._lcm.lcuEventBus.on('/lol-champ-select/v1/disabled-champion-ids', (event) => {
       this._logger.info(`被禁用的英雄: ${event.data?.length}`)
-      console.log(event)
 
       if (event.eventType === 'Delete') {
         this.champSelect.disabledChampionIdArray = []
       } else {
-        this.champSelect.disabledChampionIdArray = event.data
+        this.champSelect.setDisabledChampionIds(event.data)
       }
     })
 

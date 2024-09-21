@@ -435,7 +435,7 @@ const columnsNeed = computed(() => {
     color: #4cc69d;
   }
 
-  &.win-rate.lt-50 {
+  .win-rate.lt-50 {
     color: #ff6161;
   }
 }
