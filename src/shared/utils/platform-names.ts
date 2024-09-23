@@ -1,7 +1,7 @@
-export const RSO_PLATFORM_NAME = {
+export const TENCENT_RSO_PLATFORM_NAME = {
   HN10: '黑色玫瑰',
   HN1: '艾欧尼亚',
-  HN0: '体验',
+  PBE: '体验服',
   HN2: '祖安',
   HN3: '诺克萨斯',
   HN4: '班德尔城',
@@ -71,6 +71,23 @@ export const REGION_NAME = {
   TH2: '泰国',
   VN1: '越南',
   VN2: '越南'
+} as const
+
+export const SGP_SERVER_NAME = {
+  TENCENT_HN1: '艾欧尼亚',
+  TENCENT_HN10: '黑色玫瑰',
+  TENCENT_TJ100: '联盟四区',
+  TENCENT_TJ101: '联盟五区',
+  TENCENT_NJ100: '联盟一区',
+  TENCENT_GZ100: '联盟二区',
+  TENCENT_CQ100: '联盟三区',
+  TENCENT_BGP2: '峡谷之巅',
+  TENCENT_PBE: '体验服',
+  TW2: '台湾',
+  SG2: '新加坡',
+  PH2: '菲律宾',
+  VN2: '越南',
+  PBE: 'PBE'
 } as const
 
 /**

@@ -19,7 +19,7 @@
         <NSelect
           v-if="sgpServerOptions.length"
           style="width: 200px"
-          v-model:value="currentSgpServer"
+          v-model:value="currentSgpServerId"
           :options="sgpServerOptions"
         />
         <NButton type="primary" :disabled="!inputText" :loading="isSearching" @click="handleSearch"
@@ -90,7 +90,11 @@ import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summon
 import { getPlayerAccountAlias, getPlayerAccountNameset } from '@renderer-shared/rc-http-api/rc-api'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { inferType, resolveSummonerName } from '@shared/utils/identity'
-import { REGION_NAME, RSO_PLATFORM_NAME } from '@shared/utils/rso-platforms'
+import {
+  REGION_NAME,
+  SGP_SERVER_NAME,
+  TENCENT_RSO_PLATFORM_NAME
+} from '@shared/utils/platform-names'
 import { Close as CloseIcon } from '@vicons/carbon'
 import {
   AutoCompleteOption,
@@ -123,13 +127,10 @@ const byPuuidResult = ref<SummonerInfo>()
 
 const eds = useExternalDataSourceStore()
 
-const currentSgpServer = ref('')
+const currentSgpServerId = ref('')
 
 watchEffect(() => {
-  currentSgpServer.value =
-    eds.sgpAvailability.currentRegion === 'TENCENT'
-      ? eds.sgpAvailability.currentRsoPlatform
-      : eds.sgpAvailability.currentRegion
+  currentSgpServerId.value = eds.sgpAvailability.currentSgpServerId
 })
 
 const sgpServerOptions = computed(() => {
@@ -137,13 +138,8 @@ const sgpServerOptions = computed(() => {
     return []
   }
 
-  const platform =
-    eds.sgpAvailability.currentRegion === 'TENCENT'
-      ? eds.sgpAvailability.currentRsoPlatform
-      : eds.sgpAvailability.currentRegion
-
   const thatGroup = eds.sgpAvailability.supportedSgpServers.groups.find((g) =>
-    g.find((s) => s === platform)
+    g.find((s) => s === eds.sgpAvailability.currentSgpServerId)
   )
 
   if (!thatGroup || thatGroup.length <= 1) {
@@ -152,7 +148,7 @@ const sgpServerOptions = computed(() => {
 
   return thatGroup
     .map((s) => ({
-      label: eds.sgpAvailability.currentRsoPlatform ? RSO_PLATFORM_NAME[s] || s : REGION_NAME[s] || s,
+      label: eds.sgpAvailability.supportedSgpServers.servers[s]?.name || s,
       value: s
     }))
     .toSorted((a, b) => a.label.localeCompare(b.label))
@@ -160,11 +156,7 @@ const sgpServerOptions = computed(() => {
 
 // 跨区查询需要额外步骤
 const isCrossRegion = computed(() => {
-  if (eds.sgpAvailability.currentRegion === 'TENCENT') {
-    return eds.sgpAvailability.currentRsoPlatform !== currentSgpServer.value
-  }
-
-  return eds.sgpAvailability.currentRegion !== currentSgpServer.value
+  return eds.sgpAvailability.currentSgpServerId !== currentSgpServerId.value
 })
 
 function isNumeric(str: string): boolean {
@@ -204,7 +196,7 @@ const handleSearch = async () => {
 
   isSearching.value = true
   searchText.value = inputText.value
-  searchSgpServerId.value = currentSgpServer.value
+  searchSgpServerId.value = currentSgpServerId.value
 
   const inferredTypes = inferType(inputText.value)
   const tasks: Promise<void>[] = []
@@ -219,7 +211,7 @@ const handleSearch = async () => {
             try {
               if (isCrossRegion.value) {
                 const a = await getPlayerAccountAlias(name, tag)
-                const p = await edsm.sgp.getSummonerLcuFormat(a.puuid, currentSgpServer.value)
+                const p = await edsm.sgp.getSummonerLcuFormat(a.puuid, currentSgpServerId.value)
                 p.gameName = a.alias.game_name
                 p.tagLine = a.alias.tag_line
                 byNameResult.value = p
@@ -255,7 +247,7 @@ const handleSearch = async () => {
             if (isCrossRegion.value) {
               const summoner = await edsm.sgp.getSummonerLcuFormat(
                 type.value,
-                currentSgpServer.value
+                currentSgpServerId.value
               )
               const s = await getPlayerAccountNameset(type.value)
               summoner.gameName = s.gnt.gameName

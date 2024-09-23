@@ -1,36 +1,40 @@
 {
   "servers": {
-    "HN1": {
+    "TENCENT_HN1": {
       "name": "艾欧尼亚",
       "server": "https://hn1-k8s-sgp.lol.qq.com:21019"
     },
-    "HN10": {
+    "TENCENT_HN10": {
       "name": "黑色玫瑰",
       "server": "https://hn10-k8s-sgp.lol.qq.com:21019"
     },
-    "TJ100": {
-      "name": "服务器TJ100",
+    "TENCENT_TJ100": {
+      "name": "联盟四区",
       "server": "https://tj100-sgp.lol.qq.com:21019"
     },
-    "TJ101": {
-      "name": "服务器TJ101",
+    "TENCENT_TJ101": {
+      "name": "联盟五区",
       "server": "https://tj101-sgp.lol.qq.com:21019"
     },
-    "NJ100": {
-      "name": "服务器NJ100",
+    "TENCENT_NJ100": {
+      "name": "联盟一区",
       "server": "https://nj100-sgp.lol.qq.com:21019"
     },
-    "GZ100": {
-      "name": "服务器GZ100",
+    "TENCENT_GZ100": {
+      "name": "联盟二区",
       "server": "https://gz100-sgp.lol.qq.com:21019"
     },
-    "CQ100": {
-      "name": "服务器CQ100",
+    "TENCENT_CQ100": {
+      "name": "联盟三区",
       "server": "https://cq100-sgp.lol.qq.com:21019"
     },
-    "BGP2": {
+    "TENCENT_BGP2": {
       "name": "峡谷之巅",
       "server": "https://bgp2-k8s-sgp.lol.qq.com:21019"
+    },
+    "TENCENT_PBE": {
+      "name": "体验服",
+      "server": "https://pbe-sgp.lol.qq.com:21019"
     },
     "TW2": {
       "name": "台湾",
@@ -55,14 +59,17 @@
   },
   "groups": [
     [
-      "HN1",
-      "HN10",
-      "TJ100",
-      "TJ101",
-      "NJ100",
-      "GZ100",
-      "CQ100",
-      "BGP2"
+      "TENCENT_HN1",
+      "TENCENT_HN10",
+      "TENCENT_TJ100",
+      "TENCENT_TJ101",
+      "TENCENT_NJ100",
+      "TENCENT_GZ100",
+      "TENCENT_CQ100",
+      "TENCENT_BGP2"
+    ],
+    [
+      "TENCENT_PBE"
     ],
     [
       "TW2"

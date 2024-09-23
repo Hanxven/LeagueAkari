@@ -80,13 +80,26 @@ export class SgpApi {
     this._http.defaults.headers.Authorization = `Bearer ${this._jwtToken}`
   }
 
-  private _getSgpServerId(platformId: string) {
-    const sgpServer = this._availableSgpServers.servers[platformId.toUpperCase()]
+  private _getSgpServer(sgpServerId: string) {
+    const sgpServer = this._availableSgpServers.servers[sgpServerId.toUpperCase()]
     if (!sgpServer) {
-      throw new Error(`unknown platformId: ${platformId}`)
+      throw new Error(`unknown sgpServerId: ${sgpServerId}`)
     }
 
     return sgpServer
+  }
+
+  /**
+   * 对于腾讯系, 仅保留其 rsoPlatformId
+   * @param sgpServerId
+   */
+  private _getSubId(sgpServerId: string) {
+    if (sgpServerId.startsWith('TENCENT')) {
+      const [_, rsoPlatformId] = sgpServerId.split('_')
+      return rsoPlatformId
+    }
+
+    return sgpServerId
   }
 
   getMatchHistory(
@@ -100,12 +113,12 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = this._getSgpServerId(sgpServerId)
+    const sgpServer = this._getSgpServer(sgpServerId)
 
     return this._http.get<SgpMatchHistoryLol>(
       `/match-history-query/v1/products/lol/player/${playerPuuid}/SUMMARY`,
       {
-        baseURL: platformSgpServer.server,
+        baseURL: sgpServer.server,
         params: {
           startIndex: start,
           count,
@@ -120,7 +133,7 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const sgpServer = this._getSgpServerId(platformId)
+    const sgpServer = this._getSgpServer(platformId)
 
     return this._http.get<SgpGameSummaryLol>(
       `/match-history-query/v1/products/lol/${platformId.toUpperCase()}_${gameId}/SUMMARY`,
@@ -133,7 +146,7 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = this._getSgpServerId(platformId)
+    const platformSgpServer = this._getSgpServer(platformId)
 
     return this._http.get<SgpGameDetailsLol>(
       `/match-history-query/v1/products/lol/${platformId.toUpperCase()}_${gameId}/DETAILS`,
@@ -150,7 +163,7 @@ export class SgpApi {
       throw new Error('jwt token is not set')
     }
 
-    const sgpServer = this._getSgpServerId(platformId)
+    const sgpServer = this._getSgpServer(platformId)
 
     return this._http.get<SgpRankedStats>(`/leagues-ledge/v2/rankedStats/puuid/${puuid}`, {
       baseURL: sgpServer.server
@@ -161,32 +174,33 @@ export class SgpApi {
    * 注: 暂未测试非腾讯的服务器, 因此使用 Tencent 后缀
    * 注: 可以跨腾讯大区查询
    */
-  getSummonerByPuuidTencent(platformId: string, puuid: string) {
+  getSummonerByPuuidTencent(sgpServerId: string, puuid: string) {
     if (!this._jwtToken) {
       throw new Error('jwt token is not set')
     }
 
-    const sgpServer = this._getSgpServerId(platformId)
+    const sgpServer = this._getSgpServer(sgpServerId)
+
+    const subId = this._getSubId(sgpServerId)
 
     return this._http.post<SgpSummoner[]>(
-      `/summoner-ledge/v1/regions/${platformId.toLowerCase()}/summoners/puuids`,
+      `/summoner-ledge/v1/regions/${subId.toLowerCase()}/summoners/puuids`,
       [puuid],
       { baseURL: sgpServer.server }
     )
   }
 
-  async getSpectatorGameflowByPuuid(platformId: string, puuid: string) {
+  async getSpectatorGameflowByPuuid(sgpServerId: string, puuid: string) {
     if (!this._jwtToken) {
       throw new Error('jwt token is not set')
     }
 
-    const sgpServer = this._getSgpServerId(platformId)
+    const sgpServer = this._getSgpServer(sgpServerId)
 
-    return this._http.get<SpectatorData>(
-      `/gsm/v1/ledge/spectator/region/${platformId}/puuid/${puuid}`,
-      {
-        baseURL: sgpServer.server
-      }
-    )
+    const subId = this._getSubId(sgpServerId)
+
+    return this._http.get<SpectatorData>(`/gsm/v1/ledge/spectator/region/${subId}/puuid/${puuid}`, {
+      baseURL: sgpServer.server
+    })
   }
 }

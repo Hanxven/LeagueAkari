@@ -61,7 +61,7 @@
               {{ REGION_NAME[c.region] || c.region }}</span
             >
             <span class="rso" title="区服">{{
-              RSO_PLATFORM_NAME[c.rsoPlatformId] || c.rsoPlatformId
+              TENCENT_RSO_PLATFORM_NAME[c.rsoPlatformId] || c.rsoPlatformId
             }}</span>
             <span class="pid" title="Process ID">{{ c.pid }}</span>
             <span class="connected-indicator" v-if="c.connected"></span>
@@ -87,7 +87,7 @@
 import { lcuConnectionRendererModule as lcm } from '@renderer-shared/modules/lcu-connection'
 import { UxCommandLine, useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { leagueClientRendererModule as lcm2 } from '@renderer-shared/modules/league-client'
-import { REGION_NAME, RSO_PLATFORM_NAME } from '@shared/utils/rso-platforms'
+import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import {
   AiStatus as AiStatusIcon,
   AppSwitcher as AppSwitcherIcon,

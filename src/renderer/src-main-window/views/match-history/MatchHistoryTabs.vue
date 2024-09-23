@@ -122,7 +122,7 @@ import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-d
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { summonerName } from '@shared/utils/name'
-import { RSO_PLATFORM_NAME } from '@shared/utils/rso-platforms'
+import { TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
 import { NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
 import { computed, reactive, useTemplateRef, watch } from 'vue'
@@ -207,7 +207,7 @@ const tabNames = computed(() => {
 
       // TODO: 目前只支持腾讯服务器, 所以固定为 rso-platforms.ts 中的文本
       const { sgpServerId } = mhm.parseUnionId(tab.id)
-      const s = RSO_PLATFORM_NAME[sgpServerId] || sgpServerId
+      const s = TENCENT_RSO_PLATFORM_NAME[sgpServerId] || sgpServerId
 
       nameMap[tab.id] = {
         gameName: tab.data.summoner.gameName,

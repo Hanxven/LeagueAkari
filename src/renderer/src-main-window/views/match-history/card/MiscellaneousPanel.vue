@@ -6,8 +6,8 @@
       <span
         >区服:
         {{
-          RSO_PLATFORM_NAME[game.platformId]
-            ? `${RSO_PLATFORM_NAME[game.platformId]} (${game.platformId}) (TENCENT)`
+          TENCENT_RSO_PLATFORM_NAME[game.platformId]
+            ? `${TENCENT_RSO_PLATFORM_NAME[game.platformId]} (${game.platformId}) (TENCENT)`
             : REGION_NAME[game.platformId]
               ? `${REGION_NAME[game.platformId]} (${game.platformId})`
               : game.platformId
@@ -52,7 +52,7 @@ import { championIconUrl } from '@renderer-shared/modules/game-data'
 import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
 import { Game, Participant, Player } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
-import { REGION_NAME, RSO_PLATFORM_NAME } from '@shared/utils/rso-platforms'
+import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import dayjs from 'dayjs'
 import { DataTableColumns, NDataTable } from 'naive-ui'
 import { RowData } from 'naive-ui/es/data-table/src/interface'
@@ -100,7 +100,7 @@ const perkstyleDisplay = (perkstyleId: number) => h(PerkstyleDisplay, { size: 20
 
 const augmentDisplay = (augmentId: number) => h(AugmentDisplay, { size: 20, augmentId })
 
-const platformDisplay = (platformId: string) => RSO_PLATFORM_NAME[platformId] || platformId
+const platformDisplay = (platformId: string) => TENCENT_RSO_PLATFORM_NAME[platformId] || platformId
 
 const formatTeam = (id: number) => {
   if (id === 100) {

@@ -149,7 +149,7 @@
             <td>
               <CopyableText :text="lc.auth?.rsoPlatformId ?? '-'">{{
                 (lc.auth?.rsoPlatformId
-                  ? RSO_PLATFORM_NAME[lc.auth.rsoPlatformId] || lc.auth.rsoPlatformId
+                  ? TENCENT_RSO_PLATFORM_NAME[lc.auth.rsoPlatformId] || lc.auth.rsoPlatformId
                   : lc.auth?.rsoPlatformId) || '-'
               }}</CopyableText>
             </td>
@@ -221,7 +221,7 @@ import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/s
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { mainWindowRendererModule as mwm } from '@renderer-shared/modules/main-window'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
-import { REGION_NAME, RSO_PLATFORM_NAME } from '@shared/utils/rso-platforms'
+import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import {
   DataTableColumn,
   NAutoComplete,

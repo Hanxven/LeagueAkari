@@ -44,6 +44,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     const gameflow = useGameflowStore()
     const summoner = useSummonerStore()
     const lc = useLcuConnectionStore()
+    const eds = useExternalDataSourceStore()
 
     watch(
       () => summoner.me,
@@ -79,17 +80,10 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
 
     // 当前召唤师登录时，立即创建一个页面
     watch(
-      [() => summoner.me, () => lc.auth],
-      ([me, auth]) => {
-        if (me && auth) {
+      [() => summoner.me, () => eds.sgpAvailability.currentSgpServerId],
+      ([me, sgpServerId]) => {
+        if (me) {
           mh.tabs.forEach((t) => mh.setTabPinned(t.id, false))
-
-          let sgpServerId: string
-          if (auth.region === 'TENCENT') {
-            sgpServerId = auth.rsoPlatformId
-          } else {
-            sgpServerId = auth.region
-          }
 
           const unionId = `${sgpServerId}/${me.puuid}`
 
@@ -128,16 +122,9 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
   }
 
   private _isCrossRegion(targetSgpServerId: string) {
-    const lc = useLcuConnectionStore()
-    if (!lc.auth) {
-      return false
-    }
+    const eds = useExternalDataSourceStore()
 
-    if (lc.auth.region === 'TENCENT') {
-      return lc.auth.rsoPlatformId !== targetSgpServerId
-    } else {
-      return lc.auth.region !== targetSgpServerId
-    }
+    return eds.sgpAvailability.currentSgpServerId !== targetSgpServerId
   }
 
   async fetchTabFullData(unionId: string) {

@@ -54,7 +54,7 @@ export class SgpEds {
   private _sgp = new SgpApi()
 
   static TENCENT_REGION = 'TENCENT'
-  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v4.json'
+  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v5.json'
 
   constructor(private _edsm: ExternalDataSourceModule) {}
 
@@ -132,7 +132,8 @@ export class SgpEds {
           return
         }
 
-        const sgpServerId = auth.region === 'TENCENT' ? auth.rsoPlatformId : auth.region
+        const sgpServerId =
+          auth.region === 'TENCENT' ? `${auth.region}_${auth.rsoPlatformId}` : auth.region
 
         const supported = this._sgp.supportsSgpServer(sgpServerId)
         const supportedSgpServers = this._sgp.supportedSgpServers()

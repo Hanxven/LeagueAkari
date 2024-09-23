@@ -60,11 +60,7 @@
               v-if="eds.sgpAvailability.currentSgpServerSupported"
               style="color: #63e2b7; font-weight: bold; user-select: text"
             >
-              当前 ({{
-                eds.sgpAvailability.currentRegion === 'TENCENT'
-                  ? `TENCENT-${eds.sgpAvailability.currentSgpServerId}`
-                  : eds.sgpAvailability.currentSgpServerId
-              }}) SGP Server:
+              当前 ({{ eds.sgpAvailability.currentSgpServerId }}) SGP Server:
               {{
                 eds.sgpAvailability.supportedSgpServers.servers[
                   eds.sgpAvailability.currentSgpServerId
@@ -73,11 +69,7 @@
             </div>
             <div v-else style="color: rgb(209, 170, 124); font-weight: bold">
               暂不支持当前服务器使用 SGP 接口:
-              {{
-                eds.sgpAvailability.currentRegion === 'TENCENT'
-                  ? eds.sgpAvailability.currentRsoPlatform
-                  : eds.sgpAvailability.currentRegion
-              }}
+              {{ eds.sgpAvailability.currentSgpServerId }}
             </div>
           </template>
         </template>
@@ -184,14 +176,7 @@ import { useExternalDataSourceStore } from '@renderer-shared/modules/external-da
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { respawnTimerRendererModule as rtm } from '@renderer-shared/modules/respawn-timer'
 import { useRespawnTimerStore } from '@renderer-shared/modules/respawn-timer/store'
-import {
-  NButton,
-  NCard,
-  NInputNumber,
-  NScrollbar,
-  NSlider,
-  NSwitch
-} from 'naive-ui'
+import { NButton, NCard, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 const rt = useRespawnTimerStore()
 const cf = useCoreFunctionalityStore()
