@@ -525,15 +525,7 @@ const isSelf = computed(() => {
 })
 
 const isInSameRegion = computed(() => {
-  if (!lc.auth) {
-    return false
-  }
-
-  if (lc.auth.region === 'TENCENT') {
-    return lc.auth.rsoPlatformId === tab.sgpServerId
-  }
-
-  return lc.auth.region === tab.sgpServerId
+  return eds.sgpAvailability.currentSgpServerId === tab.sgpServerId
 })
 
 // 1182px - is same in which defined in CSS

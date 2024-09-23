@@ -118,6 +118,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
+import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
 import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
@@ -141,6 +142,7 @@ const route = useRoute()
 const router = useRouter()
 
 const summoner = useSummonerStore()
+const eds = useExternalDataSourceStore()
 
 const cf = useCoreFunctionalityStore()
 
@@ -207,7 +209,7 @@ const tabNames = computed(() => {
 
       // TODO: 目前只支持腾讯服务器, 所以固定为 rso-platforms.ts 中的文本
       const { sgpServerId } = mhm.parseUnionId(tab.id)
-      const s = TENCENT_RSO_PLATFORM_NAME[sgpServerId] || sgpServerId
+      const s = eds.sgpAvailability.supportedSgpServers.servers[sgpServerId]?.name || sgpServerId
 
       nameMap[tab.id] = {
         gameName: tab.data.summoner.gameName,
