@@ -152,7 +152,7 @@ export class SgpEds {
 
   async getSummoner(puuid: string, sgpServerId?: string) {
     if (!sgpServerId) {
-      sgpServerId = this._getSgpServerIdFromLcuAuth()
+      sgpServerId = this.state.availability.currentSgpServerId
     }
 
     const { data } = await this._sgp.getSummonerByPuuidTencent(sgpServerId, puuid)
@@ -180,7 +180,7 @@ export class SgpEds {
     sgpServerId?: string
   ) {
     if (!sgpServerId) {
-      sgpServerId = this._getSgpServerIdFromLcuAuth()
+      sgpServerId = this.state.availability.currentSgpServerId
     }
 
     if (tag) {
@@ -192,7 +192,7 @@ export class SgpEds {
 
   async getGameSummary(gameId: number, sgpServerId?: string) {
     if (!sgpServerId) {
-      sgpServerId = this._getSgpServerIdFromLcuAuth()
+      sgpServerId = this.state.availability.currentSgpServerId
     }
 
     const { data } = await this._sgp.getGameSummary(sgpServerId, gameId)
@@ -457,25 +457,9 @@ export class SgpEds {
     }
   }
 
-  private _getSgpServerIdFromLcuAuth() {
-    let sgpServerId: string
-    const auth = this._lc.state.auth
-    if (!auth) {
-      throw new Error('LCU is not connected')
-    }
-
-    if (auth.region === SgpEds.TENCENT_REGION) {
-      sgpServerId = auth.rsoPlatformId
-    } else {
-      sgpServerId = auth.region
-    }
-
-    return sgpServerId
-  }
-
   async getRankedStats(puuid: string, sgpServerId?: string) {
     if (!sgpServerId) {
-      sgpServerId = this._getSgpServerIdFromLcuAuth()
+      sgpServerId = this.state.availability.currentSgpServerId
     }
 
     try {
@@ -489,7 +473,7 @@ export class SgpEds {
 
   async getSpectatorGameflow(puuid: string, sgpServerId?: string) {
     if (!sgpServerId) {
-      sgpServerId = this._getSgpServerIdFromLcuAuth()
+      sgpServerId = this.state.availability.currentSgpServerId
     }
 
     try {

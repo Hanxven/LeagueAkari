@@ -205,7 +205,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           runInAction(() => (this.state.ongoingPreMadeTeams = {}))
         }
       },
-      { delay: 250 }
+      { delay: 100 }
     )
 
     // Akari's Opinion
