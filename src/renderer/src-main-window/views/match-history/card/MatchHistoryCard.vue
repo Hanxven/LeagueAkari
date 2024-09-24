@@ -498,11 +498,11 @@ const handleToggleShowDetailedGame = () => {
 .match-history-card {
   display: flex;
   padding: 0px 0px 0px 12px;
-  border-radius: 4px;
+  border-radius: 13px;
   box-sizing: border-box;
   background-color: #28344e;
   width: 740px;
-  height: 96px;
+  height: 126px;
   overflow: hidden;
 }
 
@@ -552,7 +552,7 @@ const handleToggleShowDetailedGame = () => {
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  width: 240px;
+  width: 200px;
 
   .stats {
     display: flex;
@@ -657,7 +657,7 @@ const handleToggleShowDetailedGame = () => {
   display: flex;
   flex-direction: column;
   padding: 10px 0;
-  width: 126px;
+  width: 90px;
   font-size: 11px;
   line-height: 14px;
   align-items: flex-start;
@@ -749,10 +749,16 @@ const handleToggleShowDetailedGame = () => {
   flex-shrink: 0;
   flex-direction: column;
   gap: 2px;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   width: 40px;
   cursor: pointer;
+  height: 90%;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 6px;
+  margin-left: 6px;
+  border-radius: 8px;
 }
 
 .icon {
@@ -770,8 +776,9 @@ const handleToggleShowDetailedGame = () => {
 }
 
 .win {
-  border-left: 6px solid rgb(0, 105, 203);
-  background-color: rgb(30, 39, 58);
+  border-left: 4px solid rgb(0, 105, 203);
+  //background-color: rgb(30, 39, 58);
+  background: linear-gradient(to right, #2B4257,#15161B, #15161B,#15161B,#15161B);
 
   .game {
     .mode {
@@ -788,13 +795,14 @@ const handleToggleShowDetailedGame = () => {
   }
 
   .show-more {
-    background-color: #2f436e;
+    background-color: rgba(36, 52, 84, 0.8);
   }
 }
 
 .lose {
-  border-left: 6px solid rgb(158, 48, 1);
-  background-color: rgb(65, 39, 43);
+  border-left: 4px solid rgb(158, 48, 1);
+  //background-color: rgb(65, 39, 43);
+  background: linear-gradient(to right, #562D2E,#191416, #191416,#191416,#191416);
 
   .game {
     .mode {
@@ -807,7 +815,7 @@ const handleToggleShowDetailedGame = () => {
   }
 
   .show-more {
-    background-color: rgb(112, 60, 71);
+    background-color: rgba(70, 38, 45, 0.8);
   }
 }
 

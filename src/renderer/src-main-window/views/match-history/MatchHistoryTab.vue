@@ -121,19 +121,6 @@
               :small="isSmallScreen"
               :ranked-entry="tab.rankedStats?.queueMap['RANKED_FLEX_SR']"
             />
-            <div class="ranked-more">
-              <NButton
-                :focusable="false"
-                title="更多"
-                size="small"
-                secondary
-                @click="isShowingRankedModal = true"
-              >
-                <template #icon>
-                  <MoreHorizFilledIcon />
-                </template>
-              </NButton>
-            </div>
           </div>
           <div class="buttons-container">
             <NButton
@@ -158,6 +145,20 @@
                 <NIcon><RefreshIcon /></NIcon>
               </template>
             </NButton>
+            <div class="ranked-more">
+              <NButton
+                :focusable="false"
+                title="更多"
+                style="width: 40px;height: 20px;border-radius: 8px"
+                secondary
+
+                @click="isShowingRankedModal = true"
+              >
+                <template #icon>
+                  <MoreHorizFilledIcon />
+                </template>
+              </NButton>
+            </div>
           </div>
         </div>
         <div class="show-on-smaller-screen">
@@ -485,7 +486,7 @@ import {
   NavigateBeforeOutlined as NavigateBeforeOutlinedIcon,
   NavigateNextOutlined as NavigateNextOutlinedIcon
 } from '@vicons/material'
-import { useIntervalFn, useMediaQuery } from '@vueuse/core'
+import { useIntervalFn, useMediaQuery, useScroll } from '@vueuse/core'
 import {
   NButton,
   NIcon,
@@ -525,7 +526,15 @@ const isSelf = computed(() => {
 })
 
 const isInSameRegion = computed(() => {
-  return eds.sgpAvailability.currentSgpServerId === tab.sgpServerId
+  if (!lc.auth) {
+    return false
+  }
+
+  if (lc.auth.region === 'TENCENT') {
+    return lc.auth.rsoPlatformId === tab.sgpServerId
+  }
+
+  return lc.auth.region === tab.sgpServerId
 })
 
 // 1182px - is same in which defined in CSS
@@ -920,7 +929,7 @@ defineExpose({
   align-items: center;
   height: 140px;
   box-sizing: border-box;
-  padding: 20px 20px 12px 20px;
+  //padding: 20px 17px 12px 20px;
 }
 
 .player-header-simplified {
@@ -1187,13 +1196,16 @@ defineExpose({
   gap: 12px;
 
   .ranked-more {
-    position: absolute;
-    bottom: -6px;
-    right: -8px;
+    //position: absolute;
+    //bottom: -6px;
+    //right: -8px;
+    height: 20px;
+    width: 40px;
   }
 
   .ranked {
-    background-color: #ffffff04;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
   }
 }
 
@@ -1267,14 +1279,17 @@ defineExpose({
 
 .buttons-container {
   display: flex;
+  flex-direction: column;
   margin-left: 32px;
+  margin-right: 18px;
   gap: 8px;
   justify-content: flex-end;
 }
 
 .square-button {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
 }
 
 .header-button {
