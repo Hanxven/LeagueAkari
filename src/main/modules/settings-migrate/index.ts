@@ -86,8 +86,11 @@ export class SettingsMigrateModule extends MobxBasedBasicModule {
       auto-search-match-rematch-strategy autoMatchmakingRematchStrategy
       auto-search-match-rematch-fixed-duration autoMatchmakingRematchFixedDuration
     */
-    await migrate('auto-gameflow/auto-honor-enabled', 'auto-gameflow/autoHonorEnabled', false, () =>
-      this._afgm.state.settings.setAutoHonorEnabled(false)
+    await migrate(
+      'auto-gameflow/auto-honor-enabled',
+      'auto-gameflow/autoHonorEnabled',
+      false,
+      (v) => this._afgm.state.settings.setAutoHonorEnabled(v)
     )
     await migrate(
       'auto-gameflow/auto-honor-strategy',
@@ -169,8 +172,8 @@ export class SettingsMigrateModule extends MobxBasedBasicModule {
       this._am.state.settings.closeStrategy,
       (v) => this._am.state.settings.setCloseStrategy(v)
     )
-    await migrate('app/use-wmic', 'app/useWmic', this._am.state.settings.useWmic, () =>
-      this._am.state.settings.setUseWmic(false)
+    await migrate('app/use-wmic', 'app/useWmic', this._am.state.settings.useWmic, (v) =>
+      this._am.state.settings.setUseWmic(v)
     )
     await migrate(
       'app/is-in-kyoko-mode',
