@@ -6,6 +6,10 @@
 
 群聊：301157623
 
+## v1.2.6-fix.1
+
+由于 v1.2.5 存在问题，现已推送 v1.2.6-fix.1 修复版本。其所有更新同 v1.2.5。
+
 ## v1.2.5 已发布
 
 更新详情：[v1.2.5](https://hanxven.github.io/LeagueAkari/updates/v1.2.5.html)
