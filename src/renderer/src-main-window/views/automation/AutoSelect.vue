@@ -46,15 +46,10 @@
           label-description="立即锁定或只是亮出"
           :label-width="200"
         >
-          <NSwitch
-            @update:value="(v) => asm.setCompleted(v)"
-            :value="as.settings.completed"
-            size="small"
-            :rail-style="completeStrategy"
-          >
-            <template #checked>锁定</template>
-            <template #unchecked>亮出</template></NSwitch
-          >
+          <NRadioGroup :value="as.settings.completed" @update:value="(v) => asm.setCompleted(v)">
+            <NRadio :value="true">立即锁定</NRadio>
+            <NRadio :value="false">亮出而不锁定</NRadio>
+          </NRadioGroup>
         </ControlItem>
         <ControlItem class="control-item-margin" label="意向英雄" :label-width="200">
           <template #labelDescription>
@@ -334,19 +329,11 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { autoSelectRendererModule as asm } from '@renderer-shared/modules/auto-select'
 import { useAutoSelectStore } from '@renderer-shared/modules/auto-select/store'
-import { NCard, NInputNumber, NScrollbar, NSwitch, NTooltip } from 'naive-ui'
+import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch, NTooltip } from 'naive-ui'
 
 import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
 
 const as = useAutoSelectStore()
-
-const completeStrategy = ({ checked }: { checked: boolean }) => {
-  if (checked) {
-    return { 'background-color': 'rgb(42,100,125)', 'font-size': '12px' }
-  } else {
-    return { 'background-color': 'rgb(42,148,125)', 'font-size': '12px' }
-  }
-}
 </script>
 
 <style lang="less" scoped>

@@ -8,7 +8,7 @@
 
 - [TODO] New language added: English.
 
-# v1.2.5 DRAFT
+# v1.2.5 (2024-09-24)
 
 ## 新增
 

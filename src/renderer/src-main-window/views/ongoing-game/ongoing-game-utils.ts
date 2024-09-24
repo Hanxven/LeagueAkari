@@ -121,7 +121,7 @@ export function useOrderOptions() {
       value: 'kda'
     },
     {
-      label: '综合降序',
+      label: '评分降序',
       value: 'akari-score'
     }
   ]

@@ -71,7 +71,7 @@ const router = useRouter()
 
 const shortcuts = [
   {
-    label: 'OP.GG',
+    label: '使用 OP.GG',
     description: '集成的 OP.GG',
     routeName: 'opgg'
   }
@@ -102,7 +102,7 @@ const handleBackToIndicatorView = () => {
   height: 100%;
   flex: 1;
   transition: all 0.3s;
-  padding: 4px 4px 2px 4px;
+  padding: 4px 4px 2px 8px;
   box-sizing: border-box;
 
   .blurred & {
@@ -114,7 +114,7 @@ const handleBackToIndicatorView = () => {
     align-items: center;
     justify-content: center;
     gap: 2px;
-    width: 64px;
+    width: 76px;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.08);
     -webkit-app-region: none;
