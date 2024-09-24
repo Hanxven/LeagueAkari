@@ -583,7 +583,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       this._logger.info(`被禁用的英雄: ${event.data?.length}`)
 
       if (event.eventType === 'Delete') {
-        this.champSelect.disabledChampionIdArray = []
+        this.champSelect.setDisabledChampionIds([])
       } else {
         this.champSelect.setDisabledChampionIds(event.data)
       }

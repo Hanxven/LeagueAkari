@@ -562,18 +562,10 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
         return
       }
 
-      const lc = useLcuConnectionStore()
+      const eds = useExternalDataSourceStore()
 
-      if (!lc.auth) {
-        return
-      }
-
-      if (sgpServerId === undefined) {
-        if (lc.auth.region === 'TENCENT') {
-          sgpServerId = lc.auth.rsoPlatformId
-        } else {
-          sgpServerId = lc.auth.region
-        }
+      if (!sgpServerId) {
+        sgpServerId = eds.sgpAvailability.currentSgpServerId
       }
 
       router.replace({
