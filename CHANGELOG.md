@@ -1,4 +1,4 @@
-# v1.2.6 DRAFT
+# vx.x.x DRAFT
 
 ## ROADMAP
 
@@ -7,6 +7,8 @@
 - [TODO] 现在可以导出和导入部分内容。
 
 - [TODO] New language added: English.
+
+- [TODO] 自动关闭小窗将判断是否游戏启用。
 
 # v1.2.5 (2024-09-24)
 
