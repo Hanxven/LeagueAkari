@@ -128,29 +128,33 @@ export class SgpApi {
     )
   }
 
-  getGameSummary(platformId: string, gameId: number) {
+  getGameSummary(sgpServerId: string, gameId: number) {
     if (!this._jwtToken) {
       throw new Error('jwt token is not set')
     }
 
-    const sgpServer = this._getSgpServer(platformId)
+    const sgpServer = this._getSgpServer(sgpServerId)
+
+    const subId = this._getSubId(sgpServerId)
 
     return this._http.get<SgpGameSummaryLol>(
-      `/match-history-query/v1/products/lol/${platformId.toUpperCase()}_${gameId}/SUMMARY`,
+      `/match-history-query/v1/products/lol/${subId.toUpperCase()}_${gameId}/SUMMARY`,
       { baseURL: sgpServer.server }
     )
   }
 
-  getGameDetails(platformId: string, gameId: number) {
+  getGameDetails(sgpServerId: string, gameId: number) {
     if (!this._jwtToken) {
       throw new Error('jwt token is not set')
     }
 
-    const platformSgpServer = this._getSgpServer(platformId)
+    const sgpServer = this._getSgpServer(sgpServerId)
+
+    const subId = this._getSubId(sgpServerId)
 
     return this._http.get<SgpGameDetailsLol>(
-      `/match-history-query/v1/products/lol/${platformId.toUpperCase()}_${gameId}/DETAILS`,
-      { baseURL: platformSgpServer.server }
+      `/match-history-query/v1/products/lol/${subId.toUpperCase()}_${gameId}/DETAILS`,
+      { baseURL: sgpServer.server }
     )
   }
 

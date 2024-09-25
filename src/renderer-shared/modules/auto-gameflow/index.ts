@@ -1,4 +1,3 @@
-import { LeagueAkariRendererModuleManager } from '@renderer-shared/akari-ipc/renderer-module-manager'
 import { StateSyncModule } from '@renderer-shared/akari-ipc/state-sync-module'
 
 import { useAutoGameflowStore } from './store'
