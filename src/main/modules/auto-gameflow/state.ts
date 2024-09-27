@@ -20,6 +20,8 @@ class AutoGameflowSettings {
   autoAcceptEnabled: boolean = false
   autoAcceptDelaySeconds: number = 0
 
+  autoReconnectEnabled: boolean = false
+
   autoMatchmakingEnabled: boolean = false
   autoMatchmakingMaximumMatchDuration: number = 0
   autoMatchmakingRematchStrategy: AutoSearchRematchStrategy = 'never'
@@ -48,6 +50,10 @@ class AutoGameflowSettings {
 
   setAutoAcceptDelaySeconds(seconds: number) {
     this.autoAcceptDelaySeconds = seconds
+  }
+
+  setAutoReconnectEnabled(enabled: boolean) {
+    this.autoReconnectEnabled = enabled
   }
 
   setAutoMatchmakingEnabled(enabled: boolean) {

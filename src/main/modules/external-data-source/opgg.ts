@@ -22,12 +22,11 @@ export class OpggEds {
         method: 'GET'
       })
 
-      // 直营服和腾讯服的路径不同
       let targetPath: string
-      if (existsSync(join(installDir, 'Config'))) {
-        targetPath = join(installDir, 'Config', 'Global', 'Recommended')
-      } else {
+      if (this._edsm.lcm.state.auth?.region === 'TENCENT') {
         targetPath = join(installDir, '..', 'Game', 'Config', 'Global', 'Recommended')
+      } else {
+        targetPath = join(installDir, 'Config', 'Global', 'Recommended')
       }
 
       if (existsSync(targetPath)) {

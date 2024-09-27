@@ -37,6 +37,10 @@ export class AutoGameflowRendererModule extends StateSyncModule {
     return this.call('set-setting', 'autoAcceptDelaySeconds', value)
   }
 
+  async setAutoReconnectEnabled(value: boolean) {
+    return this.call('set-setting', 'autoReconnectEnabled', value)
+  }
+
   async setAutoMatchmakingEnabled(value: boolean) {
     return this.call('set-setting', 'autoMatchmakingEnabled', value)
   }

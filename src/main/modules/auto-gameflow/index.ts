@@ -3,6 +3,7 @@ import {
   RegisteredSettingHandler
 } from '@main/akari-ipc/mobx-based-basic-module'
 import { chatSend } from '@main/http-api/chat'
+import { reconnect } from '@main/http-api/gameflow'
 import { ballot, honor, v2Honor } from '@main/http-api/honor'
 import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
 import { dodge } from '@main/http-api/login'
@@ -39,6 +40,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
 
   private _playAgainTask = new TimeoutTask(() => this._playAgainFn())
   private _dodgeTask = new TimeoutTask(() => this._dodgeFn())
+  private _reconnectTask = new TimeoutTask(() => this._reconnectFn())
 
   static HONOR_CATEGORY_LEGACY = ['COOL', 'SHOTCALLER', 'HEART'] as const
 
@@ -72,6 +74,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     this._handleAutoPlayAgain()
     this._handleLogging()
     this._handleLastSecondDodge()
+    this._handleAutoReconnect()
 
     this._logger.info('初始化完成')
   }
@@ -123,6 +126,10 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
         defaultValue: this.state.settings.autoAcceptDelaySeconds
       },
       {
+        key: 'autoReconnectEnabled',
+        defaultValue: this.state.settings.autoReconnectEnabled
+      },
+      {
         key: 'autoMatchmakingEnabled',
         defaultValue: this.state.settings.autoMatchmakingEnabled
       },
@@ -166,6 +173,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     this.onSettingChange<Paths<typeof this.state.settings>>('autoHonorStrategy', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>('playAgainEnabled', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>('autoAcceptDelaySeconds', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('autoAcceptEnabled', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>('autoMatchmakingEnabled', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>(
       'autoMatchmakingDelaySeconds',
@@ -639,6 +647,29 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       },
       { equals: comparer.shallow, fireImmediately: true }
     )
+  }
+
+  private _handleAutoReconnect() {
+    this.reaction(
+      () => [this._lcu.gameflow.phase, this.state.settings.autoReconnectEnabled] as const,
+      ([phase, enabled]) => {
+        if (phase === 'Reconnect' && enabled) {
+          this._logger.info('将在短暂延迟后尝试重新连接')
+          this._reconnectTask.start(1000)
+        } else {
+          this._reconnectTask.cancel()
+        }
+      }
+    )
+  }
+
+  private async _reconnectFn() {
+    try {
+      this._logger.info('Reconnect! 尝试重新连接')
+      await reconnect()
+    } catch (error) {
+      this._logger.warn(`尝试重新连接失败: ${formatError(error)}`)
+    }
   }
 
   private _adjustDodgeTimer(msLeft: number, threshold: number) {

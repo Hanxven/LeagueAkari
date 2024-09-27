@@ -8,6 +8,7 @@ export const useAutoGameflowStore = defineStore('module:auto-gameflow', () => {
     playAgainEnabled: false,
     autoAcceptEnabled: false,
     autoAcceptDelaySeconds: 0,
+    autoReconnectEnabled: false,
     autoMatchmakingEnabled: false,
     autoMatchmakingDelaySeconds: 0,
     autoMatchmakingMinimumMembers: 0,

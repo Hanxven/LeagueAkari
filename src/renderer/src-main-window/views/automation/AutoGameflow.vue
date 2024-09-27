@@ -76,7 +76,9 @@
         <ControlItem class="control-item-margin" label="自动回到房间" :label-width="200">
           <template #labelDescription>
             对局结束时回到房间。可能需要先启用
-            <span style="font-weight: bold; cursor: pointer" @click="() => am.setAutoHonorEnabled(true)"
+            <span
+              style="font-weight: bold; cursor: pointer"
+              @click="() => am.setAutoHonorEnabled(true)"
               >自动点赞</span
             >
             以完成点赞投票阶段
@@ -180,6 +182,19 @@
             @update:value="(value) => am.setAutoMatchmakingRematchFixedDuration(value || 2)"
             placeholder="秒"
             :min="1"
+            size="small"
+          />
+        </ControlItem>
+        <div class="divider"></div>
+        <ControlItem
+          class="control-item-margin"
+          label="自动重新连接"
+          label-description="当位于可重新连接状态时，尝试重新连接"
+          :label-width="200"
+        >
+          <NSwitch
+            :value="agf.settings.autoReconnectEnabled"
+            @update:value="(val) => am.setAutoReconnectEnabled(val)"
             size="small"
           />
         </ControlItem>
