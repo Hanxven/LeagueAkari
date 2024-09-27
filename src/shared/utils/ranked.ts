@@ -30,7 +30,16 @@ export interface ParsedRole {
 // assignmentReason: PRIMARY, SECONDARY, FILL_SECONDARY, FILL_PRIMARY, AUTOFILL
 // NONE, UNSELECTED
 // TOP, MIDDLE, JUNGLE, BOTTOM, UTILITY
-export function parseSelectedRole(role: string): ParsedRole {
+export function parseSelectedRole(role: string | null): ParsedRole {
+  if (!role) {
+    return {
+      current: 'NONE',
+      assignmentReason: 'NONE',
+      primary: 'NONE',
+      secondary: 'NONE'
+    }
+  }
+
   const segments = role.split('.')
   if (segments.length !== 4) {
     return {

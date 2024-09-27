@@ -1035,6 +1035,11 @@ export class LcuSyncModule extends MobxBasedBasicModule {
             const data = (await getLolLeagueSessionToken()).data
             this.lolLeagueSession.setToken(data)
           } catch (error) {
+            if (isAxiosError(error) && error.response?.status === 404) {
+              this.lolLeagueSession.setToken(null)
+              return
+            }
+
             this._logger.warn(`获取 LOL League Session 失败 ${formatError(error)}`)
           }
         } else {

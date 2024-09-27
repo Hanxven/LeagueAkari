@@ -22,29 +22,35 @@ export class OpggEds {
         method: 'GET'
       })
 
-      const path = join(installDir, '..', 'Game', 'Config', 'Global', 'Recommended')
+      // 直营服和腾讯服的路径不同
+      let targetPath: string
+      if (existsSync(join(installDir, 'Config'))) {
+        targetPath = join(installDir, 'Config', 'Global', 'Recommended')
+      } else {
+        targetPath = join(installDir, '..', 'Game', 'Config', 'Global', 'Recommended')
+      }
 
-      if (existsSync(path)) {
-        if (!statSync(path).isDirectory()) {
-          throw new Error(`The path ${path} is not a directory`)
+      if (existsSync(targetPath)) {
+        if (!statSync(targetPath).isDirectory()) {
+          throw new Error(`The path ${targetPath} is not a directory`)
         }
       } else {
-        mkdirSync(path, { recursive: true })
+        mkdirSync(targetPath, { recursive: true })
       }
 
       // 清空之前的文件, 这些文件以 `akari1` 开头
       if (clearPrevious) {
-        const files = readdirSync(path)
+        const files = readdirSync(targetPath)
         const akariFiles = files.filter((file) => file.startsWith(OpggEds.FIXED_ITEM_SET_PREFIX))
 
         for (const file of akariFiles) {
-          unlinkSync(join(path, file))
+          unlinkSync(join(targetPath, file))
         }
       }
 
       for (const itemSet of itemSets) {
         const fileName = `${itemSet.uid}.json`
-        const filePath = join(path, fileName)
+        const filePath = join(targetPath, fileName)
 
         this._edsm.logger.info(`写入物品集到文件 ${filePath}`)
 

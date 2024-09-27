@@ -34,3 +34,10 @@ export function dodge() {
     }
   })
 }
+
+export function reconnect() {
+  return lcm.lcuRequest({
+    url: '/lol-gameflow/v1/reconnect',
+    method: 'POST'
+  })
+}
