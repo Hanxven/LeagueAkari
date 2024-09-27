@@ -16,11 +16,37 @@ const axiosRetry = require('axios-retry').default as AxiosRetry
 export interface AvailableServersMap {
   servers: {
     [region: string]: {
+      /**
+       * 服务器名称
+       */
       name: string
-      server: string
+
+      /**
+       * 用于战绩查询的服务器地址
+       */
+      matchHistory: string
+
+      /**
+       * 其他通用查询服务器地址
+       */
+      common: string
     }
   }
-  groups: string[][]
+
+  /**
+   * 腾讯服务器中，以下服务器可以使用同一个 jwt token 实现战绩查询
+   */
+  tencentServerMatchHistoryInteroperability: string[]
+
+  /**
+   * 腾讯服务器中，以下服务器可以使用同一个 jwt token 实现观战查询
+   */
+  tencentServerSpectatorInteroperability: string[]
+
+  /**
+   * 腾讯服务器中，以下服务器可以使用同一个 jwt token 实现召唤师查询
+   */
+  tencentServerSummonerInteroperability: string[]
 }
 
 export class SgpApi {
@@ -28,13 +54,16 @@ export class SgpApi {
 
   private _availableSgpServers: AvailableServersMap = {
     servers: {},
-    groups: []
+    tencentServerMatchHistoryInteroperability: [],
+    tencentServerSpectatorInteroperability: [],
+    tencentServerSummonerInteroperability: []
   }
 
   /**
    * SGP API 需要用户登录的 Session
    */
-  private _jwtToken: string | null = null
+  private _entitlementToken: string | null = null
+  private _lolLeagueSessionToken: string | null = null
   private _http = axios.create({
     headers: {
       'User-Agent': SgpApi.USER_AGENT
@@ -50,34 +79,53 @@ export class SgpApi {
       }
     })
 
-    this._http.interceptors.request.use((req) => {
-      if (!req.headers.Authorization) {
-        req.headers.Authorization = `Bearer ${this._jwtToken}`
-      }
+    // this._http.interceptors.request.use((req) => {
+    //   if (!req.headers.Authorization) {
+    //     req.headers.Authorization = `Bearer ${this._entitlementToken}`
+    //   }
 
-      return req
-    })
+    //   return req
+    // })
   }
 
   setAvailableSgpServers(servers: AvailableServersMap) {
     this._availableSgpServers = servers
   }
 
-  supportsSgpServer(platformId: string) {
-    return this._availableSgpServers.servers[platformId.toUpperCase()] !== undefined
+  supportsSgpServer(sgpServerId: string) {
+    const server = this._availableSgpServers.servers[sgpServerId.toUpperCase()]
+
+    if (!server) {
+      return {
+        matchHistory: false,
+        common: false
+      }
+    }
+
+    return {
+      matchHistory: Boolean(server.matchHistory),
+      common: Boolean(server.common)
+    }
   }
 
-  supportedSgpServers() {
+  sgpServers() {
     return this._availableSgpServers
   }
 
-  hasJwtToken() {
-    return this._jwtToken !== null
+  hasEntitlementsToken() {
+    return this._entitlementToken !== null
   }
 
-  setJwtToken(token: string | null) {
-    this._jwtToken = token
-    this._http.defaults.headers.Authorization = `Bearer ${this._jwtToken}`
+  hasLolLeagueSessionToken() {
+    return this._lolLeagueSessionToken !== null
+  }
+
+  setEntitlementsToken(token: string | null) {
+    this._entitlementToken = token
+  }
+
+  setLolLeagueSessionToken(token: string) {
+    this._lolLeagueSessionToken = token
   }
 
   private _getSgpServer(sgpServerId: string) {
@@ -102,14 +150,14 @@ export class SgpApi {
     return sgpServerId
   }
 
-  getMatchHistory(
+  async getMatchHistory(
     sgpServerId: string,
     playerPuuid: string,
     start: number,
     count: number,
     tag?: string
   ) {
-    if (!this._jwtToken) {
+    if (!this._entitlementToken) {
       throw new Error('jwt token is not set')
     }
 
@@ -118,7 +166,10 @@ export class SgpApi {
     return this._http.get<SgpMatchHistoryLol>(
       `/match-history-query/v1/products/lol/player/${playerPuuid}/SUMMARY`,
       {
-        baseURL: sgpServer.server,
+        baseURL: sgpServer.matchHistory,
+        headers: {
+          Authorization: `Bearer ${this._entitlementToken}`
+        },
         params: {
           startIndex: start,
           count,
@@ -129,7 +180,7 @@ export class SgpApi {
   }
 
   getGameSummary(sgpServerId: string, gameId: number) {
-    if (!this._jwtToken) {
+    if (!this._entitlementToken) {
       throw new Error('jwt token is not set')
     }
 
@@ -139,12 +190,17 @@ export class SgpApi {
 
     return this._http.get<SgpGameSummaryLol>(
       `/match-history-query/v1/products/lol/${subId.toUpperCase()}_${gameId}/SUMMARY`,
-      { baseURL: sgpServer.server }
+      {
+        baseURL: sgpServer.matchHistory,
+        headers: {
+          Authorization: `Bearer ${this._entitlementToken}`
+        }
+      }
     )
   }
 
   getGameDetails(sgpServerId: string, gameId: number) {
-    if (!this._jwtToken) {
+    if (!this._entitlementToken) {
       throw new Error('jwt token is not set')
     }
 
@@ -154,32 +210,32 @@ export class SgpApi {
 
     return this._http.get<SgpGameDetailsLol>(
       `/match-history-query/v1/products/lol/${subId.toUpperCase()}_${gameId}/DETAILS`,
-      { baseURL: sgpServer.server }
+      {
+        baseURL: sgpServer.matchHistory,
+        headers: {
+          Authorization: `Bearer ${this._entitlementToken}`
+        }
+      }
     )
   }
 
-  /**
-   * 注: 暂未测试非腾讯的服务器, 因此使用 Tencent 后缀
-   * 注: 服务端会做校验，仅当前大区的 puuid 才能查询
-   */
-  getRankedStatsTencent(platformId: string, puuid: string) {
-    if (!this._jwtToken) {
+  getRankedStats(platformId: string, puuid: string) {
+    if (!this._lolLeagueSessionToken) {
       throw new Error('jwt token is not set')
     }
 
     const sgpServer = this._getSgpServer(platformId)
 
     return this._http.get<SgpRankedStats>(`/leagues-ledge/v2/rankedStats/puuid/${puuid}`, {
-      baseURL: sgpServer.server
+      baseURL: sgpServer.common,
+      headers: {
+        Authorization: `Bearer ${this._lolLeagueSessionToken}`
+      }
     })
   }
 
-  /**
-   * 注: 暂未测试非腾讯的服务器, 因此使用 Tencent 后缀
-   * 注: 可以跨腾讯大区查询
-   */
-  getSummonerByPuuidTencent(sgpServerId: string, puuid: string) {
-    if (!this._jwtToken) {
+  getSummonerByPuuid(sgpServerId: string, puuid: string) {
+    if (!this._lolLeagueSessionToken) {
       throw new Error('jwt token is not set')
     }
 
@@ -190,12 +246,17 @@ export class SgpApi {
     return this._http.post<SgpSummoner[]>(
       `/summoner-ledge/v1/regions/${subId.toLowerCase()}/summoners/puuids`,
       [puuid],
-      { baseURL: sgpServer.server }
+      {
+        baseURL: sgpServer.common,
+        headers: {
+          Authorization: `Bearer ${this._lolLeagueSessionToken}`
+        }
+      }
     )
   }
 
-  async getSpectatorGameflowByPuuid(sgpServerId: string, puuid: string) {
-    if (!this._jwtToken) {
+  getSpectatorGameflowByPuuid(sgpServerId: string, puuid: string) {
+    if (!this._lolLeagueSessionToken) {
       throw new Error('jwt token is not set')
     }
 
@@ -204,7 +265,10 @@ export class SgpApi {
     const subId = this._getSubId(sgpServerId)
 
     return this._http.get<SpectatorData>(`/gsm/v1/ledge/spectator/region/${subId}/puuid/${puuid}`, {
-      baseURL: sgpServer.server
+      baseURL: sgpServer.common,
+      headers: {
+        Authorization: `Bearer ${this._lolLeagueSessionToken}`
+      }
     })
   }
 }

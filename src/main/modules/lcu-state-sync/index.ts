@@ -19,14 +19,15 @@ import {
   getSummonerSpells
 } from '@main/http-api/game-data'
 import { getGameflowPhase, getGameflowSession } from '@main/http-api/gameflow'
-import { getBallot } from '@main/http-api/honor-v2'
+import { getV2Ballot } from '@main/http-api/honor'
 import { getLobby } from '@main/http-api/lobby'
 import { getLoginQueueState } from '@main/http-api/login'
+import { getLolLeagueSessionToken } from '@main/http-api/lol-league-session'
 import { getCurrentSummoner } from '@main/http-api/summoner'
 import { ChampSelectSummoner } from '@shared/types/lcu/champ-select'
 import { Conversation } from '@shared/types/lcu/chat'
 import { LcuEvent } from '@shared/types/lcu/event'
-import { BallotLegacy } from '@shared/types/lcu/honorV2'
+import { Ballot } from '@shared/types/lcu/honorV2'
 import { formatError } from '@shared/utils/errors'
 import { isAxiosError } from 'axios'
 import { comparer, computed, makeAutoObservable, observable, runInAction } from 'mobx'
@@ -43,6 +44,7 @@ import { GameflowState } from './gameflow'
 import { HonorState } from './honor'
 import { LobbyState } from './lobby'
 import { LoginState } from './login'
+import { LolLeagueSessionState } from './lol-league-session'
 import { MatchmakingState } from './matchmaking'
 import { SummonerState } from './summoner'
 
@@ -84,6 +86,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
   public matchmaking = new MatchmakingState()
   public gameData = new GameDataState()
   public entitlements = new EntitlementsState()
+  public lolLeagueSession = new LolLeagueSessionState()
 
   private _logModule: LogModule
 
@@ -119,6 +122,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
     this._syncLcuMatchmaking()
     this._syncLcuSummoner()
     this._syncLcuEntitlements()
+    this._syncLcuLolLeagueSession()
 
     this._logger.info('初始化完成')
   }
@@ -272,7 +276,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       async (state) => {
         if (state === 'connected') {
           try {
-            this.honor.setBallot((await getBallot()).data)
+            this.honor.setBallot((await getV2Ballot()).data)
           } catch (error) {
             if (isAxiosError(error) && error.response?.status === 404) {
               this.honor.setBallot(null)
@@ -289,7 +293,7 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
-    const d = this._lcm.lcuEventBus.on<LcuEvent<BallotLegacy>>(
+    const d = this._lcm.lcuEventBus.on<LcuEvent<Ballot>>(
       '/lol-honor-v2/v1/ballot',
       async (event) => {
         if (event.eventType === 'Delete') {
@@ -1015,6 +1019,33 @@ export class LcuSyncModule extends MobxBasedBasicModule {
 
     const d1 = this._lcm.lcuEventBus.on('/entitlements/v1/token', (event) => {
       this.entitlements.setToken(event.data)
+    })
+
+    this._disposers.add(d1)
+  }
+
+  private _syncLcuLolLeagueSession() {
+    this.propSync('lolLeagueSession', this.lolLeagueSession, 'token')
+
+    this.reaction(
+      () => this._lcm.state.state,
+      async (state) => {
+        if (state === 'connected') {
+          try {
+            const data = (await getLolLeagueSessionToken()).data
+            this.lolLeagueSession.setToken(data)
+          } catch (error) {
+            this._logger.warn(`获取 LOL League Session 失败 ${formatError(error)}`)
+          }
+        } else {
+          this.lolLeagueSession.setToken(null)
+        }
+      },
+      { fireImmediately: true }
+    )
+
+    const d1 = this._lcm.lcuEventBus.on('/lol-league-session/v1/league-session-token', (event) => {
+      this.lolLeagueSession.setToken(event.data)
     })
 
     this._disposers.add(d1)

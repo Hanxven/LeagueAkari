@@ -131,9 +131,13 @@
         ></template
       >
       <NTable size="small" bordered>
+        <colgroup>
+          <col style="width: 120px" />
+          <col />
+        </colgroup>
         <tbody>
           <tr>
-            <td style="width: 80px">端口</td>
+            <td>端口</td>
             <td><CopyableText :text="lc.auth?.port ?? '-'" /></td>
           </tr>
           <tr>
@@ -164,14 +168,23 @@
               }}</CopyableText>
             </td>
           </tr>
-          <tr v-if="cf.settings.useSgpApi && eds.sgpAvailability.currentSgpServerSupported">
-            <td>SGP Server</td>
+          <tr v-if="cf.settings.useSgpApi && eds.sgpAvailability.sgpServerId">
+            <td>SGP Server: Match History</td>
             <td>
               <CopyableText>
                 {{
-                  eds.sgpAvailability.supportedSgpServers.servers[
-                    eds.sgpAvailability.currentSgpServerId
-                  ].server
+                  eds.sgpAvailability.sgpServers.servers[eds.sgpAvailability.sgpServerId]
+                    .matchHistory
+                }}</CopyableText
+              >
+            </td>
+          </tr>
+          <tr v-if="cf.settings.useSgpApi && eds.sgpAvailability.sgpServerId">
+            <td>SGP Server: Common</td>
+            <td>
+              <CopyableText>
+                {{
+                  eds.sgpAvailability.sgpServers.servers[eds.sgpAvailability.sgpServerId].common
                 }}</CopyableText
               >
             </td>
@@ -220,8 +233,8 @@ import { useExternalDataSourceStore } from '@renderer-shared/modules/external-da
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { mainWindowRendererModule as mwm } from '@renderer-shared/modules/main-window'
-import { RadixMatcher } from '@shared/utils/radix-matcher'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
+import { RadixMatcher } from '@shared/utils/radix-matcher'
 import {
   DataTableColumn,
   NAutoComplete,

@@ -152,7 +152,7 @@ const app = useAppStore()
 const isInIdleState = useIdleState()
 
 const canUseSgpApi = computed(() => {
-  return cf.settings.useSgpApi && eds.sgpAvailability.currentSgpServerSupported
+  return cf.settings.useSgpApi && eds.sgpAvailability.serversSupported.matchHistory
 })
 
 const teams = computed(() => {

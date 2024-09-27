@@ -3,21 +3,23 @@ import {
   RegisteredSettingHandler
 } from '@main/akari-ipc/mobx-based-basic-module'
 import { chatSend } from '@main/http-api/chat'
-import { honor } from '@main/http-api/honor-v2'
+import { ballot, honor, v2Honor } from '@main/http-api/honor'
 import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
 import { dodge } from '@main/http-api/login'
 import { accept } from '@main/http-api/matchmaking'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { TimeoutTask } from '@main/utils/timer'
+import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { formatError } from '@shared/utils/errors'
+import { randomInt } from '@shared/utils/random'
 import { Paths } from '@shared/utils/types'
 import { set } from 'lodash'
 import { comparer, computed, runInAction } from 'mobx'
 
 import { LcuConnectionModule } from '../lcu-connection'
+import { LcuSyncModule } from '../lcu-state-sync'
 import { AppLogger, LogModule } from '../log'
 import { MainWindowModule } from '../main-window'
-import { LcuSyncModule } from '../lcu-state-sync'
 import { AutoGameflowState } from './state'
 
 /**
@@ -38,7 +40,10 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   private _playAgainTask = new TimeoutTask(() => this._playAgainFn())
   private _dodgeTask = new TimeoutTask(() => this._dodgeFn())
 
-  static HONOR_CATEGORY = ['COOL', 'SHOTCALLER', 'HEART'] as const
+  static HONOR_CATEGORY_LEGACY = ['COOL', 'SHOTCALLER', 'HEART'] as const
+
+  // 新接口似乎只有 HEART, 故只保留 HEART
+  static HONOR_CATEGORY = ['HEART'] as const
 
   static PLAY_AGAIN_WAIT_FOR_BALLOT_TIMEOUT = 3250
   static PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT = 10000
@@ -351,77 +356,81 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
   }
 
   private _handleAutoBallot() {
+    const honorables = computed(() => {
+      if (!this._lcu.honor.ballot) {
+        return null
+      }
+
+      const {
+        eligibleAllies,
+        eligibleOpponents,
+        gameId,
+        votePool: { votes }
+      } = this._lcu.honor.ballot
+
+      return {
+        allies: eligibleAllies.filter((p) => !p.botPlayer).map((p) => p.puuid),
+        opponents: eligibleOpponents.filter((p) => !p.botPlayer).map((p) => p.puuid),
+        votes,
+        gameId
+      }
+    })
+
     this.reaction(
-      () => [this._lcu.honor.ballot, this.state.settings.autoHonorEnabled] as const,
-      async ([b, e]) => {
-        // 新接口 GameId 可能是 0
-        if (b && b.gameId) {
+      () => [honorables.get(), this.state.settings.autoHonorEnabled] as const,
+      async ([h, enabled]) => {
+        if (h && h.gameId) {
           this._playAgainTask.cancel()
         }
 
-        if (b && b.gameId && e) {
+        if (h && h.gameId && enabled) {
           try {
-            if (this.state.settings.autoHonorStrategy === 'opt-out') {
-              await honor(b.gameId, 'OPT_OUT', 0)
-              return
+            const eogStatus = (await getEogStatus()).data
+            const lobbyMembers = [
+              ...eogStatus.eogPlayers,
+              ...eogStatus.leftPlayers,
+              ...eogStatus.readyPlayers
+            ]
+            const candidates: string[] = []
+
+            const lobbyAllies = h.allies.filter((p) => lobbyMembers.includes(p))
+
+            if (lobbyAllies.length > 0) {
+              const actualLobbyVotes = Math.min(h.votes, lobbyMembers.length)
+              const weights = Array(lobbyAllies.length).fill(1)
+              const maker = new ChoiceMaker(weights, lobbyAllies)
+              const lobbyCandidates = maker.choose(actualLobbyVotes)
+              candidates.push(...lobbyCandidates)
             }
 
-            const eligibleAllies = b.eligibleAllies
-            const eligibleOpponents = b.eligibleOpponents
-            const honorablePlayerIds: number[] = []
+            const leftPlayers = [...h.allies, ...h.opponents].filter(
+              (p) => !lobbyMembers.includes(p)
+            )
+            const actualLeftVotes = Math.min(h.votes - candidates.length, leftPlayers.length)
 
-            if (this.state.settings.autoHonorStrategy === 'all-member') {
-              honorablePlayerIds.push(...eligibleAllies.map((p) => p.summonerId))
-            } else if (this.state.settings.autoHonorStrategy === 'all-member-including-opponent') {
-              honorablePlayerIds.push(...eligibleAllies.map((p) => p.summonerId))
-              honorablePlayerIds.push(...eligibleOpponents.map((p) => p.summonerId))
-            } else {
-              const eligiblePlayerIds = new Set(eligibleAllies.map((p) => p.summonerId))
-              const eogStatus = (await getEogStatus()).data
-              const lobbyMemberPuuids = [
-                ...eogStatus.eogPlayers,
-                ...eogStatus.leftPlayers,
-                ...eogStatus.readyPlayers
-              ]
-              const lobbyMemberSummoners = (
-                await Promise.all(
-                  lobbyMemberPuuids.map(async (p) => (await getSummonerByPuuid(p)).data)
-                )
-              ).filter((p) => p.summonerId !== this._lcu.summoner.me?.summonerId)
-
-              const honorableLobbyMembers = lobbyMemberSummoners.filter((p) =>
-                eligiblePlayerIds.has(p.summonerId)
-              )
-
-              if (this.state.settings.autoHonorStrategy === 'only-lobby-member') {
-                honorablePlayerIds.push(...honorableLobbyMembers.map((p) => p.summonerId))
-              } else if (this.state.settings.autoHonorStrategy === 'prefer-lobby-member') {
-                if (honorableLobbyMembers.length === 0) {
-                  honorablePlayerIds.push(...eligibleAllies.map((p) => p.summonerId))
-                } else {
-                  honorablePlayerIds.push(...honorableLobbyMembers.map((p) => p.summonerId))
-                }
-              }
+            if (actualLeftVotes > 0) {
+              const leftWeights = Array(leftPlayers.length).fill(1)
+              const leftMaker = new ChoiceMaker(leftWeights, leftPlayers)
+              const leftCandidates = leftMaker.choose(actualLeftVotes)
+              candidates.push(...leftCandidates)
             }
 
-            if (honorablePlayerIds.length) {
-              const category =
+            for (const puuid of candidates) {
+              await honor(
                 AutoGameflowModule.HONOR_CATEGORY[
-                  Math.floor(Math.random() * AutoGameflowModule.HONOR_CATEGORY.length)
-                ]
-              const candidate =
-                honorablePlayerIds[Math.floor(Math.random() * honorablePlayerIds.length)]
-
-              await honor(b.gameId, category, candidate)
-
-              this._logger.info(`给玩家: ${candidate} 点赞, for ${category}, game ID: ${b.gameId}`)
-            } else {
-              await honor(b.gameId, 'OPT_OUT', 0)
-              this._logger.info('跳过点赞阶段')
+                  randomInt(0, AutoGameflowModule.HONOR_CATEGORY.length)
+                ],
+                puuid
+              )
             }
+
+            await ballot()
+            this._logger.info(
+              `自动点赞：给玩家 ${candidates.join(', ')} 点赞, 对局 ID: ${h.gameId}`
+            )
           } catch (error) {
             this._mwm.notify.warn('auto-gameflow', '自动点赞', '尝试自动点赞出现问题')
-            this._logger.warn(`无法给玩家点赞 ${formatError(error)}`)
+            this._logger.warn(`自动点赞出现错误 ${formatError(error)}`)
           }
         }
       },

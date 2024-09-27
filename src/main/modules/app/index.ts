@@ -13,16 +13,10 @@ import { join } from 'node:path'
 import { Readable } from 'node:stream'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
-import { AutoGameflowModule } from '../auto-gameflow'
-import { AutoReplyModule } from '../auto-reply'
-import { AutoSelectModule } from '../auto-select'
-import { AutoUpdateModule } from '../auto-update'
 import { AuxWindowModule } from '../auxiliary-window'
-import { CoreFunctionalityModule } from '../core-functionality'
 import { LcuConnectionModule } from '../lcu-connection'
 import { AppLogger, LogModule } from '../log'
 import { MainWindowModule } from '../main-window'
-import { RespawnTimerModule } from '../respawn-timer'
 import { AppSettings } from './state'
 
 export class AppState {
@@ -63,13 +57,8 @@ export class AppModule extends MobxBasedBasicModule {
   private _logModule: LogModule
   private _logger: AppLogger
   private _rLogger: AppLogger
-  private _afgm: AutoGameflowModule
-  private _arm: AutoReplyModule
-  private _cfm: CoreFunctionalityModule
-  private _asm: AutoSelectModule
-  private _rtm: RespawnTimerModule
+
   private _lcm: LcuConnectionModule
-  private _aum: AutoUpdateModule
 
   private _quitTasks: (() => Promise<void> | void)[] = []
 
@@ -85,13 +74,7 @@ export class AppModule extends MobxBasedBasicModule {
     this._logModule = this.manager.getModule<LogModule>('log')
     this._logger = this._logModule.createLogger('app')
     this._rLogger = this._logModule.createLogger('renderer')
-    this._afgm = this.manager.getModule<AutoGameflowModule>('auto-gameflow')
-    this._arm = this.manager.getModule<AutoReplyModule>('auto-reply')
-    this._cfm = this.manager.getModule<CoreFunctionalityModule>('core-functionality')
-    this._asm = this.manager.getModule<AutoSelectModule>('auto-select')
-    this._rtm = this.manager.getModule<RespawnTimerModule>('respawn-timer')
     this._lcm = this.manager.getModule<LcuConnectionModule>('lcu-connection')
-    this._aum = this.manager.getModule<AutoUpdateModule>('auto-update')
 
     await this._setupSettings()
     this._setupAkariProtocol()
@@ -180,10 +163,6 @@ export class AppModule extends MobxBasedBasicModule {
 
   private _setupMethodCall() {
     this.onCall('get-app-version', () => app.getVersion())
-
-    this.onCall('migrate-settings-from-legacy-version', async (all: Record<string, string>) => {
-      return await this._migrateSettingsFromLegacyVersion(all)
-    })
 
     this.onCall('open-in-explorer/user-data', () => {
       return shell.openPath(app.getPath('userData'))
@@ -384,200 +363,6 @@ export class AppModule extends MobxBasedBasicModule {
     const path = join(app.getPath('userData'), 'base-config.json')
     const json = JSON.stringify(config)
     writeFileSync(path, json, 'utf-8')
-  }
-
-  // from v1.1.x -> v1.2.x
-  private async _migrateSettingsFromLegacyVersion(all: Record<string, string>) {
-    let migrated = false
-    const _toNewSettings = async (
-      originKey: string,
-      resName: string,
-      setter: (state: any) => any
-    ) => {
-      const originValue = all[originKey]
-      if (originValue !== undefined) {
-        try {
-          const jsonValue = JSON.parse(originValue)
-          await this._sm.settings.set(resName, jsonValue)
-          runInAction(() => setter(jsonValue))
-          migrated = true
-        } catch {}
-      }
-    }
-
-    await _toNewSettings(
-      'app.autoConnect',
-      'lcu-connection/auto-connect',
-      (s) => (this._lcm.state.settings.autoConnect = s)
-    )
-    await _toNewSettings(
-      'app.autoCheckUpdates',
-      'auto-update/auto-check-updates',
-      (s) => (this._aum.state.settings.autoCheckUpdates = s)
-    )
-    await _toNewSettings(
-      'app.showFreeSoftwareDeclaration',
-      'app/show-free-software-declaration',
-      (s) => (this.state.settings.showFreeSoftwareDeclaration = s)
-    )
-    await _toNewSettings(
-      'autoAccept.enabled',
-      'auto-gameflow/auto-accept-enabled',
-      (s) => (this._afgm.state.settings.autoAcceptEnabled = s)
-    )
-    await _toNewSettings(
-      'autoAccept.delaySeconds',
-      'auto-gameflow/auto-accept-delay-seconds',
-      (s) => (this._afgm.state.settings.autoAcceptDelaySeconds = s)
-    )
-    await _toNewSettings(
-      'autoHonor.enabled',
-      'auto-gameflow/auto-honor-enabled',
-      (s) => (this._afgm.state.settings.autoHonorEnabled = s)
-    )
-    await _toNewSettings(
-      'autoHonor.strategy',
-      'auto-gameflow/auto-honor-strategy',
-      (s) => (this._afgm.state.settings.autoHonorStrategy = s)
-    )
-    await _toNewSettings(
-      'autoReply.enabled',
-      'auto-reply/enabled',
-      (s) => (this._arm.state.settings.enabled = s)
-    )
-    await _toNewSettings(
-      'autoReply.enableOnAway',
-      'auto-reply/enable-on-away',
-      (s) => (this._arm.state.settings.enableOnAway = s)
-    )
-    await _toNewSettings(
-      'autoReply.text',
-      'auto-reply/text',
-      (s) => (this._arm.state.settings.text = s)
-    )
-    await _toNewSettings(
-      'autoSelect.normalModeEnabled',
-      'auto-select/normal-mode-enabled',
-      (s) => (this._asm.state.settings.normalModeEnabled = s)
-    )
-    await _toNewSettings(
-      'autoSelect.benchModeEnabled',
-      'auto-select/bench-mode-enabled',
-      (s) => (this._asm.state.settings.benchModeEnabled = s)
-    )
-    await _toNewSettings(
-      'autoSelect.benchExpectedChampions',
-      'auto-select/bench-expected-champions',
-      (s) => (this._asm.state.settings.benchExpectedChampions = s)
-    )
-    await _toNewSettings(
-      'autoSelect.expectedChampions',
-      'auto-select/expected-champions-multi',
-      (s) =>
-        (this._asm.state.settings.expectedChampions = {
-          top: [],
-          jungle: [],
-          middle: [],
-          bottom: [],
-          utility: [],
-          default: s
-        })
-    )
-    await _toNewSettings(
-      'autoSelect.bannedChampions',
-      'auto-select/banned-champions-multi',
-      (s) =>
-        (this._asm.state.settings.bannedChampions = {
-          top: [],
-          jungle: [],
-          middle: [],
-          bottom: [],
-          utility: [],
-          default: s
-        })
-    )
-    await _toNewSettings(
-      'autoSelect.banEnabled',
-      'auto-select/ban-enabled',
-      (s) => (this._asm.state.settings.banEnabled = s)
-    )
-    await _toNewSettings(
-      'autoSelect.completed',
-      'auto-select/completed',
-      (s) => (this._asm.state.settings.completed = s)
-    )
-    await _toNewSettings(
-      'autoSelect.grabDelay',
-      'auto-select/grab-delay-seconds',
-      (s) => (this._asm.state.settings.grabDelaySeconds = s)
-    )
-    await _toNewSettings(
-      'autoSelect.banTeammateIntendedChampion',
-      'auto-select/ban-teammate-intended-champion',
-      (s) => (this._asm.state.settings.banTeammateIntendedChampion = s)
-    )
-    await _toNewSettings(
-      'autoSelect.selectTeammateIntendedChampion',
-      'auto-select/select-teammate-intended-champion',
-      (s) => (this._asm.state.settings.selectTeammateIntendedChampion = s)
-    )
-    await _toNewSettings(
-      'autoSelect.showIntent',
-      'auto-select/show-intent',
-      (s) => (this._asm.state.settings.showIntent = s)
-    )
-    await _toNewSettings(
-      'matchHistory.fetchAfterGame',
-      'core-functionality/fetch-after-game',
-      (s) => (this._cfm.state.settings.fetchAfterGame = s)
-    )
-    await _toNewSettings(
-      'matchHistory.autoRouteOnGameStart',
-      'core-functionality/auto-route-on-game-start',
-      (s) => (this._cfm.state.settings.autoRouteOnGameStart = s)
-    )
-    await _toNewSettings(
-      'matchHistory.preMadeTeamThreshold',
-      'core-functionality/pre-made-team-threshold',
-      (s) => (this._cfm.state.settings.preMadeTeamThreshold = s)
-    )
-    await _toNewSettings(
-      'matchHistory.matchHistoryLoadCount',
-      'core-functionality/match-history-load-count',
-      (s) => (this._cfm.state.settings.matchHistoryLoadCount = s)
-    )
-    await _toNewSettings(
-      'matchHistory.fetchDetailedGame',
-      'core-functionality/fetch-detailed-game',
-      (s) => (this._cfm.state.settings.fetchDetailedGame = s)
-    )
-    await _toNewSettings(
-      'matchHistory.sendKdaInGame',
-      'core-functionality/send-kda-in-game',
-      (s) => (this._cfm.state.settings.sendKdaInGame = s)
-    )
-    await _toNewSettings(
-      'matchHistory.sendKdaThreshold',
-      'core-functionality/send-kda-threshold',
-      (s) => (this._cfm.state.settings.sendKdaThreshold = s)
-    )
-    await _toNewSettings(
-      'matchHistory.sendKdaInGameWithPreMadeTeams',
-      'core-functionality/send-kda-in-game-with-pre-made-teams',
-      (s) => (this._cfm.state.settings.sendKdaInGameWithPreMadeTeams = s)
-    )
-    await _toNewSettings(
-      'respawnTimer.enabled',
-      'respawn-timer/enabled',
-      (s) => (this._rtm.state.settings.enabled = s)
-    )
-
-    if (migrated) {
-      this._logger.info('旧设置项已经成功迁移')
-      return true
-    }
-
-    return false
   }
 
   // from v1.2.x -> v1.2.5

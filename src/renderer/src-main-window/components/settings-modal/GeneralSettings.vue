@@ -57,19 +57,14 @@
           </div>
           <template v-if="cf.settings.useSgpApi && lc.state === 'connected'">
             <div
-              v-if="eds.sgpAvailability.currentSgpServerSupported"
+              v-if="eds.sgpAvailability.sgpServerId"
               style="color: #63e2b7; font-weight: bold; user-select: text"
             >
-              当前 ({{ eds.sgpAvailability.currentSgpServerId }}) SGP Server:
-              {{
-                eds.sgpAvailability.supportedSgpServers.servers[
-                  eds.sgpAvailability.currentSgpServerId
-                ].server
-              }}
+              当前 SGP Server: {{ eds.sgpAvailability.sgpServerId }}
             </div>
             <div v-else style="color: rgb(209, 170, 124); font-weight: bold">
               暂不支持当前服务器使用 SGP 接口:
-              {{ eds.sgpAvailability.currentSgpServerId }}
+              {{ eds.sgpAvailability.sgpServerId }}
             </div>
           </template>
         </template>

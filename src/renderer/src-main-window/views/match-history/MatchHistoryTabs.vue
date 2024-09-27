@@ -209,7 +209,7 @@ const tabNames = computed(() => {
 
       // TODO: 目前只支持腾讯服务器, 所以固定为 rso-platforms.ts 中的文本
       const { sgpServerId } = mhm.parseUnionId(tab.id)
-      const s = eds.sgpAvailability.supportedSgpServers.servers[sgpServerId]?.name || sgpServerId
+      const s = eds.sgpAvailability.sgpServers.servers[sgpServerId]?.name || sgpServerId
 
       nameMap[tab.id] = {
         gameName: tab.data.summoner.gameName,

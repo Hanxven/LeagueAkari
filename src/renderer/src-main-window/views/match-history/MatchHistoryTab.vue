@@ -251,8 +251,7 @@
                 </div>
                 <NSelect
                   v-if="
-                    cf.settings.useSgpApi ||
-                    eds.sgpAvailability.currentSgpServerId !== tab.sgpServerId
+                    cf.settings.useSgpApi || eds.sgpAvailability.sgpServerId !== tab.sgpServerId
                   "
                   size="small"
                   :value="tab.matchHistory.queueFilter"
@@ -465,7 +464,6 @@ import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functio
 import { externalDataSourceRendererModule as edsm } from '@renderer-shared/modules/external-data-source'
 import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
 import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
 import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { leagueClientRendererModule as lcm } from '@renderer-shared/modules/league-client'
@@ -514,18 +512,17 @@ const { tab } = defineProps<{
 }>()
 
 const isMustUseSgpApi = computed(() => {
-  return cf.settings.useSgpApi || eds.sgpAvailability.currentSgpServerId !== tab.sgpServerId
+  return cf.settings.useSgpApi || eds.sgpAvailability.sgpServerId !== tab.sgpServerId
 })
 
 const summoner = useSummonerStore()
-const lc = useLcuConnectionStore()
 
 const isSelf = computed(() => {
   return summoner.me?.puuid === tab.puuid
 })
 
 const isInSameRegion = computed(() => {
-  return eds.sgpAvailability.currentSgpServerId === tab.sgpServerId
+  return eds.sgpAvailability.sgpServerId === tab.sgpServerId
 })
 
 // 1182px - is same in which defined in CSS

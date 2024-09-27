@@ -35,7 +35,7 @@
         <ControlItem
           class="control-item-margin"
           label="自动点赞开启"
-          label-description="在游戏结束时，自动点赞一位队友。若不存在可点赞的玩家，将跳过点赞阶段"
+          label-description="在游戏结束时，自动点赞。外部工具无法跳过点赞阶段，因此将会尝试用尽票数以完成点赞阶段"
           :label-width="200"
         >
           <NSwitch
@@ -45,6 +45,7 @@
           />
         </ControlItem>
         <ControlItem
+          v-if="false"
           class="control-item-margin"
           label="点赞选择策略"
           label-description="这将决定具体给哪位玩家点赞"
@@ -57,15 +58,17 @@
             @update:value="(val) => am.setAutoHonorStrategy(val)"
           >
             <NFlex :size="4">
-              <NRadio value="prefer-lobby-member" title="优先选择房间内的人员，其次是其他队友"
+              <NRadio
+                value="prefer-lobby-member"
+                title="优先选择房间内的人员，若有剩余票数，则选择其他队友"
                 >优先预组队成员</NRadio
               >
               <NRadio value="only-lobby-member" title="只选择房间内的人员">仅预组队成员</NRadio>
               <NRadio value="all-member" title="考虑所有队友">所有队友</NRadio>
-              <NRadio value="all-member-including-opponent" title="考虑本局游戏所有玩家 (包括对手)"
+              <NRadio value="all-member-including-opponent" title="考虑本局游戏所有玩家"
                 >所有玩家</NRadio
               >
-              <NRadio value="opt-out" title="将直接跳过此阶段">永远跳过</NRadio>
+              <NRadio value="opt-out" title="将直接跳过此阶段">跳过</NRadio>
             </NFlex>
           </NRadioGroup>
         </ControlItem>
@@ -73,7 +76,10 @@
         <ControlItem class="control-item-margin" label="自动回到房间" :label-width="200">
           <template #labelDescription>
             对局结束时回到房间。可能需要先启用
-            <span style="font-weight: bold">自动点赞</span> 以跳过点赞投票阶段
+            <span style="font-weight: bold; cursor: pointer" @click="() => am.setAutoHonorEnabled(true)"
+              >自动点赞</span
+            >
+            以完成点赞投票阶段
           </template>
           <NSwitch
             :value="agf.settings.playAgainEnabled"

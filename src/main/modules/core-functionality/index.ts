@@ -846,7 +846,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
         }
 
         const sgpApiAvailable =
-          useSgpApi && this._edsm.sgp.state.availability.currentSgpServerSupported
+          useSgpApi && this._edsm.sgp.state.availability.serversSupported.matchHistory
 
         runInAction(() => {
           if (sgpApiAvailable) {

@@ -26,13 +26,18 @@ export const useExternalDataSourceStore = defineStore('module:data-sources', () 
   })
 
   const sgpAvailability = shallowRef({
-    currentRegion: '',
-    currentRsoPlatform: '',
-    currentSgpServerSupported: false,
-    currentSgpServerId: '',
-    supportedSgpServers: {
+    region: '',
+    rsoPlatform: '',
+    sgpServerId: '',
+    serversSupported: {
+      matchHistory: false,
+      common: false
+    },
+    sgpServers: {
       servers: {},
-      groups: []
+      tencentServerMatchHistoryInteroperability: [],
+      tencentServerSpectatorInteroperability: [],
+      tencentServerSummonerInteroperability: []
     } as AvailableServersMap
   })
 

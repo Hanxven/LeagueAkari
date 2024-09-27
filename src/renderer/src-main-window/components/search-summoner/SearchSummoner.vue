@@ -130,25 +130,25 @@ const eds = useExternalDataSourceStore()
 const currentSgpServerId = ref('')
 
 watchEffect(() => {
-  currentSgpServerId.value = eds.sgpAvailability.currentSgpServerId
+  currentSgpServerId.value = eds.sgpAvailability.sgpServerId
 })
 
 const sgpServerOptions = computed(() => {
-  if (!eds.sgpAvailability.currentSgpServerSupported) {
+  if (!eds.sgpAvailability.serversSupported.common) {
     return []
   }
 
-  const thatGroup = eds.sgpAvailability.supportedSgpServers.groups.find((g) =>
-    g.find((s) => s === eds.sgpAvailability.currentSgpServerId)
-  )
-
-  if (!thatGroup || thatGroup.length <= 1) {
+  if (
+    !eds.sgpAvailability.sgpServers.tencentServerSummonerInteroperability.includes(
+      eds.sgpAvailability.sgpServerId
+    )
+  ) {
     return []
   }
 
-  return thatGroup
+  return eds.sgpAvailability.sgpServers.tencentServerSummonerInteroperability
     .map((s) => ({
-      label: eds.sgpAvailability.supportedSgpServers.servers[s]?.name || s,
+      label: eds.sgpAvailability.sgpServers.servers[s]?.name || s,
       value: s
     }))
     .toSorted((a, b) => a.label.localeCompare(b.label))
@@ -156,7 +156,7 @@ const sgpServerOptions = computed(() => {
 
 // 跨区查询需要额外步骤
 const isCrossRegion = computed(() => {
-  return eds.sgpAvailability.currentSgpServerId !== currentSgpServerId.value
+  return eds.sgpAvailability.sgpServerId !== currentSgpServerId.value
 })
 
 function isNumeric(str: string): boolean {

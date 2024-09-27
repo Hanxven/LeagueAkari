@@ -1,6 +1,6 @@
 {
   "name": "league-akari",
-  "version": "1.2.6-fix.2",
+  "version": "1.2.6-rabi.3",
   "author": {
     "name": "Hanxven",
     "email": "hanxven@gmail.com"
@@ -22,6 +22,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "@types/luaparse": "^0.2.12",
+    "ajv": "^8.17.1",
     "axios": "^1.7.7",
     "axios-retry": "^4.5.0",
     "dayjs": "^1.11.13",

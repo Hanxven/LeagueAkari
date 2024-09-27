@@ -3,6 +3,7 @@ import { SgpGameSummaryLol, SgpMatchHistoryLol, SgpSummoner } from '@shared/data
 import { Game, MatchHistory } from '@shared/types/lcu/match-history'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { formatError } from '@shared/utils/errors'
+import { Ajv } from 'ajv'
 import { makeAutoObservable, observable } from 'mobx'
 import fs from 'node:fs'
 
@@ -11,15 +12,70 @@ import builtinSgpServersJson from '../../../../resources/builtin-config/external
 import { LcuConnectionModule } from '../lcu-connection'
 import { LcuSyncModule } from '../lcu-state-sync'
 
+const SCHEMA = {
+  type: 'object',
+  properties: {
+    servers: {
+      type: 'object',
+      additionalProperties: {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string'
+          },
+          matchHistory: {
+            type: ['string', 'null']
+          },
+          common: {
+            type: ['string', 'null']
+          }
+        },
+        required: ['name'],
+        additionalProperties: false
+      }
+    },
+    tencentServerMatchHistoryInteroperability: {
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    },
+    tencentServerSpectatorInteroperability: {
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    },
+    tencentServerSummonerInteroperability: {
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    }
+  },
+  required: [
+    'servers',
+    'tencentServerMatchHistoryInteroperability',
+    'tencentServerSpectatorInteroperability',
+    'tencentServerSummonerInteroperability'
+  ],
+  additionalProperties: false
+} as const
+
 export class SgpEdsState {
   availability = {
-    currentRegion: '',
-    currentRsoPlatform: '',
-    currentSgpServerId: '',
-    currentSgpServerSupported: false,
-    supportedSgpServers: {
+    region: '',
+    rsoPlatform: '',
+    sgpServerId: '',
+    serversSupported: {
+      matchHistory: false,
+      common: false
+    },
+    sgpServers: {
       servers: {},
-      groups: []
+      tencentServerMatchHistoryInteroperability: [],
+      tencentServerSpectatorInteroperability: [],
+      tencentServerSummonerInteroperability: []
     } as AvailableServersMap
   }
 
@@ -30,18 +86,21 @@ export class SgpEdsState {
   }
 
   setAvailability(
-    currentRegion: string,
-    currentRsoPlatform: string,
-    currentSgpServerId: string,
-    currentSgpServerSupported: boolean,
-    supportedSgpServers: AvailableServersMap
+    region: string,
+    rsoPlatform: string,
+    sgpServerId: string,
+    serversSupported: {
+      matchHistory: boolean
+      common: boolean
+    },
+    sgpServers: AvailableServersMap
   ) {
     this.availability = {
-      currentRegion,
-      currentRsoPlatform,
-      currentSgpServerId,
-      currentSgpServerSupported,
-      supportedSgpServers
+      region,
+      rsoPlatform,
+      sgpServerId,
+      serversSupported,
+      sgpServers
     }
   }
 }
@@ -53,8 +112,7 @@ export class SgpEds {
   private _lc: LcuConnectionModule
   private _sgp = new SgpApi()
 
-  static TENCENT_REGION = 'TENCENT'
-  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v5.json'
+  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v6.json'
 
   constructor(private _edsm: ExternalDataSourceModule) {}
 
@@ -65,7 +123,8 @@ export class SgpEds {
     await this._loadAvailableServersFromLocalFile()
     this._setupMethodCall()
     this._handleUpdateSupportedInfo()
-    this._maintainSessionToken()
+    this._maintainEntitlementsToken()
+    this._maintainLolLeagueSessionToken()
   }
 
   private async _loadAvailableServersFromLocalFile() {
@@ -84,39 +143,28 @@ export class SgpEds {
       this._edsm.logger.info('加载到本地 SGP 服务器配置文件')
       const json = await this._edsm.ss.readFromJsonConfig(SgpEds.MH_SGP_SERVERS_JSON)
 
-      if (typeof json !== 'object' || !json.servers || !json.groups) {
-        throw new Error('SGP 服务器配置文件格式错误')
-      }
+      const ajv = new Ajv()
+      const validate = ajv.compile<AvailableServersMap>(SCHEMA)
+      const valid = validate(json)
 
-      for (const key in json.servers) {
-        const server = json.servers[key]
-        if (typeof server !== 'object' || !server.name || !server.server) {
-          throw new Error('SGP 服务器配置文件格式错误')
-        }
-
-        if (typeof server.name !== 'string' || typeof server.server !== 'string') {
-          throw new Error('SGP 服务器配置文件格式错误')
-        }
-      }
-
-      if (!Array.isArray(json.groups)) {
-        throw new Error('SGP 服务器配置文件格式错误')
-      }
-
-      for (const group of json.groups) {
-        if (!Array.isArray(group)) {
-          throw new Error('SGP 服务器配置文件格式错误')
-        }
-
-        for (const server of group) {
-          if (typeof server !== 'string') {
-            throw new Error('SGP 服务器配置文件格式错误')
-          }
-        }
+      if (!valid) {
+        this._edsm.logger.warn(
+          `SGP 服务器配置文件格式错误: ${validate.errors?.map((e) => formatError(e))}`
+        )
+        return
       }
 
       this._sgp.setAvailableSgpServers(json)
-      this.state.setAvailability('', '', '', false, json)
+      this.state.setAvailability(
+        '',
+        '',
+        '',
+        {
+          common: false,
+          matchHistory: false
+        },
+        json
+      )
     } catch (error) {
       this._edsm.logger.warn(`加载 SGP 服务器配置文件时发生错误: ${formatError(error)}`)
     }
@@ -136,14 +184,17 @@ export class SgpEds {
           auth.region === 'TENCENT' ? `${auth.region}_${auth.rsoPlatformId}` : auth.region
 
         const supported = this._sgp.supportsSgpServer(sgpServerId)
-        const supportedSgpServers = this._sgp.supportedSgpServers()
+        const sgpServers = this._sgp.sgpServers()
 
         this.state.setAvailability(
           auth.region,
           auth.rsoPlatformId,
           sgpServerId,
-          supported,
-          supportedSgpServers
+          {
+            common: supported.common,
+            matchHistory: supported.matchHistory
+          },
+          sgpServers
         )
       },
       { fireImmediately: true }
@@ -152,10 +203,10 @@ export class SgpEds {
 
   async getSummoner(puuid: string, sgpServerId?: string) {
     if (!sgpServerId) {
-      sgpServerId = this.state.availability.currentSgpServerId
+      sgpServerId = this.state.availability.sgpServerId
     }
 
-    const { data } = await this._sgp.getSummonerByPuuidTencent(sgpServerId, puuid)
+    const { data } = await this._sgp.getSummonerByPuuid(sgpServerId, puuid)
 
     if (!data || data.length === 0) {
       return null
@@ -180,7 +231,7 @@ export class SgpEds {
     sgpServerId?: string
   ) {
     if (!sgpServerId) {
-      sgpServerId = this.state.availability.currentSgpServerId
+      sgpServerId = this.state.availability.sgpServerId
     }
 
     if (tag) {
@@ -192,7 +243,7 @@ export class SgpEds {
 
   async getGameSummary(gameId: number, sgpServerId?: string) {
     if (!sgpServerId) {
-      sgpServerId = this.state.availability.currentSgpServerId
+      sgpServerId = this.state.availability.sgpServerId
     }
 
     const { data } = await this._sgp.getGameSummary(sgpServerId, gameId)
@@ -459,11 +510,11 @@ export class SgpEds {
 
   async getRankedStats(puuid: string, sgpServerId?: string) {
     if (!sgpServerId) {
-      sgpServerId = this.state.availability.currentSgpServerId
+      sgpServerId = this.state.availability.sgpServerId
     }
 
     try {
-      const { data } = await this._sgp.getRankedStatsTencent(sgpServerId, puuid)
+      const { data } = await this._sgp.getRankedStats(sgpServerId, puuid)
       return data
     } catch (error) {
       this._edsm.logger.warn(`获取排位信息失败: ${formatError(error)}`)
@@ -473,20 +524,15 @@ export class SgpEds {
 
   async getSpectatorGameflow(puuid: string, sgpServerId?: string) {
     if (!sgpServerId) {
-      sgpServerId = this.state.availability.currentSgpServerId
+      sgpServerId = this.state.availability.sgpServerId
     }
 
-    try {
-      const { data } = await this._sgp.getSpectatorGameflowByPuuid(sgpServerId, puuid)
-      return data
-    } catch (error) {
-      throw error
-    }
+    return (await this._sgp.getSpectatorGameflowByPuuid(sgpServerId, puuid)).data
   }
 
   private _setupMethodCall() {
     this._edsm.onCall('sgp/supported-sgp-servers', () => {
-      return this._sgp.supportedSgpServers()
+      return this._sgp.sgpServers()
     })
 
     this._edsm.onCall(
@@ -546,23 +592,42 @@ export class SgpEds {
     })
   }
 
-  private _maintainSessionToken() {
+  private _maintainEntitlementsToken() {
     this._edsm.reaction(
       () => this._lcu.entitlements.token,
       (token) => {
         if (!token) {
-          this._sgp.setJwtToken(null)
+          this._sgp.setEntitlementsToken(null)
           return
         }
 
         const copiedToken = structuredClone(token)
 
-        copiedToken.accessToken = copiedToken.accessToken.slice(0, 8) + '...'
-        copiedToken.token = copiedToken.token.slice(0, 8) + '...'
+        copiedToken.accessToken = copiedToken.accessToken?.slice(0, 24) + '...'
+        copiedToken.token = copiedToken.token?.slice(0, 24) + '...'
 
         this._edsm.logger.info(`更新 Entitlements Token: ${JSON.stringify(copiedToken)}`)
 
-        this._sgp.setJwtToken(token.accessToken)
+        this._sgp.setEntitlementsToken(token.accessToken)
+      },
+      { fireImmediately: true }
+    )
+  }
+
+  private _maintainLolLeagueSessionToken() {
+    this._edsm.reaction(
+      () => this._lcu.lolLeagueSession.token,
+      (token) => {
+        if (!token) {
+          this._sgp.setEntitlementsToken(null)
+          return
+        }
+
+        const copied = token.slice(0, 24) + '...'
+
+        this._edsm.logger.info(`更新 Lol League Session Token: ${copied}`)
+
+        this._sgp.setLolLeagueSessionToken(token)
       },
       { fireImmediately: true }
     )

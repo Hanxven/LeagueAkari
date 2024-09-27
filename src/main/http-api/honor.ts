@@ -1,7 +1,25 @@
 import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
-import { BallotLegacy } from '@shared/types/lcu/honorV2'
+import { Ballot } from '@shared/types/lcu/honorV2'
 
-export function honor(
+export function ballot() {
+  return lcm.lcuRequest({
+    url: '/lol-honor/v1/ballot',
+    method: 'POST'
+  })
+}
+
+export function honor(honorType: string, recipientPuuid: string) {
+  return lcm.lcuRequest({
+    url: '/lol-honor/v1/honor',
+    method: 'POST',
+    data: {
+      honorType,
+      recipientPuuid
+    }
+  })
+}
+
+export function v2Honor(
   gameId: string | number,
   honorCategory: 'COOL' | 'SHOTCALLER' | 'HEART' | '' | 'OPT_OUT',
   summonerId?: string | number,
@@ -19,8 +37,8 @@ export function honor(
   })
 }
 
-export function getBallot() {
-  return lcm.lcuRequest<BallotLegacy>({
+export function getV2Ballot() {
+  return lcm.lcuRequest<Ballot>({
     url: '/lol-honor-v2/v1/ballot/',
     method: 'GET'
   })

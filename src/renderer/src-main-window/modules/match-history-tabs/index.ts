@@ -80,7 +80,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
 
     // 当前召唤师登录时，立即创建一个页面
     watch(
-      [() => summoner.me, () => eds.sgpAvailability.currentSgpServerId],
+      [() => summoner.me, () => eds.sgpAvailability.sgpServerId],
       ([me, sgpServerId]) => {
         if (me) {
           mh.tabs.forEach((t) => mh.setTabPinned(t.id, false))
@@ -124,7 +124,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
   private _isCrossRegion(targetSgpServerId: string) {
     const eds = useExternalDataSourceStore()
 
-    return eds.sgpAvailability.currentSgpServerId !== targetSgpServerId
+    return eds.sgpAvailability.sgpServerId !== targetSgpServerId
   }
 
   async fetchTabFullData(unionId: string) {
@@ -305,7 +305,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
 
       try {
         if (this._isCrossRegion(sgpServerId)) {
-          if (!eds.sgpAvailability.supportedSgpServers.servers[sgpServerId]) {
+          if (!eds.sgpAvailability.sgpServers.servers[sgpServerId].common) {
             throw new Error('Unsupported sgp server')
           }
 
@@ -363,7 +363,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
         let matchHistory: MatchHistory
         let matchHistorySource: 'sgp' | 'lcu' = 'lcu'
         if (this._isCrossRegion(sgpServerId)) {
-          if (!eds.sgpAvailability.supportedSgpServers.servers[sgpServerId]) {
+          if (!eds.sgpAvailability.sgpServers.servers[sgpServerId]) {
             throw new Error('Unsupported sgp server')
           }
 
@@ -380,7 +380,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
             tab.data.detailedGamesCache.set(g.gameId, markRaw(g))
           })
         } else {
-          if (cf.settings.useSgpApi && eds.sgpAvailability.currentSgpServerSupported) {
+          if (cf.settings.useSgpApi && eds.sgpAvailability.serversSupported.matchHistory) {
             matchHistory = await edsm.sgp.getMatchHistoryLcuFormat(
               puuid,
               (page - 1) * pageSize,
@@ -565,7 +565,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
       const eds = useExternalDataSourceStore()
 
       if (!sgpServerId) {
-        sgpServerId = eds.sgpAvailability.currentSgpServerId
+        sgpServerId = eds.sgpAvailability.sgpServerId
       }
 
       router.replace({

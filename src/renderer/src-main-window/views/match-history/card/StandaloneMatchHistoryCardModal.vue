@@ -54,7 +54,7 @@ const eds = useExternalDataSourceStore()
 const cf = useCoreFunctionalityStore()
 
 const willUseSgpApi = computed(() => {
-  return cf.settings.useSgpApi && eds.sgpAvailability.currentSgpServerSupported
+  return cf.settings.useSgpApi && eds.sgpAvailability.serversSupported.matchHistory
 })
 
 const show = defineModel<boolean>('show', { default: false })
