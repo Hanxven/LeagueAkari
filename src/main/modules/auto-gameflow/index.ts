@@ -5,7 +5,14 @@ import {
 import { chatSend } from '@main/http-api/chat'
 import { reconnect } from '@main/http-api/gameflow'
 import { ballot, honor, v2Honor } from '@main/http-api/honor'
-import { deleteSearchMatch, getEogStatus, playAgain, searchMatch } from '@main/http-api/lobby'
+import {
+  acceptReceivedInvitation,
+  declineReceivedInvitation,
+  deleteSearchMatch,
+  getEogStatus,
+  playAgain,
+  searchMatch
+} from '@main/http-api/lobby'
 import { dodge } from '@main/http-api/login'
 import { accept } from '@main/http-api/matchmaking'
 import { getSummonerByPuuid } from '@main/http-api/summoner'
@@ -75,6 +82,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     this._handleLogging()
     this._handleLastSecondDodge()
     this._handleAutoReconnect()
+    this._handleAutoHandleInvitation()
 
     this._logger.info('初始化完成')
   }
@@ -99,8 +107,10 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       'settings.autoMatchmakingRematchStrategy',
       'settings.autoMatchmakingWaitForInvitees',
       'settings.playAgainEnabled',
-      'settings.dodgeAtLastSecondThreshold'
+      'settings.dodgeAtLastSecondThreshold',
+      'settings.autoHandleInvitationsEnabled'
     ])
+    this.propSync('state', this.state, 'settings.invitationHandlingStrategies', true)
   }
 
   private async _setupSettings() {
@@ -156,6 +166,14 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       {
         key: 'dodgeAtLastSecondThreshold',
         defaultValue: this.state.settings.dodgeAtLastSecondThreshold
+      },
+      {
+        key: 'autoHandleInvitationsEnabled',
+        defaultValue: this.state.settings.autoHandleInvitationsEnabled
+      },
+      {
+        key: 'invitationHandlingStrategies',
+        defaultValue: this.state.settings.invitationHandlingStrategies
       }
     ])
 
@@ -193,6 +211,14 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     )
     this.onSettingChange<Paths<typeof this.state.settings>>(
       'autoMatchmakingRematchFixedDuration',
+      defaultSetter
+    )
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'autoHandleInvitationsEnabled',
+      defaultSetter
+    )
+    this.onSettingChange<Paths<typeof this.state.settings>>(
+      'invitationHandlingStrategies',
       defaultSetter
     )
     this.onSettingChange<Paths<typeof this.state.settings>>(
@@ -404,7 +430,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
             const lobbyAllies = h.allies.filter((p) => lobbyMembers.includes(p))
 
             if (lobbyAllies.length > 0) {
-              const actualLobbyVotes = Math.min(h.votes, lobbyMembers.length)
+              const actualLobbyVotes = Math.min(h.votes, lobbyAllies.length)
               const weights = Array(lobbyAllies.length).fill(1)
               const maker = new ChoiceMaker(weights, lobbyAllies)
               const lobbyCandidates = maker.choose(actualLobbyVotes)
@@ -670,6 +696,87 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     } catch (error) {
       this._logger.warn(`尝试重新连接失败: ${formatError(error)}`)
     }
+  }
+
+  private _handleAutoHandleInvitation() {
+    this.reaction(
+      () =>
+        [
+          this._lcu.lobby.receivedInvitations,
+          this.state.settings.autoHandleInvitationsEnabled,
+          this.state.settings.invitationHandlingStrategies
+        ] as const,
+      async ([invitations, enabled, strategies]) => {
+        if (!enabled || invitations.length === 0) {
+          return
+        }
+
+        this._logger.info(
+          `处理邀请: ${JSON.stringify(invitations)}, ${JSON.stringify(strategies)}`
+        )
+
+        const availableInvitations = invitations.filter(
+          (i) => i.state === 'Pending' && i.canAcceptInvitation
+        )
+
+        if (availableInvitations.length === 0) {
+          return
+        }
+
+        // 先找到任意一个符合要求的, decline 或 accept 或 ignore
+        const availableStrategies = availableInvitations
+          .map((i) => {
+            const strategy = strategies[i.gameConfig.inviteGameType]
+
+            if (strategy) {
+              return {
+                id: i.invitationId,
+                inviteGameType: i.gameConfig.inviteGameType,
+                strategy: strategies[i.gameConfig.inviteGameType]
+              }
+            }
+
+            return {
+              id: i.invitationId,
+              inviteGameType: i.gameConfig.inviteGameType,
+              strategy: strategies['<DEFAULT>'] || 'ignore'
+            }
+          })
+          .toSorted((a, b) => {
+            if (a.strategy === 'accept' && b.strategy !== 'accept') {
+              return -1
+            } else if (a.strategy !== 'accept' && b.strategy === 'accept') {
+              return 1
+            } else if (a.strategy === 'decline' && b.strategy !== 'decline') {
+              return -1
+            } else if (a.strategy !== 'decline' && b.strategy === 'decline') {
+              return 1
+            } else {
+              return 0
+            }
+          })
+
+        if (availableStrategies.length === 0) {
+          return
+        }
+
+        const candidate = availableStrategies[0]
+
+        try {
+          if (candidate.strategy === 'accept') {
+            await acceptReceivedInvitation(candidate.id)
+            this._logger.info(`自动处理邀请: ${candidate.id}, ${candidate.strategy}`)
+          } else if (candidate.strategy === 'decline') {
+            await declineReceivedInvitation(candidate.id)
+            this._logger.info(`自动处理邀请: ${candidate.id}, ${candidate.strategy}`)
+          } else {
+            this._logger.info(`忽略这个邀请: ${candidate.id}, ${candidate.strategy}`)
+          }
+        } catch (error) {
+          this._logger.warn(`自动处理失败: ${formatError(error)}`)
+        }
+      }
+    )
   }
 
   private _adjustDodgeTimer(msLeft: number, threshold: number) {

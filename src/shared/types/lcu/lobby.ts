@@ -177,3 +177,22 @@ interface Restriction {
 }
 
 interface RestrictionArgs {}
+
+export interface ReceivedInvitation {
+  canAcceptInvitation: boolean
+  fromSummonerId: number
+  fromSummonerName: string
+  gameConfig: InvitationGameConfig
+  invitationId: string
+  invitationType: string
+  restrictions: any[]
+  state: string
+  timestamp: string
+}
+
+interface InvitationGameConfig {
+  gameMode: string
+  inviteGameType: string
+  mapId: number
+  queueId: number
+}

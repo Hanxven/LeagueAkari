@@ -20,7 +20,7 @@ import {
 } from '@main/http-api/game-data'
 import { getGameflowPhase, getGameflowSession } from '@main/http-api/gameflow'
 import { getV2Ballot } from '@main/http-api/honor'
-import { getLobby } from '@main/http-api/lobby'
+import { getLobby, getReceivedInvitations } from '@main/http-api/lobby'
 import { getLoginQueueState } from '@main/http-api/login'
 import { getLolLeagueSessionToken } from '@main/http-api/lol-league-session'
 import { getCurrentSummoner } from '@main/http-api/summoner'
@@ -860,9 +860,14 @@ export class LcuSyncModule extends MobxBasedBasicModule {
 
   private _syncLcuLobby() {
     this.propSync('lobby', this.lobby, 'lobby')
+    this.propSync('lobby', this.lobby, 'receivedInvitations')
 
     const d1 = this._lcm.lcuEventBus.on('/lol-lobby/v2/lobby', (event) => {
       this.lobby.setLobby(event.data)
+    })
+
+    const d2 = this._lcm.lcuEventBus.on('/lol-lobby/v2/received-invitations', (event) => {
+      this.lobby.setReceivedInvitations(event.data)
     })
 
     this.reaction(
@@ -888,7 +893,31 @@ export class LcuSyncModule extends MobxBasedBasicModule {
       { fireImmediately: true }
     )
 
+    this.reaction(
+      () => this._lcm.state.state,
+      async (state) => {
+        if (state === 'connected') {
+          try {
+            const inv = (await getReceivedInvitations()).data
+            this.lobby.setReceivedInvitations(inv)
+          } catch (error) {
+            if (isAxiosError(error) && error.response?.status === 404) {
+              this.lobby.setReceivedInvitations([])
+              return
+            }
+
+            this._mwm.notify.warn('lcu-state-sync', '状态同步', '获取房间邀请失败')
+            this._logger.warn(`获取房间邀请失败 ${formatError(error)}`)
+          }
+        } else {
+          this.lobby.setReceivedInvitations([])
+        }
+      },
+      { fireImmediately: true }
+    )
+
     this._disposers.add(d1)
+    this._disposers.add(d2)
   }
 
   private _syncLcuLogin() {

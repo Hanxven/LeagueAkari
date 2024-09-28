@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, observable } from 'mobx'
 
 import { lcuSyncModule as lcu } from '../lcu-state-sync'
 
@@ -29,6 +29,9 @@ class AutoGameflowSettings {
   autoMatchmakingDelaySeconds: number = 5
   autoMatchmakingMinimumMembers = 1 // 最低满足人数
   autoMatchmakingWaitForInvitees: boolean = true // 等待邀请中的用户
+
+  autoHandleInvitationsEnabled: boolean = false
+  invitationHandlingStrategies: Record<string, string> = {}
 
   dodgeAtLastSecondThreshold: number = 2
 
@@ -80,12 +83,22 @@ class AutoGameflowSettings {
     this.autoMatchmakingRematchFixedDuration = seconds
   }
 
+  setautoHandleInvitationsEnabled(enabled: boolean) {
+    this.autoHandleInvitationsEnabled = enabled
+  }
+
   setDodgeAtLastSecondThreshold(threshold: number) {
     this.dodgeAtLastSecondThreshold = threshold
   }
 
+  setInvitationHandlingStrategies(strategies: Record<string, string>) {
+    this.invitationHandlingStrategies = strategies
+  }
+
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      invitationHandlingStrategies: observable.struct
+    })
   }
 }
 

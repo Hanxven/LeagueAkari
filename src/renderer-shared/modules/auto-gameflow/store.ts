@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { reactive, ref } from 'vue'
+import { markRaw, reactive, ref } from 'vue'
 
 export const useAutoGameflowStore = defineStore('module:auto-gameflow', () => {
   const settings = reactive({
@@ -15,7 +15,9 @@ export const useAutoGameflowStore = defineStore('module:auto-gameflow', () => {
     autoMatchmakingWaitForInvitees: true,
     autoMatchmakingRematchStrategy: 'never',
     autoMatchmakingRematchFixedDuration: 2,
-    dodgeAtLastSecondThreshold: 2
+    dodgeAtLastSecondThreshold: 2,
+    autoHandleInvitationsEnabled: false,
+    invitationHandlingStrategies: markRaw({}) as Record<string, string>
   })
 
   const willAccept = ref(false)

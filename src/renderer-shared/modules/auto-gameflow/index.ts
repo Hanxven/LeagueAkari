@@ -80,6 +80,14 @@ export class AutoGameflowRendererModule extends StateSyncModule {
   async setDodgeAtLastSecondThreshold(value: number) {
     return this.call('set-setting', 'dodgeAtLastSecondThreshold', value)
   }
+
+  async setAutoHandleInvitationsEnabled(value: boolean) {
+    return this.call('set-setting', 'autoHandleInvitationsEnabled', value)
+  }
+
+  async setInvitationHandlingStrategies(value: Record<string, string>) {
+    return this.call('set-setting', 'invitationHandlingStrategies', value)
+  }
 }
 
 export const autoGameflowRendererModule = new AutoGameflowRendererModule()

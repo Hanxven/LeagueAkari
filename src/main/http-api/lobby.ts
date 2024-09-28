@@ -1,5 +1,11 @@
 import { lcuConnectionModule as lcm } from '@main/modules/lcu-connection'
-import { AvailableBot, EogStatus, Lobby, LobbyMember } from '@shared/types/lcu/lobby'
+import {
+  AvailableBot,
+  EogStatus,
+  Lobby,
+  LobbyMember,
+  ReceivedInvitation
+} from '@shared/types/lcu/lobby'
 
 export function createCustomLobby(
   mode: string,
@@ -135,6 +141,27 @@ export function playAgain() {
 export function getEogStatus() {
   return lcm.lcuRequest<EogStatus>({
     url: '/lol-lobby/v2/party/eog-status',
+    method: 'GET'
+  })
+}
+
+export function acceptReceivedInvitation(invitationId: string) {
+  return lcm.lcuRequest({
+    url: `/lol-lobby/v2/received-invitations/${invitationId}/accept`,
+    method: 'POST'
+  })
+}
+
+export function declineReceivedInvitation(invitationId: string) {
+  return lcm.lcuRequest({
+    url: `/lol-lobby/v2/received-invitations/${invitationId}/decline`,
+    method: 'POST'
+  })
+}
+
+export function getReceivedInvitations() {
+  return lcm.lcuRequest<ReceivedInvitation[]>({
+    url: '/lol-lobby/v2/received-invitations',
     method: 'GET'
   })
 }

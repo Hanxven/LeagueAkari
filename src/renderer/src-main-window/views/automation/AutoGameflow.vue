@@ -198,6 +198,64 @@
             size="small"
           />
         </ControlItem>
+        <div class="divider"></div>
+        <ControlItem
+          class="control-item-margin"
+          label="自动处理房间邀请"
+          label-description="按照设定的策略处理房间邀请"
+          :label-width="200"
+        >
+          <NSwitch
+            :value="agf.settings.autoHandleInvitationsEnabled"
+            @update:value="(val) => am.setAutoHandleInvitationsEnabled(val)"
+            size="small"
+          />
+        </ControlItem>
+        <ControlItem
+          class="control-item-margin"
+          label="房间邀请接受策略"
+          label-description="当收到房间邀请时，将根据不同的队列模式进行处理"
+          :label-width="200"
+        >
+          <NFlex vertical align="flex-start">
+            <table>
+              <tbody>
+                <tr v-for="s of invitationStrategiesArray" :key="s.queueType">
+                  <td
+                    style="
+                      font-size: 13px;
+                      font-weight: bold;
+                      text-overflow: ellipsis;
+                      overflow: hidden;
+                      white-space: nowrap;
+                      padding: 4px 16px 4px 0;
+                    "
+                  >
+                    {{ QUEUE_TYPES[s.queueType]?.label || s.queueType }}
+                  </td>
+                  <td>
+                    <NRadioGroup
+                      :value="s.strategy"
+                      @update:value="(val) => handleChangeInvitationStrategy(s.queueType, val)"
+                    >
+                      <NRadio value="accept">接受</NRadio>
+                      <NRadio value="decline">拒绝</NRadio>
+                      <NRadio value="ignore">不处理</NRadio>
+                    </NRadioGroup>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <NPopselect
+              :options="queueTypeOptions"
+              multiple
+              :value="invitationStrategiesPopselectArray"
+              @update:value="handleChangeInvitationStrategies"
+            >
+              <NButton size="tiny" type="primary">配置</NButton>
+            </NPopselect>
+          </NFlex>
+        </ControlItem>
       </NCard>
     </div>
   </NScrollbar>
@@ -207,9 +265,121 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { autoGameflowRendererModule as am } from '@renderer-shared/modules/auto-gameflow'
 import { useAutoGameflowStore } from '@renderer-shared/modules/auto-gameflow/store'
-import { NCard, NFlex, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
+import {
+  NButton,
+  NCard,
+  NFlex,
+  NInputNumber,
+  NPopselect,
+  NRadio,
+  NRadioGroup,
+  NScrollbar,
+  NSwitch,
+  SelectOption
+} from 'naive-ui'
+import { computed, ref } from 'vue'
 
 const agf = useAutoGameflowStore()
+
+const invitationStrategiesPopselectArray = computed(() => {
+  return Object.keys(agf.settings.invitationHandlingStrategies)
+})
+
+const handleChangeInvitationStrategies = (value: string[]) => {
+  const newStrategies: Record<string, string> = {}
+
+  for (const strategy of value) {
+    if (agf.settings.invitationHandlingStrategies[strategy]) {
+      newStrategies[strategy] = agf.settings.invitationHandlingStrategies[strategy]
+    } else {
+      newStrategies[strategy] = 'ignore'
+    }
+  }
+
+  am.setInvitationHandlingStrategies(newStrategies)
+}
+
+const QUEUE_TYPES = {
+  '<DEFAULT>': {
+    label: '默认处理',
+    order: 0
+  },
+  RANKED_SOLO_5x5: {
+    label: '单双排位',
+    order: 100
+  },
+  RANKED_FLEX_SR: {
+    label: '灵活排位',
+    order: 110
+  },
+  NORMAL: {
+    label: '匹配模式',
+    order: 200
+  },
+  ARAM_UNRANKED_5x5: {
+    label: '极地大乱斗',
+    order: 300
+  },
+  CHERRY: {
+    label: '斗魂竞技场',
+    order: 400
+  },
+  URF: {
+    label: '无限火力 / 无限乱斗',
+    order: 500
+  },
+  NORMAL_TFT: {
+    label: '云顶之弈',
+    order: 600
+  },
+  RANKED_TFT: {
+    label: '云顶之弈 排位',
+    order: 610
+  },
+  RANKED_TURBO: {
+    label: '云顶之弈 狂暴',
+    order: 620
+  },
+  RANKED_TFT_DOUBLE_UP: {
+    label: '云顶之弈 双人作战',
+    order: 630
+  }
+} as const
+
+const invitationStrategiesArray = computed(() => {
+  return Object.entries(agf.settings.invitationHandlingStrategies)
+    .map(([queueType, strategy]) => {
+      return {
+        queueType,
+        strategy
+      }
+    })
+    .toSorted((a, b) => {
+      const aQueueTypeOrder = QUEUE_TYPES[a.queueType] ? QUEUE_TYPES[a.queueType].order : 0
+      const bQueueTypeOrder = QUEUE_TYPES[b.queueType] ? QUEUE_TYPES[b.queueType].order : 0
+
+      return aQueueTypeOrder - bQueueTypeOrder
+    })
+})
+
+const queueTypeOptions = computed(() => {
+  return Object.keys(QUEUE_TYPES)
+    .map((key) => {
+      return {
+        value: key,
+        label: QUEUE_TYPES[key].label
+      }
+    })
+    .toSorted((a, b) => {
+      return QUEUE_TYPES[a.value].order - QUEUE_TYPES[b.value].order
+    })
+})
+
+const handleChangeInvitationStrategy = (queueType: string, strategy: string) => {
+  const newObj = { ...agf.settings.invitationHandlingStrategies }
+  newObj[queueType] = strategy
+  am.setInvitationHandlingStrategies(newObj)
+}
 </script>
 
 <style lang="less" scoped>
