@@ -4,7 +4,7 @@ import {
 } from '@main/akari-ipc/mobx-based-basic-module'
 import { chatSend } from '@main/http-api/chat'
 import { reconnect } from '@main/http-api/gameflow'
-import { ballot, honor, v2Honor } from '@main/http-api/honor'
+import { ballot, honor } from '@main/http-api/honor'
 import {
   acceptReceivedInvitation,
   declineReceivedInvitation,
@@ -15,7 +15,6 @@ import {
 } from '@main/http-api/lobby'
 import { dodge } from '@main/http-api/login'
 import { accept } from '@main/http-api/matchmaking'
-import { getSummonerByPuuid } from '@main/http-api/summoner'
 import { TimeoutTask } from '@main/utils/timer'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { formatError } from '@shared/utils/errors'
@@ -108,7 +107,8 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       'settings.autoMatchmakingWaitForInvitees',
       'settings.playAgainEnabled',
       'settings.dodgeAtLastSecondThreshold',
-      'settings.autoHandleInvitationsEnabled'
+      'settings.autoHandleInvitationsEnabled',
+      'settings.autoReconnectEnabled'
     ])
     this.propSync('state', this.state, 'settings.invitationHandlingStrategies', true)
   }
@@ -191,6 +191,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
     this.onSettingChange<Paths<typeof this.state.settings>>('autoHonorStrategy', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>('playAgainEnabled', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>('autoAcceptDelaySeconds', defaultSetter)
+    this.onSettingChange<Paths<typeof this.state.settings>>('autoReconnectEnabled', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>('autoAcceptEnabled', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>('autoMatchmakingEnabled', defaultSetter)
     this.onSettingChange<Paths<typeof this.state.settings>>(
@@ -213,6 +214,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
       'autoMatchmakingRematchFixedDuration',
       defaultSetter
     )
+
     this.onSettingChange<Paths<typeof this.state.settings>>(
       'autoHandleInvitationsEnabled',
       defaultSetter
@@ -711,9 +713,7 @@ export class AutoGameflowModule extends MobxBasedBasicModule {
           return
         }
 
-        this._logger.info(
-          `处理邀请: ${JSON.stringify(invitations)}, ${JSON.stringify(strategies)}`
-        )
+        this._logger.info(`处理邀请: ${JSON.stringify(invitations)}, ${JSON.stringify(strategies)}`)
 
         const availableInvitations = invitations.filter(
           (i) => i.state === 'Pending' && i.canAcceptInvitation

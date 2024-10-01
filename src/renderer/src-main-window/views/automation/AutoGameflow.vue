@@ -274,10 +274,9 @@ import {
   NRadio,
   NRadioGroup,
   NScrollbar,
-  NSwitch,
-  SelectOption
+  NSwitch
 } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 const agf = useAutoGameflowStore()
 
