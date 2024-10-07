@@ -251,7 +251,8 @@
                 </div>
                 <NSelect
                   v-if="
-                    cf.settings.useSgpApi || eds.sgpAvailability.sgpServerId !== tab.sgpServerId
+                    (cf.settings.useSgpApi && eds.sgpAvailability.serversSupported.matchHistory) ||
+                    eds.sgpAvailability.sgpServerId !== tab.sgpServerId
                   "
                   size="small"
                   :value="tab.matchHistory.queueFilter"
