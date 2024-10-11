@@ -1,7 +1,6 @@
 import { TgpGame, TgpPlayers, Player, TgpBattles } from '@shared/data-sources/tgp/types'
 import axios from 'axios'
 import { AxiosRetry } from 'axios-retry'
-import { TgpApiModule } from '@main/modules/tgp-api'
 
 const axiosRetry = require('axios-retry').default as AxiosRetry
 
@@ -146,7 +145,7 @@ export class TgpApi {
     baseURL: 'https://www.wegame.com.cn/api/v1/wegame.pallas.game.LolBattle'
   })
 
-  constructor(private _tam: TgpApiModule) {
+  constructor(private _tam) {
     axiosRetry(this._http, {
       retries: 3,
       retryDelay: () => 0,

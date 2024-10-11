@@ -246,7 +246,7 @@ const matchHistorySourceOptions = [
 const qrcodeImage = ref<string | null>(null)
 const qrcodeStatus = ref<string>('')
 
-let pollingInterval: number | null = null;
+let pollingInterval: NodeJS.Timeout | null = null;
 
 onMounted(async () => { await generateQrcode() });
 
@@ -256,7 +256,7 @@ const handleChangeUseTgpApi = async (val) => {
 }
 
 const handleLogout = async () => {
-  await tam.logout(true)
+  await tam.logout()
   await generateQrcode()
 }
 

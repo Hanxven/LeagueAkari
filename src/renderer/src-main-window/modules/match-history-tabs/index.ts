@@ -243,14 +243,16 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           return
         }
 
-        let battleDetail: BattleDetail
+        let battleDetail: BattleDetail | null = null;
         if (mh.currentTab.data.detailedBattleCache.has(gameId)) {
           battleDetail = mh.currentTab.data.detailedBattleCache.get(gameId)!
         } else {
           const tgpGame = await tam.getBattleDetail(TGP_AREA_ID_SGP[mh.currentTab.data.sgpServerId][0], gameId)
           if (tgpGame) {
             battleDetail = tgpGame.battle_detail
-            mh.currentTab.data.detailedBattleCache.set(gameId, battleDetail)
+            if (battleDetail) {
+              mh.currentTab.data.detailedBattleCache.set(gameId, battleDetail)
+            }
           }
         }
 
@@ -457,18 +459,17 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
         // 获取TGP对局列表（少量信息）
         let battles: Battle[]
         if (ta.settings.enabled && !ta.settings.expired) {
-          const players = await tam.searchPlayer(
-            `${tab.data.summoner.gameName}#${tab.data.summoner.tagLine}`
-          )
-          if (players && players[0]) {
-            battles = await tam.getBattleList(players[0], page, pageSize)
+          if (tab.data.summoner) {
+            const players = await tam.searchPlayer(`${tab.data.summoner.gameName}#${tab.data.summoner.tagLine}`)
+            if (players && players[0]) {
+              battles = await tam.getBattleList(players[0], page, pageSize)
+            }
           }
-          console.log(battles)
         }
 
         const matchHistoryWithState = matchHistory.games.games.map((g) => ({
           game: tab.data.detailedGamesCache.get(g.gameId) || markRaw(g),
-          battle: battles?.find((battle) => g.gameId == battle.game_id),
+          battle: battles?.find((battle) => g.gameId.toString() === battle.game_id),
           isDetailed: tab.data.detailedGamesCache.get(g.gameId) !== undefined,
           isLoading: false,
           hasError: false,

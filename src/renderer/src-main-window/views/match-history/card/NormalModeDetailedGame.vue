@@ -171,7 +171,7 @@
             <td v-if="ta.settings.enabled && !ta.settings.expired" style="width: 40px">
               <div
                 class="score"
-                :title="p.stats.score"
+                :title="p.stats.score?.toString()"
                 :class="{
                   best:
                     match.recordStats.maxScore && p.stats.score &&
@@ -288,7 +288,9 @@ const match = computed(() => {
     )
     recordStats.maxGoldEarned = Math.max(recordStats.maxGoldEarned, p.stats.goldEarned)
     recordStats.maxCsOverall = Math.max(recordStats.maxCsOverall, p.csOverall)
-    recordStats.maxScore = Math.max(recordStats.maxScore, p.stats.score)
+    if (p.stats.score) {
+      recordStats.maxScore = Math.max(recordStats.maxScore, p.stats.score)
+    }
   })
 
   return {

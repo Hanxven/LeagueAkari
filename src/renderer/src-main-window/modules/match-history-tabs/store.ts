@@ -29,10 +29,10 @@ export interface MatchHistoryGameTabCard {
   game: Game
 
   /** 该玩家的TGP游戏信息 */
-  battle: Battle
+  battle?: Battle
 
   /** 是否获取了TGP评分 */
-  hasTgpScore: boolean
+  hasTgpScore?: boolean
 
   /** 是否已经展开 */
   isExpanded: boolean
