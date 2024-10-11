@@ -196,6 +196,7 @@ export interface Stats {
   wardsPlaced: number
   win: boolean
   playerSubteamId: number
+  score?: number
 }
 
 // 如果当前的战绩数据是从 SGP 转换得到的, 那么会有这些字段
@@ -216,6 +217,7 @@ interface SgpFields {
   holdPings: number
   needVisionPings: number
   onMyWayPings: number
+  score?: number
 }
 
 export interface ParticipantIdentity {

@@ -14,6 +14,7 @@ import { leagueClientRendererModule } from '@renderer-shared/modules/league-clie
 import { mainWindowRendererModule } from '@renderer-shared/modules/main-window'
 import { respawnTimerRendererModule } from '@renderer-shared/modules/respawn-timer'
 import { storageRendererModule } from '@renderer-shared/modules/storage'
+import { tgpApiRendererModule } from '@renderer-shared/modules/tgp-api'
 
 import { debugRendererModule } from './debug'
 import { matchHistoryTabsRendererModule } from './match-history-tabs'
@@ -38,6 +39,7 @@ export async function setupLeagueAkariRendererModules() {
   manager.use(customKeyboardSequenceRendererModule)
   manager.use(externalDataSourceRendererModule)
   manager.use(matchHistoryTabsRendererModule)
+  manager.use(tgpApiRendererModule)
 
   await manager.setup()
 }

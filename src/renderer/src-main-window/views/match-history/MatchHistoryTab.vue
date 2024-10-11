@@ -433,12 +433,15 @@
               class="match-history-card-item"
               @set-show-detailed-game="handleToggleShowDetailedGame"
               @load-detailed-game="(gameId) => mhm.fetchTabDetailedGame(tab.puuid, gameId)"
+              @fetch-tgp-score="(gameId) => mhm.fetchTgpScore(tab.puuid, gameId)"
               @to-summoner="(puuid, newTab) => handleToSummoner(puuid, newTab)"
               :self-puuid="tab.puuid"
               :is-detailed="g.isDetailed"
               :is-loading="g.isLoading"
               :is-expanded="g.isExpanded"
               :game="g.game"
+              :has-tgp-score="g.hasTgpScore"
+              :battle="g.battle"
               v-for="g of tab.matchHistory.games"
               :key="g.game.gameId"
             />
@@ -507,6 +510,7 @@ import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import IndicatorPulse from './widgets/IndicatorPulse.vue'
 import RankedDisplay from './widgets/RankedDisplay.vue'
 import SpectateStatus from './widgets/SpectateStatus.vue'
+import { useTgpApiStore } from '@renderer-shared/modules/tgp-api/store'
 
 const { tab } = defineProps<{
   tab: TabState & { id: string }
@@ -549,6 +553,7 @@ const mh = useMatchHistoryTabsStore()
 const cf = useCoreFunctionalityStore()
 const gameData = useGameDataStore()
 const app = useAppStore()
+const ta = useTgpApiStore()
 
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
   mhm.setMatchHistoryExpand(tab.id, gameId, expand)
@@ -637,6 +642,15 @@ watch(
   () => tab.matchHistory.page,
   (page) => {
     inputtingPage.value = page
+  }
+)
+
+watch(
+  () => ta.settings.expired,
+  (expired) => {
+    if (expired) {
+      laNotification.warn("QQ", "QQ登录信息已失效，请重新登录！")
+    }
   }
 )
 

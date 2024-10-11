@@ -16,6 +16,59 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">WeGame API</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="使用WeGame API"
+        label-description="登录QQ后可查看WeGame评分"
+        :label-width="320"
+      >
+        <NFlex align="center">
+          <NSwitch
+            size="small"
+            :value="ta.settings.enabled"
+            @update:value="handleChangeUseTgpApi"
+          />
+          <div v-if="ta.settings.enabled && !ta.settings.expired">
+            <NButton size="small" type="error" @click="handleLogout">
+              注销QQ: {{ ta.settings.qq }}
+            </NButton>
+          </div>
+        </NFlex>
+      </ControlItem>
+      <ControlItem
+        v-if="ta.settings.enabled && ta.settings.expired"
+        class="control-item-margin"
+        label="扫描二维码登录"
+        label-description="扫描二维码登录"
+        :label-width="320"
+      >
+        <NBadge :value="qrcodeStatus">
+          <NImage
+            v-if="qrcodeImage"
+            width="120"
+            :src="qrcodeImage"
+          />
+        </NBadge>
+      </ControlItem>
+      <NTable v-if="ta.settings.enabled && !ta.settings.expired" size="small" bordered>
+        <colgroup>
+          <col style="width: 120px" />
+          <col />
+        </colgroup>
+        <tbody>
+        <tr>
+          <td>TGP ID</td>
+          <td><CopyableText>{{ta.settings.tgpId}}</CopyableText></td>
+        </tr>
+        <tr>
+          <td>TGP TICKET</td>
+          <td><CopyableText>{{ta.settings.tgpTicket}}</CopyableText></td>
+        </tr>
+        </tbody>
+      </NTable>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">战绩页面</span></template>
       <ControlItem
         class="control-item-margin"
@@ -171,7 +224,11 @@ import { useExternalDataSourceStore } from '@renderer-shared/modules/external-da
 import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { respawnTimerRendererModule as rtm } from '@renderer-shared/modules/respawn-timer'
 import { useRespawnTimerStore } from '@renderer-shared/modules/respawn-timer/store'
-import { NButton, NCard, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
+import { tgpApiRendererModule as tam } from '@renderer-shared/modules/tgp-api'
+import { useTgpApiStore } from '@renderer-shared/modules/tgp-api/store'
+import { NButton, NCard, NFlex, NImage, NInputNumber, NScrollbar, NSlider, NSwitch, NBadge, NTable } from 'naive-ui'
+import { onMounted, ref } from 'vue'
+import CopyableText from '@renderer-shared/components/CopyableText.vue'
 
 const rt = useRespawnTimerStore()
 const cf = useCoreFunctionalityStore()
@@ -179,11 +236,55 @@ const aux = useAuxiliaryWindowStore()
 const app = useAppStore()
 const eds = useExternalDataSourceStore()
 const lc = useLcuConnectionStore()
+const ta = useTgpApiStore()
 
 const matchHistorySourceOptions = [
   { label: 'SGP', value: 'sgp' },
   { label: 'LCU', value: 'lcu' }
 ]
+
+const qrcodeImage = ref<string | null>(null)
+const qrcodeStatus = ref<string>('')
+
+let pollingInterval: number | null = null;
+
+onMounted(async () => { await generateQrcode() });
+
+const handleChangeUseTgpApi = async (val) => {
+  await tam.setEnabled(val)
+  await generateQrcode()
+}
+
+const handleLogout = async () => {
+  await tam.logout(true)
+  await generateQrcode()
+}
+
+const generateQrcode = async () => {
+  if (ta.settings.expired) {
+    qrcodeStatus.value = ''
+    const [image, qrsig] = await tam.getQrCode()
+    qrcodeImage.value = image
+    startPolling(qrsig)
+  }
+};
+
+const startPolling = (qrsig) => {
+  pollingInterval = setInterval(async () => {
+    const status = await tam.checkQrCodeStatus(qrsig);
+    qrcodeStatus.value = status;
+    if (status === '二维码已失效' || status === '登录成功' || status === '登录失败') {
+      clearPolling();
+    }
+  }, 2000);
+};
+
+const clearPolling = () => {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+    pollingInterval = null;
+  }
+};
 </script>
 
 <style lang="less" scoped>

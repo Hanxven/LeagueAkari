@@ -5,6 +5,7 @@ import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
+import { Battle, BattleDetail } from '@shared/data-sources/tgp/types'
 
 /**
  * 通用带状态的战绩数据
@@ -26,6 +27,12 @@ export interface MatchHistoryGameTabCard {
 
   /** 游戏对局信息本体 */
   game: Game
+
+  /** 该玩家的TGP游戏信息 */
+  battle: Battle
+
+  /** 是否获取了TGP评分 */
+  hasTgpScore: boolean
 
   /** 是否已经展开 */
   isExpanded: boolean
@@ -70,6 +77,9 @@ export interface TabState {
   matchHistory: SummonerTabMatchHistory
 
   detailedGamesCache: Map<number, Game>
+
+  /** 缓存展开按钮获取的TGP评分 */
+  detailedBattleCache: Map<number, BattleDetail>
 
   /** 加载中状态 */
   loading: {

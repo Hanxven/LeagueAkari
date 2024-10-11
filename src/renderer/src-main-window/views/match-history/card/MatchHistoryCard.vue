@@ -77,6 +77,8 @@
           <div class="champion">
             <ChampionIcon
               class="champion-icon"
+              :mvp="battle?.was_mvp"
+              :svp="battle?.was_svp"
               :champion-id="self.participant.championId"
               :title="gameData.champions[self.participant.championId]?.name"
             ></ChampionIcon>
@@ -279,6 +281,7 @@ import CherryModeDetailedGame from './CherryModeDetailedGame.vue'
 import MiscellaneousPanel from './MiscellaneousPanel.vue'
 import NormalNodeDetailedGame from './NormalModeDetailedGame.vue'
 import StrawberryModeDetailedGame from './StrawberryModeDetailedGame.vue'
+import { Battle } from '@shared/data-sources/tgp/types'
 
 const props = defineProps<{
   selfPuuid?: string
@@ -286,11 +289,14 @@ const props = defineProps<{
   isExpanded: boolean
   isDetailed: boolean
   game: Game
+  hasTgpScore?: boolean
+  battle?: Battle
 }>()
 
 const emits = defineEmits<{
   setShowDetailedGame: [gameId: number, expand: boolean]
   loadDetailedGame: [gameId: number]
+  fetchTgpScore: [gameId: number]
   toSummoner: [puuid: string, newTab?: boolean]
 }>()
 
@@ -491,6 +497,9 @@ const handleToggleShowDetailedGame = () => {
     emits('loadDetailedGame', props.game.gameId)
   }
   emits('setShowDetailedGame', props.game.gameId, !props.isExpanded)
+  if (!props.hasTgpScore) {
+    emits('fetchTgpScore', props.game.gameId)
+  }
 }
 </script>
 
@@ -501,7 +510,7 @@ const handleToggleShowDetailedGame = () => {
   border-radius: 4px;
   box-sizing: border-box;
   background-color: #28344e;
-  width: 740px;
+  width: 780px;
   height: 96px;
   overflow: hidden;
 }

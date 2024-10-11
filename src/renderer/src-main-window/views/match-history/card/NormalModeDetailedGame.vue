@@ -24,6 +24,7 @@
             <th class="header-cs">补兵数</th>
             <th class="header-gold">金币</th>
             <th class="header-items">物品</th>
+            <th class="header-score" v-if="ta.settings.enabled && !ta.settings.expired">评价</th>
           </tr>
         </thead>
         <tbody class="participants">
@@ -167,6 +168,19 @@
                 <ItemDisplay :size="20" is-trinket :item-id="p.stats.item6" />
               </div>
             </td>
+            <td v-if="ta.settings.enabled && !ta.settings.expired" style="width: 40px">
+              <div
+                class="score"
+                :title="p.stats.score"
+                :class="{
+                  best:
+                    match.recordStats.maxScore && p.stats.score &&
+                    p.stats.score === match.recordStats.maxScore
+                }"
+              >
+                {{ p.stats.score ? (p.stats.score / 1e4).toFixed(1) : '' }}
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -201,6 +215,9 @@ import { createReusableTemplate } from '@vueuse/core'
 import { computed } from 'vue'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
+import { useTgpApiStore } from '@renderer-shared/modules/tgp-api/store'
+
+const ta = useTgpApiStore()
 
 const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
   participants: (typeof match.value.teams)[keyof typeof match.value.teams]
@@ -238,7 +255,8 @@ const match = computed(() => {
     maxTotalDamageDealtToChampions: 0,
     maxTotalDamageTaken: 0,
     maxGoldEarned: 0,
-    maxCsOverall: 0
+    maxCsOverall: 0,
+    maxScore: 0,
   }
 
   const withExtra = all.map((v) => ({ ...v, csOverall: 0 }))
@@ -270,6 +288,7 @@ const match = computed(() => {
     )
     recordStats.maxGoldEarned = Math.max(recordStats.maxGoldEarned, p.stats.goldEarned)
     recordStats.maxCsOverall = Math.max(recordStats.maxCsOverall, p.csOverall)
+    recordStats.maxScore = Math.max(recordStats.maxScore, p.stats.score)
   })
 
   return {
@@ -300,7 +319,7 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
   background-color: rgb(45, 45, 45);
   border-radius: 4px;
   overflow: hidden;
-  width: 740px;
+  width: 780px;
   container: detailed-card / inline-size;
 }
 
@@ -458,6 +477,11 @@ table {
 .gold {
   text-align: center;
   font-size: 11px;
+}
+
+.score {
+  text-align: center;
+  font-size: 12px;
 }
 
 .team {

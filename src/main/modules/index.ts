@@ -19,6 +19,7 @@ import { debugModule } from './debug'
 import { externalDataSourceModule } from './external-data-source'
 import { lcuSyncModule } from './lcu-state-sync'
 import { respawnTimerModule } from './respawn-timer'
+import { tgpApiModule } from './tgp-api'
 
 export const manager = new LeagueAkariModuleManager()
 
@@ -45,6 +46,7 @@ export async function setupLeagueAkariModules() {
   manager.use(customKeyboardSequenceModule)
   manager.use(debugModule)
   manager.use(externalDataSourceModule)
+  manager.use(tgpApiModule)
 
   await manager.setup()
 }

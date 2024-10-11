@@ -9,11 +9,15 @@ import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/s
 import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { StorageRendererModule } from '@renderer-shared/modules/storage'
+import { tgpApiRendererModule as tam } from '@renderer-shared/modules/tgp-api'
+import { useTgpApiStore } from '@renderer-shared/modules/tgp-api/store'
 import { laNotification } from '@renderer-shared/notification'
 import { getPlayerAccountNameset } from '@renderer-shared/rc-http-api/rc-api'
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { MatchHistory } from '@shared/types/lcu/match-history'
+import { Battle, BattleDetail } from '@shared/data-sources/tgp/types'
+import { Game, MatchHistory } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
+import { TGP_AREA_ID_SGP } from '@shared/utils/platform-names'
 import { AxiosError } from 'axios'
 import { computed, markRaw, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -228,6 +232,54 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     return null
   }
 
+  async fetchTgpScore(puuid: string, gameId: number) {
+    const mh = useMatchHistoryTabsStore()
+    const ta = useTgpApiStore()
+
+    if (mh.currentTab) {
+      if (ta.settings.enabled && !ta.settings.expired) {
+        const match = mh.currentTab.data.matchHistory._gamesMap[gameId]
+        if (match.hasTgpScore) {
+          return
+        }
+
+        let battleDetail: BattleDetail
+        if (mh.currentTab.data.detailedBattleCache.has(gameId)) {
+          battleDetail = mh.currentTab.data.detailedBattleCache.get(gameId)!
+        } else {
+          const tgpGame = await tam.getBattleDetail(TGP_AREA_ID_SGP[mh.currentTab.data.sgpServerId][0], gameId)
+          if (tgpGame) {
+            battleDetail = tgpGame.battle_detail
+            mh.currentTab.data.detailedBattleCache.set(gameId, battleDetail)
+          }
+        }
+
+        if (battleDetail) {
+          this._mapTgpScoreToParticipant(battleDetail, match.game)
+          match.hasTgpScore = true
+          match.game = { ...match.game }
+        }
+      }
+    }
+  }
+
+  private _mapTgpScoreToParticipant(battleDetail: BattleDetail, game: Game) {
+    battleDetail.player_details.forEach((playerDetail) => {
+      const participantIdentity = game.participantIdentities.find(
+        (identity) => identity.player.puuid === playerDetail.original_puu_id
+      )
+      if (participantIdentity) {
+        const participant = game.participants.find(
+          (p) => p.participantId === participantIdentity.participantId
+        )
+
+        if (participant) {
+          participant.stats.score = playerDetail.gameScore
+        }
+      }
+    })
+  }
+
   async querySavedInfo(unionId: string) {
     const summoner = useSummonerStore()
     const mh = useMatchHistoryTabsStore()
@@ -339,6 +391,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     const mh = useMatchHistoryTabsStore()
     const lc = useLcuConnectionStore()
     const eds = useExternalDataSourceStore()
+    const ta = useTgpApiStore()
 
     const tab = mh.getTab(unionId)
 
@@ -401,8 +454,21 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           }
         }
 
+        // 获取TGP对局列表（少量信息）
+        let battles: Battle[]
+        if (ta.settings.enabled && !ta.settings.expired) {
+          const players = await tam.searchPlayer(
+            `${tab.data.summoner.gameName}#${tab.data.summoner.tagLine}`
+          )
+          if (players && players[0]) {
+            battles = await tam.getBattleList(players[0], page, pageSize)
+          }
+          console.log(battles)
+        }
+
         const matchHistoryWithState = matchHistory.games.games.map((g) => ({
           game: tab.data.detailedGamesCache.get(g.gameId) || markRaw(g),
+          battle: battles?.find((battle) => g.gameId == battle.game_id),
           isDetailed: tab.data.detailedGamesCache.get(g.gameId) !== undefined,
           isLoading: false,
           hasError: false,
@@ -613,6 +679,7 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
         queueFilter: -1
       },
       detailedGamesCache: markRaw(new Map()),
+      detailedBattleCache: markRaw(new Map()),
       loading: {
         isLoadingSummoner: false,
         isLoadingMatchHistory: false,
