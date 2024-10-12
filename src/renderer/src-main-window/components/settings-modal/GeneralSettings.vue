@@ -20,9 +20,17 @@
       <ControlItem
         class="control-item-margin"
         label="使用WeGame API"
-        label-description="登录QQ后可查看WeGame评分"
+        label-description=""
         :label-width="320"
       >
+        <template #labelDescription>
+          <div>
+            登录QQ后可查看WeGame评分
+            <div style="font-weight: bold; color: #63e2b7">
+              战绩页中如果选择“所有队列”，由于WeGame中不展示训练模式，会导致MVP显示缺失
+            </div>
+          </div>
+        </template>
         <NFlex align="center">
           <NSwitch
             size="small"

@@ -1123,7 +1123,7 @@ defineExpose({
     justify-content: center;
     align-items: center;
     height: 200px;
-    width: 740px;
+    width: 780px;
     background-color: #ffffff05;
     color: rgb(83, 83, 83);
   }

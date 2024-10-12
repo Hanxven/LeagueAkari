@@ -488,18 +488,16 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
         if (ta.settings.enabled && !ta.settings.expired && tab.data.summoner) {
           const players = await tam.searchPlayer(`${tab.data.summoner.gameName}#${tab.data.summoner.tagLine}`)
           if (players && players[0]) {
-            const battles = await tam.getBattleList(players[0], page, pageSize)
-            if (battles) {
+            const battles = await tam.getBattleList(players[0], page, pageSize, queueFilter)
+            if (battles && battles.length !== 0) {
               tab.data.matchHistory.games.forEach((g) => {
                 const battle = battles.find((battle) => g.game.gameId.toString() === battle.game_id)
                 if (battle) {
                   g.battle = markRaw(battle)
-                } else {
-                  console.log(tab.data.matchHistory.games.length)
-                  console.log(battles.length)
-                  console.log(g.game.gameMode)
                 }
               })
+            } else {
+              laNotification.warn('拉取WeGame数据异常', `WeGame找不到相关战绩！`)
             }
           }
         }

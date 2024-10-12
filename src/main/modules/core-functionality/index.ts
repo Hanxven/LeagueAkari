@@ -922,18 +922,21 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
           if (this._tam.state.settings.enabled && !this._tam.state.settings.expired && player.summoner) {
             const players = await this._tam.searchPlayer(`${player.summoner.gameName}#${player.summoner.tagLine}`)
             if (players && players[0]) {
-              const battles = await this._tam.getBattleList(players[0], 1, this.state.settings.matchHistoryLoadCount)
-
-              runInAction(() => {
-                withDetailedFields.forEach((g) => {
-                  const battle = battles?.find((battle) => g.game.gameId.toString() === battle.game_id)
-                  if (battle) {
-                    g.battle = battle
-                  }
+              const battles = await this._tam.getBattleList(players[0], 1, this.state.settings.matchHistoryLoadCount, queueId)
+              if (battles && battles.length !== 0) {
+                runInAction(() => {
+                  withDetailedFields.forEach((g) => {
+                    const battle = battles?.find((battle) => g.game.gameId.toString() === battle.game_id)
+                    if (battle) {
+                      g.battle = battle
+                    }
+                  });
                 });
-              });
 
-              this.sendEvent('update/ongoing-player/match-history', puuid, withDetailedFields)
+                this.sendEvent('update/ongoing-player/match-history', puuid, withDetailedFields)
+              } else {
+                this._mwm.notify.warn('core-functionality', '对局中', 'WeGame找不到相关战绩！')
+              }
             }
           }
         } catch (error) {

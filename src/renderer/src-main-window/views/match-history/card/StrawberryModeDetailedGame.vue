@@ -190,7 +190,7 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
 .detailed-game-card {
   background-color: rgb(45, 45, 45);
   border-radius: 4px;
-  width: 740px;
+  width: 780px;
   overflow: hidden;
 }
 

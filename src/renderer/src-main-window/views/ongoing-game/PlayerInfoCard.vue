@@ -654,7 +654,6 @@ const matches = computed(() => {
     return []
   }
 
-  console.log(matchHistory)
   return withSelfParticipantMatchHistory(matchHistory, puuid)
 })
 </script>

@@ -28,8 +28,8 @@ export class TgpApiRendererModule extends StateSyncModule {
     return this.call('get-battle-detail', area, gameId)
   }
 
-  async getBattleList(player: Player, page: number, pageSize: number) {
-    return await this.call('get-battle-list', player, page, pageSize)
+  async getBattleList(player: Player, page: number, pageSize: number, sgpQueueFilter: number) {
+    return await this.call('get-battle-list', player, page, pageSize, sgpQueueFilter)
   }
 
   async searchPlayer(nickname: string, pageSize: number = 1) {

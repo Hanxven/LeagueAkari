@@ -18,6 +18,16 @@ export class TgpApiModule extends MobxBasedBasicModule {
   private _tlm = new TgpLoginManager()
   private _ta = new TgpApi(this)
 
+  static SGP_QUEUE_TO_TGP_FILTER = new Map([
+    [null, ''],
+    [undefined, ''],
+    [-1, ''],
+    [420, 'rank'],
+    [450, 'aram'],
+    [440, 'team'],
+    [430, 'match']
+  ])
+
   constructor() {
     super('tgp-api')
   }
@@ -92,15 +102,20 @@ export class TgpApiModule extends MobxBasedBasicModule {
     return tgpPlayers.players
   }
 
-  async getBattleList(player: Player, page: number, pageSize: number) {
+  async getBattleList(player: Player, page: number, pageSize: number, sgpQueueFilter: number) {
+    // TODO 所有队列，TGP中无训练模式，导致获取不一致
     const maxPageSize = 10
     let allBattles: Battle[] = []
     let remainingBattles = pageSize
     let currentOffset = (page - 1) * pageSize
+    const filter = TgpApiModule.SGP_QUEUE_TO_TGP_FILTER.get(sgpQueueFilter)
+    if (!TgpApiModule.SGP_QUEUE_TO_TGP_FILTER.has(sgpQueueFilter)) {
+      return allBattles
+    }
 
     while (remainingBattles > 0) {
       const currentSize = Math.min(remainingBattles, maxPageSize)
-      const tgpBattles = (await this._ta.getBattleList(player, currentOffset, currentSize)).data
+      const tgpBattles = (await this._ta.getBattleList(player, currentOffset, currentSize, filter)).data
 
       allBattles = allBattles.concat(tgpBattles.battles)
 
@@ -120,8 +135,8 @@ export class TgpApiModule extends MobxBasedBasicModule {
       return this.searchPlayer(nickname, pageSize)
     })
 
-    this.onCall('get-battle-list', async (player: Player, page: number, pageSize: number) => {
-      return this.getBattleList(player, page, pageSize)
+    this.onCall('get-battle-list', async (player: Player, page: number, pageSize: number, sgpQueueFilter: number) => {
+      return this.getBattleList(player, page, pageSize, sgpQueueFilter)
     })
 
     this.onCall('get-qr-code', async () => {
