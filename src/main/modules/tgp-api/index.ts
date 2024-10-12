@@ -97,12 +97,12 @@ export class TgpApiModule extends MobxBasedBasicModule {
     ])
   }
 
-  async searchPlayer(nickname: string, pageSize: number) {
+  async searchPlayer(nickname: string, pageSize: number = 1) {
     const tgpPlayers = (await this._ta.searchPlayer(nickname, pageSize)).data
     return tgpPlayers.players
   }
 
-  async getBattleList(player: Player, page: number, pageSize: number, sgpQueueFilter: number) {
+  async getBattleList(player: Player, page: number, pageSize: number, sgpQueueFilter: number | null) {
     // TODO 所有队列，TGP中无训练模式，导致获取不一致
     const maxPageSize = 10
     let allBattles: Battle[] = []

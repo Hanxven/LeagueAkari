@@ -188,7 +188,7 @@ export class TgpApi {
     return this._http.post<TgpPlayers>('/SearchPlayer', payload);
   }
 
-  async getBattleList(player: Player, offset: number, count: number, filter: string) {
+  async getBattleList(player: Player, offset: number, count: number, filter: string | undefined) {
     const payload = {
       account_type: 2,
       area: player.area,

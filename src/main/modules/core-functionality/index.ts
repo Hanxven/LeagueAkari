@@ -903,7 +903,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
           const withDetailedFields = games.map((g) => ({
             game: g,
-            battle: undefined,
+            battle: undefined as Battle | undefined,
             isDetailed: true // 现在始终 true
           }))
 
