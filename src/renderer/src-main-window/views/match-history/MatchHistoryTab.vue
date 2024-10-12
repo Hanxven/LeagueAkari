@@ -900,7 +900,7 @@ defineExpose({
 </script>
 
 <style lang="less" scoped>
-@container-width: 1064px;
+@container-width: 1114px;
 
 .player-page {
   position: relative;
