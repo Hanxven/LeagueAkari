@@ -3,6 +3,7 @@ import { Game } from '@shared/types/lcu/match-history'
 import { markRaw } from 'vue'
 
 import { OngoingPlayer, useCoreFunctionalityStore } from './store'
+import { Battle } from '@shared/data-sources/tgp/types'
 
 export class CoreFunctionalityRendererModule extends StateSyncModule {
   constructor() {
@@ -58,10 +59,11 @@ export class CoreFunctionalityRendererModule extends StateSyncModule {
 
     this.onEvent(
       'update/ongoing-player/match-history',
-      (puuid, history: { isDetailed: boolean; game: Game }[]) => {
+      (puuid, history: { isDetailed: boolean; battle: Battle; game: Game }[]) => {
         if (store.ongoingPlayers[puuid]) {
           store.ongoingPlayers[puuid].matchHistory = history.map((g) => ({
             isDetailed: g.isDetailed,
+            battle: g.battle ? markRaw(g.battle) : undefined,
             game: markRaw(g.game)
           }))
         }

@@ -13,6 +13,7 @@ import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { lcuConnectionModule as lcm } from '../lcu-connection'
 import { lcuSyncModule as lcu } from '../lcu-state-sync'
+import { Battle } from '@shared/data-sources/tgp/types'
 
 class CoreFunctionalitySettings {
   fetchAfterGame: boolean = true
@@ -149,6 +150,7 @@ export interface OngoingTeamAnalysis {
 
 export interface MatchHistoryGameWithState {
   game: Game
+  battle?: Battle
   isDetailed: boolean
 }
 

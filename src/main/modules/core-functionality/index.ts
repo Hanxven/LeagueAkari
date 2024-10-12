@@ -37,6 +37,8 @@ import { AppLogger, LogModule } from '../log'
 import { MainWindowModule } from '../main-window'
 import { PlatformModule } from '../win-platform'
 import { CoreFunctionalityState } from './state'
+import { TgpApiModule } from '@main/modules/tgp-api'
+import { Battle } from '@shared/data-sources/tgp/types'
 
 export class CoreFunctionalityModule extends MobxBasedBasicModule {
   public state = new CoreFunctionalityState()
@@ -63,6 +65,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
   private _pm: PlatformModule
   private _mwm: MainWindowModule
   private _edsm: ExternalDataSourceModule
+  private _tam: TgpApiModule
 
   private _isSimulatingKeyboard = false
 
@@ -87,6 +90,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
     this._mwm = this.manager.getModule('main-window')
     this._pm = this.manager.getModule('win-platform')
     this._edsm = this.manager.getModule('external-data-source')
+    this._tam = this.manager.getModule('tgp-api')
 
     await this._setupSettings()
     this._setupStateSync()
@@ -899,6 +903,7 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
           const withDetailedFields = games.map((g) => ({
             game: g,
+            battle: undefined,
             isDetailed: true // 现在始终 true
           }))
 
@@ -910,9 +915,27 @@ export class CoreFunctionalityModule extends MobxBasedBasicModule {
 
           runInAction(() => {
             player.matchHistory = withDetailedFields
+            this.sendEvent('update/ongoing-player/match-history', puuid, withDetailedFields)
           })
 
-          this.sendEvent('update/ongoing-player/match-history', puuid, withDetailedFields)
+          // 异步加载 TGP 对局列表
+          if (this._tam.state.settings.enabled && !this._tam.state.settings.expired && player.summoner) {
+            const players = await this._tam.searchPlayer(`${player.summoner.gameName}#${player.summoner.tagLine}`)
+            if (players && players[0]) {
+              const battles = await this._tam.getBattleList(players[0], 1, this.state.settings.matchHistoryLoadCount)
+
+              runInAction(() => {
+                withDetailedFields.forEach((g) => {
+                  const battle = battles?.find((battle) => g.game.gameId.toString() === battle.game_id)
+                  if (battle) {
+                    g.battle = battle
+                  }
+                });
+              });
+
+              this.sendEvent('update/ongoing-player/match-history', puuid, withDetailedFields)
+            }
+          }
         } catch (error) {
           this._logger.warn(`无法加载战绩, ID: ${puuid} ${formatError(error)}`)
         }

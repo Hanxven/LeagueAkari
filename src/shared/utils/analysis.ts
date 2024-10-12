@@ -1,9 +1,11 @@
 import { Game, Participant, ParticipantIdentity, isPveQueue } from '@shared/types/lcu/match-history'
+import { Battle } from '@shared/data-sources/tgp/types'
 
 const WIN_RATE_TEAM_THRESHOLD = 0.9418
 
 export interface MatchHistoryGameWithState {
   game: Game
+  battle?: Battle
   isDetailed: boolean
 }
 

@@ -16,19 +16,19 @@
     <div
       v-else-if="mvp"
       class="ring"
-      :class="{ round: true }"
+      :class="{ round: round }"
       :style="{
-        borderColor: '#f9e600e6',
-        borderWidth: '4px'
+        borderColor: ringColor || '#f9e600e6',
+        borderWidth: `${ringWidth}px` || '4px'
       }"
     ></div>
     <div
       v-else-if="svp"
       class="ring"
-      :class="{ round: true }"
+      :class="{ round: round }"
       :style="{
-        borderColor: 'rgba(204,204,204,0.98)',
-        borderWidth: '4px'
+        borderColor: ringColor || 'rgba(204,204,204,0.98)',
+        borderWidth: `${ringWidth}px` || '4px'
       }"
     ></div>
   </div>

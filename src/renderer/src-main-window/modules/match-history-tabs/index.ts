@@ -14,7 +14,7 @@ import { useTgpApiStore } from '@renderer-shared/modules/tgp-api/store'
 import { laNotification } from '@renderer-shared/notification'
 import { getPlayerAccountNameset } from '@renderer-shared/rc-http-api/rc-api'
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { Battle, BattleDetail } from '@shared/data-sources/tgp/types'
+import { BattleDetail } from '@shared/data-sources/tgp/types'
 import { Game, MatchHistory } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
 import { TGP_AREA_ID_SGP } from '@shared/utils/platform-names'
@@ -456,20 +456,9 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           }
         }
 
-        // 获取TGP对局列表（少量信息）
-        let battles: Battle[]
-        if (ta.settings.enabled && !ta.settings.expired) {
-          if (tab.data.summoner) {
-            const players = await tam.searchPlayer(`${tab.data.summoner.gameName}#${tab.data.summoner.tagLine}`)
-            if (players && players[0]) {
-              battles = await tam.getBattleList(players[0], page, pageSize)
-            }
-          }
-        }
-
         const matchHistoryWithState = matchHistory.games.games.map((g) => ({
           game: tab.data.detailedGamesCache.get(g.gameId) || markRaw(g),
-          battle: battles?.find((battle) => g.gameId.toString() === battle.game_id),
+          battle: undefined,
           isDetailed: tab.data.detailedGamesCache.get(g.gameId) !== undefined,
           isLoading: false,
           hasError: false,
@@ -494,6 +483,26 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
           },
           {} as Record<number, MatchHistoryGameTabCard>
         )
+
+        // 加载 TGP 对局列表
+        if (ta.settings.enabled && !ta.settings.expired && tab.data.summoner) {
+          const players = await tam.searchPlayer(`${tab.data.summoner.gameName}#${tab.data.summoner.tagLine}`)
+          if (players && players[0]) {
+            const battles = await tam.getBattleList(players[0], page, pageSize)
+            if (battles) {
+              tab.data.matchHistory.games.forEach((g) => {
+                const battle = battles.find((battle) => g.game.gameId.toString() === battle.game_id)
+                if (battle) {
+                  g.battle = markRaw(battle)
+                } else {
+                  console.log(tab.data.matchHistory.games.length)
+                  console.log(battles.length)
+                  console.log(g.game.gameMode)
+                }
+              })
+            }
+          }
+        }
 
         // 异步加载页面战绩
         if (cf.settings.fetchDetailedGame) {

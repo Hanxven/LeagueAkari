@@ -87,33 +87,41 @@ export class TgpApiModule extends MobxBasedBasicModule {
     ])
   }
 
+  async searchPlayer(nickname: string, pageSize: number) {
+    const tgpPlayers = (await this._ta.searchPlayer(nickname, pageSize)).data
+    return tgpPlayers.players
+  }
+
+  async getBattleList(player: Player, page: number, pageSize: number) {
+    const maxPageSize = 10
+    let allBattles: Battle[] = []
+    let remainingBattles = pageSize
+    let currentOffset = (page - 1) * pageSize
+
+    while (remainingBattles > 0) {
+      const currentSize = Math.min(remainingBattles, maxPageSize)
+      const tgpBattles = (await this._ta.getBattleList(player, currentOffset, currentSize)).data
+
+      allBattles = allBattles.concat(tgpBattles.battles)
+
+      remainingBattles -= currentSize
+      currentOffset += currentSize
+    }
+
+    return allBattles
+  }
+
   private _setupMethodCall() {
     this.onCall('get-battle-detail', async (area: string, gameId: number) => {
       return (await this._ta.getBattleDetail(area, gameId)).data
     })
 
     this.onCall('search-player', async (nickname: string, pageSize: number) => {
-      const tgpPlayers = (await this._ta.searchPlayer(nickname, pageSize)).data
-      return tgpPlayers.players
+      return this.searchPlayer(nickname, pageSize)
     })
 
     this.onCall('get-battle-list', async (player: Player, page: number, pageSize: number) => {
-      const maxPageSize = 10
-      let allBattles: Battle[] = []
-      let remainingBattles = pageSize
-      let currentOffset = (page - 1) * pageSize
-
-      while (remainingBattles > 0) {
-        const currentSize = Math.min(remainingBattles, maxPageSize)
-        const tgpBattles = (await this._ta.getBattleList(player, currentOffset, currentSize)).data
-
-        allBattles = allBattles.concat(tgpBattles.battles)
-
-        remainingBattles -= currentSize
-        currentOffset += currentSize
-      }
-
-      return allBattles
+      return this.getBattleList(player, page, pageSize)
     })
 
     this.onCall('get-qr-code', async () => {

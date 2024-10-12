@@ -77,6 +77,7 @@
           <div class="champion">
             <ChampionIcon
               class="champion-icon"
+              round
               :mvp="battle?.was_mvp"
               :svp="battle?.was_svp"
               :champion-id="self.participant.championId"

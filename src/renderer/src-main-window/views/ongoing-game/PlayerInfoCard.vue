@@ -411,7 +411,7 @@
                   : emits('showGameById', item.game.gameId, puuid)
             "
           >
-            <ChampionIcon :champion-id="item.selfParticipant.championId" class="champion-icon" />
+            <ChampionIcon :ring-width="2" :mvp="item.battle?.was_mvp" :svp="item.battle?.was_svp" :champion-id="item.selfParticipant.championId" class="champion-icon" />
             <div class="queue-name-date">
               <div class="queue-name">
                 {{ gameData.queues[item.game.queueId]?.name || item.game.queueId }}
@@ -654,6 +654,7 @@ const matches = computed(() => {
     return []
   }
 
+  console.log(matchHistory)
   return withSelfParticipantMatchHistory(matchHistory, puuid)
 })
 </script>
