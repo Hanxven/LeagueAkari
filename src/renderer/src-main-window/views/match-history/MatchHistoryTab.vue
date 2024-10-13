@@ -433,7 +433,7 @@
               class="match-history-card-item"
               @set-show-detailed-game="handleToggleShowDetailedGame"
               @load-detailed-game="(gameId) => mhm.fetchTabDetailedGame(tab.puuid, gameId)"
-              @fetch-tgp-score="(gameId) => mhm.fetchTgpScore(tab.puuid, gameId)"
+              @fetch-tgp-score="(gameId) => mhm.fetchTgpScore(gameId)"
               @to-summoner="(puuid, newTab) => handleToSummoner(puuid, newTab)"
               :self-puuid="tab.puuid"
               :is-detailed="g.isDetailed"

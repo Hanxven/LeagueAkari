@@ -17,7 +17,7 @@ import { EMPTY_PUUID } from '@shared/constants/common'
 import { BattleDetail } from '@shared/data-sources/tgp/types'
 import { Game, MatchHistory } from '@shared/types/lcu/match-history'
 import { summonerName } from '@shared/utils/name'
-import { TGP_AREA_ID_SGP } from '@shared/utils/platform-names'
+import { TGP_AREA_ID, TGP_AREA_ID_SGP } from '@shared/utils/platform-names'
 import { AxiosError } from 'axios'
 import { computed, markRaw, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -232,18 +232,33 @@ export class MatchHistoryTabsRendererModule extends LeagueAkariRendererModule {
     return null
   }
 
-  async fetchTgpScore(puuid: string, gameId: number) {
+  async fetchTgpScore(gameId: number, game?: Game | null) {
     const mh = useMatchHistoryTabsStore()
     const ta = useTgpApiStore()
 
+    let battleDetail: BattleDetail | null = null;
+
+    // 对局页
+    if (game) {
+      const tgpGame = await tam.getBattleDetail(TGP_AREA_ID[game.platformId][0], gameId)
+      if (tgpGame) {
+        battleDetail = tgpGame.battle_detail
+        if (battleDetail) {
+          this._mapTgpScoreToParticipant(battleDetail, game)
+        }
+      }
+      return
+    }
+
+    // 战绩页
     if (mh.currentTab) {
+      console.log(5)
       if (ta.settings.enabled && !ta.settings.expired) {
         const match = mh.currentTab.data.matchHistory._gamesMap[gameId]
         if (match.hasTgpScore) {
           return
         }
 
-        let battleDetail: BattleDetail | null = null;
         if (mh.currentTab.data.detailedBattleCache.has(gameId)) {
           battleDetail = mh.currentTab.data.detailedBattleCache.get(gameId)!
         } else {

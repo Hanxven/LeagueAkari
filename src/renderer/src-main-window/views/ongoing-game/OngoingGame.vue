@@ -310,11 +310,14 @@ const handleHighlightSubTeam = (preMadeTeamId: string, highlight: boolean) => {
 }
 
 const isStandaloneMatchHistoryCardShow = ref(false)
-const handleShowGame = (game: Game, puuid: string) => {
+const handleShowGame = async (game: Game, puuid: string) => {
   showingGame.gameId = 0
   showingGame.game = game
   showingGame.selfPuuid = puuid
   isStandaloneMatchHistoryCardShow.value = true
+
+  await mhm.fetchTgpScore(game.gameId, game);
+  showingGame.game = { ...game }
 }
 
 const handleShowGameById = (id: number, selfPuuid: string) => {
