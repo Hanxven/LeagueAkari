@@ -326,4 +326,9 @@ export class RadixMatcher {
 
     return result
   }
+
+  clear() {
+    this._root = new RadixMatcherNode(RadixMatcherNodeType.NORMAL)
+    this._staticRouteMap.clear()
+  }
 }

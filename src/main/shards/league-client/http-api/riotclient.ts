@@ -1,0 +1,13 @@
+import { AxiosInstance } from 'axios'
+
+export class RiotClientHttpApi {
+  constructor(private _http: AxiosInstance) {}
+
+  killUx() {
+    return this._http.post('/riotclient/kill-ux')
+  }
+
+  launchUx() {
+    return this._http.post('/riotclient/launch-ux')
+  }
+}

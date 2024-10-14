@@ -288,6 +288,10 @@ export interface MatchHistoryGamesAnalysis {
   killParticipationRate: number
   kda: number
 
+  kills: number
+  deaths: number
+  assists: number
+
   // 补兵占比 (包括野怪和小兵)
   csShareToTop: number
   csShareOfTeam: number
@@ -341,6 +345,10 @@ export interface MatchHistoryGamesAnalysisSummary {
 
   averageGoldShareToTop: number
   averageGoldShareOfTeam: number
+
+  totalKills: number
+  totalDeaths: number
+  totalAssists: number
 
   win: number
   lose: number
@@ -510,7 +518,10 @@ export function analyzeMatchHistory(
       // KDA 系列
       killParticipationRate: 0,
 
-      kda: 0,
+      kda: (watashi.stats.kills + watashi.stats.assists) / (watashi.stats.deaths || 1),
+      kills: watashi.stats.kills,
+      deaths: watashi.stats.deaths,
+      assists: watashi.stats.assists,
 
       // 补兵占比 (包括野怪和小兵)
       csShareToTop: 0,
@@ -694,7 +705,6 @@ export function analyzeMatchHistory(
 
     gameAnalysis.killParticipationRate =
       (watashi.stats.kills + watashi.stats.assists) / (kills || 1)
-    gameAnalysis.kda = (watashi.stats.kills + watashi.stats.assists) / (watashi.stats.deaths || 1)
 
     gameAnalysis.csShareToTop =
       (watashi.stats.totalMinionsKilled + watashi.stats.neutralMinionsKilled) / (maxCs || 1)
@@ -796,6 +806,10 @@ export function analyzeMatchHistory(
     averageGoldShareToTop: 0,
     averageGoldShareOfTeam: 0,
 
+    totalKills: 0,
+    totalDeaths: 0,
+    totalAssists: 0,
+
     winRate: win / (win + lose),
     win: win,
     lose: lose,
@@ -843,7 +857,6 @@ export function analyzeMatchHistory(
   let totalTrueDamageTakenOfTeam = 0
 
   let totalKillParticipationRate = 0
-  let totalKda = 0
 
   let totalCsShareToTop = 0
   let totalCsShareOfTeam = 0
@@ -884,7 +897,10 @@ export function analyzeMatchHistory(
     totalTrueDamageTakenOfTeam += analysis.trueDamageTakenShareOfTeam
 
     totalKillParticipationRate += analysis.killParticipationRate
-    totalKda += analysis.kda
+
+    summary.totalKills += analysis.kills
+    summary.totalDeaths += analysis.deaths
+    summary.totalAssists += analysis.assists
 
     totalCsShareToTop += analysis.csShareToTop
     totalCsShareOfTeam += analysis.csShareOfTeam
@@ -944,7 +960,7 @@ export function analyzeMatchHistory(
 
   summary.averageKillParticipationRate = totalKillParticipationRate / (gameAnalyses.length || 1)
 
-  summary.averageKda = totalKda / (gameAnalyses.length || 1)
+  summary.averageKda = (summary.totalKills + summary.totalAssists) / (summary.totalDeaths || 1)
 
   summary.averageCsShareToTop = totalCsShareToTop / (gameAnalyses.length || 1)
   summary.averageCsShareOfTeam = totalCsShareOfTeam / (gameAnalyses.length || 1)
@@ -975,18 +991,22 @@ export function analyzeTeamMatchHistory(
   }
 
   let totalWinRate = 0
-  let totalKda = 0
+  let totalKills = 0
+  let totalDeaths = 0
+  let totalAssists = 0
   let totalAkariScore = 0
 
   for (const analysis of analyses) {
     totalWinRate += analysis.summary.winRate
-    totalKda += analysis.summary.averageKda
+    totalKills += analysis.summary.totalKills
+    totalDeaths += analysis.summary.totalDeaths
+    totalAssists += analysis.summary.totalAssists
     totalAkariScore += analysis.akariScore.total
   }
 
   return {
     averageWinRate: totalWinRate / analyses.length,
-    averageKda: totalKda / analyses.length,
+    averageKda: (totalKills + totalAssists) / (totalDeaths || 1),
     averageAkariScore: totalAkariScore / analyses.length
   }
 }

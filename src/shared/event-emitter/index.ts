@@ -48,4 +48,8 @@ export class RadixEventEmitter {
       }
     }
   }
+
+  clear() {
+    this.matcher.clear()
+  }
 }

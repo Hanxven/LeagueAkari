@@ -41,6 +41,7 @@ const leagueClientCustomTags = new Set([
 
 export default defineConfig({
   main: {
+    // https://electron-vite.org/guide/typescript-decorator
     plugins: [swcPlugin(), externalizeDepsPlugin()],
     build: {
       minify

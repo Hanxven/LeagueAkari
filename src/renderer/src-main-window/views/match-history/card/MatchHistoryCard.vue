@@ -238,7 +238,7 @@
           v-else-if="game.gameMode === 'STRAWBERRY'"
           @to-summoner="(puuid, newTab) => emits('toSummoner', puuid, newTab)"
         />
-        <NormalNodeDetailedGame
+        <NormalModeDetailedGame
           class="detailed-game"
           v-else
           :game="game"
@@ -277,7 +277,7 @@ import { computed, ref } from 'vue'
 import '../lol-view.less'
 import CherryModeDetailedGame from './CherryModeDetailedGame.vue'
 import MiscellaneousPanel from './MiscellaneousPanel.vue'
-import NormalNodeDetailedGame from './NormalModeDetailedGame.vue'
+import NormalModeDetailedGame from './NormalModeDetailedGame.vue'
 import StrawberryModeDetailedGame from './StrawberryModeDetailedGame.vue'
 
 const props = defineProps<{
