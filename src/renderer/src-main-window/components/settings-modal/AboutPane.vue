@@ -11,7 +11,7 @@
         />
       </div>
       <div class="about-para">
-        <LeagueAkariSpan bold @click="() => handleClickEasterEgg()" /> (Version {{ app.version }})
+        <LeagueAkariSpan bold @click="() => handleClickEasterEgg()" /> (联盟阿卡林，Version {{ as.version }})
         是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖
         <a target="_blank" href="https://riot-api-libraries.readthedocs.io/en/latest/lcu.html"
           >League Client Update (LCU)</a
@@ -42,13 +42,13 @@
         <ControlItem
           class="control-item-margin"
           label="检查更新"
-          :label-description="`从下载源中 (${UPDATE_SOURCE_MAP[au.settings.downloadSource]}) 中检查更新`"
+          :label-description="`从下载源中 (${UPDATE_SOURCE_MAP[sus.settings.downloadSource]}) 中检查更新`"
           :label-width="180"
         >
           <NFlex align="center">
             <NButton
               size="small"
-              :loading="au.isCheckingUpdates"
+              :loading="sus.isCheckingUpdates"
               secondary
               type="primary"
               @click="() => handleCheckUpdates()"
@@ -56,18 +56,18 @@
             >
             <NButton
               size="small"
-              v-if="au.newUpdates"
+              v-if="sus.newUpdates"
               secondary
               @click="() => handleShowUpdateModal()"
               >新版本内容</NButton
             >
-            <span v-if="au.lastCheckAt" style="font-size: 12px"
-              >最近检查 {{ dayjs(au.lastCheckAt).locale('zh-cn').fromNow() }}</span
+            <span v-if="sus.lastCheckAt" style="font-size: 12px"
+              >最近检查 {{ dayjs(sus.lastCheckAt).locale('zh-cn').fromNow() }}</span
             >
           </NFlex>
         </ControlItem>
         <ControlItem
-          v-if="au.updateProgressInfo"
+          v-if="sus.updateProgressInfo"
           class="control-item-margin"
           label="更新流程"
           label-description="正在进行的更新流程"
@@ -82,14 +82,14 @@
             <NStep>
               <template #title><span class="step-title">下载更新包</span></template>
               <div class="step-description">
-                已完成 {{ (au.updateProgressInfo.downloadingProgress * 100).toFixed() }} %
+                已完成 {{ (sus.updateProgressInfo.downloadingProgress * 100).toFixed() }} %
               </div>
-              <div class="step-description" v-if="au.updateProgressInfo.phase === 'downloading'">
-                剩余 {{ formatTime(au.updateProgressInfo.downloadTimeLeft) }}
+              <div class="step-description" v-if="sus.updateProgressInfo.phase === 'downloading'">
+                剩余 {{ formatTime(sus.updateProgressInfo.downloadTimeLeft) }}
               </div>
               <div
                 class="step-description"
-                v-if="au.updateProgressInfo.phase === 'download-failed'"
+                v-if="sus.updateProgressInfo.phase === 'download-failed'"
               >
                 下载出错
               </div>
@@ -97,9 +97,9 @@
             <NStep>
               <template #title><span class="step-title">解压更新包</span></template>
               <div class="step-description">
-                已完成 {{ (au.updateProgressInfo.unpackingProgress * 100).toFixed() }} %
+                已完成 {{ (sus.updateProgressInfo.unpackingProgress * 100).toFixed() }} %
               </div>
-              <div class="step-description" v-if="au.updateProgressInfo.phase === 'unpack-failed'">
+              <div class="step-description" v-if="sus.updateProgressInfo.phase === 'unpack-failed'">
                 解压出错
               </div>
             </NStep>
@@ -119,7 +119,7 @@
             (processStatus.current === 1 && processStatus.status !== 'error')
           "
         >
-          <NButton size="small" secondary @click="() => aum.openDownloadDir()">打开目录</NButton>
+          <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">打开目录</NButton>
         </ControlItem>
       </NCard>
       <div class="about-para copyright">© 2024 Hanxven. 本软件是开源软件，遵循 MIT 许可证。</div>
@@ -130,9 +130,10 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import { useAppStore } from '@renderer-shared/modules/app/store'
-import { autoUpdateRendererModule as aum } from '@renderer-shared/modules/auto-update'
-import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
+import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
+import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import dayjs from 'dayjs'
 import { NButton, NCard, NFlex, NScrollbar, NStep, NSteps, useMessage } from 'naive-ui'
 import { computed, h, inject } from 'vue'
@@ -142,8 +143,9 @@ const UPDATE_SOURCE_MAP = {
   gitee: 'Gitee'
 }
 
-const au = useAutoUpdateStore()
-const app = useAppStore()
+const as = useAppCommonStore()
+const sus = useSelfUpdateStore()
+const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
 
 const message = useMessage()
 
@@ -155,7 +157,7 @@ const handleClickEasterEgg = () => {
 }
 
 const handleCheckUpdates = async () => {
-  const result = await aum.checkUpdates()
+  const result = await su.checkUpdates()
   switch (result) {
     case 'no-updates':
       message.success('当前已是最新版本')
@@ -194,14 +196,14 @@ const formatTime = (seconds: number) => {
 }
 
 const processStatus = computed(() => {
-  if (!au.updateProgressInfo) {
+  if (!sus.updateProgressInfo) {
     return {
       current: 0,
       status: 'wait' as any // utilize 'any' to suppress type error
     }
   }
 
-  switch (au.updateProgressInfo.phase) {
+  switch (sus.updateProgressInfo.phase) {
     case 'downloading':
       return {
         current: 1,

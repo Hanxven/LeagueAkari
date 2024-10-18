@@ -1,40 +1,65 @@
 import { queryUxCommandLine, queryUxCommandLineNative } from '@main/utils/ux-cmd'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { formatError } from '@shared/utils/errors'
 
-import { CommonMain } from '../common'
+import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
-import { AkariLoggerInstance, LoggerFactoryMain } from '../logger-factory'
-import { LeagueClientUxState } from './state'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
+import { MobxUtilsMain } from '../mobx-utils'
+import { SettingFactoryMain } from '../setting-factory'
+import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { LeagueClientUxSettings, LeagueClientUxState } from './state'
 
 /**
  * 对于 League Client Ux 进程的相关工具集, 比如检测命令行
  */
 export class LeagueClientUxMain implements IAkariShardInitDispose {
   static id = 'league-client-ux-main'
-  static dependencies = ['akari-ipc-main', 'mobx-utils-main', 'common-main', 'logger-factory-main']
+  static dependencies = [
+    'akari-ipc-main',
+    'mobx-utils-main',
+    'app-common-main',
+    'logger-factory-main',
+    'setting-factory-main'
+  ]
 
   static UX_PROCESS_NAME = 'LeagueClientUx.exe'
   static CLIENT_CMD_POLL_INTERVAL = 2000
 
+  public readonly settings = new LeagueClientUxSettings()
   public readonly state = new LeagueClientUxState()
 
   private readonly _ipc: AkariIpcMain
-  private readonly _common: CommonMain
+  private readonly _common: AppCommonMain
   private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _log: AkariLoggerInstance
+  private readonly _settingFactory: SettingFactoryMain
+  private readonly _log: AkariLogger
+  private readonly _mobx: MobxUtilsMain
+  private readonly _setting: SetterSettingService
 
   private _pollTimerId: NodeJS.Timeout | null = null
 
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
-    this._common = deps['common-main']
+    this._common = deps['app-common-main']
     this._loggerFactory = deps['logger-factory-main']
+    this._mobx = deps['mobx-utils-main']
+    this._settingFactory = deps['setting-factory-main']
     this._log = this._loggerFactory.create(LeagueClientUxMain.id)
+    this._setting = this._settingFactory.create(
+      LeagueClientUxMain.id,
+      {
+        useWmic: { default: this.settings.useWmic }
+      },
+      this.settings
+    )
   }
 
   async onInit() {
     this._handlePollExistingUx()
+
+    await this._setting.applyToState()
+    this._mobx.propSync(LeagueClientUxMain.id, 'settings', this.settings, ['useWmic'])
+    this._mobx.propSync(LeagueClientUxMain.id, 'state', this.state, ['launchedClients'])
   }
 
   async onDispose() {
@@ -68,12 +93,12 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
       )
     } catch (error) {
       this._ipc.sendEvent(LeagueClientUxMain.id, 'error-polling')
-      this._log.error(`获取 Ux 命令行信息时失败 ${formatError(error)}`)
+      this._log.error(`获取 Ux 命令行信息时失败`, error)
     }
   }
 
   private _queryUxCommandLine() {
-    if (this.state.settings.useWmic) {
+    if (this.settings.useWmic) {
       if (!this._common.state.isAdministrator) {
         return []
       }

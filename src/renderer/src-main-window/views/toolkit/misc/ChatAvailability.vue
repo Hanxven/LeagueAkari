@@ -9,9 +9,9 @@
     >
       <NRadioGroup
         size="small"
-        :disabled="!chat.me"
+        :disabled="!lcs.chat.me"
         name="radio-group"
-        :value="chat.me?.availability"
+        :value="lcs.chat.me?.availability"
         @update:value="(a) => handleChangeAvailability(a)"
       >
         <NFlex :size="4">
@@ -30,16 +30,19 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { AvailabilityType, changeAvailability } from '@renderer-shared/http-api/chat'
-import { useChatStore } from '@renderer-shared/modules/lcu-state-sync/chat'
 import { laNotification } from '@renderer-shared/notification'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { AvailabilityType } from '@shared/http-api-axios-helper/league-client/chat'
 import { NCard, NFlex, NRadio, NRadioGroup } from 'naive-ui'
 
-const chat = useChatStore()
+const lcs = useLeagueClientStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const handleChangeAvailability = async (availability: string) => {
   try {
-    await changeAvailability(availability as AvailabilityType)
+    await lc.api.chat.changeAvailability(availability as AvailabilityType)
   } catch (error) {
     laNotification.warn('聊天状态', `尝试修改状态失败`, error)
   }

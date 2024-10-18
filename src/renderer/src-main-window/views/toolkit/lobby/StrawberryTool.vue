@@ -1,7 +1,7 @@
 <template>
   <NCard size="small">
     <template #header><span class="card-header-title">无尽狂潮</span></template>
-    <div v-if="lobby.lobby?.gameConfig.gameMode !== 'STRAWBERRY'" style="font-size: 13px">
+    <div v-if="lcs.lobby.lobby?.gameConfig.gameMode !== 'STRAWBERRY'" style="font-size: 13px">
       当前未处于无尽狂潮房间中
     </div>
     <template v-else>
@@ -86,35 +86,28 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { getStrawberryHub } from '@renderer-shared/http-api/game-data'
-import {
-  getAccountScopeLoadouts,
-  setStrawberryDifficulty
-} from '@renderer-shared/http-api/loadouts'
-import { setPlayerSlotsStrawberry1, setStrawberryMapId } from '@renderer-shared/http-api/lobby'
-import { championIconUrl } from '@renderer-shared/modules/game-data'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { useLobbyStore } from '@renderer-shared/modules/lcu-state-sync/lobby'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
 import {
   AccountScopeLoadouts,
   ChampionSimple,
   StrawberryHub,
   maybePveChampion
-} from '@shared/types/lcu/game-data'
+} from '@shared/types/league-client/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NSelect, SelectRenderLabel, useMessage } from 'naive-ui'
-import { h, onMounted, shallowRef, watchEffect } from 'vue'
+import { h, shallowRef, watchEffect } from 'vue'
 import { computed, ref } from 'vue'
 
-const lobby = useLobbyStore()
-const gameData = useGameDataStore()
-const lc = useLcuConnectionStore()
+const lcs = useLeagueClientStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 let isInitialized = false
 
 watchEffect(() => {
-  if (lc.state !== 'connected') {
+  if (lcs.connectionState !== 'connected') {
     isInitialized = false
   }
 })
@@ -133,8 +126,8 @@ const doIfNotInitialized = async () => {
   }
 
   try {
-    strawberryMapData.value = (await getStrawberryHub()).data
-    accountScopeLoadouts.value = (await getAccountScopeLoadouts()).data
+    strawberryMapData.value = (await lc.api.gameData.getStrawberryHub()).data
+    accountScopeLoadouts.value = (await lc.api.loadouts.getAccountScopeLoadouts()).data
     isInitialized = true
   } catch (error) {
     throw error
@@ -171,7 +164,7 @@ const strawberryChampions = computed(() => {
   const strawberryChampions: ChampionSimple[] = []
   const otherChampions: ChampionSimple[] = []
 
-  Object.values(gameData.champions).forEach((c) => {
+  Object.values(lcs.gameData.champions).forEach((c) => {
     if (maybePveChampion(c.id)) {
       strawberryChampions.push(c)
     } else {
@@ -242,7 +235,11 @@ const setChampion = async () => {
       difficulty = currentDifficulty.value
     }
 
-    await setPlayerSlotsStrawberry1(currentChampionId.value, mapId || 1, difficulty || 1)
+    await lc.api.lobby.setPlayerSlotsStrawberry1(
+      currentChampionId.value,
+      mapId || 1,
+      difficulty || 1
+    )
     message.success('请求已发送')
   } catch (error) {
     message.warning(`尝试设置英雄时发生错误: ${(error as any).message}`)
@@ -264,7 +261,7 @@ const setMap = async () => {
 
   try {
     const [contentId, itemIdRaw] = currentMapUnionId.value.split(',')
-    await setStrawberryMapId({ contentId, itemId: Number(itemIdRaw) })
+    await lc.api.lobby.setStrawberryMapId({ contentId, itemId: Number(itemIdRaw) })
     message.success('请求已发送')
   } catch (error) {
     message.warning(`尝试设置地图时发生错误: ${(error as any).message}`)
@@ -308,7 +305,7 @@ const setDifficulty = async () => {
 
   try {
     const loadoutsContentId = accountScopeLoadouts.value[0].id
-    await setStrawberryDifficulty(loadoutsContentId, currentDifficulty.value)
+    await lc.api.loadouts.setStrawberryDifficulty(loadoutsContentId, currentDifficulty.value)
     message.success('请求已发送')
   } catch (error) {
     message.warning(`尝试设置难度时发生错误: ${(error as any).message}`)

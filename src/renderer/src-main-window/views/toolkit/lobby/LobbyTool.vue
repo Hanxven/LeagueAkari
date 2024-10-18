@@ -27,7 +27,7 @@
           v-model:value="botSettings.team"
           :options="teamOptions"
         ></NSelect>
-        <NButton :disabled="gameflow.phase !== 'Lobby'" @click="handleAddBot" size="small"
+        <NButton :disabled="lcs.gameflow.phase !== 'Lobby'" @click="handleAddBot" size="small"
           >添加</NButton
         >
       </div>
@@ -51,7 +51,7 @@
         ></NSelect>
         <NButton
           :disabled="
-            lc.state !== 'connected' ||
+            lcs.connectionState !== 'connected' ||
             queueLobbySettings.queueId === null ||
             Number.isNaN(Number(queueLobbySettings.queueId))
           "
@@ -66,7 +66,7 @@
         <NButton
           @click="handleCreatePractice5v5"
           size="small"
-          :disabled="lc.state !== 'connected'"
+          :disabled="lcs.connectionState !== 'connected'"
           :loading="isCreatingPractice5v5"
           >创建</NButton
         >
@@ -84,25 +84,16 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import {
-  addBot,
-  createPractice5x5,
-  createQueueLobby,
-  getAvailableBots,
-  getEligiblePartyQueues,
-  getEligibleSelfQueues
-} from '@renderer-shared/http-api/lobby'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { laNotification } from '@renderer-shared/notification'
-import { AvailableBot, QueueEligibility } from '@shared/types/lcu/lobby'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { AvailableBot, QueueEligibility } from '@shared/types/league-client/lobby'
 import { NButton, NCard, NFlex, NInput, NSelect, useMessage } from 'naive-ui'
 import { computed, reactive, ref, shallowRef } from 'vue'
 
-const gameflow = useGameflowStore()
-const gameData = useGameDataStore()
-const lc = useLcuConnectionStore()
+const lcs = useLeagueClientStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const getRandomLobbyName = () => {
   return `AKARI_${(Date.now() % 10000000) + 10000000}`
@@ -122,7 +113,7 @@ const handleCreatePractice5v5 = async () => {
       practice5v5LobbyName.value = getRandomLobbyName()
     }
 
-    await createPractice5x5(practice5v5LobbyName.value)
+    await lc.api.lobby.createPractice5x5(practice5v5LobbyName.value)
     practice5v5LobbyName.value = getRandomLobbyName()
   } catch (error) {
     laNotification.warn('房间工具', '尝试创建房间失败', error)
@@ -136,7 +127,7 @@ const handleAddBot = async () => {
     return
   }
   try {
-    await addBot(botSettings.difficulty, botSettings.championId, botSettings.team)
+    await lc.api.lobby.addBot(botSettings.difficulty, botSettings.championId, botSettings.team)
   } catch (error) {
     laNotification.warn('房间工具', '尝试添加人机失败', error)
   }
@@ -146,10 +137,10 @@ const eligiblePartyQueues = shallowRef<QueueEligibility[]>([])
 const eligibleSelfQueues = shallowRef<QueueEligibility[]>([])
 
 const handleLoadEligibleQueues = async (show: boolean) => {
-  if (show && lc.state === 'connected') {
+  if (show && lcs.connectionState === 'connected') {
     try {
-      const { data: d1 } = await getEligiblePartyQueues()
-      const { data: d2 } = await getEligibleSelfQueues()
+      const { data: d1 } = await lc.api.lobby.getEligiblePartyQueues()
+      const { data: d2 } = await lc.api.lobby.getEligibleSelfQueues()
 
       eligiblePartyQueues.value = d1
       eligibleSelfQueues.value = d2
@@ -160,7 +151,7 @@ const handleLoadEligibleQueues = async (show: boolean) => {
 }
 
 const queueOptions = computed(() => {
-  if (gameData.queues === null) {
+  if (lcs.gameData.queues === null) {
     return []
   }
 
@@ -170,7 +161,7 @@ const queueOptions = computed(() => {
   const availableQueues: number[] = []
   const unavailableQueues: number[] = []
 
-  for (const v of Object.values(gameData.queues)) {
+  for (const v of Object.values(lcs.gameData.queues)) {
     if (eligiblePartyMap.has(v.id) && eligibleSelfMap.has(v.id)) {
       availableQueues.push(v.id)
     } else {
@@ -184,7 +175,7 @@ const queueOptions = computed(() => {
       type: 'group',
       children: availableQueues.map((k) => ({
         value: k,
-        label: `${gameData.queues[k].name} (${k})`
+        label: `${lcs.gameData.queues[k].name} (${k})`
       }))
     },
     {
@@ -192,7 +183,7 @@ const queueOptions = computed(() => {
       type: 'group',
       children: unavailableQueues.map((k) => ({
         value: k,
-        label: `${gameData.queues[k].name} (${k})`
+        label: `${lcs.gameData.queues[k].name} (${k})`
       }))
     }
   ]
@@ -283,7 +274,7 @@ const handleCreateQueueLobby = async () => {
   }
 
   try {
-    await createQueueLobby(queueLobbySettings.queueId)
+    await lc.api.lobby.createQueueLobby(queueLobbySettings.queueId)
   } catch (error) {
     laNotification.warn('房间工具', `尝试创建队列房间失败，${(error as any).message}`, error)
   }
@@ -293,9 +284,9 @@ const handleCreateQueueLobby = async () => {
 let acknowledged = false
 const message = useMessage()
 const handleLoadAvailableBots = async (show: boolean) => {
-  if (show && lc.state === 'connected') {
+  if (show && lcs.connectionState === 'connected') {
     try {
-      const bots = (await getAvailableBots()).data
+      const bots = (await lc.api.lobby.getAvailableBots()).data
       availableBots.value = bots
 
       if (!acknowledged && bots.length === 0) {

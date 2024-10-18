@@ -30,7 +30,7 @@
           :key="c.championId"
           class="champion-image"
           :class="{
-            'champion-image-invalid': !cs.currentPickableChampionIds.has(c.championId)
+            'champion-image-invalid': !lcs.champSelect.currentPickableChampionIds.has(c.championId)
           }"
           :src="championIconUrl(c.championId)"
           @click="() => handleBenchSwap(c.championId)"
@@ -42,48 +42,48 @@
       </div>
     </div>
     <div style="font-size: 13px" v-else>
-      {{ gameflow.phase === 'ChampSelect' ? '当前模式不可用' : '未处于英雄选择过程中' }}
+      {{ lcs.gameflow.phase === 'ChampSelect' ? '当前模式不可用' : '未处于英雄选择过程中' }}
     </div>
   </NCard>
 </template>
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { championIconUrl } from '@renderer-shared/modules/game-data'
-import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
-import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
-import { benchSwap, reroll } from '@renderer-shared/http-api/champ-select'
 import { laNotification } from '@renderer-shared/notification'
-import { isBenchEnabledSession } from '@shared/types/lcu/champ-select'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { NButton, NCard, NDivider } from 'naive-ui'
 import { computed, ref } from 'vue'
 
-const cs = useChampSelectStore()
-const gameflow = useGameflowStore()
+const lcs = useLeagueClientStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const benchChampions = computed(() => {
-  if (!isBenchEnabledSession(cs.session)) {
+  if (!isBenchEnabledSession(lcs.champSelect.session)) {
     return null
   }
 
-  return cs.session.benchChampions
+  return lcs.champSelect.session.benchChampions
 })
 
 const rerollsRemaining = computed(() => {
-  if (!isBenchEnabledSession(cs.session)) {
+  if (!isBenchEnabledSession(lcs.champSelect.session)) {
     return 0
   }
 
-  return cs.session.rerollsRemaining
+  return lcs.champSelect.session.rerollsRemaining
 })
 
 const selfChampionId = computed(() => {
-  if (!cs.session) {
+  if (!lcs.champSelect.session) {
     return null
   }
 
-  const c = cs.session.myTeam.find(
-    (t) => t.cellId == cs.session?.localPlayerCellId
+  const c = lcs.champSelect.session.myTeam.find(
+    (t) => t.cellId == lcs.champSelect.session?.localPlayerCellId
   )
 
   if (c) {
@@ -101,13 +101,13 @@ const handleBenchSwap = async (championId: number) => {
     return
   }
 
-  if (!cs.currentPickableChampionIds.has(championId)) {
+  if (!lcs.champSelect.currentPickableChampionIds.has(championId)) {
     return
   }
 
   isSwapping.value = true
   try {
-    await benchSwap(championId)
+    await lc.api.champSelect.benchSwap(championId)
   } catch (error) {
     laNotification.warn('英雄选择台', '交换失败，目标英雄可能已经不存在', error)
   } finally {
@@ -124,7 +124,7 @@ const handleReroll = async (grabBack = false) => {
   try {
     const prevChampionId = selfChampionId.value
 
-    await reroll()
+    await lc.api.champSelect.reroll()
 
     // 使用一个简短的延时来实现，simple workaround
     if (grabBack && prevChampionId !== null) {

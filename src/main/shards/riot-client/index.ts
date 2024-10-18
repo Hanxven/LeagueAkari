@@ -1,14 +1,17 @@
 import { UxCommandLine } from '@main/utils/ux-cmd'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { formatError } from '@shared/utils/errors'
+import { RiotClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/riot-client'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import https from 'https'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
-import { AkariLoggerInstance, LoggerFactoryMain } from '../logger-factory'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
-import { RiotClientHttpApi } from './http-api'
+
+export class RiotClientRcuUninitializedError extends Error {
+  name = 'RiotClientRcuUninitializedError'
+}
 
 /**
  * Riot Client 相关封装
@@ -26,15 +29,15 @@ export class RiotClientMain implements IAkariShardInitDispose {
 
   private readonly _ipc: AkariIpcMain
   private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _log: AkariLoggerInstance
+  private readonly _log: AkariLogger
   private readonly _mobx: MobxUtilsMain
   private readonly _lc: LeagueClientMain
 
-  private _api: RiotClientHttpApi | null = null
+  private _api: RiotClientHttpApiAxiosHelper | null = null
 
   private _http: AxiosInstance | null = null
 
-  // Riot Client 的事件推送和 League Client 完全相同, 但由于当前应用暂未使用, 所以不实现
+  // Riot Client 的事件推送格式和 League Client 完全相同, 但由于当前应用暂未使用, 所以不实现
   // private _ws: WebSocket | null = null
   // private _eventBus = new RadixEventEmitter()
 
@@ -48,7 +51,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
 
   get api() {
     if (!this._api) {
-      throw new Error('RC HTTP uninitialized')
+      throw new RiotClientRcuUninitializedError()
     }
 
     return this._api
@@ -72,7 +75,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
           }
         }
 
-        this._log.warn(`RiotClient HTTP 客户端错误: ${formatError(error)}`)
+        this._log.warn(`RiotClient HTTP 客户端错误`, error)
 
         throw error
       }
@@ -99,7 +102,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
       proxy: false
     })
 
-    this._api = new RiotClientHttpApi(this._http)
+    this._api = new RiotClientHttpApiAxiosHelper(this._http)
   }
 
   /**

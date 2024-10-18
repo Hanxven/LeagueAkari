@@ -11,9 +11,9 @@
         <NSelect
           style="width: 160px"
           size="small"
-          :value="app.settings.closeStrategy"
-          @update:value="(val) => am.setCloseStrategy(val)"
-          :options="closeStrategies"
+          :value="wms.settings.mainWindowCloseAction"
+          @update:value="(val) => wm.setMainWindowCloseAction(val)"
+          :options="closeActions"
         />
       </ControlItem>
     </NCard>
@@ -27,8 +27,8 @@
       >
         <NSwitch
           size="small"
-          :value="au.settings.autoCheckUpdates"
-          @update:value="(val: boolean) => aum.setAutoCheckUpdates(val)"
+          :value="sus.settings.autoCheckUpdates"
+          @update:value="(val: boolean) => su.setAutoCheckUpdates(val)"
         />
       </ControlItem>
       <ControlItem
@@ -39,8 +39,8 @@
       >
         <NSwitch
           size="small"
-          :value="au.settings.autoDownloadUpdates"
-          @update:value="(val: boolean) => aum.setAutoDownloadUpdates(val)"
+          :value="sus.settings.autoDownloadUpdates"
+          @update:value="(val: boolean) => su.setAutoDownloadUpdates(val)"
         />
       </ControlItem>
       <ControlItem
@@ -53,8 +53,8 @@
           <NSelect
             style="width: 160px"
             size="small"
-            :value="au.settings.downloadSource"
-            @update:value="(val) => aum.setDownloadSource(val)"
+            :value="sus.settings.downloadSource"
+            @update:value="(val) => su.setDownloadSource(val)"
             :options="updateDownloadSource"
           />
           <NTooltip>
@@ -81,8 +81,8 @@
       >
         <NSwitch
           size="small"
-          :value="lc.settings.autoConnect"
-          @update:value="(val: boolean) => lcm.setAutoConnect(val)"
+          :value="lcs.settings.autoConnect"
+          @update:value="(val: boolean) => lc.setAutoConnect(val)"
         />
       </ControlItem>
       <ControlItem
@@ -93,8 +93,8 @@
       >
         <NSwitch
           size="small"
-          :value="app.settings.useWmic"
-          @update:value="(val: boolean) => am.setUseWmic(val)"
+          :value="lcus.settings.useWmic"
+          @update:value="(val: boolean) => lcu.setUseWmic(val)"
         />
       </ControlItem>
     </NCard>
@@ -108,7 +108,7 @@
       >
         <NSwitch
           size="small"
-          :value="app.baseConfig?.disableHardwareAcceleration ?? false"
+          :value="as.baseConfig?.disableHardwareAcceleration ?? false"
           @update:value="(val: boolean) => handleDisableHardwareAcceleration(val)"
         />
       </ControlItem>
@@ -118,22 +118,35 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { appRendererModule as am } from '@renderer-shared/modules/app'
-import { useAppStore } from '@renderer-shared/modules/app/store'
-import { autoUpdateRendererModule as aum } from '@renderer-shared/modules/auto-update'
-import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
-import { lcuConnectionRendererModule as lcm } from '@renderer-shared/modules/lcu-connection'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
+import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
+import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
+import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
+import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip, useDialog } from 'naive-ui'
 
-const app = useAppStore()
-const lc = useLcuConnectionStore()
-const au = useAutoUpdateStore()
+const lcus = useLeagueClientUxStore()
+const lcs = useLeagueClientStore()
+const sus = useSelfUpdateStore()
+const wms = useWindowManagerStore()
+const as = useAppCommonStore()
 
-const closeStrategies = [
+const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
+const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const app = useInstance<AppCommonRenderer>('app-common-renderer')
+const lcu = useInstance<LeagueClientUxRenderer>('league-client-ux-renderer')
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+
+const closeActions = [
   { label: '最小化到托盘区', value: 'minimize-to-tray' },
   { label: '退出程序', value: 'quit' },
-  { label: '每次询问', value: 'unset' }
+  { label: '每次询问', value: 'ask' }
 ]
 
 const updateDownloadSource = [
@@ -149,7 +162,7 @@ const handleDisableHardwareAcceleration = (val: boolean) => {
     positiveText: '退出',
     negativeText: '取消',
     onPositiveClick: async () => {
-      await am.setDisableHardwareAcceleration(val)
+      await app.setDisableHardwareAcceleration(val)
     }
   })
 }

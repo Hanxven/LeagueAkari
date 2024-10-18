@@ -30,17 +30,19 @@
 </template>
 
 <script setup lang="ts">
-import { getGame } from '@renderer-shared/http-api/match-history'
-import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
-import { externalDataSourceRendererModule as edsm } from '@renderer-shared/modules/external-data-source'
-import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
 import { laNotification } from '@renderer-shared/notification'
-import { Game } from '@shared/types/lcu/match-history'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { SgpRenderer } from '@renderer-shared/shards/sgp'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { Game } from '@shared/types/league-client/match-history'
 import { AxiosError } from 'axios'
 import { NButton, NModal } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
+import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+// TODO CHANGE IT ALL
+import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 import MatchHistoryCard from './MatchHistoryCard.vue'
 
@@ -50,23 +52,28 @@ const props = defineProps<{
   selfPuuid?: string
 }>()
 
-const eds = useExternalDataSourceStore()
-const cf = useCoreFunctionalityStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const sgp = useInstance<SgpRenderer>('sgp-renderer')
+const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
+const sgps = useSgpStore()
+
+// 和战绩页面的设置共享
+const mhs = useMatchHistoryTabsStore()
 
 const willUseSgpApi = computed(() => {
-  return cf.settings.useSgpApi && eds.sgpAvailability.serversSupported.matchHistory
+  return mhs.settings.matchHistoryUseSgpApi && sgps.availability.serversSupported.matchHistory
 })
 
 const show = defineModel<boolean>('show', { default: false })
 
-const uncontrolledGame = shallowRef<Game | null>(null)
+const uncontrolledData = shallowRef<Game | null>(null)
 const isExpanded = ref(true)
 const isLoading = ref(false)
 const isFailedToLoad = ref(false)
 const isNotFound = ref(false)
 
 const showingGame = computed(() => {
-  return props.game || uncontrolledGame.value || null
+  return props.game || uncontrolledData.value || null
 })
 
 const fetchGame = async (gameId: number, useSgpApi = false) => {
@@ -79,10 +86,10 @@ const fetchGame = async (gameId: number, useSgpApi = false) => {
   isNotFound.value = false
   try {
     const g = useSgpApi
-      ? await edsm.sgp.getGameSummaryLcuFormat(gameId)
-      : (await getGame(gameId)).data
+      ? await sgp.getGameSummaryLcuFormat(gameId)
+      : (await lc.api.matchHistory.getGame(gameId)).data
     if (g.gameId === props.gameId) {
-      uncontrolledGame.value = g
+      uncontrolledData.value = g
     }
   } catch (error) {
     isFailedToLoad.value = true
@@ -117,7 +124,7 @@ watch(
       return
     }
 
-    uncontrolledGame.value = null
+    uncontrolledData.value = null
 
     if (gameId) {
       fetchGame(gameId, useSgpApi)
@@ -131,7 +138,7 @@ watch(
   { immediate: true }
 )
 
-const { navigateToTab } = mhm.useNavigateToTab()
+const { navigateToTab } = mh.useNavigateToTab()
 
 const handleToSummoner = (puuid) => {
   navigateToTab(puuid)

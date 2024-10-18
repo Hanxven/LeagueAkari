@@ -1,15 +1,11 @@
-t
 <template>
   <NModal v-model:show="show" preset="card" style="max-width: 60vw">
     <template #header><span class="card-header-title">编辑玩家标记</span></template>
-    <template v-if="summonerInfo">
+    <template v-if="summoner">
       <div class="summoner-info">
-        <LcuImage
-          class="image"
-          :src="`/lol-game-data/assets/v1/profile-icons/${summonerInfo.profileIconId}.jpg`"
-        />
+        <LcuImage class="image" :src="profileIconUrl(summoner.profileIconId)" />
         <span class="name">{{
-          summonerName(summonerInfo.gameName || summonerInfo.displayName, summonerInfo.tagLine)
+          summonerName(summoner.gameName || summoner.displayName, summoner.tagLine)
         }}</span>
       </div>
     </template>
@@ -17,7 +13,7 @@ t
     <div style="margin-top: 12px">
       <NInput
         v-model:value="text"
-        :placeholder="`填写对 ${summonerName(summonerInfo?.gameName || summonerInfo?.displayName, summonerInfo?.tagLine, props.puuid)} 的标记内容`"
+        :placeholder="`填写对 ${summonerName(summoner?.gameName || summoner?.displayName, summoner?.tagLine, puuid)} 的标记内容`"
         type="textarea"
         :autosize="{ minRows: 3, maxRows: 4 }"
         ref="input"
@@ -25,106 +21,52 @@ t
     </div>
     <div style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 4px">
       <NButton size="small" @click="show = false">取消</NButton>
-      <NButton size="small" type="primary" @click="() => handleSaveTag()">保存</NButton>
+      <NButton size="small" type="primary" @click="handleSaveTag">保存</NButton>
     </div>
   </NModal>
 </template>
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { getSummonerByPuuid } from '@renderer-shared/http-api/summoner'
-import { coreFunctionalityRendererModule as cfm } from '@renderer-shared/modules/core-functionality'
-import { SavedPlayerInfo } from '@renderer-shared/modules/core-functionality/store'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
-import { storageRendererModule as sm } from '@renderer-shared/modules/storage'
-import { laNotification } from '@renderer-shared/notification'
-import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { profileIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { PlayerTagDto } from '@renderer-shared/shards/saved-player'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NButton, NInput, NModal } from 'naive-ui'
-import { nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 const show = defineModel<boolean>('show', { default: false })
-
-const summonerInfo = shallowRef<SummonerInfo | null>(null)
-const savedInfo = shallowRef<SavedPlayerInfo | null>(null)
-
-const lc = useLcuConnectionStore()
 
 const inputEl = useTemplateRef('input')
 
 const emits = defineEmits<{
-  (e: 'edited', puuid: string): void
+  submit: [tag: string | null]
 }>()
 
-const props = defineProps<{
-  puuid?: string
+const { summoner, tags } = defineProps<{
+  puuid: string
+  summoner?: SummonerInfo | null
+  tags?: PlayerTagDto[]
 }>()
 
-watch([() => show.value, () => props.puuid], async ([sh, puuid]) => {
-  if (!puuid || !lc.auth || !summoner.me) {
-    summonerInfo.value = null
-    return
-  }
-
-  if ((!summonerInfo.value || summonerInfo.value.puuid !== props.puuid) && sh) {
-    try {
-      const s = (await getSummonerByPuuid(puuid)).data
-      summonerInfo.value = s
-
-      const p = await sm.querySavedPlayerWithGames({
-        selfPuuid: summoner.me.puuid,
-        puuid: props.puuid,
-        region: lc.auth.region,
-        rsoPlatformId: lc.auth.rsoPlatformId
-      })
-
-      if (p) {
-        savedInfo.value = p
-        text.value = p.tag
-      }
-    } catch (error) {
-      laNotification.warn('无法加载', `无法加载召唤师 ${puuid}`, error)
-    }
-  }
+const selfTagged = computed(() => {
+  return tags?.find((t) => t.markedBySelf)
 })
 
-watch([() => show.value, () => summonerInfo.value], ([s, u]) => {
-  if (s) {
-    if (s && u) {
+const text = ref('')
+
+watch(
+  () => show.value,
+  (show) => {
+    if (show) {
+      text.value = selfTagged.value?.tag || ''
       nextTick(() => inputEl.value?.focus())
     }
   }
-})
-
-const summoner = useSummonerStore()
-const text = ref('')
+)
 
 const handleSaveTag = async () => {
-  if (!lc.auth || !summoner.me || !props.puuid) {
-    return
-  }
-
-  try {
-    await cfm.saveSavedPlayer({
-      selfPuuid: summoner.me.puuid,
-      puuid: props.puuid,
-      region: lc.auth.region,
-      rsoPlatformId: lc.auth.rsoPlatformId,
-      tag: text.value || null
-    })
-
-    if (text.value) {
-      laNotification.success('玩家标记', '已更新玩家标记')
-    } else {
-      laNotification.success('玩家标记', '已清除玩家标记')
-    }
-
-    emits('edited', props.puuid)
-    show.value = false
-  } catch (error) {
-    laNotification.warn('玩家标记', '无法更新玩家标记', error)
-  }
+  emits('submit', text.value || null)
 }
 </script>
 

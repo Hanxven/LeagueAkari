@@ -7,7 +7,7 @@
         @click="handleSetChatStatusMessage"
         type="primary"
         size="small"
-        :disabled="lc.state !== 'connected'"
+        :disabled="lcs.connectionState !== 'connected'"
         >设置</NButton
       >
     </ControlItem>
@@ -31,12 +31,14 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { setChatStatusMessage } from '@renderer-shared/http-api/chat'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NButton, NCard, NInput, useMessage } from 'naive-ui'
 import { ref } from 'vue'
 
-const lc = useLcuConnectionStore()
+const lcs = useLeagueClientStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const text = ref('')
 const isSetting = ref(false)
@@ -49,7 +51,7 @@ const handleSetChatStatusMessage = async () => {
 
   try {
     isSetting.value = true
-    await setChatStatusMessage(text.value)
+    await lc.api.chat.setChatStatusMessage(text.value)
     message.success('已设置')
   } catch (error) {
     console.warn(error)

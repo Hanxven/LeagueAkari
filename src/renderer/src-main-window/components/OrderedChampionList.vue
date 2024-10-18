@@ -21,13 +21,13 @@
       <LcuImage
         :src="championIconUrl(c)"
         class="champion"
-        :title="gameData.champions[c]?.name"
+        :title="lcs.gameData.champions[c]?.name"
         :class="{
           [styles['not-pickable']]:
-            gameflow.phase === 'ChampSelect' &&
+            lcs.gameflow.phase === 'ChampSelect' &&
             (type === 'pick'
-              ? !champSelect.currentPickableChampionIds.has(c)
-              : !champSelect.currentBannableChampionIds.has(c))
+              ? !lcs.champSelect.currentPickableChampionIds.has(c)
+              : !lcs.champSelect.currentBannableChampionIds.has(c))
         }"
         v-for="c of champions.slice(0, maxShow)"
         :key="c"
@@ -40,12 +40,10 @@
 
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
-import { championIconUrl } from '@renderer-shared/modules/game-data'
-import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
-import { maybePveChampion } from '@shared/types/lcu/game-data'
+import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { maybePveChampion } from '@shared/types/league-client/game-data'
 import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
 import {
   NButton,
@@ -72,12 +70,11 @@ const champions = defineModel<number[]>('champions', { default: () => [] })
 
 const styles = useCssModule()
 
-const gameData = useGameDataStore()
-const gameflow = useGameflowStore()
-const champSelect = useChampSelectStore()
+const lcs = useLeagueClientStore()
+const eas = useExtraAssetsStore()
 
 const championOptions = computed(() => {
-  const sorted = Object.values(gameData.champions).toSorted((a, b) => {
+  const sorted = Object.values(lcs.gameData.champions).toSorted((a, b) => {
     // 以防有人看不到, 决定将空英雄放在最前面
     if (a.id === -1 || b.id === -1) {
       return -1
@@ -94,7 +91,7 @@ const championOptions = computed(() => {
   return sorted
     .filter((b) => {
       // 这个值只会在进入英雄选择阶段才会更新
-      if (champSelect.disabledChampionIds.has(b.id)) {
+      if (lcs.champSelect.disabledChampionIds.has(b.id)) {
         return false
       }
 
@@ -110,12 +107,10 @@ const championOptions = computed(() => {
     }))
 })
 
-const eds = useExternalDataSourceStore()
-
 const isNameMatch = (pattern: string, label: string, value?: number) => {
   try {
-    if (eds.heroListMap && value !== undefined) {
-      const c = eds.heroListMap[value]
+    if (eas.heroListMap && value !== undefined) {
+      const c = eas.heroListMap[value]
 
       if (c) {
         const keywords = c.keywords.split(',')
@@ -138,11 +133,11 @@ const isNameMatch = (pattern: string, label: string, value?: number) => {
 
 const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
   let pickable = true
-  if (gameflow.phase === 'ChampSelect') {
+  if (lcs.gameflow.phase === 'ChampSelect') {
     if (type === 'pick') {
-      pickable = champSelect.currentPickableChampionIds.has(option.value as number)
+      pickable = lcs.champSelect.currentPickableChampionIds.has(option.value as number)
     } else {
-      pickable = champSelect.currentBannableChampionIds.has(option.value as number)
+      pickable = lcs.champSelect.currentBannableChampionIds.has(option.value as number)
     }
   }
 
@@ -166,11 +161,11 @@ const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
 
 const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
   let pickable = true
-  if (gameflow.phase === 'ChampSelect') {
+  if (lcs.gameflow.phase === 'ChampSelect') {
     if (type === 'pick') {
-      pickable = champSelect.currentPickableChampionIds.has(option.value as number)
+      pickable = lcs.champSelect.currentPickableChampionIds.has(option.value as number)
     } else {
-      pickable = champSelect.currentBannableChampionIds.has(option.value as number)
+      pickable = lcs.champSelect.currentBannableChampionIds.has(option.value as number)
     }
   }
 

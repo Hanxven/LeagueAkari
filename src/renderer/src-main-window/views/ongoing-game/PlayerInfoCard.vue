@@ -3,9 +3,9 @@
     class="player-card"
     :class="{
       dimming:
-        currentHighlightingPreMadeTeamId && currentHighlightingPreMadeTeamId !== preMadeTeamId,
+        currentHighlightingPremadeTeamId && currentHighlightingPremadeTeamId !== premadeTeamId,
       highlighting:
-        currentHighlightingPreMadeTeamId && currentHighlightingPreMadeTeamId === preMadeTeamId
+        currentHighlightingPremadeTeamId && currentHighlightingPremadeTeamId === premadeTeamId
     }"
     :style="{
       width: `${FIXED_CARD_WIDTH_PX_LITERAL}px`
@@ -26,8 +26,8 @@
           <span
             class="name"
             :style="{
-              color: preMadeTeamId
-                ? PRE_MADE_TEAM_COLORS[preMadeTeamId]?.foregroundColor
+              color: premadeTeamId
+                ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
                 : undefined
             }"
             >{{ summoner?.gameName || summoner?.displayName || '—' }}</span
@@ -205,22 +205,22 @@
           {{ savedInfo.tag }}
         </div>
       </NPopover>
-      <NPopover :keep-alive-on-hover="false" :delay="50" v-if="preMadeTeamId">
+      <NPopover :keep-alive-on-hover="false" :delay="50" v-if="premadeTeamId">
         <template #trigger>
           <div
             class="tag"
             :style="{
-              'background-color': PRE_MADE_TEAM_COLORS[preMadeTeamId]?.foregroundColor || '#ffffff',
-              color: PRE_MADE_TEAM_COLORS[preMadeTeamId]?.color || '#000000'
+              'background-color': PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor || '#ffffff',
+              color: PREMADE_TEAM_COLORS[premadeTeamId]?.color || '#000000'
             }"
             ref="pre-made-tag-el"
           >
-            预组队 {{ preMadeTeamId }}
+            预组队 {{ premadeTeamId }}
           </div>
         </template>
         <div class="popover-text">
           这些玩家在数场对局中都位于同一个阵营，推测他们可能是一支固定的小队。为了区分，将其命名为小队
-          {{ preMadeTeamId }}
+          {{ premadeTeamId }}
         </div>
       </NPopover>
       <NPopover
@@ -330,7 +330,7 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
-        v-if="app.settings.isInKyokoMode && analysis"
+        v-if="as.settings.isInKyokoMode && analysis"
         :delay="50"
       >
         <template #trigger>
@@ -374,7 +374,7 @@
         <div class="champion-stats">
           <div class="champion-line">
             <ChampionIcon ring :ring-width="1" round class="champion-icon" :champion-id="c.id" />
-            <div class="champion-name">{{ gameData.champions[c.id]?.name || c.id }}</div>
+            <div class="champion-name">{{ lcs.gameData.champions[c.id]?.name || c.id }}</div>
           </div>
           <div class="recent-plays">
             近期 {{ c.count }} 场，胜率为 {{ (c.winRate * 100).toFixed() }} %
@@ -414,7 +414,7 @@
             <ChampionIcon :champion-id="item.selfParticipant.championId" class="champion-icon" />
             <div class="queue-name-date">
               <div class="queue-name">
-                {{ gameData.queues[item.game.queueId]?.name || item.game.queueId }}
+                {{ lcs.gameData.queues[item.game.queueId]?.name || item.game.queueId }}
               </div>
               <div class="line2">
                 {{ dayjs(item.game.gameCreation).format('MM-DD HH:mm') }}
@@ -435,13 +435,11 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
-import { useAppStore } from '@renderer-shared/modules/app/store'
-import { SavedPlayerInfo } from '@renderer-shared/modules/core-functionality/store'
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { Mastery } from '@shared/types/lcu/champion-mastery'
-import { Game } from '@shared/types/lcu/match-history'
-import { RankedStats } from '@shared/types/lcu/ranked'
-import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { SavedInfo } from '@renderer-shared/shards/ongoing-game/store'
+import { Mastery } from '@shared/types/league-client/champion-mastery'
+import { Game } from '@shared/types/league-client/match-history'
+import { RankedStats } from '@shared/types/league-client/ranked'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   MatchHistoryGameWithState,
   MatchHistoryGamesAnalysisAll,
@@ -462,17 +460,19 @@ import {
   CHINESE_NUMBERS,
   FIXED_CARD_WIDTH_PX_LITERAL,
   POSITION_ASSIGNMENT_REASON,
-  PRE_MADE_TEAM_COLORS,
+  PREMADE_TEAM_COLORS,
   RANKED_MEDAL_MAP
 } from './ongoing-game-utils'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 
-const { puuid, analysis, matchHistory, position, preMadeTeamId, summoner, rankedStats } =
+const { puuid, analysis, matchHistory, position, premadeTeamId, summoner, rankedStats } =
   defineProps<{
     puuid: string
     championId?: number
     isSelf?: boolean
-    preMadeTeamId?: string
-    currentHighlightingPreMadeTeamId?: string | null
+    premadeTeamId?: string
+    currentHighlightingPremadeTeamId?: string | null
     team?: string
     queueType?: string
     position?: {
@@ -484,7 +484,7 @@ const { puuid, analysis, matchHistory, position, preMadeTeamId, summoner, ranked
     championMastery?: Record<number, Mastery>
     matchHistory?: MatchHistoryGameWithState[]
     analysis?: MatchHistoryGamesAnalysisAll
-    savedInfo?: SavedPlayerInfo
+    savedInfo?: SavedInfo
   }>()
 
 const emits = defineEmits<{
@@ -492,25 +492,25 @@ const emits = defineEmits<{
   showGame: [game: Game, selfPuuid: string]
   showGameById: [gameId: number, selfPuuid: string]
   showSavedInfo: [puuid: string]
-  highlight: [preMadeTeamId: string, boolean]
+  highlight: [premadeTeamId: string, boolean]
 }>()
 
-const preMadeTagElHovering = useElementHover(useTemplateRef('pre-made-tag-el'))
-watch(preMadeTagElHovering, (h) => {
-  if (preMadeTeamId) {
-    emits('highlight', preMadeTeamId, h)
+const premadeTagElHovering = useElementHover(useTemplateRef('pre-made-tag-el'))
+watch(premadeTagElHovering, (h) => {
+  if (premadeTeamId) {
+    emits('highlight', premadeTeamId, h)
   }
 })
 
 // 以防路由时高亮状态未清除
 onDeactivated(() => {
-  if (preMadeTeamId) {
-    emits('highlight', preMadeTeamId, false)
+  if (premadeTeamId) {
+    emits('highlight', premadeTeamId, false)
   }
 })
 
-const gameData = useGameDataStore()
-const app = useAppStore()
+const lcs = useLeagueClientStore()
+const as = useAppCommonStore()
 
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 

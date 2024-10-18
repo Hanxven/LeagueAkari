@@ -1,13 +1,16 @@
 import vue from '@vitejs/plugin-vue'
+import history from 'connect-history-api-fallback'
 import { defineConfig, externalizeDepsPlugin, swcPlugin } from 'electron-vite'
+import fs from 'node:fs'
 import { resolve } from 'path'
+import { Plugin, UserConfig } from 'vite'
 
 const minify = process.env.NODE_ENV === 'production'
 
 // 在解析 League Client 的标签时，需要考虑到这些自创的元素
 // 作为参考，列在下面，同时供模板使用
 // 暂未实装
-const leagueClientCustomTags = new Set([
+const LC_CUSTOM_TAGS = new Set([
   'mainText',
   'stats',
   'active',
@@ -69,7 +72,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@main-window': resolve('src/renderer/src-main-window'),
-        '@auxiliary-window': resolve('src/renderer/src-auxiliary-window'),
+        '@aux-window': resolve('src/renderer/src-aux-window'),
         '@shared': resolve('src/shared'),
         '@renderer-shared': resolve('src/renderer-shared')
       }
@@ -77,13 +80,7 @@ export default defineConfig({
     plugins: [
       swcPlugin(),
       vue({
-        template: {
-          compilerOptions: {
-            isCustomElement: (tag) => {
-              return leagueClientCustomTags.has(tag)
-            }
-          }
-        }
+        template: { compilerOptions: { isCustomElement: (tag) => LC_CUSTOM_TAGS.has(tag) } }
       })
     ],
     build: {
@@ -91,7 +88,7 @@ export default defineConfig({
       rollupOptions: {
         input: {
           mainWindow: resolve(__dirname, 'src/renderer/main-window.html'),
-          auxiliaryWindow: resolve(__dirname, 'src/renderer/auxiliary-window.html')
+          auxWindow: resolve(__dirname, 'src/renderer/aux-window.html')
         }
       }
     }

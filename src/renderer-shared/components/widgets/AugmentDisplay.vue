@@ -1,34 +1,34 @@
 <template>
-  <NPopover v-if="augmentId && gameData.augments[augmentId]" :delay="50">
+  <NPopover v-if="augmentId && lcs.gameData.augments[augmentId]" :delay="50">
     <template #trigger>
       <LcuImage
-        :src="gameData.augments[augmentId].augmentSmallIconPath"
+        :src="lcs.gameData.augments[augmentId].augmentSmallIconPath"
         v-bind="$attrs"
         :style="{ width: `${size}px`, height: `${size}px` }"
         class="augment"
         :class="{
-          prismatic: gameData.augments[augmentId].rarity === 'kPrismatic',
-          gold: gameData.augments[augmentId].rarity === 'kGold',
-          silver: gameData.augments[augmentId].rarity === 'kSilver',
-          bronze: gameData.augments[augmentId].rarity === 'kBronze'
+          prismatic: lcs.gameData.augments[augmentId].rarity === 'kPrismatic',
+          gold: lcs.gameData.augments[augmentId].rarity === 'kGold',
+          silver: lcs.gameData.augments[augmentId].rarity === 'kSilver',
+          bronze: lcs.gameData.augments[augmentId].rarity === 'kBronze'
         }"
       />
     </template>
     <div style="width: 180px" class="info">
-      <LcuImage class="image" :src="gameData.augments[augmentId].augmentSmallIconPath" />
-      <div class="right-side">{{ gameData.augments[augmentId].nameTRA }}</div>
+      <LcuImage class="image" :src="lcs.gameData.augments[augmentId].augmentSmallIconPath" />
+      <div class="right-side">{{ lcs.gameData.augments[augmentId].nameTRA }}</div>
     </div>
     <div class="rarity" style="max-width: 180px; font-size: 12px">
       <span
         :class="{
-          prismatic: gameData.augments[augmentId].rarity === 'kPrismatic',
-          gold: gameData.augments[augmentId].rarity === 'kGold',
-          silver: gameData.augments[augmentId].rarity === 'kSilver',
-          bronze: gameData.augments[augmentId].rarity === 'kBronze'
+          prismatic: lcs.gameData.augments[augmentId].rarity === 'kPrismatic',
+          gold: lcs.gameData.augments[augmentId].rarity === 'kGold',
+          silver: lcs.gameData.augments[augmentId].rarity === 'kSilver',
+          bronze: lcs.gameData.augments[augmentId].rarity === 'kBronze'
         }"
         class="rarity-indicator"
       ></span>
-      {{ formatRarity(gameData.augments[augmentId].rarity) }}
+      {{ formatRarity(lcs.gameData.augments[augmentId].rarity) }}
     </div>
   </NPopover>
   <div
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
@@ -50,7 +50,7 @@ const { size = 20 } = defineProps<{
   size?: number
 }>()
 
-const gameData = useGameDataStore()
+const lcs = useLeagueClientStore()
 
 const formatRarity = (r: string) => {
   switch (r) {

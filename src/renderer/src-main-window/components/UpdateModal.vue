@@ -4,36 +4,36 @@
     size="small"
     preset="card"
     v-model:show="show"
-    :class="styles['settings-modal']"
+    :class="$style['settings-modal']"
   >
     <template #header
       ><span class="card-header-title">{{
         showingNewUpdate ? '新版本' : '版本特性'
       }}</span></template
     >
-    <div v-if="au.newUpdates">
+    <div v-if="sus.newUpdates">
       <div v-if="showingNewUpdate" class="para">
-        新版本可用：{{ au.newUpdates.releaseVersion }} (当前版本：{{
-          au.newUpdates.currentVersion
+        新版本可用：{{ sus.newUpdates.releaseVersion }} (当前版本：{{
+          sus.newUpdates.currentVersion
         }})
       </div>
-      <div v-else class="para">当前版本：{{ au.newUpdates.currentVersion }}</div>
+      <div v-else class="para">当前版本：{{ sus.newUpdates.currentVersion }}</div>
       <div>
-        <a class="small-link" target="_blank" :href="au.newUpdates.releaseNotesUrl"
-          >{{ au.newUpdates.source === 'github' ? 'Github' : 'Gitee' }} 发布页面</a
+        <a class="small-link" target="_blank" :href="sus.newUpdates.releaseNotesUrl"
+          >{{ sus.newUpdates.source === 'github' ? 'Github' : 'Gitee' }} 发布页面</a
         >
         <a
-          v-if="au.newUpdates.downloadUrl"
+          v-if="sus.newUpdates.downloadUrl"
           class="small-link"
           style="margin-left: 8px"
           target="_blank"
-          :href="au.newUpdates.downloadUrl"
-          >{{ au.newUpdates.source === 'github' ? 'Github' : 'Gitee' }} 下载</a
+          :href="sus.newUpdates.downloadUrl"
+          >{{ sus.newUpdates.source === 'github' ? 'Github' : 'Gitee' }} 下载</a
         >
       </div>
       <NScrollbar
         style="max-height: 50vh"
-        :class="styles['markdown-text-scroll-wrapper']"
+        :class="$style['markdown-text-scroll-wrapper']"
         trigger="none"
       >
         <div class="markdown-text" v-html="markdownHtmlText"></div>
@@ -43,23 +43,22 @@
 </template>
 
 <script setup lang="ts">
-import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
+import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import { NModal, NScrollbar } from 'naive-ui'
-import { computed, useCssModule } from 'vue'
+import { computed } from 'vue'
 
-const au = useAutoUpdateStore()
+defineProps<{
+  showingNewUpdate?: boolean
+}>()
 
-const styles = useCssModule()
+const sus = useSelfUpdateStore()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(au.newUpdates?.releaseNotes || '无内容')
+  return markdownIt.render(sus.newUpdates?.releaseNotes || '无内容')
 })
 
 const show = defineModel<boolean>('show', { default: false })
-const props = defineProps<{
-  showingNewUpdate?: boolean
-}>()
 </script>
 
 <style lang="less" scoped>
@@ -170,4 +169,3 @@ const props = defineProps<{
   margin-bottom: 12px;
 }
 </style>
-@renderer-shared/modules/app/store

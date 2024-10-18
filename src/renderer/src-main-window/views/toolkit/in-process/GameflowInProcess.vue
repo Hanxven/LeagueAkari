@@ -9,7 +9,7 @@
     >
       <NButton
         type="warning"
-        :disabled="gameflow.phase !== 'ChampSelect'"
+        :disabled="lcs.gameflow.phase !== 'ChampSelect'"
         @click="handleDodge"
         size="small"
         >秒退</NButton
@@ -31,7 +31,10 @@
       label-description="立即退出当前房间"
       :label-width="200"
     >
-      <NButton :disabled="gameflow.phase !== 'Lobby'" @click="deleteLobby" size="small"
+      <NButton
+        :disabled="lcs.gameflow.phase !== 'Lobby'"
+        @click="() => lc.api.lobby.deleteLobby()"
+        size="small"
         >退出房间</NButton
       >
     </ControlItem>
@@ -40,28 +43,19 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { earlyExit } from '@renderer-shared/http-api/gameflow'
-import { playAgain } from '@renderer-shared/http-api/lobby'
-import { deleteLobby } from '@renderer-shared/http-api/lobby'
-import { dodge } from '@renderer-shared/http-api/login'
-import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
 import { laNotification } from '@renderer-shared/notification'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NButton, NCard } from 'naive-ui'
 import { computed } from 'vue'
 
-const gameflow = useGameflowStore()
-
-const _handleEarlyExit = async () => {
-  try {
-    await earlyExit()
-  } catch (error) {
-    laNotification.warn('', '尝试强退失败', error)
-  }
-}
+const lcs = useLeagueClientStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const handleDodge = async () => {
   try {
-    const _ = await dodge()
+    await lc.api.login.dodge()
   } catch (error) {
     laNotification.warn('过程中', '尝试秒退失败', error)
   }
@@ -69,15 +63,15 @@ const handleDodge = async () => {
 
 const isInEndgamePhase = computed(() => {
   return (
-    gameflow.phase === 'WaitingForStats' ||
-    gameflow.phase === 'PreEndOfGame' ||
-    gameflow.phase === 'EndOfGame'
+    lcs.gameflow.phase === 'WaitingForStats' ||
+    lcs.gameflow.phase === 'PreEndOfGame' ||
+    lcs.gameflow.phase === 'EndOfGame'
   )
 })
 
 const handlePlayAgain = async () => {
   try {
-    await playAgain()
+    await lc.api.lobby.playAgain()
   } catch (error) {
     laNotification.warn('过程中', '尝试重新回到房间失败', error)
   }

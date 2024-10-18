@@ -9,8 +9,10 @@
     <template #header><span class="card-header-title">设置</span></template>
     <NTabs type="line" animated size="small" v-model:value="tabName">
       <NTabPane name="basic" tab="应用"><AppSettings /></NTabPane>
-      <NTabPane name="general" tab="通用"><GeneralSettings /></NTabPane>
+      <NTabPane name="match-history-tabs" tab="战绩页面"><MatchHistoryTabsSettings /></NTabPane>
       <NTabPane name="ongoing-game" tab="对局分析"><OngoingGameSettings /></NTabPane>
+      <NTabPane name="aux-window" tab="小窗口"><AuxWindowSettings /></NTabPane>
+      <NTabPane name="mics" tab="其他"><MiscSettings /></NTabPane>
       <NTabPane name="debug" tab="调试"><DebugSettings /></NTabPane>
       <NTabPane name="about" tab="关于"><AboutPane /></NTabPane>
     </NTabs>
@@ -23,13 +25,15 @@ import { useCssModule } from 'vue'
 
 import AboutPane from './AboutPane.vue'
 import AppSettings from './AppSettings.vue'
+import AuxWindowSettings from './AuxWindowSettings.vue'
 import DebugSettings from './DebugSettings.vue'
-import GeneralSettings from './GeneralSettings.vue'
+import MatchHistoryTabsSettings from './MatchHistoryTabsSettings.vue'
+import MiscSettings from './MiscSettings.vue'
 import OngoingGameSettings from './OngoingGameSettings.vue'
 
 const styles = useCssModule()
-const show = defineModel<boolean>('show', { default: false })
 
+const show = defineModel<boolean>('show', { default: false })
 const tabName = defineModel<string>('tabName', { default: 'basic' })
 </script>
 

@@ -1,0 +1,68 @@
+<template>
+  <NCard v-if="as2.settings.benchModeEnabled && isBenchMode" size="small">
+    <NFlex align="center" class="min-height-container" v-if="as2.upcomingGrab">
+      <LcuImage class="image" :src="championIconUrl(as2.upcomingGrab?.championId)" />
+      <span class="label">即将选择 {{ willGrabIn.toFixed(1) }} s</span>
+    </NFlex>
+    <NFlex align="center" class="min-height-container" v-else>
+      <span class="label" v-if="as2.settings.benchExpectedChampions.length === 0"
+        >自动选择没有设置期望英雄列表</span
+      >
+      <span class="label" v-else>自动选择无可用英雄</span>
+    </NFlex>
+  </NCard>
+</template>
+
+<script setup lang="ts">
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
+import { useIntervalFn } from '@vueuse/core'
+import { NCard, NFlex } from 'naive-ui'
+import { computed, ref, watch } from 'vue'
+
+const as2 = useAutoSelectStore()
+const lcs = useLeagueClientStore()
+
+const isBenchMode = computed(() => isBenchEnabledSession(lcs.champSelect.session))
+
+const willGrabIn = ref(0)
+const { pause, resume } = useIntervalFn(
+  () => {
+    const s = ((as2.upcomingGrab?.willGrabAt || -1) - Date.now()) / 1e3
+    willGrabIn.value = Math.abs(Math.max(s, 0))
+  },
+  100,
+  { immediate: false, immediateCallback: true }
+)
+
+watch(
+  () => as2.upcomingGrab,
+  (u) => {
+    if (u) {
+      resume()
+    } else {
+      pause()
+    }
+  }
+)
+</script>
+
+<style scoped lang="less">
+.label {
+  font-size: 10px;
+  color: rgb(146, 146, 146);
+}
+
+.min-height-container {
+  height: 18px;
+}
+
+.image {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+}
+</style>

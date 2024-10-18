@@ -1,4 +1,4 @@
-import { Game, Participant, ParticipantIdentity, isPveQueue } from '@shared/types/lcu/match-history'
+import { Game, Participant, ParticipantIdentity, isPveQueue } from '@shared/types/league-client/match-history'
 
 const WIN_RATE_TEAM_THRESHOLD = 0.9418
 

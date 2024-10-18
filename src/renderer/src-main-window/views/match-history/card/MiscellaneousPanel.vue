@@ -48,9 +48,9 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
-import { championIconUrl } from '@renderer-shared/modules/game-data'
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { Game, Participant, Player } from '@shared/types/lcu/match-history'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { Game, Participant, Player } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import dayjs from 'dayjs'
@@ -66,7 +66,7 @@ const hasBan = computed(() => {
   return props.game.teams.some((t) => t.bans.length)
 })
 
-const gameData = useGameDataStore()
+const lcs = useLeagueClientStore()
 
 const RESERVED_COLUMN_WIDTH = 120
 
@@ -76,8 +76,11 @@ const tableWidth = computed(() => {
 
 const championDisplay = (championId: number) => {
   return h('div', { style: { display: 'flex' } }, [
-    h(LcuImage, { style: { height: '20px', width: '20px' }, src: championIconUrl(championId || -1) }),
-    h('span', { style: { 'margin-left': '2px' } }, gameData.champions[championId].name)
+    h(LcuImage, {
+      style: { height: '20px', width: '20px' },
+      src: championIconUrl(championId || -1)
+    }),
+    h('span', { style: { 'margin-left': '2px' } }, lcs.gameData.champions[championId].name)
   ])
 }
 

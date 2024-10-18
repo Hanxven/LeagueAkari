@@ -7,39 +7,38 @@
       v-model:show="isShowingFreeSoftwareDeclaration"
       @confirm="handleConfirmation"
     />
-    <MainWindowTitleBar class="title-bar-area" />
-    <div class="content"><RouterView /></div>
+    <div class="background-wallpaper"></div>
+    <MainWindowTitleBar />
+    <div id="app-content"><RouterView /></div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
-import { appRendererModule as am } from '@renderer-shared/modules/app'
-import { useAppStore } from '@renderer-shared/modules/app/store'
-import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
-import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
 import { setupNaiveUiNotificationEvents } from '@renderer-shared/notification'
+import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
 import { useNotification } from 'naive-ui'
-import { provide, ref, watch, watchEffect } from 'vue'
-import { useRouter } from 'vue-router'
+import { provide, ref, watchEffect } from 'vue'
 
 import AnnouncementModal from './components/AnnouncementModal.vue'
 import DeclarationModal from './components/DeclarationModal.vue'
-import MainWindowTitleBar from './components/MainWindowTitleBar.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
+import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
 
 setupNaiveUiNotificationEvents()
 
-const router = useRouter()
+const su = useSelfUpdateStore()
+const as = useAppCommonStore()
 
-const app = useAppStore()
-const cf = useCoreFunctionalityStore()
-const au = useAutoUpdateStore()
+const app = useInstance<AppCommonRenderer>('app-common-renderer')
 
-greeting(app.version)
+greeting(as.version)
 
 provide('app', {
   openSettingsModal: (tabName?: string) => {
@@ -50,7 +49,7 @@ provide('app', {
   },
   openUpdateModal: () => {
     isShowingNewUpdateModal.value = true
-    if (au.newUpdates) {
+    if (su.newUpdates) {
       isShowingNewUpdate.value = true
     } else {
       isShowingNewUpdate.value = false
@@ -61,21 +60,6 @@ provide('app', {
   }
 })
 
-watch(
-  () => cf.queryState,
-  (state) => {
-    if (!cf.settings.autoRouteOnGameStart || !cf.settings.ongoingAnalysisEnabled) {
-      return
-    }
-
-    if (state.phase === 'champ-select' || state.phase === 'in-game') {
-      if (router.currentRoute.value.name !== 'ongoing-name') {
-        router.replace({ name: 'ongoing-game' })
-      }
-    }
-  }
-)
-
 const isShowingSettingModal = ref(false)
 const settingModelTab = ref('basic')
 const isShowingNewUpdateModal = ref(false)
@@ -84,19 +68,20 @@ const isShowingFreeSoftwareDeclaration = ref(false)
 const isShowingAnnouncementModal = ref(false)
 
 watchEffect(() => {
-  if (app.settings.showFreeSoftwareDeclaration) {
+  if (as.settings.showFreeSoftwareDeclaration) {
     isShowingFreeSoftwareDeclaration.value = true
   }
 })
 
 watchEffect(() => {
-  if (au.currentAnnouncement && !au.currentAnnouncement.isRead) {
+  if (su.currentAnnouncement && !su.currentAnnouncement.isRead) {
+    console.log(su.currentAnnouncement)
     isShowingAnnouncementModal.value = true
   }
 })
 
 watchEffect(() => {
-  if (au.newUpdates) {
+  if (su.newUpdates) {
     isShowingNewUpdateModal.value = true
     isShowingNewUpdate.value = true
   } else {
@@ -106,13 +91,13 @@ watchEffect(() => {
 })
 
 const handleConfirmation = (notShowAgain: boolean) => {
-  am.setShowFreeSoftwareDeclaration(notShowAgain)
+  app.setShowFreeSoftwareDeclaration(notShowAgain)
   isShowingFreeSoftwareDeclaration.value = false
 }
 
 const notification = useNotification()
 
-am.onEvent('second-instance', () => {
+app.onSecondInstance(() => {
   notification.info({
     title: 'League Akari',
     content: '因为 Akari 是独一无二的，所以同一时间只能有一个 Akari',
@@ -122,12 +107,11 @@ am.onEvent('second-instance', () => {
 
 useKeyboardCombo(KYOKO_MODE_KEY_SEQUENCE, {
   onFinish: () => {
-    if (app.settings.isInKyokoMode) {
+    if (as.settings.isInKyokoMode) {
       return
     }
 
-    am.setInKyokoMode(true)
-
+    app.setInKyokoMode(true)
     notification.success({
       title: 'League Akari 测试模式',
       content: 'Kyoko Mode, on!',
@@ -161,18 +145,44 @@ useKeyboardCombo('AKARI', {
   min-width: var(--app-min-width);
   min-height: var(--app-min-height);
 
-  > .title-bar-area {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-
-  > .content {
+  > #app-content {
     height: 0;
     flex: 1;
     overflow: hidden;
-    margin-top: var(--title-bar-height);
   }
+}
+
+.background-wallpaper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  background-image: url('@main-window/assets/zoe_splash_centered_9.jpg');
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.95) 75%, rgba(0, 0, 0, 0.95) 100%);
+  }
+}
+
+.route-fade-enter-active {
+  transition: opacity 0.2s;
+}
+
+.route-fade-enter-from {
+  opacity: 0;
+}
+
+.route-fade-enter-to {
+  opacity: 1;
 }
 </style>

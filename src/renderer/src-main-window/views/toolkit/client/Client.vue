@@ -10,7 +10,7 @@
           :label-width="320"
         >
           <NButton
-            :disabled="lc.state !== 'connected'"
+            :disabled="lcs.connectionState !== 'connected'"
             size="small"
             secondary
             type="warning"
@@ -25,7 +25,7 @@
           :label-width="320"
         >
           <NButton
-            :disabled="lc.state !== 'connected'"
+            :disabled="lcs.connectionState !== 'connected'"
             size="small"
             secondary
             type="warning"
@@ -36,20 +36,20 @@
         <ControlItem
           class="control-item-margin"
           label-description="当游戏端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏端 (游戏本体) 进程。请注意，此操作为强制结束进程，而非正常的游戏退出流程，可能产生意料之外的副作用"
-          :disabled="!app.isAdministrator"
+          :disabled="!as.isAdministrator"
           :label="
-            app.isAdministrator
+            as.isAdministrator
               ? '使用 Alt+F4 结束游戏端'
               : '使用 Alt+F4 结束游戏端 (需要管理员权限)'
           "
           :label-width="320"
         >
           <NSwitch
-            :disabled="!app.isAdministrator || lc.state !== 'connected'"
+            :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
             size="small"
             type="warning"
-            :value="lc2.settings.terminateGameClientOnAltF4"
-            @update:value="(v) => lcm2.setTerminateGameClientOnAltF4(v)"
+            :value="gcs.settings.terminateGameClientOnAltF4"
+            @update:value="(v) => gc.setTerminateGameClientOnAltF4(v)"
           />
         </ControlItem>
       </NCard>
@@ -57,8 +57,8 @@
         <template #header><span class="card-header-title">League Client UX</span></template>
         <ControlItem
           class="control-item-margin"
-          :disabled="!app.isAdministrator"
-          :label="app.isAdministrator ? '调整窗口大小' : '调整窗口大小 (需要管理员权限)'"
+          :disabled="!as.isAdministrator"
+          :label="as.isAdministrator ? '调整窗口大小' : '调整窗口大小 (需要管理员权限)'"
           label-description="FixLCUWindow - 以 WinAPI 方式调整窗口的大小。在客户端界面大小不正确时，可尝试此操作"
           :label-width="320"
         >
@@ -66,17 +66,10 @@
             <NInputNumber
               style="width: 80px"
               size="small"
-              :disabled="!app.isAdministrator || lc.state !== 'connected'"
+              :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
               :show-button="false"
               :min="1"
-              @update:value="
-                (v) =>
-                  lcm2.setFixWindowMethodAOptions({
-                    baseWidth: v || 1,
-                    baseHeight: lc2.settings.fixWindowMethodAOptions.baseHeight
-                  })
-              "
-              :value="lc2.settings.fixWindowMethodAOptions.baseWidth"
+              v-model:value="fixWindowMethodAOptions.baseWidth"
               @keyup.enter="() => fixWindowInputButton2?.focus()"
             >
               <template #prefix>W</template>
@@ -84,23 +77,16 @@
             <NInputNumber
               ref="input-2"
               style="width: 80px"
-              :disabled="!app.isAdministrator || lc.state !== 'connected'"
+              :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
               size="small"
               :show-button="false"
               :min="1"
-              @update:value="
-                (v) =>
-                  lcm2.setFixWindowMethodAOptions({
-                    baseWidth: lc2.settings.fixWindowMethodAOptions.baseWidth || 1,
-                    baseHeight: v || 1
-                  })
-              "
-              :value="lc2.settings.fixWindowMethodAOptions.baseHeight"
+              v-model:value="fixWindowMethodAOptions.baseHeight"
               @keyup.enter="() => handleFixWindowMethodA()"
               ><template #prefix>H</template>
             </NInputNumber>
             <NButton
-              :disabled="!app.isAdministrator || lc.state !== 'connected'"
+              :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
               size="small"
               secondary
               type="warning"
@@ -116,7 +102,7 @@
           :label-width="320"
         >
           <NButton
-            :disabled="lc.state !== 'connected'"
+            :disabled="lcs.connectionState !== 'connected'"
             size="small"
             secondary
             type="warning"
@@ -131,7 +117,7 @@
           :label-width="320"
         >
           <NButton
-            :disabled="lc.state !== 'connected'"
+            :disabled="lcs.connectionState !== 'connected'"
             type="warning"
             secondary
             size="small"
@@ -146,7 +132,7 @@
           :label-width="320"
         >
           <NButton
-            :disabled="lc.state !== 'connected'"
+            :disabled="lcs.connectionState !== 'connected'"
             type="warning"
             secondary
             size="small"
@@ -161,19 +147,21 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { quit } from '@renderer-shared/http-api/process-control'
-import { killUx, launchUx, restartUx } from '@renderer-shared/http-api/riotclient'
-import { useAppStore } from '@renderer-shared/modules/app/store'
-import { lcuConnectionRendererModule as lcm } from '@renderer-shared/modules/lcu-connection'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { leagueClientRendererModule as lcm2 } from '@renderer-shared/modules/league-client'
-import { useLeagueClientStore } from '@renderer-shared/modules/league-client/store'
+import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { GameClientRenderer } from '@renderer-shared/shards/game-client'
+import { useGameClientStore } from '@renderer-shared/shards/game-client/store'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NButton, NCard, NInputNumber, NScrollbar, NSwitch, useDialog } from 'naive-ui'
-import { ref, useTemplateRef } from 'vue'
+import { reactive, ref, toRaw, useTemplateRef } from 'vue'
 
-const app = useAppStore()
-const lc = useLcuConnectionStore()
-const lc2 = useLeagueClientStore()
+const as = useAppCommonStore()
+const lcs = useLeagueClientStore()
+const gcs = useGameClientStore()
+
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const gc = useInstance<GameClientRenderer>('game-client-renderer')
 
 const dialog = useDialog()
 
@@ -185,7 +173,7 @@ const handleQuitClient = async () => {
     negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        await quit()
+        await lc.api.processControl.quit()
       } catch (error) {
         console.error(error)
       }
@@ -194,7 +182,7 @@ const handleQuitClient = async () => {
 }
 
 const handleDisconnect = async () => {
-  await lcm.lcuDisconnect()
+  await lc.disconnect()
 }
 
 const handleRestartUx = async () => {
@@ -205,7 +193,7 @@ const handleRestartUx = async () => {
     negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        await restartUx()
+        await lc.api.riotclient.restartUx()
       } catch (error) {
         console.error(error)
       }
@@ -222,7 +210,7 @@ const handleKillUx = async () => {
     negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        await killUx()
+        await lc.api.riotclient.killUx()
       } catch (error) {
         console.error(error)
       }
@@ -238,7 +226,7 @@ const handleLaunchUx = async () => {
     negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        await launchUx()
+        await lc.api.riotclient.launchUx()
       } catch (error) {
         console.error(error)
       }
@@ -248,6 +236,11 @@ const handleLaunchUx = async () => {
 
 const fixWindowInputButton2 = useTemplateRef('input-2')
 
+const fixWindowMethodAOptions = reactive({
+  baseWidth: 720,
+  baseHeight: 1280
+})
+
 const handleFixWindowMethodA = async () => {
   dialog.warning({
     title: '修复客户端窗口',
@@ -256,7 +249,7 @@ const handleFixWindowMethodA = async () => {
     negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        await lcm2.fixWindowMethodA()
+        await lc.fixWindowMethodA(toRaw(fixWindowMethodAOptions))
       } catch (error) {
         console.error(error)
       }

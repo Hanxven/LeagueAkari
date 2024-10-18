@@ -1,6 +1,12 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
-  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/*", "src/shared/**/*"],
+  "include": [
+    "electron.vite.config.*",
+    "src/main/**/*",
+    "src/preload/*",
+    "src/shared/**/*",
+    "src/main/shards/game-client"
+  ],
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["ESNext"],

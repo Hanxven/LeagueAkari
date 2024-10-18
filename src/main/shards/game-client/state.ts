@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 
 export class GameClientSettings {
-  terminateGameClientOnAltF4 = true
+  terminateGameClientOnAltF4 = false
 
   constructor() {
     makeAutoObservable(this)

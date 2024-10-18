@@ -1,10 +1,42 @@
+import { ElectronAPI } from '@electron-toolkit/preload'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { IpcRendererEvent, ipcRenderer } from 'electron'
+import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
+import { IpcRendererEvent } from 'electron'
+import { getCurrentScope, onScopeDispose } from 'vue'
 
+import type { LoggerRenderer } from '../logger'
+
+declare global {
+  interface Window {
+    electron: ElectronAPI
+  }
+}
+
+export interface IpcMainSuccessDataType<T = any> {
+  success: true
+  data: T
+}
+
+export interface IpcMainErrorDataType {
+  success: false
+  error: any
+}
+
+const LOGGER_SHARD_NAMESPACE = 'logger-renderer'
+
+export type IpcMainDataType<T = any> = IpcMainSuccessDataType<T> | IpcMainErrorDataType
+
+/**
+ * 渲染进程 IPC 工具, 同时杂糅了一点 Vue 的支持
+ */
 export class AkariIpcRenderer implements IAkariShardInitDispose {
   static id = 'akari-ipc-renderer'
+  static dependencies = [SHARED_GLOBAL_ID]
+
+  private readonly _shared: AkariSharedGlobalShard
 
   private _eventMap = new Map<string, Set<Function>>()
+  private _cancelFn: (() => void) | null = null
 
   private _dispatchEvent(
     _event: IpcRendererEvent,
@@ -23,14 +55,15 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    ipcRenderer.on('akari-event', this._dispatchEvent)
-    await ipcRenderer.invoke('akari-renderer-register', 'register')
+    this._cancelFn = window.electron.ipcRenderer.on('akari-event', this._dispatchEvent)
+    await window.electron.ipcRenderer.invoke('akariRendererRegister', 'register')
   }
 
   async onDispose() {
-    ipcRenderer.off('akari-event', this._dispatchEvent)
-    await ipcRenderer.invoke('akari-renderer-register', 'unregister')
+    this._cancelFn?.()
+    this._cancelFn = null
     this._eventMap.clear()
+    await window.electron.ipcRenderer.invoke('akariRendererRegister', 'unregister')
   }
 
   /**
@@ -40,8 +73,21 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
    * @param args
    * @returns
    */
-  call<T = any>(namespace: string, fnName: string, ...args: any[]) {
-    return ipcRenderer.invoke('akari-call', namespace, fnName, ...args) as Promise<T>
+  async call<T = any>(namespace: string, fnName: string, ...args: any[]) {
+    const result: IpcMainDataType<T> = await window.electron.ipcRenderer.invoke(
+      'akariCall',
+      namespace,
+      fnName,
+      ...args
+    )
+    if (result.success) {
+      return result.data as T
+    } else {
+      // for lazy loading
+      const logger = this._shared.manager.getInstance<LoggerRenderer>(LOGGER_SHARD_NAMESPACE)
+      logger?.error(namespace, result.error)
+      throw new Error('IPC Error', { cause: result.error })
+    }
   }
 
   /**
@@ -66,6 +112,15 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
   }
 
   /**
+   * Vue 可自行解除订阅的事件
+   */
+  onEventVue(namespace: string, eventName: string, fn: (...args: any[]) => void) {
+    const disposeFn = this.onEvent(namespace, eventName, fn)
+    getCurrentScope() && onScopeDispose(() => disposeFn())
+    return disposeFn
+  }
+
+  /**
    * 取消订阅一个事件
    * @param namespace
    * @param eventName
@@ -80,5 +135,8 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
     }
   }
 
-  constructor() {}
+  constructor(deps: any) {
+    this._shared = deps[SHARED_GLOBAL_ID]
+    this._dispatchEvent = this._dispatchEvent.bind(this)
+  }
 }

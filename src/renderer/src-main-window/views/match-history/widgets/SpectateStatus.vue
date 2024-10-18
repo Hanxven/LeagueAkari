@@ -3,7 +3,7 @@
     <div class="queue">
       <IndicatorPulse style="margin-right: 8px" />
       <div class="queue-name">
-        {{ gameData.queues[data.game.gameQueueConfigId]?.name || data.game.gameQueueConfigId }}
+        {{ lcs.gameData.queues[data.game.gameQueueConfigId]?.name || data.game.gameQueueConfigId }}
       </div>
       <NPopover :disabled="isCrossRegion">
         <template #trigger>
@@ -24,7 +24,7 @@
         <ControlItem label="使用 LCU API 观战 (可选)" :label-width="240">
           <template #labelDescription>
             <div>使用 LCU API 调起同大区观战流程，而非通过进程调用</div>
-            <div class="warn-text" v-if="gameflow.phase !== 'None'">
+            <div class="warn-text" v-if="lcs.gameflow.phase !== 'None'">
               使用 LCU API 观战需要退出房间到空闲状态，当前不是空闲状态。请先退出房间
             </div>
           </template>
@@ -32,7 +32,7 @@
             class="launch-spectator"
             size="tiny"
             @click="() => handleSpectate(true)"
-            :disabled="!isSpectatorAvailable || !canSpectate || gameflow.phase !== 'None'"
+            :disabled="!isSpectatorAvailable || !canSpectate || lcs.gameflow.phase !== 'None'"
           >
             <template #icon>
               <NIcon>
@@ -130,10 +130,10 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
-import { getPlayerAccountNameset } from '@renderer-shared/rc-http-api/rc-api'
+import { useInstance } from '@renderer-shared/shards'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { championIconUrl, profileIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
 import { PlayCircleFilled as PlayCircleFilledIcon } from '@vicons/material'
 import { createReusableTemplate, useIntervalFn, useTimeoutFn } from '@vueuse/core'
@@ -176,7 +176,8 @@ const isTftMode = computed(() => {
   return data.game.gameMode === 'TFT'
 })
 
-const gameflow = useGameflowStore()
+const lcs = useLeagueClientStore()
+const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
 
 const teams = computed(() => {
   if (!data) {
@@ -217,8 +218,6 @@ const teams = computed(() => {
   }
 })
 
-const gameData = useGameDataStore()
-
 const relativeText = ref(dayjs(data.playerCredentials.gameCreateDate).locale('zh-cn').fromNow())
 useIntervalFn(
   () => {
@@ -242,7 +241,7 @@ watch(
         }
 
         try {
-          const p = await getPlayerAccountNameset(puuid)
+          const p = await rc.api.playerAccount.getPlayerAccountNameset(puuid)
           updatedSummonerInfo.value = {
             ...updatedSummonerInfo.value,
             [puuid]: {

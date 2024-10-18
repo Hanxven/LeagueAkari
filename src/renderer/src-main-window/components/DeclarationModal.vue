@@ -7,7 +7,7 @@
     :closable="false"
     :close-on-esc="false"
     :mask-closable="false"
-    :class="styles['declaration-modal']"
+    :class="$style['declaration-modal']"
   >
     <template #header><span class="card-header-title">应用声明</span></template>
     <template #footer>
@@ -22,29 +22,28 @@
     </template>
     <div>
       <div class="para">
-        League Akari
+        <LeagueAkariSpan /> (联盟阿卡林)
         是开源软件，旨在提供额外的辅助功能。您不应从任何付费渠道获取此软件。
       </div>
       <div class="para">
-        同时强调，对于使用本软件可能带来的任何后果，包括但不限于游戏账户的封禁、数据损坏或其他任何形式的游戏体验负面影响，本软件的开发者将不承担任何责任。用户在决定使用本软件时，应充分考虑并自行承担由此产生的所有风险和后果。
+        同时告知，对于使用本软件可能带来的任何后果，包括但不限于游戏账户的封禁、数据损坏或其他任何形式的游戏体验负面影响，本软件不承担任何责任。用户在决定使用本软件时，应充分考虑并自行承担由此产生的所有风险和后果。
       </div>
       <div class="para">
-        关于实现战绩查询相关功能的 LCU
-        接口，限制随区服而不同，包括但不限于接口的可用时段、最大近期对局查询数量等。
+        关于实现战绩查询相关功能的相关接口，限制随区服而不同，包括但不限于接口的可用时段、最大近期对局查询数量等。
       </div>
     </div>
   </NModal>
 </template>
 
 <script setup lang="ts">
+import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { NButton, NCheckbox, NFlex, NModal } from 'naive-ui'
-import { ref, useCssModule } from 'vue'
+import { ref } from 'vue'
 
 const emits = defineEmits<{
   (e: 'confirm', notShowAgain: boolean): void
 }>()
 
-const styles = useCssModule()
 const showAgainChecked = ref(false)
 
 const show = defineModel<boolean>('show', { default: false })

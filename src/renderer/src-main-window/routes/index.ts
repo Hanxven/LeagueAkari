@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
+// console.log(import.meta.env.BASE_URL)
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
@@ -54,25 +55,25 @@ const router = createRouter({
         {
           name: 'automation',
           path: '/automation',
-          redirect: { name: 'automation-auto-gameflow' },
-          component: () => import('@main-window/views/automation/Automation.vue'),
-          children: [
-            {
-              name: 'automation-auto-gameflow',
-              path: 'auto-gameflow',
-              component: () => import('@main-window/views/automation/AutoGameflow.vue')
-            },
-            {
-              name: 'automation-auto-select',
-              path: 'auto-select',
-              component: () => import('@main-window/views/automation/AutoSelect.vue')
-            },
-            {
-              name: 'automation-misc',
-              path: 'misc',
-              component: () => import('@main-window/views/automation/AutoMisc.vue')
-            }
-          ]
+          // redirect: { name: 'automation-auto-gameflow' },
+          component: () => import('@main-window/views/automation/Automation.vue')
+          // children: [
+          //   {
+          //     name: 'automation-auto-gameflow',
+          //     path: 'auto-gameflow',
+          //     component: () => import('@main-window/views/automation/AutoGameflow.vue')
+          //   },
+          //   {
+          //     name: 'automation-auto-select',
+          //     path: 'auto-select',
+          //     component: () => import('@main-window/views/automation/AutoSelect.vue')
+          //   },
+          //   {
+          //     name: 'automation-misc',
+          //     path: 'misc',
+          //     component: () => import('@main-window/views/automation/AutoMisc.vue')
+          //   }
+          // ]
         },
         {
           name: 'test',

@@ -43,11 +43,13 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { autoReplyRendererModule as arm } from '@renderer-shared/modules/auto-reply'
-import { useAutoReplyStore } from '@renderer-shared/modules/auto-reply/store'
+import { useInstance } from '@renderer-shared/shards'
+import { AutoReplyRenderer } from '@renderer-shared/shards/auto-reply'
+import { useAutoReplyStore } from '@renderer-shared/shards/auto-reply/store'
 import { NCard, NInput, NScrollbar, NSwitch } from 'naive-ui'
 
 const ar = useAutoReplyStore()
+const arm = useInstance<AutoReplyRenderer>('auto-reply-renderer')
 </script>
 
 <style lang="less" scoped>

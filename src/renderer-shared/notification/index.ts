@@ -4,8 +4,6 @@ import dayjs from 'dayjs'
 import { useNotification } from 'naive-ui'
 import { VNodeChild } from 'vue'
 
-import { mainWindowRendererModule as mwm } from '../modules/main-window'
-
 interface LeagueAkariNotificationEvent {
   type: 'success' | 'error' | 'warning' | 'info'
   title: string | (() => VNodeChild)
@@ -31,28 +29,6 @@ export const laNotification = {
 // 用于 Naive UI 的通知事件展示
 export function setupNaiveUiNotificationEvents() {
   const notification = useNotification()
-
-  mwm.onEvent(
-    'notification',
-    (event: LeagueAkariNotificationEvent & { module: string; id?: string }, options?: object) => {
-      notification.create({
-        type: event.type,
-        title: event.title,
-        content: event.content,
-        duration: LEAGUE_AKARI_DEFAULT_NOTIFICATION_DURATION,
-        ...options
-      })
-
-      console.log(
-        dayjs().format('HH:mm:ss'),
-        event.type,
-        event.title,
-        event.content,
-        event.error,
-        event.module
-      )
-    }
-  )
 
   bus.on((event) => {
     notification.create({

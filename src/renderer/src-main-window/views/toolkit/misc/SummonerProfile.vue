@@ -53,7 +53,7 @@
         size="small"
         type="primary"
         @click="isModalShow = true"
-        :disabled="lc.state !== 'connected'"
+        :disabled="lcs.connectionState !== 'connected'"
         >选择</NButton
       >
     </ControlItem>
@@ -64,7 +64,7 @@
       :label-width="200"
     >
       <NButton
-        :disabled="lc.state !== 'connected'"
+        :disabled="lcs.connectionState !== 'connected'"
         @click="handleUpdatePr"
         :loading="isUpdating"
         size="small"
@@ -74,15 +74,16 @@
     <ControlItem
       class="control-item-margin"
       :label-description="
-        summoner.me && summoner.me.summonerLevel <= MINIMUM_SUMMONER_LEVEL_FOR_PRESTIGE_CREST
-          ? `卸下头像框 (召唤师等级需大于等于 525, 当前等级为 ${summoner.me.summonerLevel})`
+        lcs.summoner.me &&
+        lcs.summoner.me.summonerLevel <= MINIMUM_SUMMONER_LEVEL_FOR_PRESTIGE_CREST
+          ? `卸下头像框 (召唤师等级需大于等于 525, 当前等级为 ${lcs.summoner.me.summonerLevel})`
           : '卸下头像框'
       "
       label="卸下头像框"
       :label-width="200"
     >
       <NButton
-        :disabled="lc.state !== 'connected'"
+        :disabled="lcs.connectionState !== 'connected'"
         @click="handleRemovePrestigeCrest"
         :loading="isRemovingPrestigeCrest"
         size="small"
@@ -96,7 +97,7 @@
       :label-width="200"
     >
       <NButton
-        :disabled="lc.state !== 'connected'"
+        :disabled="lcs.connectionState !== 'connected'"
         @click="handleRemoveTokens"
         :loading="isRemovingTokens"
         size="small"
@@ -109,30 +110,22 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { updatePlayerPreferences } from '@renderer-shared/http-api/challenges'
-import { getMe } from '@renderer-shared/http-api/chat'
-import { getChampDetails } from '@renderer-shared/http-api/game-data'
-import { getRegalia, updateRegalia } from '@renderer-shared/http-api/regalia'
-import {
-  setSummonerBackgroundAugments,
-  setSummonerBackgroundSkin
-} from '@renderer-shared/http-api/summoner'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
-import { ChampSkin } from '@shared/types/lcu/game-data'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { ChampSkin } from '@shared/types/league-client/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
 import { VNode, computed, h, ref, watch } from 'vue'
 
-const gameData = useGameDataStore()
-const lc = useLcuConnectionStore()
+const lcs = useLeagueClientStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const currentChampionId = ref<number>()
 const currentSkinId = ref<number>()
 const currentAugmentId = ref<string>()
 const championOptions = computed(() => {
-  const list = Object.values(gameData.champions).reduce((arr, current) => {
+  const list = Object.values(lcs.gameData.champions).reduce((arr, current) => {
     if (current.id === -1) {
       return arr
     }
@@ -266,7 +259,7 @@ watch(
       return
     }
 
-    const details = (await getChampDetails(id)).data
+    const details = (await lc.api.gameData.getChampDetails(id)).data
 
     if (details.id !== currentChampionId.value) {
       return
@@ -291,9 +284,9 @@ const handleApplyToProfile = async () => {
 
   isProceeding.value = true
   try {
-    await setSummonerBackgroundSkin(currentSkinId.value)
+    await lc.api.summoner.setSummonerBackgroundSkin(currentSkinId.value)
     if (currentAugmentId.value !== undefined) {
-      await setSummonerBackgroundAugments(currentAugmentId.value)
+      await lc.api.summoner.setSummonerBackgroundAugments(currentAugmentId.value)
     }
     message.success('成功', { duration: 1000 })
   } catch (error) {
@@ -314,7 +307,7 @@ const handleUpdatePr = async () => {
 
   try {
     isUpdating.value = true
-    await updatePlayerPreferences({ bannerAccent: BANNER_ACCENT_A })
+    await lc.api.challenges.updatePlayerPreferences({ bannerAccent: BANNER_ACCENT_A })
     message.success('请求成功')
   } catch (error) {
     message.warning('无法执行')
@@ -335,8 +328,8 @@ const handleRemovePrestigeCrest = async () => {
 
   try {
     isRemovingPrestigeCrest.value = true
-    const current = await getRegalia()
-    await updateRegalia({
+    const current = await lc.api.regalia.getRegalia()
+    await lc.api.regalia.updateRegalia({
       preferredCrestType: 'prestige',
       preferredBannerType: current.data.bannerType,
       selectedPrestigeCrest: FIXED_PRESTIGE_CREST
@@ -350,8 +343,6 @@ const handleRemovePrestigeCrest = async () => {
   }
 }
 
-const summoner = useSummonerStore()
-
 const isRemovingTokens = ref(false)
 // Copied from Seraphine: https://github.com/Zzaphkiel/Seraphine
 const handleRemoveTokens = async () => {
@@ -361,9 +352,9 @@ const handleRemoveTokens = async () => {
 
   try {
     isRemovingTokens.value = true
-    await updatePlayerPreferences({
+    await lc.api.challenges.updatePlayerPreferences({
       challengeIds: [],
-      bannerAccent: (await getMe()).data.lol?.bannerIdSelected
+      bannerAccent: (await lc.api.chat.getMe()).data.lol?.bannerIdSelected
     })
     message.success('请求成功')
   } catch (error) {

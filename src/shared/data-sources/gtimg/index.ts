@@ -34,7 +34,7 @@ export interface Hero {
   instance_id: string
 }
 
-export class Gtimg {
+export class GtimgApi {
   static BASE_URL = 'https://game.gtimg.cn/'
 
   static USER_AGENT =
@@ -42,14 +42,14 @@ export class Gtimg {
 
   private _http = axios.create({
     headers: {
-      'User-Agent': Gtimg.USER_AGENT
+      'User-Agent': GtimgApi.USER_AGENT
     },
-    baseURL: Gtimg.BASE_URL
+    baseURL: GtimgApi.BASE_URL
   })
 
   constructor() {
     axiosRetry(this._http, {
-      retries: 3,
+      retries: 2,
       retryDelay: () => 0,
       retryCondition: (error) => {
         return Boolean(error.response)

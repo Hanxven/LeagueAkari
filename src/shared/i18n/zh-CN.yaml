@@ -1,0 +1,82 @@
+auto-select-renderer:
+  settings:
+    enabled:
+      label: 启用
+      description: 在常规的模式中启用。如匹配模式，排位模式等任何非随机英雄的模式
+    showIntent:
+      label: 提前预选
+      description: 预选即将自动选用的英雄
+    selectTeammateIntendedChampion:
+      label: 无视队友预选
+      description: 开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突
+    completed:
+      label: 选择策略
+      description: 立即锁定或只是亮出
+      options:
+        true: 立即锁定
+        false: 只是亮出
+    expectedChampions:
+      label: 意向英雄
+      description: |
+        <div style="margin-bottom: 8px">将根据预设列表选择英雄</div>
+        <div style="margin-bottom: 8px">若当前模式<span style="font-weight: bold">不存在分路信息</span>或<span style="font-weight: bold">当前分路未设置英雄</span>，则按照<span style="font-weight: bold">默认</span>列表进行选择</div>
+        <div>选择优先级为列表定义顺序，优先选择位置靠前的英雄</div>
+
+match-history-tabs-renderer:
+  lose: 失败
+  win: 胜利
+  remake: 重开
+  team100: 蓝队
+  team200: 红队
+
+settings-about-panel-component:
+  line1: 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖
+  line2: 项目参考
+  line3: Github：
+  line4: © 2024 Hanxven. 本软件是开源软件，遵循 MIT 许可证。
+  downloadSource:
+    label: 检查更新
+    description: 从下载源 ({source}) 中检查更新
+    buttonCheck: 检查更新
+    buttonShowNewUpdate: 新版本内容
+    buttonRecentlyCheck: 最近检查
+  updateProgressInfo:
+    label: 更新流程
+    description: 正在进行的更新流程
+  downloadingProgress:
+    label: 下载更新包
+    progress: 已完成 {percent} %
+    remainingTime: 剩余：{time}
+    downloadFailed: 下载失败
+  unpackingProgress:
+    label: 解压更新包
+    progress: 已完成 {percent} %
+    unpackFailed: 解压出错
+  restart:
+    label: 等待重新启动
+    description: 关闭应用后将进行自动更新流程
+  updatesDir:
+    label: 更新目录
+    description: 当前更新已下载的位置，若无法执行完整的自动更新流程，则需要手动更新
+
+announcement-modal-component:
+  title: 公告
+  updatedAt: 更新
+  close: 关闭
+  read: 已读
+  currentNoAnnouncement: 暂无公告
+
+common:
+  lanes:
+    top: 上单
+    jungle: 打野
+    mid: 中单
+    bot: 下路
+    support: 辅助
+    utility: 辅助
+    TOP: 上单
+    JUNGLE: 打野
+    MID: 中单
+    BOT: 下路
+    SUPPORT: 辅助
+    UTILITY: 辅助

@@ -7,12 +7,12 @@ export interface IpcMainSuccessDataType<T = any> {
   data: T
 }
 
-export interface IpcMainErrorDataType<T = any> {
+export interface IpcMainErrorDataType {
   success: false
-  error: T
+  error: any
 }
 
-export type IpcMainDataType<T = any> = IpcMainSuccessDataType<T> | IpcMainErrorDataType<T>
+export type IpcMainDataType<T = any> = IpcMainSuccessDataType<T> | IpcMainErrorDataType
 
 /**
  * League Akari 的 IPC 主进程实现
@@ -83,22 +83,29 @@ export class AkariIpcMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    ipcMain.handle('akari-call', this._handleRendererInvocation)
-    ipcMain.handle('akari-renderer-register', this._handleRendererRegister)
+    ipcMain.handle('akariCall', this._handleRendererInvocation)
+    ipcMain.handle('akariRendererRegister', this._handleRendererRegister)
   }
 
   async onDispose() {
-    ipcMain.off('akari-call', this._handleRendererInvocation)
-    ipcMain.off('akari-renderer-register', this._handleRendererRegister)
+    ipcMain.removeHandler('akariCall')
+    ipcMain.removeHandler('akariRendererRegister')
     this._callMap.clear()
   }
 
+  /**
+   * 发送到所有已订阅的渲染进程, 事件名使用 kebab-case
+   */
   sendEvent(namespace: string, eventName: string, ...args: any[]) {
     this._renderers.forEach((id) =>
       webContents.fromId(id)?.send('akari-event', namespace, eventName, ...args)
     )
   }
 
+  /**
+   * 处理来自渲染进程的调用, 方法名使用 camelCase
+   * @param cb
+   */
   onCall(namespace: string, fnName: string, cb: (...args: any[]) => Promise<any> | any) {
     const key = `${namespace}:${fnName}`
     if (this._callMap.has(key)) {

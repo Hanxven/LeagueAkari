@@ -2,7 +2,6 @@ import axios from 'axios'
 import { AxiosRetry } from 'axios-retry'
 import axiosRetry from 'axios-retry'
 
-import { NormalizedExternalChampBuildDataSourceMeta } from '../normalized/champ-build'
 import {
   ModeType,
   OpggARAMBalance,
@@ -22,7 +21,7 @@ const isNodeEnvironment =
 
 const _axiosRetry: AxiosRetry = isNodeEnvironment ? require('axios-retry').default : axiosRetry
 
-export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMeta {
+export class OpggDataApi {
   static USER_AGENT =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
   static BASE_URL = 'https://lol-api-champion.op.gg'
@@ -52,7 +51,7 @@ export class OpggDataSource implements NormalizedExternalChampBuildDataSourceMet
   }
 
   private _http = axios.create({
-    baseURL: OpggDataSource.BASE_URL
+    baseURL: OpggDataApi.BASE_URL
     // headers: {
     //   'User-Agent': OpggDataSource.USER_AGENT
     // }

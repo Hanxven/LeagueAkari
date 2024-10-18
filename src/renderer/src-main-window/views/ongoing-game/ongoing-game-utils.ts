@@ -1,8 +1,5 @@
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
-import { InjectionKey, computed } from 'vue'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { computed } from 'vue'
 
 import BronzeMedal from '@main-window/assets/ranked-icons/bronze.png'
 import ChallengerMedal from '@main-window/assets/ranked-icons/challenger.png'
@@ -56,51 +53,47 @@ export const POSITION_ASSIGNMENT_REASON = {
   }
 }
 
-export function useQueueOptions() {
-  const gameData = useGameDataStore()
+export function useSgpTagOptions() {
+  const lc = useLeagueClientStore()
 
   return computed(() => {
     return [
       {
-        label: '当前队列',
-        value: -10
-      },
-      {
         label: '全部队列',
-        value: -20
+        value: 'all'
       },
       {
-        label: gameData.queues[420]?.name || 'Ranked Solo/Duo',
-        value: 420
+        label: lc.gameData.queues[420]?.name || 'Ranked Solo/Duo',
+        value: `q_420`
       },
       {
-        label: gameData.queues[430]?.name || 'Normal',
-        value: 430
+        label: lc.gameData.queues[430]?.name || 'Normal',
+        value: `q_430`
       },
       {
-        label: gameData.queues[440]?.name || 'Ranked Flex',
-        value: 440
+        label: lc.gameData.queues[440]?.name || 'Ranked Flex',
+        value: `q_440`
       },
       {
-        label: gameData.queues[450]?.name || 'ARAM',
-        value: 450
+        label: lc.gameData.queues[450]?.name || 'ARAM',
+        value: `q_450`
       },
 
       {
-        label: gameData.queues[1700]?.name || 'ARENA',
-        value: 1700
+        label: lc.gameData.queues[1700]?.name || 'ARENA',
+        value: 'q_1700'
       },
       {
-        label: gameData.queues[490]?.name || 'Quickplay',
-        value: 490
+        label: lc.gameData.queues[490]?.name || 'Quickplay',
+        value: `q_490`
       },
       {
-        label: gameData.queues[1900]?.name || 'URF',
-        value: 1900
+        label: lc.gameData.queues[1900]?.name || 'URF',
+        value: `q_1900`
       },
       {
-        label: gameData.queues[900]?.name || 'ARURF',
-        value: 900
+        label: lc.gameData.queues[900]?.name || 'ARURF',
+        value: `q_900`
       }
     ]
   })
@@ -128,21 +121,19 @@ export function useOrderOptions() {
 }
 
 export function useIdleState() {
-  const gameflow = useGameflowStore()
-  const champSelect = useChampSelectStore()
-  const lc = useLcuConnectionStore()
+  const lc = useLeagueClientStore()
 
   return computed(() => {
     return (
-      gameflow.phase === 'Lobby' ||
-      gameflow.phase === 'None' ||
-      gameflow.phase === 'Matchmaking' ||
-      gameflow.phase === 'ReadyCheck' ||
-      gameflow.phase === 'WatchInProgress' ||
-      (gameflow.phase !== 'InProgress' &&
-        champSelect.session &&
-        champSelect.session.isSpectating) ||
-      lc.state !== 'connected'
+      lc.gameflow.phase === 'Lobby' ||
+      lc.gameflow.phase === 'None' ||
+      lc.gameflow.phase === 'Matchmaking' ||
+      lc.gameflow.phase === 'ReadyCheck' ||
+      lc.gameflow.phase === 'WatchInProgress' ||
+      (lc.gameflow.phase !== 'InProgress' &&
+        lc.champSelect.session &&
+        lc.champSelect.session.isSpectating) ||
+      lc.connectionState !== 'connected'
     )
   })
 }
@@ -242,7 +233,7 @@ export const PRE_MADE_TEAMS = [
   'Z'
 ]
 
-export const PRE_MADE_TEAM_COLORS = {
+export const PREMADE_TEAM_COLORS = {
   A: { foregroundColor: '#da2e80', color: '#fff' },
   B: { foregroundColor: '#17d628', color: '#000' },
   C: { foregroundColor: '#628aff', color: '#000' },
@@ -254,5 +245,3 @@ export const PRE_MADE_TEAM_COLORS = {
 }
 
 export const FIXED_CARD_WIDTH_PX_LITERAL = '240px'
-
-export const ONGOING_GAME_COMP_K = Symbol('AKARI_OGC_IJK') as InjectionKey<any>

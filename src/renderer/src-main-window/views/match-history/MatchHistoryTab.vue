@@ -2,8 +2,10 @@
   <div class="player-page">
     <PlayerTagEditModal
       :puuid="tab.puuid"
+      :summoner="tab.summoner"
+      :tags="tab.tags"
       v-model:show="isShowingTagEditModal"
-      @edited="(id) => handleTagEdited(id)"
+      @submit="(id) => handleTagEdited(id)"
     />
     <NModal v-model:show="isShowingRankedModal">
       <div class="ranked-modal">
@@ -33,8 +35,10 @@
               class="header-button"
               size="small"
               title="切换到上一页"
-              @click="handleLoadPage(tab.matchHistory.page - 1)"
-              :disabled="tab.matchHistory.page <= 1 || tab.loading.isLoadingMatchHistory"
+              @click="handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 2) - 1)"
+              :disabled="
+                !tab.matchHistoryPage || tab.matchHistoryPage.page <= 1 || tab.isLoadingMatchHistory
+              "
               tertiary
             >
               <template #icon>
@@ -46,8 +50,8 @@
               size="small"
               round
               class="header-button"
-              @click="() => handleLoadPage(tab.matchHistory.page + 1)"
-              :disabled="tab.loading.isLoadingMatchHistory"
+              @click="handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 1) + 1)"
+              :disabled="!tab.matchHistoryPage || tab.isLoadingMatchHistory"
               tertiary
             >
               <template #icon>
@@ -92,14 +96,14 @@
                   :text="summonerName(tab.summoner?.gameName, tab.summoner?.tagLine, '-')"
                   >{{ tab.summoner?.gameName || '-' }}</CopyableText
                 >
-                <NPopover v-if="spectatorData && isSmallScreen" display-directive="show">
+                <NPopover v-if="tab.spectatorData && isSmallScreen" display-directive="show">
                   <template #trigger>
                     <IndicatorPulse />
                   </template>
                   <div style="width: 256px">
                     <SpectateStatus
-                      :is-cross-region="!isInSameRegion"
-                      :data="spectatorData"
+                      :is-cross-region="!isOnSelfSgpServer"
+                      :data="tab.spectatorData"
                       :puuid="tab.puuid"
                       @to-summoner="(puuid) => handleToSummoner(puuid)"
                       @launch-spectator="handleLaunchSpectator"
@@ -141,7 +145,7 @@
               class="square-button"
               title="标记"
               @click="() => handleTagPlayer()"
-              v-if="!isSelf && isInSameRegion"
+              v-if="!isSelfTab && isOnSelfSgpServer"
             >
               <template #icon>
                 <NIcon><EditIcon /></NIcon>
@@ -167,43 +171,45 @@
             style="width: 48px"
             v-model:value="inputtingPage"
             @blur="handleInputBlur"
-            @keyup.enter="() => handleLoadPage(inputtingPage || 1)"
-            :disabled="tab.loading.isLoadingMatchHistory"
+            @keyup.enter="() => handleLoadMatchHistoryPage(inputtingPage || 1)"
+            :disabled="tab.isLoadingMatchHistory"
             :min="1"
             :show-button="false"
           />
           <NButton
             size="small"
             title="切换到上一页"
-            @click="handleLoadPage(tab.matchHistory.page - 1)"
-            :disabled="tab.matchHistory.page <= 1 || tab.loading.isLoadingMatchHistory"
+            @click="handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 2) - 1)"
+            :disabled="
+              !tab.matchHistoryPage || tab.matchHistoryPage.page <= 1 || tab.isLoadingMatchHistory
+            "
             secondary
             >上一页</NButton
           >
           <NButton
             title="切换到下一页"
             size="small"
-            @click="() => handleLoadPage(tab.matchHistory.page + 1)"
-            :disabled="tab.loading.isLoadingMatchHistory"
+            @click="() => handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 1) + 1)"
+            :disabled="tab.isLoadingMatchHistory"
             secondary
             >下一页</NButton
           >
           <NSelect
-            :value="tab.matchHistory.pageSize"
+            :value="tab.matchHistoryPage?.pageSize"
             @update:value="handleChangePageSize"
-            :disabled="tab.loading.isLoadingMatchHistory"
+            :disabled="tab.isLoadingMatchHistory"
             class="page-select"
             size="small"
             style="width: 108px"
             :options="pageSizeOptions"
           ></NSelect>
           <NSelect
-            v-if="isMustUseSgpApi"
+            v-if="mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.matchHistory"
             size="small"
-            :value="tab.matchHistory.queueFilter"
+            :value="tab.matchHistoryPage?.tag || 'all'"
             style="width: 160px"
             @update:value="handleChangeSgpTag"
-            :disabled="tab.loading.isLoadingMatchHistory"
+            :disabled="tab.isLoadingMatchHistory"
             :options="sgpTagOptions"
           ></NSelect>
         </div>
@@ -218,31 +224,35 @@
                     style="flex: 1"
                     v-model:value="inputtingPage"
                     @blur="handleInputBlur"
-                    @keyup.enter="() => handleLoadPage(inputtingPage || 1)"
-                    :disabled="tab.loading.isLoadingMatchHistory"
+                    @keyup.enter="() => handleLoadMatchHistoryPage(inputtingPage || 1)"
+                    :disabled="tab.isLoadingMatchHistory"
                     :min="1"
                     :show-button="false"
                   />
                   <NButton
                     size="small"
                     title="切换到上一页"
-                    @click="handleLoadPage(tab.matchHistory.page - 1)"
-                    :disabled="tab.matchHistory.page <= 1 || tab.loading.isLoadingMatchHistory"
+                    @click="handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 2) - 1)"
+                    :disabled="
+                      !tab.matchHistoryPage ||
+                      tab.matchHistoryPage.page <= 1 ||
+                      tab.isLoadingMatchHistory
+                    "
                     secondary
                     >上一页</NButton
                   >
                   <NButton
                     title="切换到下一页"
                     size="small"
-                    @click="() => handleLoadPage(tab.matchHistory.page + 1)"
-                    :disabled="tab.loading.isLoadingMatchHistory"
+                    @click="handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 1) + 1)"
+                    :disabled="!tab.matchHistoryPage || tab.isLoadingMatchHistory"
                     secondary
                     >下一页</NButton
                   >
                   <NSelect
-                    :value="tab.matchHistory.pageSize"
+                    :value="tab.matchHistoryPage?.pageSize"
                     @update:value="handleChangePageSize"
-                    :disabled="tab.loading.isLoadingMatchHistory"
+                    :disabled="tab.isLoadingMatchHistory"
                     class="page-select"
                     size="small"
                     style="width: 86px"
@@ -251,13 +261,12 @@
                 </div>
                 <NSelect
                   v-if="
-                    (cf.settings.useSgpApi && eds.sgpAvailability.serversSupported.matchHistory) ||
-                    eds.sgpAvailability.sgpServerId !== tab.sgpServerId
+                    currentSgpServerSupported.matchHistory && mhs.settings.matchHistoryUseSgpApi
                   "
                   size="small"
-                  :value="tab.matchHistory.queueFilter"
+                  :value="tab.matchHistoryPage?.tag"
                   @update:value="handleChangeSgpTag"
-                  :disabled="tab.loading.isLoadingMatchHistory"
+                  :disabled="tab.isLoadingMatchHistory"
                   style="margin-top: 8px"
                   :options="sgpTagOptions"
                 ></NSelect>
@@ -265,32 +274,28 @@
             </div>
             <div
               class="left-content-item privacy-private"
-              v-if="!isSelf && tab.summoner && tab.summoner.privacy === 'PRIVATE'"
+              v-if="!isSelfTab && tab.summoner && tab.summoner.privacy === 'PRIVATE'"
             >
               <div class="left-content-item-title">生涯隐藏</div>
               <div class="left-content-item-content">该玩家设置了生涯不可见</div>
             </div>
-            <div class="left-content-item tagged-player" v-if="!isSelf && tab.savedInfo?.tag">
+            <div
+              v-for="tagInfo of tab.tags"
+              :key="tagInfo.selfPuuid"
+              class="left-content-item tagged-player"
+            >
               <div class="left-content-item-title">已被标记的玩家</div>
-              <div class="tagged-by-other-summoner" v-if="taggerSummoner">
-                <span class="left-span">标记自</span>
-                <LcuImage
-                  class="profile-icon"
-                  :src="profileIconUrl(taggerSummoner.profileIconId)"
-                />
-                <div class="name-and-tag" @click="() => handleToSummoner(taggerSummoner!.puuid)">
-                  <span class="game-name">{{ taggerSummoner.gameName }}</span>
-                  <span class="tag-line">#{{ taggerSummoner.tagLine }}</span>
-                </div>
-              </div>
               <NScrollbar class="tagged-player-n-scrollbar">
-                <div class="left-content-item-content">{{ tab.savedInfo.tag }}</div>
+                <div class="left-content-item-content">{{ tagInfo.tag }}</div>
               </NScrollbar>
             </div>
-            <div class="left-content-item" v-if="isMustUseSgpApi && spectatorData">
+            <div
+              class="left-content-item"
+              v-if="currentSgpServerSupported.common && tab.spectatorData"
+            >
               <SpectateStatus
-                :is-cross-region="!isInSameRegion"
-                :data="spectatorData"
+                :is-cross-region="!isOnSelfSgpServer"
+                :data="tab.spectatorData"
                 :puuid="tab.puuid"
                 @to-summoner="(puuid, newTab) => handleToSummoner(puuid, newTab)"
                 @launch-spectator="handleLaunchSpectator"
@@ -299,7 +304,7 @@
             <div class="left-content-item" v-if="analysis.matchHistory">
               <div class="left-content-item-title">总览</div>
               <div class="left-content-item-content">
-                <div class="stat-item" v-if="app.settings.isInKyokoMode" title="Akari's insight">
+                <div class="stat-item" v-if="as.settings.isInKyokoMode" title="Akari's insight">
                   <span class="stat-item-label">Akari Score</span>
                   <span class="stat-item-content" :class="{ 'n-a': analysis.akariScore === null }">
                     <template v-if="analysis.akariScore !== null">
@@ -390,7 +395,7 @@
                         </div>
                       </template>
                       <div class="stat-item-content-champion">
-                        <div>{{ gameData.champions[c.id]?.name }} · {{ c.count }} 场</div>
+                        <div>{{ lcs.gameData.champions[c.id]?.name }} · {{ c.count }} 场</div>
                         <div class="win-lose-box">
                           <span class="win">{{ c.win }} 胜</span>
                           <span class="lose">{{ c.lose }} 负</span>
@@ -432,18 +437,21 @@
             <MatchHistoryCard
               class="match-history-card-item"
               @set-show-detailed-game="handleToggleShowDetailedGame"
-              @load-detailed-game="(gameId) => mhm.fetchTabDetailedGame(tab.puuid, gameId)"
+              @load-detailed-game="(_) => loadDetailedGame(g)"
               @to-summoner="(puuid, newTab) => handleToSummoner(puuid, newTab)"
               :self-puuid="tab.puuid"
               :is-detailed="g.isDetailed"
               :is-loading="g.isLoading"
               :is-expanded="g.isExpanded"
               :game="g.game"
-              v-for="g of tab.matchHistory.games"
+              v-for="g of tab.matchHistoryPage?.games"
               :key="g.game.gameId"
             />
-            <div class="match-history-empty-placeholder" v-if="!tab.matchHistory.games.length">
-              <NSpin v-if="tab.loading.isLoadingMatchHistory" />
+            <div
+              class="match-history-empty-placeholder"
+              v-if="!tab.matchHistoryPage || tab.matchHistoryPage.games.length"
+            >
+              <NSpin v-if="tab.isLoadingMatchHistory" />
               <span v-else>暂无数据</span>
             </div>
           </div>
@@ -457,20 +465,18 @@
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import { launchSpectator } from '@renderer-shared/http-api/spectator'
-import { getSummonerByPuuid } from '@renderer-shared/http-api/summoner'
-import { appRendererModule as am } from '@renderer-shared/modules/app'
-import { useAppStore } from '@renderer-shared/modules/app/store'
-import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
-import { externalDataSourceRendererModule as edsm } from '@renderer-shared/modules/external-data-source'
-import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
-import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
-import { leagueClientRendererModule as lcm } from '@renderer-shared/modules/league-client'
 import { laNotification } from '@renderer-shared/notification'
-import { SpectatorData } from '@shared/data-sources/sgp/types'
-import { SummonerInfo } from '@shared/types/lcu/summoner'
+import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { GameClientRenderer } from '@renderer-shared/shards/game-client'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { championIconUrl, profileIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
+import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
+import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
+import { SgpRenderer } from '@renderer-shared/shards/sgp'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import {
   analyzeMatchHistory,
   analyzeMatchHistoryPlayers,
@@ -496,12 +502,16 @@ import {
   NSpin,
   useNotification
 } from 'naive-ui'
-import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, markRaw, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import RankedTable from '@main-window/components/RankedTable.vue'
-import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
-import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
+import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import {
+  GameDataState,
+  TabState,
+  useMatchHistoryTabsStore
+} from '@main-window/shards/match-history-tabs/store'
 
 import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import IndicatorPulse from './widgets/IndicatorPulse.vue'
@@ -509,29 +519,40 @@ import RankedDisplay from './widgets/RankedDisplay.vue'
 import SpectateStatus from './widgets/SpectateStatus.vue'
 
 const { tab } = defineProps<{
-  tab: TabState & { id: string }
+  tab: TabState
 }>()
 
-const isMustUseSgpApi = computed(() => {
-  return cf.settings.useSgpApi || eds.sgpAvailability.sgpServerId !== tab.sgpServerId
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
+const sgp = useInstance<SgpRenderer>('sgp-renderer')
+const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
+const log = useInstance<LoggerRenderer>('logger-renderer')
+const sp = useInstance<SavedPlayerRenderer>('saved-player-renderer')
+const gc = useInstance<GameClientRenderer>('game-client-renderer')
+
+const lcs = useLeagueClientStore()
+const mhs = useMatchHistoryTabsStore()
+const sgps = useSgpStore()
+
+// 借用类型
+
+const currentSgpServerSupported = computed(() => {
+  return (
+    sgps.availability.sgpServers.servers[tab.sgpServerId] || { common: false, matchHistory: false }
+  )
 })
 
-const summoner = useSummonerStore()
-
-const isSelf = computed(() => {
-  return summoner.me?.puuid === tab.puuid
+const isOnSelfSgpServer = computed(() => {
+  return sgps.availability.sgpServerId === tab.sgpServerId
 })
 
-const isInSameRegion = computed(() => {
-  return eds.sgpAvailability.sgpServerId === tab.sgpServerId
+const isSelfTab = computed(() => {
+  return lcs.summoner.me?.puuid === tab.puuid
 })
-
-// 1182px - is same in which defined in CSS
-const isSmallScreen = useMediaQuery(`(max-width: 1182px)`)
 
 const analysis = computed(() => {
-  const matchHistory = analyzeMatchHistory(tab.matchHistory.games, tab.puuid)
-  const players = analyzeMatchHistoryPlayers(tab.matchHistory.games, tab.puuid)
+  const matchHistory = analyzeMatchHistory(tab.matchHistoryPage?.games || [], tab.puuid)
+  const players = analyzeMatchHistoryPlayers(tab.matchHistoryPage?.games || [], tab.puuid)
 
   return {
     matchHistory: matchHistory,
@@ -540,28 +561,220 @@ const analysis = computed(() => {
   }
 })
 
-const eds = useExternalDataSourceStore()
+const loadSummoner = async () => {
+  if (tab.isLoadingSummoner) {
+    return
+  }
+
+  try {
+    tab.isLoadingSummoner = true
+
+    // 在非当前登录服务器的情况下, 需要借用 RC 和 SGP API 来补全召唤师信息 (仅限腾讯服之间)
+    if (sgps.availability.sgpServerId !== tab.sgpServerId) {
+      // 需要 SGP API 支持
+      if (currentSgpServerSupported.value.common) {
+        const data = await sgp.getSummonerLcuFormat(tab.puuid, tab.sgpServerId)
+
+        const ns = await rc.api.playerAccount.getPlayerAccountNameset(tab.puuid)
+        data.gameName = ns.gnt.gameName
+        data.tagLine = ns.gnt.tagLine
+        tab.summoner = markRaw(data)
+      }
+    } else {
+      const { data } = await lc.api.summoner.getSummonerByPuuid(tab.puuid)
+      tab.summoner = markRaw(data)
+    }
+  } catch (error) {
+    laNotification.warn('加载失败', '拉取召唤师信息失败', error)
+    log.warn(MatchHistoryTabsRenderer.id, '拉取召唤师信息失败', error)
+  } finally {
+    tab.isLoadingSummoner = false
+  }
+}
+
+/**
+ * 战绩信息, 目前无法在腾讯服务器跨区查询
+ */
+const loadRankedStats = async () => {
+  if (!isOnSelfSgpServer.value) {
+    return
+  }
+
+  if (tab.isLoadingRankedStats) {
+    return
+  }
+
+  try {
+    tab.isLoadingRankedStats = true
+    const { data } = await lc.api.ranked.getRankedStats(tab.puuid)
+    tab.rankedStats = markRaw(data)
+  } catch (error) {
+    laNotification.warn('加载失败', '拉取排位信息失败', error)
+    log.warn(MatchHistoryTabsRenderer.id, '拉取排位信息失败', error)
+  } finally {
+    tab.isLoadingRankedStats = false
+  }
+}
+
+const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) => {
+  if (tab.isLoadingMatchHistory) {
+    return
+  }
+
+  page = page || 1
+  pageSize = pageSize || 20
+
+  try {
+    tab.isLoadingMatchHistory = true
+
+    // 在优先使用 SGP API 查询战绩时, 且当前的 SGP Server 记录在案, 则使用之
+    if (mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.value.matchHistory) {
+      const data = await sgp.getMatchHistoryLcuFormat(
+        tab.puuid,
+        (page - 1) * pageSize,
+        pageSize,
+        tag === 'all' ? undefined : tag,
+        tab.sgpServerId
+      )
+      tab.matchHistoryPage = {
+        page,
+        pageSize,
+        tag: tag || 'all',
+        source: 'sgp',
+        games: data.games.games.map((g) => ({
+          isDetailed: true,
+          isLoading: false,
+          isExpanded: false,
+          hasError: false,
+          game: markRaw(g)
+        }))
+      }
+    } else {
+      // 若否, 则使用 LCU API, 仅限当前登录大区
+      if (sgps.availability.sgpServerId === tab.sgpServerId) {
+        const { data } = await lc.api.matchHistory.getMatchHistory(tab.puuid, page, pageSize)
+        tab.matchHistoryPage = {
+          page,
+          pageSize,
+          tag: 'all',
+          source: 'lcu',
+          games: data.games.games.map((g) => ({
+            isDetailed: false,
+            isLoading: false,
+            isExpanded: false,
+            hasError: false,
+            game: markRaw(g)
+          }))
+        }
+
+        const tasks = tab.matchHistoryPage.games.map(async (g) => {
+          const cached = mhs.detailedGameLruMap.get(g.game.gameId)
+          if (cached) {
+            g.game = markRaw(cached)
+            g.isDetailed = true
+            return
+          }
+
+          try {
+            g.isLoading = true
+            const { data: game } = await lc.api.matchHistory.getGame(g.game.gameId)
+            g.game = markRaw(game)
+            mhs.detailedGameLruMap.set(g.game.gameId, game)
+          } catch (error) {
+            g.hasError = true
+            log.warn(MatchHistoryTabsRenderer.id, '拉取详细战绩信息失败', error)
+          } finally {
+            g.isLoading = false
+          }
+        })
+
+        await Promise.all(tasks)
+      }
+    }
+  } catch (error) {
+    laNotification.warn('加载失败', '拉取战绩信息失败', error)
+    log.warn(MatchHistoryTabsRenderer.id, '拉取战绩信息失败', error)
+  } finally {
+    tab.isLoadingMatchHistory = false
+  }
+}
+
+const loadDetailedGame = async (dataState: GameDataState) => {
+  if (dataState.isDetailed || dataState.isLoading) {
+    return
+  }
+
+  dataState.isLoading = true
+
+  try {
+    const cached = mhs.detailedGameLruMap.get(dataState.game.gameId)
+    if (cached) {
+      dataState.game = markRaw(cached)
+      dataState.isDetailed = true
+      return
+    }
+
+    if (mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.value.matchHistory) {
+      const data = await sgp.getGameSummaryLcuFormat(dataState.game.gameId, tab.sgpServerId)
+      dataState.game = markRaw(data)
+      dataState.isDetailed = true
+    } else {
+      if (sgps.availability.sgpServerId === tab.sgpServerId) {
+        const { data } = await lc.api.matchHistory.getGame(dataState.game.gameId)
+        dataState.game = markRaw(data)
+        dataState.isDetailed = true
+      }
+    }
+  } catch (error) {
+    laNotification.warn('加载失败', '拉取详细战绩信息失败', error)
+  } finally {
+    dataState.isLoading = false
+  }
+}
+
+const loadTags = async () => {
+  if (tab.isLoadingTags) {
+    return
+  }
+
+  if (!lcs.summoner.me) {
+    return
+  }
+
+  tab.isLoadingTags
+
+  try {
+    const data = await sp.getPlayerTags({
+      puuid: tab.puuid,
+      selfPuuid: lcs.summoner.me.puuid
+    })
+    tab.tags = markRaw(data)
+  } catch (error) {
+    laNotification.warn('加载失败', '拉取标记信息失败', error)
+  } finally {
+    tab.isLoadingTags = false
+  }
+}
+
+// 1182px - is same in which defined in CSS
+const isSmallScreen = useMediaQuery(`(max-width: 1182px)`)
 
 const scrollEl = useTemplateRef('scroll')
 const rightEl = useTemplateRef('right')
 
-const mh = useMatchHistoryTabsStore()
-const cf = useCoreFunctionalityStore()
-const gameData = useGameDataStore()
-const app = useAppStore()
+const as = useAppCommonStore()
 
 const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
-  mhm.setMatchHistoryExpand(tab.id, gameId, expand)
+  const thatGame = tab.matchHistoryPage?.games.find((g) => g.game.gameId === gameId)
+  if (thatGame) {
+    thatGame.isExpanded = expand
+  }
 }
 
 const isShowingRankedModal = ref(false)
 
 const isSomethingLoading = computed(() => {
-  return (
-    tab.loading.isLoadingMatchHistory ||
-    tab.loading.isLoadingRankedStats ||
-    tab.loading.isLoadingSummoner
-  )
+  return tab.isLoadingMatchHistory || tab.isLoadingRankedStats || tab.isLoadingSummoner
 })
 
 const scrollToRightElTop = () => {
@@ -573,23 +786,29 @@ const scrollToRightElTop = () => {
 
 const handleRefresh = async () => {
   try {
-    await mhm.fetchTabFullData(tab.id)
-    scrollToRightElTop()
-    updateSpectatorData()
-  } catch {
-    laNotification.warn('召唤师信息', `无法拉取用户 ${tab.id} 的信息`)
-  }
+    const mhFn = async () => {
+      loadMatchHistory()
+      scrollToRightElTop()
+    }
+
+    await Promise.all([
+      loadSummoner(),
+      loadRankedStats(),
+      mhFn(),
+      loadTags(),
+      updateSpectatorData()
+    ])
+  } catch {}
 }
 
-const handleLoadPage = async (page?: number) => {
-  const r = await mhm.fetchTabMatchHistory(tab.id, page)
+const handleLoadMatchHistoryPage = async (page?: number) => {
+  await loadMatchHistory(page)
   scrollToRightElTop()
-  return r
 }
 
-const inputtingPage = ref(tab.matchHistory.page)
+const inputtingPage = ref(tab.matchHistoryPage?.page)
 const handleInputBlur = () => {
-  inputtingPage.value = tab.matchHistory.page
+  inputtingPage.value = tab.matchHistoryPage?.page
 }
 
 const pageSizeOptions = [
@@ -624,17 +843,11 @@ const pageSizeOptions = [
 ]
 
 const handleChangePageSize = async (pageSize: number) => {
-  const r = await mhm.fetchTabMatchHistory(
-    tab.id,
-    tab.matchHistory.page,
-    pageSize,
-    tab.matchHistory.queueFilter
-  )
-  return r
+  await loadMatchHistory(tab.matchHistoryPage?.page, pageSize, tab.matchHistoryPage?.tag)
 }
 
 watch(
-  () => tab.matchHistory.page,
+  () => tab.matchHistoryPage?.page,
   (page) => {
     inputtingPage.value = page
   }
@@ -644,56 +857,73 @@ const sgpTagOptions = computed(() => {
   return [
     {
       label: '所有队列',
-      value: -1
+      value: 'all'
     },
     {
-      label: gameData.queues[420]?.name || 'Ranked Solo/Duo',
-      value: 420
+      label: lcs.gameData.queues[420]?.name || 'Ranked Solo/Duo',
+      value: `q_420`
     },
     {
-      label: gameData.queues[430]?.name || 'Normal',
-      value: 430
+      label: lcs.gameData.queues[430]?.name || 'Normal',
+      value: `q_430`
     },
     {
-      label: gameData.queues[440]?.name || 'Ranked Flex',
-      value: 440
+      label: lcs.gameData.queues[440]?.name || 'Ranked Flex',
+      value: `q_440`
     },
     {
-      label: gameData.queues[450]?.name || 'ARAM',
-      value: 450
+      label: lcs.gameData.queues[450]?.name || 'ARAM',
+      value: `q_450`
     },
 
     {
-      label: gameData.queues[1700]?.name || 'ARENA',
-      value: 1700
+      label: lcs.gameData.queues[1700]?.name || 'ARENA',
+      value: `q_1700`
     },
     {
-      label: gameData.queues[490]?.name || 'Quickplay',
-      value: 490
+      label: lcs.gameData.queues[490]?.name || 'Quickplay',
+      value: `q_490`
     },
     {
-      label: gameData.queues[1900]?.name || 'URF',
-      value: 1900
+      label: lcs.gameData.queues[1900]?.name || 'URF',
+      value: `q_1900`
     },
     {
-      label: gameData.queues[900]?.name || 'ARURF',
-      value: 900
+      label: lcs.gameData.queues[900]?.name || 'ARURF',
+      value: `q_900`
     }
   ]
 })
 
-const handleChangeSgpTag = async (queueFilter: number | string) => {
-  const r = await mhm.fetchTabMatchHistory(tab.id, 1, tab.matchHistory.pageSize, queueFilter)
-  return r
+const handleChangeSgpTag = async (tag: string) => {
+  await loadMatchHistory(tab.matchHistoryPage?.page, tab.matchHistoryPage?.pageSize, tag)
 }
 
 const isShowingTagEditModal = ref(false)
 const handleTagPlayer = async () => {
   isShowingTagEditModal.value = true
 }
-const handleTagEdited = (_puuid: string) => {
-  mhm.querySavedInfo(tab.id)
+const handleTagEdited = async (tag: string | null) => {
+  if (!lcs.summoner.me) {
+    return
+  }
+
+  try {
+    await sp.updatePlayerTag({
+      puuid: tab.puuid,
+      selfPuuid: lcs.summoner.me.puuid,
+      tag: tag
+    })
+    isShowingTagEditModal.value = false
+  } catch (error) {
+    laNotification.warn('操作失败', '更新玩家标记失败', error)
+    log.warn(MatchHistoryTabsRenderer.id, '标记玩家失败', error)
+  }
 }
+
+onMounted(() => {
+  handleRefresh()
+})
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 const RECENTLY_PLAYED_PLAYER_THRESHOLD = 2
@@ -743,16 +973,13 @@ const recentlyTeammates = computed(() => {
   return teammates
 })
 
-const { navigateToTab } = mhm.useNavigateToTab()
+const { navigateToTab } = mh.useNavigateToTab()
 
 const handleToSummoner = (puuid: string, newTab = true) => {
   if (newTab) {
-    const { sgpServerId } = mhm.parseUnionId(tab.id)
-    navigateToTab(puuid, sgpServerId)
+    navigateToTab(puuid, tab.sgpServerId)
   } else {
-    const unionId = mhm.toUnionId(tab.sgpServerId, puuid)
-    mhm.createTab(unionId)
-    mhm.fetchTabFullData(unionId)
+    mh.createTab(puuid, tab.sgpServerId, false)
   }
 }
 
@@ -777,23 +1004,28 @@ const handleMainContentScroll = (e: Event) => {
 const shouldShowTinyHeader = computed(() => mainContentScrollTop.value > SHOW_TINY_HEADER_THRESHOLD)
 
 // 从这里开始, 将逐渐移除对全局状态的依赖
-const UPDATE_SPECTATOR_DATA_INTERVAL = 120 * 1000 // 2 分钟
-const spectatorData = shallowRef<SpectatorData | null>(null)
+const UPDATE_SPECTATOR_DATA_INTERVAL = 60 * 1000 // 1 分钟
 const updateSpectatorData = async () => {
-  if (!isMustUseSgpApi.value) {
+  // 仅仅在当前大区支持 SGP API 时才更新
+  if (!sgps.availability.serversSupported.common) {
     return
   }
 
   try {
-    const data = await edsm.sgp.getSpectatorGameflow(tab.puuid, tab.sgpServerId)
-    spectatorData.value = data
+    const data = await sgp.getSpectatorGameflow(tab.puuid, tab.sgpServerId)
+    tab.spectatorData = markRaw(data)
   } catch (error) {
     if ((error as Error).name === 'AxiosError' && (error as any).response?.status === 404) {
-      spectatorData.value = null
+      tab.spectatorData = null
       return
     }
 
-    am.logger.warn(`获取观战数据失败: ${tab.puuid} ${tab.sgpServerId}`, error)
+    // 静默失败, 打印日志
+    log.warn(
+      MatchHistoryTabsRenderer.id,
+      `获取观战数据失败: ${tab.puuid} ${tab.sgpServerId}`,
+      error
+    )
   }
 }
 const { resume: resumeSpectator, pause: pauseSpectator } = useIntervalFn(
@@ -803,9 +1035,9 @@ const { resume: resumeSpectator, pause: pauseSpectator } = useIntervalFn(
 )
 
 watch(
-  () => isMustUseSgpApi.value,
-  (use) => {
-    if (use) {
+  () => sgps.availability.serversSupported.common,
+  (ya) => {
+    if (ya) {
       resumeSpectator()
     } else {
       pauseSpectator()
@@ -816,17 +1048,17 @@ watch(
 
 const notification = useNotification()
 
-const handleLaunchSpectator = async (_: string, byLcuApi: boolean) => {
+const handleLaunchSpectator = async (_: string, useLcuApi: boolean) => {
   try {
-    if (byLcuApi) {
-      await launchSpectator(tab.puuid)
+    if (useLcuApi) {
+      await lc.api.spectator.launchSpectator(tab.puuid)
       notification.success({
         title: '观战',
         content: '已调起观战流程',
         duration: 4000
       })
     } else {
-      await lcm.launchSpectator({
+      await gc.launchSpectator({
         locale: 'zh_CN',
         puuid: tab.puuid,
         region: tab.sgpServerId
@@ -843,32 +1075,16 @@ const handleLaunchSpectator = async (_: string, byLcuApi: boolean) => {
       content: `无法调起客户端进程: ${(error as Error).message}`,
       duration: 4000
     })
-    am.logger.warn(`无法调起客户端进程: ${(error as Error).message}`, error)
+
+    log.warn(MatchHistoryTabsRenderer.id, `无法调起客户端进程: ${(error as Error).message}`, error)
   }
 }
 
-const taggerSummoner = shallowRef<SummonerInfo | null>(null)
-const isTaggedByOtherSummoner = computed(() => {
-  return tab.savedInfo && summoner.me && tab.savedInfo.selfPuuid !== summoner.me.puuid
-})
-
-watch(
-  () => isTaggedByOtherSummoner.value,
-  async (isNotSame) => {
-    if (isNotSame) {
-      taggerSummoner.value = (await getSummonerByPuuid(tab.savedInfo!.selfPuuid)).data
-    } else {
-      taggerSummoner.value = null
-    }
-  },
-  { immediate: true }
-)
-
 // workaround: KeepAlive 下 Naive UI 滚动条复位问题
 watch(
-  () => mh.currentTab?.id,
-  () => {
-    if (mh.currentTab?.id === tab.id) {
+  () => mhs.currentTabId,
+  (tabId) => {
+    if (tabId === tab.id) {
       nextTick(() => {
         scrollEl.value?.scrollTo({ top: mainContentScrollTop.value })
       })
@@ -879,8 +1095,8 @@ watch(
 
 defineExpose({
   id: tab.id,
-  sgpServerId: tab.sgpServerId,
   puuid: tab.puuid,
+  sgpServerId: tab.sgpServerId,
   refresh: handleRefresh
 })
 </script>

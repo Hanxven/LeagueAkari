@@ -4,8 +4,8 @@
     "src/renderer/env.d.ts",
     "src/renderer/src-main-window/**/*",
     "src/renderer/src-main-window/**/*.vue",
-    "src/renderer/src-auxiliary-window/**/*",
-    "src/renderer/src-auxiliary-window/**/*.vue",
+    "src/renderer/src-aux-window/**/*",
+    "src/renderer/src-aux-window/**/*.vue",
     "src/preload/*.d.ts",
     "src/shared/**/*",
     "src/renderer-shared/**/*"
@@ -17,7 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@main-window/*": ["src/renderer/src-main-window/*"],
-      "@auxiliary-window/*": ["src/renderer/src-auxiliary-window/*"],
+      "@aux-window/*": ["src/renderer/src-aux-window/*"],
       "@shared/*": ["src/shared/*"],
       "@renderer-shared/*": ["src/renderer-shared/*"]
     },

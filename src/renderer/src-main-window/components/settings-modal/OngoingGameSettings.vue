@@ -10,20 +10,8 @@
       >
         <NSwitch
           size="small"
-          :value="cf.settings.ongoingAnalysisEnabled"
-          @update:value="(val) => cfm.setOngoingAnalysisEnabled(val)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        label="自动切换至对局页面"
-        label-description="在进入英雄选择或其他游戏状态时，自动切换到“对局”页面"
-        :label-width="320"
-      >
-        <NSwitch
-          size="small"
-          :value="cf.settings.autoRouteOnGameStart"
-          @update:value="(val) => cfm.setAutoRouteOnGameStart(val)"
+          :value="ogs.settings.enabled"
+          @update:value="(val) => og.setEnabled(val)"
         />
       </ControlItem>
       <ControlItem
@@ -37,22 +25,22 @@
           size="small"
           :min="2"
           :max="200"
-          :value="cf.settings.matchHistoryLoadCount"
-          @update:value="(val) => cfm.setMatchHistoryLoadCount(val || 20)"
+          :value="ogs.settings.matchHistoryLoadCount"
+          @update:value="(val) => og.setMatchHistoryLoadCount(val || 20)"
         />
       </ControlItem>
       <ControlItem
         class="control-item-margin"
         label="预组队判定阈值"
-        :label-description="`目标玩家群体出现在同一阵营超过 ${cf.settings.preMadeTeamThreshold} 次时，则判定为预组队`"
+        :label-description="`目标玩家群体出现在同一阵营超过 ${ogs.settings.premadeTeamThreshold} 次时，则判定为预组队`"
         :label-width="320"
       >
         <NInputNumber
           style="width: 100px"
           size="small"
           :min="2"
-          :value="cf.settings.preMadeTeamThreshold"
-          @update:value="(val) => cfm.setPreMadeTeamThreshold(val || 3)"
+          :value="ogs.settings.premadeTeamThreshold"
+          @update:value="(val) => og.setPremadeTeamThreshold(val || 3)"
         />
       </ControlItem>
       <ControlItem
@@ -65,12 +53,52 @@
           style="width: 100px"
           size="small"
           :min="1"
-          :value="cf.settings.playerAnalysisFetchConcurrency"
-          @update:value="(val) => cfm.setPlayerAnalysisFetchConcurrency(val || 10)"
+          :value="ogs.settings.concurrency"
+          @update:value="(val) => og.setConcurrency(val || 10)"
         />
       </ControlItem>
+      <ControlItem class="control-item-margin" label="使用 SGP API" :label-width="320">
+        <template #labelDescription>
+          <div>优先使用 SGP API 查询对局数据，若失败则使用默认 API</div>
+          <div
+            class="unsupported-sgp-server"
+            v-if="sgps.availability.region && !sgps.availability.serversSupported.matchHistory"
+          >
+            League Akari 暂不支持当前服务器: {{ sgps.availability.sgpServerId }}
+          </div>
+        </template>
+        <NSwitch
+          size="small"
+          :min="1"
+          :value="ogs.settings.matchHistoryUseSgpApi"
+          @update:value="(val) => og.setMatchHistoryUseSgpApi(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="队列筛选偏好"
+        label-description="使用 SGP API 时，加载战绩时的队列筛选偏好"
+        :label-width="320"
+      >
+        <NRadioGroup
+          :value="ogs.settings.matchHistoryTagPreference"
+          @update:value="(val) => og.setMatchHistoryTagPreference(val)"
+        >
+          <NRadio
+            value="all"
+            :title="`请求战绩页时不添加限定条件，将拉取近期 ${ogs.settings.matchHistoryLoadCount} 场战绩`"
+          >
+            所有模式</NRadio
+          >
+          <NRadio
+            value="current"
+            title="按照当前的请求查询战绩页，若非支持筛选的队列，则退化到 '所有模式'"
+            >当前模式</NRadio
+          >
+        </NRadioGroup>
+      </ControlItem>
     </NCard>
-    <NCard size="small" style="margin-top: 8px">
+    <!-- <NCard size="small" style="margin-top: 8px">
       <template #header
         ><span class="card-header-title" :class="{ disabled: !app.isAdministrator }">{{
           app.isAdministrator ? 'KDA 简报' : 'KDA 简报 (需要管理员权限)'
@@ -95,7 +123,7 @@
             ><br />
             <span style="font-style: italic"
               >KDA 分析局数和 <span style="font-weight: bold">对局战绩分析数量</span> 一致。({{
-                cf.settings.matchHistoryLoadCount
+                ogs.settings.matchHistoryLoadCount
               }}
               场)</span
             >
@@ -104,11 +132,11 @@
         <NSwitch
           :disabled="!app.isAdministrator"
           size="small"
-          :value="cf.settings.sendKdaInGame"
+          :value="ogs.settings.sendKdaInGame"
           @update:value="(val) => cfm.setSendKdaInGame(val)"
         />
-      </ControlItem>
-      <ControlItem
+      </ControlItem> -->
+    <!-- <ControlItem
         :disabled="!app.isAdministrator"
         class="control-item-margin"
         label="KDA 发送最低值"
@@ -138,8 +166,8 @@
           :value="cf.settings.sendKdaInGameWithPreMadeTeams"
           @update:value="(val) => cfm.setSendKdaInGameWithPreMadeTeams(val)"
         />
-      </ControlItem>
-      <ControlItem
+      </ControlItem> -->
+    <!-- <ControlItem
         v-if="cf.ongoingTeams"
         :disabled="!app.isAdministrator"
         class="control-item-margin"
@@ -167,53 +195,22 @@
             }}</NCheckbox
           >
         </div>
-      </ControlItem>
-    </NCard>
+      </ControlItem> -->
+    <!-- </NCard> -->
   </NScrollbar>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { useAppStore } from '@renderer-shared/modules/app/store'
-import { auxiliaryWindowRendererModule as awm } from '@renderer-shared/modules/auxiliary-window'
-import { useAuxiliaryWindowStore } from '@renderer-shared/modules/auxiliary-window/store'
-import { coreFunctionalityRendererModule as cfm } from '@renderer-shared/modules/core-functionality'
-import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
-import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { respawnTimerRendererModule as rtm } from '@renderer-shared/modules/respawn-timer'
-import { useRespawnTimerStore } from '@renderer-shared/modules/respawn-timer/store'
-import { SummonerInfo } from '@shared/types/lcu/summoner'
-import { summonerName } from '@shared/utils/name'
-import {
-  NButton,
-  NCard,
-  NCheckbox,
-  NFlex,
-  NInput,
-  NInputNumber,
-  NScrollbar,
-  NSelect,
-  NSlider,
-  NSwitch
-} from 'naive-ui'
-import { computed } from 'vue'
+import { useInstance } from '@renderer-shared/shards'
+import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
 
-const rt = useRespawnTimerStore()
-const cf = useCoreFunctionalityStore()
-const aux = useAuxiliaryWindowStore()
-const app = useAppStore()
-const eds = useExternalDataSourceStore()
-const lc = useLcuConnectionStore()
-
-const summoners = computed(() => {
-  const obj: Record<string, SummonerInfo | undefined> = {}
-  Object.entries(cf.ongoingPlayers).forEach(([puuid, player]) => {
-    obj[puuid] = player.summoner
-  })
-
-  return obj
-})
+const ogs = useOngoingGameStore()
+const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
+const sgps = useSgpStore()
 </script>
 
 <style lang="less" scoped>
@@ -229,6 +226,11 @@ const summoners = computed(() => {
 }
 
 .card-header-title.disabled {
-  color: rgb(97, 97, 97);
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.unsupported-sgp-server {
+  color: rgb(230, 114, 41);
+  font-weight: bold;
 }
 </style>

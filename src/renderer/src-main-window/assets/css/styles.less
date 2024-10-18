@@ -10,7 +10,7 @@
   --background-color-primary: #202020;
   --app-min-height: 520px;
   --app-min-width: 670px;
-  --title-bar-height: 30px;
+  --title-bar-height: 36px;
   --scroll-bar-height: 6px;
   --scroll-bar-width: 8px;
   --n-option-padding: 0 4px;
@@ -105,12 +105,14 @@ a:visited {
 
 .n-popover-shared.popover-transition-enter-from,
 .n-popover-shared.popover-transition-leave-to {
-  transform: none;
+  opacity: 0;
+  transform: scale(0.98);
 }
 
 .n-popover-shared.popover-transition-enter-to,
 .n-popover-shared.popover-transition-leave-from {
-  transform: none;
+  opacity: 1;
+  transform: scale(1);
 }
 
 // 当前无需覆盖
@@ -125,11 +127,11 @@ a:visited {
 .n-modal.fade-in-scale-up-transition-enter-from,
 .n-modal.fade-in-scale-up-transition-leave-to {
   opacity: 0;
-  transform: none;
+  transform: scale(0.98);
 }
 
 .n-modal.fade-in-scale-up-transition-leave-from,
 .n-modal.fade-in-scale-up-transition-enter-to {
   opacity: 1;
-  transform: none;
+  transform: scale(1);
 }

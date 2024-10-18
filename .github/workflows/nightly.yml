@@ -3,6 +3,7 @@ on:
     branches:
       - main
       - dev
+      - refactor
   workflow_dispatch:
     
 jobs:

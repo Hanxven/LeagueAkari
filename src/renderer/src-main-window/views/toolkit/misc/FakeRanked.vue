@@ -10,7 +10,7 @@
       <NButton
         size="small"
         type="primary"
-        :disabled="lc.state !== 'connected'"
+        :disabled="lcs.connectionState !== 'connected'"
         @click="() => handleSet()"
         >修改</NButton
       >
@@ -47,13 +47,15 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { changeRanked } from '@renderer-shared/http-api/chat'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
 import { laNotification } from '@renderer-shared/notification'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
 import { reactive } from 'vue'
 
-const lc = useLcuConnectionStore()
+const lcs = useLeagueClientStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const state = reactive({
   queue: 'RANKED_SOLO_5x5',
@@ -65,7 +67,7 @@ const message = useMessage()
 
 const handleSet = async () => {
   try {
-    await changeRanked(
+    await lc.api.chat.changeRanked(
       state.queue,
       state.tier,
       state.tier === 'MASTER' || state.tier === 'GRANDMASTER' || state.tier === 'CHALLENGER'

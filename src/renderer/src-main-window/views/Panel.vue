@@ -20,23 +20,25 @@
           placement="right"
           v-model:show="isClientsPreviewShow"
           scrollable
-          :disabled="lc.state !== 'connected' && lc.launchedClients.length === 0"
+          :disabled="lcs.connectionState !== 'connected' && lcuxs.launchedClients.length === 0"
           style="max-height: 240px"
           :delay="50"
         >
           <template #trigger>
             <div
               :title="
-                lc.launchedClients.length === 0 && lc.state === 'disconnected'
+                lcuxs.launchedClients.length === 0 && lcs.connectionState === 'disconnected'
                   ? '没有检测到已运行的客户端'
                   : '当前正在运行的英雄联盟客户端'
               "
               class="operation"
-              :class="{ disabled: lc.state !== 'connected' && lc.launchedClients.length === 0 }"
+              :class="{
+                disabled: lcs.connectionState !== 'connected' && lcuxs.launchedClients.length === 0
+              }"
             >
               <NIcon class="icon"><ApplicationIcon /></NIcon>
-              <div class="label" v-if="lc.auth">
-                {{ REGION_NAME[lc.auth.region] || lc.auth.region }}
+              <div class="label" v-if="lcs.auth">
+                {{ REGION_NAME[lcs.auth.region] || lcs.auth.region }}
               </div>
               <div class="label" v-else>客户端</div>
             </div>
@@ -75,18 +77,21 @@
     </div>
     <div class="right-side-content">
       <RouterView v-slot="{ Component }">
-        <KeepAlive>
-          <component :is="Component" />
-        </KeepAlive>
+        <Transition name="route-fade">
+          <KeepAlive>
+            <component :is="Component" />
+          </KeepAlive>
+        </Transition>
       </RouterView>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { lcuConnectionRendererModule as lcm } from '@renderer-shared/modules/lcu-connection'
-import { UxCommandLine, useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { leagueClientRendererModule as lcm2 } from '@renderer-shared/modules/league-client'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
+import { UxCommandLine, useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import {
   AiStatus as AiStatusIcon,
@@ -98,7 +103,6 @@ import {
   Template as TemplateIcon
 } from '@vicons/carbon'
 import { CubeSharp as CubeSharpIcon, TicketSharp as TicketSharpIcon } from '@vicons/ionicons5'
-import { useIntervalFn } from '@vueuse/core'
 import { MenuOption, NIcon, NMenu, NPopover, NSpin } from 'naive-ui'
 import {
   Component as ComponentC,
@@ -106,8 +110,6 @@ import {
   h,
   inject,
   ref,
-  shallowRef,
-  watch,
   watchEffect
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -204,27 +206,26 @@ const handleOpenAnnouncementModal = () => {
   appInject.openAnnouncementModal()
 }
 
-const lc = useLcuConnectionStore()
+const lcs = useLeagueClientStore()
+const lcuxs = useLeagueClientUxStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+
 const isClientsPreviewShow = ref(false)
-const launchedClients = shallowRef<UxCommandLine[]>([])
-const updateCurrentLaunchedClients = async () => {
-  launchedClients.value = await lcm2.getLaunchedClients()
-}
 
 const clientsToConnect = computed(() => {
-  if (lc.state === 'connected') {
-    const c = launchedClients.value.map((m) => {
+  if (lcs.connectionState === 'connected') {
+    const c = lcuxs.launchedClients.map((m) => {
       return {
         ...m,
-        connected: lc.auth?.pid === m.pid,
-        disabled: lc.auth?.pid === m.pid,
-        loading: lc.connectingClient?.pid === m.pid
+        connected: lcs.auth?.pid === m.pid,
+        disabled: lcs.auth?.pid === m.pid,
+        loading: lcs.connectingClient?.pid === m.pid
       }
     })
 
     if (c.length === 0) {
       c.push({
-        ...lc.auth!,
+        ...lcs.auth!,
         loading: false,
         connected: true,
         disabled: true
@@ -233,46 +234,30 @@ const clientsToConnect = computed(() => {
 
     return c
   } else {
-    return lc.launchedClients.map((m) => {
+    return lcuxs.launchedClients.map((m) => {
       return {
         ...m,
-        connected: lc.auth?.pid === m.pid,
-        disabled: lc.connectingClient?.pid === m.pid,
-        loading: lc.connectingClient?.pid === m.pid
+        connected: lcs.auth?.pid === m.pid,
+        disabled: lcs.connectingClient?.pid === m.pid,
+        loading: lcs.connectingClient?.pid === m.pid
       }
     })
   }
 })
 
-const { pause, resume } = useIntervalFn(updateCurrentLaunchedClients, 1000, {
-  immediate: false,
-  immediateCallback: true
-})
-
-watch(
-  () => isClientsPreviewShow.value,
-  (show) => {
-    if (show) {
-      resume()
-    } else {
-      pause()
-    }
-  }
-)
-
 // 善意的提醒，以防用户一直在等
 watchEffect(() => {
-  if (lc.state === 'disconnected' && lc.launchedClients.length > 1) {
+  if (lcs.connectionState === 'disconnected' && lcuxs.launchedClients.length > 1) {
     isClientsPreviewShow.value = true
   }
 })
 
 const handleConnectToLcu = (auth: UxCommandLine) => {
-  if (lc.state === 'connected' && lc.auth?.pid === auth.pid) {
+  if (lcs.connectionState === 'connected' && lcs.auth?.pid === auth.pid) {
     return
   }
 
-  lcm.lcuConnect(auth)
+  lc.connect(auth)
 }
 
 const emits = defineEmits<{

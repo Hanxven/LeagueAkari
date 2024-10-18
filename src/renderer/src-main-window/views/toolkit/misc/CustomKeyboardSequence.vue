@@ -1,11 +1,11 @@
 <template>
   <NCard size="small">
     <template #header
-      ><span class="card-header-title" :class="{ disabled: !app.isAdministrator }">{{
-        app.isAdministrator ? '自定义发送文本' : '自定义发送文本 (需要管理员权限)'
+      ><span class="card-header-title" :class="{ disabled: !as.isAdministrator }">{{
+        as.isAdministrator ? '自定义发送文本' : '自定义发送文本 (需要管理员权限)'
       }}</span></template
     >
-    <ControlItem
+    <!-- <ControlItem
       :disabled="!app.isAdministrator"
       label="开启"
       class="control-item-margin"
@@ -36,19 +36,16 @@
         @update:value="(text) => cksm.setText(text)"
         size="small"
       ></NInput>
-    </ControlItem>
+    </ControlItem> -->
   </NCard>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { useAppStore } from '@renderer-shared/modules/app/store'
-import { customKeyboardSequenceRendererModule as cksm } from '@renderer-shared/modules/custom-keyboard-sequence'
-import { useCustomKeyboardSequenceStore } from '@renderer-shared/modules/custom-keyboard-sequence/store'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { NCard, NInput, NSwitch } from 'naive-ui'
 
-const cks = useCustomKeyboardSequenceStore()
-const app = useAppStore()
+const as = useAppCommonStore()
 </script>
 
 <style lang="less" scoped>
@@ -64,6 +61,6 @@ const app = useAppStore()
 }
 
 .card-header-title.disabled {
-  color: rgb(97, 97, 97);
+  color: rgba(255, 255, 255, 0.35);
 }
 </style>

@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts" setup>
-import { RankedEntry, RankedStats } from '@shared/types/lcu/ranked'
+import { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
 import { QUEUE_TYPE_TEXT, TIER_TEXT } from '@shared/utils/ranked'
 
 import BronzeMedal from '@main-window/assets/ranked-icons/bronze.png'

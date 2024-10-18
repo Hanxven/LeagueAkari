@@ -9,7 +9,7 @@
           <LcuImage
             class="image"
             :src="championIconUrl(p.championId)"
-            :title="gameData.champions[p.championId]?.name"
+            :title="lcs.gameData.champions[p.championId]?.name"
           />
           <div
             :title="
@@ -78,7 +78,7 @@
             <ChampionIcon
               class="champion-icon"
               :champion-id="self.participant.championId"
-              :title="gameData.champions[self.participant.championId]?.name"
+              :title="lcs.gameData.champions[self.participant.championId]?.name"
             ></ChampionIcon>
             <div class="champion-level">{{ self.participant.stats.champLevel }}</div>
           </div>
@@ -260,9 +260,9 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
-import { championIconUrl } from '@renderer-shared/modules/game-data'
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
-import { Game, ParticipantIdentity } from '@shared/types/lcu/match-history'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { Game, ParticipantIdentity } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
 import {
   ChevronDown as ChevronDownIcon,
@@ -420,7 +420,7 @@ const composedResultClass = computed(() => {
 const formattedModeText = computed(() => {
   return props.game.gameMode === 'PRACTICETOOL'
     ? '训练模式'
-    : (gameData.queues[props.game.queueId]?.name ?? props.game.queueId)
+    : (lcs.gameData.queues[props.game.queueId]?.name ?? props.game.queueId)
 })
 
 const isModalShow = ref(false)
@@ -484,7 +484,7 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
   }
 }
 
-const gameData = useGameDataStore()
+const lcs = useLeagueClientStore()
 
 const handleToggleShowDetailedGame = () => {
   if (!props.isDetailed) {

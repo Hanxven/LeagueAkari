@@ -4,20 +4,20 @@
       <NTabs
         class="tabs"
         @update:value="handleTabChange"
-        :value="mh.currentTab?.id"
+        :value="mhs.currentTabId ?? undefined"
         type="card"
         :animated="false"
         @close="handleTabClose"
         size="small"
       >
         <NTab
-          v-for="tab of mh.tabs"
+          v-for="tab of mhs.tabs"
           @mouseup.prevent="(event) => handleMouseUp(event, tab.id)"
           @contextmenu="(event) => handleShowMenu(event, tab.id)"
           :key="tab.id"
           :tab="tab.id"
           :name="tab.id"
-          :closable="tab.data.puuid !== summoner.me?.puuid"
+          :closable="tab.puuid !== lcs.summoner.me?.puuid"
           :draggable="true"
           @dragover.prevent
           @dragstart="() => handleDragStart(tab.id)"
@@ -30,14 +30,14 @@
           <div class="tab">
             <!-- 在进入游戏时，显示当前召唤师所选择的英雄的图标 -->
             <LcuImage
-              v-if="cf.ongoingChampionSelections?.[tab.data.puuid]"
+              v-if="ogs.championSelections?.[tab.puuid]"
               class="tab-icon"
-              :src="championIconUrl(cf.ongoingChampionSelections?.[tab.data.puuid])"
+              :src="championIconUrl(ogs.championSelections[tab.puuid])"
             />
             <LcuImage
-              v-else-if="tab.data.summoner"
+              v-else-if="tab.summoner"
               class="tab-icon"
-              :src="tab.data.summoner ? profileIconUrl(tab.data.summoner.profileIconId) : undefined"
+              :src="tab.summoner ? profileIconUrl(tab.summoner.profileIconId) : undefined"
             />
             <span class="tab-title-region-name" v-if="tabNames[tab.id]?.regionText"
               >[{{ tabNames[tab.id].regionText }}]</span
@@ -48,7 +48,8 @@
             >
             <NIcon
               v-if="
-                tab.data.puuid !== summoner.me?.puuid && tab.data.summoner?.privacy === 'PRIVATE'
+                tab.summoner?.puuid !== lcs.summoner.me?.puuid &&
+                tab.summoner?.privacy === 'PRIVATE'
               "
               title="隐藏生涯"
               class="privacy-private-icon"
@@ -57,7 +58,7 @@
           </div>
         </NTab>
       </NTabs>
-      <div class="search-zone" v-if="lc.state === 'connected'">
+      <div class="search-zone" v-if="lcs.connectionState === 'connected'">
         <NPopover
           content-style="padding: 0;"
           raw
@@ -73,7 +74,7 @@
             </button>
           </template>
           <div class="search-panel">
-            <SearchSummoner />
+            <!-- <SearchSummoner /> -->
           </div>
         </NPopover>
       </div>
@@ -90,12 +91,13 @@
       />
     </div>
     <div class="content">
-      <template v-if="mh.currentTab">
+      <template v-if="mhs.currentTabId">
         <MatchHistoryTab
-          v-for="t of mh.tabs"
-          :key="t.id"
-          :tab="{ id: t.id, ...(t.data as TabState) }"
-          v-show="t.id === mh.currentTab.id"
+          v-for="tab of mhs.tabs"
+          :key="tab.id"
+          :tab="tab"
+          :sgpServerId="tab.sgpServerId"
+          v-show="tab.id === mhs.currentTab?.id"
           ref="tabs-ref"
         />
       </template>
@@ -103,8 +105,8 @@
         <div class="centered">
           <LeagueAkariSpan bold class="akari-text" />
           <div
-            v-if="lc.state !== 'connected'"
-            style="font-size: 14px; font-weight: normal; color: #666"
+            v-if="lcs.connectionState !== 'connected'"
+            style="font-size: 14px; font-weight: normal; color: #666; margin-top: 8px"
           >
             未连接到客户端
           </div>
@@ -117,43 +119,41 @@
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
-import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
-import { championIconUrl, profileIconUrl } from '@renderer-shared/modules/game-data'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
-import { summonerName } from '@shared/utils/name'
-import { TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
+import { useInstance } from '@renderer-shared/shards'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { championIconUrl, profileIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Search as SearchIcon, WarningAltFilled as WarningAltFilledIcon } from '@vicons/carbon'
 import { NDropdown, NIcon, NPopover, NTab, NTabs } from 'naive-ui'
 import { computed, reactive, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
-import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
-import { TabState, useMatchHistoryTabsStore } from '@main-window/modules/match-history-tabs/store'
+// import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
+import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
+import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
 
-const mh = useMatchHistoryTabsStore()
-const lc = useLcuConnectionStore()
+const lcs = useLeagueClientStore()
 
 const route = useRoute()
 const router = useRouter()
 
-const summoner = useSummonerStore()
-const eds = useExternalDataSourceStore()
+const ogs = useOngoingGameStore()
+const sgps = useSgpStore()
+const mhs = useMatchHistoryTabsStore()
 
-const cf = useCoreFunctionalityStore()
+const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
-const handleTabClose = (puuid: string) => {
-  mh.closeTab(puuid)
+const handleTabClose = (id: string) => {
+  mhs.closeTab(id)
 }
 
-const { navigateToTab } = mhm.useNavigateToTab()
+const { navigateToTab } = mh.useNavigateToTab()
 
 const handleTabChange = async (unionId: string) => {
-  const { puuid, sgpServerId } = mhm.parseUnionId(unionId)
+  const { puuid, sgpServerId } = mh.parseUnionId(unionId)
   navigateToTab(puuid, sgpServerId)
 }
 
@@ -167,6 +167,10 @@ const handleRefresh = async (puuid: string) => {
 }
 
 const matchHistoryRoute = computed(() => {
+  if (!route.matched.some((record) => record.name === 'match-history')) {
+    return null
+  }
+
   const puuid = route.params.puuid as string
   const sgpServerId = route.params.sgpServerId as string
 
@@ -189,31 +193,30 @@ const tabNames = computed(() => {
 
   // 统计是否只有一种 sgpServerId
   const sgpServerIds = new Set<string>()
-  for (const tab of mh.tabs) {
-    const { sgpServerId } = mhm.parseUnionId(tab.id)
-    sgpServerIds.add(sgpServerId)
+  for (const tab of mhs.tabs) {
+    sgpServerIds.add(tab.sgpServerId)
   }
 
   const onlyOneType = sgpServerIds.size === 1
 
-  mh.tabs.forEach((tab) => {
-    if (tab.data.summoner) {
+  mhs.tabs.forEach((tab) => {
+    if (tab.summoner) {
       if (onlyOneType) {
         nameMap[tab.id] = {
-          gameName: tab.data.summoner.gameName,
-          tagLine: tab.data.summoner.tagLine,
+          gameName: tab.summoner.gameName,
+          tagLine: tab.summoner.tagLine,
           regionText: null
         }
         return
       }
 
       // TODO: 目前只支持腾讯服务器, 所以固定为 rso-platforms.ts 中的文本
-      const { sgpServerId } = mhm.parseUnionId(tab.id)
-      const s = eds.sgpAvailability.sgpServers.servers[sgpServerId]?.name || sgpServerId
+      const { sgpServerId } = mh.parseUnionId(tab.id)
+      const s = sgps.availability.sgpServers.servers[sgpServerId]?.name || sgpServerId
 
       nameMap[tab.id] = {
-        gameName: tab.data.summoner.gameName,
-        tagLine: tab.data.summoner.tagLine,
+        gameName: tab.summoner.gameName,
+        tagLine: tab.summoner.tagLine,
         regionText: s
       }
       return
@@ -229,49 +232,45 @@ const tabNames = computed(() => {
   return nameMap
 })
 
+// 路由到页面
 watch(
   () => matchHistoryRoute.value,
-  (r) => {
-    if (!r) {
+  (route) => {
+    if (!route) {
       return
     }
 
-    const unionId = `${r.sgpServerId}/${r.puuid}`
-
-    const tab = mh.getTab(unionId)
+    const unionId = mh.toUnionId(route.puuid, route.sgpServerId)
+    const tab = mhs.tabs.find((t) => t.id === unionId)
     if (tab) {
-      mh.setCurrentTab(unionId)
+      mhs.setCurrentTab(unionId)
     } else {
-      mhm.createTab(unionId, {
-        setCurrent: true,
-        pin: summoner.me?.puuid === r.puuid // 庆幸的是，puuid 是唯一的
-      })
-      mhm.fetchTabFullData(unionId)
+      mh.createTab(route.puuid, route.sgpServerId, true)
     }
   },
   { immediate: true }
 )
 
+// 页面到路由
 watch(
-  () => mh.currentTab,
-  (tab) => {
-    if (!tab) {
+  () => mhs.currentTabId,
+  (id) => {
+    if (!id) {
       router.replace({ name: 'match-history' })
       return
     }
 
-    if (
-      tab.id &&
-      matchHistoryRoute.value &&
-      (tab.id !== matchHistoryRoute.value.puuid ||
-        tab.data.sgpServerId !== matchHistoryRoute.value.sgpServerId)
-    ) {
-      const { sgpServerId, puuid } = mhm.parseUnionId(tab.id)
+    // 保持路由同步
+    if (matchHistoryRoute.value) {
+      const tabId = mh.toUnionId(matchHistoryRoute.value.puuid, matchHistoryRoute.value.sgpServerId)
 
-      router.replace({
-        name: 'match-history',
-        params: { puuid, sgpServerId }
-      })
+      if (id !== tabId) {
+        const { sgpServerId, puuid } = mh.parseUnionId(id)
+        router.replace({
+          name: 'match-history',
+          params: { puuid, sgpServerId }
+        })
+      }
     }
   },
   { immediate: true }
@@ -303,10 +302,11 @@ const handleDrop = (id: string) => {
     return
   }
 
-  const tab = mh.getTab(id)
+  const tab = mhs.getTab(id)
 
   if (tab) {
-    mh.moveTab(menuProps.dragging!, id)
+    // TODO DEBUG MOVE TAB
+    // mh.moveTab(menuProps.dragging!, id)
   }
 
   menuProps.dragging = null
@@ -317,12 +317,13 @@ const dropdownOptions = reactive([
     label: '刷新',
     key: 'refresh',
     disabled: computed(() => {
-      const tab = mh.getTab(menuProps.id)
+      const tab = mhs.tabs.find((t) => t.id === menuProps.id)
       if (tab) {
         return (
-          tab.data.loading.isLoadingMatchHistory ||
-          tab.data.loading.isLoadingRankedStats ||
-          tab.data.loading.isLoadingSummoner
+          tab.isLoadingMatchHistory ||
+          tab.isLoadingRankedStats ||
+          tab.isLoadingSummoner ||
+          tab.isLoadingSpectatorData
         )
       }
 
@@ -333,19 +334,19 @@ const dropdownOptions = reactive([
     label: '关闭',
     key: 'close',
     disabled: computed(() => {
-      return mh.getTab(menuProps.id)?.isPinned
+      return mhs.getTab(menuProps.id)?.pinned
     })
   },
   {
     label: '关闭其他',
     key: 'close-others',
-    disabled: computed(() => !mh.canCloseOtherTabs(menuProps.id))
+    disabled: computed(() => !mhs.canCloseOtherTabs(menuProps.id)) // TODO 设置其他
   }
 ])
 
 const handleMouseUp = (event: PointerEvent, unionId: string) => {
   if (event.button === 1) {
-    mh.closeTab(unionId)
+    mhs.closeTab(unionId)
   }
 }
 
@@ -355,10 +356,10 @@ const handleMenuSelect = (action: string) => {
       handleRefresh(menuProps.id)
       break
     case 'close':
-      mh.closeTab(menuProps.id)
+      mhs.closeTab(menuProps.id)
       break
     case 'close-others':
-      mh.closeOtherTabs(menuProps.id)
+      mhs.closeOtherTabs(menuProps.id)
       break
   }
   menuProps.show = false

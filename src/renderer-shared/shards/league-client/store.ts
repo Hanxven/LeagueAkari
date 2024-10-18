@@ -1,0 +1,121 @@
+import { ChampSelectSession } from '@shared/types/league-client/champ-select'
+import { ChatPerson, Conversation } from '@shared/types/league-client/chat'
+import {
+  Augment,
+  ChampionSimple,
+  Item,
+  Perk,
+  Perkstyles,
+  Queue,
+  SummonerSpell
+} from '@shared/types/league-client/game-data'
+import { GameflowPhase, GameflowSession } from '@shared/types/league-client/gameflow'
+import { Ballot } from '@shared/types/league-client/honorV2'
+import { Lobby, ReceivedInvitation } from '@shared/types/league-client/lobby'
+import { LoginQueueState } from '@shared/types/league-client/login'
+import { GetSearch, ReadyCheck } from '@shared/types/league-client/matchmaking'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { defineStore } from 'pinia'
+import { shallowReactive, shallowRef } from 'vue'
+
+// copied
+export type LcConnectionStateType = 'connecting' | 'connected' | 'disconnected'
+
+// copied
+export interface UxCommandLine {
+  port: number
+  pid: number
+  authToken: string
+  certificate: string
+  region: string
+  rsoPlatformId: string
+  riotClientPort: number
+  riotClientAuthToken: string
+}
+
+export const useLeagueClientStore = defineStore('shard:league-client-renderer', () => {
+  const connectionState = shallowRef<LcConnectionStateType>('disconnected')
+  const auth = shallowRef<UxCommandLine | null>(null)
+  const connectingClient = shallowRef<UxCommandLine | null>(null)
+
+  const settings = shallowReactive({
+    autoConnect: false
+  })
+
+  const gameData = {
+    champions: shallowRef<Record<number, ChampionSimple>>({}),
+    augments: shallowRef<Record<number, Augment>>({}),
+    perks: shallowRef<Record<number, Perk>>({}),
+    perkstyles: shallowRef<Record<number, Perkstyles['styles'][number]>>({}),
+    queues: shallowRef<Record<number, Queue>>({}),
+    items: shallowRef<Record<number, Item>>({}),
+    summonerSpells: shallowRef<Record<number, SummonerSpell>>({})
+  } as const
+
+  const champSelect = {
+    session: shallowRef<ChampSelectSession | null>(null),
+    currentChampion: shallowRef<number | null>(null),
+    currentPickableChampionIds: shallowRef<Set<number>>(new Set()),
+    currentBannableChampionIds: shallowRef<Set<number>>(new Set()),
+    disabledChampionIds: shallowRef<Set<number>>(new Set())
+  } as const
+
+  const chat = {
+    me: shallowRef<ChatPerson | null>(null),
+    conversations: {
+      championSelect: shallowRef<Conversation | null>(null),
+      postGame: shallowRef<Conversation | null>(null),
+      customGame: shallowRef<Conversation | null>(null)
+    } as const,
+    participants: {
+      championSelect: shallowRef<Conversation | null>(null),
+      postGame: shallowRef<Conversation | null>(null),
+      customGame: shallowRef<Conversation | null>(null)
+    } as const
+  } as const
+
+  const gameflow = {
+    phase: shallowRef<GameflowPhase | null>(null),
+    session: shallowRef<GameflowSession | null>(null)
+  } as const
+
+  const honor = {
+    ballot: shallowRef<Ballot | null>(null)
+  } as const
+
+  const lobby = {
+    lobby: shallowRef<Lobby | null>(null),
+    receivedInvitations: shallowRef<ReceivedInvitation[]>([])
+  } as const
+
+  const summoner = {
+    me: shallowRef<SummonerInfo | null>(null)
+  } as const
+
+  const login = {
+    loginQueueState: shallowRef<LoginQueueState | null>(null)
+  } as const
+
+  const matchmaking = {
+    readyCheck: shallowRef<ReadyCheck | null>(null),
+    search: shallowRef<GetSearch | null>(null)
+  } as const
+
+  return {
+    gameData,
+    champSelect,
+    chat,
+    gameflow,
+    honor,
+    lobby,
+    summoner,
+    login,
+    matchmaking,
+
+    settings,
+
+    connectionState,
+    auth,
+    connectingClient
+  }
+})

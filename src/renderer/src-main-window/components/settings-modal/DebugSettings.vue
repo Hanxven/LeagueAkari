@@ -100,21 +100,21 @@
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">在控制台打印 LCU 事件</span></template>
       <div class="operations">
-        <NCheckbox size="small" class="check-box" v-model:checked="debug.settings.printAllLcuEvents"
+        <NCheckbox size="small" class="check-box" v-model:checked="rds.printAll"
           >打印全部事件</NCheckbox
         >
         <NButton
           size="tiny"
           @click="handleShowAddModal"
-          v-show="!debug.settings.printAllLcuEvents"
+          v-show="!rds.printAll"
           secondary
           type="primary"
           >添加规则</NButton
         >
       </div>
-      <NCollapseTransition :show="!debug.settings.printAllLcuEvents">
+      <NCollapseTransition :show="!rds.printAll">
         <NDataTable
-          :class="styles.table"
+          :class="$style.table"
           :columns="columns"
           :data="printRulesArr"
           size="small"
@@ -127,7 +127,7 @@
     <NCard size="small" style="margin-top: 8px">
       <template #header
         ><span class="card-header-title"
-          >LCU{{ lc.state === 'connected' ? '' : ' (未连接)' }}</span
+          >LCU{{ lc.connectionState === 'connected' ? '' : ' (未连接)' }}</span
         ></template
       >
       <NTable size="small" bordered>
@@ -168,42 +168,21 @@
               }}</CopyableText>
             </td>
           </tr>
-          <tr v-if="cf.settings.useSgpApi && eds.sgpAvailability.sgpServerId">
-            <td>SGP Server: Match History</td>
-            <td>
-              <CopyableText>
-                {{
-                  eds.sgpAvailability.sgpServers.servers[eds.sgpAvailability.sgpServerId]
-                    .matchHistory
-                }}</CopyableText
-              >
-            </td>
-          </tr>
-          <tr v-if="cf.settings.useSgpApi && eds.sgpAvailability.sgpServerId">
-            <td>SGP Server: Common</td>
-            <td>
-              <CopyableText>
-                {{
-                  eds.sgpAvailability.sgpServers.servers[eds.sgpAvailability.sgpServerId].common
-                }}</CopyableText
-              >
-            </td>
-          </tr>
         </tbody>
       </NTable>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">游戏流</span></template>
-      <span class="text" v-if="lc.state === 'connected'"
-        >{{ gameflowText[gameflow.phase || 'None'] }} ({{ gameflow.phase }})</span
+      <span class="text" v-if="lc.connectionState === 'connected'"
+        >{{ gameflowText[lc.gameflow.phase || 'None'] }} ({{ lc.gameflow.phase }})</span
       >
       <span class="text" v-else>不可用 (未连接)</span>
     </NCard>
-    <NCard v-if="app.isAdministrator" size="small" style="margin-top: 8px">
+    <NCard v-if="as.isAdministrator" size="small" style="margin-top: 8px">
       <template #header><LeagueAkariSpan class="card-header-title" /></template>
       <span class="text">League Akari 运行在管理员权限，仅用于实现特定的客户端功能</span>
     </NCard>
-    <NCard v-if="app.settings.isInKyokoMode" size="small" style="margin-top: 8px">
+    <NCard v-if="as.settings.isInKyokoMode" size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">Akari~</span></template>
       <ControlItem
         class="control-item-margin"
@@ -213,9 +192,9 @@
       >
         <NSwitch
           size="small"
-          v-if="app.settings.isInKyokoMode"
-          :value="app.settings.isInKyokoMode"
-          @update:value="(val: boolean) => am.setInKyokoMode(val)"
+          v-if="as.settings.isInKyokoMode"
+          :value="as.settings.isInKyokoMode"
+          @update:value="(val: boolean) => app.setInKyokoMode(val)"
         />
       </ControlItem>
     </NCard>
@@ -226,13 +205,14 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import { appRendererModule as am } from '@renderer-shared/modules/app'
-import { useAppStore } from '@renderer-shared/modules/app/store'
-import { useCoreFunctionalityStore } from '@renderer-shared/modules/core-functionality/store'
-import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
-import { mainWindowRendererModule as mwm } from '@renderer-shared/modules/main-window'
+import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
+import { RendererDebugRenderer } from '@renderer-shared/shards/renderer-debug'
+import { useRendererDebugStore } from '@renderer-shared/shards/renderer-debug/store'
+import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
 import {
@@ -250,19 +230,18 @@ import {
   NSwitch,
   NTable
 } from 'naive-ui'
-import { computed, h, nextTick, ref, useCssModule, useTemplateRef, watch } from 'vue'
+import { computed, h, nextTick, ref, useTemplateRef, watch } from 'vue'
 
-import { debugRendererModule as dm } from '@main-window/modules/debug'
-import { useDebugStore } from '@main-window/modules/debug/store'
+import { LCU_ENDPOINTS } from './lcu-endpoints'
 
-import { lcuEndpoints } from './lcu-endpoints'
+const lc = useLeagueClientStore()
+const rds = useRendererDebugStore()
+const as = useAppCommonStore()
 
-const gameflow = useGameflowStore()
-const app = useAppStore()
-const debug = useDebugStore()
-const lc = useLcuConnectionStore()
-const eds = useExternalDataSourceStore()
-const cf = useCoreFunctionalityStore()
+const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const log = useInstance<LoggerRenderer>('logger-renderer')
+const app = useInstance<AppCommonRenderer>('app-common-renderer')
+const rd = useInstance<RendererDebugRenderer>('renderer-debug-renderer')
 
 const gameflowText = {
   Matchmaking: '正在匹配',
@@ -289,9 +268,9 @@ const columns: DataTableColumn<any>[] = [
       return h(NCheckbox, {
         'onUpdate:checked': (val: boolean) => {
           if (val) {
-            dm.enablePrintRule(row.rule)
+            rd.enableRule(row.rule)
           } else {
-            dm.disablePrintRule(row.rule)
+            rd.disableRule(row.rule)
           }
         },
         checked: row.data.enabled,
@@ -334,12 +313,10 @@ const columns: DataTableColumn<any>[] = [
 ]
 
 const printRulesArr = computed(() => {
-  return Object.keys(debug.settings.printRules)
-    .sort((a, b) => a.localeCompare(b))
-    .map((k) => ({
-      rule: k,
-      data: debug.settings.printRules[k]
-    }))
+  return rds.rules.map((rule) => ({
+    rule,
+    data: rule
+  }))
 })
 
 const editRuleModalShow = ref(false)
@@ -368,7 +345,7 @@ function isSubsequence(s: string, t: string) {
 }
 
 const options = computed(() => {
-  return lcuEndpoints
+  return LCU_ENDPOINTS
     .filter((v) => isSubsequence(editRuleText.value, v))
     .toSorted((a, b) => a.length - b.length)
 })
@@ -396,27 +373,24 @@ const handleAddRule = async () => {
     return
   }
 
-  dm.addPrintRule(editRuleText.value)
+  rd.disableRule(editRuleText.value)
 
   editRuleModalShow.value = false
 }
 
 const handleRemoveEditRule = async (rule: string) => {
-  dm.removePrintRule(rule)
+  rd.removeRule(rule)
 }
-
-const styles = useCssModule()
-
 const handleToggleDevtools = async () => {
-  await mwm.toggleDevTools()
+  await wm.toggleMainWindowDevtools()
 }
 
 const handleShowLogsDir = async () => {
-  await am.openLogsDirInExplorer()
+  await log.openLogsDir()
 }
 
 const handleShowUserDataDir = async () => {
-  await am.openUserDataDirInExplorer()
+  await app.openUserDataDir()
 }
 
 const handleReload = () => {

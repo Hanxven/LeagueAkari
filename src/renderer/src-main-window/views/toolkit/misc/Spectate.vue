@@ -2,9 +2,11 @@
   <NCard size="small">
     <template #header
       ><span class="card-header-title"
-        >观战<span v-if="gameflow.phase === 'Lobby'" style="color: yellow; font-size: 14px">
+        >观战<span v-if="lcs.gameflow.phase === 'Lobby'" style="color: yellow; font-size: 14px">
           (需要先退出当前房间)
-          <NButton size="tiny" secondary @click="() => deleteLobby()">退出房间</NButton></span
+          <NButton size="tiny" secondary @click="() => lc.api.lobby.deleteLobby()"
+            >退出房间</NButton
+          ></span
         ></span
       ></template
     >
@@ -18,7 +20,7 @@
         <NDropdown
           trigger="click"
           placement="top-start"
-          :disabled="gameflow.phase !== 'None'"
+          :disabled="lcs.gameflow.phase !== 'None'"
           :options="watchableFriendOptions"
           @select="(puuid) => handleSpectatePuuid(puuid)"
           @update:show="handleLoadFriends"
@@ -27,14 +29,14 @@
             placeholder="召唤师名称 / PUUID"
             style="width: 200px"
             size="small"
-            :disabled="gameflow.phase !== 'None'"
+            :disabled="lcs.gameflow.phase !== 'None'"
             @keyup.enter="handleSpectate"
             v-model:value="spectator.summonerIdentity"
           ></NInput>
         </NDropdown>
         <NButton
           :loading="spectator.isProcessing"
-          :disabled="spectator.summonerIdentity.length === 0 || gameflow.phase !== 'None'"
+          :disabled="spectator.summonerIdentity.length === 0 || lcs.gameflow.phase !== 'None'"
           @click="handleSpectate"
           size="small"
           >调起观战</NButton
@@ -46,22 +48,19 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { getFriends } from '@renderer-shared/http-api/chat'
-import { deleteLobby } from '@renderer-shared/http-api/lobby'
-import { launchSpectator } from '@renderer-shared/http-api/spectator'
-import { getSummonerAlias, getSummonerByName } from '@renderer-shared/http-api/summoner'
-import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
-import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
 import { laNotification } from '@renderer-shared/notification'
-import { Friend } from '@shared/types/lcu/chat'
+import { useInstance } from '@renderer-shared/shards'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { Friend } from '@shared/types/league-client/chat'
 import { resolveSummonerName } from '@shared/utils/identity'
 import { summonerName } from '@shared/utils/name'
 import { AxiosError } from 'axios'
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
 import { computed, reactive, ref } from 'vue'
 
-const gameflow = useGameflowStore()
-const summoner = useSummonerStore()
+const lcs = useLeagueClientStore()
+const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const spectator = reactive({
   summonerIdentity: '',
@@ -69,7 +68,7 @@ const spectator = reactive({
 })
 
 const handleSpectate = async () => {
-  if (spectator.isProcessing || gameflow.phase !== 'None') {
+  if (spectator.isProcessing || lcs.gameflow.phase !== 'None') {
     return
   }
 
@@ -81,8 +80,10 @@ const handleSpectate = async () => {
     targetPuuid = spectator.summonerIdentity
   } else {
     try {
-      if (summoner.newIdSystemEnabled) {
-        const s = await getSummonerAlias(...resolveSummonerName(spectator.summonerIdentity))
+      if (lcs.summoner.me?.tagLine) {
+        const s = await lc.api.summoner.getSummonerAlias(
+          ...resolveSummonerName(spectator.summonerIdentity)
+        )
         if (s) {
           targetPuuid = s.puuid
         } else {
@@ -91,7 +92,7 @@ const handleSpectate = async () => {
       } else {
         const {
           data: { puuid }
-        } = await getSummonerByName(spectator.summonerIdentity)
+        } = await lc.api.summoner.getSummonerByName(spectator.summonerIdentity)
         targetPuuid = puuid
       }
     } catch (error) {
@@ -103,7 +104,7 @@ const handleSpectate = async () => {
   }
 
   try {
-    await launchSpectator(targetPuuid)
+    await lc.api.spectator.launchSpectator(targetPuuid)
 
     laNotification.success('观战', '已拉起观战')
   } catch (error) {
@@ -119,14 +120,14 @@ const handleSpectate = async () => {
 
 // 一个 PUUID 的版本
 const handleSpectatePuuid = async (puuid: string) => {
-  if (spectator.isProcessing || gameflow.phase !== 'None') {
+  if (spectator.isProcessing || lcs.gameflow.phase !== 'None') {
     return
   }
 
   spectator.isProcessing = true
 
   try {
-    await launchSpectator(puuid)
+    await lc.api.spectator.launchSpectator(puuid)
 
     laNotification.success('观战', '已拉起观战')
   } catch (error) {
@@ -148,7 +149,7 @@ const watchableFriendOptions = computed(() => {
 
 const handleLoadFriends = async () => {
   try {
-    friends.value = (await getFriends()).data
+    friends.value = (await lc.api.chat.getFriends()).data
   } catch (error) {
     console.error('好友列表加载失败', error)
   }

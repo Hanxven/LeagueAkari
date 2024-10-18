@@ -6,45 +6,49 @@
       :self-puuid="showingGame.selfPuuid"
       v-model:show="isStandaloneMatchHistoryCardShow"
     />
-    <DefineOngoingTeam v-slot="{ players, team, teamAnalysis }">
+    <DefineOngoingTeam v-slot="{ players, team }">
       <div class="team-wrapper">
         <div class="team-header">
           <span class="title">{{ formatTeamText(team).name }}</span>
-          <div class="analysis" v-if="teamAnalysis && players.length >= 1">
+          <div class="analysis" v-if="og.playerStats?.teams[team] && players.length >= 1">
             <span
               title="队伍平均胜率"
               class="win-rate"
               :class="{
-                'gte-50': teamAnalysis.averageWinRate >= 0.5,
-                'lt-50': teamAnalysis.averageWinRate < 0.5
+                'gte-50': og.playerStats.teams[team].averageWinRate >= 0.5,
+                'lt-50': og.playerStats.teams[team].averageWinRate < 0.5
               }"
-              >{{ (teamAnalysis.averageWinRate * 100).toFixed() }} %</span
+              >{{ (og.playerStats.teams[team].averageWinRate * 100).toFixed() }} %</span
             >
-            <span title="队伍平均 KDA">{{ teamAnalysis.averageKda.toFixed(2) }}</span>
+            <span title="队伍平均 KDA">{{
+              og.playerStats?.teams[team].averageKda.toFixed(2)
+            }}</span>
             <span
               title="队伍平均 Akari Score"
               style="color: #ff65ce"
               v-if="app.settings.isInKyokoMode"
-              >{{ teamAnalysis.averageAkariScore.toFixed(2) }}</span
+              >{{ og.playerStats.teams[team].averageAkariScore.toFixed(2) }}</span
             >
           </div>
         </div>
         <div class="team">
           <PlayerInfoCard
-            v-for="{ player, analysis, position } of players"
-            :puuid="player.puuid"
-            :key="player.puuid"
-            :is-self="player.puuid === summoner.me?.puuid"
-            :champion-id="cf.ongoingChampionSelections?.[player.puuid]"
-            :match-history="player.matchHistory"
-            :summoner="player.summoner"
-            :ranked-stats="player.rankedStats"
-            :saved-info="player.savedInfo"
-            :champion-mastery="player.championMastery"
-            :analysis="analysis"
-            :position="position"
-            :pre-made-team-id="preMadeTeamInfo.players[player.puuid]"
-            :current-highlighting-pre-made-team-id="currentHighlightingPreMadeTeamIdD"
+            v-for="player of players"
+            :puuid="player"
+            :key="player"
+            :is-self="player === lc.summoner.me?.puuid"
+            :champion-id="og.championSelections?.[player]"
+            :match-history="
+              og.matchHistory[player]?.data.map((g) => ({ isDetailed: true, game: g }))
+            "
+            :summoner="og.summoner[player]?.data"
+            :ranked-stats="og.rankedStats[player]?.data"
+            :saved-info="og.savedInfo[player]"
+            :champion-mastery="og.championMastery[player]?.data"
+            :analysis="og.playerStats?.players[player]"
+            :position="og.positionAssignments?.[player]"
+            :premade-team-id="premadeTeamInfo.players[player]"
+            :currentHighlightingPremadeTeamId="currentHighlightingPremadeTeamIdD"
             @show-game="handleShowGame"
             @show-game-by-id="handleShowGameById"
             @to-summoner="handleToSummoner"
@@ -53,32 +57,31 @@
         </div>
       </div>
     </DefineOngoingTeam>
-    <NScrollbar v-if="!isInIdleState && cf.settings.ongoingAnalysisEnabled" x-scrollable>
+    <NScrollbar v-if="!isInIdleState && og.settings.enabled" x-scrollable>
       <div class="inner-container" :class="{ 'fit-content': columnsNeed >= 4 }">
         <div class="header-controls">
           <NSelect
             :options="orderOptions"
             placeholder="排序方式"
             size="small"
-            :value="cf.settings.orderPlayerBy"
-            @update:value="(val) => cfm.setOrderPlayerBy(val)"
+            :value="og.settings.orderPlayerBy"
+            @update:value="(val) => (og.settings.orderPlayerBy = val)"
             class="order-selector"
           />
           <NSelect
             v-if="canUseSgpApi"
-            :options="queueOptions"
-            :value="cf.queueFilter"
-            @update:value="(val) => cfm.setQueueFilter(val)"
+            :options="sgpTagOptions"
+            :value="og.matchHistoryTag"
+            @update:value="(val) => ogs.setMatchHistoryTag(val)"
             placeholder="队列筛选"
             size="small"
             class="queue-selector"
           />
-          <NButton @click="() => cfm.refresh()" size="small" type="primary">刷新</NButton>
+          <NButton @click="() => ogs.reload()" size="small" type="primary">刷新</NButton>
         </div>
         <OngoingTeam
-          v-for="(players, team) of teams"
+          v-for="(players, team) of sortedTeams"
           :team="team"
-          :team-analysis="cf.ongoingPlayerAnalysis?.teams[team]"
           :key="team"
           :players="players"
         />
@@ -88,16 +91,18 @@
       <div class="centered">
         <LeagueAkariSpan bold class="akari-text" />
         <div
-          v-if="cf.settings.ongoingAnalysisEnabled"
-          style="font-size: 14px; font-weight: normal; color: #666"
+          v-if="og.settings.enabled"
+          style="font-size: 14px; font-weight: normal; color: #666; margin-top: 8px"
         >
-          <template v-if="lc.state !== 'connected'">未连接到客户端</template>
-          <template v-else-if="champSelect.session && champSelect.session.isSpectating"
+          <template v-if="lc.connectionState !== 'connected'">未连接到客户端</template>
+          <template v-else-if="lc.champSelect.session && lc.champSelect.session.isSpectating"
             >等待观战延迟</template
           >
           <template v-else>没有正在进行中的游戏</template>
         </div>
-        <div v-else style="font-size: 14px; font-weight: normal; color: #666">对局分析已禁用</div>
+        <div v-else style="font-size: 14px; font-weight: normal; color: #666; margin-top: 8px">
+          对局分析已禁用
+        </div>
       </div>
     </div>
   </div>
@@ -105,129 +110,82 @@
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import { useAppStore } from '@renderer-shared/modules/app/store'
-import { coreFunctionalityRendererModule as cfm } from '@renderer-shared/modules/core-functionality'
-import {
-  OngoingPlayer,
-  useCoreFunctionalityStore
-} from '@renderer-shared/modules/core-functionality/store'
-import { useExternalDataSourceStore } from '@renderer-shared/modules/external-data-source/store'
-import { useLcuConnectionStore } from '@renderer-shared/modules/lcu-connection/store'
-import { useChampSelectStore } from '@renderer-shared/modules/lcu-state-sync/champ-select'
-import { useGameflowStore } from '@renderer-shared/modules/lcu-state-sync/gameflow'
-import { useSummonerStore } from '@renderer-shared/modules/lcu-state-sync/summoner'
-import { Game } from '@shared/types/lcu/match-history'
-import {
-  MatchHistoryGamesAnalysisAll,
-  MatchHistoryGamesAnalysisTeamSide
-} from '@shared/utils/analysis'
-import { ParsedRole } from '@shared/utils/ranked'
+import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { Game } from '@shared/types/league-client/match-history'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
 import { NButton, NScrollbar, NSelect } from 'naive-ui'
-import { computed, provide, reactive, ref, useTemplateRef } from 'vue'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
 
-import { matchHistoryTabsRendererModule as mhm } from '@main-window/modules/match-history-tabs'
+import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
 import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMatchHistoryCardModal.vue'
 import PlayerInfoCard from './PlayerInfoCard.vue'
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,
-  ONGOING_GAME_COMP_K,
-  PRE_MADE_TEAMS,
+  PRE_MADE_TEAMS as PREMADE_TEAMS,
   TEAM_NAMES,
   TeamMeta,
   useIdleState,
   useOrderOptions,
-  useQueueOptions
+  useSgpTagOptions
 } from './ongoing-game-utils'
 
-const cf = useCoreFunctionalityStore()
-const lc = useLcuConnectionStore()
-const gameflow = useGameflowStore()
-const champSelect = useChampSelectStore()
-const summoner = useSummonerStore()
-const eds = useExternalDataSourceStore()
-const app = useAppStore()
+const lc = useLeagueClientStore()
+const app = useAppCommonStore()
+
+const og = useOngoingGameStore()
+const sgp = useSgpStore()
+const ogs = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
+
+const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
 const isInIdleState = useIdleState()
 
 const canUseSgpApi = computed(() => {
-  return cf.settings.useSgpApi && eds.sgpAvailability.serversSupported.matchHistory
+  return og.settings.matchHistoryUseSgpApi && sgp.availability.serversSupported.matchHistory
 })
 
-const teams = computed(() => {
-  if (!cf.ongoingTeams || !Object.keys(cf.ongoingPlayers).length) {
+const sortedTeams = computed(() => {
+  if (!og.teams) {
     return {}
   }
 
-  const teamMap: Record<
-    string,
-    {
-      player: OngoingPlayer
-      analysis?: MatchHistoryGamesAnalysisAll
-      position: {
-        position: string
-        role: ParsedRole | null
-      }
-    }[]
-  > = {}
+  const sorted: Record<string, string[]> = {}
 
-  Object.entries(cf.ongoingTeams).forEach(([team, players]) => {
+  Object.entries(og.teams).forEach(([team, players]) => {
     if (!players.length) {
       return
     }
 
-    const ps = players.filter((p) => cf.ongoingPlayers[p]).map((p) => cf.ongoingPlayers[p])
-    if (ps.length) {
-      teamMap[team] = ps
-        .map((player) => {
-          const data: {
-            player: OngoingPlayer
-            analysis?: MatchHistoryGamesAnalysisAll
-            position: {
-              position: string
-              role: ParsedRole | null
-            }
-          } = {
-            player,
-            position: {
-              position: 'NONE',
-              role: null
-            }
-          }
+    sorted[team] = players.toSorted((a, b) => {
+      const statsA = og.playerStats?.players[a]
+      const statsB = og.playerStats?.players[b]
 
-          if (cf.ongoingPlayerAnalysis && cf.ongoingPlayerAnalysis.players[player.puuid]) {
-            data.analysis = cf.ongoingPlayerAnalysis.players[player.puuid]
-          }
+      if (og.settings.orderPlayerBy === 'akari-score') {
+        return (statsB?.akariScore.total || 0) - (statsA?.akariScore.total || 0)
+      }
 
-          if (cf.ongoingPositionAssignments && cf.ongoingPositionAssignments[player.puuid]) {
-            data.position = cf.ongoingPositionAssignments[player.puuid]
-          }
+      if (og.settings.orderPlayerBy === 'kda') {
+        return (statsB?.summary.averageKda || 0) - (statsA?.summary.averageKda || 0)
+      }
 
-          return data
-        })
-        .toSorted((a, b) => {
-          if (cf.settings.orderPlayerBy === 'akari-score') {
-            return (b.analysis?.akariScore.total || 0) - (a.analysis?.akariScore.total || 0)
-          }
+      if (og.settings.orderPlayerBy === 'win-rate') {
+        return (statsB?.summary.winRate || 0) - (statsA?.summary.winRate || 0)
+      }
 
-          if (cf.settings.orderPlayerBy === 'kda') {
-            return (b.analysis?.summary.averageKda || 0) - (a.analysis?.summary.averageKda || 0)
-          }
-
-          if (cf.settings.orderPlayerBy === 'win-rate') {
-            return (b.analysis?.summary.winRate || 0) - (a.analysis?.summary.winRate || 0)
-          }
-
-          return 0
-        })
-    }
+      return 0
+    })
   })
 
-  return teamMap
+  return sorted
 })
 
-const preMadeTeamInfo = computed(() => {
+const premadeTeamInfo = computed(() => {
   const playerMap: {
     groups: Record<string, string[]>
     players: Record<string, string>
@@ -237,9 +195,9 @@ const preMadeTeamInfo = computed(() => {
   }
 
   let groupIndex = 0
-  Object.entries(cf.ongoingPreMadeTeams).forEach(([_, groups]) => {
+  Object.entries(og.premadeTeams || {}).forEach(([_, groups]) => {
     groups.forEach((g) => {
-      const groupId = PRE_MADE_TEAMS[groupIndex++]
+      const groupId = PREMADE_TEAMS[groupIndex++]
       playerMap.groups[groupId] = g
 
       g.forEach((p) => {
@@ -252,8 +210,8 @@ const preMadeTeamInfo = computed(() => {
 })
 
 const formatTeamText = (team: string): TeamMeta => {
-  if (cf.ongoingGameInfo?.queueType === 'CHERRY') {
-    if (gameflow.phase === 'ChampSelect') {
+  if (og.gameInfo?.queueType === 'CHERRY') {
+    if (lc.gameflow.phase === 'ChampSelect') {
       return {
         name: team.startsWith('our') ? '我方小队' : '敌方小队',
         side: -1
@@ -271,16 +229,9 @@ const formatTeamText = (team: string): TeamMeta => {
 }
 
 const [DefineOngoingTeam, OngoingTeam] = createReusableTemplate<{
-  players: {
-    player: OngoingPlayer
-    analysis?: MatchHistoryGamesAnalysisAll
-    position?: { position: string; role: ParsedRole | null }
-  }[]
-  teamAnalysis?: MatchHistoryGamesAnalysisTeamSide
+  players: string[]
   team: string
 }>({ inheritAttrs: false })
-
-provide(ONGOING_GAME_COMP_K, {})
 
 const showingGame = reactive<{
   gameId: number
@@ -292,20 +243,20 @@ const showingGame = reactive<{
   selfPuuid: ''
 })
 
-const currentHighlightingPreMadeTeamId = ref<string | null>(null)
-const currentHighlightingPreMadeTeamIdD = refDebounced<string | null>(
-  currentHighlightingPreMadeTeamId,
+const currentHighlightingPremadeTeamId = ref<string | null>(null)
+const currentHighlightingPremadeTeamIdD = refDebounced<string | null>(
+  currentHighlightingPremadeTeamId,
   200
 )
 
 const orderOptions = useOrderOptions()
-const queueOptions = useQueueOptions()
+const sgpTagOptions = useSgpTagOptions()
 
 const handleHighlightSubTeam = (preMadeTeamId: string, highlight: boolean) => {
   if (highlight) {
-    currentHighlightingPreMadeTeamId.value = preMadeTeamId
+    currentHighlightingPremadeTeamId.value = preMadeTeamId
   } else {
-    currentHighlightingPreMadeTeamId.value = null
+    currentHighlightingPremadeTeamId.value = null
   }
 }
 
@@ -324,7 +275,7 @@ const handleShowGameById = (id: number, selfPuuid: string) => {
   isStandaloneMatchHistoryCardShow.value = true
 }
 
-const { navigateToTab } = mhm.useNavigateToTab()
+const { navigateToTab } = mh.useNavigateToTab()
 const handleToSummoner = (puuid: string) => {
   navigateToTab(puuid)
 }
@@ -332,11 +283,8 @@ const handleToSummoner = (puuid: string) => {
 // 基于经验的手动测量, 确定的较为不错的列数, 最多支持 8 列
 // 注意, 这建立在卡片元素在 240px 宽度的基础上, 同时行间隔为 4px. 如果任意一个条件发生变化, 列数需要重新调整
 const { width } = useElementSize(useTemplateRef('page-el'))
-// watchEffect(() => {
-//   console.log(width.value)
-// })
 const columnsNeed = computed(() => {
-  const teamColumns = Object.values(teams.value)
+  const teamColumns = Object.values(og.teams || {})
     .map((t) => t.length)
     .reduce((a, b) => Math.max(a, b), 0)
 

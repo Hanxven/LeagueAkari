@@ -10,8 +10,8 @@
           :label-width="200"
         >
           <NSwitch
-            :value="agf.settings.autoAcceptEnabled"
-            @update:value="(val) => am.setAutoAcceptEnabled(val)"
+            :value="store.settings.autoAcceptEnabled"
+            @update:value="(val) => shard.setAutoAcceptEnabled(val)"
             size="small"
           />
         </ControlItem>
@@ -23,8 +23,8 @@
         >
           <NInputNumber
             style="width: 80px"
-            :value="agf.settings.autoAcceptDelaySeconds"
-            @update:value="(value) => am.setAutoAcceptDelaySeconds(value || 0)"
+            :value="store.settings.autoAcceptDelaySeconds"
+            @update:value="(value) => shard.setAutoAcceptDelaySeconds(value || 0)"
             placeholder="秒"
             :min="0"
             :max="10"
@@ -39,8 +39,8 @@
           :label-width="200"
         >
           <NSwitch
-            :value="agf.settings.autoHonorEnabled"
-            @update:value="(val) => am.setAutoHonorEnabled(val)"
+            :value="store.settings.autoHonorEnabled"
+            @update:value="(val) => shard.setAutoHonorEnabled(val)"
             size="small"
           />
         </ControlItem>
@@ -54,8 +54,8 @@
           <NRadioGroup
             size="small"
             name="radio-group"
-            :value="agf.settings.autoHonorStrategy"
-            @update:value="(val) => am.setAutoHonorStrategy(val)"
+            :value="store.settings.autoHonorStrategy"
+            @update:value="(val) => shard.setAutoHonorStrategy(val)"
           >
             <NFlex :size="4">
               <NRadio
@@ -78,14 +78,14 @@
             对局结束时回到房间。可能需要先启用
             <span
               style="font-weight: bold; cursor: pointer"
-              @click="() => am.setAutoHonorEnabled(true)"
+              @click="() => shard.setAutoHonorEnabled(true)"
               >自动点赞</span
             >
             以完成点赞投票阶段
           </template>
           <NSwitch
-            :value="agf.settings.playAgainEnabled"
-            @update:value="(val) => am.setPlayAgainEnabled(val)"
+            :value="store.settings.playAgainEnabled"
+            @update:value="(val) => shard.setPlayAgainEnabled(val)"
             size="small"
           />
         </ControlItem>
@@ -97,20 +97,20 @@
           :label-width="200"
         >
           <NSwitch
-            :value="agf.settings.autoMatchmakingEnabled"
-            @update:value="(val) => am.setAutoMatchmakingEnabled(val)"
+            :value="store.settings.autoMatchmakingEnabled"
+            @update:value="(val) => shard.setAutoMatchmakingEnabled(val)"
             size="small"
           />
         </ControlItem>
         <ControlItem
           class="control-item-margin"
           label="最低人数"
-          :label-description="`自动开始匹配需满足人数达到 ${agf.settings.autoMatchmakingMinimumMembers} 人`"
+          :label-description="`自动开始匹配需满足人数达到 ${store.settings.autoMatchmakingMinimumMembers} 人`"
           :label-width="200"
         >
           <NInputNumber
-            :value="agf.settings.autoMatchmakingMinimumMembers"
-            @update:value="(val) => am.setAutoMatchmakingMinimumMembers(val || 1)"
+            :value="store.settings.autoMatchmakingMinimumMembers"
+            @update:value="(val) => shard.setAutoMatchmakingMinimumMembers(val || 1)"
             :min="1"
             :max="99"
             size="small"
@@ -125,8 +125,8 @@
         >
           <NInputNumber
             style="width: 80px"
-            :value="agf.settings.autoMatchmakingDelaySeconds"
-            @update:value="(value) => am.setAutoMatchmakingDelaySeconds(value || 0)"
+            :value="store.settings.autoMatchmakingDelaySeconds"
+            @update:value="(value) => shard.setAutoMatchmakingDelaySeconds(value || 0)"
             placeholder="秒"
             :min="0"
             size="small"
@@ -139,8 +139,8 @@
           :label-width="200"
         >
           <NSwitch
-            :value="agf.settings.autoMatchmakingWaitForInvitees"
-            @update:value="(val) => am.setAutoMatchmakingWaitForInvitees(val)"
+            :value="store.settings.autoMatchmakingWaitForInvitees"
+            @update:value="(val) => shard.setAutoMatchmakingWaitForInvitees(val)"
             size="small"
           />
         </ControlItem>
@@ -151,8 +151,8 @@
           :label-width="200"
         >
           <NRadioGroup
-            :value="agf.settings.autoMatchmakingRematchStrategy"
-            @update:value="(s) => am.setAutoMatchmakingRematchStrategy(s)"
+            :value="store.settings.autoMatchmakingRematchStrategy"
+            @update:value="(s) => shard.setAutoMatchmakingRematchStrategy(s)"
             size="small"
           >
             <NFlex>
@@ -168,18 +168,18 @@
           class="control-item-margin"
           label="退出匹配时间 (s)"
           :label-description="
-            agf.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'
+            store.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'
               ? `该选项仅当停止匹配策略为固定时间时生效`
               : `在超过该时间后，将停止匹配，单位为秒`
           "
-          :disabled="agf.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'"
+          :disabled="store.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'"
           :label-width="200"
         >
           <NInputNumber
-            :disabled="agf.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'"
+            :disabled="store.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'"
             style="width: 80px"
-            :value="agf.settings.autoMatchmakingRematchFixedDuration"
-            @update:value="(value) => am.setAutoMatchmakingRematchFixedDuration(value || 2)"
+            :value="store.settings.autoMatchmakingRematchFixedDuration"
+            @update:value="(value) => shard.setAutoMatchmakingRematchFixedDuration(value || 2)"
             placeholder="秒"
             :min="1"
             size="small"
@@ -193,8 +193,8 @@
           :label-width="200"
         >
           <NSwitch
-            :value="agf.settings.autoReconnectEnabled"
-            @update:value="(val) => am.setAutoReconnectEnabled(val)"
+            :value="store.settings.autoReconnectEnabled"
+            @update:value="(val) => shard.setAutoReconnectEnabled(val)"
             size="small"
           />
         </ControlItem>
@@ -206,8 +206,8 @@
           :label-width="200"
         >
           <NSwitch
-            :value="agf.settings.autoHandleInvitationsEnabled"
-            @update:value="(val) => am.setAutoHandleInvitationsEnabled(val)"
+            :value="store.settings.autoHandleInvitationsEnabled"
+            @update:value="(val) => shard.setAutoHandleInvitationsEnabled(val)"
             size="small"
           />
         </ControlItem>
@@ -263,8 +263,9 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { autoGameflowRendererModule as am } from '@renderer-shared/modules/auto-gameflow'
-import { useAutoGameflowStore } from '@renderer-shared/modules/auto-gameflow/store'
+import { useInstance } from '@renderer-shared/shards'
+import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
+import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/store'
 import {
   NButton,
   NCard,
@@ -278,24 +279,25 @@ import {
 } from 'naive-ui'
 import { computed } from 'vue'
 
-const agf = useAutoGameflowStore()
+const store = useAutoGameflowStore()
+const shard = useInstance<AutoGameflowRenderer>('auto-gameflow-renderer')
 
 const invitationStrategiesPopselectArray = computed(() => {
-  return Object.keys(agf.settings.invitationHandlingStrategies)
+  return Object.keys(store.settings.invitationHandlingStrategies)
 })
 
 const handleChangeInvitationStrategies = (value: string[]) => {
   const newStrategies: Record<string, string> = {}
 
   for (const strategy of value) {
-    if (agf.settings.invitationHandlingStrategies[strategy]) {
-      newStrategies[strategy] = agf.settings.invitationHandlingStrategies[strategy]
+    if (store.settings.invitationHandlingStrategies[strategy]) {
+      newStrategies[strategy] = store.settings.invitationHandlingStrategies[strategy]
     } else {
       newStrategies[strategy] = 'ignore'
     }
   }
 
-  am.setInvitationHandlingStrategies(newStrategies)
+  shard.setInvitationHandlingStrategies(newStrategies)
 }
 
 const QUEUE_TYPES = {
@@ -346,7 +348,7 @@ const QUEUE_TYPES = {
 } as const
 
 const invitationStrategiesArray = computed(() => {
-  return Object.entries(agf.settings.invitationHandlingStrategies)
+  return Object.entries(store.settings.invitationHandlingStrategies)
     .map(([queueType, strategy]) => {
       return {
         queueType,
@@ -375,9 +377,9 @@ const queueTypeOptions = computed(() => {
 })
 
 const handleChangeInvitationStrategy = (queueType: string, strategy: string) => {
-  const newObj = { ...agf.settings.invitationHandlingStrategies }
+  const newObj = { ...store.settings.invitationHandlingStrategies }
   newObj[queueType] = strategy
-  am.setInvitationHandlingStrategies(newObj)
+  shard.setInvitationHandlingStrategies(newObj)
 }
 </script>
 

@@ -1,8 +1,8 @@
 import { makeAutoObservable, observable } from 'mobx'
 
-import { LeagueClientSyncedData } from '../league-client/data'
+import { LeagueClientSyncedData } from '../league-client/lc-state'
 
-class RespawnTimerSettings {
+export class RespawnTimerSettings {
   enabled: boolean = false
 
   setEnabled(enabled: boolean) {
@@ -24,8 +24,6 @@ export class RespawnTimerState {
     totalTime: 0,
     isDead: false
   }
-
-  settings = new RespawnTimerSettings()
 
   /**
    * 依赖于 LeagueClientSyncedData 的计算属性

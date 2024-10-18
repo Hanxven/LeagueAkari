@@ -4,10 +4,9 @@
 </template>
 
 <script lang="ts" setup>
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { addLeadingSlash } from '@shared/utils/uri'
 import { ref, watchEffect } from 'vue'
-
-import { useLcuConnectionStore } from '../modules/lcu-connection/store'
 
 const props = defineProps<{
   src?: string
@@ -16,10 +15,10 @@ const props = defineProps<{
 }>()
 
 const url = ref<string | null>(null)
-const lc = useLcuConnectionStore()
+const lcs = useLeagueClientStore()
 
 watchEffect(() => {
-  if (lc.state === 'connected') {
+  if (lcs.connectionState === 'connected') {
     url.value = `akari://lcu${addLeadingSlash(props.src)}`
   } else {
     url.value = null

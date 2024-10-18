@@ -1,13 +1,13 @@
 <template>
   <NPopover
-    v-if="itemId && gameData.items[itemId]"
+    v-if="itemId && lcs.gameData.items[itemId]"
     :delay="50"
     :scrollable="true"
     style="max-height: 50vh"
   >
     <template #trigger>
       <LcuImage
-        :src="gameData.items[itemId].iconPath"
+        :src="lcs.gameData.items[itemId].iconPath"
         v-bind="$attrs"
         :style="{ width: `${size}px`, height: `${size}px` }"
         class="item"
@@ -15,34 +15,34 @@
       />
     </template>
     <div class="info">
-      <LcuImage class="image" :src="gameData.items[itemId].iconPath" />
+      <LcuImage class="image" :src="lcs.gameData.items[itemId].iconPath" />
       <div class="right-side">
-        <div class="name">{{ gameData.items[itemId].name }}</div>
+        <div class="name">{{ lcs.gameData.items[itemId].name }}</div>
         <div class="price">
-          {{ gameData.items[itemId].priceTotal }} G
+          {{ lcs.gameData.items[itemId].priceTotal }} G
           {{
-            gameData.items[itemId].price !== gameData.items[itemId].priceTotal
-              ? `(合成 ${gameData.items[itemId].price}  G)`
+            lcs.gameData.items[itemId].price !== lcs.gameData.items[itemId].priceTotal
+              ? `(合成 ${lcs.gameData.items[itemId].price}  G)`
               : ''
           }}
         </div>
       </div>
     </div>
-    <div class="from" v-if="gameData.items[itemId].from.length !== 0">
+    <div class="from" v-if="lcs.gameData.items[itemId].from.length !== 0">
       <LcuImage
         class="image"
-        :title="gameData.items[item].name"
-        :src="gameData.items[item].iconPath"
-        v-for="item of gameData.items[itemId].from"
+        :title="lcs.gameData.items[item].name"
+        :src="lcs.gameData.items[item].iconPath"
+        v-for="item of lcs.gameData.items[itemId].from"
         :key="item"
       />
     </div>
-    <div class="to" v-if="gameData.items[itemId].to.length !== 0">
+    <div class="to" v-if="lcs.gameData.items[itemId].to.length !== 0">
       <LcuImage
         class="image"
-        :title="gameData.items[item].name"
-        :src="gameData.items[item].iconPath"
-        v-for="item of gameData.items[itemId].to"
+        :title="lcs.gameData.items[item].name"
+        :src="lcs.gameData.items[item].iconPath"
+        v-for="item of lcs.gameData.items[itemId].to"
         :key="item"
       />
     </div>
@@ -50,7 +50,7 @@
       :style="{ maxWidth: `${maxWidth}px` }"
       style="font-size: 12px"
       lol-view
-      v-html="gameData.items[itemId].description"
+      v-html="lcs.gameData.items[itemId].description"
     ></div>
   </NPopover>
   <div
@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
@@ -79,7 +79,7 @@ const {
   size?: number
 }>()
 
-const gameData = useGameDataStore()
+const lcs = useLeagueClientStore()
 </script>
 
 <style lang="less" scoped>

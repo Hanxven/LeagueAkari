@@ -10,8 +10,8 @@
           :label-width="200"
         >
           <NSwitch
-            @update:value="(v) => asm.setNormalModeEnabled(v)"
-            :value="as.settings.normalModeEnabled"
+            @update:value="(v) => shard.setNormalModeEnabled(v)"
+            :value="store.settings.normalModeEnabled"
             size="small"
           ></NSwitch>
         </ControlItem>
@@ -24,8 +24,8 @@
           <NSwitch
             type="pick"
             size="small"
-            :value="as.settings.showIntent"
-            @update:value="(val) => asm.setShowIntent(val)"
+            :value="store.settings.showIntent"
+            @update:value="(val) => shard.setShowIntent(val)"
           />
         </ControlItem>
         <ControlItem
@@ -35,8 +35,8 @@
           :label-width="200"
         >
           <NSwitch
-            @update:value="(v) => asm.setSelectTeammateIntendedChampion(v)"
-            :value="as.settings.selectTeammateIntendedChampion"
+            @update:value="(v) => shard.setSelectTeammateIntendedChampion(v)"
+            :value="store.settings.selectTeammateIntendedChampion"
             size="small"
           />
         </ControlItem>
@@ -46,7 +46,10 @@
           label-description="立即锁定或只是亮出"
           :label-width="200"
         >
-          <NRadioGroup :value="as.settings.completed" @update:value="(v) => asm.setCompleted(v)">
+          <NRadioGroup
+            :value="store.settings.completed"
+            @update:value="(v) => shard.setCompleted(v)"
+          >
             <NRadio :value="true">立即锁定</NRadio>
             <NRadio :value="false">亮出而不锁定</NRadio>
           </NRadioGroup>
@@ -64,80 +67,107 @@
           </template>
           <div class="expected-champion-groups">
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'top' }">
+              <div class="label" :class="{ current: store.memberMe?.assignedPosition === 'top' }">
                 上路
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions.top"
+                :champions="store.settings.expectedChampions.top"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions({ ...as.settings.expectedChampions, top: list })
+                    shard.setExpectedChampions({ ...store.settings.expectedChampions, top: list })
                 "
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'middle' }">
+              <div
+                class="label"
+                :class="{ current: store.memberMe?.assignedPosition === 'middle' }"
+              >
                 中路
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions.middle"
+                :champions="store.settings.expectedChampions.middle"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions({ ...as.settings.expectedChampions, middle: list })
+                    shard.setExpectedChampions({
+                      ...store.settings.expectedChampions,
+                      middle: list
+                    })
                 "
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'jungle' }">
+              <div
+                class="label"
+                :class="{ current: store.memberMe?.assignedPosition === 'jungle' }"
+              >
                 打野
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions.jungle"
+                :champions="store.settings.expectedChampions.jungle"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions({ ...as.settings.expectedChampions, jungle: list })
+                    shard.setExpectedChampions({
+                      ...store.settings.expectedChampions,
+                      jungle: list
+                    })
                 "
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'bottom' }">
+              <div
+                class="label"
+                :class="{ current: store.memberMe?.assignedPosition === 'bottom' }"
+              >
                 下路
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions.bottom"
+                :champions="store.settings.expectedChampions.bottom"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions({ ...as.settings.expectedChampions, bottom: list })
+                    shard.setExpectedChampions({
+                      ...store.settings.expectedChampions,
+                      bottom: list
+                    })
                 "
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'utility' }">
+              <div
+                class="label"
+                :class="{ current: store.memberMe?.assignedPosition === 'utility' }"
+              >
                 辅助
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions.utility"
+                :champions="store.settings.expectedChampions.utility"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions({ ...as.settings.expectedChampions, utility: list })
+                    shard.setExpectedChampions({
+                      ...store.settings.expectedChampions,
+                      utility: list
+                    })
                 "
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === '' }">
+              <div class="label" :class="{ current: store.memberMe?.assignedPosition === '' }">
                 默认
               </div>
               <OrderedChampionList
                 type="pick"
-                :champions="as.settings.expectedChampions.default"
+                :champions="store.settings.expectedChampions.default"
                 @update:champions="
                   (list) =>
-                    asm.setExpectedChampions({ ...as.settings.expectedChampions, default: list })
+                    shard.setExpectedChampions({
+                      ...store.settings.expectedChampions,
+                      default: list
+                    })
                 "
               />
             </div>
@@ -153,8 +183,8 @@
           :label-width="200"
         >
           <NSwitch
-            @update:value="(v) => asm.setBenchModeEnabled(v)"
-            :value="as.settings.benchModeEnabled"
+            @update:value="(v) => shard.setBenchModeEnabled(v)"
+            :value="store.settings.benchModeEnabled"
             size="small"
           ></NSwitch>
         </ControlItem>
@@ -176,8 +206,8 @@
             placeholder="秒"
             :min="0"
             size="small"
-            :value="as.settings.grabDelaySeconds"
-            @update:value="(v) => asm.setGrabDelaySeconds(v || 0)"
+            :value="store.settings.grabDelaySeconds"
+            @update:value="(v) => shard.setGrabDelaySeconds(v || 0)"
           />
         </ControlItem>
         <ControlItem
@@ -187,16 +217,16 @@
           :label-width="200"
         >
           <NSwitch
-            @update:value="(v) => asm.setBenchSelectFirstAvailableChampion(v)"
-            :value="as.settings.benchSelectFirstAvailableChampion"
+            @update:value="(v) => shard.setBenchSelectFirstAvailableChampion(v)"
+            :value="store.settings.benchSelectFirstAvailableChampion"
             size="small"
           ></NSwitch>
         </ControlItem>
         <ControlItem class="control-item-margin" label="期望英雄" :label-width="200">
           <OrderedChampionList
             type="pick"
-            :champions="as.settings.benchExpectedChampions"
-            @update:champions="(list) => asm.setBenchExpectedChampions(list)"
+            :champions="store.settings.benchExpectedChampions"
+            @update:champions="(list) => shard.setBenchExpectedChampions(list)"
           />
         </ControlItem>
       </NCard>
@@ -209,8 +239,8 @@
           :label-width="200"
         >
           <NSwitch
-            @update:value="(v) => asm.setBanEnabled(v)"
-            :value="as.settings.banEnabled"
+            @update:value="(v) => shard.setBanEnabled(v)"
+            :value="store.settings.banEnabled"
             size="small"
           ></NSwitch>
         </ControlItem>
@@ -221,8 +251,8 @@
           :label-width="200"
         >
           <NSwitch
-            @update:value="(v) => asm.setBanTeammateIntendedChampion(v)"
-            :value="as.settings.banTeammateIntendedChampion"
+            @update:value="(v) => shard.setBanTeammateIntendedChampion(v)"
+            :value="store.settings.banTeammateIntendedChampion"
             size="small"
           ></NSwitch>
         </ControlItem>
@@ -239,82 +269,98 @@
           </template>
           <div class="expected-champion-groups">
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'top' }">
+              <div class="label" :class="{ current: store.memberMe?.assignedPosition === 'top' }">
                 上路
               </div>
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions.top"
+                :champions="store.settings.bannedChampions.top"
                 @update:champions="
-                  (list) => asm.setBannedChampions({ ...as.settings.bannedChampions, top: list })
+                  (list) =>
+                    shard.setBannedChampions({ ...store.settings.bannedChampions, top: list })
                 "
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'middle' }">
+              <div
+                class="label"
+                :class="{ current: store.memberMe?.assignedPosition === 'middle' }"
+              >
                 中路
               </div>
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions.middle"
+                :champions="store.settings.bannedChampions.middle"
                 @update:champions="
-                  (list) => asm.setBannedChampions({ ...as.settings.bannedChampions, middle: list })
+                  (list) =>
+                    shard.setBannedChampions({ ...store.settings.bannedChampions, middle: list })
                 "
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'jungle' }">
+              <div
+                class="label"
+                :class="{ current: store.memberMe?.assignedPosition === 'jungle' }"
+              >
                 打野
               </div>
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions.jungle"
+                :champions="store.settings.bannedChampions.jungle"
                 @update:champions="
-                  (list) => asm.setBannedChampions({ ...as.settings.bannedChampions, jungle: list })
+                  (list) =>
+                    shard.setBannedChampions({ ...store.settings.bannedChampions, jungle: list })
                 "
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'bottom' }">
+              <div
+                class="label"
+                :class="{ current: store.memberMe?.assignedPosition === 'bottom' }"
+              >
                 下路
               </div>
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions.bottom"
+                :champions="store.settings.bannedChampions.bottom"
                 @update:champions="
-                  (list) => asm.setBannedChampions({ ...as.settings.bannedChampions, bottom: list })
+                  (list) =>
+                    shard.setBannedChampions({ ...store.settings.bannedChampions, bottom: list })
                 "
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === 'utility' }">
+              <div
+                class="label"
+                :class="{ current: store.memberMe?.assignedPosition === 'utility' }"
+              >
                 辅助
               </div>
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions.utility"
+                :champions="store.settings.bannedChampions.utility"
                 @update:champions="
                   (list) =>
-                    asm.setBannedChampions({ ...as.settings.bannedChampions, utility: list })
+                    shard.setBannedChampions({ ...store.settings.bannedChampions, utility: list })
                 "
               />
             </div>
             <div class="group">
-              <div class="label" :class="{ current: as.memberMe?.assignedPosition === '' }">
+              <div class="label" :class="{ current: store.memberMe?.assignedPosition === '' }">
                 默认
               </div>
               <OrderedChampionList
                 type="ban"
                 allow-empty
-                :champions="as.settings.bannedChampions.default"
+                :champions="store.settings.bannedChampions.default"
                 @update:champions="
                   (list) =>
-                    asm.setBannedChampions({ ...as.settings.bannedChampions, default: list })
+                    shard.setBannedChampions({ ...store.settings.bannedChampions, default: list })
                 "
               />
             </div>
@@ -327,13 +373,15 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { autoSelectRendererModule as asm } from '@renderer-shared/modules/auto-select'
-import { useAutoSelectStore } from '@renderer-shared/modules/auto-select/store'
+import { useInstance } from '@renderer-shared/shards'
+import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
+import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch, NTooltip } from 'naive-ui'
 
 import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
 
-const as = useAutoSelectStore()
+const store = useAutoSelectStore()
+const shard = useInstance<AutoSelectRenderer>('auto-select-renderer')
 </script>
 
 <style lang="less" scoped>

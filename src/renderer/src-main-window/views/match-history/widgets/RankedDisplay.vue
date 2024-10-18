@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts" setup>
-import { RankedEntry } from '@shared/types/lcu/ranked'
+import { RankedEntry } from '@shared/types/league-client/ranked'
 import { QUEUE_TYPE_TEXT, TIER_TEXT } from '@shared/utils/ranked'
 import { computed } from 'vue'
 

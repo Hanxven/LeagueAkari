@@ -1,18 +1,18 @@
 <template>
-  <NPopover v-if="spellId && gameData.summonerSpells[spellId]" :delay="50">
+  <NPopover v-if="spellId && lcs.gameData.summonerSpells[spellId]" :delay="50">
     <template #trigger>
       <LcuImage
-        :src="gameData.summonerSpells[spellId].iconPath"
+        :src="lcs.gameData.summonerSpells[spellId].iconPath"
         v-bind="$attrs"
         :style="{ width: `${size}px`, height: `${size}px` }"
         class="spell"
       />
     </template>
     <div style="max-width: 240px">
-      <div class="name">{{ gameData.summonerSpells[spellId].name }}</div>
-      <div class="cooldown">冷却时间: {{ gameData.summonerSpells[spellId].cooldown }} 秒</div>
-      <div class="level">等级需求: {{ gameData.summonerSpells[spellId].summonerLevel }}</div>
-      <div class="description">{{ gameData.summonerSpells[spellId].description }}</div>
+      <div class="name">{{ lcs.gameData.summonerSpells[spellId].name }}</div>
+      <div class="cooldown">冷却时间: {{ lcs.gameData.summonerSpells[spellId].cooldown }} 秒</div>
+      <div class="level">等级需求: {{ lcs.gameData.summonerSpells[spellId].summonerLevel }}</div>
+      <div class="description">{{ lcs.gameData.summonerSpells[spellId].description }}</div>
     </div>
   </NPopover>
   <div
@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGameDataStore } from '@renderer-shared/modules/lcu-state-sync/game-data'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
@@ -34,7 +34,7 @@ const { size = 20 } = defineProps<{
   size?: number
 }>()
 
-const gameData = useGameDataStore()
+const lcs = useLeagueClientStore()
 </script>
 
 <style lang="less" scoped>

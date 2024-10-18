@@ -1,15 +1,33 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import dayjs from 'dayjs'
+import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
+import { formatError } from '@shared/utils/errors'
 import { app, shell } from 'electron'
-import { mkdirSync, rmSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { Logger, createLogger, format, transports } from 'winston'
+import { Logger } from 'winston'
 
-export type AkariLoggerInstance = {
-  info: (message: any) => Logger
-  warn: (message: any) => Logger
-  error: (message: any) => Logger
-  debug: (message: any) => Logger
+import { AkariIpcMain } from '../ipc'
+
+export class AkariLogger {
+  constructor(
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _namespace: string
+  ) {}
+
+  info(...args: any[]) {
+    return this._loggerFactory.info(this._namespace, ...args)
+  }
+
+  warn(...args: any[]) {
+    return this._loggerFactory.warn(this._namespace, ...args)
+  }
+
+  error(...args: any[]) {
+    return this._loggerFactory.error(this._namespace, ...args)
+  }
+
+  debug(...args: any[]) {
+    return this._loggerFactory.debug(this._namespace, ...args)
+  }
 }
 
 /**
@@ -17,59 +35,54 @@ export type AkariLoggerInstance = {
  */
 export class LoggerFactoryMain implements IAkariShardInitDispose {
   static id = 'logger-factory-main'
+  static dependencies = [SHARED_GLOBAL_ID, 'akari-ipc-main']
 
-  private _loggerInstance: Logger | null = null
-
+  // 从全局注入的 logger 实例
+  private readonly _logger: Logger
   private readonly _logsDir: string
   private readonly _appDir: string
+  private readonly _ipc: AkariIpcMain
 
-  async onInit() {
-    this._initializeLogger()
-  }
+  private readonly _shared: AkariSharedGlobalShard
 
-  constructor() {
+  constructor(deps: any) {
     this._appDir = join(app.getPath('exe'), '..')
     this._logsDir = join(this._appDir, 'logs')
+    this._shared = deps[SHARED_GLOBAL_ID]
+    this._logger = this._shared.global.logger
+    this._ipc = deps['akari-ipc-main']
+  }
+
+  private _objectsToString(...args: any[]) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          return formatError(arg)
+        }
+
+        if (typeof arg === 'undefined') {
+          return 'undefined'
+        }
+
+        if (typeof arg === 'function') {
+          return arg.toString()
+        }
+
+        if (typeof arg === 'object') {
+          try {
+            return JSON.stringify(arg, null, 2)
+          } catch (error) {
+            return arg.toString()
+          }
+        }
+
+        return arg
+      })
+      .join(' ')
   }
 
   openLogsDir() {
     return shell.openPath(this._logsDir)
-  }
-
-  private _initializeLogger() {
-    try {
-      const stats = statSync(this._logsDir)
-
-      if (!stats.isDirectory()) {
-        rmSync(this._logsDir, { recursive: true, force: true })
-        mkdirSync(this._logsDir)
-      }
-    } catch (error) {
-      if ((error as any).code === 'ENOENT') {
-        mkdirSync(this._logsDir)
-      } else {
-        throw error
-      }
-    }
-
-    this._loggerInstance = createLogger({
-      format: format.combine(
-        format.timestamp(),
-        format.printf(({ level, message, namespace, timestamp }) => {
-          return `[${dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss:SSS')}] [${namespace}] [${level}] ${message}`
-        })
-      ),
-      transports: [
-        new transports.File({
-          filename: `LeagueAkari_${dayjs().format('YYYYMMDD_HHmmssSSS')}.log`,
-          dirname: this._logsDir,
-          level: 'info'
-        }),
-        new transports.Console({
-          level: import.meta.env.DEV ? 'info' : 'warn'
-        })
-      ]
-    })
   }
 
   /**
@@ -77,31 +90,64 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
    * @param namespace
    * @returns
    */
-  create(namespace: string): AkariLoggerInstance {
-    const getLogger = () => {
-      if (!this._loggerInstance) {
-        throw new Error('logger is not initialized')
+  create(namespace: string) {
+    return new AkariLogger(this, namespace)
+  }
+
+  info(namespace: string, ...args: any[]) {
+    return this._logger.info({
+      namespace: namespace,
+      message: this._objectsToString(...args)
+    })
+  }
+
+  warn(namespace: string, ...args: any[]) {
+    return this._logger.warn({
+      namespace: namespace,
+      message: this._objectsToString(...args)
+    })
+  }
+
+  error(namespace: string, ...args: any[]) {
+    return this._logger.error({
+      namespace: namespace,
+      message: this._objectsToString(...args)
+    })
+  }
+
+  debug(namespace: string, ...args: any[]) {
+    return this._logger.debug({
+      namespace: namespace,
+      message: this._objectsToString(...args)
+    })
+  }
+
+  async onInit() {
+    this._ipc.onCall(
+      LoggerFactoryMain.id,
+      'log',
+      (namespace: string, level: string, ...args: any[]) => {
+        switch (level) {
+          case 'info':
+            this.info(namespace, ...args)
+            return
+          case 'warn':
+            this.warn(namespace, ...args)
+            return
+          case 'error':
+            this.error(namespace, ...args)
+            return
+          case 'debug':
+            this.debug(namespace, ...args)
+            return
+          default:
+            this.info(namespace, ...args)
+        }
       }
+    )
 
-      return this._loggerInstance
-    }
-
-    const info = (message: any) => {
-      return getLogger().info({ namespace, message })
-    }
-
-    const warn = (message: any) => {
-      return getLogger().warn({ namespace, message })
-    }
-
-    const error = (message: any) => {
-      return getLogger().error({ namespace, message })
-    }
-
-    const debug = (message: any) => {
-      return getLogger().debug({ namespace, message })
-    }
-
-    return { info, warn, error, debug }
+    this._ipc.onCall(LoggerFactoryMain.id, 'openLogsDir', () => {
+      this.openLogsDir()
+    })
   }
 }

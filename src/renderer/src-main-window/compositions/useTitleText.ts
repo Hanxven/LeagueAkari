@@ -1,8 +1,8 @@
-import { useAppStore } from '@renderer-shared/modules/app/store'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { computed } from 'vue'
 
 export function useTitleText(debugIdentifier = 'rabi') {
-  const app = useAppStore()
+  const app = useAppCommonStore()
 
   const titleText = computed(() => {
     const isRabiVersion = app.version.includes(debugIdentifier)

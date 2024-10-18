@@ -4,19 +4,19 @@
     size="small"
     preset="card"
     v-model:show="show"
-    :class="styles['ann-modal']"
+    :class="$style['ann-modal']"
   >
     <template #header
       ><span class="card-header-title"
-        >公告<span style="font-size: 12px" v-if="au.currentAnnouncement">
-          ({{ dayjs(au.currentAnnouncement.updateAt).locale('zh-cn').fromNow() }} 更新)</span
+        >公告<span style="font-size: 12px" v-if="sus.currentAnnouncement">
+          ({{ dayjs(sus.currentAnnouncement.updateAt).locale('zh-cn').fromNow() }} 更新)</span
         ></span
       ></template
     >
     <div>
       <NScrollbar
         style="max-height: 50vh"
-        :class="styles['markdown-text-scroll-wrapper']"
+        :class="$style['markdown-text-scroll-wrapper']"
         trigger="none"
       >
         <div class="markdown-text" v-html="markdownHtmlText"></div>
@@ -24,7 +24,7 @@
       <div style="display: flex; justify-content: flex-end">
         <NButton
           type="primary"
-          v-if="!au.currentAnnouncement || au.currentAnnouncement.isRead"
+          v-if="!sus.currentAnnouncement || sus.currentAnnouncement.isRead"
           @click="show = false"
           size="small"
           >关闭</NButton
@@ -36,26 +36,26 @@
 </template>
 
 <script setup lang="ts">
-import { autoUpdateRendererModule as aum } from '@renderer-shared/modules/auto-update'
-import { useAutoUpdateStore } from '@renderer-shared/modules/auto-update/store'
+import { useInstance } from '@renderer-shared/shards'
+import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
+import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import dayjs from 'dayjs'
 import { NButton, NModal, NScrollbar } from 'naive-ui'
 import { computed, useCssModule } from 'vue'
 
-const au = useAutoUpdateStore()
-
-const styles = useCssModule()
+const sus = useSelfUpdateStore()
+const aum = useInstance<SelfUpdateRenderer>('self-update-renderer')
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(au.currentAnnouncement?.content || '当前没有任何公告')
+  return markdownIt.render(sus.currentAnnouncement?.content || '当前没有任何公告')
 })
 
 const show = defineModel<boolean>('show', { default: false })
 
 const handleRead = () => {
-  if (au.currentAnnouncement) {
-    aum.setReadAnnouncement(au.currentAnnouncement.sha)
+  if (sus.currentAnnouncement) {
+    aum.setAnnouncementRead(sus.currentAnnouncement.sha)
   }
   show.value = false
 }
@@ -168,4 +168,3 @@ const handleRead = () => {
   margin-bottom: 12px;
 }
 </style>
-@renderer-shared/modules/app/store

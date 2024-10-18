@@ -1,7 +1,7 @@
 export type AkariDeps = Record<string, any>
 
-interface AkariShardConstructor<T = any> {
-  new (deps?: AkariDeps): T
+export interface AkariShardConstructor<T = any> {
+  new (deps?: any | AkariDeps): T
 
   /**
    * 关于此模块的唯一 id
@@ -14,6 +14,15 @@ interface AkariShardConstructor<T = any> {
   dependencies?: string[]
 }
 
+export interface AkariSharedGlobalShard {
+  readonly global: AkariSharedGlobal
+  readonly manager: AkariManager
+}
+
+export interface AkariSharedGlobal {}
+
+export const SHARED_GLOBAL_ID = '<akari-shared-global>'
+
 export class AkariManager {
   private _registry: Map<string, AkariShardConstructor> = new Map()
   private _instances: Map<string, any> = new Map()
@@ -21,19 +30,32 @@ export class AkariManager {
   private _isSetup = false
   private _initializationStack: string[] = []
 
-  static INTERNAL_ROOT_ID = '<akari-root-ヾ(≧▽≦*)o>'
+  // @ts-ignore
+  public readonly global: AkariSharedGlobal = {}
+
+  private static INTERNAL_RUNNER_ID = '<akari-shard-runner-ヾ(≧▽≦*)o>'
 
   /**
    * 将模块注册到管理器中, 将在 setup 时初始化
    * @param shard 类构造函数
    */
   use(...shards: AkariShardConstructor[]) {
+    const global = this.global
+    const manager = this
+    shards.push(
+      class __$SharedGlobalShard {
+        static id = SHARED_GLOBAL_ID
+        public readonly global: Record<string, any> = global
+        public readonly manager: AkariManager = manager
+      }
+    )
+
     for (const shard of shards) {
       if (!shard.id) {
         throw new Error('Shard id is required')
       }
 
-      if (this._registry.has(shard.id) || shard.id === AkariManager.INTERNAL_ROOT_ID) {
+      if (this._registry.has(shard.id) || shard.id === AkariManager.INTERNAL_RUNNER_ID) {
         throw new Error(`Shard with id "${shard.id}" already exists`)
       }
 
@@ -43,17 +65,16 @@ export class AkariManager {
     const allDeps = this._registry.keys()
 
     this._registry.set(
-      AkariManager.INTERNAL_ROOT_ID,
-      class RootShard {
-        static id = AkariManager.INTERNAL_ROOT_ID
-        static dependencies = [...allDeps].filter((dep) => dep !== AkariManager.INTERNAL_ROOT_ID)
+      AkariManager.INTERNAL_RUNNER_ID,
+      class __$RootShard {
+        static id = AkariManager.INTERNAL_RUNNER_ID
+        static dependencies = [...allDeps].filter((dep) => dep !== AkariManager.INTERNAL_RUNNER_ID)
       }
     )
   }
 
   /**
    * 启用所有注册的模块, Akari, 启动!
-   * @returns 返回一个函数, 用于清理所有模块
    */
   async setup() {
     if (this._isSetup) {
@@ -61,7 +82,7 @@ export class AkariManager {
     }
 
     this._initializationStack = []
-    this._resolve(AkariManager.INTERNAL_ROOT_ID, new Set<string>(), this._initializationStack)
+    this._resolve(AkariManager.INTERNAL_RUNNER_ID, new Set<string>(), this._initializationStack)
 
     for (const id of this._initializationStack) {
       const instance = this._instances.get(id)
@@ -91,16 +112,12 @@ export class AkariManager {
   }
 
   /**
-   * 获取某个模块
+   * 获取某个模块的实例
    * @param id 模块 ID
    * @returns 模块 ID 实例
    */
-  get(id: string) {
-    if (!this._instances.has(id)) {
-      throw new Error(`Shard with id "${id}" does not exist`)
-    }
-
-    return this._instances.get(id)!
+  getInstance<T = any>(id: string) {
+    return this._instances.get(id) as T | undefined
   }
 
   private _resolve(id: string, visited: Set<string>, stack: string[]) {
@@ -126,15 +143,14 @@ export class AkariManager {
           instances[dep] = this._instances.get(dep)!
         } else {
           visited.add(dep)
-          stack.push(dep)
           instances[dep] = this._resolve(dep, visited, stack)
           visited.delete(dep)
         }
       }
     }
 
+    stack.push(id)
     const instance = Object.keys(instances).length ? new cls(instances) : new cls()
-
     this._instances.set(id, instance)
 
     return instance
