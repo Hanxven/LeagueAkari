@@ -1,10 +1,9 @@
 import { queryUxCommandLine, queryUxCommandLineNative } from '@main/utils/ux-cmd'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { formatError } from '@shared/utils/errors'
 
-import { CommonMain } from '../common'
+import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
-import { AkariLoggerInstance, LoggerFactoryMain } from '../logger-factory'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { LeagueClientUxState } from './state'
 
 /**
@@ -12,7 +11,7 @@ import { LeagueClientUxState } from './state'
  */
 export class LeagueClientUxMain implements IAkariShardInitDispose {
   static id = 'league-client-ux-main'
-  static dependencies = ['akari-ipc-main', 'mobx-utils-main', 'common-main', 'logger-factory-main']
+  static dependencies = ['akari-ipc-main', 'mobx-utils-main', 'app-common-main', 'logger-factory-main']
 
   static UX_PROCESS_NAME = 'LeagueClientUx.exe'
   static CLIENT_CMD_POLL_INTERVAL = 2000
@@ -20,15 +19,15 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   public readonly state = new LeagueClientUxState()
 
   private readonly _ipc: AkariIpcMain
-  private readonly _common: CommonMain
+  private readonly _common: AppCommonMain
   private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _log: AkariLoggerInstance
+  private readonly _log: AkariLogger
 
   private _pollTimerId: NodeJS.Timeout | null = null
 
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
-    this._common = deps['common-main']
+    this._common = deps['app-common-main']
     this._loggerFactory = deps['logger-factory-main']
     this._log = this._loggerFactory.create(LeagueClientUxMain.id)
   }
@@ -68,7 +67,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
       )
     } catch (error) {
       this._ipc.sendEvent(LeagueClientUxMain.id, 'error-polling')
-      this._log.error(`获取 Ux 命令行信息时失败 ${formatError(error)}`)
+      this._log.error(`获取 Ux 命令行信息时失败`, error)
     }
   }
 

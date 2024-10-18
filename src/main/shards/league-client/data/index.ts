@@ -9,7 +9,7 @@ import PQueue from 'p-queue'
 
 import type { LeagueClientMain } from '..'
 import { AkariIpcMain } from '../../ipc'
-import { AkariLoggerInstance } from '../../logger-factory'
+import { AkariLogger } from '../../logger-factory'
 import { MobxUtilsMain } from '../../mobx-utils'
 import { ChampSelectState } from './champ-select'
 import { ChatState } from './chat'
@@ -24,10 +24,10 @@ import { MatchmakingState } from './matchmaking'
 import { SummonerState } from './summoner'
 
 export class LeagueClientSyncedData {
-  static SUMMONER_FETCH_MAX_RETRIES = 114514
+  static SUMMONER_FETCH_MAX_RETRIES = 114514 + 1919810
 
   private _ipc: AkariIpcMain
-  private _log: AkariLoggerInstance
+  private _log: AkariLogger
   private _mobx: MobxUtilsMain
 
   private _gameDataLimiter = new PQueue({
@@ -51,7 +51,7 @@ export class LeagueClientSyncedData {
     private readonly _C: typeof LeagueClientMain,
     _deps: {
       ipc: AkariIpcMain
-      log: AkariLoggerInstance
+      log: AkariLogger
       mobx: MobxUtilsMain
     }
   ) {

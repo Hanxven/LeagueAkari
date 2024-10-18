@@ -3,9 +3,10 @@ import { AxiosRequestConfig } from 'axios'
 import { protocol, session } from 'electron'
 import { Readable } from 'node:stream'
 
+import { AuxWindowMain } from '../aux-window'
 import { LeagueClientMain } from '../league-client'
+import { MainWindowMain } from '../main-window'
 import { RiotClientMain } from '../riot-client'
-import { WindowManagerMain } from '../window-manager'
 
 /**
  * 实现 `akari://` 协议, 用于渲染进程 HTTP 请求的代理
@@ -24,33 +25,14 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
     this._riotClient = deps['riot-client-main']
   }
 
-  /**
-   * 需要在 `app.whenReady` 之前调用这个方法
-   */
-  static registerAkariProtocolAsPrivileged() {
-    protocol.registerSchemesAsPrivileged([
-      {
-        scheme: AkariProtocolMain.AKARI_PROTOCOL,
-        privileges: {
-          standard: true,
-          secure: true,
-          supportFetchAPI: true,
-          corsEnabled: true,
-          stream: true,
-          bypassCSP: true
-        }
-      }
-    ])
-  }
-
   async onInit() {
-    this._handlePartitionAkariProtocol(WindowManagerMain.MW_PARTITION)
-    this._handlePartitionAkariProtocol(WindowManagerMain.AW_PARTITION)
+    this._handlePartitionAkariProtocol(MainWindowMain.PARTITION)
+    this._handlePartitionAkariProtocol(AuxWindowMain.PARTITION)
   }
 
   async onDispose() {
-    this._unhandlePartitionAkariProtocol(WindowManagerMain.MW_PARTITION)
-    this._unhandlePartitionAkariProtocol(WindowManagerMain.AW_PARTITION)
+    this._unhandlePartitionAkariProtocol(MainWindowMain.PARTITION)
+    this._unhandlePartitionAkariProtocol(AuxWindowMain.PARTITION)
   }
 
   private _unhandlePartitionAkariProtocol(partition: string) {

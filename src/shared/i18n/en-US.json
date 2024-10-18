@@ -1,0 +1,59 @@
+{
+  "auto-select-renderer": {
+    "settings": {
+      "enabled": {
+        "title": "Enabled",
+        "description": "Enabled in normal modes. Such as match mode, rank mode, etc. Any mode that is not a random hero mode"
+      },
+      "showIntent": {
+        "title": "Show Intent",
+        "description": "Pre-select the champion that will be automatically selected"
+      },
+      "selectTeammateIntendedChampion": {
+        "title": "Ignore Teammate's Intent",
+        "description": "When enabled, it will not consider the teammate's pre-selected champion, otherwise it will avoid conflicts with the teammate's selection"
+      },
+      "completed": {
+        "title": "Selection Strategy",
+        "description": "LOCK immediately or JUST SHOW",
+        "options": {
+          "true": "Lock",
+          "false": "Show"
+        }
+      },
+      "expectedChampions": {
+        "title": "Expected Champions",
+        "description": "<div style=\"margin-bottom: 8px\">Select champions according to the preset list</div>\n<div style=\"margin-bottom: 8px\">If the current mode <span style=\"font-weight: bold\">does not have lane information</span> or <span style=\"font-weight: bold\">the current lane has not set a champion</span>, it will select according to the <span style=\"font-weight: bold\">default</span> list</div>\n<div>The priority of selection is the order defined in the list, and the champion closer to the front will be selected first</div>"
+      }
+    }
+  },
+  "match-history-tabs-renderer": {
+    "lose": "Lose",
+    "win": "Win",
+    "remake": "Remake",
+    "team100": "Blue Team",
+    "team200": "Red Team"
+  },
+  "common": {
+    "lanes": {
+      "top": "TOP",
+      "jungle": "JUNGLE",
+      "mid": "MIDDLE",
+      "middle": "MIDDLE",
+      "bot": "BOTTOM",
+      "support": "SUPPORT",
+      "utility": "SUPPORT",
+      "TOP": "TOP",
+      "JUNGLE": "JUNGLE",
+      "MID": "MIDDLE",
+      "MIDDLE": "MIDDLE",
+      "BOT": "BOTTOM",
+      "SUPPORT": "SUPPORT",
+      "UTILITY": "SUPPORT"
+    }
+  },
+  "sgpServer": {
+    "TENCENT_1": "Ionia",
+    "TENCENT_10": "Demacia"
+  }
+}

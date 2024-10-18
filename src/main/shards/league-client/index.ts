@@ -2,7 +2,6 @@ import { UxCommandLine } from '@main/utils/ux-cmd'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
-import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import { comparer } from 'mobx'
@@ -12,7 +11,7 @@ import WebSocket from 'ws'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientUxMain } from '../league-client-ux'
-import { AkariLoggerInstance, LoggerFactoryMain } from '../logger-factory'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { LeagueClientSyncedData } from './data'
 import { LeagueClientHttpApi } from './http-api'
@@ -31,7 +30,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   static id = 'league-client-main'
   static dependencies = [
     'akari-ipc-main',
-    'common-main',
+    'app-common-main',
     'logger-factory-main',
     'mobx-utils-main',
     'league-client-ux-main'
@@ -46,7 +45,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
   private readonly _ipc: AkariIpcMain
   private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _log: AkariLoggerInstance
+  private readonly _log: AkariLogger
   private readonly _mobx: MobxUtilsMain
   private readonly _ux: LeagueClientUxMain
 
@@ -144,7 +143,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
           }
         }
 
-        this._log.warn(`LeagueClient HTTP 客户端错误: ${formatError(error)}`)
+        this._log.warn('LeagueClient HTTP 客户端错误', error)
 
         throw error
       }
@@ -228,9 +227,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       ([a, s]) => {
         if (a) {
           const { certificate, ...rest } = a
-          this._log.info(`LCU 状态发生变化: ${s} ${JSON.stringify(rest)}`)
+          this._log.info(`LCU 状态发生变化: ${s}`, rest)
         } else {
-          this._log.info(`LCU 状态发生变化: ${s} ${JSON.stringify(a)}`)
+          this._log.info(`LCU 状态发生变化: ${s}`, a)
         }
       },
       { equals: comparer.shallow }
@@ -257,7 +256,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       } catch (error) {
         if ((error as any).code !== 'ECONNREFUSED') {
           this._ipc.sendEvent(LeagueClientMain.id, 'error-connecting', (error as any)?.message)
-          this._log.error(`尝试连接到 LC 时发生错误 ${formatError(error)}`)
+          this._log.error(`尝试连接到 LC 时发生错误`, error)
           break
         }
       }
@@ -276,7 +275,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       }
 
       const { certificate, ...rest } = auth
-      this._log.info(`尝试连接，${JSON.stringify(rest)}`)
+      this._log.info(`尝试连接`, rest)
       this.state.setConnecting()
 
       await this._initWebSocket(auth)
@@ -390,7 +389,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       this._api = new LeagueClientHttpApi(this._http)
     } catch (error) {
       if (isAxiosError(error) && (!error.response || (error.status && error.status >= 500))) {
-        this._log.warn(`无法执行 PING 操作: ${formatError(error)}`)
+        this._log.warn(`无法执行 PING 操作`, error)
 
         throw new Error('http initialization PING failed')
       }

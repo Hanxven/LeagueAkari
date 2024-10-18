@@ -132,7 +132,7 @@ export class AutoUpdateModule extends MobxBasedBasicModule {
         sha: data.sha
       })
     } catch (error) {
-      this._logger.warn(`更新公告时发生错误 ${formatError(error)}`)
+      this._logger.warn(`尝试拉取公告失败 ${formatError(error)}`)
     }
   }
 

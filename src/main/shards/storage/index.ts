@@ -6,7 +6,7 @@ import { existsSync, renameSync } from 'node:fs'
 import { join } from 'node:path'
 import { DataSource, QueryRunner } from 'typeorm'
 
-import { AkariLoggerInstance, LoggerFactoryMain } from '../logger-factory'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { EncounteredGame } from './entities/EncounteredGame'
 import { Metadata } from './entities/Metadata'
 import { SavedPlayer } from './entities/SavedPlayers'
@@ -22,7 +22,7 @@ export class StorageMain implements IAkariShardInitDispose {
   static dependencies = ['logger-factory-main']
 
   private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _log: AkariLoggerInstance
+  private readonly _log: AkariLogger
 
   private readonly _dataSource: DataSource
 

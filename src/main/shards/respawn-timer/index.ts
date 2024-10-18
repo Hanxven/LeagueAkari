@@ -3,7 +3,7 @@ import { comparer, computed, runInAction } from 'mobx'
 
 import { GameClientMain } from '../game-client'
 import { LeagueClientMain } from '../league-client'
-import { AkariLoggerInstance, LoggerFactoryMain } from '../logger-factory'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { MobxSettingService } from '../setting-factory/mobx-setting-service'
@@ -25,7 +25,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
 
   private readonly _gameClient: GameClientMain
   private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _log: AkariLoggerInstance
+  private readonly _log: AkariLogger
   private readonly _leagueClient: LeagueClientMain
   private readonly _mobx: MobxUtilsMain
   private readonly _settingFactory: SettingFactoryMain
@@ -44,19 +44,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
     this._setting = this._settingFactory.create(
       RespawnTimerMain.id,
       {
-        enabled: {
-          default: false,
-          onChange: async (v: boolean, { setter }) => {
-            if (v && this._leagueClient.data.gameflow.phase === 'InProgress') {
-              this._startRespawnTimerPoll()
-            } else if (v === false) {
-              this._stopRespawnTimerPoll()
-            }
-
-            this.state.settings.setEnabled(v)
-            await setter()
-          }
-        }
+        enabled: { default: false }
       },
       this.state.settings
     )
@@ -64,9 +52,18 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    await this._setting.applySettingsToState()
+    await this._setting.applyToState()
 
-    this._setting
+    this._setting.onChange('enabled', async (v, { setter }) => {
+      if (v && this._leagueClient.data.gameflow.phase === 'InProgress') {
+        this._startRespawnTimerPoll()
+      } else if (v === false) {
+        this._stopRespawnTimerPoll()
+      }
+
+      this.state.settings.setEnabled(v)
+      await setter()
+    })
 
     this._mobx.propSync(RespawnTimerMain.id, 'state', this.state, ['info', 'settings.enabled'])
 

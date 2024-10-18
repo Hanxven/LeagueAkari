@@ -1,0 +1,53 @@
+{
+  "auto-select-renderer": {
+    "settings": {
+      "enabled": {
+        "title": "启用",
+        "description": "在常规的模式中启用。如匹配模式，排位模式等任何非随机英雄的模式"
+      },
+      "showIntent": {
+        "title": "提前预选",
+        "description": "预选即将自动选用的英雄"
+      },
+      "selectTeammateIntendedChampion": {
+        "title": "无视队友预选",
+        "description": "开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突"
+      },
+      "completed": {
+        "title": "选择策略",
+        "description": "立即锁定或只是亮出",
+        "options": {
+          "true": "立即锁定",
+          "false": "只是亮出"
+        }
+      },
+      "expectedChampions": {
+        "title": "意向英雄",
+        "description": "<div style=\"margin-bottom: 8px\">将根据预设列表选择英雄</div>\n<div style=\"margin-bottom: 8px\">若当前模式<span style=\"font-weight: bold\">不存在分路信息</span>或<span style=\"font-weight: bold\">当前分路未设置英雄</span>，则按照<span style=\"font-weight: bold\">默认</span>列表进行选择</div>\n<div>选择优先级为列表定义顺序，优先选择位置靠前的英雄</div>"
+      }
+    }
+  },
+  "match-history-tabs-renderer": {
+    "lose": "失败",
+    "win": "胜利",
+    "remake": "重开",
+    "team100": "蓝队",
+    "team200": "红队"
+  },
+  "common": {
+    "lanes": {
+      "top": "上单",
+      "jungle": "打野",
+      "mid": "中单",
+      "bot": "下路",
+      "support": "辅助",
+      "utility": "辅助",
+      "TOP": "上单",
+      "JUNGLE": "打野",
+      "MID": "中单",
+      "BOT": "下路",
+      "SUPPORT": "辅助",
+      "UTILITY": "辅助"
+    }
+  }
+}

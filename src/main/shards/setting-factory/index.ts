@@ -1,12 +1,19 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { Paths } from '@shared/utils/types'
-import { set } from 'lodash'
-import { runInAction } from 'mobx'
 
 import { AkariIpcMain } from '../ipc'
 import { MobxUtilsMain } from '../mobx-utils'
 import { StorageMain } from '../storage'
 import { MobxSettingService } from './mobx-setting-service'
+
+export type OnChangeCallback<T = any> = (
+  newValue: T,
+  extra: {
+    oldValue: T
+    key: string
+    setter: (newValue?: T) => void | Promise<void>
+  }
+) => void | Promise<void>
 
 export interface SettingSchema<T = any> {
   /**
@@ -17,26 +24,7 @@ export interface SettingSchema<T = any> {
   /**
    * 实现该设置项的类型, 不提供将会直接修改状态值
    */
-  onChange?: (
-    newValue: T,
-    extra: {
-      /**
-       * 旧值
-       */
-      oldValue: T
-
-      /**
-       * 设置项的键, 可能为 `path.path1.path2`
-       */
-      key: string
-
-      /**
-       * 原本的状态设置器 传入 `undefined` 将会使用默认行为, 传入值将会覆盖为修正值
-       * @returns
-       */
-      setter: (newValue?: T) => void | Promise<void> // setter 处理的是类型 T
-    }
-  ) => void | Promise<void>
+  onChange?: OnChangeCallback<T>
 }
 
 /**
@@ -59,7 +47,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     this._mobx = deps['mobx-utils-main']
   }
 
-  create<T extends object>(
+  create<T extends object = any>(
     namespace: string,
     schema: Partial<Record<Paths<T>, SettingSchema>>,
     obj: T
@@ -69,9 +57,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     }
 
     const service = new MobxSettingService(this, SettingFactoryMain, namespace, schema, obj, {
-      storage: this._storage,
-      ipc: this._ipc,
-      mobx: this._mobx
+      storage: this._storage
     })
 
     this._settings.set(namespace, service)
@@ -91,27 +77,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
           throw new Error(`namespace ${namespace} not found`)
         }
 
-        const fn = service._schema[key]?.onChange
-
-        if (fn) {
-          const oldValue = service._obj[key]
-          await fn(newValue, {
-            oldValue,
-            key,
-            setter: async (v?: any) => {
-              if (v === undefined) {
-                runInAction(() => set(service._obj, key, newValue))
-                await service.set(key, v)
-              } else {
-                runInAction(() => set(service._obj, key, v))
-                await service.set(key, newValue)
-              }
-            }
-          })
-        } else {
-          runInAction(() => set(service._obj, key, newValue))
-          await service.set(key, newValue)
-        }
+        await service.set(key, newValue)
       }
     )
   }

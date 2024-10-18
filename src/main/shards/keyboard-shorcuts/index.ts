@@ -1,4 +1,4 @@
-import { CommonMain } from '../common'
+import { AppCommonMain } from '../app-common'
 
 /**
  * 处理键盘快捷键的模块
@@ -6,11 +6,11 @@ import { CommonMain } from '../common'
  */
 export class KeyboardShortcuts {
   static id = 'keyboard-shortcuts-main'
-  static dependencies = ['common-main']
+  static dependencies = ['app-common-main']
 
-  private readonly _common: CommonMain
+  private readonly _common: AppCommonMain
 
   constructor(deps: any) {
-    this._common = deps['common-main']
+    this._common = deps['app-common-main']
   }
 }

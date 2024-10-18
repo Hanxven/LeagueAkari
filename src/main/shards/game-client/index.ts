@@ -4,7 +4,7 @@ import https from 'https'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
 import { AkariIpcMain } from '../ipc'
-import { AkariLoggerInstance, LoggerFactoryMain } from '../logger-factory'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { SettingFactoryMain } from '../setting-factory'
 import { MobxSettingService } from '../setting-factory/mobx-setting-service'
 import { GameClientHttpApi } from './http-api'
@@ -24,7 +24,7 @@ export class GameClientMain implements IAkariShardInitDispose {
   private readonly _ipc: AkariIpcMain
   private readonly _loggerFactory: LoggerFactoryMain
   private readonly _settingFactory: SettingFactoryMain
-  private readonly _log: AkariLoggerInstance
+  private readonly _log: AkariLogger
   private readonly _setting: MobxSettingService
 
   private readonly _http = axios.create({
@@ -65,7 +65,7 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    await this._setting.applySettingsToState()
+    await this._setting.applyToState()
     this._handleCall()
   }
 

@@ -1,29 +1,35 @@
-import { BrowserWindow } from 'electron'
+import { optimizer } from '@electron-toolkit/utils'
+import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { BrowserWindow, app } from 'electron'
 
 import { AkariIpcMain } from '../ipc'
-import { AkariLoggerInstance, LoggerFactoryMain } from '../logger-factory'
+import { AkariLogger } from '../logger-factory'
+import { MobxUtilsMain } from '../mobx-utils'
+import { WindowManagerSettings } from './state'
 
-/**
- * 管理了所有浏览器窗口, 这很伟大
- */
-export class WindowManagerMain {
+export class WindowManagerMain implements IAkariShardInitDispose {
   static id = 'window-manager-main'
+  static dependencies = ['akari-ipc-main', 'mobx-utils-main', 'logger-factory-main']
 
-  static MW_PARTITION = 'persist:main-window'
-  static AW_PARTITION = 'persist:persist:auxiliary-window'
+  private _ipc: AkariIpcMain
+  private _mobx: MobxUtilsMain
+  private _log: AkariLogger
 
-  static dependencies = ['akari-ipc-main', 'logger-factory-main']
-
-  private readonly _ipc: AkariIpcMain
-  private readonly _log: AkariLoggerInstance
-  private readonly _loggerFactory: LoggerFactoryMain
-
-  private _mainWindow: BrowserWindow | null = null
-  private _auxiliaryWindow: BrowserWindow | null = null
+  public readonly settings = new WindowManagerSettings()
 
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
-    this._loggerFactory = deps['logger-factory-main']
-    this._log = this._loggerFactory.create(WindowManagerMain.id)
+    this._mobx = deps['mobx-utils-main']
+    this._log = deps['logger-factory-main'].create(WindowManagerMain.id)
   }
+
+  // private readonly _mainWindow: MainWindowMain
+  // private readonly _auxWindow: AuxWindowMain
+
+  // constructor(deps: any) {
+  //   this._mainWindow = deps['main-window-main']
+  //   this._auxWindow = deps['aux-window-main']
+  // }
+
+  async onInit() {}
 }

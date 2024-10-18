@@ -1,6 +1,6 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { Paths } from '@shared/utils/types'
-import { get } from 'lodash'
+import _ from 'lodash'
 import { IReactionOptions, IReactionPublic, reaction, toJS } from 'mobx'
 
 import { AkariIpcMain } from '../ipc'
@@ -75,7 +75,7 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
         const item = this._registeredStates.get(key)!
         const prop = item.props.get(propPath)!
 
-        const value = prop.raw ? toJS(get(item.object, propPath)) : get(item.object, propPath)
+        const value = prop.raw ? toJS(_.get(item.object, propPath)) : _.get(item.object, propPath)
         return value
       }
     )
@@ -126,7 +126,7 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
       config.props.set(path, { raw })
 
       const fn = reaction(
-        () => get(obj, path),
+        () => _.get(obj, path),
         (newValue) => {
           this._ipc.sendEvent(
             namespace,

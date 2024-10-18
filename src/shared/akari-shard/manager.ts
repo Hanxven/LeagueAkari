@@ -14,6 +14,8 @@ interface AkariShardConstructor<T = any> {
   dependencies?: string[]
 }
 
+export interface AkariSharedGlobal {}
+
 export class AkariManager {
   private _registry: Map<string, AkariShardConstructor> = new Map()
   private _instances: Map<string, any> = new Map()
@@ -21,19 +23,30 @@ export class AkariManager {
   private _isSetup = false
   private _initializationStack: string[] = []
 
-  static INTERNAL_ROOT_ID = '<akari-root-ヾ(≧▽≦*)o>'
+  private _global: AkariSharedGlobal = {}
+
+  private static INTERNAL_RUNNER_ID = '<akari-shard-runner-ヾ(≧▽≦*)o>'
+  static SHARED_GLOBAL_ID = '<akari-shared-global>'
 
   /**
    * 将模块注册到管理器中, 将在 setup 时初始化
    * @param shard 类构造函数
    */
   use(...shards: AkariShardConstructor[]) {
+    const global = this._global
+    shards.push(
+      class SharedGlobalShard {
+        public readonly global: Record<string, any> = global
+        static id = AkariManager.SHARED_GLOBAL_ID
+      }
+    )
+
     for (const shard of shards) {
       if (!shard.id) {
         throw new Error('Shard id is required')
       }
 
-      if (this._registry.has(shard.id) || shard.id === AkariManager.INTERNAL_ROOT_ID) {
+      if (this._registry.has(shard.id) || shard.id === AkariManager.INTERNAL_RUNNER_ID) {
         throw new Error(`Shard with id "${shard.id}" already exists`)
       }
 
@@ -43,17 +56,16 @@ export class AkariManager {
     const allDeps = this._registry.keys()
 
     this._registry.set(
-      AkariManager.INTERNAL_ROOT_ID,
+      AkariManager.INTERNAL_RUNNER_ID,
       class RootShard {
-        static id = AkariManager.INTERNAL_ROOT_ID
-        static dependencies = [...allDeps].filter((dep) => dep !== AkariManager.INTERNAL_ROOT_ID)
+        static id = AkariManager.INTERNAL_RUNNER_ID
+        static dependencies = [...allDeps].filter((dep) => dep !== AkariManager.INTERNAL_RUNNER_ID)
       }
     )
   }
 
   /**
    * 启用所有注册的模块, Akari, 启动!
-   * @returns 返回一个函数, 用于清理所有模块
    */
   async setup() {
     if (this._isSetup) {
@@ -61,7 +73,7 @@ export class AkariManager {
     }
 
     this._initializationStack = []
-    this._resolve(AkariManager.INTERNAL_ROOT_ID, new Set<string>(), this._initializationStack)
+    this._resolve(AkariManager.INTERNAL_RUNNER_ID, new Set<string>(), this._initializationStack)
 
     for (const id of this._initializationStack) {
       const instance = this._instances.get(id)
@@ -138,5 +150,9 @@ export class AkariManager {
     this._instances.set(id, instance)
 
     return instance
+  }
+
+  get global() {
+    return this._global
   }
 }

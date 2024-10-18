@@ -3,10 +3,6 @@ import 'reflect-metadata'
 import { electronApp } from '@electron-toolkit/utils'
 import { AKARI_USER_MODEL_ID } from '@shared/constants/common'
 import { formatError } from '@shared/utils/errors'
-import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'
-import duration from 'dayjs/plugin/duration'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { app, dialog } from 'electron'
 import { configure } from 'mobx'
 import EventEmitter from 'node:events'
@@ -15,9 +11,7 @@ import { setupLeagueAkariModules } from './modules'
 import { appModule } from './modules/app'
 import { logModule } from './modules/log'
 import { mainWindowModule } from './modules/main-window'
-
-dayjs.extend(relativeTime)
-dayjs.extend(duration)
+import { bootstrap } from './bootstrap'
 
 EventEmitter.defaultMaxListeners = 1000
 
@@ -59,20 +53,5 @@ app.whenReady().then(async () => {
   }
 })
 
-process.on('uncaughtException', (e) => {
-  if (!appModule.state.isQuitting) {
-    logger.error(`uncaughtException ${formatError(e)}`)
-  }
-
-  dialog.showErrorBox('未捕获的异常', e.message)
-  console.error(e)
-  app.quit()
-})
-
-process.on('unhandledRejection', (e) => {
-  if (!appModule.state.isQuitting) {
-    logger.error(`unhandledRejection ${formatError(e)}`)
-  }
-
-  console.error(e)
-})
+// 新的启动方式
+// bootstrap()
