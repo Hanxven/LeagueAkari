@@ -1,1 +1,3 @@
-export class MainWindowPart {}
+export class MainWindowPart {
+  
+}

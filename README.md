@@ -100,11 +100,11 @@ dev：`yarn dev`
 
 build（for Windows only）: `yarn build:win`
 
-## 3.2 Node Addon
+## 3.2 Node 原生模块
 
 需要 MSVC 编译环境和 `node-gyp`。
 
-Node Addons 使 League Akari 具备更强大的功能，因为它为其提供了操作系统级 API 的调用入口。
+Node Addons 使 League Akari 具备更强大的功能，因为它为其提供了操作系统级 API 的调用入口。这些模块位于 `addons/` 下。
 
 如果你修改了 `addons/*` 下的模块内容，请重新编译。
 
@@ -116,6 +116,8 @@ yarn install
 node-gyp configure
 node-gyp build
 ```
+
+之后将 `la-input-win64.node` 以及 `la-tools-win64.node` 复制到应用源码 `src/main/native` 下，并更新类型定义 `src/main/node-addon.d.ts`。
 
 # 4. 参考
 

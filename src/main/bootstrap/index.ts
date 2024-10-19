@@ -1,6 +1,16 @@
 import { optimizer } from '@electron-toolkit/utils'
 import { initAppLogger } from '@main/logger'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
+import { AppCommonMain } from '@main/shards/app-common'
+import { GameClientMain } from '@main/shards/game-client'
+import { AkariIpcMain } from '@main/shards/ipc'
+import { LeagueClientMain } from '@main/shards/league-client'
+import { LeagueClientUxMain } from '@main/shards/league-client-ux'
+import { LoggerFactoryMain } from '@main/shards/logger-factory'
+import { MobxUtilsMain } from '@main/shards/mobx-utils'
+import { RiotClientMain } from '@main/shards/riot-client'
+import { SettingFactoryMain } from '@main/shards/setting-factory'
+import { StorageMain } from '@main/shards/storage'
 import { AkariManager } from '@shared/akari-shard/manager'
 import { formatError } from '@shared/utils/errors'
 import dayjs from 'dayjs'
@@ -12,6 +22,7 @@ import { configure } from 'mobx'
 import EventEmitter from 'node:events'
 import { Logger } from 'winston'
 
+import toolkit from '../../native/laToolkitWin32x64.node'
 import { readBaseConfig, writeBaseConfig } from './base-config'
 
 interface AkariAppEventMap {
@@ -29,6 +40,11 @@ declare module '@shared/akari-shard/manager' {
      * 特殊事件总线
      */
     bus: EventEmitter<AkariAppEventMap>
+
+    /**
+     * 是否是管理员权限
+     */
+    isAdministrator: boolean
 
     /**
      * 基础全局设置
@@ -57,6 +73,8 @@ function handleUnhandledErrors(logger: Logger) {
     })
   })
 }
+
+export const isAdministrator = toolkit.isElevated()
 
 /**
  * 应用级别的初始化启动细节，基础组件注入和基础事件处理
@@ -118,6 +136,22 @@ export function bootstrap() {
       value: baseConfig,
       write: (config: any) => writeBaseConfig(config)
     }
+    manager.global.isAdministrator = isAdministrator
+
+    // use all the shards
+    manager.use(
+      AkariIpcMain,
+      LoggerFactoryMain,
+      AppCommonMain,
+      GameClientMain,
+      LeagueClientMain,
+      RiotClientMain,
+      MobxUtilsMain,
+      SettingFactoryMain,
+      StorageMain,
+      LeagueClientUxMain
+      // ... more shards are under development
+    )
 
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
       bus.emit('second-instance', commandLine, workingDirectory)
@@ -125,6 +159,11 @@ export function bootstrap() {
         message: `用户尝试启动第二个实例, cmd=${JSON.stringify(commandLine)}, pwd=${workingDirectory}`,
         namespace: 'electron'
       })
+    })
+
+    app.on('window-all-closed', () => {
+      // it currently only for Windows, so we can safely
+      app.quit()
     })
 
     app.whenReady().then(async () => {

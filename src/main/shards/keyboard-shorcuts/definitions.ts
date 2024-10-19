@@ -1,8 +1,4 @@
-import EventEmitter from 'events'
-
-import input from '../laInputWin32x64.node'
-
-const keyMap = {
+export const VKEY_MAP = {
   0x30: { _nameRaw: 'VK_0', name: '0', standardName: '0' },
   0x31: { _nameRaw: 'VK_1', name: '1', standardName: '1' },
   0x32: { _nameRaw: 'VK_2', name: '2', standardName: '2' },
@@ -177,15 +173,15 @@ const keyMap = {
   0xfe: { _nameRaw: 'VK_OEM_CLEAR', name: 'OEM_CLEAR', standardName: '' }
 }
 
-export const globalKeyListener = new EventEmitter()
+// export const globalKeyListener = new EventEmitter()
 
 // unused yet
-export function installKeyboardListener() {
-  input.install()
-  input.setOnKeyUpDown(({ keyCode, isKeyDown }) => {
-    const key = keyMap[keyCode] || {}
-    globalKeyListener.emit('key', { isDown: isKeyDown, keyCode, ...key })
-  })
+// export function installKeyboardListener() {
+//   input.install()
+//   input.setOnKeyUpDown(({ keyCode, isKeyDown }) => {
+//     const key = keyMap[keyCode] || {}
+//     globalKeyListener.emit('key', { isDown: isKeyDown, keyCode, ...key })
+//   })
 
-  return input.uninstall
-}
+//   return input.uninstall
+// }

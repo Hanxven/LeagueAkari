@@ -1,7 +1,6 @@
 import { AkariSharedGlobalShard } from '@shared/akari-shard/interface'
 import { AkariManager } from '@shared/akari-shard/manager'
 
-import toolkit from '../../native/laToolkitWin32x64.node'
 import { AkariIpcMain } from '../ipc'
 import { AppCommonState } from './state'
 
@@ -21,7 +20,7 @@ export class AppCommonMain {
     this._shared = deps[AkariManager.SHARED_GLOBAL_ID]
     this._ipc = deps['akari-ipc-main']
 
-    this.state.setAdministrator(toolkit.isElevated())
+    this.state.setAdministrator(this._shared.global.isAdministrator)
 
     // 通知第二实例事件
     this._shared.global.bus.on('second-instance', (commandLine, workingDirectory) => {
