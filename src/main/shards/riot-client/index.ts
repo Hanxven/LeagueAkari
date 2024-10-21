@@ -1,5 +1,6 @@
 import { UxCommandLine } from '@main/utils/ux-cmd'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { RiotClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/riot-client'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import https from 'https'
 
@@ -7,7 +8,6 @@ import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
-import { RiotClientHttpApi } from './http-api'
 
 /**
  * Riot Client 相关封装
@@ -29,7 +29,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
   private readonly _mobx: MobxUtilsMain
   private readonly _lc: LeagueClientMain
 
-  private _api: RiotClientHttpApi | null = null
+  private _api: RiotClientHttpApiAxiosHelper | null = null
 
   private _http: AxiosInstance | null = null
 
@@ -98,7 +98,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
       proxy: false
     })
 
-    this._api = new RiotClientHttpApi(this._http)
+    this._api = new RiotClientHttpApiAxiosHelper(this._http)
   }
 
   /**

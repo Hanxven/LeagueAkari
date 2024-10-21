@@ -1,7 +1,7 @@
 import { PlayerList } from '@shared/types/game-client'
 import { AxiosInstance } from 'axios'
 
-export class GameClientHttpApi {
+export class GameClientHttpApiAxiosHelper {
   constructor(private _http: AxiosInstance) {}
 
   getLiveClientDataPlayerList() {

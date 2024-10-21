@@ -4,18 +4,24 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
-import { LeagueClientUxState } from './state'
+import { LeagueClientUxSettings, LeagueClientUxState } from './state'
 
 /**
  * 对于 League Client Ux 进程的相关工具集, 比如检测命令行
  */
 export class LeagueClientUxMain implements IAkariShardInitDispose {
   static id = 'league-client-ux-main'
-  static dependencies = ['akari-ipc-main', 'mobx-utils-main', 'app-common-main', 'logger-factory-main']
+  static dependencies = [
+    'akari-ipc-main',
+    'mobx-utils-main',
+    'app-common-main',
+    'logger-factory-main'
+  ]
 
   static UX_PROCESS_NAME = 'LeagueClientUx.exe'
   static CLIENT_CMD_POLL_INTERVAL = 2000
 
+  public readonly settings = new LeagueClientUxSettings()
   public readonly state = new LeagueClientUxState()
 
   private readonly _ipc: AkariIpcMain
@@ -72,7 +78,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   }
 
   private _queryUxCommandLine() {
-    if (this.state.settings.useWmic) {
+    if (this.settings.useWmic) {
       if (!this._common.state.isAdministrator) {
         return []
       }

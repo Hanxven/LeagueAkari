@@ -1,7 +1,7 @@
 export type AkariDeps = Record<string, any>
 
 interface AkariShardConstructor<T = any> {
-  new (deps?: AkariDeps): T
+  new (deps?: any | AkariDeps): T
 
   /**
    * 关于此模块的唯一 id
@@ -14,7 +14,14 @@ interface AkariShardConstructor<T = any> {
   dependencies?: string[]
 }
 
+export interface AkariSharedGlobalShard {
+  readonly global: AkariSharedGlobal
+  readonly manager: AkariManager
+}
+
 export interface AkariSharedGlobal {}
+
+export const SHARED_GLOBAL_ID = '<akari-shared-global>'
 
 export class AkariManager {
   private _registry: Map<string, AkariShardConstructor> = new Map()
@@ -23,21 +30,23 @@ export class AkariManager {
   private _isSetup = false
   private _initializationStack: string[] = []
 
-  private _global: AkariSharedGlobal = {}
+  // @ts-ignore
+  public readonly global: AkariSharedGlobal = {}
 
   private static INTERNAL_RUNNER_ID = '<akari-shard-runner-ヾ(≧▽≦*)o>'
-  static SHARED_GLOBAL_ID = '<akari-shared-global>'
 
   /**
    * 将模块注册到管理器中, 将在 setup 时初始化
    * @param shard 类构造函数
    */
   use(...shards: AkariShardConstructor[]) {
-    const global = this._global
+    const global = this.global
+    const manager = this
     shards.push(
-      class SharedGlobalShard {
+      class __$SharedGlobalShard {
+        static id = SHARED_GLOBAL_ID
         public readonly global: Record<string, any> = global
-        static id = AkariManager.SHARED_GLOBAL_ID
+        public readonly manager: AkariManager = manager
       }
     )
 
@@ -57,7 +66,7 @@ export class AkariManager {
 
     this._registry.set(
       AkariManager.INTERNAL_RUNNER_ID,
-      class RootShard {
+      class __$RootShard {
         static id = AkariManager.INTERNAL_RUNNER_ID
         static dependencies = [...allDeps].filter((dep) => dep !== AkariManager.INTERNAL_RUNNER_ID)
       }
@@ -103,11 +112,11 @@ export class AkariManager {
   }
 
   /**
-   * 获取某个模块
+   * 获取某个模块的实例
    * @param id 模块 ID
    * @returns 模块 ID 实例
    */
-  get(id: string) {
+  getInstance(id: string) {
     if (!this._instances.has(id)) {
       throw new Error(`Shard with id "${id}" does not exist`)
     }
@@ -150,9 +159,5 @@ export class AkariManager {
     this._instances.set(id, instance)
 
     return instance
-  }
-
-  get global() {
-    return this._global
   }
 }

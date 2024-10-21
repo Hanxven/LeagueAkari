@@ -1,4 +1,11 @@
-export const VKEY_MAP = {
+export interface KeyDefinition {
+  _nameRaw: string
+  name: string
+  standardName: string
+}
+
+// copied from global-key-listener
+export const VKEY_MAP: Record<string, KeyDefinition> = {
   0x30: { _nameRaw: 'VK_0', name: '0', standardName: '0' },
   0x31: { _nameRaw: 'VK_1', name: '1', standardName: '1' },
   0x32: { _nameRaw: 'VK_2', name: '2', standardName: '2' },
@@ -173,15 +180,7 @@ export const VKEY_MAP = {
   0xfe: { _nameRaw: 'VK_OEM_CLEAR', name: 'OEM_CLEAR', standardName: '' }
 }
 
-// export const globalKeyListener = new EventEmitter()
-
-// unused yet
-// export function installKeyboardListener() {
-//   input.install()
-//   input.setOnKeyUpDown(({ keyCode, isKeyDown }) => {
-//     const key = keyMap[keyCode] || {}
-//     globalKeyListener.emit('key', { isDown: isKeyDown, keyCode, ...key })
-//   })
-
-//   return input.uninstall
-// }
+export function isModifierKey(keyCode: number) {
+  // VK_SHIFT, VK_CONTROL, VK_MENU, VK_LWIN, VK_RWIN, VK_LSHIFT, VK_RSHIFT, VK_LCONTROL, VK_RCONTROL, VK_LMENU, VK_RMENU
+  return [0x10, 0x11, 0x12, 0xa0, 0xa1, 0xa2, 0xa3].includes(keyCode)
+}

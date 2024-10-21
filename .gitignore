@@ -4,8 +4,5 @@ out
 *.log*
 examples
 images
-.git-origin
-
-picacg
-jmcomic2
-lucky-star
+addons-new/build
+addons/build

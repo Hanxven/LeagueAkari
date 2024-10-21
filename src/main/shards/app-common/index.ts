@@ -1,5 +1,4 @@
-import { AkariSharedGlobalShard } from '@shared/akari-shard/interface'
-import { AkariManager } from '@shared/akari-shard/manager'
+import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 
 import { AkariIpcMain } from '../ipc'
 import { AppCommonState } from './state'
@@ -9,7 +8,7 @@ import { AppCommonState } from './state'
  */
 export class AppCommonMain {
   static id = 'app-common-main'
-  static dependencies = [AkariManager.SHARED_GLOBAL_ID, 'akari-ipc-main']
+  static dependencies = [SHARED_GLOBAL_ID, 'akari-ipc-main']
 
   public state = new AppCommonState()
 
@@ -17,13 +16,13 @@ export class AppCommonMain {
   private _ipc: AkariIpcMain
 
   constructor(deps: any) {
-    this._shared = deps[AkariManager.SHARED_GLOBAL_ID]
+    this._shared = deps[SHARED_GLOBAL_ID]
     this._ipc = deps['akari-ipc-main']
 
     this.state.setAdministrator(this._shared.global.isAdministrator)
 
     // 通知第二实例事件
-    this._shared.global.bus.on('second-instance', (commandLine, workingDirectory) => {
+    this._shared.global.events.on('second-instance', (commandLine, workingDirectory) => {
       this._ipc.sendEvent(AppCommonMain.id, 'second-instance', commandLine, workingDirectory)
     })
   }

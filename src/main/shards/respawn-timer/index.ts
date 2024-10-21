@@ -7,7 +7,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { MobxSettingService } from '../setting-factory/mobx-setting-service'
-import { RespawnTimerState } from './state'
+import { RespawnTimerSettings, RespawnTimerState } from './state'
 
 export class RespawnTimerMain implements IAkariShardInitDispose {
   static id = 'respawn-timer-main'
@@ -21,6 +21,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
 
   static POLL_INTERVAL = 1000
 
+  public readonly settings = new RespawnTimerSettings()
   public readonly state: RespawnTimerState
 
   private readonly _gameClient: GameClientMain
@@ -46,7 +47,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       {
         enabled: { default: false }
       },
-      this.state.settings
+      this.settings
     )
     this.state = new RespawnTimerState(this._leagueClient.data)
   }
@@ -61,14 +62,15 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
         this._stopRespawnTimerPoll()
       }
 
-      this.state.settings.setEnabled(v)
+      this.settings.setEnabled(v)
       await setter()
     })
 
-    this._mobx.propSync(RespawnTimerMain.id, 'state', this.state, ['info', 'settings.enabled'])
+    this._mobx.propSync(RespawnTimerMain.id, 'state', this.state, ['info'])
+    this._mobx.propSync(RespawnTimerMain.id, 'settings', this.settings, ['enabled'])
 
     this._mobx.reaction(
-      () => [this._leagueClient.data.gameflow.phase, this.state.settings.enabled],
+      () => [this._leagueClient.data.gameflow.phase, this.settings.enabled],
       ([phase, enabled]) => {
         if (phase === 'InProgress') {
           if (enabled) {

@@ -53,7 +53,7 @@ export class ChatHttpApi {
   }
 
   getChatParticipants(chatRoomId: string) {
-    return this._http.get(`/lol-chat/v1/conversations/${chatRoomId}/participants`)
+    return this._http.get<ChatPerson[]>(`/lol-chat/v1/conversations/${chatRoomId}/participants`)
   }
 
   changeRanked(rankedLeagueQueue: string, rankedLeagueTier: string, rankedLeagueDivision?: string) {

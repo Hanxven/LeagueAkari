@@ -2,8 +2,10 @@ import { UxCommandLine } from '@main/utils/ux-cmd'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
+import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
 import { sleep } from '@shared/utils/sleep'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
+import { AxiosRetry } from 'axios-retry'
 import { comparer } from 'mobx'
 import https from 'node:https'
 import PQueue from 'p-queue'
@@ -13,9 +15,12 @@ import { AkariIpcMain } from '../ipc'
 import { LeagueClientUxMain } from '../league-client-ux'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
+import { SettingFactoryMain } from '../setting-factory'
+import { MobxSettingService } from '../setting-factory/mobx-setting-service'
 import { LeagueClientSyncedData } from './data'
-import { LeagueClientHttpApi } from './http-api'
-import { LeagueClientState } from './state'
+import { LeagueClientSettings, LeagueClientState } from './state'
+
+const axiosRetry = require('axios-retry').default as AxiosRetry
 
 export interface LaunchSpectatorConfig {
   locale?: string
@@ -41,6 +46,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   static HTTP_PING_URL = '/riotclient/auth-token'
   static REQUEST_TIMEOUT_MS = 12500
 
+  public readonly settings = new LeagueClientSettings()
   public readonly state = new LeagueClientState()
 
   private readonly _ipc: AkariIpcMain
@@ -48,11 +54,13 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _mobx: MobxUtilsMain
   private readonly _ux: LeagueClientUxMain
+  private readonly _settingFactory: SettingFactoryMain
+  private readonly _setting: MobxSettingService
 
   private _http: AxiosInstance | null = null
   private _ws: WebSocket | null = null
 
-  private _api: LeagueClientHttpApi | null = null
+  private _api: LeagueClientHttpApiAxiosHelper | null = null
   private _data: LeagueClientSyncedData
 
   private _eventBus = new RadixEventEmitter()
@@ -81,7 +89,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     return this._data
   }
 
-  get eventBus() {
+  get events() {
     return this._eventBus
   }
 
@@ -97,6 +105,14 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       ipc: this._ipc,
       mobx: this._mobx
     })
+    this._settingFactory = deps['setting-factory-main']
+    this._setting = this._settingFactory.create(
+      LeagueClientMain.id,
+      {
+        autoConnect: { default: this.settings.autoConnect }
+      },
+      this.settings
+    )
   }
 
   async onInit() {
@@ -108,16 +124,18 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
   async onDispose() {
     this._disconnect()
-    this.eventBus.clear()
+    this.events.clear()
   }
 
-  private _handleState() {
+  private async _handleState() {
+    await this._setting.applyToState()
+
     this._mobx.propSync(LeagueClientMain.id, 'state', this.state, [
       'connectionState',
       'auth',
-      'connectingClient',
-      'settings.autoConnect'
+      'connectingClient'
     ])
+    this._mobx.propSync(LeagueClientMain.id, 'settings', this.settings, ['autoConnect'])
   }
 
   private _handleCall() {
@@ -195,7 +213,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () =>
         [
-          this.state.settings.autoConnect,
+          this.settings.autoConnect,
           this._ux.state.launchedClients,
           this.state.connectionState
         ] as const,
@@ -280,7 +298,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
       await this._initWebSocket(auth)
 
-      let timeoutTimer: NodeJS.Timeout
+      let timeoutTimer: NodeJS.Timeout | null
       await new Promise<void>((resolve, reject) => {
         timeoutTimer = setTimeout(() => {
           this._ws!.close()
@@ -294,7 +312,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         this._ws!.on('open', async () => {
           try {
             await this._initHttpInstance(auth)
-            clearTimeout(timeoutTimer)
+            clearTimeout(timeoutTimer!)
           } catch (error) {
             this._ws?.close()
             reject(error)
@@ -327,14 +345,15 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
         this._ws!.on('error', (error) => {
           this.state.setDisconnected()
-          clearTimeout(timeoutTimer)
+          clearTimeout(timeoutTimer!)
           reject(error)
         })
       })
 
       this._ws!.on('close', () => {
         this.state.setDisconnected()
-        clearTimeout(timeoutTimer)
+        clearTimeout(timeoutTimer!)
+        timeoutTimer = null
       })
 
       this._ws!.on('message', (msg) => {
@@ -384,36 +403,46 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       proxy: false
     })
 
+    axiosRetry(this._http, {
+      retries: 2,
+      retryCondition: (error) => {
+        if (error.response === undefined) {
+          return true
+        }
+
+        if (error.response.status >= 400 && error.response.status < 500) {
+          return false
+        }
+
+        return true
+      }
+    })
+
     try {
       await this._http.get(LeagueClientMain.HTTP_PING_URL)
-      this._api = new LeagueClientHttpApi(this._http)
+      this._api = new LeagueClientHttpApiAxiosHelper(this._http)
     } catch (error) {
       if (isAxiosError(error) && (!error.response || (error.status && error.status >= 500))) {
         this._log.warn(`无法执行 PING 操作`, error)
-
         throw new Error('http initialization PING failed')
       }
     }
   }
 
-  async request<T = any, D = any>(config: AxiosRequestConfig<D>, maxRetries = 3) {
+  async request<T = any, D = any>(config: AxiosRequestConfig<D>) {
     if (!this._http) {
       throw new Error('LC disconnected')
     }
 
     if (config.url && config.url.startsWith('lol-game-data/assets')) {
-      return this._limitedRequest<T, D>(config, this._assetLimiter, maxRetries)
+      return this._limitedRequest(config, this._assetLimiter)
     } else {
-      return this._retryRequest<T, D>(config, maxRetries)
+      return this.http.request<T>(config)
     }
   }
 
-  private async _limitedRequest<T = any, D = any>(
-    config: AxiosRequestConfig<D>,
-    limiter: PQueue,
-    maxRetries = 3
-  ) {
-    const res = await limiter.add(() => this._retryRequest<T>(config, maxRetries))
+  private async _limitedRequest<T = any, D = any>(config: AxiosRequestConfig<D>, limiter: PQueue) {
+    const res = await limiter.add(() => this.http.request<T>(config))
 
     if (!res) {
       throw new Error('asset request failed')
@@ -421,76 +450,4 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
     return res
   }
-
-  private async _retryRequest<T = any, D = any>(config: AxiosRequestConfig<D>, maxRetries = 3) {
-    if (!this._http) {
-      throw new Error('LC disconnected')
-    }
-
-    let retries = 0
-    let lastError: any = null
-
-    while (true) {
-      try {
-        const res = await this._http.request<T>(config)
-        return res
-      } catch (error) {
-        lastError = error
-
-        if (isAxiosError(error)) {
-          if (
-            error.code === 'ECONNABORTED' ||
-            (error.response?.status && error.response.status >= 500)
-          ) {
-            retries++
-          } else {
-            throw error
-          }
-        } else {
-          throw error
-        }
-      }
-
-      if (retries >= maxRetries) {
-        throw lastError || new Error('max retries exceeded')
-      }
-    }
-  }
-
-  // private async _launchSpectator(config: LaunchSpectatorConfig) {
-  //   const {
-  //     game: { gameMode },
-  //     playerCredentials: { observerServerIp, observerServerPort, observerEncryptionKey, gameId }
-  //   } = await this._eds.sgp.getSpectatorGameflow(config.puuid, config.region)
-
-  //   if (!this._lcm.lcuHttp) {
-  //     throw new Error('LCU not connected')
-  //   }
-
-  //   const { data: installDir } = await this._lcm.lcuHttp.request<{
-  //     gameExecutablePath: string
-  //     gameInstallRoot: string
-  //   }>({
-  //     url: '/lol-patch/v1/products/league_of_legends/install-location',
-  //     method: 'GET'
-  //   })
-
-  //   const cmds = [
-  //     `spectator ${observerServerIp}:${observerServerPort} ${observerEncryptionKey} ${gameId} ${config.region}`,
-  //     `-GameBaseDir=${installDir.gameInstallRoot}`,
-  //     `-Locale=${config.locale || 'zh-CN'}`
-  //   ]
-
-  //   if (gameMode === 'TFT') {
-  //     cmds.push('-Product=TFT')
-  //   }
-
-  //   // 调起进程但不与其关联
-  //   const p = spawn(installDir.gameExecutablePath, cmds, {
-  //     cwd: installDir.gameInstallRoot,
-  //     detached: true
-  //   })
-
-  //   p.unref()
-  // }
 }

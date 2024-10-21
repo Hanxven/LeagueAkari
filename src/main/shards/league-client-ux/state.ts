@@ -1,7 +1,7 @@
 import { UxCommandLine } from '@main/utils/ux-cmd'
 import { makeAutoObservable, observable } from 'mobx'
 
-class LeagueClientUxSettings {
+export class LeagueClientUxSettings {
   useWmic = false
 
   constructor() {
@@ -14,8 +14,6 @@ class LeagueClientUxSettings {
 }
 
 export class LeagueClientUxState {
-  settings = new LeagueClientUxSettings()
-
   launchedClients: UxCommandLine[] = []
 
   constructor() {

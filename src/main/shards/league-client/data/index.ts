@@ -240,7 +240,7 @@ export class LeagueClientSyncedData {
       { fireImmediately: true }
     )
 
-    this._i.eventBus.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (event) => {
+    this._i.events.on<LcuEvent<Ballot>>('/lol-honor-v2/v1/ballot', async (event) => {
       if (event.eventType === 'Delete') {
         this.honor.setBallot(null)
         return
@@ -438,7 +438,7 @@ export class LeagueClientSyncedData {
       { fireImmediately: true }
     )
 
-    this._i.eventBus.on('/lol-champ-select/v1/session', (event) => {
+    this._i.events.on('/lol-champ-select/v1/session', (event) => {
       if (event.eventType === 'Delete') {
         this.champSelect.setSession(null)
         this.champSelect.setSelfSummoner(null)
@@ -447,17 +447,14 @@ export class LeagueClientSyncedData {
       }
     })
 
-    this._i.eventBus.on<LcuEvent<number[]>>(
-      '/lol-champ-select/v1/pickable-champion-ids',
-      (event) => {
-        if (event.eventType === 'Delete') {
-          this.champSelect.setCurrentPickableChampionArray([])
-        } else {
-          this._log.info(`更新可选用英雄列表, 共 ${event.data?.length} 个`)
-          this.champSelect.setCurrentPickableChampionArray(event.data)
-        }
+    this._i.events.on<LcuEvent<number[]>>('/lol-champ-select/v1/pickable-champion-ids', (event) => {
+      if (event.eventType === 'Delete') {
+        this.champSelect.setCurrentPickableChampionArray([])
+      } else {
+        this._log.info(`更新可选用英雄列表, 共 ${event.data?.length} 个`)
+        this.champSelect.setCurrentPickableChampionArray(event.data)
       }
-    )
+    })
 
     // 额外的检查步骤, 下同
     // 在后面的时机再次检查一下是否存在数据
@@ -476,17 +473,14 @@ export class LeagueClientSyncedData {
       }
     )
 
-    this._i.eventBus.on<LcuEvent<number[]>>(
-      '/lol-champ-select/v1/bannable-champion-ids',
-      (event) => {
-        if (event.eventType === 'Delete') {
-          this.champSelect.setCurrentBannableChampionArray([])
-        } else {
-          this._log.info(`更新可禁用英雄列表, 共 ${event.data?.length} 个`)
-          this.champSelect.setCurrentBannableChampionArray(event.data)
-        }
+    this._i.events.on<LcuEvent<number[]>>('/lol-champ-select/v1/bannable-champion-ids', (event) => {
+      if (event.eventType === 'Delete') {
+        this.champSelect.setCurrentBannableChampionArray([])
+      } else {
+        this._log.info(`更新可禁用英雄列表, 共 ${event.data?.length} 个`)
+        this.champSelect.setCurrentBannableChampionArray(event.data)
       }
-    )
+    })
 
     this._mobx.reaction(
       () => this.gameflow.phase,
@@ -503,7 +497,7 @@ export class LeagueClientSyncedData {
       }
     )
 
-    this._i.eventBus.on<LcuEvent<ChampSelectSummoner>>(
+    this._i.events.on<LcuEvent<ChampSelectSummoner>>(
       '/lol-champ-select/v1/summoners/*',
       (event) => {
         if (event.data && event.data.isSelf) {
@@ -513,7 +507,7 @@ export class LeagueClientSyncedData {
       }
     )
 
-    this._i.eventBus.on<LcuEvent<number>>('/lol-champ-select/v1/current-champion', (event) => {
+    this._i.events.on<LcuEvent<number>>('/lol-champ-select/v1/current-champion', (event) => {
       this._log.info(`当前选择的英雄: ${event.data}`)
 
       if (event.eventType === 'Delete') {
@@ -523,7 +517,7 @@ export class LeagueClientSyncedData {
       this.champSelect.setCurrentChampion(event.data)
     })
 
-    this._i.eventBus.on('/lol-champ-select/v1/disabled-champion-ids', (event) => {
+    this._i.events.on('/lol-champ-select/v1/disabled-champion-ids', (event) => {
       this._log.info(`被禁用的英雄: ${event.data?.length}`)
 
       if (event.eventType === 'Delete') {
@@ -545,72 +539,69 @@ export class LeagueClientSyncedData {
       'conversations.championSelect'
     ])
 
-    this._i.eventBus.on<LcuEvent<Conversation>>(
-      '/lol-chat/v1/conversations/:id',
-      (event, { id }) => {
-        if (event.eventType === 'Delete') {
-          const decodedId = decodeURIComponent(id) // 需要解码
-          if (this.chat.conversations.championSelect?.id === decodedId) {
-            runInAction(() => {
-              this.chat.setConversationChampSelect(null)
-              this.chat.setParticipantsChampSelect(null)
-            })
-          } else if (this.chat.conversations.postGame?.id === decodedId) {
-            runInAction(() => {
-              this.chat.setConversationPostGame(null)
-              this.chat.setParticipantsPostGame(null)
-            })
-          } else if (this.chat.conversations.customGame?.id === decodedId) {
-            runInAction(() => {
-              this.chat.setConversationCustomGame(null)
-              this.chat.setParticipantsPostGame(null)
-            })
-          }
-          return
+    this._i.events.on<LcuEvent<Conversation>>('/lol-chat/v1/conversations/:id', (event, { id }) => {
+      if (event.eventType === 'Delete') {
+        const decodedId = decodeURIComponent(id) // 需要解码
+        if (this.chat.conversations.championSelect?.id === decodedId) {
+          runInAction(() => {
+            this.chat.setConversationChampSelect(null)
+            this.chat.setParticipantsChampSelect(null)
+          })
+        } else if (this.chat.conversations.postGame?.id === decodedId) {
+          runInAction(() => {
+            this.chat.setConversationPostGame(null)
+            this.chat.setParticipantsPostGame(null)
+          })
+        } else if (this.chat.conversations.customGame?.id === decodedId) {
+          runInAction(() => {
+            this.chat.setConversationCustomGame(null)
+            this.chat.setParticipantsPostGame(null)
+          })
         }
-
-        switch (event.data.type) {
-          case 'championSelect':
-            if (!event.data.id.includes('lol-champ-select')) {
-              return
-            }
-
-            if (event.eventType === 'Create') {
-              runInAction(() => {
-                this.chat.setConversationChampSelect(event.data)
-                this.chat.setParticipantsChampSelect([])
-              })
-            } else if (event.eventType === 'Update') {
-              this.chat.setConversationChampSelect(event.data)
-            }
-            break
-          case 'postGame':
-            if (event.eventType === 'Create') {
-              runInAction(() => {
-                this.chat.setConversationPostGame(event.data)
-                this.chat.setParticipantsPostGame([])
-              })
-            } else if (event.eventType === 'Update') {
-              this.chat.setConversationPostGame(event.data)
-            }
-            break
-
-          case 'customGame':
-            if (event.eventType === 'Create') {
-              runInAction(() => {
-                this.chat.setConversationCustomGame(event.data)
-                this.chat.setParticipantsCustomGame([])
-              })
-            } else if (event.eventType === 'Update') {
-              this.chat.setConversationCustomGame(event.data)
-            }
-            break
-        }
+        return
       }
-    )
+
+      switch (event.data.type) {
+        case 'championSelect':
+          if (!event.data.id.includes('lol-champ-select')) {
+            return
+          }
+
+          if (event.eventType === 'Create') {
+            runInAction(() => {
+              this.chat.setConversationChampSelect(event.data)
+              this.chat.setParticipantsChampSelect([])
+            })
+          } else if (event.eventType === 'Update') {
+            this.chat.setConversationChampSelect(event.data)
+          }
+          break
+        case 'postGame':
+          if (event.eventType === 'Create') {
+            runInAction(() => {
+              this.chat.setConversationPostGame(event.data)
+              this.chat.setParticipantsPostGame([])
+            })
+          } else if (event.eventType === 'Update') {
+            this.chat.setConversationPostGame(event.data)
+          }
+          break
+
+        case 'customGame':
+          if (event.eventType === 'Create') {
+            runInAction(() => {
+              this.chat.setConversationCustomGame(event.data)
+              this.chat.setParticipantsCustomGame([])
+            })
+          } else if (event.eventType === 'Update') {
+            this.chat.setConversationCustomGame(event.data)
+          }
+          break
+      }
+    })
 
     // 监测用户进入房间
-    this._i.eventBus.on(
+    this._i.events.on(
       '/lol-chat/v1/conversations/:conversationId/messages/:messageId',
       (event, param) => {
         if (event.data && event.data.type === 'system' && event.data.body === 'joined_room') {
@@ -647,7 +638,7 @@ export class LeagueClientSyncedData {
       }
     )
 
-    this._i.eventBus.on('/lol-chat/v1/me', (event) => {
+    this._i.events.on('/lol-chat/v1/me', (event) => {
       if (event.eventType === 'Update' || event.eventType === 'Create') {
         this.chat.setMe(event.data)
         return
@@ -737,11 +728,11 @@ export class LeagueClientSyncedData {
   private _syncLcuMatchmaking() {
     this._mobx.propSync(this._C.id, 'matchmaking', this.matchmaking, ['readyCheck', 'search'])
 
-    this._i.eventBus.on('/lol-matchmaking/v1/ready-check', (event) => {
+    this._i.events.on('/lol-matchmaking/v1/ready-check', (event) => {
       this.matchmaking.setReadyCheck(event.data)
     })
 
-    this._i.eventBus.on('/lol-matchmaking/v1/search', (event) => {
+    this._i.events.on('/lol-matchmaking/v1/search', (event) => {
       this.matchmaking.setSearch(event.data)
     })
   }
@@ -777,24 +768,23 @@ export class LeagueClientSyncedData {
       { fireImmediately: true }
     )
 
-    this._i.eventBus.on('/lol-gameflow/v1/gameflow-phase', (event) => {
+    this._i.events.on('/lol-gameflow/v1/gameflow-phase', (event) => {
       this.gameflow.setPhase(event.data)
     })
 
-    this._i.eventBus.on('/lol-gameflow/v1/session', (event) => {
+    this._i.events.on('/lol-gameflow/v1/session', (event) => {
       this.gameflow.setSession(event.data)
     })
   }
 
   private _syncLcuLobby() {
-    this._mobx.propSync(this._C.id, 'lobby', this.lobby, 'lobby')
-    this._mobx.propSync(this._C.id, 'lobby', this.lobby, 'receivedInvitations')
+    this._mobx.propSync(this._C.id, 'lobby', this.lobby, ['lobby', 'receivedInvitations'])
 
-    this._i.eventBus.on('/lol-lobby/v2/lobby', (event) => {
+    this._i.events.on('/lol-lobby/v2/lobby', (event) => {
       this.lobby.setLobby(event.data)
     })
 
-    this._i.eventBus.on('/lol-lobby/v2/received-invitations', (event) => {
+    this._i.events.on('/lol-lobby/v2/received-invitations', (event) => {
       this.lobby.setReceivedInvitations(event.data)
     })
 
@@ -848,7 +838,7 @@ export class LeagueClientSyncedData {
   private _syncLcuLogin() {
     this._mobx.propSync(this._C.id, 'login', this.login, 'loginQueueState')
 
-    this._i.eventBus.on('/lol-login/v1/login-queue-state', (event) => {
+    this._i.events.on('/lol-login/v1/login-queue-state', (event) => {
       this.login.setLoginQueueState(event.data)
     })
 
@@ -936,7 +926,7 @@ export class LeagueClientSyncedData {
       { equals: comparer.structural, fireImmediately: true }
     )
 
-    this._i.eventBus.on('/lol-summoner/v1/current-summoner', (event) => {
+    this._i.events.on('/lol-summoner/v1/current-summoner', (event) => {
       this.summoner.setMe(event.data)
     })
   }
@@ -967,7 +957,7 @@ export class LeagueClientSyncedData {
       { fireImmediately: true }
     )
 
-    this._i.eventBus.on('/entitlements/v1/token', (event) => {
+    this._i.events.on('/entitlements/v1/token', (event) => {
       this.entitlements.setToken(event.data)
     })
   }
@@ -998,7 +988,7 @@ export class LeagueClientSyncedData {
       { fireImmediately: true }
     )
 
-    this._i.eventBus.on('/lol-league-session/v1/league-session-token', (event) => {
+    this._i.events.on('/lol-league-session/v1/league-session-token', (event) => {
       this.lolLeagueSession.setToken(event.data)
     })
   }

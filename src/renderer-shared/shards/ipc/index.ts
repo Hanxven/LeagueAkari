@@ -24,12 +24,12 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
 
   async onInit() {
     ipcRenderer.on('akari-event', this._dispatchEvent)
-    await ipcRenderer.invoke('akari-renderer-register', 'register')
+    await ipcRenderer.invoke('akariRendererRegister', 'register')
   }
 
   async onDispose() {
     ipcRenderer.off('akari-event', this._dispatchEvent)
-    await ipcRenderer.invoke('akari-renderer-register', 'unregister')
+    await ipcRenderer.invoke('akariRendererRegister', 'unregister')
     this._eventMap.clear()
   }
 
@@ -41,7 +41,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
    * @returns
    */
   call<T = any>(namespace: string, fnName: string, ...args: any[]) {
-    return ipcRenderer.invoke('akari-call', namespace, fnName, ...args) as Promise<T>
+    return ipcRenderer.invoke('akariCall', namespace, fnName, ...args) as Promise<T>
   }
 
   /**

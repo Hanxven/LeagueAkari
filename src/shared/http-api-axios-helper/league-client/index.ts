@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios'
 
 import { ChampSelectHttpApi } from './champ-select'
 import { ChampionMasteryHttpApi } from './champion-mastery'
+import { ChatHttpApi } from './chat'
 import { EntitlementsHttpApi } from './entitlements'
 import { GameDataHttpApi } from './game-data'
 import { GameflowHttpApi } from './gameflow'
@@ -18,9 +19,11 @@ import { RankedHttpApi } from './ranked'
 import { RiotClientHttpApi } from './riotclient'
 import { SpectatorHttpApi } from './spectator'
 import { SummonerHttpApi } from './summoner'
-import { ChatHttpApi } from './chat'
 
-export class LeagueClientHttpApi {
+/**
+ * 基于 Axios 封装的调用
+ */
+export class LeagueClientHttpApiAxiosHelper {
   public readonly champSelect: ChampSelectHttpApi
   public readonly championMastery: ChampionMasteryHttpApi
   public readonly chat: ChatHttpApi

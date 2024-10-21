@@ -1,5 +1,4 @@
-import { AkariSharedGlobalShard } from '@shared/akari-shard/interface'
-import { AkariManager } from '@shared/akari-shard/manager'
+import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 import { formatError } from '@shared/utils/errors'
 import { app, shell } from 'electron'
 import { join } from 'node:path'
@@ -73,7 +72,7 @@ export class AkariLogger {
  */
 export class LoggerFactoryMain {
   static id = 'logger-factory-main'
-  static dependencies = [AkariManager.SHARED_GLOBAL_ID]
+  static dependencies = [SHARED_GLOBAL_ID]
 
   // 从全局注入的 logger 实例
   private readonly _logger: Logger
@@ -85,7 +84,7 @@ export class LoggerFactoryMain {
   constructor(deps: any) {
     this._appDir = join(app.getPath('exe'), '..')
     this._logsDir = join(this._appDir, 'logs')
-    this._shared = deps[AkariManager.SHARED_GLOBAL_ID]
+    this._shared = deps[SHARED_GLOBAL_ID]
     this._logger = this._shared.global.logger
   }
 

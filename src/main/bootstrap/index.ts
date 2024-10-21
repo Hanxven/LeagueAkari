@@ -2,15 +2,24 @@ import { optimizer } from '@electron-toolkit/utils'
 import { initAppLogger } from '@main/logger'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
 import { AppCommonMain } from '@main/shards/app-common'
+import { AutoGameflowMain } from '@main/shards/auto-gameflow'
+import { AutoReplyMain } from '@main/shards/auto-reply'
+import { AutoSelectMain } from '@main/shards/auto-select'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcMain } from '@main/shards/ipc'
+import { KeyboardShortcutsMain } from '@main/shards/keyboard-shorcuts'
 import { LeagueClientMain } from '@main/shards/league-client'
 import { LeagueClientUxMain } from '@main/shards/league-client-ux'
 import { LoggerFactoryMain } from '@main/shards/logger-factory'
 import { MobxUtilsMain } from '@main/shards/mobx-utils'
+import { OngoingGameMain } from '@main/shards/ongoing-game'
+import { RespawnTimerMain } from '@main/shards/respawn-timer'
 import { RiotClientMain } from '@main/shards/riot-client'
+import { SelfUpdateMain } from '@main/shards/self-update'
 import { SettingFactoryMain } from '@main/shards/setting-factory'
 import { StorageMain } from '@main/shards/storage'
+import { TrayMain } from '@main/shards/tray'
+import { WindowManagerMain } from '@main/shards/window-manager'
 import { AkariManager } from '@shared/akari-shard/manager'
 import { formatError } from '@shared/utils/errors'
 import dayjs from 'dayjs'
@@ -39,7 +48,7 @@ declare module '@shared/akari-shard/manager' {
     /**
      * 特殊事件总线
      */
-    bus: EventEmitter<AkariAppEventMap>
+    events: EventEmitter<AkariAppEventMap>
 
     /**
      * 是否是管理员权限
@@ -84,7 +93,7 @@ export function bootstrap() {
   const logger = initAppLogger()
 
   // 应用级别的事件总线
-  const bus = new EventEmitter<AkariAppEventMap>()
+  const events = new EventEmitter<AkariAppEventMap>()
 
   // 基础全局设置
   EventEmitter.defaultMaxListeners = 1e5
@@ -131,30 +140,45 @@ export function bootstrap() {
     // 启用所有 akari shard
     const manager = new AkariManager()
     manager.global.logger = logger
-    manager.global.bus = bus
+    manager.global.events = events
     manager.global.baseConfig = {
       value: baseConfig,
       write: (config: any) => writeBaseConfig(config)
     }
     manager.global.isAdministrator = isAdministrator
 
-    // use all the shards
     manager.use(
+      // basic fundamental shards
       AkariIpcMain,
-      LoggerFactoryMain,
       AppCommonMain,
-      GameClientMain,
-      LeagueClientMain,
-      RiotClientMain,
+      LoggerFactoryMain,
       MobxUtilsMain,
       SettingFactoryMain,
       StorageMain,
-      LeagueClientUxMain
-      // ... more shards are under development
+
+      // connection & data provider shards
+      GameClientMain,
+      LeagueClientMain,
+      LeagueClientUxMain,
+      RiotClientMain,
+
+      // application specific shards
+      WindowManagerMain,
+      TrayMain,
+      KeyboardShortcutsMain,
+      SelfUpdateMain,
+
+      // functional shards
+      AutoGameflowMain,
+      AutoReplyMain,
+      AutoSelectMain,
+      AutoSelectMain,
+      OngoingGameMain,
+      RespawnTimerMain
     )
 
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
-      bus.emit('second-instance', commandLine, workingDirectory)
+      events.emit('second-instance', commandLine, workingDirectory)
       logger.warn({
         message: `用户尝试启动第二个实例, cmd=${JSON.stringify(commandLine)}, pwd=${workingDirectory}`,
         namespace: 'electron'
@@ -162,7 +186,7 @@ export function bootstrap() {
     })
 
     app.on('window-all-closed', () => {
-      // it currently only for Windows, so we can safely
+      // hanxven's note: this is a Windows only app
       app.quit()
     })
 
@@ -201,7 +225,7 @@ export function bootstrap() {
         })
         .finally(() => {
           shardDisposed = true
-          bus.removeAllListeners()
+          events.removeAllListeners()
           logger.on('finish', () => app.quit())
           logger.end()
         })

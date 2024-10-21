@@ -1,15 +1,15 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AxiosRequestConfig } from 'axios'
-import { protocol, session } from 'electron'
+import { session } from 'electron'
 import { Readable } from 'node:stream'
 
-import { AuxWindowMain } from '../aux-window'
 import { LeagueClientMain } from '../league-client'
-import { MainWindowMain } from '../main-window'
 import { RiotClientMain } from '../riot-client'
+import { WindowManagerMain } from '../window-manager'
 
 /**
  * 实现 `akari://` 协议, 用于渲染进程 HTTP 请求的代理
+ * 代理 league-client 和 riot-client 的请求
  */
 export class AkariProtocolMain implements IAkariShardInitDispose {
   static id = 'akari-protocol-main'
@@ -26,13 +26,13 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    this._handlePartitionAkariProtocol(MainWindowMain.PARTITION)
-    this._handlePartitionAkariProtocol(AuxWindowMain.PARTITION)
+    this._handlePartitionAkariProtocol(WindowManagerMain.MAIN_WINDOW_PARTITION)
+    this._handlePartitionAkariProtocol(WindowManagerMain.AUX_WINDOW_PARTITION)
   }
 
   async onDispose() {
-    this._unhandlePartitionAkariProtocol(MainWindowMain.PARTITION)
-    this._unhandlePartitionAkariProtocol(AuxWindowMain.PARTITION)
+    this._unhandlePartitionAkariProtocol(WindowManagerMain.MAIN_WINDOW_PARTITION)
+    this._unhandlePartitionAkariProtocol(WindowManagerMain.AUX_WINDOW_PARTITION)
   }
 
   private _unhandlePartitionAkariProtocol(partition: string) {
@@ -45,7 +45,7 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
       .protocol.handle(AkariProtocolMain.AKARI_PROTOCOL, async (req) => {
         const path = req.url.slice(`${AkariProtocolMain.AKARI_PROTOCOL}://`.length)
         const index = path.indexOf('/')
-        const domain = path.slice(0, index)
+        const domain = path.slice(0, index).trim()
         const uri = path.slice(index + 1).trim()
 
         const reqHeaders: Record<string, string> = {}

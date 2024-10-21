@@ -1,9 +1,9 @@
 import { UxCommandLine } from '@main/utils/ux-cmd'
 import { makeAutoObservable, observable } from 'mobx'
 
-export type LcuConnectionStateType = 'connecting' | 'connected' | 'disconnected'
+export type LcConnectionStateType = 'connecting' | 'connected' | 'disconnected'
 
-class LeagueClientSettings {
+export class LeagueClientSettings {
   autoConnect = true
 
   constructor() {
@@ -16,9 +16,7 @@ class LeagueClientSettings {
 }
 
 export class LeagueClientState {
-  settings = new LeagueClientSettings()
-
-  connectionState: LcuConnectionStateType = 'disconnected'
+  connectionState: LcConnectionStateType = 'disconnected'
 
   auth: UxCommandLine | null = null
 
