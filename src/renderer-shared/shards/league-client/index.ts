@@ -2,8 +2,8 @@ import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/le
 import axios from 'axios'
 
 import { AkariIpcRenderer } from '../ipc'
-import { PiniaMobxUtils } from '../pinia-mobx-utils'
-import { SettingUtils } from '../setting'
+import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
+import { SettingUtilsRenderer } from '../setting'
 import { useLeagueClientStore } from './store'
 
 export const MAIN_SHARD_NAMESPACE = 'league-client-main'
@@ -13,8 +13,8 @@ export class LeagueClientRenderer {
   static dependencies = ['pinia-mobx-utils-renderer', 'akari-ipc-renderer', 'setting-utils']
 
   private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtils
-  private readonly _setting: SettingUtils
+  private readonly _pm: PiniaMobxUtilsRenderer
+  private readonly _setting: SettingUtilsRenderer
 
   public readonly api = new LeagueClientHttpApiAxiosHelper(
     axios.create({
@@ -41,7 +41,7 @@ export class LeagueClientRenderer {
   constructor(deps: any) {
     this._pm = deps['pinia-mobx-utils-renderer']
     this._ipc = deps['akari-ipc-renderer']
-    this._setting = deps['setting-utils']
+    this._setting = deps['setting-utils-renderer']
   }
 
   setAutoConnect(enabled: boolean) {

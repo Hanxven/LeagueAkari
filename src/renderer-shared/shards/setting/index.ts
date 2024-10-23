@@ -2,8 +2,8 @@ import { AkariIpcRenderer } from '../ipc'
 
 export const MAIN_SHARD_NAMESPACE = 'setting-factory-main'
 
-export class SettingUtils {
-  static id = 'setting-utils'
+export class SettingUtilsRenderer {
+  static id = 'setting-utils-renderer'
   static dependencies = ['akari-ipc-renderer']
 
   private _ipc: AkariIpcRenderer

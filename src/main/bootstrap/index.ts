@@ -15,8 +15,10 @@ import { MobxUtilsMain } from '@main/shards/mobx-utils'
 import { OngoingGameMain } from '@main/shards/ongoing-game'
 import { RespawnTimerMain } from '@main/shards/respawn-timer'
 import { RiotClientMain } from '@main/shards/riot-client'
+import { SavedPlayerMain } from '@main/shards/saved-player'
 import { SelfUpdateMain } from '@main/shards/self-update'
 import { SettingFactoryMain } from '@main/shards/setting-factory'
+import { SgpMain } from '@main/shards/sgp'
 import { StorageMain } from '@main/shards/storage'
 import { TrayMain } from '@main/shards/tray'
 import { WindowManagerMain } from '@main/shards/window-manager'
@@ -174,7 +176,9 @@ export function bootstrap() {
       AutoSelectMain,
       AutoSelectMain,
       OngoingGameMain,
-      RespawnTimerMain
+      RespawnTimerMain,
+      SavedPlayerMain,
+      SgpMain
     )
 
     app.on('second-instance', (_event, commandLine, workingDirectory) => {

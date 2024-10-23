@@ -2,13 +2,13 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { RiotClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/riot-client'
 import axios from 'axios'
 
-import { PiniaMobxUtils } from '../pinia-mobx-utils'
+import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 
 export class RiotClientRenderer implements IAkariShardInitDispose {
   static id = 'riot-client-renderer'
   static dependencies = ['pinia-mobx-utils-renderer']
 
-  private readonly _pm: PiniaMobxUtils
+  private readonly _pm: PiniaMobxUtilsRenderer
 
   public readonly api = new RiotClientHttpApiAxiosHelper(
     axios.create({

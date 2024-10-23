@@ -3,8 +3,9 @@ import { AxiosRequestConfig } from 'axios'
 import { session } from 'electron'
 import { Readable } from 'node:stream'
 
-import { LeagueClientMain } from '../league-client'
-import { RiotClientMain } from '../riot-client'
+import { LeagueClientHttpUninitializedError, LeagueClientMain } from '../league-client'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
+import { RiotClientHttpUninitializedError, RiotClientMain } from '../riot-client'
 import { WindowManagerMain } from '../window-manager'
 
 /**
@@ -13,16 +14,20 @@ import { WindowManagerMain } from '../window-manager'
  */
 export class AkariProtocolMain implements IAkariShardInitDispose {
   static id = 'akari-protocol-main'
-  static dependencies = ['league-client-main', 'riot-client-main']
+  static dependencies = ['league-client-main', 'riot-client-main', 'logger-factory-main']
 
   static AKARI_PROTOCOL = 'akari'
 
   private readonly _leagueClient: LeagueClientMain
   private readonly _riotClient: RiotClientMain
+  private readonly _loggerFactory: LoggerFactoryMain
+  private readonly _log: AkariLogger
 
   constructor(deps: any) {
     this._leagueClient = deps['league-client-main']
     this._riotClient = deps['riot-client-main']
+    this._loggerFactory = deps['logger-factory-main']
+    this._log = this._loggerFactory.create(AkariProtocolMain.id)
   }
 
   async onInit() {
@@ -81,7 +86,18 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
                 status: res.status
               })
             } catch (error) {
-              console.error(error)
+              this._log.warn(`Failed to proxy request`, error)
+
+              if (
+                error instanceof LeagueClientHttpUninitializedError ||
+                error instanceof RiotClientHttpUninitializedError
+              ) {
+                return new Response(JSON.stringify({ error: error.name }), {
+                  headers: { 'Content-Type': 'application/json' },
+                  status: 503
+                })
+              }
+
               return new Response((error as Error).message, {
                 headers: { 'Content-Type': 'text/plain' },
                 status: 500

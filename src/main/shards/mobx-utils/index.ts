@@ -145,7 +145,8 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
             MobxUtilsMain.id,
             `update-state-prop/${namespace}:${stateId}`,
             path,
-            isObservable(newValue) ? toJS(newValue) : newValue
+            isObservable(newValue) ? toJS(newValue) : newValue,
+            { action: 'update' }
           )
         }
       )

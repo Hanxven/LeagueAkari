@@ -70,7 +70,8 @@ const SCHEMA = {
 } as const
 
 /**
- * SGP 相关功能, 提供自动化的维持
+ * Service Gateway Proxy
+ * 访问 SGP API 相关功能, 提供自动化的 token 维持
  */
 export class SgpMain implements IAkariShardInitDispose {
   static id = 'sgp-main'

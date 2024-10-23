@@ -37,7 +37,7 @@ export function initAppLogger() {
         level: 'info'
       }),
       new transports.Console({
-        level: import.meta.env.DEV ? 'info' : 'warn'
+        level: import.meta.env.DEV ? 'debug' : 'warn'
       })
     ]
   })

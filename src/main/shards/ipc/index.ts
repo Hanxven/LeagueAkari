@@ -94,7 +94,7 @@ export class AkariIpcMain implements IAkariShardInitDispose {
   }
 
   /**
-   * 发送到所有已订阅的渲染进程, 事件名应使用 kebab-case
+   * 发送到所有已订阅的渲染进程, 事件名使用 kebab-case
    */
   sendEvent(namespace: string, eventName: string, ...args: any[]) {
     this._renderers.forEach((id) =>
@@ -103,7 +103,7 @@ export class AkariIpcMain implements IAkariShardInitDispose {
   }
 
   /**
-   * 处理来自渲染进程的调用, 方法名应使用 camelCase
+   * 处理来自渲染进程的调用, 方法名使用 camelCase
    * @param cb
    */
   onCall(namespace: string, fnName: string, cb: (...args: any[]) => Promise<any> | any) {

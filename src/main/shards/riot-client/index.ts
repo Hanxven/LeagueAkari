@@ -9,6 +9,10 @@ import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 
+export class RiotClientHttpUninitializedError extends Error {
+  name = 'RiotClientHttpUninitializedError'
+}
+
 /**
  * Riot Client 相关封装
  */
@@ -33,7 +37,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
 
   private _http: AxiosInstance | null = null
 
-  // Riot Client 的事件推送和 League Client 完全相同, 但由于当前应用暂未使用, 所以不实现
+  // Riot Client 的事件推送格式和 League Client 完全相同, 但由于当前应用暂未使用, 所以不实现
   // private _ws: WebSocket | null = null
   // private _eventBus = new RadixEventEmitter()
 
@@ -47,7 +51,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
 
   get api() {
     if (!this._api) {
-      throw new Error('RC HTTP uninitialized')
+      throw new RiotClientHttpUninitializedError()
     }
 
     return this._api

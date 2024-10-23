@@ -1,4 +1,5 @@
 import { EMPTY_PUUID } from '@shared/constants/common'
+import { PlayerChampionMastery } from '@shared/types/lcu/champion-mastery'
 import { Game, MatchHistory } from '@shared/types/lcu/match-history'
 import { RankedStats } from '@shared/types/lcu/ranked'
 import { SummonerInfo } from '@shared/types/lcu/summoner'
@@ -10,6 +11,7 @@ import { parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { LeagueClientSyncedData } from '../league-client/data'
+import { SavedPlayer } from '../storage/entities/SavedPlayers'
 
 export class OngoingGameSettings {
   enabled: boolean = true
@@ -22,6 +24,11 @@ export class OngoingGameSettings {
    * 查询战绩时是否优先使用 SGP API
    */
   matchHistoryUseSgpApi: boolean = true
+
+  /**
+   * 战绩查询时, 优先查询当前模式还是全部模式
+   */
+  matchHistoryQueuePreference: 'current' | 'all' = 'current'
 
   setEnabled(value: boolean) {
     this.enabled = value
@@ -39,7 +46,7 @@ export class OngoingGameSettings {
     this.concurrency = limit
   }
 
-  setUseSgpApi(value: boolean) {
+  setMatchHistoryUseSgpApi(value: boolean) {
     this.matchHistoryUseSgpApi = value
   }
 
@@ -303,7 +310,11 @@ export class OngoingGameState {
   /**
    * 计算出来的预设队伍
    */
-  premadeTeams: Record<string, string[][]> = {}
+  premadeTeams: Record<string, string[][]> | null = null
+
+  setPremadeTeams(value: Record<string, string[][]> | null) {
+    this.premadeTeams = value
+  }
 
   /**
    * 根据目前所有战绩计算出来的玩家分析数据
@@ -313,6 +324,24 @@ export class OngoingGameState {
     teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
   } | null = null
 
+  setPlayerStats(
+    value: {
+      players: Record<string, MatchHistoryGamesAnalysisAll>
+      teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
+    } | null
+  ) {
+    this.playerStats = value
+  }
+
+  /**
+   * 战绩列表的 tag, 用于 SGP API
+   */
+  matchHistoryTag: string | null
+
+  setMatchHistoryTag(value: string | null) {
+    this.matchHistoryTag = value
+  }
+
   /**
    * 每名玩家的战绩
    * 手动同步
@@ -320,9 +349,18 @@ export class OngoingGameState {
   matchHistory: Record<
     string,
     {
+      /** 战绩源, lc 为通过 LC 代理查询服务器, SGP 为直接查询服务器. 前者高可用 */
       source: 'lcu' | 'sgp'
+
+      /** 适用于 SGP 的 tag string, 当设置为 lcu 时, 该选项会被忽略 */
+      tag?: string
+
+      /** 目标加载数量, 非实际数量 */
+      targetCount: number
+
+      /** 大概不用说明 */
       data: Game[]
-    }[]
+    }
   > = {}
 
   /**
@@ -334,7 +372,7 @@ export class OngoingGameState {
     {
       source: 'lcu' | 'sgp'
       data: SummonerInfo
-    }[]
+    }
   > = {}
 
   /**
@@ -349,12 +387,43 @@ export class OngoingGameState {
     }
   > = {}
 
+  /**
+   * 每名玩家的段位
+   * 手动同步
+   */
+  championMastery: Record<
+    string,
+    {
+      source: 'lcu' | 'sgp'
+      data: Record<
+        number,
+        {
+          championId: number
+          championLevel: number
+          championPoints: number
+        }
+      >
+    }
+  > = {}
+
+  savedInfo: Record<string, SavedPlayer> = {}
+
+  clear() {
+    this.playerStats = null
+    this.premadeTeams = {}
+    this.matchHistory = {}
+    this.summoner = {}
+    this.savedInfo = {}
+    this.matchHistoryTag = null
+  }
+
   constructor(private readonly _lcData: LeagueClientSyncedData) {
     makeAutoObservable(this, {
       // shallow object
       matchHistory: observable.shallow,
       summoner: observable.shallow,
       rankedStats: observable.shallow,
+      savedInfo: observable.shallow,
 
       // structured data
       championSelections: computed.struct,

@@ -28,6 +28,10 @@ export interface LaunchSpectatorConfig {
   puuid: string
 }
 
+export class LeagueClientHttpUninitializedError extends Error {
+  name = 'LeagueClientHttpUninitializedError'
+}
+
 /**
  * League Client 相关功能, 包括与 LeagueClient.exe 的连接, 封装的 HTTP 请求, 以及 WebSocket 通信
  */
@@ -71,7 +75,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
   get http() {
     if (!this._http) {
-      throw new Error('LC HTTP uninitialized')
+      throw new LeagueClientHttpUninitializedError()
     }
 
     return this._http
@@ -79,7 +83,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
   get api() {
     if (!this._api) {
-      throw new Error('LC HTTP uninitialized')
+      throw new LeagueClientHttpUninitializedError()
     }
 
     return this._api
@@ -131,8 +135,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     await this._setting.applyToState()
 
     this._mobx.propSync(LeagueClientMain.id, 'state', this.state, [
-      'connectionState',
       'auth',
+      'connectionState',
       'connectingClient'
     ])
     this._mobx.propSync(LeagueClientMain.id, 'settings', this.settings, ['autoConnect'])

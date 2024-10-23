@@ -10,7 +10,7 @@ export const MAIN_SHARD_NAMESPACE = 'mobx-utils-main'
 /**
  * 对应主进程模块, 适用于 Pinia 的状态同步器
  */
-export class PiniaMobxUtils implements IAkariShardInitDispose {
+export class PiniaMobxUtilsRenderer implements IAkariShardInitDispose {
   static id = 'pinia-mobx-utils-renderer'
   static dependencies = ['akari-ipc-renderer']
 
@@ -24,8 +24,12 @@ export class PiniaMobxUtils implements IAkariShardInitDispose {
     this._ipc.onEvent(
       MAIN_SHARD_NAMESPACE,
       `update-state-prop/${namespace}:${stateId}`,
-      (path, value) => {
-        _.set(store, path, _.isObject(value) ? markRaw(value) : value)
+      (path, value, { action }) => {
+        if (action === 'update' || action === 'create') {
+          _.set(store, path, _.isObject(value) ? markRaw(value) : value)
+        } else if (action === 'delete') {
+          _.unset(store, path)
+        }
       }
     )
 
