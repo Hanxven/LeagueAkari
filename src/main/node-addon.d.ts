@@ -71,7 +71,7 @@ declare module '@main/native/la-input-win64.node' {
      * 将会收到类似于 `132,DOWN` 或 `132,UP` 的类似的字符串
      * @param cb 回调
      */
-    OnKeyEvent(cb: (raw: string) => void): void
+    onKeyEvent(cb: (raw: string) => void): void
 
     /**
      * 开始和停止监听

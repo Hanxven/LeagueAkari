@@ -43,7 +43,9 @@ export class MobxSettingService {
    * @param defaultValue
    * @returns
    */
-  async _getFromStorage(key: string, defaultValue: any) {
+  async _getFromStorage<T = any>(key: string): Promise<T | undefined>
+  async _getFromStorage<T>(key: string, defaultValue: T): Promise<T>
+  async _getFromStorage(key: string, defaultValue?: any) {
     const key2 = `${this._namespace}/${key}`
     const v = await this._storage.dataSource.manager.findOneBy(Setting, { key: key2 })
     if (!v) {

@@ -1,4 +1,10 @@
-import { appRendererModule as am } from '@renderer-shared/modules/app'
+import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
+import { PiniaMobxUtilsRenderer } from '@renderer-shared/shards/pinia-mobx-utils'
+import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
+import { SettingUtilsRenderer } from '@renderer-shared/shards/setting'
+import { AkariManager } from '@shared/akari-shard/manager'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'
@@ -9,7 +15,6 @@ import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'
 import './assets/css/styles.less'
-import { setupLeagueAkariRendererModules } from './modules'
 import { router } from './routes'
 
 dayjs.extend(relativeTime)
@@ -19,14 +24,29 @@ const app = createApp(NaiveUIProviderApp)
 app.use(router)
 app.use(createPinia())
 
+const manager = new AkariManager()
+
+app.provide('shard-manager', manager)
+
+manager.use(
+  LeagueClientRenderer,
+  RiotClientRenderer,
+  SettingUtilsRenderer,
+  AkariIpcRenderer,
+  PiniaMobxUtilsRenderer,
+  LoggerRenderer
+)
+
 try {
-  await setupLeagueAkariRendererModules()
-} catch (error) {
-  console.error('League Akari 无法正确加载：', error)
-} finally {
+  await manager.setup()
+
+  const logger = manager.getInstance('logger-renderer') as LoggerRenderer
+
   app.config.errorHandler = (err, instance, info) => {
-    am.logger.error(info, err)
+    logger.error('Vue', err, instance, info)
     console.error('Vue Error:', err, instance, info)
   }
   app.mount('#app')
+} catch (error) {
+  console.error('League Akari 无法正确加载：', error)
 }

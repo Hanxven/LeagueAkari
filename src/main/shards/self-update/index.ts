@@ -11,12 +11,13 @@ import { app, shell } from 'electron'
 import { comparer } from 'mobx'
 import { extractFull } from 'node-7z'
 import { spawn } from 'node:child_process'
-import { createWriteStream, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
-import { basename, dirname, extname, join } from 'node:path'
+import fs, { rmSync } from 'node:fs'
+import path from 'node:path'
 import { Readable, pipeline } from 'node:stream'
 import { lt } from 'semver'
 
 import sevenBinPath from '../../../../resources/7za.exe?asset'
+import updateScriptPath from '../../../../resources/update.bat?asset'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -40,7 +41,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   static UPDATES_CHECK_INTERVAL = 7.2e6 // 2 hours
   static ANNOUNCEMENT_CHECK_INTERVAL = 7.2e6 // 2 hours
   static DOWNLOAD_DIR_NAME = 'NewUpdates'
-  static UPDATE_SCRIPT_NAME = 'LeagueAkariUpdate.ps1'
+  static UPDATE_SCRIPT_NAME = 'LeagueAkariUpdate.bat'
+  static EXECUTABLE_NAME = 'LeagueAkari.exe'
   static UPDATE_PROGRESS_UPDATE_INTERVAL = 200
   static USER_AGENT = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 LeagueAkari/${app.getVersion()} `
 
@@ -60,15 +62,13 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   private readonly _setting: MobxSettingService
 
   private _http = axios.create({
-    headers: {
-      'User-Agent': SelfUpdateMain.USER_AGENT
-    }
+    headers: { 'User-Agent': SelfUpdateMain.USER_AGENT }
   })
 
   private _checkUpdateTimerId: NodeJS.Timeout | null = null
   private _checkAnnouncementTimerId: NodeJS.Timeout | null = null
 
-  private _lastQuitTask: (() => void) | null = null
+  private _updateOnQuitFn: (() => void) | null = null
   private _currentUpdateTaskCanceler: (() => void) | null = null
 
   constructor(deps: any) {
@@ -283,10 +283,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     })
 
     const appDir = app.getPath('userData')
-    const downloadDir = join(appDir, SelfUpdateMain.DOWNLOAD_DIR_NAME)
-    const downloadPath = join(downloadDir, filename)
+    const downloadDir = path.join(appDir, SelfUpdateMain.DOWNLOAD_DIR_NAME)
+    const downloadPath = path.join(downloadDir, filename)
 
-    mkdirSync(downloadDir, { recursive: true })
+    fs.mkdirSync(downloadDir, { recursive: true })
 
     const now = Date.now()
 
@@ -295,13 +295,14 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     let lastUpdateProgressTime = now
 
     const asyncTask = new Promise<string>((resolve, reject) => {
-      const writer = createWriteStream(downloadPath)
+      const writer = fs.createWriteStream(downloadPath)
 
       this._currentUpdateTaskCanceler = () => {
         const error = new Error('Download canceled')
         error.name = 'Canceled'
         resp.data.destroy(error)
         writer.close()
+        this._log.info(`取消下载更新包 ${downloadPath}`)
       }
 
       const _updateProgress = (nowTime: number) => {
@@ -351,8 +352,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
             this._log.warn(`下载或写入更新包文件失败 ${formatError(error)}`)
           }
 
-          if (existsSync(downloadPath)) {
-            rmSync(downloadPath, { force: true })
+          if (fs.existsSync(downloadPath)) {
+            fs.rmSync(downloadPath, { force: true })
           }
 
           reject(error)
@@ -368,8 +369,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     return asyncTask
   }
 
-  private async _unpackDownloadedUpdate(filepath: string) {
-    if (!existsSync(filepath)) {
+  private async _unpackDownloadedUpdate(filepath: string, targetDirName: string) {
+    if (!fs.existsSync(filepath)) {
       this.state.setUpdateProgressInfo({
         phase: 'unpack-failed',
         downloadingProgress: 1,
@@ -382,7 +383,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       throw new Error(`No such file ${filepath}`)
     }
 
-    const dirPath = join(dirname(filepath), basename(filepath, extname(filepath)))
+    const extractedTo = path.join(filepath, targetDirName)
 
     this.state.setUpdateProgressInfo({
       phase: 'unpacking',
@@ -393,18 +394,15 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       unpackingProgress: 0
     })
 
-    // 如果有就删除，全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！
-    // 全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！
-    // 全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！全都删了！
-    if (existsSync(dirPath)) {
-      this._log.info(`存在旧的更新目录，删除旧的更新目录 ${dirPath}`)
-      rmSync(dirPath, { recursive: true, force: true })
+    if (fs.existsSync(extractedTo)) {
+      this._log.info(`存在旧的更新目录，删除旧的更新目录 ${extractedTo}`)
+      fs.rmSync(extractedTo, { recursive: true, force: true })
     }
 
     const asyncTask = new Promise<string>((resolve, reject) => {
-      this._log.info(`开始解压更新包 ${filepath} 到 ${dirPath}, 使用 ${sevenBinPath}`)
+      this._log.info(`开始解压更新包 ${filepath} 到 ${extractedTo}, 使用 ${sevenBinPath}`)
 
-      const seven = extractFull(join(filepath), dirPath, {
+      const seven = extractFull(filepath, extractedTo, {
         $bin: sevenBinPath.replace('app.asar', 'app.asar.unpacked'),
         $progress: true
       })
@@ -413,6 +411,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         const error = new Error('Unpacking canceled')
         error.name = 'Canceled'
         seven.destroy(error)
+        this._log.info(`取消解压更新包 ${filepath}`)
       }
 
       seven.on('progress', (progress) => {
@@ -438,7 +437,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           unpackingProgress: 1
         })
 
-        resolve(dirPath)
+        rmSync(filepath, { force: true })
+        resolve(extractedTo)
       })
 
       seven.on('error', (error) => {
@@ -461,8 +461,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           this._log.error(`解压更新包失败 ${formatError(error)}`)
         }
 
-        if (existsSync(filepath)) {
-          rmSync(filepath, { force: true })
+        if (fs.existsSync(filepath)) {
+          fs.rmSync(filepath, { force: true })
         }
 
         reject(error)
@@ -472,127 +472,30 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     return asyncTask
   }
 
-  private _applyUpdatesOnNextStartup(newUpdateDir: string, shouldStartNewApp: boolean = false) {
-    if (!existsSync(newUpdateDir)) {
+  private _applyUpdatesOnNextStartup(newUpdateDir: string, _shouldStartNewApp: boolean = false) {
+    if (!fs.existsSync(newUpdateDir)) {
       this.state.setUpdateProgressInfo(null)
       this._log.error(`更新目录不存在 ${newUpdateDir}`)
       throw new Error(`No such directory ${newUpdateDir}`)
     }
 
+    const copiedScriptPath = path.join(app.getPath('temp'), SelfUpdateMain.UPDATE_SCRIPT_NAME)
+
+    fs.copyFileSync(updateScriptPath, copiedScriptPath)
+
+    this._log.info(`写入更新脚本 ${copiedScriptPath}`)
+
     const appExePath = app.getPath('exe')
+    const appDir = path.dirname(appExePath)
 
-    const appDir = dirname(appExePath)
-    const appDirParent = dirname(appDir)
-    const newUpdateDirParent = dirname(newUpdateDir)
-    const appOriginalBasename = basename(appDir)
-
-    /**
-     * 1. 等待退出 League Akari 主进程
-     * 2. 复制解压后的新更新目录到 League Akari 所在的父目录，使用随机目录名
-     * 3. 删除原来的 League Akari 目录
-     * 4. 重命名新更新的目录为原来的 League Akari 目录
-     * 5. 根据逻辑是否启动新的 League Akari
-     * 6. 删除下载的更新包
-     */
-    const generatedPowershellScript = `
-  $processName = "LeagueAkari"
-  
-  Write-Output "Waiting for quit: LeagueAkari.exe"
-  Wait-Process -Name $processName -ErrorAction SilentlyContinue
-  
-  $sourceDir = "${newUpdateDir}"
-  $targetDir = "${appDirParent}"
-  $updateDir = "${newUpdateDirParent}"
-  $originalDirName = "${appOriginalBasename}"
-  $shouldStartProcess = $${shouldStartNewApp}
-  
-  function Get-RandomValidDirectoryName {
-      param (
-          [string]$targetDir
-      )
-      do {
-          $randomDirName = "NEW_AKARI_" + -join ((65..90) + (97..122) + (48..57) | Get-Random -Count 8 | % {[char]$_})
-          $newDirPath = Join-Path -Path $targetDir -ChildPath $randomDirName
-      } while (Test-Path -Path $newDirPath)
-      return $randomDirName
-  }
-  
-  $randomDirName = Get-RandomValidDirectoryName -targetDir $targetDir
-  
-  Write-Output "Copying files from $sourceDir to $targetDir\\$randomDirName..."
-  Try {
-      Copy-Item -Path $sourceDir -Destination "$targetDir\\$randomDirName" -Recurse -Force
-  } Catch {
-      Write-Output "Error copying files: $_"
-      Exit
-  }
-  
-  Write-Output "Removing original directory $targetDir\\$originalDirName..."
-  Try {
-      Remove-Item -Path "$targetDir\\$originalDirName" -Recurse -Force
-  } Catch {
-      Write-Output "Error removing original directory: $_"
-      Exit
-  }
-  
-  Write-Output "Renaming $targetDir\\$randomDirName to $originalDirName..."
-  Try {
-      Rename-Item -Path "$targetDir\\$randomDirName" -NewName $originalDirName
-  } Catch {
-      Write-Output "Error renaming directory: $_"
-      Exit
-  }
-  
-  
-  Write-Output "Removing update directory $updateDir..."
-  Try {
-      Remove-Item -Path "$updateDir" -Recurse -Force
-  } Catch {
-      Write-Output "Error removing update directory: $_"
-      Exit
-  }
-  
-  
-  if ($shouldStartProcess -eq $true) {
-      Write-Output "Starting: LeagueAkari.exe - Akari~"
-      Try {
-          Start-Process -FilePath "$targetDir\\$originalDirName\\$processName"
-      } Catch {
-          Write-Output "Error starting process: $_"
-          Exit
-      }
-  }
-  
-  Write-Output "Cleaning up script..."
-  Try {
-      Remove-Item -Path $MyInvocation.MyCommand.Path -Force
-  } Catch {
-      Write-Output "Error cleaning up script: $_"
-      Exit
-  }
-  `
-
-    this._log.info(
-      `generatedPowershellScript=${generatedPowershellScript}, appDirName=${appOriginalBasename}, appDirParent=${appDirParent}, newUpdateDir=${newUpdateDir}, shouldStartNewApp=${shouldStartNewApp}, appExePath=${appExePath}, appDir=${appDir}, newUpdateDirParent=${newUpdateDirParent}`
-    )
-
-    const scriptPath = join(app.getPath('temp'), SelfUpdateMain.UPDATE_SCRIPT_NAME)
-
-    const bom = Buffer.from([0xef, 0xbb, 0xbf])
-    const scriptFileWithBom = Buffer.concat([bom, Buffer.from(generatedPowershellScript, 'utf-8')])
-
-    writeFileSync(scriptPath, scriptFileWithBom)
-
-    this._log.info(`写入更新脚本 ${scriptPath}`)
-
-    if (this._lastQuitTask) {
+    if (this._updateOnQuitFn) {
       this._log.info(`存在上一个退出更新任务，移除上一个退出任务`)
     }
 
-    this._log.info(`添加退出任务: 更新脚本 ${scriptPath}`)
+    this._log.info(`添加退出任务: 更新脚本 ${copiedScriptPath}`)
 
-    const _quitTask = () => {
-      const c = spawn(`powershell.exe`, ['-ExecutionPolicy', 'Bypass', '-File', scriptPath], {
+    const _updateOnQuitFn = () => {
+      const c = spawn(`cmd.exe`, [newUpdateDir, appDir, SelfUpdateMain.EXECUTABLE_NAME], {
         detached: true,
         stdio: 'ignore',
         shell: true,
@@ -602,7 +505,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       c.unref()
     }
 
-    this._lastQuitTask = _quitTask
+    this._updateOnQuitFn = _updateOnQuitFn
 
     this.state.setUpdateProgressInfo({
       phase: 'waiting-for-restart',
@@ -614,17 +517,23 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     })
 
     this._currentUpdateTaskCanceler = () => {
-      if (existsSync(scriptPath)) {
-        rmSync(scriptPath)
+      if (fs.existsSync(copiedScriptPath)) {
+        fs.rmSync(copiedScriptPath)
       }
 
-      if (existsSync(newUpdateDirParent)) {
-        rmSync(newUpdateDirParent, { recursive: true, force: true })
+      if (fs.existsSync(newUpdateDir)) {
+        fs.rmSync(newUpdateDir, { recursive: true, force: true })
       }
 
       this._currentUpdateTaskCanceler = null
-      this._lastQuitTask = null
+      this._updateOnQuitFn = null
       this.state.setUpdateProgressInfo(null)
+
+      this._log.info(
+        `取消退出更新任务`,
+        `删除更新脚本 ${copiedScriptPath}`,
+        `删除更新目录 ${newUpdateDir}`
+      )
     }
   }
 
@@ -647,7 +556,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     let unpackedPath: string
     try {
-      unpackedPath = await this._unpackDownloadedUpdate(downloadPath)
+      unpackedPath = await this._unpackDownloadedUpdate(downloadPath, filename)
     } catch {
       return
     }
@@ -659,12 +568,17 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
   private _cancelUpdateProcess() {
     if (this._currentUpdateTaskCanceler) {
-      this._currentUpdateTaskCanceler()
+      try {
+        this._currentUpdateTaskCanceler()
+      } catch (error) {
+        this._ipc.sendEvent(SelfUpdateMain.id, 'error-cancel-update', formatError(error))
+        this._log.warn(`尝试取消更新任务时发生错误`, error)
+      }
     }
   }
 
   private _handleIpcCall() {
-    this._ipc.onCall(SelfUpdateMain.id, 'check-updates', async () => {
+    this._ipc.onCall(SelfUpdateMain.id, 'checkUpdates', async () => {
       const updateType = this._updateReleaseUpdatesInfo()
       if (this.state.newUpdates && this.settings.autoDownloadUpdates) {
         await this._startUpdateProcess(
@@ -675,7 +589,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       return updateType
     })
 
-    this._ipc.onCall(SelfUpdateMain.id, 'start-update', async () => {
+    this._ipc.onCall(SelfUpdateMain.id, 'startUpdate', async () => {
       if (this.state.newUpdates) {
         await this._startUpdateProcess(
           this.state.newUpdates.downloadUrl,
@@ -684,7 +598,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       }
     })
 
-    this._ipc.onCall(SelfUpdateMain.id, 'set-read', async (sha: string) => {
+    this._ipc.onCall(SelfUpdateMain.id, 'setAnnouncementRead', async (sha: string) => {
       if (this.state.currentAnnouncement) {
         this.state.setAnnouncementRead(true)
         await this._setting._saveToStorage('lastReadAnnouncementSha', sha)
@@ -698,12 +612,21 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(SelfUpdateMain.id, 'openNewUpdatesDir', () => {
-      const p = join(app.getPath('userData'), SelfUpdateMain.DOWNLOAD_DIR_NAME)
+      const p = path.join(app.getPath('userData'), SelfUpdateMain.DOWNLOAD_DIR_NAME)
       return shell.openPath(p)
     })
   }
 
+  async onInit() {
+    await this._handleState()
+    this._handlePeriodicCheck()
+    this._handleIpcCall()
+  }
+
   async onDispose() {
-    this._lastQuitTask?.()
+    this._updateOnQuitFn?.()
+    this._cancelUpdateProcess()
+    this._checkUpdateTimerId && clearInterval(this._checkUpdateTimerId)
+    this._checkAnnouncementTimerId && clearInterval(this._checkAnnouncementTimerId)
   }
 }

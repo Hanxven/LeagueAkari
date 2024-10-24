@@ -46,7 +46,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
         standardName: ''
       }
 
-      input.OnKeyEvent((key) => {
+      input.onKeyEvent((key) => {
         const [keyCodeRaw, state] = key.split(',')
 
         const keyCode = parseInt(keyCodeRaw)

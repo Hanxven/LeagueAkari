@@ -42,7 +42,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     'app-common-main',
     'logger-factory-main',
     'mobx-utils-main',
-    'league-client-ux-main'
+    'league-client-ux-main',
+    'setting-factory-main'
   ]
 
   static INTERNAL_TIMEOUT = 12500
@@ -414,11 +415,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
           return true
         }
 
-        if (error.response.status >= 400 && error.response.status < 500) {
-          return false
-        }
-
-        return true
+        return !(error.response.status >= 400 && error.response.status < 500)
       }
     })
 

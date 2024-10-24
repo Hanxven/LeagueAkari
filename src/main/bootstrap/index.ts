@@ -18,6 +18,7 @@ import { RiotClientMain } from '@main/shards/riot-client'
 import { SavedPlayerMain } from '@main/shards/saved-player'
 import { SelfUpdateMain } from '@main/shards/self-update'
 import { SettingFactoryMain } from '@main/shards/setting-factory'
+import { SettingMigrateMain } from '@main/shards/setting-migrate'
 import { SgpMain } from '@main/shards/sgp'
 import { StorageMain } from '@main/shards/storage'
 import { TrayMain } from '@main/shards/tray'
@@ -31,10 +32,10 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { app, dialog, protocol } from 'electron'
 import { configure } from 'mobx'
 import EventEmitter from 'node:events'
-import { Logger } from 'winston'
+import { Logger, level } from 'winston'
 
-import toolkit from '../../native/laToolkitWin32x64.node'
-import { readBaseConfig, writeBaseConfig } from './base-config'
+import toolkit from '../native/la-tools-win64.node'
+import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
 
 interface AkariAppEventMap {
   'second-instance': [commandLine: string[], workingDirectory: string]
@@ -61,9 +62,20 @@ declare module '@shared/akari-shard/manager' {
      * 基础全局设置
      */
     baseConfig: {
-      value: any
-      write: (config: any) => void
+      value: BaseConfig | null
+      write: (config: BaseConfig) => void
     }
+
+    /**
+     * 退出应用
+     */
+    quit: () => void
+
+    /**
+     * app.relaunch() + app.quit()
+     * @returns
+     */
+    restart: () => void
   }
 }
 
@@ -148,6 +160,11 @@ export function bootstrap() {
       write: (config: any) => writeBaseConfig(config)
     }
     manager.global.isAdministrator = isAdministrator
+    manager.global.quit = () => app.quit()
+    manager.global.restart = () => {
+      app.relaunch()
+      app.quit()
+    }
 
     manager.use(
       // basic fundamental shards
@@ -155,10 +172,12 @@ export function bootstrap() {
       AppCommonMain,
       LoggerFactoryMain,
       MobxUtilsMain,
+      // SettingMigrateMain, // TODO
       SettingFactoryMain,
       StorageMain,
 
       // connection & data provider shards
+      AkariProtocolMain,
       GameClientMain,
       LeagueClientMain,
       LeagueClientUxMain,
@@ -173,7 +192,6 @@ export function bootstrap() {
       // functional shards
       AutoGameflowMain,
       AutoReplyMain,
-      AutoSelectMain,
       AutoSelectMain,
       OngoingGameMain,
       RespawnTimerMain,
@@ -203,7 +221,8 @@ export function bootstrap() {
           namespace: 'akari-shard-manager'
         })
         dialog.showErrorBox('功能初始化时出现错误', formatError(error))
-        app.exit(10002)
+        logger.on('finish', () => app.exit(10002))
+        logger.end()
       }
     })
 
@@ -230,6 +249,10 @@ export function bootstrap() {
         .finally(() => {
           shardDisposed = true
           events.removeAllListeners()
+          logger.info({
+            message: `应用退出`,
+            namespace: 'bootstrap'
+          })
           logger.on('finish', () => app.quit())
           logger.end()
         })
@@ -240,6 +263,7 @@ export function bootstrap() {
       namespace: 'bootstrap'
     })
     dialog.showErrorBox('应用启动时出现错误', formatError(error))
-    app.exit(10001)
+    logger.on('finish', () => app.exit(10001))
+    logger.end()
   }
 }

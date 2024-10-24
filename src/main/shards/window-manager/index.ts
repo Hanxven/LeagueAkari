@@ -8,9 +8,8 @@ import icon from '../../../../resources/LA_ICON.ico?asset'
 import opggIcon from '../../../../resources/OPGG_ICON.ico?asset'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
-import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
+import { AkariLogger } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
-import { SettingFactoryMain } from '../setting-factory'
 import { MobxSettingService } from '../setting-factory/mobx-setting-service'
 import { WindowManagerSettings, WindowManagerState } from './state'
 
@@ -103,6 +102,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._handleMainWindowIpcCall()
     this._handleAuxWindowIpcCall()
     this._handleAuxWindowObservations()
+
+    this.createMainWindow()
   }
 
   private _handleMainWindowIpcCall() {

@@ -10,7 +10,7 @@ import { WindowManagerMain } from '../window-manager'
  */
 export class TrayMain implements IAkariShardInitDispose {
   static id = 'tray-main'
-  static dependencies = ['window-manager-main']
+  static dependencies = ['window-manager-main', 'mobx-utils-main']
 
   private readonly _wm: WindowManagerMain
   private readonly _mobx: MobxUtilsMain

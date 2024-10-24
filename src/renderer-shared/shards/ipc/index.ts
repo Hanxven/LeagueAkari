@@ -1,10 +1,18 @@
+import { ElectronAPI } from '@electron-toolkit/preload'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { IpcRendererEvent, ipcRenderer } from 'electron'
+import { IpcRenderer, IpcRendererEvent } from 'electron'
+
+declare global {
+  interface Window {
+    electron: ElectronAPI
+  }
+}
 
 export class AkariIpcRenderer implements IAkariShardInitDispose {
   static id = 'akari-ipc-renderer'
 
   private _eventMap = new Map<string, Set<Function>>()
+  private _cancelFn: (() => void) | null = null
 
   private _dispatchEvent(
     _event: IpcRendererEvent,
@@ -23,14 +31,15 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    ipcRenderer.on('akari-event', this._dispatchEvent)
-    await ipcRenderer.invoke('akariRendererRegister', 'register')
+    this._cancelFn = window.electron.ipcRenderer.on('akari-event', this._dispatchEvent)
+    await window.electron.ipcRenderer.invoke('akariRendererRegister', 'register')
   }
 
   async onDispose() {
-    ipcRenderer.off('akari-event', this._dispatchEvent)
-    await ipcRenderer.invoke('akariRendererRegister', 'unregister')
+    this._cancelFn?.()
+    this._cancelFn = null
     this._eventMap.clear()
+    await window.electron.ipcRenderer.invoke('akariRendererRegister', 'unregister')
   }
 
   /**
@@ -41,7 +50,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
    * @returns
    */
   call<T = any>(namespace: string, fnName: string, ...args: any[]) {
-    return ipcRenderer.invoke('akariCall', namespace, fnName, ...args) as Promise<T>
+    return window.electron.ipcRenderer.invoke('akariCall', namespace, fnName, ...args) as Promise<T>
   }
 
   /**
@@ -80,5 +89,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
     }
   }
 
-  constructor() {}
+  constructor() {
+    this._dispatchEvent = this._dispatchEvent.bind(this)
+  }
 }

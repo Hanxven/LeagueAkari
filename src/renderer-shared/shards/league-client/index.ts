@@ -10,16 +10,18 @@ export const MAIN_SHARD_NAMESPACE = 'league-client-main'
 
 export class LeagueClientRenderer {
   static id = 'league-client-renderer'
-  static dependencies = ['pinia-mobx-utils-renderer', 'akari-ipc-renderer', 'setting-utils']
+  static dependencies = [
+    'pinia-mobx-utils-renderer',
+    'akari-ipc-renderer',
+    'setting-utils-renderer'
+  ]
 
   private readonly _ipc: AkariIpcRenderer
   private readonly _pm: PiniaMobxUtilsRenderer
   private readonly _setting: SettingUtilsRenderer
 
   public readonly api = new LeagueClientHttpApiAxiosHelper(
-    axios.create({
-      baseURL: 'akari://league-client'
-    })
+    axios.create({ baseURL: 'akari://league-client' })
   )
 
   async onInit() {

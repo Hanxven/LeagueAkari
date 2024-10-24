@@ -147,15 +147,14 @@ export class AkariManager {
           instances[dep] = this._instances.get(dep)!
         } else {
           visited.add(dep)
-          stack.push(dep)
           instances[dep] = this._resolve(dep, visited, stack)
           visited.delete(dep)
         }
       }
     }
 
+    stack.push(id)
     const instance = Object.keys(instances).length ? new cls(instances) : new cls()
-
     this._instances.set(id, instance)
 
     return instance
