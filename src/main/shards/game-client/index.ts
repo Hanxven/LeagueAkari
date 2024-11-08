@@ -103,8 +103,10 @@ export class GameClientMain implements IAkariShardInitDispose {
   private _handleTerminateGameClientOnAltF4() {
     // 松手时触发, 而非按下时触发
     this._kbd.events.on('last-active-shortcut', ({ id }) => {
-      if (id === 'LeftAlt+F4' || id === 'RightAlt+F4') {
-        this._terminateGameClient()
+      if (this.settings.terminateGameClientOnAltF4) {
+        if (id === 'LeftAlt+F4' || id === 'RightAlt+F4') {
+          this._terminateGameClient()
+        }
       }
     })
   }

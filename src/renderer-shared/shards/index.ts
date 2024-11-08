@@ -3,6 +3,12 @@ import { App, getCurrentInstance } from 'vue'
 
 import { LoggerRenderer } from './logger'
 
+declare module 'vue' {
+  export interface ComponentCustomProperties {
+    $akariManager: AkariManager
+  }
+}
+
 /**
  * Vue 版本插件工厂, 特别地, 日志工具被内置到支持中
  * @returns

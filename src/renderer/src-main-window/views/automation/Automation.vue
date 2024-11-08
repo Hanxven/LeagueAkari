@@ -1,13 +1,94 @@
 <template>
   <div class="automation-page">
-    <div class="sections"></div>
-    <div class="contents"></div>
+    <div class="sections">
+      <div class="section-icon-container">
+        <NIcon class="section-icon"><AiStatusIcon /></NIcon>
+        <span class="session-label">自动化</span>
+      </div>
+      <NTabs
+        v-model:value="currentTab"
+        :theme-overrides="{ tabGapMediumBar: '18px' }"
+        size="medium"
+      >
+        <NTab name="auto-gameflow">
+          <span class="tab-name">游戏流程</span>
+        </NTab>
+        <NTab name="auto-select" class="tab-name">
+          <span class="tab-name">英雄选择 / 禁用</span>
+        </NTab>
+        <NTab name="misc" class="tab-name">
+          <span class="tab-name">其他</span>
+        </NTab>
+      </NTabs>
+    </div>
+    <div class="contents">
+      <Transition name="move-fade">
+        <KeepAlive>
+          <AutoGameflow v-if="currentTab === 'auto-gameflow'" />
+          <AutoSelect v-else-if="currentTab === 'auto-select'" />
+          <AutoMisc v-else-if="currentTab === 'misc'" />
+        </KeepAlive>
+      </Transition>
+    </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
+import { AiStatus as AiStatusIcon } from '@vicons/carbon'
+import { NIcon, NTab, NTabs } from 'naive-ui'
+import { ref } from 'vue'
+
+import AutoGameflow from './AutoGameflow.vue'
+import AutoMisc from './AutoMisc.vue'
+import AutoSelect from './AutoSelect.vue'
+
+const currentTab = ref('auto-gameflow')
 </script>
 
 <style lang="less" scoped>
+.automation-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
+  .sections {
+    display: flex;
+    height: 52px;
+    padding: 0 24px;
+    align-items: flex-end;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .contents {
+    flex: 1;
+    height: 0;
+  }
+}
+
+.tab-name {
+  font-weight: bold;
+}
+
+.section-icon-container {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: 24px;
+  margin-bottom: 4px;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.8);
+
+  .section-icon {
+    font-size: 24px;
+  }
+
+  .session-label {
+    font-size: 16px;
+    font-weight: bold;
+  }
+}
+
+.transition-single-root {
+  height: 100%;
+}
 </style>

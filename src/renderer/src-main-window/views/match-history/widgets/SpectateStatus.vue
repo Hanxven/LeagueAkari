@@ -59,7 +59,7 @@
             <LcuImage
               class="champion-icon"
               v-for="ban of bans"
-              :src="championIconUrl(ban.championId)"
+              :src="championIconUri(ban.championId)"
             />
           </div>
         </div>
@@ -73,9 +73,9 @@
             <LcuImage
               v-if="isTftMode"
               class="champion-icon"
-              :src="profileIconUrl(player.profileIconId)"
+              :src="profileIconUri(player.profileIconId)"
             />
-            <LcuImage v-else class="champion-icon" :src="championIconUrl(player.championId)" />
+            <LcuImage v-else class="champion-icon" :src="championIconUri(player.championId)" />
             <div
               class="player-name"
               @click="() => emits('toSummoner', player.puuid)"
@@ -105,7 +105,7 @@
         <LcuImage
           class="champion-icon"
           v-for="ban of data.game.bannedChampions"
-          :src="championIconUrl(ban.championId)"
+          :src="championIconUri(ban.championId)"
         />
       </div>
     </div>
@@ -132,7 +132,7 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl, profileIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
 import { PlayCircleFilled as PlayCircleFilledIcon } from '@vicons/material'

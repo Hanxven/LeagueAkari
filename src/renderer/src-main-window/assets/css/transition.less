@@ -1,0 +1,29 @@
+.fade-enter-active {
+  position: relative;
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+}
+
+.fade-enter-to {
+  opacity: 1;
+}
+
+.move-fade-enter-active {
+  position: relative;
+  transition:
+    opacity 0.2s ease,
+    top 0.3s cubic-bezier(0.19, 1, 0.22, 1); // cubic copied from OpenAI
+}
+
+.move-fade-enter-from {
+  top: 12px;
+  opacity: 0;
+}
+
+.move-fade-enter-to {
+  top: 0;
+  opacity: 1;
+}

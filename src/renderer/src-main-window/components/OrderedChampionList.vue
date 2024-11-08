@@ -19,7 +19,7 @@
     >
     <div class="champions">
       <LcuImage
-        :src="championIconUrl(c)"
+        :src="championIconUri(c)"
         class="champion"
         :title="lcs.gameData.champions[c]?.name"
         :class="{
@@ -42,7 +42,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { maybePveChampion } from '@shared/types/league-client/game-data'
 import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
 import {
@@ -151,7 +151,7 @@ const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
     },
     [
       h(LcuImage, {
-        src: championIconUrl(option.value as number),
+        src: championIconUri(option.value as number),
         style: { width: '18px', height: '18px' }
       }),
       h('span', { style: { 'margin-left': '4px', 'font-size': '13px' } }, option.label)
@@ -187,7 +187,7 @@ const renderTargetLabel: TransferRenderTargetLabel = ({ option }) => {
     },
     [
       h(LcuImage, {
-        src: championIconUrl(option.value as number),
+        src: championIconUri(option.value as number),
         style: { width: '18px', height: '18px' }
       }),
       h('span', { style: { 'margin-left': '4px', 'font-size': '13px' } }, option.label),

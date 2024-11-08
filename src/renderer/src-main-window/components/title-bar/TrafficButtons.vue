@@ -113,6 +113,7 @@ const handleReallyClose = async () => {
 .traffic-buttons {
   height: 100%;
   display: flex;
+  z-index: 10000000;
 
   &.blurred {
     filter: brightness(0.8);

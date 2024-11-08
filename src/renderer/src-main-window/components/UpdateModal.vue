@@ -20,7 +20,7 @@
       <div v-else class="para">当前版本：{{ sus.newUpdates.currentVersion }}</div>
       <div>
         <a class="small-link" target="_blank" :href="sus.newUpdates.releaseNotesUrl"
-          >{{ sus.newUpdates.source === 'github' ? 'Github' : 'Gitee' }} 发布页面</a
+          >{{ sus.newUpdates.source === 'github' ? 'GitHub' : 'Gitee' }} 发布页面</a
         >
         <a
           v-if="sus.newUpdates.downloadUrl"
@@ -28,7 +28,7 @@
           style="margin-left: 8px"
           target="_blank"
           :href="sus.newUpdates.downloadUrl"
-          >{{ sus.newUpdates.source === 'github' ? 'Github' : 'Gitee' }} 下载</a
+          >{{ sus.newUpdates.source === 'github' ? 'GitHub' : 'Gitee' }} 下载</a
         >
       </div>
       <NScrollbar

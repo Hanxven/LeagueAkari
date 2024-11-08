@@ -1,148 +1,153 @@
 <template>
-  <NScrollbar class="outer-wrapper">
-    <div class="inner-wrapper">
-      <NCard size="small">
-        <template #header><span class="card-header-title">League Client</span></template>
-        <ControlItem
-          class="control-item-margin"
-          label="断开连接"
-          label-description="断开 League Akari 与游戏客户端的连接"
-          :label-width="320"
-        >
-          <NButton
-            :disabled="lcs.connectionState !== 'connected'"
-            size="small"
-            secondary
-            type="warning"
-            @click="handleDisconnect"
-            >断开</NButton
+  <div class="single-root">
+    <NScrollbar class="outer-wrapper">
+      <div class="inner-wrapper">
+        <NCard size="small">
+          <template #header><span class="card-header-title">League Client</span></template>
+          <ControlItem
+            class="control-item-margin"
+            label="断开连接"
+            label-description="断开 League Akari 与 League Client 的连接"
+            :label-width="320"
           >
-        </ControlItem>
-        <ControlItem
-          class="control-item-margin"
-          label="关闭客户端进程"
-          label-description="关闭 LeagueClient"
-          :label-width="320"
-        >
-          <NButton
-            :disabled="lcs.connectionState !== 'connected'"
-            size="small"
-            secondary
-            type="warning"
-            @click="handleQuitClient"
-            >关闭 Client 进程</NButton
-          >
-        </ControlItem>
-        <ControlItem
-          class="control-item-margin"
-          label-description="当游戏端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏端 (游戏本体) 进程。请注意，此操作为强制结束进程，而非正常的游戏退出流程，可能产生意料之外的副作用"
-          :disabled="!as.isAdministrator"
-          :label="
-            as.isAdministrator
-              ? '使用 Alt+F4 结束游戏端'
-              : '使用 Alt+F4 结束游戏端 (需要管理员权限)'
-          "
-          :label-width="320"
-        >
-          <NSwitch
-            :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
-            size="small"
-            type="warning"
-            :value="gcs.settings.terminateGameClientOnAltF4"
-            @update:value="(v) => gc.setTerminateGameClientOnAltF4(v)"
-          />
-        </ControlItem>
-      </NCard>
-      <NCard size="small" style="margin-top: 8px">
-        <template #header><span class="card-header-title">League Client UX</span></template>
-        <ControlItem
-          class="control-item-margin"
-          :disabled="!as.isAdministrator"
-          :label="as.isAdministrator ? '调整窗口大小' : '调整窗口大小 (需要管理员权限)'"
-          label-description="FixLCUWindow - 以 WinAPI 方式调整窗口的大小。在客户端界面大小不正确时，可尝试此操作"
-          :label-width="320"
-        >
-          <div class="control" style="display: flex; gap: 4px; align-items: baseline">
-            <NInputNumber
-              style="width: 80px"
-              size="small"
-              :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
-              :show-button="false"
-              :min="1"
-              v-model:value="fixWindowMethodAOptions.baseWidth"
-              @keyup.enter="() => fixWindowInputButton2?.focus()"
-            >
-              <template #prefix>W</template>
-            </NInputNumber>
-            <NInputNumber
-              ref="input-2"
-              style="width: 80px"
-              :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
-              size="small"
-              :show-button="false"
-              :min="1"
-              v-model:value="fixWindowMethodAOptions.baseHeight"
-              @keyup.enter="() => handleFixWindowMethodA()"
-              ><template #prefix>H</template>
-            </NInputNumber>
             <NButton
-              :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
+              :disabled="lcs.connectionState !== 'connected'"
               size="small"
               secondary
               type="warning"
-              @click="handleFixWindowMethodA"
-              >调整</NButton
+              @click="handleDisconnect"
+              >断开</NButton
             >
-          </div>
-        </ControlItem>
-        <ControlItem
-          class="control-item-margin"
-          label="重启 UX 进程"
-          label-description="立即重启渲染进程。该操作不会影响正在进行中的活动，适用于修复客户端界面错误"
-          :label-width="320"
-        >
-          <NButton
-            :disabled="lcs.connectionState !== 'connected'"
-            size="small"
-            secondary
-            type="warning"
-            @click="handleRestartUx"
-            >重启 UX 进程</NButton
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            label="关闭客户端进程"
+            label-description="关闭 League Client"
+            :label-width="320"
           >
-        </ControlItem>
-        <ControlItem
-          class="control-item-margin"
-          label="结束 UX 进程"
-          label-description="立即关闭渲染进程。该操作不会影响正在进行中的活动"
-          :label-width="320"
-        >
-          <NButton
-            :disabled="lcs.connectionState !== 'connected'"
-            type="warning"
-            secondary
-            size="small"
-            @click="handleKillUx"
-            >结束 UX 进程</NButton
+            <NButton
+              :disabled="lcs.connectionState !== 'connected'"
+              size="small"
+              secondary
+              type="warning"
+              @click="handleQuitClient"
+              >关闭 Client 进程</NButton
+            >
+          </ControlItem>
+        </NCard>
+        <NCard size="small" style="margin-top: 8px">
+          <template #header><span class="card-header-title">游戏端</span></template>
+          <ControlItem
+            class="control-item-margin"
+            label-description="当游戏端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏端 (游戏本体) 进程。请注意，此操作为强制结束进程，而非正常的游戏退出流程，可能产生意料之外的副作用"
+            :disabled="!as.isAdministrator"
+            :label="
+              as.isAdministrator
+                ? '使用 Alt+F4 结束游戏端'
+                : '使用 Alt+F4 结束游戏端 (需要管理员权限)'
+            "
+            :label-width="320"
           >
-        </ControlItem>
-        <ControlItem
-          class="control-item-margin"
-          label="启动 UX 进程"
-          label-description="如果渲染进程已经关闭，则立即启动渲染进程"
-          :label-width="320"
-        >
-          <NButton
-            :disabled="lcs.connectionState !== 'connected'"
-            type="warning"
-            secondary
-            size="small"
-            @click="handleLaunchUx"
-            >启动 UX 进程</NButton
+            <NSwitch
+              :disabled="!as.isAdministrator"
+              size="small"
+              type="warning"
+              :value="gcs.settings.terminateGameClientOnAltF4"
+              @update:value="(v) => gc.setTerminateGameClientOnAltF4(v)"
+            />
+          </ControlItem>
+        </NCard>
+        <NCard size="small" style="margin-top: 8px">
+          <template #header><span class="card-header-title">League Client UX</span></template>
+          <ControlItem
+            class="control-item-margin"
+            :disabled="!as.isAdministrator"
+            :label="as.isAdministrator ? '调整窗口大小' : '调整窗口大小 (需要管理员权限)'"
+            label-description="FixLCUWindow - 以 WinAPI 方式调整窗口的大小。在客户端界面大小不正确时，可尝试此操作"
+            :label-width="320"
           >
-        </ControlItem>
-      </NCard>
-    </div>
-  </NScrollbar>
+            <div class="control" style="display: flex; gap: 4px; align-items: baseline">
+              <NInputNumber
+                style="width: 80px"
+                size="small"
+                :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
+                :show-button="false"
+                :min="1"
+                v-model:value="fixWindowMethodAOptions.baseWidth"
+                @keyup.enter="() => fixWindowInputButton2?.focus()"
+              >
+                <template #prefix>W</template>
+              </NInputNumber>
+              <NInputNumber
+                ref="input-2"
+                style="width: 80px"
+                :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
+                size="small"
+                :show-button="false"
+                :min="1"
+                v-model:value="fixWindowMethodAOptions.baseHeight"
+                @keyup.enter="() => handleFixWindowMethodA()"
+                ><template #prefix>H</template>
+              </NInputNumber>
+              <NButton
+                :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
+                size="small"
+                secondary
+                type="warning"
+                @click="handleFixWindowMethodA"
+                >调整</NButton
+              >
+            </div>
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            label="重启 UX 进程"
+            label-description="立即重启渲染进程。该操作不会影响正在进行中的活动，适用于修复客户端界面错误"
+            :label-width="320"
+          >
+            <NButton
+              :disabled="lcs.connectionState !== 'connected'"
+              size="small"
+              secondary
+              type="warning"
+              @click="handleRestartUx"
+              >重启 UX 进程</NButton
+            >
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            label="结束 UX 进程"
+            label-description="立即关闭渲染进程。该操作不会影响正在进行中的活动"
+            :label-width="320"
+          >
+            <NButton
+              :disabled="lcs.connectionState !== 'connected'"
+              type="warning"
+              secondary
+              size="small"
+              @click="handleKillUx"
+              >结束 UX 进程</NButton
+            >
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            label="启动 UX 进程"
+            label-description="如果渲染进程已经关闭，则立即启动渲染进程"
+            :label-width="320"
+          >
+            <NButton
+              :disabled="lcs.connectionState !== 'connected'"
+              type="warning"
+              secondary
+              size="small"
+              @click="handleLaunchUx"
+              >启动 UX 进程</NButton
+            >
+          </ControlItem>
+        </NCard>
+      </div>
+    </NScrollbar>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -284,5 +289,9 @@ const handleFixWindowMethodA = async () => {
 .card-header-title {
   font-weight: bold;
   font-size: 18px;
+}
+
+.single-root {
+  height: 100%;
 }
 </style>

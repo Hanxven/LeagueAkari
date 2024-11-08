@@ -59,7 +59,7 @@
       </ControlItem>
       <ControlItem class="control-item-margin" label="使用 SGP API" :label-width="320">
         <template #labelDescription>
-          <div>优先使用 SGP API 查询对局数据，若失败则使用默认 API</div>
+          <div>对局分析优先使用 SGP API 查询对局，若当前 SGP API 不可用，则使用 LCU API</div>
           <div
             class="unsupported-sgp-server"
             v-if="sgps.availability.region && !sgps.availability.serversSupported.matchHistory"

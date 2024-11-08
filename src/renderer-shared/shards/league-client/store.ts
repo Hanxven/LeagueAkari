@@ -16,7 +16,7 @@ import { LoginQueueState } from '@shared/types/league-client/login'
 import { GetSearch, ReadyCheck } from '@shared/types/league-client/matchmaking'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { defineStore } from 'pinia'
-import { shallowReactive, shallowRef } from 'vue'
+import { computed, shallowReactive, shallowRef } from 'vue'
 
 // copied
 export type LcConnectionStateType = 'connecting' | 'connected' | 'disconnected'
@@ -37,6 +37,8 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
   const connectionState = shallowRef<LcConnectionStateType>('disconnected')
   const auth = shallowRef<UxCommandLine | null>(null)
   const connectingClient = shallowRef<UxCommandLine | null>(null)
+
+  const isConnected = computed(() => connectionState.value === 'connected')
 
   const settings = shallowReactive({
     autoConnect: false
@@ -115,6 +117,7 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     settings,
 
     connectionState,
+    isConnected, // for convenience
     auth,
     connectingClient
   }

@@ -4,5 +4,4 @@ out
 *.log*
 examples
 images
-addons-new/build
 addons/build

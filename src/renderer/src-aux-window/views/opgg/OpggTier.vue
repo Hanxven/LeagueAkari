@@ -25,7 +25,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
 import { useMediaQuery } from '@vueuse/core'
 import {
@@ -110,7 +110,7 @@ const columns: DataTableColumns<any> = [
         [
           h(LcuImage, {
             class: [styles.image],
-            src: championIconUrl(row.id)
+            src: championIconUri(row.id)
           }),
           h(
             'div',
@@ -319,7 +319,7 @@ const countersColumn: DataTableColumn<any> = {
         position.counters.slice(0, 3).map((c: any) => {
           return h(LcuImage, {
             style: { width: '18px', height: '18px' },
-            src: championIconUrl(c.champion_id)
+            src: championIconUri(c.champion_id)
           })
         })
       )

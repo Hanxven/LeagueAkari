@@ -21,7 +21,7 @@ export class LeagueClientRenderer {
   private readonly _setting: SettingUtilsRenderer
 
   public readonly api = new LeagueClientHttpApiAxiosHelper(
-    axios.create({ baseURL: 'akari://league-client' })
+    axios.create({ baseURL: 'akari://league-client', adapter: 'fetch' })
   )
 
   async onInit() {
@@ -44,6 +44,10 @@ export class LeagueClientRenderer {
     this._pm = deps['pinia-mobx-utils-renderer']
     this._ipc = deps['akari-ipc-renderer']
     this._setting = deps['setting-utils-renderer']
+  }
+
+  url(uri: string) {
+    return new URL(uri, 'akari://league-client').href
   }
 
   setAutoConnect(enabled: boolean) {

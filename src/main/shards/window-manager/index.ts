@@ -1,6 +1,7 @@
 import { is } from '@electron-toolkit/utils'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { BrowserWindow, Event, Rectangle, app, dialog, screen, shell } from 'electron'
+import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
+import { BrowserWindow, Event, Rectangle, dialog, screen, shell } from 'electron'
 import { comparer, computed } from 'mobx'
 import { join } from 'node:path'
 
@@ -465,18 +466,22 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._mw.on('page-title-updated', (e) => e.preventDefault())
 
     this._mw.webContents.setWindowOpenHandler((details) => {
-      const response = dialog.showMessageBoxSync({
-        type: 'question',
-        buttons: ['是', '否'],
-        defaultId: 0,
-        title: '确认',
-        message: `将跳转到外部链接 ${new URL(details.url).origin}`,
-        detail: details.url
-      })
-
-      if (response === 0) {
-        shell.openExternal(details.url)
-      }
+      dialog
+        .showMessageBox({
+          type: 'question',
+          buttons: ['是', '否'],
+          defaultId: 0,
+          title: '确认',
+          message: details.url.startsWith(LEAGUE_AKARI_GITHUB)
+            ? '将转到 League Akari 的项目主页 ❤️'
+            : `将跳转到外部链接 ${new URL(details.url).origin}`,
+          detail: details.url
+        })
+        .then((r) => {
+          if (r.response === 0) {
+            shell.openExternal(details.url)
+          }
+        })
 
       return { action: 'deny' }
     })
@@ -536,18 +541,22 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     })
 
     this._aw.webContents.setWindowOpenHandler((details) => {
-      const response = dialog.showMessageBoxSync({
-        type: 'question',
-        buttons: ['是', '否'],
-        defaultId: 0,
-        title: '确认',
-        message: `将跳转到外部链接 ${new URL(details.url).origin}`,
-        detail: details.url
-      })
-
-      if (response === 0) {
-        shell.openExternal(details.url)
-      }
+      dialog
+        .showMessageBox({
+          type: 'question',
+          buttons: ['是', '否'],
+          defaultId: 0,
+          title: '确认',
+          message: details.url.startsWith(LEAGUE_AKARI_GITHUB)
+            ? '将转到 League Akari 的项目主页 ❤️'
+            : `将跳转到外部链接 ${new URL(details.url).origin}`,
+          detail: details.url
+        })
+        .then((r) => {
+          if (r.response === 0) {
+            shell.openExternal(details.url)
+          }
+        })
 
       return { action: 'deny' }
     })

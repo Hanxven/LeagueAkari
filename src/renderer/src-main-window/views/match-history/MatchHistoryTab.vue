@@ -25,7 +25,7 @@
         <div class="header-simplified-inner">
           <LcuImage
             class="small-profile-icon"
-            :src="tab.summoner ? profileIconUrl(tab.summoner.profileIconId) : undefined"
+            :src="tab.summoner ? profileIconUri(tab.summoner.profileIconId) : undefined"
           />
           <span class="small-game-name">{{ tab.summoner?.gameName }}</span>
           <span class="small-tag-line">#{{ tab.summoner?.tagLine }}</span>
@@ -82,7 +82,7 @@
             <div class="profile-image">
               <LcuImage
                 class="profile-image-icon"
-                :src="tab.summoner ? profileIconUrl(tab.summoner.profileIconId) : undefined"
+                :src="tab.summoner ? profileIconUri(tab.summoner.profileIconId) : undefined"
               />
               <div class="profile-image-lv" v-if="tab.summoner">
                 {{ tab.summoner.summonerLevel }}
@@ -389,7 +389,7 @@
                         <div class="champion-slot">
                           <LcuImage
                             style="width: 100%; height: 100%"
-                            :src="championIconUrl(c.id)"
+                            :src="championIconUri(c.id)"
                           />
                           <div class="champion-used-count">{{ c.count }}</div>
                         </div>
@@ -417,7 +417,7 @@
                 >
                   <LcuImage
                     style="width: 18px; height: 18px"
-                    :src="profileIconUrl(p.targetProfileIconId)"
+                    :src="profileIconUri(p.targetProfileIconId)"
                   />
                   <div
                     class="name-and-tag"
@@ -449,7 +449,7 @@
             />
             <div
               class="match-history-empty-placeholder"
-              v-if="!tab.matchHistoryPage || tab.matchHistoryPage.games.length"
+              v-if="!tab.matchHistoryPage || tab.matchHistoryPage.games.length === 0"
             >
               <NSpin v-if="tab.isLoadingMatchHistory" />
               <span v-else>暂无数据</span>
@@ -471,7 +471,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl, profileIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
@@ -973,11 +973,11 @@ const recentlyTeammates = computed(() => {
   return teammates
 })
 
-const { navigateToTab } = mh.useNavigateToTab()
+const { navigateToTabByPuuidAndSgpServerId } = mh.useNavigateToTab()
 
 const handleToSummoner = (puuid: string, newTab = true) => {
   if (newTab) {
-    navigateToTab(puuid, tab.sgpServerId)
+    navigateToTabByPuuidAndSgpServerId(puuid, tab.sgpServerId)
   } else {
     mh.createTab(puuid, tab.sgpServerId, false)
   }
@@ -1013,6 +1013,12 @@ const updateSpectatorData = async () => {
 
   try {
     const data = await sgp.getSpectatorGameflow(tab.puuid, tab.sgpServerId)
+
+    if (data === null) {
+      tab.spectatorData = null
+      return
+    }
+
     tab.spectatorData = markRaw(data)
   } catch (error) {
     if ((error as Error).name === 'AxiosError' && (error as any).response?.status === 404) {

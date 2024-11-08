@@ -32,7 +32,7 @@
             <td style="min-width: 100px">
               <div class="info">
                 <div class="champion">
-                  <LcuImage class="champion-icon" :src="championIconUrl(p.championId)" />
+                  <LcuImage class="champion-icon" :src="championIconUri(p.championId)" />
                   <div class="champion-level">{{ p.stats.champLevel }}</div>
                 </div>
                 <div class="summoner-spells">
@@ -148,7 +148,7 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
-import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game, Participant, ParticipantIdentity } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'

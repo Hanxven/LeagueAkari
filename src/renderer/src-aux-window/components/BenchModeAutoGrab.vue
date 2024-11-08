@@ -1,7 +1,7 @@
 <template>
   <NCard v-if="as2.settings.benchModeEnabled && isBenchMode" size="small">
     <NFlex align="center" class="min-height-container" v-if="as2.upcomingGrab">
-      <LcuImage class="image" :src="championIconUrl(as2.upcomingGrab?.championId)" />
+      <LcuImage class="image" :src="championIconUri(as2.upcomingGrab?.championId)" />
       <span class="label">即将选择 {{ willGrabIn.toFixed(1) }} s</span>
     </NFlex>
     <NFlex align="center" class="min-height-container" v-else>
@@ -17,7 +17,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { useIntervalFn } from '@vueuse/core'
 import { NCard, NFlex } from 'naive-ui'

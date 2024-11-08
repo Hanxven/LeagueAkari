@@ -1,9 +1,7 @@
 import vue from '@vitejs/plugin-vue'
-import history from 'connect-history-api-fallback'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig, externalizeDepsPlugin, swcPlugin } from 'electron-vite'
-import fs from 'node:fs'
 import { resolve } from 'path'
-import { Plugin, UserConfig } from 'vite'
 
 const minify = process.env.NODE_ENV === 'production'
 
@@ -81,6 +79,9 @@ export default defineConfig({
       swcPlugin(),
       vue({
         template: { compilerOptions: { isCustomElement: (tag) => LC_CUSTOM_TAGS.has(tag) } }
+      }),
+      vueJsx({
+        isCustomElement: (tag) => LC_CUSTOM_TAGS.has(tag)
       })
     ],
     build: {

@@ -17,7 +17,7 @@ const lcs = useLeagueClientStore()
 
 watchEffect(() => {
   if (lcs.connectionState === 'connected' && typeof props.src !== 'undefined') {
-    url.value = `akari://lcu${addLeadingSlash(props.src)}`
+    url.value = `akari://league-client${addLeadingSlash(props.src)}`
   } else {
     url.value = null
   }

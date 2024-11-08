@@ -40,16 +40,13 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
     })
 
     this._scope.run(() => {
-      watch(
-        () => store.rules.length,
-        (len) => {
-          if (len) {
-            this.setSendAllNativeLcuEvents(true)
-          } else {
-            this.setSendAllNativeLcuEvents(false)
-          }
+      watch([() => store.rules.length, () => store.printAll], ([len, printAll]) => {
+        if (len || printAll) {
+          this.setSendAllNativeLcuEvents(true)
+        } else {
+          this.setSendAllNativeLcuEvents(false)
         }
-      )
+      })
     })
   }
 

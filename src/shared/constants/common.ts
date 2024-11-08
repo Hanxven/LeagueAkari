@@ -4,6 +4,8 @@ export const LEAGUE_AKARI_DB_OLD_FILENAME = 'league-akari.db'
 
 export const LEAGUE_AKARI_DB_FILENAME = 'LeagueAkari.db'
 
+export const LEAGUE_AKARI_GITHUB = 'https://github.com/Hanxven/LeagueAkari'
+
 export const LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL =
   'https://api.github.com/repos/Hanxven/LeagueAkari/releases/latest'
 

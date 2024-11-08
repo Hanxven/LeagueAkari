@@ -292,7 +292,7 @@ export class LeagueClientSyncedData {
               try {
                 const pickables = (await this._i.api.champSelect.getPickableChampIds()).data
                 this.champSelect.setCurrentPickableChampionArray(pickables)
-                this._log.info(`加载可选用英雄列表, 共 ${pickables.length} 个`)
+                this._log.debug(`加载可选用英雄列表, 共 ${pickables.length} 个`)
               } catch (error) {
                 if (isAxiosError(error) && error.response?.status === 404) {
                   this.champSelect.setCurrentPickableChampionArray([])
@@ -307,7 +307,7 @@ export class LeagueClientSyncedData {
               try {
                 const bannables = (await this._i.api.champSelect.getBannableChampIds()).data
                 this.champSelect.setCurrentBannableChampionArray(bannables)
-                this._log.info(`加载可禁用英雄列表, 共 ${bannables.length} 个`)
+                this._log.debug(`加载可禁用英雄列表, 共 ${bannables.length} 个`)
               } catch (error) {
                 if (isAxiosError(error) && error.response?.status === 404) {
                   this.champSelect.setCurrentBannableChampionArray([])
@@ -374,7 +374,7 @@ export class LeagueClientSyncedData {
     this._mobx.reaction(
       () => selfSummonerExtracted.get(),
       (s) => {
-        this._log.info(`Self Summoner Cell: ${JSON.stringify(s)}`)
+        this._log.debug(`Self Summoner Cell: ${JSON.stringify(s)}`)
       },
       { equals: comparer.structural }
     )
@@ -397,11 +397,11 @@ export class LeagueClientSyncedData {
           try {
             const c = (await this._i.api.champSelect.getCurrentChamp()).data
             this.champSelect.setCurrentChampion(c)
-            this._log.info(`当前选择的英雄: ${c}`)
+            this._log.debug(`当前选择的英雄: ${this.gameData.champions[c]?.name || c}`)
           } catch (error) {
             if (isAxiosError(error) && error.response?.status === 404) {
               this.champSelect.setCurrentChampion(null)
-              this._log.info(`当前选择的英雄: 无`)
+              this._log.debug(`当前选择的英雄: 无`)
               return
             }
 
@@ -421,11 +421,11 @@ export class LeagueClientSyncedData {
           try {
             const c = (await this._i.api.champSelect.getDisabledChampions()).data
             this.champSelect.setDisabledChampionIds(c)
-            this._log.info(`已被禁用的英雄: ${c}`)
+            this._log.debug(`已被禁用的英雄: ${c}`)
           } catch (error) {
             if (isAxiosError(error) && error.response?.status === 404) {
               this.champSelect.setDisabledChampionIds([])
-              this._log.info(`已被禁用的英雄: 无`)
+              this._log.debug(`已被禁用的英雄: 无`)
               return
             }
 
@@ -451,7 +451,7 @@ export class LeagueClientSyncedData {
       if (event.eventType === 'Delete') {
         this.champSelect.setCurrentPickableChampionArray([])
       } else {
-        this._log.info(`更新可选用英雄列表, 共 ${event.data?.length} 个`)
+        this._log.debug(`更新可选用英雄列表, 共 ${event.data?.length} 个`)
         this.champSelect.setCurrentPickableChampionArray(event.data)
       }
     })
@@ -477,7 +477,7 @@ export class LeagueClientSyncedData {
       if (event.eventType === 'Delete') {
         this.champSelect.setCurrentBannableChampionArray([])
       } else {
-        this._log.info(`更新可禁用英雄列表, 共 ${event.data?.length} 个`)
+        this._log.debug(`更新可禁用英雄列表, 共 ${event.data?.length} 个`)
         this.champSelect.setCurrentBannableChampionArray(event.data)
       }
     })
@@ -508,7 +508,7 @@ export class LeagueClientSyncedData {
     )
 
     this._i.events.on<LcuEvent<number>>('/lol-champ-select/v1/current-champion', (event) => {
-      this._log.info(`当前选择的英雄: ${event.data}`)
+      this._log.debug(`当前选择的英雄: ${event.data}`)
 
       if (event.eventType === 'Delete') {
         this.champSelect.setCurrentChampion(null)
@@ -518,7 +518,9 @@ export class LeagueClientSyncedData {
     })
 
     this._i.events.on('/lol-champ-select/v1/disabled-champion-ids', (event) => {
-      this._log.info(`被禁用的英雄: ${event.data?.length}`)
+      if (event.data?.length !== 0) {
+        this._log.debug(`被禁用的英雄: ${event.data?.length}`)
+      }
 
       if (event.eventType === 'Delete') {
         this.champSelect.setDisabledChampionIds([])
@@ -869,7 +871,7 @@ export class LeagueClientSyncedData {
       () => !!this.login.loginQueueState,
       (isQueueing) => {
         if (isQueueing) {
-          this._log.info(`正在登录排队中`)
+          this._log.debug(`正在登录排队中`)
         }
       },
       { fireImmediately: true }

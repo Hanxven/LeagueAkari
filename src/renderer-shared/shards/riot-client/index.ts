@@ -12,7 +12,8 @@ export class RiotClientRenderer implements IAkariShardInitDispose {
 
   public readonly api = new RiotClientHttpApiAxiosHelper(
     axios.create({
-      baseURL: 'akari://riot-client'
+      baseURL: 'akari://riot-client',
+      adapter: 'fetch'
     })
   )
 

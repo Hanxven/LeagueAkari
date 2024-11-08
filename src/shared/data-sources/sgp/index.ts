@@ -78,14 +78,6 @@ export class SgpApi {
         return Boolean(error.response)
       }
     })
-
-    // this._http.interceptors.request.use((req) => {
-    //   if (!req.headers.Authorization) {
-    //     req.headers.Authorization = `Bearer ${this._entitlementToken}`
-    //   }
-
-    //   return req
-    // })
   }
 
   setAvailableSgpServers(servers: AvailableServersMap) {

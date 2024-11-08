@@ -81,7 +81,7 @@
               :key="c.champion_id"
               @click="() => emits('showChampion', c.champion_id)"
             >
-              <LcuImage class="image" :src="championIconUrl(c.champion_id)" />
+              <LcuImage class="image" :src="championIconUri(c.champion_id)" />
               <div class="win-rate" title="胜率">
                 {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
               </div>
@@ -100,7 +100,7 @@
               )"
               :key="c.champion_id"
             >
-              <LcuImage class="image" :src="championIconUrl(c.champion_id)" />
+              <LcuImage class="image" :src="championIconUri(c.champion_id)" />
               <div class="win-rate" title="胜率" :class="{ win: c.win / (c.play || 1) > 0.5 }">
                 {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
               </div>
@@ -228,7 +228,7 @@
           >
             <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
             <div class="image-name" @click="() => emits('showChampion', s.champion_id)">
-              <LcuImage class="image" :src="championIconUrl(s.champion_id)" />
+              <LcuImage class="image" :src="championIconUri(s.champion_id)" />
               <span>{{ lcs.gameData.champions[s.champion_id]?.name || s.champion_id }}</span>
             </div>
             <div class="desc">
@@ -641,7 +641,7 @@ import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSp
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
 import {

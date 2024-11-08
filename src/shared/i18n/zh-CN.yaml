@@ -33,7 +33,7 @@ settings-about-panel-component:
   line1: 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖
   line2: 项目参考
   line3: Github：
-  line4: © 2024 Hanxven. 本软件是开源软件，遵循 MIT 许可证。
+  line4: © 2024 Hanxven. 本软件是开源软件，遵循 GPL-3.0 许可证。
   downloadSource:
     label: 检查更新
     description: 从下载源 ({source}) 中检查更新

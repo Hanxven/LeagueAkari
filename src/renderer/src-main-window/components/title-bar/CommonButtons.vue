@@ -12,13 +12,13 @@
     </NTooltip>
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
-        <div class="common-button-outer" @click="handleOpenSettingsModal">
+        <div class="common-button-outer" @click="handleToGithub">
           <div class="common-button-inner">
-            <NIcon><SettingsIcon /></NIcon>
+            <NIcon><LogoGithub /></NIcon>
           </div>
         </div>
       </template>
-      设置
+      GitHub
     </NTooltip>
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" v-if="wms.settings.auxWindowEnabled">
       <template #trigger>
@@ -37,8 +37,10 @@
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { Notification as NotificationIcon, Settings as SettingsIcon } from '@vicons/carbon'
 import { WindowMultiple16Filled as WindowMultiple16FilledIcon } from '@vicons/fluent'
+import { LogoGithub } from '@vicons/ionicons5'
 import { NIcon, NTooltip } from 'naive-ui'
 import { inject } from 'vue'
 
@@ -53,8 +55,8 @@ const handleShowAuxWindow = () => {
   wm.showAuxWindow()
 }
 
-const handleOpenSettingsModal = () => {
-  openSettingsModal()
+const handleToGithub = () => {
+  window.open(LEAGUE_AKARI_GITHUB, '_blank')
 }
 </script>
 

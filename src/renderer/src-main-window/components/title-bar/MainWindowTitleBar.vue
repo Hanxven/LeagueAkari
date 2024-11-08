@@ -1,11 +1,13 @@
 <template>
   <div id="app-title-bar">
-    <div class="app-logo">
-      <LeagueAkariSpan text="先占上位" />
-    </div>
+    <div class="app-logo">League Akari</div>
     <div class="divider" />
     <!-- 为特定模块留出的位置 -->
-    <div class="shard-area" />
+    <div class="shard-area">
+      <Transition name="fade">
+        <MatchHistoryTabsTitle v-if="route.name === 'match-history'" />
+      </Transition>
+    </div>
     <div class="divider" />
     <CommonButtons />
     <div class="divider" />
@@ -15,18 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useRoute } from 'vue-router'
 
 import CommonButtons from './CommonButtons.vue'
+import MatchHistoryTabsTitle from './MatchHistoryTabsTitle.vue'
 import TrafficButtons from './TrafficButtons.vue'
 
 const route = useRoute()
-
-route.matched.forEach((record) => {
-  console.log(record)
-  record.name
-})
 </script>
 
 <style lang="less" scoped>
@@ -35,21 +32,24 @@ route.matched.forEach((record) => {
   position: relative;
   height: var(--title-bar-height);
   align-items: center;
-  z-index: 1e8;
   -webkit-app-region: drag;
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .app-logo {
-  width: 80px;
+  color: rgba(255, 255, 255, 0.8);
   text-align: center;
+  padding: 4px;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 14px;
   margin-left: 8px;
+  -webkit-app-region: drag;
 }
 
 .shard-area {
+  height: 100%;
+  width: 0;
   flex: 1;
 }
 

@@ -7,6 +7,7 @@ import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'
 import './assets/css/styles.less'
+import './assets/css/transition.less'
 import { router } from './routes'
 import { manager } from './shards'
 

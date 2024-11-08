@@ -125,10 +125,10 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
+    this._data.init()
     this._handleState()
     this._handleIpcCall()
     this._handleConnect()
-    this._data.init()
   }
 
   async onDispose() {
@@ -186,8 +186,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(LeagueClientMain.id, 'disconnect', async () => {
-      this._disconnect()
       this._manuallyDisconnected = true
+      this._disconnect()
     })
 
     this._ipc.onCall(
@@ -238,13 +238,13 @@ export class LeagueClientMain implements IAkariShardInitDispose {
           this._ux.state.launchedClients,
           this.state.connectionState
         ] as const,
-      async ([s, c, conn], [ps, _, __]) => {
+      async ([s, c, conn], prev) => {
         if (conn === 'connected') {
           return
         }
 
         // 抖动一下可以清除该状态
-        if (ps === false && s === true) {
+        if (prev && prev[0] === false && s === true) {
           this._manuallyDisconnected = false
         }
 
@@ -257,7 +257,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
             this.state.setConnectingClient(null)
           }
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     // 仅作为日志记录
@@ -266,9 +267,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       ([a, s]) => {
         if (a) {
           const { certificate, ...rest } = a
-          this._log.info(`LCU 状态发生变化: ${s}`, rest)
+          this._log.debug(`LCU 状态发生变化: ${s}`, rest)
         } else {
-          this._log.info(`LCU 状态发生变化: ${s}`, a)
+          this._log.debug(`LCU 状态发生变化: ${s}`, a)
         }
       },
       { equals: comparer.shallow }

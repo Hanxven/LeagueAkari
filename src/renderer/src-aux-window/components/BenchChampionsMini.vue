@@ -15,7 +15,7 @@
               class="champion-image"
               style="border-radius: 50%; cursor: default"
               :class="championAdjustment(lcs.champSelect.currentChampion)?.overallEffect"
-              :src="championIconUrl(lcs.champSelect.currentChampion || -1)"
+              :src="championIconUri(lcs.champSelect.currentChampion || -1)"
             />
           </template>
           <div class="raw-popover">
@@ -79,7 +79,7 @@
                 ),
                 [championAdjustment(c.championId)?.overallEffect || 'neutral']: true
               }"
-              :src="championIconUrl(c.championId)"
+              :src="championIconUri(c.championId)"
               @click="() => handleBenchSwap(c.championId)"
             />
           </template>
@@ -113,7 +113,7 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
 import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
@@ -278,6 +278,7 @@ const handleBenchSwap = async (championId: number) => {
   try {
     await lc.api.champSelect.benchSwap(championId)
   } catch (error) {
+    console.error(error)
     message.warning('尝试交换英雄失败')
   } finally {
     isSwapping.value = false

@@ -11,25 +11,25 @@
         </template>
         <template v-if="a[0].completed">
           <div class="solution completed" v-if="a[0].type === 'pick'">
-            <LcuImage class="image" :src="championIconUrl(a[0].championId)" />
+            <LcuImage class="image" :src="championIconUri(a[0].championId)" />
             <span class="label">已选择</span>
           </div>
           <div class="solution completed" v-else-if="a[0].type === 'vote'">
-            <LcuImage class="image" :src="championIconUrl(a[0].championId)" />
+            <LcuImage class="image" :src="championIconUri(a[0].championId)" />
             <span class="label">已投票</span>
           </div>
           <div class="solution completed" v-else-if="a[0].type === 'ban'">
-            <LcuImage class="image" :src="championIconUrl(a[0].championId)" />
+            <LcuImage class="image" :src="championIconUri(a[0].championId)" />
             <span class="label">已禁用</span>
           </div>
         </template>
         <template v-else>
           <div class="solution" v-if="as2.upcomingPick && as2.upcomingPick.action.id === a[0].id">
-            <LcuImage class="image" :src="championIconUrl(as2.upcomingPick.championId)" />
+            <LcuImage class="image" :src="championIconUri(as2.upcomingPick.championId)" />
             <span class="label">自动选择</span>
           </div>
           <div class="solution" v-if="as2.upcomingBan && as2.upcomingBan.action.id === a[0].id">
-            <LcuImage class="image" :src="championIconUrl(as2.upcomingBan.championId)" />
+            <LcuImage class="image" :src="championIconUri(as2.upcomingBan.championId)" />
             <span class="label">自动禁用</span>
           </div>
         </template>
@@ -42,7 +42,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Action } from '@shared/types/league-client/champ-select'
 import { NCard, NTimeline, NTimelineItem } from 'naive-ui'
 import { computed } from 'vue'

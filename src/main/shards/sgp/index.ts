@@ -5,6 +5,7 @@ import { Game, MatchHistory } from '@shared/types/league-client/match-history'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { formatError } from '@shared/utils/errors'
 import Ajv from 'ajv'
+import { isAxiosError } from 'axios'
 import fs from 'node:fs'
 
 import builtinSgpServersJson from '../../../../resources/builtin-config/sgp/mh-sgp-servers.json?commonjs-external&asset'
@@ -511,7 +512,17 @@ export class SgpMain implements IAkariShardInitDispose {
       sgpServerId = this.state.availability.sgpServerId
     }
 
-    return (await this._sgp.getSpectatorGameflowByPuuid(sgpServerId, puuid)).data
+    try {
+      const { data } = await this._sgp.getSpectatorGameflowByPuuid(sgpServerId, puuid)
+
+      return data
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 404) {
+        return null
+      }
+
+      throw error
+    }
   }
 
   private _handleIpcCall() {

@@ -3,7 +3,7 @@
     <template #header><span class="card-header-title">编辑玩家标记</span></template>
     <template v-if="summoner">
       <div class="summoner-info">
-        <LcuImage class="image" :src="profileIconUrl(summoner.profileIconId)" />
+        <LcuImage class="image" :src="profileIconUri(summoner.profileIconId)" />
         <span class="name">{{
           summonerName(summoner.gameName || summoner.displayName, summoner.tagLine)
         }}</span>
@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { profileIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { PlayerTagDto } from '@renderer-shared/shards/saved-player'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { summonerName } from '@shared/utils/name'

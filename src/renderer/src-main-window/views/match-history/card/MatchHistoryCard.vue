@@ -8,7 +8,7 @@
         <div class="player" v-for="p of participants" :key="p.participantId">
           <LcuImage
             class="image"
-            :src="championIconUrl(p.championId)"
+            :src="championIconUri(p.championId)"
             :title="lcs.gameData.champions[p.championId]?.name"
           />
           <div
@@ -261,7 +261,7 @@ import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Game, ParticipantIdentity } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
 import {

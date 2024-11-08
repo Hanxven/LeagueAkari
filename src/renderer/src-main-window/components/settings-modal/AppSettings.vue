@@ -64,7 +64,7 @@
               - 在中国大陆内拥有较好的响应速度
             </div>
             <div style="font-size: 12px">
-              <span style="display: inline-block; width: 44px; font-weight: bold">Github</span>
+              <span style="display: inline-block; width: 44px; font-weight: bold">GitHub</span>
               - 在中国大陆外拥有较好的响应速度
             </div>
           </NTooltip>
@@ -151,15 +151,17 @@ const closeActions = [
 
 const updateDownloadSource = [
   { label: 'Gitee', value: 'gitee' },
-  { label: 'Github', value: 'github' }
+  { label: 'GitHub', value: 'github' }
 ]
 
 const dialog = useDialog()
 const handleDisableHardwareAcceleration = (val: boolean) => {
   dialog.warning({
-    title: `${val ? '启用' : '禁用'}硬件加速`,
-    content: '是否确认更改硬件加速设置？将重启应用以应用更改',
-    positiveText: '退出',
+    title: `${val ? '禁用' : '启用'}硬件加速`,
+    content: val
+      ? '是否确认禁用硬件加速？将重启应用以应用更改'
+      : '将启用硬件加速，重启应用以应用更改',
+    positiveText: '重启应用并退出',
     negativeText: '取消',
     onPositiveClick: async () => {
       await app.setDisableHardwareAcceleration(val)

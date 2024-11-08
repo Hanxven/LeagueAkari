@@ -1,10 +1,12 @@
 <template>
-  <NScrollbar class="outer-wrapper">
-    <div class="inner-wrapper">
-      <LobbyTool class="tool" />
-      <StrawberryTool class="tool" />
-    </div>
-  </NScrollbar>
+  <div class="single-root">
+    <NScrollbar class="outer-wrapper">
+      <div class="inner-wrapper">
+        <LobbyTool class="tool" />
+        <StrawberryTool class="tool" />
+      </div>
+    </NScrollbar>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -33,5 +35,9 @@ import StrawberryTool from './StrawberryTool.vue'
 
 .tool:not(:last-child) {
   margin-bottom: 8px;
+}
+
+.single-root {
+  height: 100%;
 }
 </style>

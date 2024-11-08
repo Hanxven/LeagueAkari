@@ -1,83 +1,18 @@
 <template>
   <div class="panel">
-    <div class="sider">
-      <NMenu
-        :root-indent="12"
-        :collapsed="false"
-        :icon-size="18"
-        default-expand-all
-        :options="options"
-        :value="currentMenu"
-        @update:value="handleMenuChange"
-      ></NMenu>
-      <div class="bottom-operations">
-        <div class="operation" title="公告" @click="handleOpenAnnouncementModal">
-          <NIcon class="icon"><NotificationIcon /></NIcon>
-          <span class="label">公告</span>
-        </div>
-        <NPopover
-          trigger="click"
-          placement="right"
-          v-model:show="isClientsPreviewShow"
-          scrollable
-          :disabled="lcs.connectionState !== 'connected' && lcuxs.launchedClients.length === 0"
-          style="max-height: 240px"
-          :delay="50"
-        >
-          <template #trigger>
-            <div
-              :title="
-                lcuxs.launchedClients.length === 0 && lcs.connectionState === 'disconnected'
-                  ? '没有检测到已运行的客户端'
-                  : '当前正在运行的英雄联盟客户端'
-              "
-              class="operation"
-              :class="{
-                disabled: lcs.connectionState !== 'connected' && lcuxs.launchedClients.length === 0
-              }"
-            >
-              <NIcon class="icon"><ApplicationIcon /></NIcon>
-              <div class="label" v-if="lcs.auth">
-                {{ REGION_NAME[lcs.auth.region] || lcs.auth.region }}
-              </div>
-              <div class="label" v-else>客户端</div>
-            </div>
-          </template>
-          <div
-            v-for="c of clientsToConnect"
-            :key="c.pid"
-            class="client"
-            :class="{ connected: c.connected }"
-            :style="{
-              cursor: c.disabled ? 'not-allowed' : 'cursor'
-            }"
-            @click="() => handleConnectToLcu(c)"
-          >
-            <span class="region" title="地区"
-              ><NSpin v-if="c.loading" :size="12" class="left-widget" /><NIcon
-                v-else
-                class="left-widget"
-                style="vertical-align: text-bottom"
-                ><CubeSharpIcon
-              /></NIcon>
-              {{ REGION_NAME[c.region] || c.region }}</span
-            >
-            <span class="rso" title="区服">{{
-              TENCENT_RSO_PLATFORM_NAME[c.rsoPlatformId] || c.rsoPlatformId
-            }}</span>
-            <span class="pid" title="Process ID">{{ c.pid }}</span>
-            <span class="connected-indicator" v-if="c.connected"></span>
-          </div>
-        </NPopover>
-        <div class="operation" title="设置" @click="handleOpenSettingsModal">
-          <NIcon class="icon"><SettingsIcon /></NIcon>
-          <span class="label">设置</span>
-        </div>
-      </div>
+    <div class="left-side-content">
+      <SidebarMenu
+        class="sidebar-menu"
+        :items="menu"
+        :current="currentMenu"
+        @update:current="(key) => handleMenuChange(key)"
+      />
+      <div class="dragging-zone"></div>
+      <SidebarFixed :summoner="lcs.summoner.me" />
     </div>
     <div class="right-side-content">
       <RouterView v-slot="{ Component }">
-        <Transition name="route-fade">
+        <Transition name="fade">
           <KeepAlive>
             <component :is="Component" />
           </KeepAlive>
@@ -91,98 +26,57 @@
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
-import { UxCommandLine, useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
   AiStatus as AiStatusIcon,
   AppSwitcher as AppSwitcherIcon,
-  Application as ApplicationIcon,
   Layers as LayersIcon,
-  Notification as NotificationIcon,
-  Settings as SettingsIcon,
   Template as TemplateIcon
 } from '@vicons/carbon'
-import { CubeSharp as CubeSharpIcon, TicketSharp as TicketSharpIcon } from '@vicons/ionicons5'
-import { MenuOption, NIcon, NMenu, NPopover, NSpin } from 'naive-ui'
-import {
-  Component as ComponentC,
-  computed,
-  h,
-  inject,
-  ref,
-  watchEffect
-} from 'vue'
+import { TicketSharp as TicketSharpIcon } from '@vicons/ionicons5'
+import { NIcon } from 'naive-ui'
+import { Component as ComponentC, h, inject, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import SidebarFixed from '@main-window/components/sidebar/SidebarFixed.vue'
+import SidebarMenu from '@main-window/components/sidebar/SidebarMenu.vue'
 
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
 }
 
-const options = ref<MenuOption[]>([
+const currentMenu = ref('match-history')
+const menu = ref([
   {
-    label: '战绩',
     key: 'match-history',
-    icon: renderIcon(LayersIcon)
+    icon: renderIcon(LayersIcon),
+    name: '战绩页面'
   },
   {
-    label: '对局',
     key: 'ongoing-game',
-    icon: renderIcon(TemplateIcon)
+    icon: renderIcon(TemplateIcon),
+    name: '对局分析'
   },
   {
-    label: '自动化',
     key: 'automation',
     icon: renderIcon(AiStatusIcon),
-    children: [
-      {
-        label: '自动流程',
-        key: 'automation-auto-gameflow'
-      },
-      {
-        label: '选择禁用',
-        key: 'automation-auto-select'
-      },
-      {
-        label: '其他',
-        key: 'automation-misc'
-      }
-    ]
+    name: '自动操作'
   },
   {
-    label: '工具',
     key: 'toolkit',
     icon: renderIcon(AppSwitcherIcon),
-    children: [
-      {
-        label: '过程中',
-        key: 'toolkit-in-process'
-      },
-      {
-        label: '房间',
-        key: 'toolkit-lobby'
-      },
-      {
-        label: '客户端',
-        key: 'toolkit-client'
-      },
-      {
-        label: '其他',
-        key: 'toolkit-misc'
-      }
-    ]
+    name: '工具集'
   },
   {
-    label: '测试',
     key: 'test',
     icon: renderIcon(TicketSharpIcon),
+    name: '测试',
     show: import.meta.env.DEV
   }
 ])
 
 const router = useRouter()
 const route = useRoute()
-
-const currentMenu = ref('match-history')
 
 watchEffect(() => {
   currentMenu.value = route.name as string
@@ -212,57 +106,12 @@ const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const isClientsPreviewShow = ref(false)
 
-const clientsToConnect = computed(() => {
-  if (lcs.connectionState === 'connected') {
-    const c = lcuxs.launchedClients.map((m) => {
-      return {
-        ...m,
-        connected: lcs.auth?.pid === m.pid,
-        disabled: lcs.auth?.pid === m.pid,
-        loading: lcs.connectingClient?.pid === m.pid
-      }
-    })
-
-    if (c.length === 0) {
-      c.push({
-        ...lcs.auth!,
-        loading: false,
-        connected: true,
-        disabled: true
-      })
-    }
-
-    return c
-  } else {
-    return lcuxs.launchedClients.map((m) => {
-      return {
-        ...m,
-        connected: lcs.auth?.pid === m.pid,
-        disabled: lcs.connectingClient?.pid === m.pid,
-        loading: lcs.connectingClient?.pid === m.pid
-      }
-    })
-  }
-})
-
 // 善意的提醒，以防用户一直在等
 watchEffect(() => {
   if (lcs.connectionState === 'disconnected' && lcuxs.launchedClients.length > 1) {
     isClientsPreviewShow.value = true
   }
 })
-
-const handleConnectToLcu = (auth: UxCommandLine) => {
-  if (lcs.connectionState === 'connected' && lcs.auth?.pid === auth.pid) {
-    return
-  }
-
-  lc.connect(auth)
-}
-
-const emits = defineEmits<{
-  (e: 'openSettings'): void
-}>()
 </script>
 
 <style lang="less" scoped>
@@ -271,66 +120,20 @@ const emits = defineEmits<{
   width: 100%;
   height: 100%;
 
-  .sider {
+  .dragging-zone {
+    flex: 1;
+    -webkit-app-region: drag;
+  }
+
+  .fixed-buttons {
+    height: 96px;
+    background-color: rgba(167, 37, 37, 0.518);
+  }
+
+  .left-side-content {
     display: flex;
-    width: 124px;
     flex-direction: column;
-    justify-content: space-between;
-    flex-shrink: 0;
-    box-sizing: border-box;
-
-    :deep(.n-menu-item) {
-      --n-item-height: 32px;
-      font-size: 12px;
-
-      .n-menu-item-content__icon .n-icon {
-        font-size: 16px;
-      }
-    }
-
-    .bottom-operations {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      padding: 8px;
-
-      .operation {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        padding: 4px 8px;
-        cursor: pointer;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-
-        &:hover:not(.disabled) {
-          background-color: rgba(255, 255, 255, 0.12);
-        }
-
-        &:active:not(.disabled) {
-          background-color: rgba(255, 255, 255, 0.05);
-        }
-      }
-
-      .disabled {
-        cursor: not-allowed;
-        color: #5d5c5c;
-      }
-
-      .icon {
-        font-size: 16px;
-      }
-
-      .label {
-        width: 36px;
-        font-size: 12px;
-        text-align: left;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-    }
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .right-side-content {

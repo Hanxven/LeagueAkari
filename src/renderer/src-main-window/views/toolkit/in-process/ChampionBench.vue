@@ -20,7 +20,7 @@
         <LcuImage
           class="champion-image"
           style="border-radius: 50%; cursor: default"
-          :src="championIconUrl(selfChampionId || -1)"
+          :src="championIconUri(selfChampionId || -1)"
         />
       </div>
       <NDivider vertical />
@@ -32,7 +32,7 @@
           :class="{
             'champion-image-invalid': !lcs.champSelect.currentPickableChampionIds.has(c.championId)
           }"
-          :src="championIconUrl(c.championId)"
+          :src="championIconUri(c.championId)"
           @click="() => handleBenchSwap(c.championId)"
         />
         <div
@@ -53,7 +53,7 @@ import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { NButton, NCard, NDivider } from 'naive-ui'
 import { computed, ref } from 'vue'

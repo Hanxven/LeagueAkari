@@ -1,15 +1,17 @@
 <template>
-  <NScrollbar class="outer-wrapper">
-    <div class="inner-wrapper">
-      <SummonerProfile class="tool" />
-      <Spectate class="tool" />
-      <ChatAvailability class="tool" />
-      <FakeRanked class="tool" />
-      <ChatStatusMessage class="tool" />
-      <GameView class="tool" />
-      <!-- <CustomKeyboardSequence class="tool" /> -->
-    </div>
-  </NScrollbar>
+  <div class="single-root">
+    <NScrollbar class="outer-wrapper">
+      <div class="inner-wrapper">
+        <SummonerProfile class="tool" />
+        <Spectate class="tool" />
+        <ChatAvailability class="tool" />
+        <FakeRanked class="tool" />
+        <ChatStatusMessage class="tool" />
+        <GameView class="tool" />
+        <!-- <CustomKeyboardSequence class="tool" /> -->
+      </div>
+    </NScrollbar>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -43,5 +45,9 @@ import SummonerProfile from './SummonerProfile.vue'
 
 .tool:not(:last-child) {
   margin-bottom: 8px;
+}
+
+.single-root {
+  height: 100%;
 }
 </style>

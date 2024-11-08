@@ -17,7 +17,6 @@ import { watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AuxWindowTitleBar from './components/AuxWindowTitleBar.vue'
-import { useChampionBalanceData } from './compositions/useBalanceData'
 
 const mws = useWindowManagerStore()
 
@@ -37,11 +36,6 @@ watch(
   },
   { immediate: true }
 )
-
-const { data } = useChampionBalanceData('fandom')
-watchEffect(() => {
-  console.log(data.value)
-})
 </script>
 
 <style lang="less">

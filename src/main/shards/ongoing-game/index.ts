@@ -8,7 +8,7 @@ import {
 } from '@shared/utils/analysis'
 import { calculateTogetherTimes, removeOverlappingSubsets } from '@shared/utils/team-up-calc'
 import _ from 'lodash'
-import { comparer, computed, toJS } from 'mobx'
+import { comparer, computed, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
 
 import { AkariIpcMain } from '../ipc'
@@ -433,7 +433,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         tag
       }
 
-      this.state.matchHistory[puuid] = toBeLoaded
+      runInAction(() => this.state.matchHistory[puuid] = toBeLoaded)
       this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
     } else {
       const res = await this._queue
@@ -455,7 +455,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         source: 'lcu' as 'sgp' | 'lcu'
       }
 
-      this.state.matchHistory[puuid] = toBeLoaded
+      runInAction(() => this.state.matchHistory[puuid] = toBeLoaded)
       this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
     }
   }
@@ -488,7 +488,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const data = res.data
 
     const toBeLoaded = { data, source: 'lcu' as 'sgp' | 'lcu' }
-    this.state.summoner[puuid] = toBeLoaded
+    runInAction(() =>  this.state.summoner[puuid] = toBeLoaded)
     this._ipc.sendEvent(OngoingGameMain.id, 'summoner-loaded', puuid, toBeLoaded)
   }
 
@@ -528,7 +528,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       return
     }
 
-    this.state.savedInfo[puuid] = res
+    runInAction(() => this.state.savedInfo[puuid] = res)
     this._ipc.sendEvent(OngoingGameMain.id, 'saved-info-loaded', puuid, res)
   }
 
@@ -559,7 +559,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const data = res.data
 
     const toBeLoaded = { data, source: 'lcu' as 'sgp' | 'lcu' }
-    this.state.rankedStats[puuid] = toBeLoaded
+    runInAction(() => this.state.rankedStats[puuid] = toBeLoaded)
     this._ipc.sendEvent(OngoingGameMain.id, 'ranked-stats-loaded', puuid, toBeLoaded)
   }
 
@@ -602,7 +602,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       }, {} as any)
 
     const toBeLoaded = { data: simplifiedMastery, source: 'lcu' as 'sgp' | 'lcu' }
-    this.state.championMastery[puuid] = toBeLoaded
+    runInAction(() => this.state.championMastery[puuid] = toBeLoaded)
     this._ipc.sendEvent(OngoingGameMain.id, 'champion-mastery-loaded', puuid, toBeLoaded)
   }
 

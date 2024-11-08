@@ -155,7 +155,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         event.data &&
         (event.data.playerResponse === 'Declined' || event.data.playerResponse === 'Accepted')
       ) {
-        this.cancelAutoAccept('declined')
+        this.cancelAutoAccept(event.data.playerResponse.toLowerCase())
       }
     })
   }

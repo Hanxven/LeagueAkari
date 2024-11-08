@@ -11,27 +11,23 @@
         />
       </div>
       <div class="about-para">
-        <LeagueAkariSpan bold @click="() => handleClickEasterEgg()" /> (联盟阿卡林，Version {{ as.version }})
+        <LeagueAkariSpan bold @click="() => handleClickEasterEgg()" /> (联盟阿卡林，Version
+        {{ as.version }})
         是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖
         <a target="_blank" href="https://riot-api-libraries.readthedocs.io/en/latest/lcu.html"
           >League Client Update (LCU)</a
         >。
-        <a
-          target="_blank"
-          href="https://github.com/Hanxven/LeagueAkari?tab=readme-ov-file#4-%E5%8F%82%E8%80%83"
+        <a target="_blank" :href="`${LEAGUE_AKARI_GITHUB}?tab=readme-ov-file#4-%E5%8F%82%E8%80%83`"
           >项目参考</a
         >.
       </div>
 
       <div class="about-para-2">
-        <span>Github：</span>
-        <a
-          target="_blank"
-          href="https://github.com/Hanxven/LeagueAkari"
-          style="text-indent: 0; margin-right: 8px"
+        <span>GitHub：</span>
+        <a target="_blank" :href="LEAGUE_AKARI_GITHUB" style="text-indent: 0; margin-right: 8px"
           >League Akari</a
         >
-        <a target="_blank" href="https://github.com/Hanxven/LeagueAkari">
+        <a target="_blank" :href="LEAGUE_AKARI_GITHUB">
           <img
             alt="GitHub Repo stars"
             src="https://img.shields.io/github/stars/Hanxven/LeagueAkari"
@@ -122,7 +118,9 @@
           <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">打开目录</NButton>
         </ControlItem>
       </NCard>
-      <div class="about-para copyright">© 2024 Hanxven. 本软件是开源软件，遵循 MIT 许可证。</div>
+      <div class="about-para copyright">
+        © 2024 Hanxven. 本软件是开源软件，遵循 GPL-3.0 许可证。
+      </div>
     </div>
   </NScrollbar>
 </template>
@@ -134,12 +132,13 @@ import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
+import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import dayjs from 'dayjs'
 import { NButton, NCard, NFlex, NScrollbar, NStep, NSteps, useMessage } from 'naive-ui'
 import { computed, h, inject } from 'vue'
 
 const UPDATE_SOURCE_MAP = {
-  github: 'Github',
+  github: 'GitHub',
   gitee: 'Gitee'
 }
 

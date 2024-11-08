@@ -114,7 +114,7 @@ export interface TabState {
 }
 
 /** 声明到全局状态, 以减少状态管理的复杂度 */
-export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs', () => {
+export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-renderer', () => {
   const settings = shallowReactive({
     /**
      *  游戏结束后刷新涉及到的页面卡
@@ -165,6 +165,8 @@ export const useMatchHistoryTabsStore = defineStore('module:match-history-tabs',
     if (setCurrent) {
       currentTabId.value = data.id
     }
+
+    tabs.value.push(data)
   }
 
   const getTab = (id: string) => {

@@ -5,6 +5,9 @@
     preset="card"
     transform-origin="center"
     v-model:show="show"
+    :close-on-esc="false"
+    @keydown.enter.prevent
+    @keydown.space.prevent
     title="快捷键设定"
   >
     <template #footer>

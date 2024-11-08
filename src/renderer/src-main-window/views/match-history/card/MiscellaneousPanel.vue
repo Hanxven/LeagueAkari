@@ -22,7 +22,7 @@
           style="height: 20px; width: 20px"
           v-for="b of t.bans"
           :key="b.championId"
-          :src="championIconUrl(b.championId)"
+          :src="championIconUri(b.championId)"
         />
       </div>
     </div>
@@ -49,7 +49,7 @@ import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUrl } from '@renderer-shared/shards/league-client/utils'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Game, Participant, Player } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
@@ -78,7 +78,7 @@ const championDisplay = (championId: number) => {
   return h('div', { style: { display: 'flex' } }, [
     h(LcuImage, {
       style: { height: '20px', width: '20px' },
-      src: championIconUrl(championId || -1)
+      src: championIconUri(championId || -1)
     }),
     h('span', { style: { 'margin-left': '2px' } }, lcs.gameData.champions[championId].name)
   ])
@@ -295,7 +295,7 @@ const columns = computed(() => {
         return h('div', { style: { display: 'flex' } }, [
           h(LcuImage, {
             style: { height: '20px', width: '20px' },
-            src: championIconUrl(p.championId || -1)
+            src: championIconUri(p.championId || -1)
           }),
           h(
             'span',
