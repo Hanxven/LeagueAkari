@@ -83,9 +83,6 @@ export interface TabState {
   /** 该玩家数据来源自哪个大区或 RSO */
   sgpServerId: string
 
-  /** 是否是不可关闭的 */
-  pinned: boolean
-
   /** 召唤师信息需要加载 */
   summoner: SummonerInfo | null
 
@@ -198,22 +195,17 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
   }
 
   const closeAllTabs = () => {
-    tabs.value = tabs.value.filter((t) => t.pinned)
-
-    if (tabs.value.length > 0) {
-      currentTabId.value = tabs.value[tabs.value.length - 1].id
-    } else {
-      currentTabId.value = null
-    }
+    tabs.value = []
+    currentTabId.value = null
   }
 
   const closeOtherTabs = (centerId: string) => {
-    tabs.value = tabs.value.filter((t) => t.pinned || t.id === centerId)
+    tabs.value = tabs.value.filter((t) => t.id === centerId)
     currentTabId.value = centerId
   }
 
   const canCloseOtherTabs = (centerId: string) => {
-    return tabs.value.some((t) => !t.pinned && t.id !== centerId)
+    return tabs.value.some((t) => t.id !== centerId)
   }
 
   /** 避免太多的加载, 在所有的页面中可以共享 */

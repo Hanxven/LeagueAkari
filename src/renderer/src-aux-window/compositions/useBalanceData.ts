@@ -17,8 +17,8 @@ const ADJUSTMENT_EFFECT = {
 const ADJUSTMENT_DISPLAY = {
   'damage-dealt': 'percentage',
   'damage-taken': 'percentage',
-  shielding: 'literal',
-  healing: 'literal',
+  shielding: 'percentage',
+  healing: 'percentage',
   'ability-haste': 'literal',
   'attack-speed': 'percentage',
   'energy-regen': 'percentage',

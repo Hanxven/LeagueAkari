@@ -274,6 +274,20 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       },
       { equals: comparer.shallow }
     )
+
+    /**
+     * 在连接上之后，查询的速度放缓
+     */
+    this._mobx.reaction(
+      () => this.state.connectionState,
+      (state) => {
+        if (state === 'connected') {
+          this._ux.setPollInterval(LeagueClientUxMain.CLIENT_CMD_LONG_POLL_INTERVAL)
+        } else {
+          this._ux.setPollInterval(LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL, true)
+        }
+      }
+    )
   }
 
   private async _doConnectingLoop() {

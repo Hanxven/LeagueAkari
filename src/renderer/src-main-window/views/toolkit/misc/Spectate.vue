@@ -12,8 +12,8 @@
     >
     <ControlItem
       class="control-item-margin"
-      label="目标召唤师"
-      label-description="通过 PUUID 或召唤师名称观战，前提是玩家正在可观战的对局中"
+      label="召唤师观战"
+      label-description="通过 PUUID 或召唤师名称观战当前大区玩家，前提是玩家正在可观战的对局中"
       :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px">
@@ -43,6 +43,29 @@
         >
       </div>
     </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      label="口令观战"
+      label-description="通过符合格式的特殊口令，调起客户端观战进程"
+      :label-width="200"
+    >
+      <div style="display: flex; align-items: center; gap: 8px">
+        <NInput
+          placeholder="符合格式的观战口令"
+          style="width: 200px; font-family: monospace"
+          size="small"
+          type="textarea"
+          :autosize="{ minRows: 1, maxRows: 3 }"
+          v-model:value="spectator.token"
+        ></NInput>
+        <NButton
+          :disabled="!checkSpectateToken(spectator.token)"
+          @click="handleSpectateByToken"
+          size="small"
+          >调起观战</NButton
+        >
+      </div>
+    </ControlItem>
   </NCard>
 </template>
 
@@ -50,21 +73,27 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { Friend } from '@shared/types/league-client/chat'
 import { resolveSummonerName } from '@shared/utils/identity'
 import { summonerName } from '@shared/utils/name'
+import { useIntervalFn } from '@vueuse/core'
 import { AxiosError } from 'axios'
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
-import { computed, reactive, ref } from 'vue'
+import { computed, onActivated, onDeactivated, reactive, ref } from 'vue'
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const gc = useInstance<GameClientRenderer>('game-client-renderer')
+const app = useInstance<AppCommonRenderer>('app-common-renderer')
 
 const spectator = reactive({
   summonerIdentity: '',
-  isProcessing: false
+  isProcessing: false,
+  token: ''
 })
 
 const handleSpectate = async () => {
@@ -154,6 +183,66 @@ const handleLoadFriends = async () => {
     console.error('好友列表加载失败', error)
   }
 }
+
+interface SpectateToken {
+  akariVersion: string
+  locale?: string
+  sgpServerId: string
+  puuid: string
+}
+
+const checkSpectateToken = (str: string) => {
+  try {
+    const obj = JSON.parse(str) as SpectateToken
+
+    return (
+      typeof obj.akariVersion === 'string' &&
+      typeof obj.sgpServerId === 'string' &&
+      typeof obj.puuid === 'string' &&
+      (typeof obj.locale === 'undefined' || typeof obj.locale === 'string')
+    )
+  } catch (error) {
+    return false
+  }
+}
+
+const handleSpectateByToken = async () => {
+  const obj = JSON.parse(spectator.token) as SpectateToken
+
+  try {
+    await gc.launchSpectator({
+      locale: obj.locale,
+      sgpServerId: obj.sgpServerId,
+      puuid: obj.puuid
+    })
+    laNotification.success('观战', '已拉起观战')
+  } catch (error) {
+    laNotification.warn('观战', (error as any).message, error)
+  }
+}
+
+// 剪贴板内容缝缝补补
+const { resume: resumeClipboardCheck, pause: pauseClipboardCheck } = useIntervalFn(
+  async () => {
+    const text = await app.readClipboardText()
+
+    if (spectator.token.length === 0 && checkSpectateToken(text)) {
+      spectator.token = text
+    }
+  },
+  2000,
+  {
+    immediateCallback: true
+  }
+)
+
+onActivated(() => {
+  resumeClipboardCheck()
+})
+
+onDeactivated(() => {
+  pauseClipboardCheck()
+})
 </script>
 
 <style lang="less" scoped>

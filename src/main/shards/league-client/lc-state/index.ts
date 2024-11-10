@@ -883,7 +883,7 @@ export class LeagueClientSyncedData {
     let retryCount = 0
     let timerId: NodeJS.Timeout | null = null
 
-    this._mobx.propSync(this._C.id, 'summoner', this.summoner, 'me')
+    this._mobx.propSync(this._C.id, 'summoner', this.summoner, ['me', 'profile'])
 
     /**
      * 个人信息获取十分关键，因此必须优先获取，以实现后续功能
@@ -928,8 +928,42 @@ export class LeagueClientSyncedData {
       { equals: comparer.structural, fireImmediately: true }
     )
 
+    this._mobx.reaction(
+      () => this._i.state.connectionState,
+      async (state) => {
+        if (state === 'connected') {
+          try {
+            const { data } = await this._i.api.summoner.getSummonerProfile()
+            this.summoner.setProfile(data)
+          } catch (error) {
+            // ignore
+          }
+        } else {
+          this.summoner.setProfile(null)
+        }
+      }
+    )
+
+    this._mobx.reaction(
+      () => this.summoner.me,
+      async (me) => {
+        if (me && !this.summoner.profile) {
+          try {
+            const { data } = await this._i.api.summoner.getSummonerProfile()
+            this.summoner.setProfile(data)
+          } catch (error) {
+            // ignore
+          }
+        }
+      }
+    )
+
     this._i.events.on('/lol-summoner/v1/current-summoner', (event) => {
       this.summoner.setMe(event.data)
+    })
+
+    this._i.events.on('/lol-summoner/v1/current-summoner/summoner-profile', (event) => {
+      this.summoner.setProfile(event.data)
     })
   }
 

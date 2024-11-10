@@ -14,7 +14,7 @@ import { Ballot } from '@shared/types/league-client/honorV2'
 import { Lobby, ReceivedInvitation } from '@shared/types/league-client/lobby'
 import { LoginQueueState } from '@shared/types/league-client/login'
 import { GetSearch, ReadyCheck } from '@shared/types/league-client/matchmaking'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
 import { defineStore } from 'pinia'
 import { computed, shallowReactive, shallowRef } from 'vue'
 
@@ -39,6 +39,8 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
   const connectingClient = shallowRef<UxCommandLine | null>(null)
 
   const isConnected = computed(() => connectionState.value === 'connected')
+  const isConnecting = computed(() => connectionState.value === 'connecting')
+  const isDisconnected = computed(() => connectionState.value === 'disconnected')
 
   const settings = shallowReactive({
     autoConnect: false
@@ -91,7 +93,8 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
   } as const
 
   const summoner = {
-    me: shallowRef<SummonerInfo | null>(null)
+    me: shallowRef<SummonerInfo | null>(null),
+    profile: shallowRef<SummonerProfile | null>(null),
   } as const
 
   const login = {
@@ -118,6 +121,8 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
 
     connectionState,
     isConnected, // for convenience
+    isConnecting, // for convenience
+    isDisconnected, // for convenience
     auth,
     connectingClient
   }

@@ -2,7 +2,10 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { createEventBus } from '@renderer-shared/utils/events'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { EMPTY_PUUID } from '@shared/constants/common'
+import { UseEventBusReturn, useEventBus } from '@vueuse/core'
 import { computed, effectScope, markRaw, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -17,6 +20,8 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
 
   private readonly _setting: SettingUtilsRenderer
   private readonly _scope = effectScope()
+
+  private readonly _events = createEventBus()
 
   constructor(deps: any) {
     this._setting = deps['setting-utils-renderer']
@@ -46,27 +51,6 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
           const tab = mhs.getTabByPuuid(summoner.puuid)
           if (tab) {
             tab.summoner = markRaw(summoner)
-          }
-        }
-      }
-    )
-
-    const isEndGame = computed(
-      () => lcs.gameflow.phase === 'EndOfGame' || lcs.gameflow.phase === 'PreEndOfGame'
-    )
-
-    // 游戏结束更新战绩
-    watch(
-      () => isEndGame.value,
-      (is, _prevP) => {
-        if (mhs.settings.refreshTabsAfterGameEnds && is) {
-          const allPlayerPuuids = Object.values(ogs.teams || {}).flat()
-
-          for (const tab of mhs.tabs) {
-            if (allPlayerPuuids.includes(tab.puuid)) {
-              // TODO DEBUG 刷新战绩
-              // this.fetchTabMatchHistory(this.toUnionId(tab.data.sgpServerId, tab.data.puuid))
-            }
           }
         }
       }
@@ -108,10 +92,12 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
     )
   }
 
-  private _isCrossRegion(targetSgpServerId: string) {
-    const sgps = useSgpStore()
+  get events() {
+    if (!this._events) {
+      throw new Error('event emitter is not ready')
+    }
 
-    return sgps.availability.sgpServerId !== targetSgpServerId
+    return this._events
   }
 
   /**
@@ -189,9 +175,14 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   // 如果直接引用 router, 在热更新的时候会失效
   useNavigateToTab() {
     const router = useRouter()
+    const sgps = useSgpStore()
 
     const navigateToTab = async (unionId: string) => {
       const { sgpServerId, puuid } = this.parseUnionId(unionId)
+
+      if (!puuid || puuid === EMPTY_PUUID) {
+        return
+      }
 
       return router.replace({
         name: 'match-history',
@@ -200,17 +191,36 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
     }
 
     const navigateToTabByPuuidAndSgpServerId = async (puuid: string, sgpServerId: string) => {
+      if (!puuid || puuid === EMPTY_PUUID) {
+        return
+      }
+
       return router.replace({
         name: 'match-history',
         params: { puuid, sgpServerId }
       })
     }
 
-    return { navigateToTab, navigateToTabByPuuidAndSgpServerId }
+    /**
+     * 以当前大区为准跳转到指定 puuid 的战绩页面
+     */
+    const navigateToTabByPuuid = async (puuid: string) => {
+      if (!puuid || puuid === EMPTY_PUUID) {
+        return
+      }
+
+      return router.replace({
+        name: 'match-history',
+        params: { puuid, sgpServerId: sgps.availability.sgpServerId }
+      })
+    }
+
+    return { navigateToTab, navigateToTabByPuuidAndSgpServerId, navigateToTabByPuuid }
   }
 
   parseUnionId(unionId: string) {
     const [sgpServerId, puuid] = unionId.split(':')
+
     return { sgpServerId, puuid }
   }
 
@@ -242,8 +252,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
         isLoadingMatchHistory: false,
         isLoadingRankedStats: false,
         isLoadingSummoner: false,
-        isLoadingSpectatorData: false,
-        pinned: pin
+        isLoadingSpectatorData: false
       },
       setCurrent
     )

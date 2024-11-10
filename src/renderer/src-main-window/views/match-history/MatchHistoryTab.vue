@@ -103,6 +103,7 @@
                   <div style="width: 256px">
                     <SpectateStatus
                       :is-cross-region="!isOnSelfSgpServer"
+                      :sgp-server-id="tab.sgpServerId"
                       :data="tab.spectatorData"
                       :puuid="tab.puuid"
                       @to-summoner="(puuid) => handleToSummoner(puuid)"
@@ -295,6 +296,7 @@
             >
               <SpectateStatus
                 :is-cross-region="!isOnSelfSgpServer"
+                :sgp-server-id="tab.sgpServerId"
                 :data="tab.spectatorData"
                 :puuid="tab.puuid"
                 @to-summoner="(puuid, newTab) => handleToSummoner(puuid, newTab)"
@@ -756,8 +758,8 @@ const loadTags = async () => {
   }
 }
 
-// 1182px - is same in which defined in CSS
-const isSmallScreen = useMediaQuery(`(max-width: 1182px)`)
+// 1100px - is same in which defined in CSS
+const isSmallScreen = useMediaQuery(`(max-width: 1100px)`)
 
 const scrollEl = useTemplateRef('scroll')
 const rightEl = useTemplateRef('right')
@@ -1021,7 +1023,10 @@ const updateSpectatorData = async () => {
 
     tab.spectatorData = markRaw(data)
   } catch (error) {
-    if ((error as Error).name === 'AxiosError' && (error as any).response?.status === 404) {
+    if (
+      (error as Error).name === 'AxiosError' &&
+      ((error as any).response?.status === 404 || (error as any).response?.status === 400)
+    ) {
       tab.spectatorData = null
       return
     }
@@ -1067,7 +1072,7 @@ const handleLaunchSpectator = async (_: string, useLcuApi: boolean) => {
       await gc.launchSpectator({
         locale: 'zh_CN',
         puuid: tab.puuid,
-        region: tab.sgpServerId
+        sgpServerId: tab.sgpServerId
       })
       notification.success({
         title: '观战',
@@ -1149,9 +1154,9 @@ defineExpose({
   right: 0;
   height: 64px;
   z-index: 1;
-  background-color: rgba(#202020, 0.95);
+  background-color: rgba(#000, 0.4);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
 
   .header-simplified-inner {
     display: flex;
@@ -1181,7 +1186,7 @@ defineExpose({
       color: #858585;
     }
 
-    @media (max-width: 1182px) {
+    @media (max-width: 1100px) {
       width: 764px;
     }
   }
@@ -1206,14 +1211,14 @@ defineExpose({
     display: none;
     padding: 0px 12px;
 
-    @media (max-width: 1182px) {
+    @media (max-width: 1100px) {
       display: flex;
       justify-content: flex-end;
       gap: 4px;
     }
   }
 
-  @media (max-width: 1182px) {
+  @media (max-width: 1100px) {
     width: 764px;
   }
 }
@@ -1223,7 +1228,7 @@ defineExpose({
   flex: 1;
   padding: 12px 0 12px 12px;
 
-  @media (max-width: 1182px) {
+  @media (max-width: 1100px) {
     display: none;
   }
 }

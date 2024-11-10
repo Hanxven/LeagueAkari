@@ -1,8 +1,8 @@
-# 2024-09-26 公告
+# 2024-xx-xx 公告
 
-欢迎使用 League Akari。本软件为开源且免费软件，遵循 MIT 协议。
+欢迎使用 League Akari。本软件是开源软件，遵循 GPL-3.0 协议。
 
-群聊：301157623
+QQ 群聊：[301157623](https://qm.qq.com/q/F1Xv85etlm)
 
 ## v1.2.6-fix.1
 

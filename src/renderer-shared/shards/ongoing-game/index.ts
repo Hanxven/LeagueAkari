@@ -52,7 +52,6 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
   }
 
   setMatchHistoryTagPreference(value: 'current' | 'all') {
-
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'matchHistoryTagPreference', value)
   }
 

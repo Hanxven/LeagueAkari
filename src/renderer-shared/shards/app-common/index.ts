@@ -49,6 +49,10 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setDisableHardwareAcceleration', s)
   }
 
+  readClipboardText() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'readClipboardText') as Promise<string>
+  }
+
   async onInit() {
     const store = useAppCommonStore()
     store.version = await this.getVersion()

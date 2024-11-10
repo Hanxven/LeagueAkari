@@ -24,3 +24,9 @@ export interface RerollPoints {
   pointsCostToRoll: number
   pointsToReroll: number
 }
+
+export interface SummonerProfile {
+  backgroundSkinAugments: string
+  backgroundSkinId: number
+  regalia: string
+}

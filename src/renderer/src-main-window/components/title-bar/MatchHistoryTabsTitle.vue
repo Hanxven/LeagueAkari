@@ -1,7 +1,19 @@
 <template>
   <div class="match-history-tabs-title">
+    <SearchSummonerModal v-model:show="searchSummonerModalShow" />
+    <NDropdown
+      placement="bottom-start"
+      trigger="manual"
+      :show="contextMenuState.show"
+      :x="contextMenuState.x"
+      :y="contextMenuState.y"
+      :options="contextMenuOptions"
+      @clickoutside="contextMenuState.show = false"
+      size="small"
+      @select="handleContextMenuSelect"
+      :theme-overrides="{ color: '#222e', fontSizeSmall: '13px', optionHeightSmall: '26px' }"
+    />
     <template v-if="lcs.isConnected">
-      <SearchSummonerModal v-model:show="searchSummonerModalShow" />
       <NScrollbar
         :class="$style['scroll-bar']"
         x-scrollable
@@ -10,28 +22,54 @@
         ref="scrollbar"
       >
         <div class="mh-tabs">
-          <NPopover v-for="tab of mhs.tabs" :key="tab.id">
+          <NPopover
+            :disabled="true || contextMenuState.show"
+            v-for="tab of mhs.tabs"
+            :key="tab.id"
+            ref="tabs-ref"
+            :delay="1000"
+          >
             <template #trigger>
               <div
                 class="tab"
-                :class="{ active: mhs.currentTabId === tab.id }"
+                :data-id="tab.id"
+                draggable="true"
+                :class="{
+                  active: mhs.currentTabId === tab.id,
+                  'drag-hover': currentDragHoverTabId === tab.id
+                }"
+                @contextmenu="handleContextMenu($event, tab.id)"
                 @click="handleTabChange(tab.id)"
                 @mouseup="handleMouseUp($event, tab.id)"
+                @dragstart="handleTabDragStart($event, tab.id)"
+                @drop="handleTabDrop($event, tab.id)"
+                @dragover="handleTabDragOver($event, tab.id)"
+                @dragleave="handleTagDragLeave($event, tab.id)"
+                @dragend="handleTagDragEnd($event, tab.id)"
               >
-                <Transition name="fade" mode="out-in">
-                  <NSpin v-if="isTabLoading(tab)" :size="12" class="tab-icon" />
-                  <LcuImage
-                    class="tab-icon"
-                    v-else-if="ogs.championSelections && ogs.championSelections[tab.puuid]"
-                    :src="championIconUri(ogs.championSelections[tab.puuid])"
-                  />
-                  <LcuImage
-                    class="tab-icon"
-                    v-else-if="tab.summoner"
-                    :src="profileIconUri(tab.summoner.profileIconId)"
-                  />
-                  <div v-else class="tab-icon"></div>
-                </Transition>
+                <NBadge
+                  :show="tab.spectatorData !== null"
+                  dot
+                  :size="4"
+                  color="#00ff00"
+                  processing
+                  :offset="[-20, 2]"
+                >
+                  <Transition name="fade" mode="out-in">
+                    <NSpin v-if="isTabLoading(tab)" :size="12" class="tab-icon" />
+                    <LcuImage
+                      class="tab-icon"
+                      v-else-if="ogs.championSelections && ogs.championSelections[tab.puuid]"
+                      :src="championIconUri(ogs.championSelections[tab.puuid])"
+                    />
+                    <LcuImage
+                      class="tab-icon"
+                      v-else-if="tab.summoner"
+                      :src="profileIconUri(tab.summoner.profileIconId)"
+                    />
+                    <div v-else class="tab-icon tab-icon-placeholder"></div>
+                  </Transition>
+                </NBadge>
                 <template v-if="tab.summoner">
                   <div class="summoner-name">
                     <span class="game-name">{{ tab.summoner.gameName }}</span>
@@ -39,12 +77,13 @@
                   </div>
                 </template>
                 <template v-else>
-                  <span>{{ tab.id.slice(0, 16) }}...</span>
+                  <span class="empty-placeholder-text">{{ tab.id.slice(0, 16) }}...</span>
                 </template>
                 <NIcon @click.stop="mhs.closeTab(tab.id)" class="close-icon"><CloseIcon /></NIcon>
               </div>
             </template>
-            <div class="tab-popover">{{ tab.summoner?.puuid || tab.id }}</div>
+            <!-- TODO 提供一个悬停查看 -->
+            <div class="tab-popover">{{ 'placeholder' }}</div>
           </NPopover>
         </div>
       </NScrollbar>
@@ -65,8 +104,8 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
-import { NIcon, NPopover, NScrollbar, NSpin } from 'naive-ui'
-import { ref, useTemplateRef } from 'vue'
+import { NBadge, NDropdown, NIcon, NPopover, NScrollbar, NSpin } from 'naive-ui'
+import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import { TabState, useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
@@ -80,7 +119,6 @@ const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
 const scrollBarEl = useTemplateRef('scrollbar')
-
 const handleWheel = (e: WheelEvent) => {
   scrollBarEl.value?.scrollBy({
     left: e.deltaY * 0.75 // 这个速度会舒服一点
@@ -110,6 +148,154 @@ const { navigateToTab } = mh.useNavigateToTab()
 const handleTabChange = async (unionId: string) => {
   navigateToTab(unionId)
 }
+
+const alignTabToVisibleArea = (tabId: string) => {
+  const tabEl = document.querySelector(`.tab[data-id="${tabId}"]`)
+  const parentEl = scrollBarEl.value?.$el.nextElementSibling as HTMLElement
+
+  if (!tabEl || !parentEl) {
+    return
+  }
+
+  const tabRect = tabEl.getBoundingClientRect()
+  const parentRect = parentEl.getBoundingClientRect()
+
+  if (tabRect.left < parentRect.left) {
+    tabEl.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'start'
+    })
+  } else if (tabRect.right > parentRect.right) {
+    tabEl.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'end'
+    })
+  }
+}
+
+const AKARI_MIME_TYPE = 'x-league-akari-tab-drag'
+const currentDragHoverTabId = ref<string | null>(null)
+
+const handleTabDragStart = (event: DragEvent, id: string) => {
+  event.dataTransfer?.setData(AKARI_MIME_TYPE, id)
+  contextMenuState.show = false
+}
+
+const handleTabDragOver = (event: DragEvent, id: string) => {
+  event.preventDefault()
+  currentDragHoverTabId.value = id
+}
+
+const handleTagDragEnd = (_event: DragEvent, _id: string) => {
+  currentDragHoverTabId.value = null
+}
+
+const handleTagDragLeave = (_event: DragEvent, _id: string) => {
+  currentDragHoverTabId.value = null
+}
+
+const handleTabDrop = (event: DragEvent, id: string) => {
+  const fromId = event.dataTransfer?.getData(AKARI_MIME_TYPE)
+  if (fromId) {
+    mhs.moveTabBefore(fromId, id)
+    nextTick(() => mhs.currentTabId && alignTabToVisibleArea(mhs.currentTabId))
+  }
+
+  currentDragHoverTabId.value = null
+}
+
+const handleContextMenu = (event: MouseEvent, id: string) => {
+  event.preventDefault()
+
+  contextMenuState.show = false
+
+  // 根据 naive-ui 的官方用例
+  // 但不加 nextTick 似乎也没问题
+  nextTick(() => {
+    const height =
+      getComputedStyle(document.documentElement).getPropertyValue('--title-bar-height') || '0'
+    contextMenuState.x = event.clientX
+    contextMenuState.y = event.clientY - parseInt(height)
+    contextMenuState.show = true
+    contextMenuState.id = id
+  })
+}
+
+const contextMenuState = reactive({
+  x: 0,
+  y: 0,
+  show: false,
+  id: ''
+})
+
+const contextMenuOptions = reactive([
+  {
+    label: '刷新',
+    key: 'refresh',
+    disabled: computed(() => {
+      const tab = mhs.tabs.find((t) => t.id === contextMenuState.id)
+      if (tab) {
+        return isTabLoading(tab)
+      }
+
+      return true
+    })
+  },
+  {
+    label: '关闭',
+    key: 'close'
+  },
+  {
+    label: '关闭其他页面',
+    key: 'close-others',
+    disabled: computed(() => !mhs.canCloseOtherTabs(contextMenuState.id))
+  }
+])
+
+const handleContextMenuSelect = (key: string) => {
+  switch (key) {
+    case 'refresh':
+      mh.events.emit('refresh-tab', contextMenuState.id)
+      break
+    case 'close':
+      mhs.closeTab(contextMenuState.id)
+      break
+    case 'close-others':
+      mhs.closeOtherTabs(contextMenuState.id)
+      break
+  }
+
+  contextMenuState.show = false
+}
+
+// 保证活动页面始终在可视区域内
+watch(
+  () => mhs.currentTabId,
+  (current) => {
+    if (!current) {
+      return
+    }
+
+    nextTick(() => alignTabToVisibleArea(current))
+  },
+  { immediate: true }
+)
+
+const currentTabSummoner = computed(() => {
+  return mhs.tabs.find((t) => t.id === mhs.currentTabId)?.summoner
+})
+
+// 保证更新后的活动页面也在可视区域内
+watch(
+  () => currentTabSummoner.value,
+  (summoner) => {
+    if (summoner) {
+      nextTick(() => mhs.currentTabId && alignTabToVisibleArea(mhs.currentTabId))
+    }
+  }
+)
 </script>
 
 <style lang="less" scoped>
@@ -136,16 +322,19 @@ const handleTabChange = async (unionId: string) => {
   flex-shrink: 0;
   padding: 0 4px 0 8px;
   box-sizing: border-box;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    filter 0.2s;
   line-height: 1;
   filter: brightness(0.55);
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.1);
+    filter: brightness(0.8);
   }
 
   .tab-icon {
@@ -155,6 +344,11 @@ const handleTabChange = async (unionId: string) => {
     margin-right: 4px;
     width: 16px;
     height: 16px;
+  }
+
+  .tab-icon-placeholder {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
   }
 
   .close-icon {
@@ -175,6 +369,11 @@ const handleTabChange = async (unionId: string) => {
     align-items: flex-end;
   }
 
+  .empty-placeholder-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
   .game-name {
     font-size: 12px;
     font-weight: bold;
@@ -189,7 +388,12 @@ const handleTabChange = async (unionId: string) => {
 
   &.active {
     filter: brightness(1);
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.12);
+  }
+
+  &.drag-hover {
+    filter: brightness(0.8);
+    background-color: rgba(255, 255, 255, 0.4);
   }
 }
 

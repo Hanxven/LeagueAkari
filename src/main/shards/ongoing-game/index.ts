@@ -123,6 +123,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'championSelections',
       'gameInfo',
       'positionAssignments',
+      'playerStats',
       'premadeTeams',
       'queryStage',
       'teams',
@@ -136,6 +137,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this._handleLoad()
     this._handleIpcCall()
     this._handleCalculation()
+    this._handleEndOfGameSave()
 
     // for better control
     this._setting.onChange('matchHistoryLoadCount', async (value, { setter }) => {
@@ -160,13 +162,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private _handlePQueue() {
     this._mhQueue.on('active', () => {
       this._log.debug(
-        `更新队列: 并发=${this._mhQueue.concurrency}, 当前数量=${this._mhQueue.size}, 等待中=${this._mhQueue.pending}`
+        `更新战绩查询队列: 并发=${this._mhQueue.concurrency}, 当前数量=${this._mhQueue.size}, 等待中=${this._mhQueue.pending}`
       )
     })
 
     this._queue.on('active', () => {
       this._log.debug(
-        `更新队列: 并发=${this._mhQueue.concurrency}, 当前数量=${this._mhQueue.size}, 等待中=${this._mhQueue.pending}`
+        `更新普通查询队列: 并发=${this._mhQueue.concurrency}, 当前数量=${this._mhQueue.size}, 等待中=${this._mhQueue.pending}`
       )
     })
 
@@ -433,7 +435,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         tag
       }
 
-      runInAction(() => this.state.matchHistory[puuid] = toBeLoaded)
+      runInAction(() => (this.state.matchHistory[puuid] = toBeLoaded))
       this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
     } else {
       const res = await this._queue
@@ -455,7 +457,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         source: 'lcu' as 'sgp' | 'lcu'
       }
 
-      runInAction(() => this.state.matchHistory[puuid] = toBeLoaded)
+      runInAction(() => (this.state.matchHistory[puuid] = toBeLoaded))
       this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
     }
   }
@@ -488,7 +490,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const data = res.data
 
     const toBeLoaded = { data, source: 'lcu' as 'sgp' | 'lcu' }
-    runInAction(() =>  this.state.summoner[puuid] = toBeLoaded)
+    runInAction(() => (this.state.summoner[puuid] = toBeLoaded))
     this._ipc.sendEvent(OngoingGameMain.id, 'summoner-loaded', puuid, toBeLoaded)
   }
 
@@ -528,7 +530,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       return
     }
 
-    runInAction(() => this.state.savedInfo[puuid] = res)
+    runInAction(() => (this.state.savedInfo[puuid] = res))
     this._ipc.sendEvent(OngoingGameMain.id, 'saved-info-loaded', puuid, res)
   }
 
@@ -559,7 +561,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const data = res.data
 
     const toBeLoaded = { data, source: 'lcu' as 'sgp' | 'lcu' }
-    runInAction(() => this.state.rankedStats[puuid] = toBeLoaded)
+    runInAction(() => (this.state.rankedStats[puuid] = toBeLoaded))
     this._ipc.sendEvent(OngoingGameMain.id, 'ranked-stats-loaded', puuid, toBeLoaded)
   }
 
@@ -602,7 +604,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       }, {} as any)
 
     const toBeLoaded = { data: simplifiedMastery, source: 'lcu' as 'sgp' | 'lcu' }
-    runInAction(() => this.state.championMastery[puuid] = toBeLoaded)
+    runInAction(() => (this.state.championMastery[puuid] = toBeLoaded))
     this._ipc.sendEvent(OngoingGameMain.id, 'champion-mastery-loaded', puuid, toBeLoaded)
   }
 
@@ -778,6 +780,53 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         this.state.setPremadeTeams(this._calcTeamUp())
       },
       { delay: 200, equals: comparer.shallow }
+    )
+  }
+
+  private async _handleEndOfGameSave() {
+    const isInEndOfGame = computed(() => {
+      return (
+        this._lc.data.gameflow.phase === 'EndOfGame' ||
+        this._lc.data.gameflow.phase === 'PreEndOfGame'
+      )
+    })
+
+    this._mobx.reaction(
+      () => isInEndOfGame.get(),
+      async (yes) => {
+        if (yes) {
+          if (
+            !this._lc.state.auth ||
+            !this._lc.data.summoner.me ||
+            !this.state.queryStage.gameInfo
+          ) {
+            return
+          }
+
+          const players = Object.values(this.state.teams || {}).flat()
+
+          for (const player of players) {
+            await this._saved.saveEncounteredGame({
+              gameId: this.state.queryStage.gameInfo.gameId,
+              puuid: player,
+              region: this._lc.state.auth.region,
+              rsoPlatformId: this._lc.state.auth.rsoPlatformId,
+              selfPuuid: this._lc.data.summoner.me.puuid,
+              queueType: this.state.queryStage.gameInfo.queueType
+            })
+
+            this._log.info(`保存了对局信息: ${this.state.queryStage.gameInfo.gameId}`)
+            await this._saved.saveSavedPlayer({
+              encountered: true,
+              puuid: player,
+              selfPuuid: this._lc.data.summoner.me.puuid,
+              region: this._lc.state.auth.region,
+              rsoPlatformId: this._lc.state.auth.rsoPlatformId
+            })
+            this._log.info(`保存了玩家信息: ${player}`)
+          }
+        }
+      }
     )
   }
 

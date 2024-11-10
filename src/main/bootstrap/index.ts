@@ -95,7 +95,7 @@ function handleUnhandledErrors(logger: Logger) {
 
   process.on('unhandledRejection', (error) => {
     logger.warn({
-      message: `功能初始化时出现错误 ${formatError(error)}`,
+      message: `意料之外的 Rejection ${formatError(error)}`,
       namespace: 'error-handling'
     })
   })

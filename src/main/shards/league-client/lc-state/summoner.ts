@@ -1,4 +1,4 @@
-import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class SummonerState {
@@ -7,17 +7,23 @@ export class SummonerState {
    */
   me: SummonerInfo | null = null
 
+  profile: SummonerProfile | null = null
+
   /**
    * 该大区是否启用了新 ID 系统，e.g. `雪之下雪乃#10000`
    */
   newIdSystemEnabled: boolean = false
 
   constructor() {
-    makeAutoObservable(this, { me: observable.struct })
+    makeAutoObservable(this, { me: observable.struct, profile: observable.struct })
   }
 
   setMe(value: SummonerInfo | null) {
     this.me = value
+  }
+
+  setProfile(value: SummonerProfile | null) {
+    this.profile = value
   }
 
   setNewIdSystemEnabled(enabled: boolean) {

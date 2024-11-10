@@ -1,4 +1,4 @@
-import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
 import { AxiosInstance } from 'axios'
 
 export class SummonerHttpApi {
@@ -58,5 +58,10 @@ export class SummonerHttpApi {
     const response = await this.getSummonerAliases([{ gameName: name, tagLine: tag }])
     const result = response.data[0]
     return result || null
+  }
+
+  // /lol-summoner/v1/current-summoner/summoner-profile
+  getSummonerProfile() {
+    return this._http.get<SummonerProfile>('/lol-summoner/v1/current-summoner/summoner-profile')
   }
 }

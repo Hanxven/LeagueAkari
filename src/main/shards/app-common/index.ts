@@ -1,6 +1,7 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 import { app, shell } from 'electron'
+import { clipboard } from 'electron'
 
 import { AkariIpcMain } from '../ipc'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -108,6 +109,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
     this._ipc.onCall(AppCommonMain.id, 'openUserDataDir', () => {
       return this.openUserDataDir()
+    })
+
+    this._ipc.onCall(AppCommonMain.id, 'readClipboardText', () => {
+      return clipboard.readText()
     })
   }
 }

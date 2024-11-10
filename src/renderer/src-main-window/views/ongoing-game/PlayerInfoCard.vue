@@ -26,9 +26,7 @@
           <span
             class="name"
             :style="{
-              color: premadeTeamId
-                ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
-                : undefined
+              color: premadeTeamId ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor : undefined
             }"
             >{{ summoner?.gameName || summoner?.displayName || '—' }}</span
           >
@@ -435,6 +433,8 @@
 
 <script setup lang="ts">
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SavedInfo } from '@renderer-shared/shards/ongoing-game/store'
 import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { Game } from '@shared/types/league-client/match-history'
@@ -463,10 +463,8 @@ import {
   PREMADE_TEAM_COLORS,
   RANKED_MEDAL_MAP
 } from './ongoing-game-utils'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 
-const { puuid, analysis, matchHistory, position, premadeTeamId, summoner, rankedStats } =
+const { puuid, analysis, matchHistory, position, premadeTeamId, summoner, rankedStats, savedInfo } =
   defineProps<{
     puuid: string
     championId?: number

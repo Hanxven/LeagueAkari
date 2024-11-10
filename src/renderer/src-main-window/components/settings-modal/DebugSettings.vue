@@ -25,7 +25,6 @@
         :status="editRuleValid ? 'success' : 'error'"
       />
     </NModal>
-
     <NCard size="small">
       <template #header><span class="card-header-title">Akari's Electron</span></template>
       <ControlItem
@@ -268,9 +267,9 @@ const columns: DataTableColumn<any>[] = [
       return h(NCheckbox, {
         'onUpdate:checked': (val: boolean) => {
           if (val) {
-            rd.enableRule(row.rule)
+            rd.enableRule(row.data.rule)
           } else {
-            rd.disableRule(row.rule)
+            rd.disableRule(row.data.rule)
           }
         },
         checked: row.data.enabled,
@@ -287,7 +286,7 @@ const columns: DataTableColumn<any>[] = [
         {
           style: { userSelect: 'text' }
         },
-        row.rule
+        row.data.rule
       )
     }
   },
@@ -303,7 +302,7 @@ const columns: DataTableColumn<any>[] = [
             size: 'tiny',
             type: 'error',
             secondary: true,
-            onClick: () => handleRemoveEditRule(row.rule)
+            onClick: () => handleRemoveEditRule(row.data.rule)
           },
           { default: () => '删除' }
         )
@@ -373,7 +372,7 @@ const handleAddRule = async () => {
     return
   }
 
-  rd.disableRule(editRuleText.value)
+  rd.addRule(editRuleText.value)
 
   editRuleModalShow.value = false
 }

@@ -8,7 +8,7 @@
           :duration="100"
           :delay="300"
           :keep-alive-on-hover="false"
-          :disabled="!data[lcs.champSelect.currentChampion]"
+          :disabled="!hasChampionAdjustment(lcs.champSelect.currentChampion)"
         >
           <template #trigger>
             <LcuImage
@@ -68,7 +68,7 @@
           v-for="c of benchChampions"
           :key="c.championId"
           :keep-alive-on-hover="false"
-          :disabled="!data[c.championId]"
+          :disabled="!hasChampionAdjustment(c.championId)"
         >
           <template #trigger>
             <LcuImage
@@ -105,10 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  BalanceAdjustment,
-  useChampionBalanceData
-} from '@aux-window/compositions/useBalanceData'
+import { BalanceAdjustment, useChampionBalanceData } from '@aux-window/compositions/useBalanceData'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -242,6 +239,26 @@ const championAdjustment = (championId: number) => {
         formattedValue: formatValue(item)
       }))
   }
+}
+
+const hasChampionAdjustment = (championId: number) => {
+  if (!gameMode.value) {
+    return false
+  }
+
+  const champion = data.value[championId]
+
+  if (!champion) {
+    return false
+  }
+
+  const modeAdjustment = champion.modes[gameMode.value]
+
+  if (!modeAdjustment) {
+    return false
+  }
+
+  return modeAdjustment.adjustments.length > 0
 }
 
 const benchChampions = computed(() => {

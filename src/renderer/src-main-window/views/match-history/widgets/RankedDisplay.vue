@@ -230,6 +230,7 @@ const formatPreviousTier = computed(() => {
   display: flex;
   font-size: 10px;
   color: rgb(200, 200, 200);
+  align-items: center;
 
   .label {
     margin-right: 2px;
@@ -239,7 +240,7 @@ const formatPreviousTier = computed(() => {
     width: 16px;
     height: 16px;
     margin-right: 2px;
-    vertical-align: bottom;
+    vertical-align: middle;
   }
 
   &.highest-unranked {

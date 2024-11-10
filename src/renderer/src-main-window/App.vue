@@ -7,7 +7,16 @@
       v-model:show="isShowingFreeSoftwareDeclaration"
       @confirm="handleConfirmation"
     />
-    <div class="background-wallpaper"></div>
+    <Transition name="bg-fade">
+      <div
+        :key="muis.backgroundSkinUrl"
+        class="background-wallpaper"
+        :class="{ 'no-image': !muis.backgroundSkinUrl }"
+        :style="{
+          backgroundImage: `url('${muis.backgroundSkinUrl}')`
+        }"
+      ></div>
+    </Transition>
     <MainWindowTitleBar />
     <div id="app-content"><RouterView /></div>
   </div>
@@ -30,8 +39,11 @@ import DeclarationModal from './components/DeclarationModal.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
+import { useMainWindowUiStore } from './shards/main-window-ui/store'
 
 setupNaiveUiNotificationEvents()
+
+const muis = useMainWindowUiStore()
 
 const su = useSelfUpdateStore()
 const as = useAppCommonStore()
@@ -161,9 +173,8 @@ useKeyboardCombo('AKARI', {
   background-size: cover;
   background-position: center;
   z-index: -1;
-  background-image: url('@main-window/assets/zoe_splash_centered_9.jpg');
 
-  &:before {
+  &::before {
     content: '';
     position: absolute;
     top: 0;
@@ -173,9 +184,32 @@ useKeyboardCombo('AKARI', {
     background: linear-gradient(
       180deg,
       rgba(0, 0, 0, 0.75) 0%,
-      rgba(0, 0, 0, 0.95) 75%,
-      rgba(0, 0, 0, 0.95) 100%
+      rgba(0, 0, 0, 0.85) 75%,
+      rgba(0, 0, 0, 0.85) 100%
     );
   }
+
+  &.no-image {
+    background-color: var(--background-color-primary);
+
+    &::before {
+      background: none;
+    }
+  }
+}
+
+.bg-fade-enter-active,
+.bg-fade-leave-active {
+  transition: opacity 1s;
+}
+
+.bg-fade-enter-from,
+.bg-fade-leave-to {
+  opacity: 0;
+}
+
+.bg-fade-enter-to,
+.bg-fade-leave-from {
+  opacity: 1;
 }
 </style>

@@ -23,7 +23,10 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   ]
 
   static UX_PROCESS_NAME = 'LeagueClientUx.exe'
-  static CLIENT_CMD_POLL_INTERVAL = 2000
+  static CLIENT_CMD_DEFAULT_POLL_INTERVAL = 2000
+  static CLIENT_CMD_LONG_POLL_INTERVAL = 8000
+
+  private _pollInterval = LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL
 
   public readonly settings = new LeagueClientUxSettings()
   public readonly state = new LeagueClientUxState()
@@ -69,11 +72,24 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     }
   }
 
+  setPollInterval(interval: number, immediate = false) {
+    this._pollInterval = interval
+    if (this._pollTimerId) {
+      clearInterval(this._pollTimerId)
+
+      if (immediate) {
+        this.update()
+      }
+
+      this._pollTimerId = setInterval(() => this.update(), interval)
+    }
+  }
+
   private _handlePollExistingUx() {
     this.update()
     this._pollTimerId = setInterval(
       () => this.update(),
-      LeagueClientUxMain.CLIENT_CMD_POLL_INTERVAL
+      LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL
     )
   }
 
@@ -89,7 +105,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
       }
       this._pollTimerId = setInterval(
         () => this.update(),
-        LeagueClientUxMain.CLIENT_CMD_POLL_INTERVAL
+        LeagueClientUxMain.CLIENT_CMD_DEFAULT_POLL_INTERVAL
       )
     } catch (error) {
       this._ipc.sendEvent(LeagueClientUxMain.id, 'error-polling')

@@ -17,7 +17,7 @@ import { GameClientSettings } from './state'
 
 export interface LaunchSpectatorConfig {
   locale?: string
-  region: string
+  sgpServerId: string
   puuid: string
 }
 
@@ -117,7 +117,7 @@ export class GameClientMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(GameClientMain.id, 'launchSpectator', (config: LaunchSpectatorConfig) => {
-      this.launchSpectator(config)
+      return this.launchSpectator(config)
     })
   }
 
@@ -137,10 +137,18 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   async launchSpectator(config: LaunchSpectatorConfig) {
+    const gf = await this._sgp.getSpectatorGameflow(config.puuid, config.sgpServerId)
+
+    if (!gf) {
+      const err = new Error('未找到游戏')
+      err.name = 'GameNotFound'
+      throw err
+    }
+
     const {
       game: { gameMode },
       playerCredentials: { observerServerIp, observerServerPort, observerEncryptionKey, gameId }
-    } = await this._sgp.getSpectatorGameflow(config.puuid, config.region)
+    } = gf
 
     if (!this.http) {
       throw new Error('LCU not connected')
@@ -151,17 +159,30 @@ export class GameClientMain implements IAkariShardInitDispose {
       gameInstallRoot: string
     }>('/lol-patch/v1/products/league_of_legends/install-location')
 
+    // sgpServerId 格式为 region_platformId, 或 region
+    const [region, rsoPlatformId] = config.sgpServerId.split('_')
+
     const cmds = [
-      `spectator ${observerServerIp}:${observerServerPort} ${observerEncryptionKey} ${gameId} ${config.region}`,
+      `spectator ${observerServerIp}:${observerServerPort} ${observerEncryptionKey} ${gameId} ${region}`,
       `-GameBaseDir=${installDir.gameInstallRoot}`,
-      `-Locale=${config.locale || 'zh-CN'}`
+      `-Locale=${config.locale || 'zh_CN'}`,
+      `-GameID=${gameId}`,
+      `-Region=${region}`,
+      `-UseNewX3D=1`,
+      '-PlayerNameMode=ALIAS',
+      '-UseNewX3DFramebuffers=1'
     ]
 
     if (gameMode === 'TFT') {
       cmds.push('-Product=TFT')
+    } else {
+      cmds.push('-Product=LoL')
     }
 
-    // 调起进程但不与其关联
+    if (rsoPlatformId) {
+      cmds.push(`-PlatformId=${rsoPlatformId}`)
+    }
+
     const p = cp.spawn(installDir.gameExecutablePath, cmds, {
       cwd: installDir.gameInstallRoot,
       detached: true

@@ -138,10 +138,10 @@ watch(
   { immediate: true }
 )
 
-const { navigateToTab } = mh.useNavigateToTab()
+const { navigateToTabByPuuid } = mh.useNavigateToTab()
 
 const handleToSummoner = (puuid) => {
-  navigateToTab(puuid)
+  navigateToTabByPuuid(puuid)
 }
 </script>
 

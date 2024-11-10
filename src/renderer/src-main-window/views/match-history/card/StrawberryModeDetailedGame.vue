@@ -188,7 +188,6 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
 
 <style lang="less" scoped>
 .detailed-game-card {
-  background-color: rgb(45, 45, 45);
   border-radius: 4px;
   width: 740px;
   overflow: hidden;
@@ -364,11 +363,11 @@ table {
   width: 100%;
 
   &.win {
-    background-color: rgb(30, 39, 58);
+    background-color: rgba(30, 39, 58, 0.8);
   }
 
   &.lose {
-    background-color: rgb(65, 39, 43);
+    background-color: rgba(65, 39, 43, 0.8);
   }
 }
 

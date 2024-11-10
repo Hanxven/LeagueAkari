@@ -72,6 +72,17 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
+      <template #header><span class="card-header-title">主窗口界面</span></template>
+      <ControlItem
+        class="control-item-margin"
+        label="使用生涯皮肤背景"
+        label-description="League Akari 将使用当前玩家的生涯背景皮肤作为背景"
+        :label-width="320"
+      >
+        <NSwitch size="small" v-model:value="muis.settings.useProfileSkinAsBackground" />
+      </ControlItem>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">LCU 连接</span></template>
       <ControlItem
         class="control-item-margin"
@@ -131,11 +142,14 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip, useDialog } from 'naive-ui'
 
+import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
+
 const lcus = useLeagueClientUxStore()
 const lcs = useLeagueClientStore()
 const sus = useSelfUpdateStore()
 const wms = useWindowManagerStore()
 const as = useAppCommonStore()
+const muis = useMainWindowUiStore()
 
 const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')

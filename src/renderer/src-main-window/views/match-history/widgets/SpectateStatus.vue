@@ -42,6 +42,26 @@
             LCU API 观战</NButton
           >
         </ControlItem>
+        <ControlItem
+          style="margin-top: 8px"
+          label="复制观战口令"
+          :label-width="240"
+          label-description="可以在另一个 League Akari 中调起观战进程"
+        >
+          <NButton
+            class="launch-spectator"
+            size="tiny"
+            @click="handleCopyToken"
+            :disabled="!canSpectate"
+          >
+            <template #icon>
+              <NIcon>
+                <CopyAllFilledIcon />
+              </NIcon>
+            </template>
+            复制</NButton
+          >
+        </ControlItem>
       </NPopover>
     </div>
     <div class="time">
@@ -131,14 +151,18 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
-import { PlayCircleFilled as PlayCircleFilledIcon } from '@vicons/material'
+import {
+  CopyAllFilled as CopyAllFilledIcon,
+  PlayCircleFilled as PlayCircleFilledIcon
+} from '@vicons/material'
 import { createReusableTemplate, useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import dayjs from 'dayjs'
-import { NButton, NIcon, NPopover } from 'naive-ui'
+import { NButton, NIcon, NPopover, useMessage } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
@@ -160,10 +184,12 @@ const [DefineTeamSide, TeamSide] = createReusableTemplate<{
 const {
   data,
   puuid,
-  isCrossRegion = false
+  isCrossRegion = false,
+  sgpServerId
 } = defineProps<{
   isCrossRegion?: boolean
   puuid: string
+  sgpServerId: string
   data: SpectatorData
 }>()
 
@@ -177,6 +203,7 @@ const isTftMode = computed(() => {
 })
 
 const lcs = useLeagueClientStore()
+const as = useAppCommonStore()
 const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
 
 const teams = computed(() => {
@@ -278,6 +305,27 @@ const handleSpectate = (byLcuApi: boolean) => {
   isSpectatorAvailable.value = false
   start()
   emits('launchSpectator', puuid, byLcuApi)
+}
+
+const message = useMessage()
+
+const handleCopyToken = () => {
+  const token = {
+    akariVersion: as.version,
+    sgpServerId,
+    puuid
+  }
+
+  const str = JSON.stringify(token)
+
+  navigator.clipboard
+    .writeText(str)
+    .then(() => {
+      message.success('已复制观战口令')
+    })
+    .catch(() => {
+      message.error('复制观战口令失败')
+    })
 }
 </script>
 

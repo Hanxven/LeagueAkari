@@ -2,7 +2,7 @@
   <NCard size="small">
     <template #header><span class="card-header-title">召唤师 Profile</span></template>
     <NModal
-      style="max-width: 560px"
+      style="width: fit-content;"
       preset="card"
       size="small"
       title="选择皮肤"

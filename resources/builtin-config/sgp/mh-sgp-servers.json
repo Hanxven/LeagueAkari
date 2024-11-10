@@ -74,31 +74,31 @@
   "tencentServerMatchHistoryInteroperability": [
     "TENCENT_HN1",
     "TENCENT_HN10",
-    "TENCENT_TJ100",
-    "TENCENT_TJ101",
     "TENCENT_NJ100",
     "TENCENT_GZ100",
     "TENCENT_CQ100",
+    "TENCENT_TJ100",
+    "TENCENT_TJ101",
     "TENCENT_BGP2"
   ],
   "tencentServerSpectatorInteroperability": [
     "TENCENT_HN1",
     "TENCENT_HN10",
-    "TENCENT_TJ100",
-    "TENCENT_TJ101",
     "TENCENT_NJ100",
     "TENCENT_GZ100",
     "TENCENT_CQ100",
+    "TENCENT_TJ100",
+    "TENCENT_TJ101",
     "TENCENT_BGP2"
   ],
   "tencentServerSummonerInteroperability": [
     "TENCENT_HN1",
     "TENCENT_HN10",
-    "TENCENT_TJ100",
-    "TENCENT_TJ101",
     "TENCENT_NJ100",
     "TENCENT_GZ100",
     "TENCENT_CQ100",
+    "TENCENT_TJ100",
+    "TENCENT_TJ101",
     "TENCENT_BGP2"
   ]
 }

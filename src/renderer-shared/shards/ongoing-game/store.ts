@@ -107,7 +107,9 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const teams = shallowRef<Record<string, string[]> | null>(null)
 
   // untyped
-  const queryStage = shallowRef()
+  const queryStage = shallowRef<{
+    phase: 'unavailable' | 'champ-select' | 'in-game'
+  }>({ phase: 'unavailable' })
   const isInEog = shallowRef(false)
   const premadeTeams = shallowRef<Record<string, string[][]> | null>(null)
 

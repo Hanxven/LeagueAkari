@@ -21,6 +21,7 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
 import { MatchHistoryTabsRenderer } from './match-history-tabs'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
+import { MainWindowUiRenderer } from './main-window-ui'
 
 const manager = createManager()
 
@@ -45,7 +46,8 @@ manager.use(
   SelfUpdateRenderer,
   SettingUtilsRenderer,
   SgpRenderer,
-  WindowManagerRenderer
+  WindowManagerRenderer,
+  MainWindowUiRenderer
 )
 
 export { manager }

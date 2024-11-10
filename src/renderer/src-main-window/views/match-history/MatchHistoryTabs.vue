@@ -13,24 +13,31 @@
     <div v-else class="tabs-placeholder">
       <div class="centered">
         <LeagueAkariSpan bold class="akari-text" />
-        <div
-          v-if="lcs.connectionState !== 'connected'"
-          style="font-size: 14px; font-weight: normal; color: #666; margin-top: 8px"
-        >
-          未连接到客户端
-        </div>
+        <div v-if="lcs.connectionState !== 'connected'" class="disconnected">未连接到客户端</div>
+        <template v-if="lcs.summoner.me && mhs.tabs.length === 0">
+          <div class="no-tab">当前没有活跃的战绩页面</div>
+          <div class="shortcut" @click="handleOpenSelfTab">
+            <LcuImage
+              class="shortcut-profile-icon"
+              :src="profileIconUri(lcs.summoner.me.profileIconId)"
+            />
+            <span class="shortcut-game-name">{{ lcs.summoner.me.gameName }}</span>
+            <span class="shortcut-tag-line">#{{ lcs.summoner.me.tagLine }}</span>
+          </div>
+        </template>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { computed, reactive, useTemplateRef, watch } from 'vue'
+import { computed, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 // import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
@@ -44,30 +51,12 @@ const lcs = useLeagueClientStore()
 const route = useRoute()
 const router = useRouter()
 
-const ogs = useOngoingGameStore()
-const sgps = useSgpStore()
 const mhs = useMatchHistoryTabsStore()
+const ogs = useOngoingGameStore()
 
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
-const handleTabClose = (id: string) => {
-  mhs.closeTab(id)
-}
-
-const { navigateToTab } = mh.useNavigateToTab()
-
-const handleTabChange = async (unionId: string) => {
-  navigateToTab(unionId)
-}
-
 const tabsRef = useTemplateRef('tabs-ref')
-
-const handleRefresh = async (puuid: string) => {
-  if (tabsRef.value) {
-    const tab = tabsRef.value.find((t) => t && t.puuid === puuid)
-    tab?.refresh()
-  }
-}
 
 const matchHistoryRoute = computed(() => {
   if (route.name !== 'match-history') {
@@ -84,7 +73,7 @@ const matchHistoryRoute = computed(() => {
   return null
 })
 
-// 路由到页面
+// 路由 ==> 页面
 watch(
   () => matchHistoryRoute.value,
   (route) => {
@@ -97,7 +86,7 @@ watch(
   { immediate: true }
 )
 
-// 页面到路由
+// 路由 <== 页面
 watch(
   () => mhs.currentTabId,
   (id) => {
@@ -106,7 +95,6 @@ watch(
       return
     }
 
-    // 保持路由同步
     if (matchHistoryRoute.value) {
       const tabId = mh.toUnionId(matchHistoryRoute.value.puuid, matchHistoryRoute.value.sgpServerId)
 
@@ -122,102 +110,44 @@ watch(
   { immediate: true }
 )
 
-const menuProps = reactive({
-  x: 0,
-  y: 0,
-  show: false,
-  id: '',
-  dragging: null as string | null,
-  hover: null as string | null
-})
+const isEndOfGame = computed(
+  () => lcs.gameflow.phase === 'EndOfGame' || lcs.gameflow.phase === 'PreEndOfGame'
+)
 
-const handleDragStart = (id: string) => {
-  menuProps.dragging = id
-}
-
-const handleDragEnter = (id: string) => {
-  menuProps.hover = id
-}
-
-const handleDragLeaveOrEnd = (_id: string) => {
-  menuProps.hover = null
-}
-
-const handleDrop = (id: string) => {
-  if (id === menuProps.dragging) {
-    return
-  }
-
-  const tab = mhs.getTab(id)
-
-  if (tab) {
-    // TODO DEBUG MOVE TAB
-    // mh.moveTab(menuProps.dragging!, id)
-  }
-
-  menuProps.dragging = null
-}
-
-const dropdownOptions = reactive([
-  {
-    label: '刷新',
-    key: 'refresh',
-    disabled: computed(() => {
-      const tab = mhs.tabs.find((t) => t.id === menuProps.id)
-      if (tab) {
-        return (
-          tab.isLoadingMatchHistory ||
-          tab.isLoadingRankedStats ||
-          tab.isLoadingSummoner ||
-          tab.isLoadingSpectatorData
-        )
+// 页面在游戏结束后刷新对应 tab 的战绩
+// 当该页面被 KeepAlive, 即使页面不可见也会触发
+watch(
+  () => isEndOfGame.value,
+  (is, _prevP) => {
+    if (mhs.settings.refreshTabsAfterGameEnds && is) {
+      if (!ogs.teams || !tabsRef.value) {
+        return
       }
 
-      return true
-    })
-  },
-  {
-    label: '关闭',
-    key: 'close',
-    disabled: computed(() => {
-      return mhs.getTab(menuProps.id)?.pinned
-    })
-  },
-  {
-    label: '关闭其他',
-    key: 'close-others',
-    disabled: computed(() => !mhs.canCloseOtherTabs(menuProps.id)) // TODO 设置其他
+      const allPlayerPuuids = Object.values(ogs.teams).flat()
+      tabsRef.value.forEach((tab) => {
+        if (tab && allPlayerPuuids.includes(tab.puuid)) {
+          tab.refresh()
+        }
+      })
+    }
   }
-])
+)
 
-const handleMouseUp = (event: PointerEvent, unionId: string) => {
-  if (event.button === 1) {
-    mhs.closeTab(unionId)
+const { navigateToTabByPuuid } = mh.useNavigateToTab()
+
+const handleOpenSelfTab = () => {
+  if (lcs.summoner.me) {
+    navigateToTabByPuuid(lcs.summoner.me.puuid)
   }
 }
 
-const handleMenuSelect = (action: string) => {
-  switch (action) {
-    case 'refresh':
-      handleRefresh(menuProps.id)
-      break
-    case 'close':
-      mhs.closeTab(menuProps.id)
-      break
-    case 'close-others':
-      mhs.closeOtherTabs(menuProps.id)
-      break
+mh.events.on('refresh-tab', (tabId: string) => {
+  const tab = tabsRef.value?.find((tab) => tab && tab.id === tabId)
+  if (tab) {
+    tab.refresh()
   }
-  menuProps.show = false
-}
-
-const handleShowMenu = (e: PointerEvent, puuid: string) => {
-  e.preventDefault()
-  menuProps.show = true
-  menuProps.x = e.clientX
-  menuProps.y = e.clientY - 30 /* 30 = title-bar-height */
-  menuProps.id = puuid
-}
+})
 </script>
 
 <style lang="less" scoped>
@@ -228,126 +158,10 @@ const handleShowMenu = (e: PointerEvent, puuid: string) => {
   flex-direction: column;
 }
 
-.tabs-header {
-  display: flex;
-  max-width: 100%;
-  z-index: 5;
-  // border-bottom: 1px solid #2b2b2b;
-
-  :deep(.n-tabs-tab) {
-    --n-tab-padding: 4px 8px;
-    --n-tab-border-radius: 0px;
-    border: none;
-    transition: none;
-  }
-
-  :deep(.n-tabs-tab-pad) {
-    --n-tab-gap: 2px;
-  }
-
-  :deep(.n-tabs .n-tabs-nav.n-tabs-nav--card-type .n-tabs-tab.tab-outer) {
-    transition: background-color 0.3s;
-  }
-
-  :deep(.n-tabs .n-tabs-nav.n-tabs-nav--card-type .n-tabs-tab.tab-outer:hover) {
-    background-color: rgba(255, 255, 255, 0.075);
-  }
-
-  :deep(.n-tabs .n-tabs-nav.n-tabs-nav--card-type .n-tabs-tab.tab-outer) {
-    height: 26px;
-  }
-
-  :deep(.n-tabs .n-tabs-nav.n-tabs-nav--top.n-tabs-nav--card-type .n-tabs-pad) {
-    border-bottom: none;
-  }
-
-  .tabs {
-    flex-grow: 1;
-    width: 0;
-  }
-
-  .search-zone {
-    width: 120px;
-    vertical-align: bottom;
-  }
-
-  .search-area {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    box-sizing: border-box;
-    font-size: 12px;
-    height: 22px;
-    outline: none;
-    border: none;
-    border-radius: 2px;
-    width: 108px;
-    background-color: rgba(255, 255, 255, 0.06);
-    margin: 2px auto;
-    color: rgb(99, 226, 183);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.15);
-    }
-
-    &:active {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-  }
-}
-
 .content {
   position: relative;
   flex: 1;
   height: 0;
-}
-
-:deep(.n-tabs-tab.n-tabs-tab--active) {
-  .tab-title-tag-line {
-    margin-left: 4px;
-    font-size: 13px;
-    color: var(--n-tab-text-color-active);
-  }
-}
-
-.tab {
-  display: flex;
-  align-items: center;
-  line-height: normal;
-
-  .tab-icon {
-    width: 16px;
-    height: 16px;
-    border-radius: 2px;
-  }
-
-  .tab-title-region-name {
-    margin-left: 4px;
-    font-size: 13px;
-  }
-
-  .tab-title-game-name {
-    margin-left: 4px;
-    font-size: 13px;
-    font-weight: bold;
-  }
-
-  .tab-title-tag-line {
-    margin-left: 4px;
-    font-size: 13px;
-    color: #a8a8a8;
-  }
-
-  .privacy-private-icon {
-    position: relative;
-    top: 1px;
-    font-size: 13px;
-    margin-left: 4px;
-    color: rgb(206, 52, 52);
-  }
 }
 
 .tabs-placeholder {
@@ -357,6 +171,55 @@ const handleShowMenu = (e: PointerEvent, puuid: string) => {
 
   .akari-text {
     font-size: 22px;
+  }
+
+  .disconnected {
+    font-size: 14px;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 8px;
+  }
+
+  .no-tab {
+    font-size: 14px;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 8px;
+  }
+
+  .shortcut {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+    background-color: rgba(255, 255, 255, 0.06);
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    backdrop-filter: blur(4px);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .shortcut-profile-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+
+    .shortcut-game-name {
+      margin-left: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .shortcut-tag-line {
+      margin-left: 4px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
+    }
   }
 }
 

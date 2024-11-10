@@ -80,9 +80,9 @@ Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/H
 
 百密一疏，各种问题总是难以避免，作为使用者，您可以：
 
-## 2.1 Github Issues
+## 2.1 GitHub Issues
 
-Github Issues 是最重要的反馈渠道，请精准描述您的需求、遇到的问题或任何可行的想法。
+GitHub Issues 是最重要的反馈渠道，请精准描述您的需求、遇到的问题或任何可行的想法。
 
 ## 2.2 加入开发
 
@@ -100,7 +100,7 @@ dev：`yarn dev`
 
 build（for Windows only）: `yarn build:win`
 
-## 3.2 Node 原生模块
+## 3.2 Node 原生模块 (可选)
 
 需要 MSVC 编译环境和 `node-gyp`。
 
@@ -123,18 +123,18 @@ node-gyp build
 
 League Akari 的实现参考了许多现有的优秀开源项目，这些项目为软件的部分模块开发提供了清晰的思路指导，特此表示感谢。❤️
 
-| 项目名称 | 描述 |
-| --- | --- |
-| ⭐⭐⭐ [Pengu Loader](https://github.com/PenguLoader/PenguLoader) | 用于 UX 客户端调试和逆向工程工具 |
-| ⭐⭐⭐ [League of Legends LCU and Riot Client API Docs](https://github.com/KebsCS/lcu-and-riotclient-api) | LCU API 文档参考 |
-| ⭐⭐ [Community Dragon](https://www.communitydragon.org/documentation/assets) | 资源管理和参考文档 |
-| ⭐⭐ [Seraphine](https://github.com/Zzaphkiel/Seraphine) | 缝合重灾区，提供了集成思路 |
-| ⭐ [fix-lcu-window](https://github.com/LeagueTavern/fix-lcu-window) | 修复客户端窗口大小问题的思路借鉴 |
-| ⭐ [Joi](https://github.com/watchingfun/Joi) | OP.GG 相关实现的参考 |
-| ⭐ [lol-helper](https://github.com/4379711/lol-helper) | (曾经的) 卡炫彩功能和工具设计的参考 |
-| ⭐ [vscode-league-respawn-timer](https://github.com/Coooookies/vscode-league-respawn-timer) | 重生倒计时功能的参考 |
-| ⭐ [LeaguePrank](https://github.com/LeagueTavern/LeaguePrank) | 趣味功能的实现参考 |
-| ⭐ [LCU API](https://www.mingweisamuel.com/lcu-schema/tool/#/) | LCU API 早期参考文档 |
+| 项目名称                                                                                                  | 描述                                |
+| --------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| ⭐⭐⭐ [Pengu Loader](https://github.com/PenguLoader/PenguLoader)                                         | 用于 UX 客户端调试和逆向工程工具    |
+| ⭐⭐⭐ [League of Legends LCU and Riot Client API Docs](https://github.com/KebsCS/lcu-and-riotclient-api) | LCU API 文档参考                    |
+| ⭐⭐ [Community Dragon](https://www.communitydragon.org/documentation/assets)                             | 资源管理和参考文档                  |
+| ⭐⭐ [Seraphine](https://github.com/Zzaphkiel/Seraphine)                                                  | 缝合重灾区，提供了集成思路          |
+| ⭐ [fix-lcu-window](https://github.com/LeagueTavern/fix-lcu-window)                                       | 修复客户端窗口大小问题的思路借鉴    |
+| ⭐ [Joi](https://github.com/watchingfun/Joi)                                                              | OP.GG 相关实现的参考                |
+| ⭐ [lol-helper](https://github.com/4379711/lol-helper)                                                    | (曾经的) 卡炫彩功能和工具设计的参考 |
+| ⭐ [vscode-league-respawn-timer](https://github.com/Coooookies/vscode-league-respawn-timer)               | 重生倒计时功能的参考                |
+| ⭐ [LeaguePrank](https://github.com/LeagueTavern/LeaguePrank)                                             | 趣味功能的实现参考                  |
+| ⭐ [LCU API](https://www.mingweisamuel.com/lcu-schema/tool/#/)                                            | LCU API 早期参考文档                |
 
 # 5. FAQ - 常见问题及回答
 

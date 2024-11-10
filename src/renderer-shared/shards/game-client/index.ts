@@ -8,7 +8,7 @@ import { useGameClientStore } from './store'
 // copied from main shard
 interface LaunchSpectatorConfig {
   locale?: string
-  region: string
+  sgpServerId: string
   puuid: string
 }
 

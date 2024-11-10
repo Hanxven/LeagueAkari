@@ -9,7 +9,7 @@
     <template #header
       ><span class="card-header-title"
         >公告<span style="font-size: 12px" v-if="sus.currentAnnouncement">
-          ({{ dayjs(sus.currentAnnouncement.updateAt).locale('zh-cn').fromNow() }} 更新)</span
+          ({{ dayjs(sus.currentAnnouncement.updateAt).locale('zh-cn').fromNow() }} 拉取)</span
         ></span
       ></template
     >

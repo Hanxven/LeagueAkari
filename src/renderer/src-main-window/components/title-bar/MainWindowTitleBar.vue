@@ -1,11 +1,17 @@
 <template>
   <div id="app-title-bar">
-    <div class="app-logo">League Akari</div>
+    <div class="app-logo">
+      League Akari
+      <span style="font-size: 12px; font-weight: normal; color: #fffa">(TEST)</span>
+    </div>
     <div class="divider" />
     <!-- 为特定模块留出的位置 -->
     <div class="shard-area">
       <Transition name="fade">
-        <MatchHistoryTabsTitle v-if="route.name === 'match-history'" />
+        <KeepAlive>
+          <MatchHistoryTabsTitle v-if="route.name === 'match-history'" />
+          <OngoingGameTitle v-else-if="route.name === 'ongoing-game'" />
+        </KeepAlive>
       </Transition>
     </div>
     <div class="divider" />
@@ -17,10 +23,12 @@
 </template>
 
 <script setup lang="ts">
+import { NIcon, NTooltip } from 'naive-ui'
 import { useRoute } from 'vue-router'
 
 import CommonButtons from './CommonButtons.vue'
 import MatchHistoryTabsTitle from './MatchHistoryTabsTitle.vue'
+import OngoingGameTitle from './OngoingGameTitle.vue'
 import TrafficButtons from './TrafficButtons.vue'
 
 const route = useRoute()
@@ -33,7 +41,7 @@ const route = useRoute()
   height: var(--title-bar-height);
   align-items: center;
   -webkit-app-region: drag;
-
+  backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 

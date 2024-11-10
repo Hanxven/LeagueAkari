@@ -420,6 +420,8 @@ export class OngoingGameState {
     this.matchHistory = {}
     this.summoner = {}
     this.savedInfo = {}
+    this.rankedStats = {}
+    this.championMastery = {}
     this.matchHistoryTag = 'all'
   }
 

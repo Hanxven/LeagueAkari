@@ -92,7 +92,7 @@
         <LeagueAkariSpan bold class="akari-text" />
         <div
           v-if="og.settings.enabled"
-          style="font-size: 14px; font-weight: normal; color: #666; margin-top: 8px"
+          class="no-ongoing-game-text"
         >
           <template v-if="lc.connectionState !== 'connected'">未连接到客户端</template>
           <template v-else-if="lc.champSelect.session && lc.champSelect.session.isSpectating"
@@ -275,9 +275,9 @@ const handleShowGameById = (id: number, selfPuuid: string) => {
   isStandaloneMatchHistoryCardShow.value = true
 }
 
-const { navigateToTab } = mh.useNavigateToTab()
+const { navigateToTabByPuuid } = mh.useNavigateToTab()
 const handleToSummoner = (puuid: string) => {
-  navigateToTab(puuid)
+  navigateToTabByPuuid(puuid)
 }
 
 // 基于经验的手动测量, 确定的较为不错的列数, 最多支持 8 列
@@ -409,6 +409,13 @@ const columnsNeed = computed(() => {
 
   .akari-text {
     font-size: 22px;
+  }
+
+  .no-ongoing-game-text {
+    font-size: 14px;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 8px;
   }
 }
 

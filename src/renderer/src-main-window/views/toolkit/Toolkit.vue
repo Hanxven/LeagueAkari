@@ -20,7 +20,7 @@
           <span class="tab-name">房间工具</span>
         </NTab>
         <NTab name="misc" class="tab-name">
-          <span class="tab-name">其他</span>
+          <span class="tab-name">百宝箱</span>
         </NTab>
       </NTabs>
     </div>

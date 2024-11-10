@@ -209,8 +209,8 @@
         <NIcon class="icon" @click.stop="() => handleShowMiscellaneous()" title="杂项"
           ><ListIcon
         /></NIcon>
-        <NIcon class="icon" :title="isExpanded ? '收起' : '展开'">
-          <ChevronUpIcon v-if="isExpanded" /><ChevronDownIcon v-else />
+        <NIcon class="icon" :class="{ rotated: isExpanded }" :title="isExpanded ? '收起' : '展开'">
+          <ChevronUpIcon />
         </NIcon>
       </div>
     </div>
@@ -763,15 +763,19 @@ const handleToggleShowDetailedGame = () => {
   transition: background-color 0.3s ease;
   background-color: transparent;
   border-radius: 2px;
+
+  &.rotated {
+    transform: rotate(180deg);
+  }
 }
 
 .icon:hover {
-  background-color: rgba(255, 255, 255, 0.17);
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .win {
   border-left: 6px solid rgb(0, 105, 203);
-  background-color: rgb(30, 39, 58);
+  background-color: rgba(30, 39, 58, 0.8);
 
   .game {
     .mode {
@@ -794,7 +798,7 @@ const handleToggleShowDetailedGame = () => {
 
 .lose {
   border-left: 6px solid rgb(158, 48, 1);
-  background-color: rgb(65, 39, 43);
+  background-color: rgba(65, 39, 43, 0.8);
 
   .game {
     .mode {
@@ -813,7 +817,7 @@ const handleToggleShowDetailedGame = () => {
 
 .remake {
   border-left: 6px solid rgb(139, 139, 139);
-  background-color: rgb(54, 54, 54);
+  background-color: rgba(54, 54, 54, 0.8);
 
   .game {
     .mode {

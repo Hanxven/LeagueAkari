@@ -2,13 +2,13 @@
   <div class="common-buttons" :class="{ blurred: wms.mainWindowFocus === 'blurred' }">
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
-        <div class="common-button-outer">
+        <div class="common-button-outer" @click="openAnnouncementModal">
           <div class="common-button-inner">
             <NIcon><NotificationIcon /></NIcon>
           </div>
         </div>
       </template>
-      通知
+      公告
     </NTooltip>
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
@@ -24,7 +24,7 @@
       <template #trigger>
         <div class="common-button-outer" @click="handleShowAuxWindow">
           <div class="common-button-inner">
-            <NIcon><WindowMultiple16FilledIcon /></NIcon>
+            <NIcon><Window24FilledIcon /></NIcon>
           </div>
         </div>
       </template>
@@ -38,8 +38,8 @@ import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
-import { Notification as NotificationIcon, Settings as SettingsIcon } from '@vicons/carbon'
-import { WindowMultiple16Filled as WindowMultiple16FilledIcon } from '@vicons/fluent'
+import { Notification as NotificationIcon } from '@vicons/carbon'
+import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { NIcon, NTooltip } from 'naive-ui'
 import { inject } from 'vue'
@@ -47,7 +47,7 @@ import { inject } from 'vue'
 const wms = useWindowManagerStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
 
-const { openSettingsModal } = inject('app') as any
+const { openAnnouncementModal } = inject('app') as any
 
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 

@@ -16,7 +16,9 @@
                 :src="profileIconUri(summoner.profileIconId)"
               />
             </NProgress>
-            <NIcon v-else class="menu-item-icon"><BareMetalServerIcon /></NIcon>
+            <NBadge v-else dot processing :show="lcs.isDisconnected && clients.others.length > 0">
+              <NIcon class="menu-item-icon"><BareMetalServerIcon /></NIcon>
+            </NBadge>
           </div>
         </div>
       </template>
@@ -35,8 +37,8 @@
             <div class="region-name">
               {{ REGION_NAME[clients.current.region] || clients.current.region }}
             </div>
-            <div class="rso-name" v-if="!clients.current.rsoPlatformId">
-              {{ TENCENT_RSO_PLATFORM_NAME['HN10'] || clients.current.rsoPlatformId }}
+            <div class="rso-name" v-if="clients.current.rsoPlatformId">
+              {{ TENCENT_RSO_PLATFORM_NAME[clients.current.rsoPlatformId] || clients.current.rsoPlatformId }}
             </div>
             <div class="pid">(PID: {{ clients.current.pid }})</div>
           </div>
@@ -104,7 +106,7 @@ import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import { BareMetalServer as BareMetalServerIcon, Settings as SettingsIcon } from '@vicons/carbon'
 import { PlugDisconnected24Filled as PlugDisconnected24FilledIcon } from '@vicons/fluent'
-import { NIcon, NPopover, NProgress, NScrollbar, NSpin, NTooltip } from 'naive-ui'
+import { NBadge, NIcon, NPopover, NProgress, NScrollbar, NSpin, NTooltip } from 'naive-ui'
 import { computed, inject } from 'vue'
 
 const lcs = useLeagueClientStore()
@@ -139,7 +141,11 @@ const clients = computed(() => {
 })
 
 const handleConnectToLeagueClient = (auth: UxCommandLine) => {
-  if (lcs.connectionState === 'connected' && lcs.auth?.pid === auth.pid) {
+  if (lcs.isConnecting) {
+    return
+  }
+
+  if (lcs.isConnected && lcs.auth?.pid === auth.pid) {
     return
   }
 
