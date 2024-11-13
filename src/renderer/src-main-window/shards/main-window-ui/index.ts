@@ -4,8 +4,11 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { effectScope, watch } from 'vue'
+import { computed, effectScope, watch } from 'vue'
 
+import { router } from '@main-window/routes'
+
+import { useMatchHistoryTabsStore } from '../match-history-tabs/store'
 import { useMainWindowUiStore } from './store'
 
 export class MainWindowUiRenderer implements IAkariShardInitDispose {
@@ -16,6 +19,8 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
   private readonly _lc: LeagueClientRenderer
   private readonly _log: LoggerRenderer
   private readonly _scope = effectScope()
+
+  private readonly _urlCache = new Map<number, string>()
 
   constructor(deps: any) {
     this._setting = deps['setting-utils-renderer']
@@ -37,6 +42,7 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
   private _handleSyncProfileSkinUrl() {
     const lcs = useLeagueClientStore()
     const mui = useMainWindowUiStore()
+    const mhs = useMatchHistoryTabsStore()
 
     watch(
       [() => lcs.summoner.profile, () => mui.settings.useProfileSkinAsBackground],
@@ -46,29 +52,16 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
           return
         }
 
-        if (profile) {
-          const championId = profile.backgroundSkinId.toString().slice(0, -3)
-
+        if (profile && profile.backgroundSkinId) {
           try {
-            const { data } = await this._lc.api.gameData.getChampDetails(Number(championId))
+            const url = await this._getChampionSkinUrl(profile.backgroundSkinId)
 
-            for (const skin of data.skins) {
-              if (skin.id === profile.backgroundSkinId) {
-                mui.backgroundSkinUrl = this._lc.url(skin.splashPath)
-                return
-              }
-
-              if (skin.questSkinInfo) {
-                for (const tier of skin.questSkinInfo.tiers) {
-                  if (tier.id === profile.backgroundSkinId) {
-                    mui.backgroundSkinUrl = this._lc.url(tier.splashPath)
-                    return
-                  }
-                }
-              }
+            if (url === null) {
+              this._log.warn(MainWindowUiRenderer.id, `Skin ${profile.backgroundSkinId} not found`)
+              return
             }
 
-            this._log.warn(MainWindowUiRenderer.id, `Skin ${profile.backgroundSkinId} not found`)
+            mui.backgroundSkinUrl = url
           } catch (error) {
             // 静默失败
             this._log.warn(MainWindowUiRenderer.id, 'Failed to get skin details', error)
@@ -77,6 +70,73 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
       },
       { immediate: true }
     )
+
+    const currentTabProfileSkinId = computed(() => {
+      if (
+        router.currentRoute.value.name === 'match-history' &&
+        mhs.currentTab &&
+        mhs.currentTab.summonerProfile &&
+        mhs.currentTab.summonerProfile.backgroundSkinId
+      ) {
+        return mhs.currentTab.summonerProfile.backgroundSkinId
+      }
+
+      return null
+    })
+
+    // 获取当前页面的皮肤, 需要注意的是, 如果目标用户没有设置皮肤, 则 backgroundSkinId 不存在
+    // 此时在其主页展示的内容为默认成就最高的英雄
+    watch(
+      () => currentTabProfileSkinId.value,
+      async (skinId) => {
+        if (skinId) {
+          try {
+            const url = await this._getChampionSkinUrl(skinId)
+
+            if (url === null) {
+              mui.tabBackgroundSkinUrl = '' // tab 的皮肤 url 强同步
+              this._log.warn(MainWindowUiRenderer.id, `Skin ${skinId} not found`)
+              return
+            }
+
+            mui.tabBackgroundSkinUrl = url
+          } catch (error) {
+            mui.tabBackgroundSkinUrl = ''
+            this._log.warn(MainWindowUiRenderer.id, 'Failed to get skin details', error)
+          }
+        } else {
+          mui.tabBackgroundSkinUrl = ''
+        }
+      },
+      { immediate: true }
+    )
+  }
+
+  private async _getChampionSkinUrl(skinId: number) {
+    if (this._urlCache.has(skinId)) {
+      return this._lc.url(this._urlCache.get(skinId)!)
+    }
+
+    const championId = skinId.toString().slice(0, -3)
+    const { data } = await this._lc.api.gameData.getChampDetails(Number(championId))
+
+    for (const skin of data.skins) {
+      if (skin.id === skinId) {
+        this._urlCache.set(skinId, skin.splashPath)
+        return this._lc.url(skin.splashPath)
+      }
+
+      if (skin.questSkinInfo) {
+        for (const tier of skin.questSkinInfo.tiers) {
+          if (tier.id === skinId) {
+            this._urlCache.set(skinId, tier.splashPath)
+            return this._lc.url(tier.splashPath)
+          }
+        }
+      }
+    }
+
+    return null
   }
 
   private async _handleSettings() {

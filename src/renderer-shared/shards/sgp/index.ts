@@ -63,7 +63,7 @@ export class SgpRenderer implements IAkariShardInitDispose {
   }
 
   getSummonerLcuFormat(puuid: string, sgpServerId?: string) {
-    return this._ipc.call<SummonerInfo>(
+    return this._ipc.call<SummonerInfo | null>(
       MAIN_SHARD_NAMESPACE,
       'getSummonerLcuFormat',
       puuid,

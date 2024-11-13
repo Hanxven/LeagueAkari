@@ -19,6 +19,7 @@ export interface IpcMainSuccessDataType<T = any> {
 
 export interface IpcMainErrorDataType {
   success: false
+  isAxiosError?: boolean
   error: any
 }
 
@@ -83,6 +84,11 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
     if (result.success) {
       return result.data as T
     } else {
+      // axios 错误将不会触发特殊日志
+      if (result.isAxiosError) {
+        throw result.error
+      }
+
       // for lazy loading
       const logger = this._shared.manager.getInstance<LoggerRenderer>(LOGGER_SHARD_NAMESPACE)
       logger?.error(namespace, result.error)

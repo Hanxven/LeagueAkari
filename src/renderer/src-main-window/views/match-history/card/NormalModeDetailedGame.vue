@@ -214,7 +214,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  toSummoner: [puuid: string, newTab?: boolean]
+  toSummoner: [puuid: string, setCurrent?: boolean]
 }>()
 
 const match = computed(() => {
@@ -463,15 +463,15 @@ table {
   width: 100%;
 
   &.win {
-    background-color: rgba(30, 39, 58, 0.8);
+    background-color: rgba(30, 39, 58, 0.9);
   }
 
   &.lose {
-    background-color: rgba(65, 39, 43, 0.8);
+    background-color: rgba(65, 39, 43, 0.9);
   }
 
   &.na {
-    background-color: rgba(56, 56, 56, 0.8);
+    background-color: rgba(56, 56, 56, 0.9);
   }
 }
 

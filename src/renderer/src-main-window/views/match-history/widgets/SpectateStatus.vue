@@ -170,7 +170,7 @@ import PositionIcon from '@main-window/components/icons/position-icons/PositionI
 import IndicatorPulse from './IndicatorPulse.vue'
 
 const emits = defineEmits<{
-  toSummoner: [puuid: string, newTab?: boolean]
+  toSummoner: [puuid: string, setCurrent?: boolean]
   launchSpectator: [puuid: string, byLcuApi: boolean]
 }>()
 
@@ -268,12 +268,17 @@ watch(
         }
 
         try {
-          const p = await rc.api.playerAccount.getPlayerAccountNameset(puuid)
+          const { data } = await rc.api.playerAccount.getPlayerAccountNameset([puuid])
+
+          if (data.namesets.length === 0) {
+            return
+          }
+
           updatedSummonerInfo.value = {
             ...updatedSummonerInfo.value,
             [puuid]: {
-              gameName: p.gnt.gameName,
-              tagLine: p.gnt.tagLine
+              gameName: data.namesets[0].gnt.gameName,
+              tagLine: data.namesets[0].gnt.tagLine
             }
           }
         } catch {}
@@ -407,29 +412,46 @@ const handleCopyToken = () => {
 
   .position-icon {
     font-size: 18px;
-    color: #d6d6d6;
+    color: rgba(255, 255, 255, 0.8);
     margin-right: 2px;
   }
 
   .player-name {
     margin-left: 4px;
     font-size: 12px;
-    transition: filter 0.3s;
     cursor: pointer;
+
+    .name {
+      color: rgba(255, 255, 255, 0.8);
+      transition: color 0.3s;
+    }
 
     .tag-line {
       font-size: 11px;
-      color: #858585;
+      color: rgba(255, 255, 255, 0.6);
       margin-left: 2px;
+      transition: color 0.3s;
     }
 
     &.self {
-      font-weight: bold;
-      color: #e8e8e8;
+      .name {
+        font-weight: bold;
+        color: rgba(255, 255, 255, 1);
+      }
+
+      .tag-line {
+        color: rgba(255, 255, 255, 0.8);
+      }
     }
 
     &:hover {
-      filter: brightness(1.2);
+      .name {
+        color: rgba(255, 255, 255, 1);
+      }
+
+      .tag-line {
+        color: rgba(255, 255, 255, 0.8);
+      }
     }
   }
 }

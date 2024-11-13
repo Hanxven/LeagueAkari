@@ -7,9 +7,11 @@ export const useMainWindowUiStore = defineStore('shard:main-window-ui-renderer',
   })
 
   const backgroundSkinUrl = ref('')
+  const tabBackgroundSkinUrl = ref('')
 
   return {
     settings,
-    backgroundSkinUrl
+    backgroundSkinUrl,
+    tabBackgroundSkinUrl
   }
 })

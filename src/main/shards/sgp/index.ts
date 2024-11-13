@@ -72,7 +72,7 @@ const SCHEMA = {
 
 /**
  * Service Gateway Proxy
- * 访问 SGP API 相关功能, 提供自动化的 token 维持
+ * 处理任何跨区相关逻辑, 提供 API 调用或数据转换
  */
 export class SgpMain implements IAkariShardInitDispose {
   static id = 'sgp-main'
@@ -84,7 +84,7 @@ export class SgpMain implements IAkariShardInitDispose {
     'akari-ipc-main'
   ]
 
-  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v6.json'
+  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v7.json'
 
   public readonly state = new SgpState()
 
@@ -164,6 +164,16 @@ export class SgpMain implements IAkariShardInitDispose {
       () => this._lc.state.auth,
       async (auth) => {
         if (!auth) {
+          this.state.setAvailability(
+            '',
+            '',
+            '',
+            {
+              common: false,
+              matchHistory: false
+            },
+            this.state.availability.sgpServers
+          )
           return
         }
 
@@ -271,7 +281,7 @@ export class SgpMain implements IAkariShardInitDispose {
   async getSummonerLcuFormat(playerPuuid: string, sgpServerId?: string) {
     const result = await this.getSummoner(playerPuuid, sgpServerId)
     if (!result) {
-      throw new Error(`Summoner ${playerPuuid} not found`)
+      return null
     }
 
     try {

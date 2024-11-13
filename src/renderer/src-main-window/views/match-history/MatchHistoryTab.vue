@@ -76,7 +76,7 @@
       </div>
     </Transition>
     <NScrollbar x-scrollable ref="scroll" @scroll="(e) => handleMainContentScroll(e)">
-      <div class="inner-container">
+      <div class="inner-container" ref="inner-container">
         <div class="profile">
           <div class="header-profile">
             <div class="profile-image">
@@ -299,7 +299,7 @@
                 :sgp-server-id="tab.sgpServerId"
                 :data="tab.spectatorData"
                 :puuid="tab.puuid"
-                @to-summoner="(puuid, newTab) => handleToSummoner(puuid, newTab)"
+                @to-summoner="(puuid, setCurrent) => handleToSummoner(puuid, setCurrent)"
                 @launch-spectator="handleLaunchSpectator"
               />
             </div>
@@ -409,12 +409,12 @@
                 </div>
               </div>
             </div>
-            <div class="left-content-item" v-if="recentlyTeammates.length">
-              <div class="left-content-item-title">近期队友 (本页)</div>
+            <div class="left-content-item" v-if="recentlyPlayers.teammates.length">
+              <div class="left-content-item-title">近期队友</div>
               <div class="left-content-item-content">
                 <div
                   class="recently-played-item"
-                  v-for="p of recentlyTeammates"
+                  v-for="p of recentlyPlayers.teammates"
                   :key="p.targetPuuid"
                 >
                   <LcuImage
@@ -427,7 +427,32 @@
                     @mouseup.prevent="(event) => handleMouseUp(event, p.targetPuuid)"
                     @mousedown="handleMouseDown"
                   >
-                    <span class="game-name">{{ p.targetGameName }}</span>
+                    <span class="game-name-line">{{ p.targetGameName }}</span>
+                    <span class="tag-line">#{{ p.targetTagLine }}</span>
+                  </div>
+                  <span class="win-or-lose">{{ p.win }} 胜 {{ p.lose }} 负</span>
+                </div>
+              </div>
+            </div>
+            <div class="left-content-item" v-if="recentlyPlayers.opponents.length">
+              <div class="left-content-item-title">近期对手</div>
+              <div class="left-content-item-content">
+                <div
+                  class="recently-played-item"
+                  v-for="p of recentlyPlayers.opponents"
+                  :key="p.targetPuuid"
+                >
+                  <LcuImage
+                    style="width: 18px; height: 18px"
+                    :src="profileIconUri(p.targetProfileIconId)"
+                  />
+                  <div
+                    class="name-and-tag"
+                    @click="() => handleToSummoner(p.targetPuuid)"
+                    @mouseup.prevent="(event) => handleMouseUp(event, p.targetPuuid)"
+                    @mousedown="handleMouseDown"
+                  >
+                    <span class="game-name-line">{{ p.targetGameName }}</span>
                     <span class="tag-line">#{{ p.targetTagLine }}</span>
                   </div>
                   <span class="win-or-lose">{{ p.win }} 胜 {{ p.lose }} 负</span>
@@ -440,7 +465,7 @@
               class="match-history-card-item"
               @set-show-detailed-game="handleToggleShowDetailedGame"
               @load-detailed-game="(_) => loadDetailedGame(g)"
-              @to-summoner="(puuid, newTab) => handleToSummoner(puuid, newTab)"
+              @to-summoner="(puuid, setCurrent) => handleToSummoner(puuid, setCurrent)"
               :self-puuid="tab.puuid"
               :is-detailed="g.isDetailed"
               :is-loading="g.isLoading"
@@ -469,6 +494,7 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -480,6 +506,7 @@ import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import {
+  GameRelationship,
   analyzeMatchHistory,
   analyzeMatchHistoryPlayers,
   calculateAkariScore
@@ -493,6 +520,7 @@ import {
   NavigateNextOutlined as NavigateNextOutlinedIcon
 } from '@vicons/material'
 import { useIntervalFn, useMediaQuery } from '@vueuse/core'
+import { toBlob } from 'html-to-image'
 import {
   NButton,
   NIcon,
@@ -502,6 +530,7 @@ import {
   NScrollbar,
   NSelect,
   NSpin,
+  useMessage,
   useNotification
 } from 'naive-ui'
 import { computed, markRaw, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
@@ -531,6 +560,7 @@ const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 const log = useInstance<LoggerRenderer>('logger-renderer')
 const sp = useInstance<SavedPlayerRenderer>('saved-player-renderer')
 const gc = useInstance<GameClientRenderer>('game-client-renderer')
+const app = useInstance<AppCommonRenderer>('app-common-renderer')
 
 const lcs = useLeagueClientStore()
 const mhs = useMatchHistoryTabsStore()
@@ -577,9 +607,18 @@ const loadSummoner = async () => {
       if (currentSgpServerSupported.value.common) {
         const data = await sgp.getSummonerLcuFormat(tab.puuid, tab.sgpServerId)
 
-        const ns = await rc.api.playerAccount.getPlayerAccountNameset(tab.puuid)
-        data.gameName = ns.gnt.gameName
-        data.tagLine = ns.gnt.tagLine
+        if (!data) {
+          return
+        }
+
+        const { data: ns } = await rc.api.playerAccount.getPlayerAccountNameset([tab.puuid])
+
+        if (ns.namesets.length === 0) {
+          throw new Error('召唤师不存在')
+        }
+
+        data.gameName = ns.namesets[0].gnt.gameName
+        data.tagLine = ns.namesets[0].gnt.tagLine
         tab.summoner = markRaw(data)
       }
     } else {
@@ -615,6 +654,28 @@ const loadRankedStats = async () => {
     log.warn(MatchHistoryTabsRenderer.id, '拉取排位信息失败', error)
   } finally {
     tab.isLoadingRankedStats = false
+  }
+}
+
+const loadSummonerProfile = async () => {
+  // TODO try to support SGP API
+  if (!isOnSelfSgpServer.value) {
+    return
+  }
+
+  if (tab.isLoadingSummonerProfile) {
+    return
+  }
+
+  try {
+    tab.isLoadingSummonerProfile = true
+    const { data } = await lc.api.summoner.getSummonerProfile(tab.puuid)
+    tab.summonerProfile = markRaw(data)
+  } catch (error) {
+    laNotification.warn('加载失败', '拉取召唤师信息失败', error)
+    log.warn(MatchHistoryTabsRenderer.id, '拉取召唤师信息失败', error)
+  } finally {
+    tab.isLoadingSummonerProfile = false
   }
 }
 
@@ -763,6 +824,7 @@ const isSmallScreen = useMediaQuery(`(max-width: 1100px)`)
 
 const scrollEl = useTemplateRef('scroll')
 const rightEl = useTemplateRef('right')
+const innerContainerEl = useTemplateRef('inner-container')
 
 const as = useAppCommonStore()
 
@@ -780,9 +842,14 @@ const isSomethingLoading = computed(() => {
 })
 
 const scrollToRightElTop = () => {
-  const top = rightEl.value?.offsetTop
-  if (top && top < mainContentScrollTop.value) {
-    scrollEl.value?.scrollTo({ top: top })
+  if (rightEl.value && innerContainerEl.value) {
+    const top = rightEl.value.offsetTop
+    const padding = parseInt(window.getComputedStyle(innerContainerEl.value).paddingTop, 10)
+    const relativeTop = top - padding
+
+    if (relativeTop && relativeTop < mainContentScrollTop.value) {
+      scrollEl.value?.scrollTo({ top: relativeTop })
+    }
   }
 }
 
@@ -796,6 +863,7 @@ const handleRefresh = async () => {
     await Promise.all([
       loadSummoner(),
       loadRankedStats(),
+      loadSummonerProfile(),
       mhFn(),
       loadTags(),
       updateSpectatorData()
@@ -947,38 +1015,40 @@ const frequentlyUsedChampions = computed(() => {
     })
 })
 
-const recentlyTeammates = computed(() => {
+const recentlyPlayers = computed(() => {
   const relationship = analysis.value.playerRelationship
-  const teammates = Object.values(relationship)
-    .filter((a) => a.games.length >= RECENTLY_PLAYED_PLAYER_THRESHOLD)
-    .map((a) => {
-      const teammateGames = a.games.filter((g) => !g.isOpponent)
-      return {
-        ...a,
-        games: teammateGames
-      }
-    })
-    .filter((a) => a.games.length >= RECENTLY_PLAYED_PLAYER_THRESHOLD)
-    .map((a) => {
-      const win = a.games.filter((g) => g.win).length
-      const lose = a.games.filter((g) => !g.win).length
-      return { ...a, win, lose }
-    })
-    .sort((a, b) => {
-      if (a.games.length !== b.games.length) {
-        return b.games.length - a.games.length
-      }
 
-      return b.win - a.win
-    })
+  function processPlayers(isOpponent: boolean) {
+    return Object.values(relationship)
+      .filter((a) => a.games.length >= RECENTLY_PLAYED_PLAYER_THRESHOLD)
+      .map((a) => {
+        const filteredGames = a.games.filter((g) => g.isOpponent === isOpponent)
+        return { ...a, games: filteredGames }
+      })
+      .filter((a) => a.games.length >= RECENTLY_PLAYED_PLAYER_THRESHOLD)
+      .map((a) => {
+        const win = a.games.filter((g) => g.win).length
+        const lose = a.games.filter((g) => !g.win).length
+        return { ...a, win, lose }
+      })
+      .sort((a, b) => {
+        if (a.games.length !== b.games.length) {
+          return b.games.length - a.games.length
+        }
+        return b.win - a.win
+      })
+  }
 
-  return teammates
+  const teammates = processPlayers(false)
+  const opponents = processPlayers(true)
+
+  return { teammates, opponents }
 })
 
 const { navigateToTabByPuuidAndSgpServerId } = mh.useNavigateToTab()
 
-const handleToSummoner = (puuid: string, newTab = true) => {
-  if (newTab) {
+const handleToSummoner = (puuid: string, setCurrent = true) => {
+  if (setCurrent) {
     navigateToTabByPuuidAndSgpServerId(puuid, tab.sgpServerId)
   } else {
     mh.createTab(puuid, tab.sgpServerId, false)
@@ -1104,11 +1174,51 @@ watch(
   { immediate: true }
 )
 
+const message = useMessage()
+
+const handleScreenshot = async () => {
+  if (!innerContainerEl.value) {
+    return
+  }
+
+  try {
+    tab.isTakingScreenshot = true
+
+    // 经过测试, 性能非常差
+    const blob = await toBlob(innerContainerEl.value, {
+      style: {
+        margin: '0',
+        backgroundColor:
+          getComputedStyle(document.documentElement).getPropertyValue(
+            '--background-color-primary'
+          ) || '#000'
+      }
+    })
+
+    if (!blob) {
+      message.warning('尝试截图失败，未获取到图片信息')
+      return
+    }
+
+    await app.writeClipboardImage(await blob.arrayBuffer())
+    message.success('已复制截图到剪贴板')
+  } catch (error) {
+    if (error instanceof Error) {
+      message.error(`尝试截图失败: ${error.message}`)
+    } else {
+      message.error('尝试截图失败')
+    }
+  } finally {
+    tab.isTakingScreenshot = false
+  }
+}
+
 defineExpose({
   id: tab.id,
   puuid: tab.puuid,
   sgpServerId: tab.sgpServerId,
-  refresh: handleRefresh
+  refresh: handleRefresh,
+  screenshot: handleScreenshot
 })
 </script>
 
@@ -1125,7 +1235,7 @@ defineExpose({
   align-items: center;
   flex-direction: column;
   border-radius: 4px;
-  background-color: #202020;
+  background-color: rgba(25, 25, 28, 0.98);
   padding: 16px;
 
   .blocks {
@@ -1202,6 +1312,7 @@ defineExpose({
   height: 100%;
   width: @container-width;
   margin: 0 auto;
+  padding: 28px 0 0 0;
 
   .content {
     display: flex;
@@ -1292,7 +1403,7 @@ defineExpose({
     cursor: pointer;
   }
 
-  .game-name {
+  .game-name-line {
     font-size: 12px;
     color: #fff;
     margin-left: 4px;

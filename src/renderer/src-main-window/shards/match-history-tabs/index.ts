@@ -1,12 +1,10 @@
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { createEventBus } from '@renderer-shared/utils/events'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { UseEventBusReturn, useEventBus } from '@vueuse/core'
-import { computed, effectScope, markRaw, watch } from 'vue'
+import { effectScope, markRaw, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useMatchHistoryTabsStore } from './store'
@@ -39,7 +37,6 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   }
 
   private _handleMatchHistoryTabs() {
-    const ogs = useOngoingGameStore()
     const mhs = useMatchHistoryTabsStore()
     const lcs = useLeagueClientStore()
     const sgps = useSgpStore()
@@ -51,6 +48,18 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
           const tab = mhs.getTabByPuuid(summoner.puuid)
           if (tab) {
             tab.summoner = markRaw(summoner)
+          }
+        }
+      }
+    )
+
+    watch(
+      () => lcs.summoner.profile,
+      (profile) => {
+        if (profile && lcs.summoner.me) {
+          const tab = mhs.getTabByPuuid(lcs.summoner.me.puuid)
+          if (tab) {
+            tab.summonerProfile = markRaw(profile)
           }
         }
       }
@@ -246,13 +255,16 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
         savedInfo: null,
         summoner: null,
         spectatorData: null,
+        summonerProfile: null,
         tags: markRaw([]),
         isLoadingTags: false,
         isLoadingSavedInfo: false,
         isLoadingMatchHistory: false,
         isLoadingRankedStats: false,
         isLoadingSummoner: false,
-        isLoadingSpectatorData: false
+        isLoadingSpectatorData: false,
+        isLoadingSummonerProfile: false,
+        isTakingScreenshot: false
       },
       setCurrent
     )

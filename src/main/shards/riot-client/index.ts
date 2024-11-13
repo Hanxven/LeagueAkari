@@ -4,6 +4,7 @@ import { RiotClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/riot
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import https from 'https'
 
+import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -22,7 +23,8 @@ export class RiotClientMain implements IAkariShardInitDispose {
     'akari-ipc-main',
     'logger-factory-main',
     'mobx-utils-main',
-    'league-client-main' // 引入此依赖的原因是, 需要获取其使用的是哪个客户端 (考虑到客户端多开的情况)
+    'league-client-main', // 引入此依赖的原因是, 需要获取其使用的是哪个客户端 (考虑到客户端多开的情况)
+    'akari-protocol-main'
   ]
 
   static REQUEST_TIMEOUT_MS = 12500
@@ -32,6 +34,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _mobx: MobxUtilsMain
   private readonly _lc: LeagueClientMain
+  private readonly _protocol: AkariProtocolMain
 
   private _api: RiotClientHttpApiAxiosHelper | null = null
 
@@ -46,7 +49,10 @@ export class RiotClientMain implements IAkariShardInitDispose {
     this._mobx = deps['mobx-utils-main']
     this._lc = deps['league-client-main']
     this._loggerFactory = deps['logger-factory-main']
+    this._protocol = deps['akari-protocol-main']
     this._log = this._loggerFactory.create(RiotClientMain.id)
+
+    this._handleProtocol()
   }
 
   get api() {
@@ -55,6 +61,52 @@ export class RiotClientMain implements IAkariShardInitDispose {
     }
 
     return this._api
+  }
+
+  private _handleProtocol() {
+    this._protocol.registerDomain('riot-client', async (uri, req) => {
+      const reqHeaders: Record<string, string> = {}
+      req.headers.forEach((value, key) => {
+        reqHeaders[key] = value
+      })
+
+      try {
+        const config: AxiosRequestConfig = {
+          method: req.method,
+          url: uri,
+          data: req.body ? AkariProtocolMain.convertWebStreamToNodeStream(req.body) : undefined,
+          validateStatus: () => true,
+          responseType: 'stream',
+          headers: reqHeaders
+        }
+
+        const res = await this.request(config)
+
+        const resHeaders = Object.fromEntries(
+          Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')
+        )
+
+        return new Response(res.status === 204 || res.status === 304 ? null : res.data, {
+          statusText: res.statusText,
+          headers: resHeaders,
+          status: res.status
+        })
+      } catch (error) {
+        this._log.warn(`Failed to RiotClient request`, error)
+
+        if (error instanceof RiotClientRcuUninitializedError) {
+          return new Response(JSON.stringify({ error: error.name }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 503
+          })
+        }
+
+        return new Response((error as Error).message, {
+          headers: { 'Content-Type': 'text/plain' },
+          status: 500
+        })
+      }
+    })
   }
 
   private _handleCall() {
@@ -128,12 +180,14 @@ export class RiotClientMain implements IAkariShardInitDispose {
           this._http = null
           this._api = null
         }
-      }
+      },
+      { fireImmediately: true }
     )
   }
 
   async onDispose() {
     this._http = null
     this._api = null
+    this._protocol.unregisterDomain('riot-client')
   }
 }

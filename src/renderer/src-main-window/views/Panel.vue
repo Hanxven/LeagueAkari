@@ -8,7 +8,7 @@
         @update:current="(key) => handleMenuChange(key)"
       />
       <div class="dragging-zone"></div>
-      <SidebarFixed :summoner="lcs.summoner.me" />
+      <SidebarFixed @summoner-click="handleSummonerClick" :summoner="lcs.summoner.me" />
     </div>
     <div class="right-side-content">
       <RouterView v-slot="{ Component }">
@@ -24,9 +24,9 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
-import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   AiStatus as AiStatusIcon,
   AppSwitcher as AppSwitcherIcon,
@@ -35,11 +35,12 @@ import {
 } from '@vicons/carbon'
 import { TicketSharp as TicketSharpIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
-import { Component as ComponentC, h, inject, ref, watchEffect } from 'vue'
+import { Component as ComponentC, h, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import SidebarFixed from '@main-window/components/sidebar/SidebarFixed.vue'
 import SidebarMenu from '@main-window/components/sidebar/SidebarMenu.vue'
+import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
@@ -90,19 +91,15 @@ const handleMenuChange = async (val: string) => {
   }
 }
 
-const appInject = inject('app') as any
+const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
+const { navigateToTabByPuuid } = mh.useNavigateToTab()
 
-const handleOpenSettingsModal = () => {
-  appInject.openSettingsModal()
-}
-
-const handleOpenAnnouncementModal = () => {
-  appInject.openAnnouncementModal()
+const handleSummonerClick = (summoner: SummonerInfo) => {
+  navigateToTabByPuuid(summoner.puuid)
 }
 
 const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const isClientsPreviewShow = ref(false)
 

@@ -40,11 +40,9 @@
 
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { useExtraAssetsStore } from '@renderer-shared/shards/extra-assets/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { maybePveChampion } from '@shared/types/league-client/game-data'
-import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
 import {
   NButton,
   NModal,
@@ -53,6 +51,8 @@ import {
   TransferRenderTargetLabel
 } from 'naive-ui'
 import { computed, h, ref, useCssModule } from 'vue'
+
+import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
 
 const {
   maxShow = 6,
@@ -71,7 +71,6 @@ const champions = defineModel<number[]>('champions', { default: () => [] })
 const styles = useCssModule()
 
 const lcs = useLeagueClientStore()
-const eas = useExtraAssetsStore()
 
 const championOptions = computed(() => {
   const sorted = Object.values(lcs.gameData.champions).toSorted((a, b) => {
@@ -107,29 +106,7 @@ const championOptions = computed(() => {
     }))
 })
 
-const isNameMatch = (pattern: string, label: string, value?: number) => {
-  try {
-    if (eas.heroListMap && value !== undefined) {
-      const c = eas.heroListMap[value]
-
-      if (c) {
-        const keywords = c.keywords.split(',')
-        return (
-          isChampionNameMatchKeywords(pattern, [label, ...keywords]) ||
-          value.toString().includes(pattern)
-        )
-      }
-    }
-
-    return (
-      isChampionNameMatch(pattern, label) || Boolean(value && value.toString().includes(pattern))
-    )
-  } catch {
-    return (
-      isChampionNameMatch(pattern, label) || Boolean(value && value.toString().includes(pattern))
-    )
-  }
-}
+const { match: isNameMatch } = useChampionNameMatch()
 
 const renderSourceLabel: TransferRenderSourceLabel = ({ option }) => {
   let pickable = true

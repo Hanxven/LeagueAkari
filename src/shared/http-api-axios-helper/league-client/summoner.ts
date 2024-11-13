@@ -60,8 +60,13 @@ export class SummonerHttpApi {
     return result || null
   }
 
-  // /lol-summoner/v1/current-summoner/summoner-profile
-  getSummonerProfile() {
+  getCurrentSummonerProfile() {
     return this._http.get<SummonerProfile>('/lol-summoner/v1/current-summoner/summoner-profile')
+  }
+
+  getSummonerProfile(puuid: string) {
+    return this._http.get<SummonerProfile>(`/lol-summoner/v1/summoner-profile`, {
+      params: { puuid }
+    })
   }
 }

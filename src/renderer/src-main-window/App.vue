@@ -9,11 +9,11 @@
     />
     <Transition name="bg-fade">
       <div
-        :key="muis.backgroundSkinUrl"
+        :key="muis.tabBackgroundSkinUrl || muis.backgroundSkinUrl"
         class="background-wallpaper"
-        :class="{ 'no-image': !muis.backgroundSkinUrl }"
+        :class="{ 'no-image': !muis.backgroundSkinUrl && !muis.tabBackgroundSkinUrl }"
         :style="{
-          backgroundImage: `url('${muis.backgroundSkinUrl}')`
+          backgroundImage: `url('${muis.tabBackgroundSkinUrl || muis.backgroundSkinUrl}')`
         }"
       ></div>
     </Transition>
@@ -183,7 +183,7 @@ useKeyboardCombo('AKARI', {
     height: 100%;
     background: linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.75) 0%,
+      rgba(0, 0, 0, 0.80) 0%,
       rgba(0, 0, 0, 0.85) 75%,
       rgba(0, 0, 0, 0.85) 100%
     );
@@ -200,7 +200,7 @@ useKeyboardCombo('AKARI', {
 
 .bg-fade-enter-active,
 .bg-fade-leave-active {
-  transition: opacity 1s;
+  transition: opacity 0.3s;
 }
 
 .bg-fade-enter-from,

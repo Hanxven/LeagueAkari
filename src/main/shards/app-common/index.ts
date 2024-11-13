@@ -1,6 +1,6 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
-import { app, shell } from 'electron'
+import { app, nativeImage, shell } from 'electron'
 import { clipboard } from 'electron'
 
 import { AkariIpcMain } from '../ipc'
@@ -113,6 +113,12 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
     this._ipc.onCall(AppCommonMain.id, 'readClipboardText', () => {
       return clipboard.readText()
+    })
+
+    this._ipc.onCall(AppCommonMain.id, 'writeClipboardImage', (buffer: ArrayBuffer) => {
+      const buf = Buffer.from(buffer)
+      const image = nativeImage.createFromBuffer(buf)
+      clipboard.writeImage(image)
     })
   }
 }

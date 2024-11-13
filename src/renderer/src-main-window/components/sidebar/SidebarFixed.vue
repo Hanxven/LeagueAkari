@@ -6,6 +6,7 @@
           <div class="menu-item-inner">
             <NProgress
               v-if="summoner"
+              @click="emits('summonerClick', summoner)"
               type="circle"
               :stroke-width="4"
               :percentage="(summoner.xpSinceLastLevel / summoner.xpUntilNextLevel) * 100"
@@ -24,7 +25,7 @@
       </template>
       <span class="menu-item-popover">
         <div class="summoner-name" v-if="summoner">
-          <span class="game-name">{{ summoner.gameName }}</span>
+          <span class="game-name-line">{{ summoner.gameName }}</span>
           <span class="tag-line">#{{ summoner.tagLine }}</span>
         </div>
         <template v-if="clients.current">
@@ -38,7 +39,10 @@
               {{ REGION_NAME[clients.current.region] || clients.current.region }}
             </div>
             <div class="rso-name" v-if="clients.current.rsoPlatformId">
-              {{ TENCENT_RSO_PLATFORM_NAME[clients.current.rsoPlatformId] || clients.current.rsoPlatformId }}
+              {{
+                TENCENT_RSO_PLATFORM_NAME[clients.current.rsoPlatformId] ||
+                clients.current.rsoPlatformId
+              }}
             </div>
             <div class="pid">(PID: {{ clients.current.pid }})</div>
           </div>
@@ -113,6 +117,10 @@ const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
 
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+
+const emits = defineEmits<{
+  summonerClick: [summoner: SummonerInfo]
+}>()
 
 const { openSettingsModal } = inject('app') as any
 const handleOpenSettingsModal = () => {
@@ -223,8 +231,9 @@ const handleConnectToLeagueClient = (auth: UxCommandLine) => {
 .summoner-name {
   display: flex;
   align-items: flex-end;
+  cursor: pointer;
 
-  .game-name {
+  .game-name-line {
     font-size: 14px;
     font-weight: bold;
   }

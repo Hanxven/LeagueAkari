@@ -65,6 +65,7 @@
     "electron": "^33.2.0",
     "electron-builder": "25.1.8",
     "electron-vite": "^2.3.0",
+    "html-to-image": "^1.11.11",
     "less": "^4.2.0",
     "markdown-it": "^14.1.0",
     "naive-ui": "^2.40.1",

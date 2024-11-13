@@ -508,7 +508,7 @@ export class LeagueClientSyncedData {
     )
 
     this._i.events.on<LcuEvent<number>>('/lol-champ-select/v1/current-champion', (event) => {
-      this._log.debug(`当前选择的英雄: ${event.data}`)
+      this._log.debug(`当前选择的英雄: ${this.gameData.champions[event.data]?.name || event.data}`)
 
       if (event.eventType === 'Delete') {
         this.champSelect.setCurrentChampion(null)
@@ -933,7 +933,7 @@ export class LeagueClientSyncedData {
       async (state) => {
         if (state === 'connected') {
           try {
-            const { data } = await this._i.api.summoner.getSummonerProfile()
+            const { data } = await this._i.api.summoner.getCurrentSummonerProfile()
             this.summoner.setProfile(data)
           } catch (error) {
             // ignore
@@ -949,7 +949,7 @@ export class LeagueClientSyncedData {
       async (me) => {
         if (me && !this.summoner.profile) {
           try {
-            const { data } = await this._i.api.summoner.getSummonerProfile()
+            const { data } = await this._i.api.summoner.getCurrentSummonerProfile()
             this.summoner.setProfile(data)
           } catch (error) {
             // ignore

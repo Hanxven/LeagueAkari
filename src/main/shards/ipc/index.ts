@@ -9,6 +9,7 @@ export interface IpcMainSuccessDataType<T = any> {
 
 export interface IpcMainErrorDataType {
   success: false
+  isAxiosError?: boolean
   error: any
 }
 
@@ -115,6 +116,11 @@ export class AkariIpcMain implements IAkariShardInitDispose {
     this._callMap.set(key, cb)
   }
 
+  /**
+   * 处理一般错误和 axios 错误, 包含特例, 对业务错误网开一面
+   * @param error
+   * @returns
+   */
   private static _handleError(error: any): IpcMainDataType {
     if (isAxiosError(error)) {
       const errorWithResponse = {
@@ -133,6 +139,7 @@ export class AkariIpcMain implements IAkariShardInitDispose {
 
       return {
         success: false,
+        isAxiosError: true,
         error: errorWithResponse
       }
     } else if (error instanceof Error) {

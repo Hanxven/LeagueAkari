@@ -210,7 +210,7 @@
           ><ListIcon
         /></NIcon>
         <NIcon class="icon" :class="{ rotated: isExpanded }" :title="isExpanded ? '收起' : '展开'">
-          <ChevronUpIcon />
+          <ChevronDownIcon />
         </NIcon>
       </div>
     </div>
@@ -229,21 +229,21 @@
           :game="game"
           :self-puuid="selfPuuid"
           v-if="game.gameMode === 'CHERRY'"
-          @to-summoner="(puuid, newTab) => emits('toSummoner', puuid, newTab)"
+          @to-summoner="(puuid, setCurrent) => emits('toSummoner', puuid, setCurrent)"
         />
         <StrawberryModeDetailedGame
           class="detailed-game"
           :game="game"
           :self-puuid="selfPuuid"
           v-else-if="game.gameMode === 'STRAWBERRY'"
-          @to-summoner="(puuid, newTab) => emits('toSummoner', puuid, newTab)"
+          @to-summoner="(puuid, setCurrent) => emits('toSummoner', puuid, setCurrent)"
         />
         <NormalModeDetailedGame
           class="detailed-game"
           v-else
           :game="game"
           :self-puuid="selfPuuid"
-          @to-summoner="(puuid, newTab) => emits('toSummoner', puuid, newTab)"
+          @to-summoner="(puuid, setCurrent) => emits('toSummoner', puuid, setCurrent)"
         />
       </template>
       <div v-else-if="isLoading" class="loading">加载中...</div>
@@ -266,7 +266,6 @@ import { Game, ParticipantIdentity } from '@shared/types/league-client/match-his
 import { summonerName } from '@shared/utils/name'
 import {
   ChevronDown as ChevronDownIcon,
-  ChevronUp as ChevronUpIcon,
   List as ListIcon
 } from '@vicons/ionicons5'
 import { createReusableTemplate, useTimeoutPoll } from '@vueuse/core'
@@ -291,7 +290,7 @@ const props = defineProps<{
 const emits = defineEmits<{
   setShowDetailedGame: [gameId: number, expand: boolean]
   loadDetailedGame: [gameId: number]
-  toSummoner: [puuid: string, newTab?: boolean]
+  toSummoner: [puuid: string, setCurrent?: boolean]
 }>()
 
 const [DefineSubTeam, SubTeam] = createReusableTemplate<{
@@ -775,7 +774,7 @@ const handleToggleShowDetailedGame = () => {
 
 .win {
   border-left: 6px solid rgb(0, 105, 203);
-  background-color: rgba(30, 39, 58, 0.8);
+  background-color: rgba(30, 39, 58, 0.9);
 
   .game {
     .mode {
@@ -798,7 +797,7 @@ const handleToggleShowDetailedGame = () => {
 
 .lose {
   border-left: 6px solid rgb(158, 48, 1);
-  background-color: rgba(65, 39, 43, 0.8);
+  background-color: rgba(65, 39, 43, 0.9);
 
   .game {
     .mode {

@@ -1,5 +1,5 @@
 <template>
-  <div class="opgg-champion-tier-wrapper">
+  <div class="standalone-card-wrapper">
     <NInput
       v-model:value="filterText"
       placeholder="查找英雄"
@@ -480,7 +480,7 @@ const data = computed(() => {
 </script>
 
 <style lang="less" scoped>
-.opgg-champion-tier-wrapper {
+.standalone-card-wrapper {
   height: 100%;
   display: flex;
   flex-direction: column;

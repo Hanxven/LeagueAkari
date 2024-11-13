@@ -33,10 +33,12 @@
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useMessage } from 'naive-ui'
 import { computed, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -95,17 +97,11 @@ watch(
       return
     }
 
-    if (matchHistoryRoute.value) {
-      const tabId = mh.toUnionId(matchHistoryRoute.value.puuid, matchHistoryRoute.value.sgpServerId)
-
-      if (id !== tabId) {
-        const { sgpServerId, puuid } = mh.parseUnionId(id)
-        router.replace({
-          name: 'match-history',
-          params: { puuid, sgpServerId }
-        })
-      }
-    }
+    const { sgpServerId, puuid } = mh.parseUnionId(id)
+    router.replace({
+      name: 'match-history',
+      params: { puuid, sgpServerId }
+    })
   },
   { immediate: true }
 )
@@ -142,10 +138,32 @@ const handleOpenSelfTab = () => {
   }
 }
 
+const message = useMessage()
+
+// for debugging only
+useKeyboardCombo('PUUID', {
+  requireSameEl: true,
+  onFinish: () => {
+    if (mhs.currentTab) {
+      navigator.clipboard.writeText(
+        `${mhs.currentTab.sgpServerId}\nPUUID: ${mhs.currentTab.puuid}\nSummoner ID: ${mhs.currentTab.summoner?.summonerId}`
+      )
+      message.success('已复制 PUUID 到剪贴板')
+    }
+  }
+})
+
 mh.events.on('refresh-tab', (tabId: string) => {
   const tab = tabsRef.value?.find((tab) => tab && tab.id === tabId)
   if (tab) {
     tab.refresh()
+  }
+})
+
+mh.events.on('screenshot-tab', (tabId: string) => {
+  const tab = tabsRef.value?.find((tab) => tab && tab.id === tabId)
+  if (tab) {
+    tab.screenshot()
   }
 })
 </script>

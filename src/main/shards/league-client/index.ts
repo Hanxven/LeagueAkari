@@ -14,6 +14,7 @@ import path from 'node:path'
 import PQueue from 'p-queue'
 import WebSocket from 'ws'
 
+import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientUxMain } from '../league-client-ux'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -46,7 +47,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     'logger-factory-main',
     'mobx-utils-main',
     'league-client-ux-main',
-    'setting-factory-main'
+    'setting-factory-main',
+    'akari-protocol-main'
   ]
 
   static INTERNAL_TIMEOUT = 12500
@@ -65,6 +67,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   private readonly _ux: LeagueClientUxMain
   private readonly _settingFactory: SettingFactoryMain
   private readonly _setting: SetterSettingService
+  private readonly _protocol: AkariProtocolMain
 
   private _http: AxiosInstance | null = null
   private _ws: WebSocket | null = null
@@ -107,6 +110,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     this._mobx = deps['mobx-utils-main']
     this._ux = deps['league-client-ux-main']
     this._loggerFactory = deps['logger-factory-main']
+    this._protocol = deps['akari-protocol-main']
     this._log = this._loggerFactory.create(LeagueClientMain.id)
 
     this._data = new LeagueClientSyncedData(this, LeagueClientMain, {
@@ -122,6 +126,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       },
       this.settings
     )
+
+    this._handleProtocol()
   }
 
   async onInit() {
@@ -134,6 +140,53 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   async onDispose() {
     this._disconnect()
     this.events.clear()
+    this._protocol.unregisterDomain('league-client')
+  }
+
+  private _handleProtocol() {
+    this._protocol.registerDomain('league-client', async (uri, req) => {
+      const reqHeaders: Record<string, string> = {}
+      req.headers.forEach((value, key) => {
+        reqHeaders[key] = value
+      })
+
+      try {
+        const config: AxiosRequestConfig = {
+          method: req.method,
+          url: uri,
+          data: req.body ? AkariProtocolMain.convertWebStreamToNodeStream(req.body) : undefined,
+          validateStatus: () => true,
+          responseType: 'stream',
+          headers: reqHeaders
+        }
+
+        const res = await this.request(config)
+
+        const resHeaders = Object.fromEntries(
+          Object.entries(res.headers).filter(([_, value]) => typeof value === 'string')
+        )
+
+        return new Response(res.status === 204 || res.status === 304 ? null : res.data, {
+          statusText: res.statusText,
+          headers: resHeaders,
+          status: res.status
+        })
+      } catch (error) {
+        this._log.warn(`Failed to LeagueClient request`, error)
+
+        if (error instanceof LeagueClientLcuUninitializedError) {
+          return new Response(JSON.stringify({ error: error.name }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 503
+          })
+        }
+
+        return new Response((error as Error).message, {
+          headers: { 'Content-Type': 'text/plain' },
+          status: 500
+        })
+      }
+    })
   }
 
   private async _handleState() {

@@ -2,7 +2,7 @@
   <div id="app-title-bar">
     <div class="app-logo">
       League Akari
-      <span style="font-size: 12px; font-weight: normal; color: #fffa">(TEST)</span>
+      <span style="font-size: 12px; font-weight: normal; color: #fffa">(测试 · 基础版)</span>
     </div>
     <div class="divider" />
     <!-- 为特定模块留出的位置 -->
@@ -23,7 +23,6 @@
 </template>
 
 <script setup lang="ts">
-import { NIcon, NTooltip } from 'naive-ui'
 import { useRoute } from 'vue-router'
 
 import CommonButtons from './CommonButtons.vue'

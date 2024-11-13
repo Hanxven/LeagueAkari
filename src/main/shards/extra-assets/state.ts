@@ -2,12 +2,6 @@ import { BalanceType } from '@shared/data-sources/fandom'
 import { GtimgHeroListJs } from '@shared/data-sources/gtimg'
 import { makeAutoObservable, observable } from 'mobx'
 
-export class ExtraAssetsState {
-  constructor() {
-    makeAutoObservable(this)
-  }
-}
-
 export class ExtraAssetsStateGtimg {
   heroList: GtimgHeroListJs | null
 

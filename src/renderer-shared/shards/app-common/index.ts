@@ -53,6 +53,10 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'readClipboardText') as Promise<string>
   }
 
+  writeClipboardImage(buffer: ArrayBuffer) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'writeClipboardImage', buffer)
+  }
+
   async onInit() {
     const store = useAppCommonStore()
     store.version = await this.getVersion()

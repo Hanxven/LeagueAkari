@@ -2,7 +2,7 @@
   <NCard size="small">
     <template #header><span class="card-header-title">召唤师 Profile</span></template>
     <NModal
-      style="width: fit-content;"
+      style="width: fit-content"
       preset="card"
       size="small"
       title="选择皮肤"
@@ -14,7 +14,7 @@
           :options="championOptions"
           v-model:value="currentChampionId"
           size="small"
-          :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
+          :filter="(a, b) => isNameMatch(a, b.label as string, b.value as number)"
         ></NSelect>
         <NButton
           type="primary"
@@ -32,7 +32,7 @@
         :render-option="renderOption"
         v-model:value="currentSkinId"
         size="small"
-        :filter="(a, b) => isChampionNameMatch(a, b.label as string)"
+        :filter="(a, b) => isNameMatch(a, b.label as string)"
       ></NSelect>
       <NSelect
         filterable
@@ -114,12 +114,15 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { ChampSkin } from '@shared/types/league-client/game-data'
-import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
 import { VNode, computed, h, ref, watch } from 'vue'
 
+import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
+
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+
+const { match: isNameMatch } = useChampionNameMatch()
 
 const currentChampionId = ref<number>()
 const currentSkinId = ref<number>()

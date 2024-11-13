@@ -59,26 +59,6 @@
     </DefineOngoingTeam>
     <NScrollbar v-if="!isInIdleState && og.settings.enabled" x-scrollable>
       <div class="inner-container" :class="{ 'fit-content': columnsNeed >= 4 }">
-        <div class="header-controls">
-          <NSelect
-            :options="orderOptions"
-            placeholder="排序方式"
-            size="small"
-            :value="og.settings.orderPlayerBy"
-            @update:value="(val) => (og.settings.orderPlayerBy = val)"
-            class="order-selector"
-          />
-          <NSelect
-            v-if="canUseSgpApi"
-            :options="sgpTagOptions"
-            :value="og.matchHistoryTag"
-            @update:value="(val) => ogs.setMatchHistoryTag(val)"
-            placeholder="队列筛选"
-            size="small"
-            class="queue-selector"
-          />
-          <NButton @click="() => ogs.reload()" size="small" type="primary">刷新</NButton>
-        </div>
         <OngoingTeam
           v-for="(players, team) of sortedTeams"
           :team="team"
@@ -90,19 +70,14 @@
     <div v-else class="no-ongoing-game">
       <div class="centered">
         <LeagueAkariSpan bold class="akari-text" />
-        <div
-          v-if="og.settings.enabled"
-          class="no-ongoing-game-text"
-        >
+        <div v-if="og.settings.enabled" class="no-ongoing-game-text">
           <template v-if="lc.connectionState !== 'connected'">未连接到客户端</template>
           <template v-else-if="lc.champSelect.session && lc.champSelect.session.isSpectating"
             >等待观战延迟</template
           >
           <template v-else>没有正在进行中的游戏</template>
         </div>
-        <div v-else style="font-size: 14px; font-weight: normal; color: #666; margin-top: 8px">
-          对局分析已禁用
-        </div>
+        <div v-else class="no-ongoing-game-text">对局分析已禁用</div>
       </div>
     </div>
   </div>
@@ -249,9 +224,6 @@ const currentHighlightingPremadeTeamIdD = refDebounced<string | null>(
   200
 )
 
-const orderOptions = useOrderOptions()
-const sgpTagOptions = useSgpTagOptions()
-
 const handleHighlightSubTeam = (preMadeTeamId: string, highlight: boolean) => {
   if (highlight) {
     currentHighlightingPremadeTeamId.value = preMadeTeamId
@@ -333,18 +305,6 @@ const columnsNeed = computed(() => {
 
   &.fit-content {
     width: fit-content;
-  }
-}
-
-.header-controls {
-  display: flex;
-  justify-content: flex-end;
-  // margin-bottom: 8px; // maybe it's unnecessary
-  gap: 8px;
-
-  .queue-selector,
-  .order-selector {
-    width: 160px;
   }
 }
 

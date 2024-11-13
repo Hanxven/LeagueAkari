@@ -2,7 +2,7 @@ import { PlayerTagDto } from '@renderer-shared/shards/saved-player'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
 import { Game } from '@shared/types/league-client/match-history'
 import { RankedStats } from '@shared/types/league-client/ranked'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { SummonerInfo, SummonerProfile } from '@shared/types/league-client/summoner'
 import { defineStore } from 'pinia'
 import QuickLRU from 'quick-lru'
 import { computed, ref, shallowReactive } from 'vue'
@@ -98,6 +98,8 @@ export interface TabState {
   /** 观战信息 */
   spectatorData: SpectatorData | null
 
+  summonerProfile: SummonerProfile | null
+
   /** 标记信息 */
   tags: PlayerTagDto[]
 
@@ -108,6 +110,9 @@ export interface TabState {
   isLoadingSpectatorData: boolean
   isLoadingTags: boolean
   isLoadingSavedInfo: boolean
+  isLoadingSummonerProfile: boolean
+
+  isTakingScreenshot: boolean
 }
 
 /** 声明到全局状态, 以减少状态管理的复杂度 */
@@ -140,9 +145,9 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
 
     tabs.value = tabs.value.filter((t) => t.id !== id)
 
-    const newTabIndex = Math.min(index, tabs.value.length - 1)
-    if (newTabIndex >= 0) {
-      currentTabId.value = tabs.value[newTabIndex].id
+    const setCurrentIndex = Math.min(index, tabs.value.length - 1)
+    if (setCurrentIndex >= 0) {
+      currentTabId.value = tabs.value[setCurrentIndex].id
     } else {
       currentTabId.value = null
     }
@@ -204,6 +209,24 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
     currentTabId.value = centerId
   }
 
+  const closeTabsToTheRight = (centerId: string) => {
+    const index = tabs.value.findIndex((t) => t.id === centerId)
+    if (index === -1) {
+      return
+    }
+
+    tabs.value = tabs.value.slice(0, index + 1)
+
+    if (!tabs.value.some((t) => t.id === currentTabId.value)) {
+      currentTabId.value = tabs.value[tabs.value.length - 1].id
+    }
+  }
+
+  const canCloseTabsToTheRight = (centerId: string) => {
+    const index = tabs.value.findIndex((t) => t.id === centerId)
+    return index !== -1 && index < tabs.value.length - 1
+  }
+
   const canCloseOtherTabs = (centerId: string) => {
     return tabs.value.some((t) => t.id !== centerId)
   }
@@ -227,7 +250,9 @@ export const useMatchHistoryTabsStore = defineStore('shard:match-history-tabs-re
     getTabByPuuid,
     closeAllTabs,
     closeOtherTabs,
+    closeToTheRight: closeTabsToTheRight,
     canCloseOtherTabs,
+    canCloseTabsToTheRight,
     moveTabBefore
   }
 })

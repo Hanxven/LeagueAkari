@@ -1,6 +1,6 @@
 <template>
   <div class="match-history-tabs-title">
-    <SearchSummonerModal v-model:show="searchSummonerModalShow" />
+    <SearchSummonerModal v-model:show="searchSummonerModalShow" @to-summoner="handleToSummoner" />
     <NDropdown
       placement="bottom-start"
       trigger="manual"
@@ -70,9 +70,12 @@
                     <div v-else class="tab-icon tab-icon-placeholder"></div>
                   </Transition>
                 </NBadge>
+                <div class="sgp-server" v-if="isNeedToShowSgpServer">
+                  {{ sgps.availability.sgpServers.servers[tab.sgpServerId].name }}
+                </div>
                 <template v-if="tab.summoner">
                   <div class="summoner-name">
-                    <span class="game-name">{{ tab.summoner.gameName }}</span>
+                    <span class="game-name-line">{{ tab.summoner.gameName }}</span>
                     <span class="tag-line"> #{{ tab.summoner.tagLine }}</span>
                   </div>
                 </template>
@@ -99,12 +102,13 @@
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
 import { NBadge, NDropdown, NIcon, NPopover, NScrollbar, NSpin } from 'naive-ui'
+import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
@@ -113,9 +117,9 @@ import { TabState, useMatchHistoryTabsStore } from '@main-window/shards/match-hi
 import SearchSummonerModal from '../search-summoner-modal/SearchSummonerModal.vue'
 
 const mhs = useMatchHistoryTabsStore()
+const sgps = useSgpStore()
 const ogs = useOngoingGameStore()
 const lcs = useLeagueClientStore()
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
 const scrollBarEl = useTemplateRef('scrollbar')
@@ -139,11 +143,12 @@ const isTabLoading = (tab: TabState) => {
     tab.isLoadingRankedStats ||
     tab.isLoadingSavedInfo ||
     tab.isLoadingSpectatorData ||
-    tab.isLoadingSummoner
+    tab.isLoadingSummoner ||
+    tab.isLoadingSummonerProfile
   )
 }
 
-const { navigateToTab } = mh.useNavigateToTab()
+const { navigateToTab, navigateToTabByPuuidAndSgpServerId } = mh.useNavigateToTab()
 
 const handleTabChange = async (unionId: string) => {
   navigateToTab(unionId)
@@ -230,7 +235,7 @@ const contextMenuState = reactive({
   id: ''
 })
 
-const contextMenuOptions = reactive([
+const contextMenuOptions: DropdownMixedOption[] = reactive([
   {
     label: '刷新',
     key: 'refresh',
@@ -251,6 +256,27 @@ const contextMenuOptions = reactive([
     label: '关闭其他页面',
     key: 'close-others',
     disabled: computed(() => !mhs.canCloseOtherTabs(contextMenuState.id))
+  },
+  {
+    label: '关闭右侧页面',
+    key: 'close-to-the-right',
+    disabled: computed(() => !mhs.canCloseTabsToTheRight(contextMenuState.id))
+  },
+  {
+    type: 'divider',
+    key: 'divider-1'
+  },
+  {
+    label: '截图当前页面',
+    key: 'screenshot',
+    disabled: computed(() => {
+      const tab = mhs.tabs.find((t) => t.id === contextMenuState.id)
+      if (tab) {
+        return tab.isTakingScreenshot || tab.id !== mhs.currentTabId
+      }
+
+      return true
+    })
   }
 ])
 
@@ -265,10 +291,41 @@ const handleContextMenuSelect = (key: string) => {
     case 'close-others':
       mhs.closeOtherTabs(contextMenuState.id)
       break
+    case 'close-to-the-right':
+      mhs.closeToTheRight(contextMenuState.id)
+      break
+    case 'screenshot':
+      mh.events.emit('screenshot-tab', contextMenuState.id)
   }
 
   contextMenuState.show = false
 }
+
+// 是否需要显示服务器的名称
+// - 当存在多个不同服务器
+// - 仅剩的服务器不是当前服务器
+const isNeedToShowSgpServer = computed(() => {
+  const count: Record<string, number> = {}
+  for (const tab of mhs.tabs) {
+    if (count[tab.sgpServerId]) {
+      count[tab.sgpServerId]++
+    } else {
+      count[tab.sgpServerId] = 1
+    }
+  }
+
+  return Object.keys(count).length > 1 || !count[sgps.availability.sgpServerId]
+})
+
+// 一些情况下需要隐藏右键菜单, 比如页面不存在
+watch(
+  () => contextMenuState.id,
+  (id) => {
+    if (!id || !mhs.tabs.some((t) => t.id === id)) {
+      contextMenuState.show = false
+    }
+  }
+)
 
 // 保证活动页面始终在可视区域内
 watch(
@@ -296,6 +353,16 @@ watch(
     }
   }
 )
+
+const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true) => {
+  if (setCurrent) {
+    searchSummonerModalShow.value = false
+    navigateToTabByPuuidAndSgpServerId(puuid, sgpServerId)
+  } else {
+    // 先路由
+    mh.createTab(puuid, sgpServerId, false)
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -364,6 +431,13 @@ watch(
     }
   }
 
+  .sgp-server {
+    font-size: 11px;
+    font-weight: bold;
+    color: rgba(174, 245, 219, 0.8);
+    margin-right: 4px;
+  }
+
   .summoner-name {
     display: flex;
     align-items: flex-end;
@@ -374,7 +448,7 @@ watch(
     color: rgba(255, 255, 255, 0.8);
   }
 
-  .game-name {
+  .game-name-line {
     font-size: 12px;
     font-weight: bold;
     color: rgba(255, 255, 255, 1);

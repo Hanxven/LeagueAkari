@@ -168,7 +168,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  toSummoner: [puuid: string, newTab?: boolean]
+  toSummoner: [puuid: string, setCurrent?: boolean]
 }>()
 
 const chineseNumber = ['一', '二', '三', '四', '五', '六', '七', '八', '九']
@@ -449,11 +449,11 @@ table {
   width: 100%;
 
   &.win {
-    background-color: rgba(30, 39, 58, 0.8);
+    background-color: rgba(30, 39, 58, 0.9);
   }
 
   &.lose {
-    background-color: rgba(65, 39, 43, 0.8);
+    background-color: rgba(65, 39, 43, 0.9);
   }
 }
 

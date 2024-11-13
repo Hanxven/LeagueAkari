@@ -4042,6 +4042,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"html-to-image@npm:^1.11.11":
+  version: 1.11.11
+  resolution: "html-to-image@npm:1.11.11"
+  checksum: 10c0/0b6349221ad253dfca01d165c589d44341e942faf0273aab28c8b7d86ff2922d3e8e6390f57bf5ddaf6bac9a3b590a8cdaa77d52a363354796dd0e0e05eb35d2
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.0.0, http-cache-semantics@npm:^4.1.0, http-cache-semantics@npm:^4.1.1":
   version: 4.1.1
   resolution: "http-cache-semantics@npm:4.1.1"
@@ -4520,6 +4527,7 @@ __metadata:
     electron-builder: "npm:25.1.8"
     electron-vite: "npm:^2.3.0"
     fast-csv: "npm:^5.0.2"
+    html-to-image: "npm:^1.11.11"
     less: "npm:^4.2.0"
     lodash: "npm:^4.17.21"
     luaparse: "npm:^0.3.1"
