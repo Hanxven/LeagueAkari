@@ -61,7 +61,7 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useSelfUpdateStore()
 
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
   }
 }

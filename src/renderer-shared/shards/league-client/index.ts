@@ -27,17 +27,17 @@ export class LeagueClientRenderer {
   async onInit() {
     const store = useLeagueClientStore()
 
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'gameData', store.gameData)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'honor', store.honor)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'champSelect', store.champSelect)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'chat', store.chat)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'matchmaking', store.matchmaking)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'gameflow', store.gameflow)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'lobby', store.lobby)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'login', store.login)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'summoner', store.summoner)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'gameData', store.gameData)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'honor', store.honor)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'champSelect', store.champSelect)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'chat', store.chat)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'matchmaking', store.matchmaking)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'gameflow', store.gameflow)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'lobby', store.lobby)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'login', store.login)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'summoner', store.summoner)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
   constructor(deps: any) {

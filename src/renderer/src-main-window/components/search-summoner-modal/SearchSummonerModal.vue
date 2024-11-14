@@ -104,7 +104,7 @@
             @click="emits('toSummoner', s.puuid, s.sgpServerId, true)"
             @mouseup.prevent="handleSearchHistoryMouseUp($event, s)"
           >
-            <div class="sgp-server">
+            <div class="sgp-server" v-if="isSearchHistoryNeedToShowSgpServer">
               {{ sgps.availability.sgpServers.servers[s.sgpServerId]?.name || s.sgpServerId }}
             </div>
             <div class="game-name-line">{{ s.summoner.gameName }}</div>
@@ -265,6 +265,19 @@ const filteredSearchHistory = computed(() => {
   return searchHistory.value.filter((item) => {
     return item.sgpServerId === sgps.availability.sgpServerId
   })
+})
+
+const isSearchHistoryNeedToShowSgpServer = computed(() => {
+  const count: Record<string, number> = {}
+  for (const h of filteredSearchHistory.value) {
+    if (count[h.sgpServerId]) {
+      count[h.sgpServerId]++
+    } else {
+      count[h.sgpServerId] = 1
+    }
+  }
+
+  return Object.keys(count).length > 1 || !count[sgps.availability.sgpServerId]
 })
 
 const searchProgress = reactive({

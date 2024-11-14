@@ -35,7 +35,7 @@ export class GameClientRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useGameClientStore()
 
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
   launchSpectator(config: LaunchSpectatorConfig) {

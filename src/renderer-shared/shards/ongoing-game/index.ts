@@ -72,8 +72,8 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useOngoingGameStore()
 
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'clear', () => {
       store.summoner = {}

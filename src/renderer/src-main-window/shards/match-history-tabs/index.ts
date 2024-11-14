@@ -43,8 +43,8 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   }
 
   async onInit() {
+    await this._handleSettings()
     this._scope.run(() => {
-      this._handleSettings()
       this._handleMatchHistoryTabs()
     })
   }
@@ -281,30 +281,18 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   private async _handleSettings() {
     const store = useMatchHistoryTabsStore()
 
-    store.settings.refreshTabsAfterGameEnds = await this._setting.get(
+    await this._setting.autoSaveProp(
       MatchHistoryTabsRenderer.id,
       'refreshTabsAfterGameEnds',
-      store.settings.refreshTabsAfterGameEnds
+      () => store.settings.refreshTabsAfterGameEnds,
+      (v) => (store.settings.refreshTabsAfterGameEnds = v)
     )
 
-    store.settings.matchHistoryUseSgpApi = await this._setting.get(
+    await this._setting.autoSaveProp(
       MatchHistoryTabsRenderer.id,
       'matchHistoryUseSgpApi',
-      store.settings.matchHistoryUseSgpApi
-    )
-
-    watch(
-      () => store.settings.refreshTabsAfterGameEnds,
-      async (newValue) => {
-        await this._setting.set(MatchHistoryTabsRenderer.id, 'refreshTabsAfterGameEnds', newValue)
-      }
-    )
-
-    watch(
       () => store.settings.matchHistoryUseSgpApi,
-      async (newValue) => {
-        await this._setting.set(MatchHistoryTabsRenderer.id, 'matchHistoryUseSgpApi', newValue)
-      }
+      (v) => (store.settings.matchHistoryUseSgpApi = v)
     )
   }
 }

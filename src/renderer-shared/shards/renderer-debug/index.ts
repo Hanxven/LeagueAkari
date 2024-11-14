@@ -28,7 +28,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useRendererDebugStore()
 
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'lc-event', (data: LcuEvent) => {
       if (store.printAll) {

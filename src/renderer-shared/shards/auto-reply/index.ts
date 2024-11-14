@@ -40,6 +40,6 @@ export class AutoReplyRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useAutoReplyStore()
 
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 }

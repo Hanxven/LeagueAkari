@@ -107,9 +107,11 @@ import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
+import { Screenshot20Regular as Screenshot20RegularIcon } from '@vicons/fluent'
+import { CloseRound as CloseRoundIcon, RefreshRound as RefreshRoundIcon } from '@vicons/material'
 import { NBadge, NDropdown, NIcon, NPopover, NScrollbar, NSpin } from 'naive-ui'
 import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
-import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
+import { computed, h, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import { TabState, useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
@@ -247,11 +249,17 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
       }
 
       return true
-    })
+    }),
+    icon: () => h(NIcon, null, { default: () => h(RefreshRoundIcon) })
+  },
+  {
+    type: 'divider',
+    key: 'divider-1'
   },
   {
     label: '关闭',
-    key: 'close'
+    key: 'close',
+    icon: () => h(NIcon, null, { default: () => h(CloseRoundIcon) })
   },
   {
     label: '关闭其他页面',
@@ -265,7 +273,7 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
   },
   {
     type: 'divider',
-    key: 'divider-1'
+    key: 'divider-2'
   },
   {
     label: '截图当前页面',
@@ -277,7 +285,8 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
       }
 
       return true
-    })
+    }),
+    icon: () => h(NIcon, null, { default: () => h(Screenshot20RegularIcon) })
   }
 ])
 

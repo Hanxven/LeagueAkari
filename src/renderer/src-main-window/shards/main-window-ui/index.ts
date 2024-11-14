@@ -29,8 +29,8 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
   }
 
   async onInit() {
+    await this._handleSettings()
     this._scope.run(() => {
-      this._handleSettings()
       this._handleSyncProfileSkinUrl()
     })
   }
@@ -142,17 +142,11 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
   private async _handleSettings() {
     const store = useMainWindowUiStore()
 
-    store.settings.useProfileSkinAsBackground = await this._setting.get(
+    await this._setting.autoSaveProp(
       MainWindowUiRenderer.id,
       'useProfileSkinAsBackground',
-      store.settings.useProfileSkinAsBackground
-    )
-
-    watch(
       () => store.settings.useProfileSkinAsBackground,
-      async (newValue) => {
-        await this._setting.set(MainWindowUiRenderer.id, 'useProfileSkinAsBackground', newValue)
-      }
+      (v) => (store.settings.useProfileSkinAsBackground = v)
     )
   }
 }

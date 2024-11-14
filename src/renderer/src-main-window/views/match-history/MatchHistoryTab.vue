@@ -684,7 +684,8 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
   }
 
   page = page || 1
-  pageSize = pageSize || 20
+  pageSize = pageSize || tab.matchHistoryPage?.pageSize || 20
+  tag = tag || tab.matchHistoryPage?.tag || 'all'
 
   try {
     tab.isLoadingMatchHistory = true

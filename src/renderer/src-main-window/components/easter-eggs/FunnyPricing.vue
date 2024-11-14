@@ -1,6 +1,7 @@
 <template>
   <NModal v-model:show="show">
     <div class="pricing-wrapper">
+      <div class="huge-title">选择你的订阅</div>
       <div class="credit">
         <span>当前余额：</span>
         <span class="credit-amount"
@@ -224,6 +225,13 @@ const formatCredit = computed(() => {
 .pricing-wrapper {
   padding: 24px;
   background-color: var(--background-color-primary);
+}
+
+.huge-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 1);
+  margin-bottom: 24px;
 }
 
 .credit {

@@ -18,7 +18,7 @@ export class RiotClientRenderer implements IAkariShardInitDispose {
   )
 
   async onInit() {
-    // this._pm.sync('league-client-main')
+    // await this._pm.sync('league-client-main')
   }
 
   constructor(deps: any) {

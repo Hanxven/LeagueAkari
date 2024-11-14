@@ -16,11 +16,19 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   const disableHardwareAcceleration = ref(false)
   const baseConfig = shallowRef<BaseConfig | null>(null)
 
+  /* for fun only */
+  const tempAkariSubscriptionInfo = shallowRef({
+    current: 'basic',
+    isFirstShow: false
+  })
+
   return {
     settings,
     isAdministrator,
     disableHardwareAcceleration,
     version,
-    baseConfig
+    baseConfig,
+
+    tempAkariSubscriptionInfo
   }
 })

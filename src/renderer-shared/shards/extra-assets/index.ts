@@ -18,7 +18,7 @@ export class ExtraAssetsRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useExtraAssetsStore()
 
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'gtimg', store.gtimg)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'fandom', store.fandom)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'gtimg', store.gtimg)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'fandom', store.fandom)
   }
 }

@@ -104,7 +104,7 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useAutoGameflowStore()
 
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 }
