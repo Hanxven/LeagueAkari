@@ -46,7 +46,7 @@
     <ControlItem
       class="control-item-margin"
       label="口令观战"
-      label-description="通过符合格式的特殊口令，调起客户端观战进程"
+      label-description="通过符合格式的特殊口令，调起游戏端观战进程"
       :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px">
@@ -215,7 +215,12 @@ const handleSpectateByToken = async () => {
       sgpServerId: obj.sgpServerId,
       puuid: obj.puuid
     })
-    laNotification.success('观战', '已拉起观战')
+
+    if (lcs.connectionState === 'connected') {
+      laNotification.success('观战', '已拉起观战')
+    } else {
+      laNotification.success('观战', '已拉起观战，使用上一次记录的客户端位置')
+    }
   } catch (error) {
     laNotification.warn('观战', (error as any).message, error)
   }

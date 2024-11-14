@@ -98,6 +98,27 @@ export class GameClientMain implements IAkariShardInitDispose {
     ])
     this._handleIpcCall()
     this._handleTerminateGameClientOnAltF4()
+    this._handleSaveInstallLocation()
+  }
+
+  private _handleSaveInstallLocation() {
+    this._mobx.reaction(
+      () => this._lc.state.connectionState,
+      async (state) => {
+        if (state === 'connected') {
+          try {
+            const { data: location } = await this._lc.http.get<{
+              gameExecutablePath: string
+              gameInstallRoot: string
+            }>('/lol-patch/v1/products/league_of_legends/install-location')
+            await this._setting._saveToStorage('x:installLocation', location)
+            this._log.info('保存游戏安装目录', location)
+          } catch (error) {
+            this._log.warn('保存游戏安装目录失败', error)
+          }
+        }
+      }
+    )
   }
 
   private _handleTerminateGameClientOnAltF4() {
@@ -150,21 +171,34 @@ export class GameClientMain implements IAkariShardInitDispose {
       playerCredentials: { observerServerIp, observerServerPort, observerEncryptionKey, gameId }
     } = gf
 
-    if (!this.http) {
-      throw new Error('LCU not connected')
+    let location: { gameExecutablePath: string; gameInstallRoot: string }
+    // 如果客户端没有启动, 那么会考虑记录的安装目录, 尝试之
+    if (this._lc.state.connectionState === 'connected') {
+      const { data: location2 } = await this._lc.http.get<{
+        gameExecutablePath: string
+        gameInstallRoot: string
+      }>('/lol-patch/v1/products/league_of_legends/install-location')
+      await this._setting._saveToStorage('x:installLocation', location2)
+      location = location2
+    } else {
+      const location2 = await this._setting._getFromStorage('x:installLocation')
+      if (location2) {
+        location = location2
+      } else {
+        const err = new Error('LCU 未连接')
+        err.name = 'LeagueClientNotConnected'
+        throw err
+      }
     }
 
-    const { data: installDir } = await this._lc.http.get<{
-      gameExecutablePath: string
-      gameInstallRoot: string
-    }>('/lol-patch/v1/products/league_of_legends/install-location')
+    // 记录之, 以保证下次启动即使没有连接客户端, 也会尝试启动
 
     // sgpServerId 格式为 region_platformId, 或 region
     const [region, rsoPlatformId] = config.sgpServerId.split('_')
 
     const cmds = [
       `spectator ${observerServerIp}:${observerServerPort} ${observerEncryptionKey} ${gameId} ${region}`,
-      `-GameBaseDir=${installDir.gameInstallRoot}`,
+      `-GameBaseDir=${location.gameInstallRoot}`,
       `-Locale=${config.locale || 'zh_CN'}`,
       `-GameID=${gameId}`,
       `-Region=${region}`,
@@ -183,8 +217,8 @@ export class GameClientMain implements IAkariShardInitDispose {
       cmds.push(`-PlatformId=${rsoPlatformId}`)
     }
 
-    const p = cp.spawn(installDir.gameExecutablePath, cmds, {
-      cwd: installDir.gameInstallRoot,
+    const p = cp.spawn(location.gameExecutablePath, cmds, {
+      cwd: location.gameInstallRoot,
       detached: true
     })
 
