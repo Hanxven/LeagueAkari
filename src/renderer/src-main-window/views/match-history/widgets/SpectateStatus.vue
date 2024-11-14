@@ -5,7 +5,7 @@
       <div class="queue-name">
         {{ lcs.gameData.queues[data.game.gameQueueConfigId]?.name || data.game.gameQueueConfigId }}
       </div>
-      <NPopover :disabled="isCrossRegion">
+      <NPopover>
         <template #trigger>
           <NButton
             class="launch-spectator"
@@ -21,7 +21,12 @@
             观战</NButton
           >
         </template>
-        <ControlItem label="使用 LCU API 观战 (可选)" :label-width="240">
+        <ControlItem
+          style="margin-bottom: 8px"
+          v-if="!isCrossRegion"
+          label="使用 LCU API 观战 (可选)"
+          :label-width="240"
+        >
           <template #labelDescription>
             <div>使用 LCU API 调起同大区观战流程，而非通过进程调用</div>
             <div class="warn-text" v-if="lcs.gameflow.phase !== 'None'">
@@ -43,7 +48,6 @@
           >
         </ControlItem>
         <ControlItem
-          style="margin-top: 8px"
           label="复制观战口令"
           :label-width="240"
           label-description="可以在另一个 League Akari 中调起观战进程"

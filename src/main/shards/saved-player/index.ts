@@ -2,6 +2,7 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { Equal } from 'typeorm'
 
 import { AkariIpcMain } from '../ipc'
+import { LeagueClientMain } from '../league-client'
 import { StorageMain } from '../storage'
 import { EncounteredGame } from '../storage/entities/EncounteredGame'
 import { SavedPlayer } from '../storage/entities/SavedPlayers'
@@ -179,13 +180,27 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
       selfPuuid: Equal(dto.selfPuuid)
     })
 
-    if (!player) {
-      throw new Error('player not found')
-    }
+    if (player) {
+      player.tag = dto.tag
+      player.updateAt = new Date()
 
-    player.tag = dto.tag
-    player.updateAt = new Date()
-    return this._storage.dataSource.manager.save(player)
+      return this._storage.dataSource.manager.save(player)
+    } else {
+      if (dto.rsoPlatformId === undefined || dto.region === undefined) {
+        throw new Error('When creating tag, rsoPlatformId, region cannot be empty')
+      }
+
+      const newPlayer = new SavedPlayer()
+      const date = new Date()
+      newPlayer.puuid = dto.puuid
+      newPlayer.tag = dto.tag
+      newPlayer.selfPuuid = dto.selfPuuid
+      newPlayer.updateAt = date
+      newPlayer.rsoPlatformId = dto.rsoPlatformId
+      newPlayer.region = dto.region
+
+      return this._storage.dataSource.manager.save(newPlayer)
+    }
   }
 
   private _handleIpcCall() {

@@ -11,6 +11,7 @@
         <NSelect
           v-if="sgps.availability.region === 'TENCENT'"
           class="select"
+          :consistent-menu-width="false"
           placeholder="区服"
           v-model:value="sgpServerId"
           :disabled="searchProgress.isProcessing"
@@ -208,12 +209,9 @@ const emits = defineEmits<{
 }>()
 
 const PLACEHOLDER_TEXTS = [
-  '查询召唤师 - 格式如：赤座灯里#akari',
-  '查询召唤师 - 格式如：岁纳京子#kyoko',
-  '查询召唤师 - 格式如：船见结衣#yui',
-  '查询召唤师 - 格式如：杉浦绫乃#ayano',
-  '查询召唤师 - 格式如：大室樱子#sakur',
-  '查询召唤师 - 格式如：古谷向日葵#himaw'
+  '如完整查询：赤座灯里#akari',
+  '如模糊查询 - 格式如：船见结衣',
+  '如 PUUID 查询 - 格式如：<puuid>'
 ]
 
 const placeholderText = PLACEHOLDER_TEXTS[Math.floor(Math.random() * PLACEHOLDER_TEXTS.length)]
@@ -354,6 +352,15 @@ watch(
     }
   },
   { immediate: true }
+)
+
+watch(
+  () => searchProgress.isProcessing,
+  (p) => {
+    if (!p) {
+      nextTick(() => inputEl.value?.focus())
+    }
+  }
 )
 
 const route = useRoute()
@@ -690,7 +697,8 @@ const handleSearchResultMouseUp = (
   gap: 4px;
 
   .select {
-    width: 180px;
+    width: 102px;
+    flex-shrink: 0;
   }
 
   .input {

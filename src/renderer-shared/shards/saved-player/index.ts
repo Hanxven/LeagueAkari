@@ -45,7 +45,7 @@ export class SavedPlayerRenderer {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getPlayerTags', dto)
   }
 
-  updatePlayerTag(dto: UpdateTagDto) {
+  updatePlayerTag<T extends UpdateTagDto>(dto: T) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updatePlayerTag', dto)
   }
 }

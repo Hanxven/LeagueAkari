@@ -28,21 +28,17 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
   /**
    * 远古工具方法 2.0, 仅用于渲染进程的某些数据存储和初始化
    */
-  async autoSaveProp(
+  async autoSavePropVue(
     namespace: string,
     key: string,
     getter: () => any,
-    setter: (value: any) => void
+    initValueSetter: (value: any) => void
   ) {
-    const stopHandle = watch(
-      getter,
-      (value) => {
-        this.set(namespace, key, toRaw(value))
-      },
-      { immediate: true }
-    )
+    initValueSetter(await this.get(namespace, key, getter()))
+    const stopHandle = watch(getter, (value) => {
+      this.set(namespace, key, toRaw(value))
+    })
     this._stopHandles.add(stopHandle)
-    setter(await this.get(namespace, key, getter()))
   }
 
   async onDispose() {

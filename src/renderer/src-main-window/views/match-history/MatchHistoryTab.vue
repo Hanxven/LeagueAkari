@@ -145,7 +145,7 @@
               secondary
               class="square-button"
               title="标记"
-              @click="() => handleTagPlayer()"
+              @click="handleTagPlayer"
               v-if="!isSelfTab && isOnSelfSgpServer"
             >
               <template #icon>
@@ -157,7 +157,7 @@
               class="square-button"
               title="刷新"
               :loading="isSomethingLoading"
-              @click="() => handleRefresh()"
+              @click="handleRefresh"
             >
               <template #icon>
                 <NIcon><RefreshIcon /></NIcon>
@@ -285,7 +285,27 @@
               :key="tagInfo.selfPuuid"
               class="left-content-item tagged-player"
             >
-              <div class="left-content-item-title">已被标记的玩家</div>
+              <div class="left-content-item-title">
+                <span>被标记</span>
+                <span
+                  v-if="!tagInfo.markedBySelf"
+                  class="marked-by-other"
+                  @click="handleToSummoner(tagInfo.selfPuuid)"
+                >
+                  来自其他账号
+                </span>
+                <NPopconfirm
+                  type="warning"
+                  @positive-click="handleRemoveTag(tagInfo.puuid, tagInfo.selfPuuid)"
+                >
+                  <template #trigger>
+                    <NIcon class="remove-tag">
+                      <DeleteIcon />
+                    </NIcon>
+                  </template>
+                  删除该玩家的标记？
+                </NPopconfirm>
+              </div>
               <NScrollbar class="tagged-player-n-scrollbar">
                 <div class="left-content-item-content">{{ tagInfo.tag }}</div>
               </NScrollbar>
@@ -511,6 +531,7 @@ import {
   calculateAkariScore
 } from '@shared/utils/analysis'
 import { summonerName } from '@shared/utils/name'
+import { Delete as DeleteIcon } from '@vicons/carbon'
 import { Edit20Filled as EditIcon } from '@vicons/fluent'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import {
@@ -525,6 +546,7 @@ import {
   NIcon,
   NInputNumber,
   NModal,
+  NPopconfirm,
   NPopover,
   NScrollbar,
   NSelect,
@@ -812,6 +834,7 @@ const loadTags = async () => {
       selfPuuid: lcs.summoner.me.puuid
     })
     tab.tags = markRaw(data)
+    console.log(data)
   } catch (error) {
     laNotification.warn('加载失败', '拉取标记信息失败', error)
   } finally {
@@ -974,7 +997,7 @@ const handleTagPlayer = async () => {
   isShowingTagEditModal.value = true
 }
 const handleTagEdited = async (tag: string | null) => {
-  if (!lcs.summoner.me) {
+  if (!lcs.summoner.me || !lcs.auth) {
     return
   }
 
@@ -982,11 +1005,33 @@ const handleTagEdited = async (tag: string | null) => {
     await sp.updatePlayerTag({
       puuid: tab.puuid,
       selfPuuid: lcs.summoner.me.puuid,
-      tag: tag
+      tag: tag,
+      rsoPlatformId: lcs.auth.rsoPlatformId,
+      region: lcs.auth.region
     })
     isShowingTagEditModal.value = false
+
+    message.success(`已更新标记`)
+    await loadTags()
   } catch (error) {
     laNotification.warn('操作失败', '更新玩家标记失败', error)
+    log.warn(VIEW_NAMESPACE, '标记玩家失败', error)
+  }
+}
+
+const handleRemoveTag = async (puuid: string, selfPuuid: string) => {
+  try {
+    await sp.updatePlayerTag({
+      puuid,
+      selfPuuid,
+      tag: null
+    })
+    isShowingTagEditModal.value = false
+
+    message.success(`已删除标记`)
+    await loadTags()
+  } catch (error) {
+    laNotification.warn('操作失败', '删除玩家标记失败', error)
     log.warn(VIEW_NAMESPACE, '标记玩家失败', error)
   }
 }
@@ -1347,6 +1392,8 @@ defineExpose({
   border-radius: 4px;
 
   .left-content-item-title {
+    display: flex;
+    align-items: center;
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 8px;
@@ -1371,6 +1418,31 @@ defineExpose({
 
   :deep(.tagged-player-n-scrollbar) {
     max-height: 100px;
+  }
+
+  .marked-by-other {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: underline;
+    transition: color 0.2s;
+    cursor: pointer;
+    margin-left: 4px;
+    align-self: flex-end;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .remove-tag {
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    margin-left: auto;
+    transition: color 0.2s;
+
+    &:hover {
+      color: rgba(255, 255, 255, 1);
+    }
   }
 }
 

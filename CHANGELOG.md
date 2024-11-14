@@ -38,6 +38,8 @@
 
 - [TODO] 迁移设置项
 
+- [TODO] Pages 开源协议更新
+
 # v1.3.0 Sakurako DRAFT
 
 ## 协议变更

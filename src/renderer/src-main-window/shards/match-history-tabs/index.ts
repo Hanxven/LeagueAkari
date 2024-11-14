@@ -281,14 +281,14 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   private async _handleSettings() {
     const store = useMatchHistoryTabsStore()
 
-    await this._setting.autoSaveProp(
+    await this._setting.autoSavePropVue(
       MatchHistoryTabsRenderer.id,
       'refreshTabsAfterGameEnds',
       () => store.settings.refreshTabsAfterGameEnds,
       (v) => (store.settings.refreshTabsAfterGameEnds = v)
     )
 
-    await this._setting.autoSaveProp(
+    await this._setting.autoSavePropVue(
       MatchHistoryTabsRenderer.id,
       'matchHistoryUseSgpApi',
       () => store.settings.matchHistoryUseSgpApi,

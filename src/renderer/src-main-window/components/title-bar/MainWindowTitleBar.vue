@@ -1,9 +1,6 @@
 <template>
   <div id="app-title-bar">
-    <div class="app-logo">
-      League Akari
-      <span style="font-size: 12px; font-weight: normal; color: #fffa">(测试 · 基础版)</span>
-    </div>
+    <FunnyAppLogo />
     <div class="divider" />
     <!-- 为特定模块留出的位置 -->
     <div class="shard-area">
@@ -25,6 +22,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 
+import FunnyAppLogo from '../easter-eggs/FunnyAppLogo.vue'
 import CommonButtons from './CommonButtons.vue'
 import MatchHistoryTabsTitle from './MatchHistoryTabsTitle.vue'
 import OngoingGameTitle from './OngoingGameTitle.vue'
@@ -42,16 +40,6 @@ const route = useRoute()
   -webkit-app-region: drag;
   backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.app-logo {
-  color: rgba(255, 255, 255, 0.8);
-  text-align: center;
-  padding: 4px;
-  font-weight: bold;
-  font-size: 14px;
-  margin-left: 8px;
-  -webkit-app-region: drag;
 }
 
 .shard-area {

@@ -56,7 +56,7 @@
                   :offset="[-20, 2]"
                 >
                   <Transition name="fade" mode="out-in">
-                    <NSpin v-if="isTabLoading(tab)" :size="12" class="tab-icon" />
+                    <NSpin v-if="tabLoadingStateMap[tab.id]" :size="12" class="tab-icon" />
                     <LcuImage
                       class="tab-icon"
                       v-else-if="ogs.championSelections && ogs.championSelections[tab.puuid]"
@@ -78,6 +78,9 @@
                     <span class="game-name-line">{{ tab.summoner.gameName }}</span>
                     <span class="tag-line"> #{{ tab.summoner.tagLine }}</span>
                   </div>
+                </template>
+                <template v-else-if="tabLoadingStateMap[tab.id]">
+                  <span class="empty-placeholder-text">加载中...</span>
                 </template>
                 <template v-else>
                   <span class="empty-placeholder-text">{{ tab.id.slice(0, 16) }}...</span>
@@ -149,6 +152,15 @@ const isTabLoading = (tab: TabState) => {
     tab.isLoadingSummonerProfile
   )
 }
+
+const tabLoadingStateMap = computed(() => {
+  const map: Record<string, boolean> = {}
+  for (const tab of mhs.tabs) {
+    map[tab.id] = isTabLoading(tab)
+  }
+
+  return map
+})
 
 const { navigateToTab, navigateToTabByPuuidAndSgpServerId } = mh.useNavigateToTab()
 

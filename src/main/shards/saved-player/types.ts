@@ -38,4 +38,6 @@ export interface UpdateTagDto {
   selfPuuid: string
   puuid: string
   tag: string | null
+  rsoPlatformId: string
+  region: string
 }

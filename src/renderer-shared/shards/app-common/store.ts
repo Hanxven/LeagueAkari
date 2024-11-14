@@ -19,7 +19,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   /* for fun only */
   const tempAkariSubscriptionInfo = shallowRef({
     current: 'basic',
-    isFirstShow: false
+    shown: false
   })
 
   return {

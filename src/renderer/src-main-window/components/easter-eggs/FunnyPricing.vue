@@ -1,7 +1,7 @@
 <template>
   <NModal v-model:show="show">
     <div class="pricing-wrapper">
-      <div class="huge-title">选择你的订阅</div>
+      <div class="beautiful-akari">选择你的订阅</div>
       <div class="credit">
         <span>当前余额：</span>
         <span class="credit-amount"
@@ -11,8 +11,7 @@
           type="primary"
           class="button"
           :style="{
-            // 随机偏移
-            left: balance >= 29950 ? `${Math.random() * 300}px` : '0'
+            left: `${offsetLeft}px`
           }"
           size="tiny"
           ref="btn"
@@ -44,8 +43,8 @@
               <span class="text">{{ p.text }}</span>
             </div>
           </div>
-          <div class="subscribe" :class="{ current: c.current }" @click="handleBuy(c)">
-            {{ c.current ? '当前的方案' : '订阅' }}
+          <div class="subscribe" :class="{ current: current === c.id }" @click="handleBuy(c)">
+            {{ current === c.id ? '当前的方案' : '订阅' }}
           </div>
         </div>
       </div>
@@ -54,13 +53,21 @@
 </template>
 
 <script lang="ts" setup>
-// 这个页面当作彩蛋, 只能通过特殊方式启用
 import { Checkmark as CheckmarkIcon } from '@vicons/carbon'
-import { NButton, NIcon, NModal, useMessage } from 'naive-ui'
+import { NButton, NIcon, NModal } from 'naive-ui'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
 const show = defineModel('show', { default: false })
 const balance = ref(0) // 单位是厘
+
+const emits = defineEmits<{
+  purchased: [item: ItemType]
+  notEnough: [item: ItemType]
+}>()
+
+const { current = 'basic' } = defineProps<{
+  current?: string
+}>()
 
 watch(
   () => show.value,
@@ -70,6 +77,24 @@ watch(
     }
   }
 )
+
+const offsetLeft = ref(0)
+watch(
+  () => balance.value,
+  (balance) => {
+    if (balance >= 29950) {
+      offsetLeft.value = Math.random() * 300
+    }
+  }
+)
+
+interface ItemType {
+  id: string
+  title: string
+  price: number
+  description: string
+  privileges: { level: number; text: string }[]
+}
 
 const commonPart = [
   { level: 1, text: '战绩查询以及跨区查询' },
@@ -89,16 +114,14 @@ const choices = ref([
     title: '基础版',
     price: 0,
     description: '最实惠的选择！',
-    privileges: [...commonPart],
-    current: true
+    privileges: [...commonPart]
   },
   {
     id: 'pro',
     title: '⭐ Pro 版',
     price: 30000,
     description: '进阶用户最爱！',
-    privileges: [...commonPart, { level: 2, text: '多花 30 阿卡林币' }],
-    current: false
+    privileges: [...commonPart, { level: 2, text: '多花 30 阿卡林币' }]
   },
   {
     id: 'max',
@@ -109,19 +132,20 @@ const choices = ref([
       ...commonPart,
       { level: 2, text: '多花 30 阿卡林币' },
       { level: 3, text: '再多花 168 阿卡林币' }
-    ],
-    current: false
+    ]
   }
 ])
 
-const message = useMessage()
-
 const handleBuy = (item: any) => {
-  if (item.price > balance.value) {
-    message.warning(`您的余额不足，需要 ${item.price / 1000} 阿卡林币`)
+  if (item.id === current) {
     return
+  }
+
+  if (item.price > balance.value) {
+    emits('notEnough', item)
   } else {
-    message.success(`当前商品暂未开放，前面的套餐，以后再来试试吧`)
+    balance.value -= item.price
+    emits('purchased', item)
   }
 }
 
@@ -379,6 +403,29 @@ const formatCredit = computed(() => {
         color: rgba(255, 255, 255, 0.2);
       }
     }
+  }
+}
+
+.beautiful-akari {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 24px;
+  background-clip: text;
+  background-image: linear-gradient(90deg, #91dcff, #91dcff 10%, #ff59cb 55%, #ffc1eb 100%);
+  color: transparent;
+  background-size: 200% 200%;
+  animation: gradient-flow 10s linear infinite;
+}
+
+@keyframes gradient-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 </style>
