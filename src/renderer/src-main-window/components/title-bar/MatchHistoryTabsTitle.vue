@@ -156,7 +156,8 @@ const handleTabChange = async (unionId: string) => {
 
 const alignTabToVisibleArea = (tabId: string) => {
   const tabEl = document.querySelector(`.tab[data-id="${tabId}"]`)
-  const parentEl = scrollBarEl.value?.$el.nextElementSibling as HTMLElement
+  // @ts-ignore
+  const parentEl = scrollBarEl.value?.scrollbarInstRef?.wrapperRef as HTMLElement
 
   if (!tabEl || !parentEl) {
     return

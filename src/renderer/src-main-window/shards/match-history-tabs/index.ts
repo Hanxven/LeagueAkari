@@ -9,12 +9,29 @@ import { useRouter } from 'vue-router'
 
 import { useMatchHistoryTabsStore } from './store'
 
+export interface SearchHistoryItem {
+  // 目标的 puuid, 当作主键
+  puuid: string
+
+  // 目标所属的服务器
+  sgpServerId: string
+
+  // 不是必要项, 但用于展示很方便
+  summoner: {
+    gameName: string
+    tagLine: string
+  }
+}
+
 /**
  * 仅适用于主窗口战绩页面的渲染端模块
  */
 export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   static id = 'match-history-tabs-renderer'
   static dependencies = ['setting-utils-renderer', 'sgp-renderer']
+
+  static SEARCH_HISTORY_KEY = 'x:searchHistory'
+  static SEARCH_HISTORY_MAX_LENGTH = 20
 
   private readonly _setting: SettingUtilsRenderer
   private readonly _scope = effectScope()
@@ -110,75 +127,55 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   }
 
   /**
-   * 基于本地存储
+   * 获取搜索历史, 有数量限制
    */
-  saveLocalStorageSearchHistory(
-    playerName: string,
-    puuid: string,
-    region: string,
-    rsoPlatformId: string,
-    selfPuuid: string
-  ) {
-    const lcs = useLeagueClientStore()
-
-    if (!lcs.auth) {
-      return
-    }
-
-    if (lcs.summoner.me?.puuid === puuid) {
-      return
-    }
-
-    const key = `search-history-${selfPuuid}-${region}-${rsoPlatformId || '_'}`
-    const str = localStorage.getItem(key) || '[]'
-
-    try {
-      const arr = JSON.parse(str)
-      const index = arr.findIndex((item: any) => item.puuid === puuid)
-      if (index !== -1) {
-        arr.splice(index, 1)
-      }
-      arr.unshift({ playerName, puuid })
-      const newArr = arr.slice(0, 10)
-      localStorage.setItem(key, JSON.stringify(newArr))
-    } catch {
-      localStorage.setItem(key, '[]')
-    }
+  async getSearchHistory(): Promise<SearchHistoryItem[]> {
+    return this._setting.get(
+      MatchHistoryTabsRenderer.id,
+      MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
+      []
+    )
   }
 
-  getLocalStorageSearchHistory(
-    region: string,
-    rsoPlatformId: string,
-    selfPuuid: string
-  ): { playerName: string; puuid: string }[] {
-    const key = `search-history-${selfPuuid}-${region}-${rsoPlatformId || '_'}`
-    const str = localStorage.getItem(key) || '[]'
+  /**
+   * 使用全量替换的方式更新搜索历史
+   * @param item
+   */
+  async saveSearchHistory(item: SearchHistoryItem) {
+    const items = await this.getSearchHistory()
 
-    try {
-      return JSON.parse(str)
-    } catch {
-      return []
+    // 先查重, 若存在, 则将其放到第一位
+    const index = items.findIndex((i) => i.puuid === item.puuid)
+    if (index !== -1) {
+      items.splice(index, 1)
     }
+
+    items.unshift(item)
+
+    if (items.length > MatchHistoryTabsRenderer.SEARCH_HISTORY_MAX_LENGTH) {
+      items.pop()
+    }
+
+    return this._setting.set(
+      MatchHistoryTabsRenderer.id,
+      MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
+      items
+    )
   }
 
-  deleteLocalStorageSearchHistory(
-    region: string,
-    rsoPlatformId: string,
-    selfPuuid: string,
-    puuid: string
-  ) {
-    const key = `search-history-${selfPuuid}-${region}-${rsoPlatformId || '_'}`
-    const str = localStorage.getItem(key) || '[]'
-    try {
-      const arr = JSON.parse(str)
-      const index = arr.findIndex((item: any) => item.puuid === puuid)
-      if (index !== -1) {
-        arr.splice(index, 1)
-        localStorage.setItem(key, JSON.stringify(arr))
-      }
-    } catch {
-      localStorage.setItem(key, '[]')
+  async deleteSearchHistory(puuid: string) {
+    const items = await this.getSearchHistory()
+    const index = items.findIndex((i) => i.puuid === puuid)
+
+    if (index !== -1) {
+      items.splice(index, 1)
     }
+
+    return this._setting.set(
+      MatchHistoryTabsRenderer.id,
+      MatchHistoryTabsRenderer.SEARCH_HISTORY_KEY,
+      items
+    )
   }
 
   // 如果直接引用 router, 在热更新的时候会失效

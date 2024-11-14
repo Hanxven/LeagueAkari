@@ -506,7 +506,6 @@ import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import {
-  GameRelationship,
   analyzeMatchHistory,
   analyzeMatchHistoryPlayers,
   calculateAkariScore
@@ -566,7 +565,7 @@ const lcs = useLeagueClientStore()
 const mhs = useMatchHistoryTabsStore()
 const sgps = useSgpStore()
 
-// 借用类型
+const VIEW_NAMESPACE = 'view:MatchHistoryTab'
 
 const currentSgpServerSupported = computed(() => {
   return (
@@ -627,7 +626,7 @@ const loadSummoner = async () => {
     }
   } catch (error) {
     laNotification.warn('加载失败', '拉取召唤师信息失败', error)
-    log.warn(MatchHistoryTabsRenderer.id, '拉取召唤师信息失败', error)
+    log.warn(VIEW_NAMESPACE, '拉取召唤师信息失败', error)
   } finally {
     tab.isLoadingSummoner = false
   }
@@ -651,7 +650,7 @@ const loadRankedStats = async () => {
     tab.rankedStats = markRaw(data)
   } catch (error) {
     laNotification.warn('加载失败', '拉取排位信息失败', error)
-    log.warn(MatchHistoryTabsRenderer.id, '拉取排位信息失败', error)
+    log.warn(VIEW_NAMESPACE, '拉取排位信息失败', error)
   } finally {
     tab.isLoadingRankedStats = false
   }
@@ -673,7 +672,7 @@ const loadSummonerProfile = async () => {
     tab.summonerProfile = markRaw(data)
   } catch (error) {
     laNotification.warn('加载失败', '拉取召唤师信息失败', error)
-    log.warn(MatchHistoryTabsRenderer.id, '拉取召唤师信息失败', error)
+    log.warn(VIEW_NAMESPACE, '拉取召唤师信息失败', error)
   } finally {
     tab.isLoadingSummonerProfile = false
   }
@@ -745,7 +744,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
             mhs.detailedGameLruMap.set(g.game.gameId, game)
           } catch (error) {
             g.hasError = true
-            log.warn(MatchHistoryTabsRenderer.id, '拉取详细战绩信息失败', error)
+            log.warn(VIEW_NAMESPACE, '拉取详细战绩信息失败', error)
           } finally {
             g.isLoading = false
           }
@@ -756,7 +755,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
     }
   } catch (error) {
     laNotification.warn('加载失败', '拉取战绩信息失败', error)
-    log.warn(MatchHistoryTabsRenderer.id, '拉取战绩信息失败', error)
+    log.warn(VIEW_NAMESPACE, '拉取战绩信息失败', error)
   } finally {
     tab.isLoadingMatchHistory = false
   }
@@ -987,7 +986,7 @@ const handleTagEdited = async (tag: string | null) => {
     isShowingTagEditModal.value = false
   } catch (error) {
     laNotification.warn('操作失败', '更新玩家标记失败', error)
-    log.warn(MatchHistoryTabsRenderer.id, '标记玩家失败', error)
+    log.warn(VIEW_NAMESPACE, '标记玩家失败', error)
   }
 }
 
@@ -1102,11 +1101,7 @@ const updateSpectatorData = async () => {
     }
 
     // 静默失败, 打印日志
-    log.warn(
-      MatchHistoryTabsRenderer.id,
-      `获取观战数据失败: ${tab.puuid} ${tab.sgpServerId}`,
-      error
-    )
+    log.warn(VIEW_NAMESPACE, `获取观战数据失败: ${tab.puuid} ${tab.sgpServerId}`, error)
   }
 }
 const { resume: resumeSpectator, pause: pauseSpectator } = useIntervalFn(
@@ -1157,7 +1152,7 @@ const handleLaunchSpectator = async (_: string, useLcuApi: boolean) => {
       duration: 4000
     })
 
-    log.warn(MatchHistoryTabsRenderer.id, `无法调起客户端进程: ${(error as Error).message}`, error)
+    log.warn(VIEW_NAMESPACE, `无法调起客户端进程: ${(error as Error).message}`, error)
   }
 }
 

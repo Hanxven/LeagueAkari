@@ -37,9 +37,10 @@ import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useMessage } from 'naive-ui'
-import { computed, useTemplateRef, watch } from 'vue'
+import { computed, onActivated, onDeactivated, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 // import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
@@ -53,9 +54,11 @@ const lcs = useLeagueClientStore()
 const route = useRoute()
 const router = useRouter()
 
+const VIEW_NAMESPACE = 'view:MatchHistoryTabs'
+
 const mhs = useMatchHistoryTabsStore()
 const ogs = useOngoingGameStore()
-
+const log = useInstance<LoggerRenderer>('logger-renderer')
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
 const tabsRef = useTemplateRef('tabs-ref')
@@ -98,6 +101,15 @@ watch(
     }
 
     const { sgpServerId, puuid } = mh.parseUnionId(id)
+
+    if (
+      matchHistoryRoute.value &&
+      matchHistoryRoute.value.puuid === puuid &&
+      matchHistoryRoute.value.sgpServerId === sgpServerId
+    ) {
+      return
+    }
+
     router.replace({
       name: 'match-history',
       params: { puuid, sgpServerId }
@@ -126,6 +138,8 @@ watch(
           tab.refresh()
         }
       })
+
+      log.info(VIEW_NAMESPACE, `战绩页面刷新`, allPlayerPuuids)
     }
   }
 )
@@ -140,22 +154,26 @@ const handleOpenSelfTab = () => {
 
 const message = useMessage()
 
-// for debugging only
-useKeyboardCombo('PUUID', {
+const { stop, start } = useKeyboardCombo('PUUID', {
   requireSameEl: true,
   onFinish: () => {
     if (mhs.currentTab) {
       navigator.clipboard.writeText(
-        `${mhs.currentTab.sgpServerId}\nPUUID: ${mhs.currentTab.puuid}\nSummoner ID: ${mhs.currentTab.summoner?.summonerId}`
+        `${mhs.currentTab.sgpServerId}\nPUUID: ${mhs.currentTab.puuid}\nSummoner ID: ${mhs.currentTab.summoner?.summonerId}\n${mhs.currentTab.summoner?.gameName}#${mhs.currentTab.summoner?.tagLine}`
       )
       message.success('已复制 PUUID 到剪贴板')
     }
-  }
+  },
+  immediate: false
 })
+
+onActivated(() => start())
+onDeactivated(() => stop())
 
 mh.events.on('refresh-tab', (tabId: string) => {
   const tab = tabsRef.value?.find((tab) => tab && tab.id === tabId)
   if (tab) {
+    log.info(VIEW_NAMESPACE, `刷新战绩页面`, tabId)
     tab.refresh()
   }
 })
@@ -163,6 +181,7 @@ mh.events.on('refresh-tab', (tabId: string) => {
 mh.events.on('screenshot-tab', (tabId: string) => {
   const tab = tabsRef.value?.find((tab) => tab && tab.id === tabId)
   if (tab) {
+    log.info(VIEW_NAMESPACE, `截图战绩页面`, tabId)
     tab.screenshot()
   }
 })

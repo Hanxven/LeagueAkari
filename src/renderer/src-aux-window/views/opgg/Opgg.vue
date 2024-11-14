@@ -222,7 +222,7 @@ const savedPreferences = useLocalStorage('opgg-preferences', {
 })
 
 onErrorCaptured((error, _instance, info) => {
-  log.warn('view:aux-window-opgg', `Component OP.GG error: ${info}`, error)
+  log.warn('view:Opgg', `Component OP.GG error: ${info}`, error)
   return false
 })
 
@@ -321,7 +321,7 @@ const loadVersionsData = async () => {
     }
 
     message.warning(`获取版本数据失败: ${(error as any).message}`)
-    log.warn('view:aux-window-opgg', `获取版本数据失败: ${(error as any).message}`, error)
+    log.warn('view:Opgg', `获取版本数据失败: ${(error as any).message}`, error)
   } finally {
     isLoadingVersions.value = false
   }
@@ -349,7 +349,7 @@ const loadTierData = async () => {
     }
 
     message.warning(`获取 tier 数据失败: ${(error as any).message}`)
-    log.warn('view:aux-window-opgg', `获取 tier 数据失败: ${(error as any).message}`, error)
+    log.warn('view:Opgg', `获取 tier 数据失败: ${(error as any).message}`, error)
   } finally {
     isLoadingTier.value = false
   }
@@ -383,7 +383,7 @@ const loadChampionData = async () => {
     }
 
     message.warning(`获取英雄数据失败: ${(error as any).message}`)
-    log.warn('view:aux-window-opgg', `获取英雄数据失败: ${(error as any).message}`, error)
+    log.warn('view:Opgg', `获取英雄数据失败: ${(error as any).message}`, error)
   } finally {
     isLoadingChampion.value = false
   }
@@ -636,7 +636,7 @@ const setSummonerSpells = async (ids: number[]) => {
         .catch(() => {})
     }
   } catch (error) {
-    log.warn('view:aux-window-opgg', `设置召唤师技能失败: ${(error as any).message}`, error)
+    log.warn('view:Opgg', `设置召唤师技能失败: ${(error as any).message}`, error)
     message.warning(`设置召唤师技能失败: ${(error as any).message}`)
   }
 }
@@ -700,7 +700,7 @@ const setRunes = async (r: {
       )
     }
   } catch (error) {
-    log.warn('view:aux-window-opgg', `设置符文配法失败: ${(error as any).message}`, error)
+    log.warn('view:Opgg', `设置符文配法失败: ${(error as any).message}`, error)
     message.warning(`设置符文配法失败: ${(error as any).message}`)
   }
 }

@@ -93,29 +93,40 @@
       </NCollapseTransition>
       <NCollapseTransition
         class="section"
-        :show="recentSearches.length > 0 && inputText.length === 0"
+        :show="filteredSearchHistory.length > 0 && inputText.length === 0"
       >
         <div class="section-title">历史搜索</div>
         <div class="recent-searches">
-          <div class="record" v-for="s of recentSearches" :key="s.puuid">
+          <div
+            class="record"
+            v-for="s of filteredSearchHistory"
+            :key="s.puuid"
+            @click="emits('toSummoner', s.puuid, s.sgpServerId, true)"
+            @mouseup.prevent="handleSearchHistoryMouseUp($event, s)"
+          >
             <div class="sgp-server">
               {{ sgps.availability.sgpServers.servers[s.sgpServerId]?.name || s.sgpServerId }}
             </div>
-            <div class="game-name-line">{{ s.gameName }}</div>
-            <div class="tag-line">#{{ s.tagLine }}</div>
-            <NIcon class="close-icon"><CloseIcon /></NIcon>
+            <div class="game-name-line">{{ s.summoner.gameName }}</div>
+            <div class="tag-line">#{{ s.summoner.tagLine }}</div>
+            <NIcon class="close-icon" @click.stop="handleDeleteSearchHistory(s.puuid)"
+              ><CloseIcon
+            /></NIcon>
           </div>
         </div>
       </NCollapseTransition>
       <NCollapseTransition class="section" :show="searchResult.length > 0">
         <div class="section-title">搜索结果</div>
         <NScrollbar :class="$style['search-result-scroll']">
-          <div class="search-result-items">
+          <TransitionGroup tag="div" class="search-result-items" name="fade">
             <div
               class="search-result-item"
-              @click="emits('toSummoner', result.puuid, result.sgpServerId, true)"
+              @click="handleSearchResultToSummoner(result, true)"
               @mousedown="handleMouseDown"
-              @mouseup.prevent="(event) => handleMouseUp(event, result.puuid, result.sgpServerId)"
+              @mouseup.prevent="
+                (event) =>
+                  handleSearchResultMouseUp(event, result.puuid, result.sgpServerId, result)
+              "
               v-for="result of searchResult"
               :key="result.puuid"
             >
@@ -136,7 +147,7 @@
                 <div class="tag-line">#{{ result.tagLine }}</div>
               </div>
             </div>
-          </div>
+          </TransitionGroup>
         </NScrollbar>
       </NCollapseTransition>
       <NCollapseTransition class="section" :show="isEmpty">
@@ -176,13 +187,17 @@ import {
   NSelect,
   useMessage
 } from 'naive-ui'
-import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
+import { computed, markRaw, nextTick, reactive, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
+
+import { MatchHistoryTabsRenderer, SearchHistoryItem } from '@main-window/shards/match-history-tabs'
 
 const show = defineModel<boolean>('show', { default: false })
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
 const sgp = useInstance<SgpRenderer>('sgp-renderer')
+
+const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
 const sgps = useSgpStore()
 
@@ -234,6 +249,23 @@ const searchText = ref('')
 
 const searchResult = ref<SearchResult[]>([])
 const isEmpty = ref(false)
+
+const searchHistory = shallowRef<SearchHistoryItem[]>([])
+
+// 保证一些不该出现的玩家不会在这里出现
+const filteredSearchHistory = computed(() => {
+  if (sgps.availability.region === 'TENCENT') {
+    return searchHistory.value.filter((item) => {
+      return sgps.availability.sgpServers.tencentServerMatchHistoryInteroperability.includes(
+        item.sgpServerId
+      )
+    })
+  }
+
+  return searchHistory.value.filter((item) => {
+    return item.sgpServerId === sgps.availability.sgpServerId
+  })
+})
 
 const searchProgress = reactive({
   isProcessing: false,
@@ -289,6 +321,9 @@ watch(
       isEmpty.value = false
       searchProgress.isProcessing = false
       sgpServerId.value = sgps.availability.sgpServerId
+      mh.getSearchHistory().then((history) => {
+        searchHistory.value = history
+      })
       nextTick(() => inputEl.value?.focus())
     } else {
       searchProgress.isProcessing = false
@@ -318,52 +353,6 @@ const isCurrentTab = (puuid: string, sgpServerId: string) => {
   )
 }
 
-const recentSearches = ref<
-  {
-    sgpServerId: string
-    gameName: string
-    tagLine: string
-    puuid: string
-  }[]
->([
-  {
-    sgpServerId: 'YuriYuri',
-    gameName: '赤座灯里',
-    tagLine: 'akari',
-    puuid: '763dbd6d-1d2b-55a6-b4ed-f2020fe7e4cc'
-  },
-  {
-    sgpServerId: 'TENCENT_HN10',
-    gameName: '岁纳京子',
-    tagLine: 'kyoko',
-    puuid: '763dbd6d-1d2b-55a6-b4ed-f2020fe7e4cc'
-  },
-  {
-    sgpServerId: 'TENCENT_HN10',
-    gameName: '船见结衣',
-    tagLine: 'yui',
-    puuid: '763dbd6d-1d2b-55a6-b4ed-f2020fe7e4cc'
-  },
-  {
-    sgpServerId: 'TENCENT_HN10',
-    gameName: '杉浦绫乃',
-    tagLine: 'ayano',
-    puuid: '763dbd6d-1d2b-55a6-b4ed-f2020fe7e4cc'
-  },
-  {
-    sgpServerId: 'TENCENT_HN10',
-    gameName: '大室樱子',
-    tagLine: 'sakur',
-    puuid: '763dbd6d-1d2b-55a6-b4ed-f2020fe7e4cc'
-  },
-  {
-    sgpServerId: 'TENCENT_HN1',
-    gameName: '古谷向日葵',
-    tagLine: 'himaw',
-    puuid: '763dbd6d-1d2b-55a6-b4ed-f2020fe7e4cc'
-  }
-])
-
 interface SearchResult {
   puuid: string
   gameName: string
@@ -391,6 +380,8 @@ const handleCancel = () => {
   searchProgress.isProcessing = false
 }
 
+// 三种搜索条件: puuid, fuzzy, exact
+// 每种搜索都会考虑是否是跨区查询, 以应用不同的逻辑
 const handelSearch = async () => {
   if (searchType.value === 'invalid') {
     return
@@ -415,15 +406,17 @@ const handelSearch = async () => {
 
         const { data: summoner } = await lc.api.summoner.getSummonerByPuuid(searchText.value)
 
-        searchResult.value.push({
-          puuid: summoner.puuid,
-          gameName: summoner.gameName,
-          tagLine: summoner.tagLine,
-          profileIconId: summoner.profileIconId,
-          sgpServerId: sgpServerId.value,
-          privacy: summoner.privacy,
-          summonerLevel: summoner.summonerLevel
-        })
+        searchResult.value.push(
+          markRaw({
+            puuid: summoner.puuid,
+            gameName: summoner.gameName,
+            tagLine: summoner.tagLine,
+            profileIconId: summoner.profileIconId,
+            sgpServerId: sgpServerId.value,
+            privacy: summoner.privacy,
+            summonerLevel: summoner.summonerLevel
+          })
+        )
       } catch (error) {
         handleError(error, () => {
           isEmpty.value = true
@@ -455,15 +448,17 @@ const handelSearch = async () => {
           }
         } catch {}
 
-        searchResult.value.push({
-          puuid: searchText.value,
-          gameName: summoner.gameName,
-          tagLine: summoner.tagLine,
-          profileIconId: summoner.profileIconId,
-          sgpServerId: sgpServerId.value,
-          privacy: summoner.privacy,
-          summonerLevel: summoner.summonerLevel
-        })
+        searchResult.value.push(
+          markRaw({
+            puuid: searchText.value,
+            gameName: summoner.gameName,
+            tagLine: summoner.tagLine,
+            profileIconId: summoner.profileIconId,
+            sgpServerId: sgpServerId.value,
+            privacy: summoner.privacy,
+            summonerLevel: summoner.summonerLevel
+          })
+        )
       } catch (error) {
         handleError(error)
       } finally {
@@ -503,15 +498,17 @@ const handelSearch = async () => {
           try {
             const { data: summoner } = await lc.api.summoner.getSummonerByPuuid(alias.puuid)
 
-            searchResult.value.push({
-              puuid: summoner.puuid,
-              gameName: summoner.gameName,
-              tagLine: summoner.tagLine,
-              profileIconId: summoner.profileIconId,
-              sgpServerId: sgpServerId.value,
-              privacy: summoner.privacy,
-              summonerLevel: summoner.summonerLevel
-            })
+            searchResult.value.push(
+              markRaw({
+                puuid: summoner.puuid,
+                gameName: summoner.gameName,
+                tagLine: summoner.tagLine,
+                profileIconId: summoner.profileIconId,
+                sgpServerId: sgpServerId.value,
+                privacy: summoner.privacy,
+                summonerLevel: summoner.summonerLevel
+              })
+            )
             added++
           } catch (error) {
             handleError(error)
@@ -536,15 +533,17 @@ const handelSearch = async () => {
               continue
             }
 
-            searchResult.value.push({
-              puuid: alias.puuid,
-              gameName: alias.alias.game_name,
-              tagLine: alias.alias.tag_line,
-              profileIconId: summoner.profileIconId,
-              sgpServerId: sgpServerId.value,
-              privacy: summoner.privacy,
-              summonerLevel: summoner.summonerLevel
-            })
+            searchResult.value.push(
+              markRaw({
+                puuid: alias.puuid,
+                gameName: alias.alias.game_name,
+                tagLine: alias.alias.tag_line,
+                profileIconId: summoner.profileIconId,
+                sgpServerId: sgpServerId.value,
+                privacy: summoner.privacy,
+                summonerLevel: summoner.summonerLevel
+              })
+            )
             added++
           } catch (error) {
             handleError(error)
@@ -582,15 +581,17 @@ const handelSearch = async () => {
       // 同区查询只需用 LCU API, 以保证最大的可用性
       if (sgpServerId.value === sgps.availability.sgpServerId) {
         const { data: summoner } = await lc.api.summoner.getSummonerByPuuid(alias.puuid)
-        searchResult.value.push({
-          puuid: summoner.puuid,
-          gameName: summoner.gameName,
-          tagLine: summoner.tagLine,
-          profileIconId: summoner.profileIconId,
-          sgpServerId: sgpServerId.value,
-          privacy: summoner.privacy,
-          summonerLevel: summoner.summonerLevel
-        })
+        searchResult.value.push(
+          markRaw({
+            puuid: summoner.puuid,
+            gameName: summoner.gameName,
+            tagLine: summoner.tagLine,
+            profileIconId: summoner.profileIconId,
+            sgpServerId: sgpServerId.value,
+            privacy: summoner.privacy,
+            summonerLevel: summoner.summonerLevel
+          })
+        )
       } else {
         const summoner = await sgp.getSummonerLcuFormat(alias.puuid, sgpServerId.value)
 
@@ -599,15 +600,17 @@ const handelSearch = async () => {
           return
         }
 
-        searchResult.value.push({
-          puuid: alias.puuid,
-          gameName: alias.alias.game_name,
-          tagLine: alias.alias.tag_line,
-          profileIconId: summoner.profileIconId,
-          sgpServerId: sgpServerId.value,
-          privacy: summoner.privacy,
-          summonerLevel: summoner.summonerLevel
-        })
+        searchResult.value.push(
+          markRaw({
+            puuid: alias.puuid,
+            gameName: alias.alias.game_name,
+            tagLine: alias.alias.tag_line,
+            profileIconId: summoner.profileIconId,
+            sgpServerId: sgpServerId.value,
+            privacy: summoner.privacy,
+            summonerLevel: summoner.summonerLevel
+          })
+        )
       }
     } catch (error) {
       handleError(error, () => {
@@ -625,9 +628,44 @@ const handleMouseDown = (event: MouseEvent) => {
   }
 }
 
-const handleMouseUp = (event: MouseEvent, puuid: string, sgpServerId: string) => {
+const handleSaveSearchHistory = async (result: SearchResult) => {
+  await mh.saveSearchHistory({
+    puuid: result.puuid,
+    sgpServerId: result.sgpServerId,
+    summoner: { gameName: result.gameName, tagLine: result.tagLine }
+  })
+  searchHistory.value = await mh.getSearchHistory()
+}
+
+const handleDeleteSearchHistory = async (puuid: string) => {
+  await mh.deleteSearchHistory(puuid)
+  searchHistory.value = await mh.getSearchHistory()
+}
+
+const handleSearchHistoryMouseUp = (
+  event: MouseEvent,
+
+  item: SearchHistoryItem
+) => {
+  if (event.button === 1) {
+    emits('toSummoner', item.puuid, item.sgpServerId, false)
+  }
+}
+
+const handleSearchResultToSummoner = (result: SearchResult, setCurrent: boolean) => {
+  emits('toSummoner', result.puuid, result.sgpServerId, setCurrent)
+  handleSaveSearchHistory(result)
+}
+
+const handleSearchResultMouseUp = (
+  event: MouseEvent,
+  puuid: string,
+  sgpServerId: string,
+  result: SearchResult
+) => {
   if (event.button === 1) {
     emits('toSummoner', puuid, sgpServerId, false)
+    handleSaveSearchHistory(result)
   }
 }
 </script>
@@ -670,23 +708,20 @@ const handleMouseUp = (event: MouseEvent, puuid: string, sgpServerId: string) =>
 
     .sgp-server {
       font-size: 10px;
-      color: rgba(255, 255, 255, 0.8);
-      text-align: center;
-      background-color: rgba(#33745e, 0.8);
+      font-weight: bold;
+      color: rgba(174, 245, 219, 0.8);
       border-radius: 2px;
-      padding: 0 4px;
     }
 
     .game-name-line {
       font-size: 12px;
+      font-weight: bold;
       color: rgba(255, 255, 255, 1);
-      text-align: center;
     }
 
     .tag-line {
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.8);
-      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
     }
 
     .close-icon {
@@ -748,7 +783,9 @@ const handleMouseUp = (event: MouseEvent, puuid: string, sgpServerId: string) =>
     border-radius: 2px;
     background-color: rgba(0, 0, 0, 0.6);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition:
+      background-color 0.2s,
+      opacity 0.2s; // opacity here to match TransitionGroup#fade
 
     &:hover {
       background-color: rgba(0, 0, 0, 0.4);

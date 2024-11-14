@@ -967,7 +967,7 @@ const handleAddToItemSet = async () => {
         .catch(() => {})
     }
   } catch (error) {
-    log.warn('view:aux-window-opgg', `[OP.GG] 添加到物品集失败: ${(error as any).message}`, error)
+    log.warn('view:OpggChampion', `[OP.GG] 添加到物品集失败: ${(error as any).message}`, error)
     message.warning(`添加到装备方案失败: ${(error as any).message}`)
   }
 }

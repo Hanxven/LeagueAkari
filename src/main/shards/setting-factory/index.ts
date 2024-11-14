@@ -198,7 +198,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
         if (service) {
           await service.set(key, newValue)
         } else {
-          this._saveToStorage(namespace, key, newValue)
+          await this._saveToStorage(namespace, key, newValue)
         }
       }
     )
