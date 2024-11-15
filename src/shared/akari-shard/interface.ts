@@ -11,4 +11,9 @@ export interface IAkariShardInitDispose {
    * 在模块清理时被调用
    */
   onDispose?(): Promise<void>
+
+  /**
+   * 在所有模块初始化完成后被调用
+   */
+  onFinish?(): Promise<void>
 }

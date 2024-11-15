@@ -2,7 +2,7 @@
   <div class="ongoing-game-title">
     <template v-if="ogs.queryStage.phase !== 'unavailable'">
       <NSelect
-        class="queue-tag-select"
+        class="order-select"
         size="tiny"
         :options="orderOptions"
         v-model:value="ogs.settings.orderPlayerBy"
@@ -119,8 +119,13 @@ const sgpTagOptions = computed(() => {
   -webkit-app-region: no-drag;
 }
 
-.queue-tag-select {
+.order-select {
   width: 120px;
+  -webkit-app-region: no-drag;
+}
+
+.queue-tag-select {
+  width: 160px;
   -webkit-app-region: no-drag;
 }
 

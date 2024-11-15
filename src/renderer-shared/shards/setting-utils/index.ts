@@ -27,6 +27,7 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
 
   /**
    * 远古工具方法 2.0, 仅用于渲染进程的某些数据存储和初始化
+   * 用于持久化某些仅用于渲染进程的数据
    */
   async autoSavePropVue(
     namespace: string,

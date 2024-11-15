@@ -834,7 +834,6 @@ const loadTags = async () => {
       selfPuuid: lcs.summoner.me.puuid
     })
     tab.tags = markRaw(data)
-    console.log(data)
   } catch (error) {
     laNotification.warn('加载失败', '拉取标记信息失败', error)
   } finally {

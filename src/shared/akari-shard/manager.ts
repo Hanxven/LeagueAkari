@@ -92,6 +92,13 @@ export class AkariManager {
     }
 
     this._isSetup = true
+
+    for (const id of this._initializationStack) {
+      const instance = this._instances.get(id)
+      if (instance && instance.onFinish) {
+        await instance.onFinish()
+      }
+    }
   }
 
   async dispose() {

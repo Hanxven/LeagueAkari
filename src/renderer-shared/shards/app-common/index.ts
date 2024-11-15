@@ -49,6 +49,10 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setDisableHardwareAcceleration', s)
   }
 
+  setLocale(s: string) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'locale', s)
+  }
+
   readClipboardText() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'readClipboardText') as Promise<string>
   }
@@ -60,6 +64,13 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
   async onInit() {
     const store = useAppCommonStore()
     store.version = await this.getVersion()
+
+    await this._setting.autoSavePropVue(
+      AppCommonRenderer.id,
+      'tempAkariSubscriptionInfo',
+      () => store.tempAkariSubscriptionInfo,
+      (v) => (store.tempAkariSubscriptionInfo = v)
+    )
 
     await this._setting.autoSavePropVue(
       AppCommonRenderer.id,

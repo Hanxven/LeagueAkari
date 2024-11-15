@@ -37,6 +37,12 @@ export class SgpState {
     }
   }
 
+  isTokenReady = false
+
+  setTokenReady(ready: boolean) {
+    this.isTokenReady = ready
+  }
+
   constructor() {
     makeAutoObservable(this)
   }

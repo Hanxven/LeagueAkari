@@ -39,12 +39,21 @@ export class AppCommonSettings {
    */
   isInKyokoMode: boolean = false
 
+  /**
+   * 语言
+   */
+  locale: string = 'zh-CN'
+
   setShowFreeSoftwareDeclaration(s: boolean) {
     this.showFreeSoftwareDeclaration = s
   }
 
   setIsInKyokoMode(s: boolean) {
     this.isInKyokoMode = s
+  }
+
+  setLocale(s: string) {
+    this.locale = s
   }
 
   constructor() {

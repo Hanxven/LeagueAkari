@@ -121,8 +121,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._handleAuxWindowObservations()
     this._handleMainWindowIpcCall()
     this._handleAuxWindowIpcCall()
-
-    this.createMainWindow()
   }
 
   private _handleMainWindowIpcCall() {
@@ -874,5 +872,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
         this._mw.minimize()
       }
     }
+  }
+
+  async onFinish() {
+    this.createMainWindow()
   }
 }

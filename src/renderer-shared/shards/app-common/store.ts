@@ -8,7 +8,8 @@ interface BaseConfig {
 export const useAppCommonStore = defineStore('shard:app-common-renderer', () => {
   const settings = shallowReactive({
     showFreeSoftwareDeclaration: false,
-    isInKyokoMode: false
+    isInKyokoMode: false,
+    locale: 'zh-CN'
   })
 
   const version = ref('0.0.0')

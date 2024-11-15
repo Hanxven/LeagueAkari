@@ -8,7 +8,7 @@ import {
 } from '@shared/utils/analysis'
 import { calculateTogetherTimes, removeOverlappingSubsets } from '@shared/utils/team-up-calc'
 import _ from 'lodash'
-import { comparer, computed, runInAction, toJS } from 'mobx'
+import { comparer, computed, runInAction, toJS, when } from 'mobx'
 import PQueue from 'p-queue'
 
 import { AkariIpcMain } from '../ipc'
@@ -83,7 +83,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private readonly _queue = new PQueue()
   private _controller: AbortController | null = null
 
-  private _debouncedUpdateMatchHistoryFn = _.debounce(() => this._updateMatchHistory(), 500)
+  private _debouncedUpdateMatchHistoryFn = _.debounce(() => this._updateMatchHistory(), 250)
 
   constructor(deps: any) {
     this._loggerFactory = deps['logger-factory-main']
@@ -133,11 +133,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
   async onInit() {
     await this._handleState()
+
     this._handlePQueue()
-    this._handleLoad()
     this._handleIpcCall()
     this._handleCalculation()
     this._handleEndOfGameSave()
+
+    this._handleLoad()
 
     // for better control
     this._setting.onChange('matchHistoryLoadCount', async (value, { setter }) => {
@@ -184,8 +186,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
   private _handleLoad() {
     this._mobx.reaction(
-      () => [this.state.queryStage, this.settings.enabled] as const,
-      ([stage, enabled]) => {
+      () => [this.state.queryStage, this.settings.enabled, this._sgp.state.isTokenReady] as const,
+      ([stage, enabled, tokenReady]) => {
         if (this._controller) {
           this._controller.abort()
           this._controller = null
@@ -198,7 +200,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
         this._debouncedUpdateMatchHistoryFn.cancel()
 
-        if (stage.phase === 'unavailable' || !enabled) {
+        if (stage.phase === 'unavailable' || !enabled || !tokenReady) {
           this.state.clear()
           this.state.setMatchHistoryTag('all')
           this._ipc.sendEvent(OngoingGameMain.id, 'clear')
@@ -255,6 +257,18 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     })
   }
 
+  private _getCurrentGameMatchHistoryTag() {
+    if (!this.state.queryStage.gameInfo) {
+      return 'all'
+    }
+
+    if (OngoingGameMain.SAFE_TAGS.has(`q_${this.state.queryStage.gameInfo.queueId}`)) {
+      return `q_${this.state.queryStage.gameInfo.queueId}`
+    }
+
+    return 'all'
+  }
+
   /**
    *
    * @param options 其中的 force, 用于标识是否强制刷新. 若为 false, 在查询条件未发生变动时不会重新加载
@@ -267,6 +281,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       this._loadPlayerMatchHistory(puuid, {
         signal: mhSignal,
         force,
+        tag:
+          this.settings.matchHistoryTagPreference === 'current'
+            ? this._getCurrentGameMatchHistoryTag()
+            : 'all',
         count: this.settings.matchHistoryLoadCount,
         useSgpApi: this.settings.matchHistoryUseSgpApi
       })
@@ -286,6 +304,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       this._loadPlayerMatchHistory(puuid, {
         signal: mhSignal,
         force,
+        tag:
+          this.settings.matchHistoryTagPreference === 'current'
+            ? this._getCurrentGameMatchHistoryTag()
+            : 'all',
         count: this.settings.matchHistoryLoadCount,
         useSgpApi: this.settings.matchHistoryUseSgpApi
       })
@@ -396,24 +418,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     }
 
     if (isAbleToUseSgpApi) {
-      // SGP API 可以筛选战绩
-      // 在未设置筛选条件的情况下, 会根据设置的偏好来决定是否筛选
-      if (tag === undefined || tag === 'all') {
-        if (this.settings.matchHistoryTagPreference === 'all') {
-          this.state.setMatchHistoryTag('all')
-        } else if (
-          this.settings.matchHistoryTagPreference === 'current' &&
-          this.state.queryStage.gameInfo &&
-          OngoingGameMain.SAFE_TAGS.has(`q_${this.state.queryStage.gameInfo.queueId}`)
-        ) {
-          tag = `q_${this.state.queryStage.gameInfo.queueId}`
-          this.state.setMatchHistoryTag(`q_${this.state.queryStage.gameInfo.queueId}`)
-        }
-      } else {
-        // 对于已经设置 tag 偏好的情况, 会检测是否是安全队列, 否则重置
-        if (!OngoingGameMain.SAFE_TAGS.has(tag)) {
+      if (tag) {
+        if (tag === 'all' || !OngoingGameMain.SAFE_TAGS.has(tag)) {
           tag = undefined
           this.state.setMatchHistoryTag('all')
+        } else {
+          this.state.setMatchHistoryTag(tag)
         }
       }
 
@@ -422,7 +432,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           signal,
           priority: OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY
         })
-        .catch((error) => this._handleAbortError(error))
+        .catch((error) => this._handleError(error, 'match-history'))
 
       if (!data) {
         return
@@ -443,7 +453,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           signal,
           priority: OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY
         })
-        .catch((error) => this._handleAbortError(error))
+        .catch((error) => this._handleError(error, 'match-history'))
 
       if (!res) {
         return
@@ -481,7 +491,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         signal,
         priority: OngoingGameMain.LOADING_PRIORITY.SUMMONER
       })
-      .catch((error) => this._handleAbortError(error))
+      .catch((error) => this._handleError(error, 'summoner'))
 
     if (!res) {
       return
@@ -524,7 +534,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         signal,
         priority: OngoingGameMain.LOADING_PRIORITY.SAVED_INFO
       })
-      .catch((error) => this._handleAbortError(error))
+      .catch((error) => this._handleError(error, 'saved-info'))
 
     if (!res) {
       return
@@ -552,7 +562,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         signal,
         priority: OngoingGameMain.LOADING_PRIORITY.RANKED_STATS
       })
-      .catch((error) => this._handleAbortError(error))
+      .catch((error) => this._handleError(error, 'ranked-stats'))
 
     if (!res) {
       return
@@ -583,7 +593,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         signal,
         priority: OngoingGameMain.LOADING_PRIORITY.CHAMPION_MASTERY
       })
-      .catch((error) => this._handleAbortError(error))
+      .catch((error) => this._handleError(error, 'champion-mastery'))
 
     if (!res) {
       return
@@ -830,10 +840,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     )
   }
 
-  private _handleAbortError(e: any) {
+  private _handleError(e: any, mark = '') {
     if (e instanceof Error && e.name === 'AbortError') {
       return
     }
-    return Promise.reject(e)
+
+    this._log.warn('在尝试加载时出现错误', e, mark)
+    return
   }
 }

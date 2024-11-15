@@ -16,6 +16,20 @@
           :options="closeActions"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="语言 / Language"
+        label-description="设置应用的主语言 / Set primary language for League Akari"
+        :label-width="320"
+      >
+        <NSelect
+          style="width: 160px"
+          size="small"
+          :value="as.settings.locale"
+          @update:value="(val) => app.setLocale(val)"
+          :options="locales"
+        />
+      </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">应用更新</span></template>
@@ -166,6 +180,11 @@ const closeActions = [
 const updateDownloadSource = [
   { label: 'Gitee', value: 'gitee' },
   { label: 'GitHub', value: 'github' }
+]
+
+const locales = [
+  { label: '中文', value: 'zh-CN' },
+  { label: 'English', value: 'en' }
 ]
 
 const dialog = useDialog()

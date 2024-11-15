@@ -82,7 +82,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
     await this._setting.applyToState()
     this._mobx.propSync(AppCommonMain.id, 'settings', this.settings, [
       'isInKyokoMode',
-      'showFreeSoftwareDeclaration'
+      'showFreeSoftwareDeclaration',
+      'locale'
     ])
     this._mobx.propSync(AppCommonMain.id, 'state', this.state, [
       'isAdministrator',

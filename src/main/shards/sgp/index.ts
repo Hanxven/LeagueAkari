@@ -6,6 +6,7 @@ import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { formatError } from '@shared/utils/errors'
 import Ajv from 'ajv'
 import { isAxiosError } from 'axios'
+import { comparer, when } from 'mobx'
 import fs from 'node:fs'
 
 import builtinSgpServersJson from '../../../../resources/builtin-config/sgp/mh-sgp-servers.json?commonjs-external&asset'
@@ -110,10 +111,24 @@ export class SgpMain implements IAkariShardInitDispose {
 
   async onInit() {
     await this._loadAvailableServersFromLocalFile()
+
     this._handleIpcCall()
     this._handleUpdateSupportedInfo()
     this._maintainEntitlementsToken()
     this._maintainLolLeagueSessionToken()
+
+    // 是否 token 准备好
+    this._mobx.reaction(
+      () => [this._lc.data.lolLeagueSession.token, this._lc.data.entitlements.token] as const,
+      ([t1, t2]) => {
+        if (t1 && t2) {
+          this.state.setTokenReady(true)
+        } else {
+          this.state.setTokenReady(false)
+        }
+      },
+      { equals: comparer.shallow }
+    )
   }
 
   private async _loadAvailableServersFromLocalFile() {
