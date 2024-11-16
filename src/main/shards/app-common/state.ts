@@ -42,7 +42,7 @@ export class AppCommonSettings {
   /**
    * 语言
    */
-  locale: string = 'zh-CN'
+  locale: string = 'zh-cn'
 
   setShowFreeSoftwareDeclaration(s: boolean) {
     this.showFreeSoftwareDeclaration = s

@@ -3,14 +3,14 @@
     <colgroup></colgroup>
     <thead>
       <tr>
-        <th>队列</th>
-        <th>当前段位</th>
-        <th>胜点</th>
-        <th>胜局</th>
-        <th>负局</th>
-        <th>上赛季末段位</th>
-        <th>上赛季最高段位</th>
-        <th>历史最高段位</th>
+        <th>{{ t('RankedTable.queueType') }}</th>
+        <th>{{ t('RankedTable.tier') }}</th>
+        <th>{{ t('RankedTable.leaguePoints') }}</th>
+        <th>{{ t('RankedTable.wins') }}</th>
+        <th>{{ t('RankedTable.losses') }}</th>
+        <th>{{ t('RankedTable.previousSeasonEndTier') }}</th>
+        <th>{{ t('RankedTable.previousSeasonHighestTier') }}</th>
+        <th>{{ t('RankedTable.highestTier') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -71,6 +71,7 @@
 <script lang="ts" setup>
 import { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
 import { QUEUE_TYPE_TEXT, TIER_TEXT } from '@shared/utils/ranked'
+import { useI18n } from 'vue-i18n'
 
 import BronzeMedal from '@main-window/assets/ranked-icons/bronze.png'
 import ChallengerMedal from '@main-window/assets/ranked-icons/challenger.png'
@@ -86,6 +87,8 @@ import SilverMedal from '@main-window/assets/ranked-icons/silver.png'
 const { rankedStats } = defineProps<{
   rankedStats: RankedStats
 }>()
+
+const { t } = useI18n()
 
 const RANKED_MEDAL_MAP: Record<string, string> = {
   IRON: IronMedal,
@@ -110,7 +113,8 @@ const QUEUE_TYPE_ORDER: Record<string, number> = {
 }
 
 const formatQueueName = (queueType: string) => {
-  return QUEUE_TYPE_TEXT[queueType] || queueType
+
+  return t(`common.queueTypes.${queueType}`, queueType)
 }
 
 const formatWins = (entry: RankedEntry) => {

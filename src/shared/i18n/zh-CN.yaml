@@ -1,77 +1,563 @@
-auto-select-renderer:
-  settings:
+# 大致的命名规则: 组件名 / 随心所欲
+
+SettingModal:
+  title: 设置
+
+AnnouncementModal:
+  title: 公告
+  close: 关闭
+
+DeclarationModal:
+  title: 声明
+  close: 关闭
+  ok: 我已阅读
+  showAgain: 再次提醒
+  line1: (联盟阿卡林) 是开源软件，旨在提供额外的辅助功能。您不应从任何付费渠道获取此软件。
+  line2: 同时告知，对于使用本软件可能带来的任何后果，包括但不限于游戏账户的封禁、数据损坏或其他任何形式的游戏体验负面影响，本软件不承担任何责任。
+  line3: 用户在决定使用本软件时，应充分考虑并自行承担由此产生的所有风险和后果。
+
+CommonButtons:
+  announcement: 公告
+  github: 项目主页
+  auxWindow: 小窗口
+
+TrafficButtons:
+  minimize: 最小化
+  maximize: 最大化
+  restore: 还原
+  close: 关闭
+
+  modal:
+    title: 退出 League Akari
+    options:
+      minimize-to-tray: 最小化到托盘区
+      quit: 退出应用
+    remember: 记住选择
+    ok: 确定
+    cancel: 取消
+
+OngoingGameTitle:
+  refresh: 刷新对局页面
+  orderOptions:
+    default: 楼层顺序
+    win-rate: 胜率降序
+    kda: KDA 降序
+    akari-score: 评分降序
+
+AppSettings:
+  title: 应用
+
+  basic:
+    title: 基础
+
+    mainWindowCloseAction:
+      label: 窗口关闭策略
+      description: 当关闭主窗口时所执行的行为
+      options:
+        minimize-to-tray: 最小化到托盘
+        quit: 退出应用
+        ask: 每次询问
+
+  selfUpdate:
+    title: 应用更新
+    tip:
+      title: 如何选择？
+      gitee: '- 在中国大陆内拥有较好的响应速度'
+      github: '- 在中国大陆外拥有较好的响应速度'
+
+    autoCheckUpdates:
+      label: 自动检查更新
+      description: 在应用启动时，自动从更新源拉取最新版本信息
+
+    autoDownloadUpdates:
+      label: 自动下载更新
+      description: 在检查到新版本时，自动下载更新包
+
+    downloadSource:
+      label: 下载源
+      description: 选择更新包下载源
+
+  mainWindowUi:
+    title: 主界面
+
+    useProfileSkinAsBackground:
+      label: 使用生涯皮肤背景
+      description: League Akari 将使用当前玩家的生涯背景皮肤作为背景
+
+  lcConnection:
+    title: LCU 连接
+
+    autoConnect:
+      label: 自动连接
+      description: 存在唯一的客户端时，则自动连接该客户端
+
+    useWmic:
+      label: 使用 WMIC
+      description: 使用 WMIC 获取客户端命令行信息，而不是默认的 Win32 API 方式。需要管理员权限
+
+  misc:
+    title: 其他
+
+    disableHardwareAcceleration:
+      label: 禁用硬件加速
+      description: 禁用硬件加速，可能会解决一些渲染问题，如字体模糊
+
+    disableHardwareAccelerationDialog:
+      enableText: 启用硬件加速
+      disableText: 禁用硬件加速
+      disableConfirmation: 是否确认禁用硬件加速？将重启应用以应用更改
+      enableConfirmation: 将启用硬件加速，重启应用以应用更改
+      positiveText: 重启应用并退出
+      negativeText: 取消
+
+MatchHistoryTabsSettings:
+  title: 战绩页面
+
+  refreshTabsAfterGameEnds:
+    label: 更新页面战绩
+    description: 在对局结束后，主动刷新所有涉及到本次对局的战绩页面。由于服务器的更新延迟，获取到的战绩仍可能非最新
+
+  matchHistoryUseSgpApi:
+    label: 使用 SGP API
+    description: 战绩页面使用 SGP API 作为数据源
+    current: '当前 SGP Server: {server}'
+    unsupported: '暂不支持当前服务器使用 SGP API: {server}'
+
+OngoingGameSettings:
+  title: 对局分析
+
+  enabled:
+    label: 启用
+    description: 在进入英雄选择中或对局时，将进行对局分析
+
+  matchHistoryLoadCount:
+    label: 对局战绩分析数量
+    description: 在对局页面中，用于分析每名玩家的战绩拉取对局数量
+
+  premadeTeamThreshold:
+    label: 预组队判定阈值
+    description: 目标玩家群体出现在同一阵营超过 {threshold} 次时，则判定为预组队
+
+  concurrency:
+    label: 并发请求数量
+    description: 在对局分析中，所进行的所有网络请求总并发数限制。它并不会限制其他模块的请求并发数
+
+  matchHistoryUseSgpApi:
+    label: 使用 SGP API
+    description: 对局分析优先使用 SGP API 查询对局，若当前 SGP API 不可用，则使用 LCU API
+    unsupported: '暂不支持当前服务器使用 SGP API: {server}'
+
+  matchHistoryTagPreference:
+    label: 队列筛选偏好
+    description: 使用 SGP API 时，加载战绩时的队列筛选偏好
+    options:
+      all: 所有模式
+      current: 当前模式
+
+AuxWindowSettings:
+  title: 小窗口
+
+  auxWindowEnabled:
+    label: 启用小窗口
+    description: 在一些游戏流程中使用小窗口来展示状态以及提供额外操作
+
+  auxWindowAutoShow:
+    label: 自动弹出和关闭
+    description: 在游戏流程的部分阶段，自动弹出或关闭小窗口
+
+  auxWindowOpacity:
+    label: 小窗口不透明度
+    description: 小窗口的半透明状态
+
+  auxWindowShowSkinSelector:
+    label: 皮肤设置器
+    description: 在小窗口展示一个设置皮肤的快捷入口
+
+  auxWindowZoomFactor:
+    label: 缩放
+    description: 可以调整小窗口的整体大小
+
+  resetAuxWindowPosition:
+    label: 重置小窗口位置
+    description: 重新设置小窗口的位置，还原到默认主屏幕正中心
+    button: 重置
+
+MiscSettings:
+  title: 其他
+
+  respawnTimer:
+    title: 重生倒计时
+
     enabled:
       label: 启用
-      description: 在常规的模式中启用。如匹配模式，排位模式等任何非随机英雄的模式
-    showIntent:
-      label: 提前预选
-      description: 预选即将自动选用的英雄
-    selectTeammateIntendedChampion:
-      label: 无视队友预选
-      description: 开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突
-    completed:
-      label: 选择策略
-      description: 立即锁定或只是亮出
-      options:
-        true: 立即锁定
-        false: 只是亮出
-    expectedChampions:
-      label: 意向英雄
-      description: |
-        <div style="margin-bottom: 8px">将根据预设列表选择英雄</div>
-        <div style="margin-bottom: 8px">若当前模式<span style="font-weight: bold">不存在分路信息</span>或<span style="font-weight: bold">当前分路未设置英雄</span>，则按照<span style="font-weight: bold">默认</span>列表进行选择</div>
-        <div>选择优先级为列表定义顺序，优先选择位置靠前的英雄</div>
+      description: 在标题栏展示一个距离重生剩余时间的指示器
 
-match-history-tabs-renderer:
-  lose: 失败
-  win: 胜利
-  remake: 重开
-  team100: 蓝队
-  team200: 红队
+DebugSettings:
+  title: 调试
 
-settings-about-panel-component:
-  line1: 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖
+  electron:
+    title: Akari's Electron
+
+    devTools:
+      label: 开发者工具
+      description: Toggle DevTools
+      button: Toggle DevTools
+
+    reload:
+      label: 页面重载
+      description: 刷新 League Akari 用户界面
+      button: 重新加载页面
+
+  files:
+    title: 文件目录
+
+    logs:
+      label: 日志目录
+      description: 打开日志目录
+      button: 日志目录
+
+    appData:
+      label: 应用数据目录
+      popoverTrigger: 详情
+      button: 应用目录
+      description:
+        part1: 打开 League Akari 应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
+        part2: 存储用户设置、已标记的玩家等信息
+        part3: 即将进行的自动更新临时文件
+        part4: 一些可以替换的设置项文件
+        part5: 特殊配置文件
+
+  lcuEvent:
+    label: 在控制台打印 LCU 事件
+    printAll: 打印全部事件
+    addRule: 添加规则
+    empty: 无规则
+    enable: 启用
+    rule: 规则
+    delete: 删除
+
+    modal:
+      title: 添加
+      button: 添加
+      placeholder: 输入匹配规则，如 /path/:name/to
+
+  lcuConnection:
+    titleConnected: LCU
+    titleDisconnected: LCU (未连接)
+    port: 端口
+    pid: 进程 ID
+    auth: 密钥
+    rsoPlatform: 区服
+    region: 地区
+
+  gameflow:
+    title: 游戏流
+    unavailable: 不可用 (未连接)
+
+    Matchmaking: '正在匹配'
+    ChampSelect: '英雄选择中'
+    ReadyCheck: '等待接受状态中'
+    InProgress: '游戏进行中'
+    EndOfGame: '游戏结算'
+    Lobby: '房间'
+    GameStart: '游戏开始'
+    None: '无'
+    Reconnect: '重新连接'
+    WaitingForStats: '等待结果'
+    PreEndOfGame: '结束游戏之前'
+    WatchInProgress: '在观战中'
+
+  inAdministrator:
+    description: League Akari 运行在管理员权限，仅用于实现特定的客户端功能
+
+  kyokoMode:
+    description: 部分功能仅用于调试用途
+
+AboutPane:
+  title: 关于
+  line1: ' (联盟阿卡林，Version { version }) 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖'
   line2: 项目参考
-  line3: Github：
-  line4: © 2024 Hanxven. 本软件是开源软件，遵循 GPL-3.0 许可证。
-  downloadSource:
-    label: 检查更新
-    description: 从下载源 ({source}) 中检查更新
-    buttonCheck: 检查更新
-    buttonShowNewUpdate: 新版本内容
-    buttonRecentlyCheck: 最近检查
-  updateProgressInfo:
+  copyright: © 2024 Hanxven. 本软件是开源软件，遵循 GPL-3.0 许可证。
+
+  checkFrom: 从下载源中 ({ source }) 检查更新
+  checkUpdates: 检查更新
+  newUpdates: 新版本内容
+  lastCheckAt: 上次检查
+
+  updateProcess:
     label: 更新流程
     description: 正在进行的更新流程
-  downloadingProgress:
-    label: 下载更新包
-    progress: 已完成 {percent} %
-    remainingTime: 剩余：{time}
-    downloadFailed: 下载失败
-  unpackingProgress:
-    label: 解压更新包
-    progress: 已完成 {percent} %
+    downloading: 下载更新包
+    finished: 已完成 {progress} %
+    remain: 剩余 {time}
+    downloadFailed: 下载出错
+    unpacking: 解压更新包
     unpackFailed: 解压出错
-  restart:
-    label: 等待重新启动
-    description: 关闭应用后将进行自动更新流程
-  updatesDir:
+    waitingForRestart: 等待重新启动
+    waitingForRestartDescription: 关闭应用后将进行自动更新流程
+
+  updateDir:
     label: 更新目录
     description: 当前更新已下载的位置，若无法执行完整的自动更新流程，则需要手动更新
+    open: 打开
 
-announcement-modal-component:
-  title: 公告
-  updatedAt: 更新
-  close: 关闭
-  read: 已读
-  currentNoAnnouncement: 暂无公告
+Automation:
+  title: 自动化
+  autoGameflow: 自动游戏流程
+  autoSelect: 自动选择 / 禁用
+  autoMisc: 其他
+
+AutoGameflow:
+  title: 游戏流
+
+  autoAcceptEnabled:
+    label: 自动接受对局开启
+    description: 当匹配到玩家时，自动确认
+  autoAcceptDelaySeconds:
+    label: 自动接受对局延时 (s)
+    description: 在可接受时延迟执行接受操作的时间，单位为秒
+  autoHonorEnabled:
+    label: 自动点赞开启
+    description: 在游戏结束时，自动点赞。外部工具无法跳过点赞阶段，因此将会尝试用尽票数以完成点赞阶段
+  autoHonorStrategy:
+    label: 点赞选择策略
+    description: 这将决定具体给哪位玩家点赞
+    options:
+      prefer-lobby-member: 优先选择房间内的人员，若有剩余票数，则选择其他队友
+      only-lobby-member: 仅预组队成员
+      all-member: 所有队友
+      all-member-including-opponent: 考虑本局游戏所有玩家
+      opt-out: 不点赞
+  playAgainEnabled:
+    label: 自动回到房间
+    description:
+      part1: 对局结束时回到房间。可能需要先启用
+      part2: 自动点赞
+      part3: 以完成点赞投票阶段
+  autoMatchmakingEnabled:
+    label: 自动匹配对局
+    description: 在可匹配对局时，将自动开始匹配对局
+  autoMatchmakingMinimumMembers:
+    label: 最低人数
+    description: 自动开始匹配需满足人数达到 {members} 人
+  autoMatchmakingDelaySeconds:
+    label: 匹配前等待时间 (s)
+    description: 在可匹配对局时，预留的等待时间，单位为秒
+  autoMatchmakingWaitForInvitees:
+    label: 等待邀请中成员
+    description: 自动开启匹配将等待所有被邀请的玩家做出回应
+  autoMatchmakingRematchStrategy:
+    label: 停止匹配策略
+    description: 在某些情况下，自动停止匹配状态。当自动匹配开启时，将会重新开始匹配
+    options:
+      never: 永不
+      fixed-duration: 固定时间
+      estimated-duration: 超过队列预估时间
+  autoMatchmakingRematchFixedDuration:
+    label: 退出匹配时间 (s)
+    description:
+      fixed-duration: 在超过该时间后，将停止匹配，单位为秒
+      no-fixed-duration: 该选项仅当停止匹配策略为固定时间时生效
+  autoReconnectEnabled:
+    label: 自动重新连接
+    description: 当位于可重新连接状态时，尝试重新连接
+  autoHandleInvitationsEnabled:
+    label: 自动处理房间邀请
+    description: 按照设定的策略处理房间邀请
+  invitationHandlingStrategies:
+    label: 房间邀请接受策略
+    description: 当收到房间邀请时，将根据不同的队列模式进行处理
+    options:
+      accept: 接受
+      decline: 拒绝
+      ignore: 不处理
+    button: 配置
+    queueTypes:
+      default: 默认
+
+AutoSelect:
+  normalModeTitle: 自动英雄选择 · 普通模式
+  benchModeTitle: 自动英雄选择 · 随机模式
+  banTitle: 自动禁用
+
+  normalModeEnabled:
+    label: 开启
+    description: 在常规的模式中启用。如匹配模式，排位模式等任何非随机英雄的模式
+
+  showIntent:
+    label: 提前预选
+    description: 预选即将自动选用的英雄
+
+  selectTeammateIntendedChampion:
+    label: 无视队友预选
+    description: 开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突
+
+  completed:
+    label: 锁定策略
+    description: 立即锁定或只是亮出
+    options:
+      true: 立即锁定
+      false: 亮出而不锁定
+
+  expectedChampions:
+    label: 意向英雄
+    button: 配置
+    description: |
+      <div style="margin-bottom: 8px">将根据预设列表选择英雄</div>
+      <div style="margin-bottom: 8px">若当前模式<span style="font-weight: bold">不存在分路信息</span>或<span style="font-weight: bold">当前分路未设置英雄</span>，则按照<span style="font-weight: bold">默认</span>列表进行选择</div>
+      <div>选择优先级为列表定义顺序，优先选择位置靠前的英雄</div>
+
+  benchModeEnabled:
+    label: 开启
+    description: 在随机英雄的模式中启用。如极地大乱斗等随机英雄的模式
+
+  grabDelaySeconds:
+    label: 选用最低累积时间 (s)
+    description:
+      part1: 目标英雄出现在英雄选择台上的累计时间需达到此值才会执行交换操作，单位为秒
+      part2: 当英雄出现在英雄选择台上时，会针对该英雄进行计时。仅当其在英雄选择台上的累计时间满足设定值时，自动交换才会执行，避免过早选择英雄，即 “秒抢”
+
+  benchSelectFirstAvailableChampion:
+    label: 优先选择首位
+    description: 开启此项后，将始终选用期望列表中第一个可用的英雄
+
+  benchExpectedChampions:
+    label: 期望英雄
+
+  banEnabled:
+    label: 开启
+    description: 自动执行英雄的禁用操作
+
+  banTeammateIntendedChampion:
+    label: 无视队友预选
+    description: 开启后将不会考虑队友的预选英雄
+
+  bannedChampions:
+    label: 禁用英雄
+    description: |
+      <div style="margin-bottom: 8px">将根据预设列表禁用英雄</div>
+      <div style="margin-bottom: 8px">若当前模式<span style="font-weight: bold">不存在分路信息</span>或<span style="font-weight: bold">当前分路未设置英雄</span>，则按照<span style="font-weight: bold">默认</span>列表进行选择</div>
+      <div>禁用优先级为列表定义顺序，优先禁用位置靠前的英雄</div>
+
+AutoMisc:
+  autoReply:
+    title: 自动回复
+
+    enabled:
+      label: 开启
+
+    enableOnAway:
+      label: 仅在离开时
+      description: 仅在游戏状态为离开时，自动回复才会生效
+
+    text:
+      label: 回复内容
+      description: 将作为自动回复的内容词
+
+SideBarMenu:
+  match-history: 战绩
+  ongoing-game: 对局分析
+  automation: 自动操作
+  toolkit: 工具集
+  test: 测试
+
+SideBarFixed:
+  currentConnected: 当前已连接
+  launchedClients: 已启动的客户端
+  noClientTitle: 无可用客户端
+  noClient: 当前无可用客户端，请启动游戏
+  settings: 设置
+
+OrderedChampionList:
+  searchForChampion: 搜索英雄
+  edit: 编辑
+  unselected: 未选择
+
+RankedTable:
+  queueType: 队列
+  tier: 当前段位
+  leaguePoints: 胜点
+  ratedRating: 分数
+  wins: 胜场
+  losses: 负场
+  previousSeasonEndTier: 上赛季段位
+  previousSeasonHighestTier: 上赛季最高段位
+  highestTier: 历史最高段位
+
+RankedDisplay:
+  unranked: 未定级
+  win: 胜
+  lose: 负
+  point: 分
+  leaguePoint: 胜点
+  highest: 最高
+  empty: 无内容
+
+DamageMetricsBar:
+  total: 伤害总计
+  physical: 物理伤害
+  magic: 魔法伤害
+  true: 真实伤害
+
+MatchHistoryTabsTitle:
+  loading: 加载中...
+  search: 搜索玩家
+
+SearchSummonerModal:
+  title: 召唤师搜索
+  placeholder: Enter the summoner name
+  sgpServer: 区服
+  cancel: 取消
+  search: 搜索玩家
+  result: 搜索结果
+  history: 历史搜索
+  validating: 正在验证玩家 ({current} / {total})
+  validated: 验证了 {count} 条可能的玩家记录，无搜索结果符合
+  noResult: 无搜索结果符合
+  privacy: 生涯隐藏
+  currentRoute: 当前
+  invalidInput: 当前输入不符合格式要求：应为 "游戏名称#标签" 或 "游戏名称"
+  hasInvisibleChar: 当前搜索文本包含不可见字符，将被过滤
+  puuidSearch: 当前为精确搜索：搜索指定 PUUID
+  exactSearch: 当前为精确搜索：搜索指定名称和标签的召唤师
+  fuzzySearch: 当前为模糊搜索：搜索指定名称的召唤师
+
+  placeholders:
+    - '如完整查询：赤座灯里#akari'
+    - '如模糊查询 - 格式如：船见结衣'
+    - '如 PUUID 查询 - 格式如：<puuid>'
+
+PlayerTagEditModal:
+  title: 编辑玩家标记
+  loading: 加载中...
+  save: 保存
+  cancel: 取消
+
+ShortcutSelectionModal:
+  title: 快捷键设定
+  hint: 按下按键以记录快捷键
+  tooComplicated: 该快捷键组合具有较高复杂度，请确认
+  ok: 确认
+  cancel: 取消
+
+UpdateModal:
+  newVersion: 新版本
+  versionFeatures: 版本特性
+  newVersionAvailable: 新版本可用：{version} (当前版本：{currentVersion})
+  currentVersion: 当前版本：{version}
+  releasePage: 发布页面
+  download: 下载
 
 common:
+  appName: League Akari
+  default: 默认
   lanes:
     top: 上单
     jungle: 打野
     mid: 中单
+    middle: 中单
     bot: 下路
+    bottom: 下路
     support: 辅助
     utility: 辅助
     TOP: 上单
@@ -80,3 +566,51 @@ common:
     BOT: 下路
     SUPPORT: 辅助
     UTILITY: 辅助
+
+  queueTypes:
+    RANKED_SOLO_5x5: 单双排位
+    RANKED_FLEX_SR: 灵活排位
+    NORMAL: 匹配模式
+    ARAM_UNRANKED_5x5: 极地大乱斗
+    CHERRY: 斗魂竞技场
+    URF: 无限火力 / 无限乱斗
+    NORMAL_TFT: 云顶之弈
+    RANKED_TFT: 云顶之弈 排位
+    RANKED_TFT_TURBO: 云顶之弈 狂暴模式
+    RANKED_TFT_DOUBLE_UP: 云顶之弈 双人作战
+
+  sgpMatchHistoryTags:
+    all: 所有模式
+    current: 当前模式
+    q_420: 单双排位
+    q_430: 匹配模式
+    q_440: 灵活排位
+    q_450: 极地大乱斗
+    q_490: 快速匹配
+    q_900: 无限乱斗
+    q_1700: 斗魂竞技场
+    q_1900: 无限火力
+
+  tiers:
+    IRON: 坚韧黑铁
+    BRONZE: 英勇黄铜
+    SILVER: 不屈白银
+    GOLD: 荣耀黄金
+    PLATINUM: 华贵铂金
+    EMERALD: 流光翡翠
+    DIAMOND: 璀璨钻石
+    MASTER: 超凡大师
+    GRANDMASTER: 傲世宗师
+    CHALLENGER: 最强王者
+
+  shortTiers:
+    IRON: 黑铁
+    BRONZE: 黄铜
+    SILVER: 白银
+    GOLD: 黄金
+    PLATINUM: 铂金
+    EMERALD: 翡翠
+    DIAMOND: 钻石
+    MASTER: 大师
+    GRANDMASTER: 宗师
+    CHALLENGER: 王者

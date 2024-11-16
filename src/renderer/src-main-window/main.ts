@@ -1,3 +1,4 @@
+import { i18n } from '@renderer-shared/i18n'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'
@@ -15,7 +16,7 @@ try {
   dayjs.extend(relativeTime)
   dayjs.extend(duration)
 
-  const app = createApp(NaiveUIProviderApp).use(router).use(createPinia()).use(manager)
+  const app = createApp(NaiveUIProviderApp).use(router).use(createPinia()).use(i18n).use(manager)
   await manager.setup()
   app.mount('#app')
 } catch (error) {

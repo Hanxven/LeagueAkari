@@ -183,7 +183,7 @@ useKeyboardCombo('AKARI', {
     height: 100%;
     background: linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.80) 0%,
+      rgba(0, 0, 0, 0.8) 0%,
       rgba(0, 0, 0, 0.85) 75%,
       rgba(0, 0, 0, 0.85) 100%
     );

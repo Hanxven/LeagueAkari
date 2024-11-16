@@ -1,21 +1,24 @@
 <template>
   <div v-if="rankedEntry" class="ranked-wrapper" :class="{ small: small }">
     <div class="ranked-type">
-      {{ QUEUE_TYPE_TEXT[rankedEntry.queueType] || rankedEntry.queueType }}
+      {{ t(`common.queueTypes.${rankedEntry.queueType}`, rankedEntry.queueType) }}
     </div>
     <div class="ranked-display">
-      <img
-        class="ranked-image"
-        v-if="!small"
-        :src="rankedImageMap[rankedEntry.tier] || rankedImageMap['UNRANKED']"
-      />
+      <div class="ranked-image-container" v-if="!small">
+        <img
+          class="ranked-image"
+          :src="rankedImageMap[rankedEntry.tier] || rankedImageMap['UNRANKED']"
+        />
+      </div>
       <div class="ranked-info" :class="{ small: small }">
         <span class="ranked-name" v-if="rankedEntry.queueType !== 'CHERRY'">{{ formatTier }}</span>
         <span v-if="rankedEntry.ratedRating" class="wins"
-          >{{ rankedEntry.wins }} 胜 {{ rankedEntry.ratedRating }} 分</span
+          >{{ rankedEntry.wins }} {{ t('RankedDisplay.win') }} {{ rankedEntry.ratedRating }}
+          {{ t('RankedDisplay.point') }}</span
         >
         <span v-else class="ranked-wins-lp"
-          >{{ rankedEntry.wins }} 胜 {{ rankedEntry.leaguePoints }} LP</span
+          >{{ rankedEntry.wins }} {{ t('RankedDisplay.win') }}
+          {{ rankedEntry.leaguePoints }} LP</span
         >
         <div
           class="ranked-highest"
@@ -25,7 +28,7 @@
               rankedEntry.previousSeasonHighestTier === 'NA'
           }"
         >
-          <span class="label">最高</span>
+          <span class="label">{{ t('RankedDisplay.highest') }}</span>
           <div class="content">
             <img
               v-if="
@@ -41,13 +44,13 @@
       </div>
     </div>
   </div>
-  <div v-else class="ranked-display-empty">无内容</div>
+  <div v-else class="ranked-display-empty">{{ t('RankedDisplay.empty') }}</div>
 </template>
 
 <script lang="ts" setup>
 import { RankedEntry } from '@shared/types/league-client/ranked'
-import { QUEUE_TYPE_TEXT, TIER_TEXT } from '@shared/utils/ranked'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import RankedBronze from '@main-window/assets/ranked-icons-large/bronze.png'
 import RankedChallenger from '@main-window/assets/ranked-icons-large/challenger.png'
@@ -75,6 +78,8 @@ const props = defineProps<{
   rankedEntry?: RankedEntry
   small?: boolean
 }>()
+
+const { t } = useI18n()
 
 const rankedImageMap: Record<string, string> = {
   UNRANKED: RankedNone,
@@ -108,10 +113,12 @@ const formatTier = computed(() => {
     return ''
   }
 
-  const tier = TIER_TEXT[props.rankedEntry.tier] || props.rankedEntry.tier
+  const tier = props.rankedEntry.tier
+    ? t(`common.tiers.${props.rankedEntry.tier}`)
+    : props.rankedEntry.tier
 
   if (tier === '' || tier === 'NA') {
-    return '未定级'
+    return t('RankedDisplay.unranked')
   }
 
   const division = props.rankedEntry.division
@@ -128,12 +135,12 @@ const formatPreviousTier = computed(() => {
     return ''
   }
 
-  const tier =
-    TIER_TEXT[props.rankedEntry.previousSeasonHighestTier] ||
-    props.rankedEntry.previousSeasonHighestTier
+  const tier = props.rankedEntry.previousSeasonHighestTier
+    ? t(`common.tiers.${props.rankedEntry.previousSeasonHighestTier}`)
+    : props.rankedEntry.previousSeasonHighestTier
 
   if (tier === '' || tier === 'NA') {
-    return '未定级'
+    return t('RankedDisplay.unranked')
   }
 
   const division = props.rankedEntry.previousSeasonHighestDivision
@@ -167,6 +174,9 @@ const formatPreviousTier = computed(() => {
   top: 4px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
 }
 
 .ranked-type {
@@ -183,16 +193,26 @@ const formatPreviousTier = computed(() => {
   position: relative;
 }
 
+.ranked-image-container {
+  position: relative;
+  width: 64px;
+  height: 48px;
+}
+
 .ranked-image {
-  width: 96px;
-  height: 72px;
+  width: 144%;
+  height: 144%;
+  position: absolute;
   object-fit: contain;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .ranked-info {
   display: flex;
   flex-direction: column;
-  width: 96px;
+  min-width: 64px; // 让它看起来更加居中
 
   &.small {
     width: unset;

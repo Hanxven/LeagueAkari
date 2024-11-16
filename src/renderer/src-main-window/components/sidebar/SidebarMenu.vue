@@ -22,14 +22,14 @@
 
 <script setup lang="ts">
 import { NTooltip } from 'naive-ui'
-import { Component as ComponentC, watchEffect } from 'vue'
+import { Component as ComponentC, computed, watchEffect } from 'vue'
 
 const { defaultValue, items = [] } = defineProps<{
   defaultValue?: string
   items?: { key: string; icon: ComponentC; name: string; show?: boolean }[]
 }>()
 
-const showItems = items.filter((item) => item.show !== false)
+const showItems = computed(() => items.filter((item) => item.show !== false))
 const currentActiveItem = defineModel<string>('current')
 
 watchEffect(() => {

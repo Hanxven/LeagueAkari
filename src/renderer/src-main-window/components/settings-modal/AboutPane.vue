@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar style="max-height: 65vh" trigger="none">
+  <NScrollbar style="max-height: 65vh">
     <div style="padding: 16px 16px 8px">
       <div
         style="display: flex; justify-content: center; vertical-align: bottom; margin-bottom: 16px"
@@ -11,19 +11,21 @@
         />
       </div>
       <div class="about-para">
-        <LeagueAkariSpan bold @click="() => handleClickEasterEgg()" /> (联盟阿卡林，Version
-        {{ as.version }})
-        是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖
+        <LeagueAkariSpan bold @click="() => handleClickEasterEgg()" />{{
+          t('AboutPane.line1', { version: as.version })
+        }}
         <a target="_blank" href="https://riot-api-libraries.readthedocs.io/en/latest/lcu.html"
           >League Client Update (LCU)</a
-        >。
-        <a target="_blank" :href="`${LEAGUE_AKARI_GITHUB}?tab=readme-ov-file#4-%E5%8F%82%E8%80%83`"
-          >项目参考</a
+        >.
+        <a
+          target="_blank"
+          :href="`${LEAGUE_AKARI_GITHUB}?tab=readme-ov-file#4-%E5%8F%82%E8%80%83`"
+          >{{ t('AboutPane.line2') }}</a
         >.
       </div>
 
       <div class="about-para-2">
-        <span>GitHub：</span>
+        <span style="margin-right: 4px">GitHub: </span>
         <a target="_blank" :href="LEAGUE_AKARI_GITHUB" style="text-indent: 0; margin-right: 8px"
           >League Akari</a
         >
@@ -37,8 +39,10 @@
       <NCard size="small">
         <ControlItem
           class="control-item-margin"
-          label="检查更新"
-          :label-description="`从下载源中 (${UPDATE_SOURCE_MAP[sus.settings.downloadSource]}) 中检查更新`"
+          :label="t('AboutPane.checkUpdates')"
+          :label-description="
+            t('AboutPane.checkFrom', { source: UPDATE_SOURCE_MAP[sus.settings.downloadSource] })
+          "
           :label-width="180"
         >
           <NFlex align="center">
@@ -48,25 +52,26 @@
               secondary
               type="primary"
               @click="() => handleCheckUpdates()"
-              >检查更新</NButton
+              >{{ t('AboutPane.checkUpdates') }}</NButton
             >
             <NButton
               size="small"
               v-if="sus.newUpdates"
               secondary
               @click="() => handleShowUpdateModal()"
-              >新版本内容</NButton
+              >{{ t('AboutPane.newUpdates') }}</NButton
             >
             <span v-if="sus.lastCheckAt" style="font-size: 12px"
-              >最近检查 {{ dayjs(sus.lastCheckAt).locale('zh-cn').fromNow() }}</span
+              >{{ t('AboutPane.lastCheckAt') }}
+              {{ dayjs(sus.lastCheckAt).locale(locale).fromNow() }}</span
             >
           </NFlex>
         </ControlItem>
         <ControlItem
           v-if="sus.updateProgressInfo"
           class="control-item-margin"
-          label="更新流程"
-          label-description="正在进行的更新流程"
+          :label="t('AboutPane.updateProcess.label')"
+          :label-description="t('AboutPane.updateProcess.description')"
           :label-width="180"
         >
           <NSteps
@@ -76,50 +81,78 @@
             :status="processStatus.status"
           >
             <NStep>
-              <template #title><span class="step-title">下载更新包</span></template>
+              <template #title
+                ><span class="step-title">{{
+                  t('AboutPane.updateProcess.downloading')
+                }}</span></template
+              >
               <div class="step-description">
-                已完成 {{ (sus.updateProgressInfo.downloadingProgress * 100).toFixed() }} %
+                {{
+                  t('AboutPane.updateProcess.finished', {
+                    progress: (sus.updateProgressInfo.downloadingProgress * 100).toFixed()
+                  })
+                }}
               </div>
               <div class="step-description" v-if="sus.updateProgressInfo.phase === 'downloading'">
-                剩余 {{ formatTime(sus.updateProgressInfo.downloadTimeLeft) }}
+                {{
+                  t('AboutPane.updateProgress.remain', {
+                    time: formatTime(sus.updateProgressInfo.downloadTimeLeft)
+                  })
+                }}
               </div>
               <div
                 class="step-description"
                 v-if="sus.updateProgressInfo.phase === 'download-failed'"
               >
-                下载出错
+                {{ t('AboutPane.updateProgress.downloadFailed') }}
               </div>
             </NStep>
             <NStep>
-              <template #title><span class="step-title">解压更新包</span></template>
+              <template #title
+                ><span class="step-title">{{
+                  t('AboutPane.updateProgress.unpacking')
+                }}</span></template
+              >
               <div class="step-description">
-                已完成 {{ (sus.updateProgressInfo.unpackingProgress * 100).toFixed() }} %
+                {{
+                  t('AboutPane.updateProgress.finish', {
+                    progress: (sus.updateProgressInfo.unpackingProgress * 100).toFixed()
+                  })
+                }}
               </div>
               <div class="step-description" v-if="sus.updateProgressInfo.phase === 'unpack-failed'">
-                解压出错
+                {{ t('AboutPane.updateProgress.unpackFailed') }}
               </div>
             </NStep>
             <NStep>
-              <template #title><span class="step-title">等待重新启动</span></template>
-              <div class="step-description">关闭应用后将进行自动更新流程</div>
+              <template #title
+                ><span class="step-title">{{
+                  t('AboutPane.updateProgress.waitingForRestart')
+                }}</span></template
+              >
+              <div class="step-description">
+                {{ t('AboutPane.updateProgress.waitingForRestartDescription') }}
+              </div>
             </NStep>
           </NSteps>
         </ControlItem>
         <ControlItem
           class="control-item-margin"
-          label="更新文件夹"
-          label-description="当前更新已下载的位置，若无法执行完整的自动更新流程，则需要手动更新"
+          :label="t('AboutPane.updateDir.label')"
+          :label-description="t('AboutPane.updateDir.description')"
           :label-width="180"
           v-if="
             processStatus.current >= 2 ||
             (processStatus.current === 1 && processStatus.status !== 'error')
           "
         >
-          <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">打开目录</NButton>
+          <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">{{
+            t('AboutPane.updateDir.open')
+          }}</NButton>
         </ControlItem>
       </NCard>
       <div class="about-para copyright">
-        © 2024 Hanxven. 本软件是开源软件，遵循 GPL-3.0 许可证。
+        {{ t('AboutPane.copyright') }}
       </div>
     </div>
   </NScrollbar>
@@ -136,11 +169,14 @@ import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import dayjs from 'dayjs'
 import { NButton, NCard, NFlex, NScrollbar, NStep, NSteps, useMessage } from 'naive-ui'
 import { computed, h, inject } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const UPDATE_SOURCE_MAP = {
   github: 'GitHub',
   gitee: 'Gitee'
 }
+
+const { t, locale } = useI18n()
 
 const as = useAppCommonStore()
 const sus = useSelfUpdateStore()

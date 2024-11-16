@@ -8,7 +8,7 @@
           </div>
         </div>
       </template>
-      公告
+      {{ t('CommonButtons.announcement') }}
     </NTooltip>
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
@@ -18,7 +18,7 @@
           </div>
         </div>
       </template>
-      GitHub
+      {{ t('CommonButtons.github') }}
     </NTooltip>
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" v-if="wms.settings.auxWindowEnabled">
       <template #trigger>
@@ -28,7 +28,7 @@
           </div>
         </div>
       </template>
-      小窗口
+      {{ t('CommonButtons.auxWindow') }}
     </NTooltip>
   </div>
 </template>
@@ -43,6 +43,9 @@ import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { NIcon, NTooltip } from 'naive-ui'
 import { inject } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const wms = useWindowManagerStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')

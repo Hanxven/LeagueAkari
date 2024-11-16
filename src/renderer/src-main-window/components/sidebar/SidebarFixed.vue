@@ -32,7 +32,7 @@
           <div class="separator" v-if="summoner"></div>
           <div class="title-label">
             <NIcon class="icon"><BareMetalServerIcon /></NIcon>
-            <span>当前已连接</span>
+            <span>{{ t('SideBarFixed.currentConnected') }}</span>
           </div>
           <div class="client">
             <div class="region-name">
@@ -52,7 +52,7 @@
           <div class="launched-clients">
             <div class="title-label">
               <NIcon class="icon"><BareMetalServerIcon /></NIcon>
-              <span>已启动的客户端</span>
+              <span>{{ t('SideBarFixed.launchedClients') }}</span>
             </div>
             <NScrollbar style="max-height: 180px">
               <div
@@ -78,9 +78,9 @@
         <template v-if="!clients.current && clients.others.length === 0">
           <div class="title-label">
             <NIcon class="icon"><PlugDisconnected24FilledIcon /></NIcon>
-            <span>无可用客户端</span>
+            <span>{{ t('SideBarFixed.noClientTitle') }}</span>
           </div>
-          <div class="no-client">当前无可用客户端，请启动游戏</div>
+          <div class="no-client">{{ t('SideBarFixed.noClient') }}</div>
         </template>
       </span>
     </NPopover>
@@ -93,7 +93,7 @@
         </div>
       </template>
       <span class="simple-popover">
-        <div class="title">设置</div>
+        <div class="title">{{ t('SideBarFixed.settings') }}</div>
       </span>
     </NTooltip>
   </div>
@@ -112,6 +112,9 @@ import { BareMetalServer as BareMetalServerIcon, Settings as SettingsIcon } from
 import { PlugDisconnected24Filled as PlugDisconnected24FilledIcon } from '@vicons/fluent'
 import { NBadge, NIcon, NPopover, NProgress, NScrollbar, NSpin, NTooltip } from 'naive-ui'
 import { computed, inject } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()

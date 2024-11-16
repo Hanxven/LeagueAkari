@@ -1,11 +1,13 @@
 <template>
-  <NScrollbar style="max-height: 65vh" trigger="none">
+  <NScrollbar style="max-height: 65vh">
     <NCard size="small">
-      <template #header><span class="card-header-title">重生倒计时</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('MiscSettings.respawnTimer.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="启用"
-        label-description="在标题栏展示一个距离重生剩余时间的指示器"
+        :label="t('MiscSettings.respawnTimer.enabled.label')"
+        :label-description="t('MiscSettings.respawnTimer.enabled.description')"
         :label-width="320"
       >
         <NSwitch
@@ -24,6 +26,9 @@ import { useInstance } from '@renderer-shared/shards'
 import { RespawnTimerRenderer } from '@renderer-shared/shards/respawn-timer'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const rts = useRespawnTimerStore()
 const rt = useInstance<RespawnTimerRenderer>('respawn-timer-renderer')

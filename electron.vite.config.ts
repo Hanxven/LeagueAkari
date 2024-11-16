@@ -1,3 +1,4 @@
+import yaml from '@modyfi/vite-plugin-yaml'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig, externalizeDepsPlugin, swcPlugin } from 'electron-vite'
@@ -77,6 +78,7 @@ export default defineConfig({
     },
     plugins: [
       swcPlugin(),
+      yaml(),
       vue({
         template: { compilerOptions: { isCustomElement: (tag) => LC_CUSTOM_TAGS.has(tag) } }
       }),

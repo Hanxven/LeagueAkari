@@ -2,7 +2,7 @@
   <NModal
     transform-origin="center"
     v-model:show="show"
-    title="召唤师搜索"
+    :title="t('SearchSummonerModal.title')"
     size="small"
     :class="$style['search-summoner-modal']"
   >
@@ -12,7 +12,7 @@
           v-if="sgps.availability.region === 'TENCENT'"
           class="select"
           :consistent-menu-width="false"
-          placeholder="区服"
+          :placeholder="t('SearchSummonerModal.sgpServer')"
           v-model:value="sgpServerId"
           :disabled="searchProgress.isProcessing"
           :options="tencentServers"
@@ -35,7 +35,7 @@
           <template #icon>
             <CloseIcon />
           </template>
-          取消
+          {{ t('SearchSummonerModal.cancel') }}
         </NButton>
         <NButton
           type="primary"
@@ -46,38 +46,38 @@
           <template #icon>
             <SearchIcon />
           </template>
-          搜索玩家
+          {{ t('SearchSummonerModal.search') }}
         </NButton>
       </div>
       <NCollapseTransition
         class="section hint-text"
         :show="searchType === 'fuzzy' && !searchProgress.isProcessing"
       >
-        当前为模糊搜索：搜索所有满足名称的召唤师
+        {{ t('SearchSummonerModal.fuzzySearch') }}
       </NCollapseTransition>
       <NCollapseTransition
         class="section hint-text"
         :show="searchType === 'exact' && !searchProgress.isProcessing"
       >
-        当前为精确搜索：搜索指定名称和标签的召唤师
+        {{ t('SearchSummonerModal.exactSearch') }}
       </NCollapseTransition>
       <NCollapseTransition
         class="section hint-text"
         :show="searchType === 'puuid' && !searchProgress.isProcessing"
       >
-        当前为精确搜索：搜索指定 PUUID
+        {{ t('SearchSummonerModal.puuidSearch') }}
       </NCollapseTransition>
       <NCollapseTransition
         class="section hint-text"
         :show="hasInvisibleChar && !searchProgress.isProcessing"
       >
-        当前搜索文本包含不可见字符，将被过滤
+        {{ t('SearchSummonerModal.hasInvisibleChar') }}
       </NCollapseTransition>
       <NCollapseTransition
         class="section warning-text"
         :show="inputText.length !== 0 && searchType === 'invalid' && !searchProgress.isProcessing"
       >
-        当前输入不符合格式要求：应为 "游戏名称#标签" 或 "游戏名称"
+        {{ t('SearchSummonerModal.invalidInput') }}
       </NCollapseTransition>
       <NCollapseTransition
         class="section hint-text"
@@ -89,14 +89,19 @@
           status="success"
           processing
         >
-          正在验证玩家 ({{ searchProgress.finish }} / {{ searchProgress.total }})
+          {{
+            t('SearchSummonerModal.validating', {
+              current: searchProgress.finish,
+              total: searchProgress.total
+            })
+          }}
         </NProgress>
       </NCollapseTransition>
       <NCollapseTransition
         class="section"
         :show="filteredSearchHistory.length > 0 && inputText.length === 0"
       >
-        <div class="section-title">历史搜索</div>
+        <div class="section-title">{{ t('SearchSummonerModal.history') }}</div>
         <div class="recent-searches">
           <div
             class="record"
@@ -117,7 +122,7 @@
         </div>
       </NCollapseTransition>
       <NCollapseTransition class="section" :show="searchResult.length > 0">
-        <div class="section-title">搜索结果</div>
+        <div class="section-title">{{ t('SearchSummonerModal.result') }}</div>
         <NScrollbar :class="$style['search-result-scroll']">
           <TransitionGroup tag="div" class="search-result-items" name="fade">
             <div
@@ -136,13 +141,13 @@
                 <div class="game-name-line">
                   <div class="game-name">{{ result.gameName }}</div>
                   <span class="small-tag level">LV. {{ result.summonerLevel }}</span>
-                  <span class="small-tag private" v-if="result.privacy === 'PRIVATE'"
-                    >生涯隐藏</span
-                  >
+                  <span class="small-tag private" v-if="result.privacy === 'PRIVATE'">{{
+                    t('SearchSummonerModal.privacy')
+                  }}</span>
                   <span
                     class="small-tag current-route"
                     v-if="isCurrentTab(result.puuid, result.sgpServerId)"
-                    >当前</span
+                    >{{ t('SearchSummonerModal.currentRoute') }}</span
                   >
                 </div>
                 <div class="tag-line">#{{ result.tagLine }}</div>
@@ -152,13 +157,13 @@
         </NScrollbar>
       </NCollapseTransition>
       <NCollapseTransition class="section" :show="isEmpty">
-        <div class="section-title">搜索结果</div>
+        <div class="section-title">{{ t('SearchSummonerModal.result') }}</div>
         <div class="empty-result" v-if="searchProgress.type === 'fuzzy'">
-          验证了 {{ searchProgress.finish }} 条可能的玩家记录，无搜索结果符合
+          {{ t('SearchSummonerModal.validated', { count: searchProgress.finish }) }}
           <span style="font-weight: bold">{{ searchText }}</span>
         </div>
         <div class="empty-result" v-else>
-          无搜索结果符合
+          {{ t('SearchSummonerModal.noResult') }}
           <span style="font-weight: bold">{{ searchText }}</span>
         </div>
       </NCollapseTransition>
@@ -189,9 +194,12 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, markRaw, nextTick, reactive, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { MatchHistoryTabsRenderer, SearchHistoryItem } from '@main-window/shards/match-history-tabs'
+
+const { t } = useI18n()
 
 const show = defineModel<boolean>('show', { default: false })
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -208,13 +216,15 @@ const emits = defineEmits<{
   toSummoner: [puuid: string, sgpServerId: string, setCurrent?: boolean]
 }>()
 
-const PLACEHOLDER_TEXTS = [
-  '如完整查询：赤座灯里#akari',
-  '如模糊查询 - 格式如：船见结衣',
-  '如 PUUID 查询 - 格式如：<puuid>'
-]
+const placeholderTexts = computed(() => {
+  return [
+    t('SearchSummonerModal.placeholders.0'),
+    t('SearchSummonerModal.placeholders.1'),
+    t('SearchSummonerModal.placeholders.2')
+  ]
+})
 
-const placeholderText = PLACEHOLDER_TEXTS[Math.floor(Math.random() * PLACEHOLDER_TEXTS.length)]
+const placeholderText = placeholderTexts.value[Math.floor(Math.random() * placeholderTexts.value.length)]
 
 /**
  * 识别 {gameName}#{tagLIne} 或 {fuzzyGameName} 的输入

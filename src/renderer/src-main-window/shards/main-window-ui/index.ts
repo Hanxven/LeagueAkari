@@ -1,4 +1,3 @@
-import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
@@ -46,8 +45,8 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
 
     watch(
       [() => lcs.summoner.profile, () => mui.settings.useProfileSkinAsBackground],
-      async ([profile, enabledVV]) => {
-        if (enabledVV !== undefined && !enabledVV) {
+      async ([profile, enabled]) => {
+        if (!enabled) {
           mui.backgroundSkinUrl = ''
           return
         }
@@ -87,9 +86,9 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     // 获取当前页面的皮肤, 需要注意的是, 如果目标用户没有设置皮肤, 则 backgroundSkinId 不存在
     // 此时在其主页展示的内容为默认成就最高的英雄
     watch(
-      () => currentTabProfileSkinId.value,
-      async (skinId) => {
-        if (skinId) {
+      [() => currentTabProfileSkinId.value, () => mui.settings.useProfileSkinAsBackground],
+      async ([skinId, enabled]) => {
+        if (skinId && enabled) {
           try {
             const url = await this._getChampionSkinUrl(skinId)
 

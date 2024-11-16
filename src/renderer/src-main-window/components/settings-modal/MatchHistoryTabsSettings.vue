@@ -1,18 +1,24 @@
 <template>
-  <NScrollbar style="max-height: 65vh" trigger="none">
+  <NScrollbar style="max-height: 65vh">
     <NCard size="small">
-      <template #header><span class="card-header-title">战绩页面</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('MatchHistoryTabsSettings.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="更新页面战绩"
-        label-description="在对局结束后，主动刷新所有涉及到本次对局的战绩页面。由于服务器的更新延迟，获取到的战绩仍可能非最新"
+        :label="t('MatchHistoryTabsSettings.refreshTabsAfterGameEnds.label')"
+        :label-description="t('MatchHistoryTabsSettings.refreshTabsAfterGameEnds.description')"
         :label-width="320"
       >
         <NSwitch size="small" v-model:value="mhs.settings.refreshTabsAfterGameEnds" />
       </ControlItem>
-      <ControlItem class="control-item-margin" label="使用 SGP API" :label-width="320">
+      <ControlItem
+        class="control-item-margin"
+        :label="t('MatchHistoryTabsSettings.matchHistoryUseSgpApi.label')"
+        :label-width="320"
+      >
         <template #labelDescription>
-          <div>战绩页面使用 SGP API 作为数据源</div>
+          <div>{{ t('MatchHistoryTabsSettings.matchHistoryUseSgpApi.description') }}</div>
           <template
             v-if="mhs.settings.matchHistoryUseSgpApi && lcs.connectionState === 'connected'"
           >
@@ -20,11 +26,18 @@
               v-if="sgps.availability.sgpServerId"
               style="color: #63e2b7; font-weight: bold; user-select: text"
             >
-              当前 SGP Server: {{ sgps.availability.sgpServerId }}
+              {{
+                t('MatchHistoryTabsSettings.matchHistoryUseSgpApi.current', {
+                  server: sgps.availability.sgpServerId
+                })
+              }}
             </div>
             <div v-else style="color: rgb(209, 170, 124); font-weight: bold">
-              暂不支持当前服务器使用 SGP API:
-              {{ sgps.availability.sgpServerId }}
+              {{
+                t('MatchHistoryTabsSettings.matchHistoryUseSgpApi.unsupported', {
+                  server: sgps.availability.sgpServerId
+                })
+              }}
             </div>
           </template>
         </template>
@@ -39,8 +52,11 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
+
+const { t } = useI18n()
 
 const mhs = useMatchHistoryTabsStore()
 const sgps = useSgpStore()

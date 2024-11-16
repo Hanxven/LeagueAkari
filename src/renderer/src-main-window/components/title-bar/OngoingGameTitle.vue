@@ -22,7 +22,7 @@
             </template>
           </NButton>
         </template>
-        刷新对局页面
+        {{ t('OngoingGameTitle.refresh') }}
       </NTooltip>
     </template>
   </div>
@@ -36,6 +36,9 @@ import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { RefreshRound as RefreshIcon } from '@vicons/material'
 import { NButton, NIcon, NSelect, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 
@@ -43,62 +46,64 @@ const ogs = useOngoingGameStore()
 const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
 const lcs = useLeagueClientStore()
 
-const orderOptions = [
-  {
-    label: '楼层顺序',
-    value: 'default'
-  },
-  {
-    label: '胜率降序',
-    value: 'win-rate'
-  },
-  {
-    label: 'KDA 降序',
-    value: 'kda'
-  },
-  {
-    label: '评分降序',
-    value: 'akari-score'
-  }
-]
+const orderOptions = computed(() => {
+  return [
+    {
+      label: t('OngoingGameTitle.orderOptions.default'),
+      value: 'default'
+    },
+    {
+      label: t('OngoingGameTitle.orderOptions.win-rate'),
+      value: 'win-rate'
+    },
+    {
+      label: t('OngoingGameTitle.orderOptions.kda'),
+      value: 'kda'
+    },
+    {
+      label: t('OngoingGameTitle.orderOptions.akari-score'),
+      value: 'akari-score'
+    }
+  ]
+})
 
 const sgpTagOptions = computed(() => {
   return [
     {
-      label: '全部队列',
+      label: t('common.sgpMatchHistoryTags.all'),
       value: 'all'
     },
     {
-      label: lcs.gameData.queues[420]?.name || 'Ranked Solo/Duo',
+      label: lcs.gameData.queues[420]?.name || t('common.sgpMatchHistoryTags.q_420'),
       value: `q_420`
     },
     {
-      label: lcs.gameData.queues[430]?.name || 'Normal',
+      label: lcs.gameData.queues[430]?.name || t('common.sgpMatchHistoryTags.q_430'),
       value: `q_430`
     },
     {
-      label: lcs.gameData.queues[440]?.name || 'Ranked Flex',
+      label: lcs.gameData.queues[440]?.name || t('common.sgpMatchHistoryTags.q_440'),
       value: `q_440`
     },
     {
-      label: lcs.gameData.queues[450]?.name || 'ARAM',
+      label: lcs.gameData.queues[450]?.name || t('common.sgpMatchHistoryTags.q_450'),
       value: `q_450`
     },
 
     {
-      label: lcs.gameData.queues[1700]?.name || 'ARENA',
+      label: lcs.gameData.queues[1700]?.name || t('common.sgpMatchHistoryTags.q_1700'),
       value: 'q_1700'
     },
     {
-      label: lcs.gameData.queues[490]?.name || 'Quickplay',
+      label: lcs.gameData.queues[490]?.name || t('common.sgpMatchHistoryTags.q_490'),
       value: `q_490`
     },
     {
-      label: lcs.gameData.queues[1900]?.name || 'URF',
+      label: lcs.gameData.queues[1900]?.name || t('common.sgpMatchHistoryTags.q_1900'),
       value: `q_1900`
     },
     {
-      label: lcs.gameData.queues[900]?.name || 'ARURF',
+      label: lcs.gameData.queues[900]?.name || t('common.sgpMatchHistoryTags.q_900'),
       value: `q_900`
     }
   ]

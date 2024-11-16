@@ -1,7 +1,7 @@
 <template>
-  <NScrollbar style="max-height: 65vh" trigger="none">
+  <NScrollbar style="max-height: 65vh">
     <NModal preset="card" size="small" v-model:show="editRuleModalShow" style="max-width: 500px">
-      <template #header>添加</template>
+      <template #header>{{ t('DebugSettings.lcuEvent.modal.title') }}</template>
       <template #footer>
         <div class="right-side">
           <NButton
@@ -12,13 +12,13 @@
             @click="handleAddRule"
             style="margin-left: auto"
           >
-            添加
+            {{ t('DebugSettings.lcuEvent.modal.button') }}
           </NButton>
         </div>
       </template>
       <NAutoComplete
         ref="edit-rule-input"
-        placeholder="输入匹配规则，如 /path/:name/to"
+        :placeholder="t('DebugSettings.lcuEvent.modal.placeholder')"
         v-model:value="editRuleText"
         :options="options"
         size="small"
@@ -26,45 +26,56 @@
       />
     </NModal>
     <NCard size="small">
-      <template #header><span class="card-header-title">Akari's Electron</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('DebugSettings.electron.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="开发者工具"
-        label-description="Toggle DevTools"
+        :label="t('DebugSettings.electron.devTools.label')"
+        :label-description="t('DebugSettings.electron.devTools.description')"
         :label-width="320"
       >
-        <NButton size="small" secondary type="primary" @click="handleToggleDevtools"
-          >Toggle Devtools</NButton
-        >
+        <NButton size="small" secondary type="primary" @click="handleToggleDevtools">{{
+          t('DebugSettings.electron.devTools.button')
+        }}</NButton>
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="页面重载"
-        label-description="刷新 League Akari 用户界面"
+        :label="t('DebugSettings.electron.reload.label')"
+        :label-description="t('DebugSettings.electron.reload.description')"
         :label-width="320"
       >
-        <NButton size="small" secondary type="primary" @click="handleReload">重新加载界面</NButton>
+        <NButton size="small" secondary type="primary" @click="handleReload">
+          {{ t('DebugSettings.electron.reload.button') }}
+        </NButton>
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">存储</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('DebugSettings.files.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="日志目录"
-        label-description="打开 League Akari 日志文件所在目录"
+        :label="t('DebugSettings.files.logs.label')"
+        :label-description="t('DebugSettings.files.logs.description')"
         :label-width="320"
       >
         <NButton size="small" secondary type="primary" @click="() => handleShowLogsDir()"
-          >日志目录</NButton
-        >
+          >{{ t('DebugSettings.files.logs.button') }}
+        </NButton>
       </ControlItem>
-      <ControlItem class="control-item-margin" label="应用数据目录" :label-width="320">
+      <ControlItem
+        class="control-item-margin"
+        :label="t('DebugSettings.files.appData.label')"
+        :label-width="320"
+      >
         <template #labelDescription>
-          打开 League Akari
-          应用文件存储目录。该目录为应用数据存储位置，在应用第一次运行时生成。删除此目录将丢失所有已存储的内容
+          {{ t('DebugSettings.files.appData.description.part1') }}
           <NPopover :delay="50">
             <template #trigger>
-              <span style="font-weight: bold; color: #fff; cursor: pointer">详情</span>
+              <span style="font-weight: bold; color: #fff; cursor: pointer">
+                {{ t('DebugSettings.files.appData.popoverTrigger') }}
+              </span>
             </template>
             <table>
               <colgroup>
@@ -73,42 +84,44 @@
               <tbody style="font-size: 12px">
                 <tr>
                   <td>LeagueAkari.db</td>
-                  <td>存储用户设置、已标记的玩家等信息</td>
+                  <td>{{ t('DebugSettings.files.appData.description.part2') }}</td>
                 </tr>
                 <tr>
                   <td>NewUpdates/</td>
-                  <td>即将进行的自动更新临时文件</td>
+                  <td>{{ t('DebugSettings.files.appData.description.part3') }}</td>
                 </tr>
                 <tr>
                   <td>AkariConfig/</td>
-                  <td>一些可以替换的设置项文件</td>
+                  <td>{{ t('DebugSettings.files.appData.description.part4') }}</td>
                 </tr>
                 <tr>
                   <td>base-config.json</td>
-                  <td>特殊配置文件</td>
+                  <td>{{ t('DebugSettings.files.appData.description.part5') }}</td>
                 </tr>
               </tbody>
             </table>
           </NPopover>
         </template>
-        <NButton size="small" secondary type="primary" @click="() => handleShowUserDataDir()"
-          >应用目录</NButton
-        >
+        <NButton size="small" secondary type="primary" @click="() => handleShowUserDataDir()">{{
+          t('DebugSettings.files.appData.button')
+        }}</NButton>
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">在控制台打印 LCU 事件</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('DebugSettings.lcuEvent.label') }}</span></template
+      >
       <div class="operations">
-        <NCheckbox size="small" class="check-box" v-model:checked="rds.printAll"
-          >打印全部事件</NCheckbox
-        >
+        <NCheckbox size="small" class="check-box" v-model:checked="rds.printAll">{{
+          t('DebugSettings.lcuEvent.printAll')
+        }}</NCheckbox>
         <NButton
           size="tiny"
           @click="handleShowAddModal"
           v-show="!rds.printAll"
           secondary
           type="primary"
-          >添加规则</NButton
+          >{{ t('DebugSettings.lcuEvent.addRule') }}</NButton
         >
       </div>
       <NCollapseTransition :show="!rds.printAll">
@@ -119,15 +132,17 @@
           size="small"
           bordered
         >
-          <template #empty>无内容</template>
+          <template #empty>{{ t('DebugSettings.lcuEvent.empty') }}</template>
         </NDataTable>
       </NCollapseTransition>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header
-        ><span class="card-header-title"
-          >LCU{{ lc.connectionState === 'connected' ? '' : ' (未连接)' }}</span
-        ></template
+        ><span class="card-header-title">{{
+          lc.connectionState === 'connected'
+            ? t('DebugSettings.lcuConnection.titleDisconnected')
+            : t('DebugSettings.lcuConnection.titleConnected')
+        }}</span></template
       >
       <NTable size="small" bordered>
         <colgroup>
@@ -136,19 +151,19 @@
         </colgroup>
         <tbody>
           <tr>
-            <td>端口</td>
+            <td>{{ t('DebugSettings.lcuConnection.port') }}</td>
             <td><CopyableText :text="lc.auth?.port ?? '-'" /></td>
           </tr>
           <tr>
-            <td>PID</td>
+            <td>{{ t('DebugSettings.lcuConnection.pid') }}</td>
             <td><CopyableText :text="lc.auth?.pid ?? '-'" /></td>
           </tr>
           <tr>
-            <td>密钥</td>
+            <td>{{ t('DebugSettings.lcuConnection.auth') }}</td>
             <td><CopyableText :text="lc.auth?.authToken ?? '-'" /></td>
           </tr>
           <tr>
-            <td>区服</td>
+            <td>{{ t('DebugSettings.lcuConnection.rsoPlatform') }}</td>
             <td>
               <CopyableText :text="lc.auth?.rsoPlatformId ?? '-'">{{
                 (lc.auth?.rsoPlatformId
@@ -158,7 +173,7 @@
             </td>
           </tr>
           <tr>
-            <td>地域</td>
+            <td>{{ t('DebugSettings.lcuConnection.region') }}</td>
             <td>
               <CopyableText :text="lc.auth?.region ?? '-'">{{
                 lc.auth?.region
@@ -171,22 +186,24 @@
       </NTable>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">游戏流</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('DebugSettings.gameflow.title') }}</span></template
+      >
       <span class="text" v-if="lc.connectionState === 'connected'"
         >{{ gameflowText[lc.gameflow.phase || 'None'] }} ({{ lc.gameflow.phase }})</span
       >
-      <span class="text" v-else>不可用 (未连接)</span>
+      <span class="text" v-else>{{ t('DebugSettings.gameflow.unavailable') }}</span>
     </NCard>
     <NCard v-if="as.isAdministrator" size="small" style="margin-top: 8px">
       <template #header><LeagueAkariSpan class="card-header-title" /></template>
-      <span class="text">League Akari 运行在管理员权限，仅用于实现特定的客户端功能</span>
+      <span class="text">{{ t('DebugSettings.inAdministrator.description') }}</span>
     </NCard>
     <NCard v-if="as.settings.isInKyokoMode" size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">Akari~</span></template>
       <ControlItem
         class="control-item-margin"
         label="Kyoko Mode"
-        label-description="部分功能仅用于调试用途"
+        :label-description="t('DebugSettings.kyokoMode.description')"
         :label-width="320"
       >
         <NSwitch
@@ -230,8 +247,11 @@ import {
   NTable
 } from 'naive-ui'
 import { computed, h, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { LCU_ENDPOINTS } from './lcu-endpoints'
+
+const { t } = useI18n()
 
 const lc = useLeagueClientStore()
 const rds = useRendererDebugStore()
@@ -242,26 +262,28 @@ const log = useInstance<LoggerRenderer>('logger-renderer')
 const app = useInstance<AppCommonRenderer>('app-common-renderer')
 const rd = useInstance<RendererDebugRenderer>('renderer-debug-renderer')
 
-const gameflowText = {
-  Matchmaking: '正在匹配',
-  ChampSelect: '英雄选择中',
-  ReadyCheck: '等待接受状态中',
-  InProgress: '游戏进行中',
-  EndOfGame: '游戏结算',
-  Lobby: '房间',
-  GameStart: '游戏开始',
-  None: '无',
-  Reconnect: '重新连接',
-  WaitingForStats: '等待结果',
-  PreEndOfGame: '结束游戏之前',
-  WatchInProgress: '在观战中'
-}
+const gameflowText = computed(() => {
+  return {
+    Matchmaking: t('DebugSettings.gameflow.Matchmaking'),
+    ChampSelect: t('DebugSettings.gameflow.ChampSelect'),
+    ReadyCheck: t('DebugSettings.gameflow.ReadyCheck'),
+    InProgress: t('DebugSettings.gameflow.InProgress'),
+    EndOfGame: t('DebugSettings.gameflow.EndOfGame'),
+    Lobby: t('DebugSettings.gameflow.Lobby'),
+    GameStart: t('DebugSettings.gameflow.GameStart'),
+    None: t('DebugSettings.gameflow.None'),
+    Reconnect: t('DebugSettings.gameflow.Reconnect'),
+    WaitingForStats: t('DebugSettings.gameflow.WaitingForStats'),
+    PreEndOfGame: t('DebugSettings.gameflow.PreEndOfGame'),
+    WatchInProgress: t('DebugSettings.gameflow.WatchInProgress')
+  }
+})
 
 const columns: DataTableColumn<any>[] = [
   {
-    title: '启用',
+    title: t('DebugSettings.lcuEvent.enable'),
     key: 'enable',
-    width: 60,
+    width: 84,
     fixed: 'left',
     render: (row) => {
       return h(NCheckbox, {
@@ -278,7 +300,7 @@ const columns: DataTableColumn<any>[] = [
     }
   },
   {
-    title: '规则',
+    title: t('DebugSettings.lcuEvent.rule'),
     key: 'rule',
     render: (row) => {
       return h(
@@ -304,7 +326,7 @@ const columns: DataTableColumn<any>[] = [
             secondary: true,
             onClick: () => handleRemoveEditRule(row.data.rule)
           },
-          { default: () => '删除' }
+          { default: () => t('DebugSettings.lcuEvent.delete') }
         )
       ])
     }
@@ -344,9 +366,9 @@ function isSubsequence(s: string, t: string) {
 }
 
 const options = computed(() => {
-  return LCU_ENDPOINTS
-    .filter((v) => isSubsequence(editRuleText.value, v))
-    .toSorted((a, b) => a.length - b.length)
+  return LCU_ENDPOINTS.filter((v) => isSubsequence(editRuleText.value, v)).toSorted(
+    (a, b) => a.length - b.length
+  )
 })
 
 const editRuleValid = computed(() => {

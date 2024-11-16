@@ -15,6 +15,7 @@
     "lib": ["ESNext", "DOM"],
     "composite": true,
     "baseUrl": ".",
+    "types": ["@modyfi/vite-plugin-yaml/modules"],
     "paths": {
       "@main-window/*": ["src/renderer/src-main-window/*"],
       "@aux-window/*": ["src/renderer/src-aux-window/*"],

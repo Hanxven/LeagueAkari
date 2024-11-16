@@ -80,7 +80,9 @@
                   </div>
                 </template>
                 <template v-else-if="tabLoadingStateMap[tab.id]">
-                  <span class="empty-placeholder-text">加载中...</span>
+                  <span class="empty-placeholder-text"
+                    >{{ t('MatchHistoryTabsTitle.loading') }}.</span
+                  >
                 </template>
                 <template v-else>
                   <span class="empty-placeholder-text">{{ tab.id.slice(0, 16) }}...</span>
@@ -96,7 +98,7 @@
       <div class="divider" />
       <div class="search-area" @click="searchSummonerModalShow = true">
         <NIcon class="search-icon"><SearchIcon /></NIcon>
-        <span class="search-label">搜索玩家</span>
+        <span class="search-label">{{ t('MatchHistoryTabsTitle.search') }}</span>
       </div>
     </template>
   </div>
@@ -115,11 +117,14 @@ import { CloseRound as CloseRoundIcon, RefreshRound as RefreshRoundIcon } from '
 import { NBadge, NDropdown, NIcon, NPopover, NScrollbar, NSpin } from 'naive-ui'
 import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { computed, h, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import { TabState, useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 import SearchSummonerModal from '../search-summoner-modal/SearchSummonerModal.vue'
+
+const { t } = useI18n()
 
 const mhs = useMatchHistoryTabsStore()
 const sgps = useSgpStore()

@@ -15,6 +15,9 @@
           }"
           size="tiny"
           ref="btn"
+          :focusable="false"
+          @keydown.enter.prevent
+          @keyup.enter.prevent
           @click="handleTopUp"
           >充值</NButton
         >

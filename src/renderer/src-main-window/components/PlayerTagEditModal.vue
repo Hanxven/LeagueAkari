@@ -1,6 +1,8 @@
 <template>
   <NModal v-model:show="show" preset="card" style="max-width: 60vw">
-    <template #header><span class="card-header-title">编辑玩家标记</span></template>
+    <template #header
+      ><span class="card-header-title">{{ t('PlayerTagEditModal.title') }}</span></template
+    >
     <template v-if="summoner">
       <div class="summoner-info">
         <LcuImage class="image" :src="profileIconUri(summoner.profileIconId)" />
@@ -9,19 +11,31 @@
         }}</span>
       </div>
     </template>
-    <template v-else><span style="font-size: 12px">加载中...</span></template>
+    <template v-else
+      ><span style="font-size: 12px">{{ t('PlayerTagEditModal.loading') }}</span></template
+    >
     <div style="margin-top: 12px">
       <NInput
         v-model:value="text"
-        :placeholder="`填写对 ${summonerName(summoner?.gameName || summoner?.displayName, summoner?.tagLine, puuid)} 的标记内容`"
+        :placeholder="
+          t('PlayerTagEditModal.placeholder', {
+            name: summonerName(
+              summoner?.gameName || summoner?.displayName,
+              summoner?.tagLine,
+              puuid
+            )
+          })
+        "
         type="textarea"
         :autosize="{ minRows: 3, maxRows: 4 }"
         ref="input"
       ></NInput>
     </div>
     <div style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 4px">
-      <NButton size="small" @click="show = false">取消</NButton>
-      <NButton size="small" type="primary" @click="handleSaveTag">保存</NButton>
+      <NButton size="small" @click="show = false">{{ t('PlayerTagEditModal.cancel') }}</NButton>
+      <NButton size="small" type="primary" @click="handleSaveTag">{{
+        t('PlayerTagEditModal.save')
+      }}</NButton>
     </div>
   </NModal>
 </template>
@@ -34,6 +48,9 @@ import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NButton, NInput, NModal } from 'naive-ui'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const show = defineModel<boolean>('show', { default: false })
 

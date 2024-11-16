@@ -737,7 +737,11 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
     } else {
       // 若否, 则使用 LCU API, 仅限当前登录大区
       if (sgps.availability.sgpServerId === tab.sgpServerId) {
-        const { data } = await lc.api.matchHistory.getMatchHistory(tab.puuid, page, pageSize)
+        const { data } = await lc.api.matchHistory.getMatchHistory(
+          tab.puuid,
+          (page - 1) * pageSize,
+          page * pageSize - 1
+        )
         tab.matchHistoryPage = {
           page,
           pageSize,
@@ -764,6 +768,7 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
             g.isLoading = true
             const { data: game } = await lc.api.matchHistory.getGame(g.game.gameId)
             g.game = markRaw(game)
+            g.isDetailed = true
             mhs.detailedGameLruMap.set(g.game.gameId, game)
           } catch (error) {
             g.hasError = true
@@ -860,7 +865,14 @@ const handleToggleShowDetailedGame = (gameId: number, expand: boolean) => {
 const isShowingRankedModal = ref(false)
 
 const isSomethingLoading = computed(() => {
-  return tab.isLoadingMatchHistory || tab.isLoadingRankedStats || tab.isLoadingSummoner
+  return (
+    tab.isLoadingMatchHistory ||
+    tab.isLoadingRankedStats ||
+    tab.isLoadingSavedInfo ||
+    tab.isLoadingSpectatorData ||
+    tab.isLoadingSummoner ||
+    tab.isLoadingSummonerProfile
+  )
 })
 
 const scrollToRightElTop = () => {

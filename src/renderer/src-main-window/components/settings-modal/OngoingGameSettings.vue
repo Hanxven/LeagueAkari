@@ -1,11 +1,13 @@
 <template>
-  <NScrollbar style="max-height: 65vh" trigger="none">
+  <NScrollbar style="max-height: 65vh">
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">配置项</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('OngoingGameSettings.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="启用"
-        label-description="在进入英雄选择中或对局时，将进行对局分析"
+        :label="t('OngoingGameSettings.enabled.label')"
+        :label-description="t('OngoingGameSettings.enabled.description')"
         :label-width="320"
       >
         <NSwitch
@@ -16,8 +18,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="对局战绩分析数量"
-        label-description="在对局页面中，用于分析每名玩家的战绩拉取对局数量"
+        :label="t('OngoingGameSettings.matchHistoryLoadCount.label')"
+        :label-description="t('OngoingGameSettings.matchHistoryLoadCount.description')"
         :label-width="320"
       >
         <NInputNumber
@@ -31,8 +33,12 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="预组队判定阈值"
-        :label-description="`目标玩家群体出现在同一阵营超过 ${ogs.settings.premadeTeamThreshold} 次时，则判定为预组队`"
+        :label="t('OngoingGameSettings.premadeTeamThreshold.label')"
+        :label-description="
+          t('OngoingGameSettings.premadeTeamThreshold.description', {
+            threshold: ogs.settings.premadeTeamThreshold
+          })
+        "
         :label-width="320"
       >
         <NInputNumber
@@ -45,8 +51,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="对局中请求并发数"
-        label-description="在对局分析中，所进行的所有网络请求总并发数限制。它并不会限制其他模块的请求并发数"
+        :label="t('OngoingGameSettings.concurrency.label')"
+        :label-description="t('OngoingGameSettings.concurrency.description')"
         :label-width="320"
       >
         <NInputNumber
@@ -57,14 +63,22 @@
           @update:value="(val) => og.setConcurrency(val || 10)"
         />
       </ControlItem>
-      <ControlItem class="control-item-margin" label="使用 SGP API" :label-width="320">
+      <ControlItem
+        class="control-item-margin"
+        :label="t('OngoingGameSettings.matchHistoryUseSgpApi.label')"
+        :label-width="320"
+      >
         <template #labelDescription>
-          <div>对局分析优先使用 SGP API 查询对局，若当前 SGP API 不可用，则使用 LCU API</div>
+          <div>{{ t('OngoingGameSettings.matchHistoryUseSgpApi.description') }}</div>
           <div
             class="unsupported-sgp-server"
             v-if="sgps.availability.region && !sgps.availability.serversSupported.matchHistory"
           >
-            League Akari 暂不支持当前服务器: {{ sgps.availability.sgpServerId }}
+            {{
+              t('OngoingGameSettings.matchHistoryUseSgpApi.unsupported', {
+                server: sgps.availability.region
+              })
+            }}
           </div>
         </template>
         <NSwitch
@@ -76,25 +90,20 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="队列筛选偏好"
-        label-description="使用 SGP API 时，加载战绩时的队列筛选偏好"
+        :label="t('OngoingGameSettings.matchHistoryTagPreference.label')"
+        :label-description="t('OngoingGameSettings.matchHistoryTagPreference.description')"
         :label-width="320"
       >
         <NRadioGroup
           :value="ogs.settings.matchHistoryTagPreference"
           @update:value="(val) => og.setMatchHistoryTagPreference(val)"
         >
-          <NRadio
-            value="all"
-            :title="`请求战绩页时不添加限定条件，将拉取近期 ${ogs.settings.matchHistoryLoadCount} 场战绩`"
+          <NRadio value="all">
+            {{ t('OngoingGameSettings.matchHistoryTagPreference.options.all') }}</NRadio
           >
-            所有模式</NRadio
-          >
-          <NRadio
-            value="current"
-            title="按照当前的请求查询战绩页，若非支持筛选的队列，则退化到 '所有模式'"
-            >当前模式</NRadio
-          >
+          <NRadio value="current">{{
+            t('OngoingGameSettings.matchHistoryTagPreference.options.current')
+          }}</NRadio>
         </NRadioGroup>
       </ControlItem>
     </NCard>
@@ -207,6 +216,9 @@ import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const ogs = useOngoingGameStore()
 const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')

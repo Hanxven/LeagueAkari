@@ -52,24 +52,33 @@
         "
       >
         <div>
-          <div style="font-size: 11px; font-weight: bold">伤害总计</div>
+          <div style="font-size: 11px; font-weight: bold">{{ t('DamageMetricsBar.total') }}</div>
           <div>{{ totalDamage.toLocaleString() }}</div>
         </div>
         <div>
           <div style="font-size: 11px; font-weight: bold">
-            物理伤害 ({{ ((physicalDamage / (totalDamage || 1)) * 100).toFixed() }} %)
+            {{ t('DamageMetricsBar.physical') }} ({{
+              ((physicalDamage / (totalDamage || 1)) * 100).toFixed()
+            }}
+            %)
           </div>
           <div>{{ physicalDamage.toLocaleString() }}</div>
         </div>
         <div>
           <div style="font-size: 11px; font-weight: bold">
-            魔法伤害 ({{ ((magicDamage / (totalDamage || 1)) * 100).toFixed() }} %)
+            {{ t('DamageMetricsBar.magic') }} ({{
+              ((magicDamage / (totalDamage || 1)) * 100).toFixed()
+            }}
+            %)
           </div>
           <div>{{ magicDamage.toLocaleString() }}</div>
         </div>
         <div>
           <div style="font-size: 11px; font-weight: bold">
-            真实伤害 ({{ ((trueDamage / (totalDamage || 1)) * 100).toFixed() }} %)
+            {{ t('DamageMetricsBar.true') }} ({{
+              ((trueDamage / (totalDamage || 1)) * 100).toFixed()
+            }}
+            %)
           </div>
           <div>{{ trueDamage.toLocaleString() }}</div>
         </div>
@@ -81,6 +90,7 @@
 <script setup lang="ts">
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const {
   baselineDamage = 1,
@@ -99,6 +109,8 @@ const {
   width?: number
   height?: number
 }>()
+
+const { t } = useI18n()
 
 const INNER_WIDTH = 140
 

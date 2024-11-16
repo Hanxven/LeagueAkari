@@ -20,6 +20,8 @@
 
 # 1. League Akari
 
+[简体中文](README.md) | [English](README-en.md)
+
 Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/Hanxven/LeagueAkari)
 
 ## 1.1 已支持功能

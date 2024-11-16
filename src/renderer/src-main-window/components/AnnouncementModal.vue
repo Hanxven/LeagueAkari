@@ -8,8 +8,9 @@
   >
     <template #header
       ><span class="card-header-title"
-        >公告<span style="font-size: 12px" v-if="sus.currentAnnouncement">
-          ({{ dayjs(sus.currentAnnouncement.updateAt).locale('zh-cn').fromNow() }} 拉取)</span
+        >{{ t('AnnouncementModal.title')
+        }}<span style="font-size: 12px" v-if="sus.currentAnnouncement">
+          ({{ dayjs(sus.currentAnnouncement.updateAt).locale(locale).fromNow() }})</span
         ></span
       ></template
     >
@@ -27,7 +28,7 @@
           v-if="!sus.currentAnnouncement || sus.currentAnnouncement.isRead"
           @click="show = false"
           size="small"
-          >关闭</NButton
+          >{{ t('AnnouncementModal.close') }}</NButton
         >
         <NButton type="primary" v-else @click="handleRead" size="small">已读</NButton>
       </div>
@@ -42,7 +43,10 @@ import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import dayjs from 'dayjs'
 import { NButton, NModal, NScrollbar } from 'naive-ui'
-import { computed, useCssModule } from 'vue'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t, locale } = useI18n()
 
 const sus = useSelfUpdateStore()
 const aum = useInstance<SelfUpdateRenderer>('self-update-renderer')

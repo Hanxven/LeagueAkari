@@ -1,34 +1,27 @@
 <template>
   <div id="app-title-bar">
-    <FunnyAppLogo />
+    <span class="app-name">League Akari</span>
     <div class="divider" />
-    <!-- 为特定模块留出的位置 -->
     <div class="shard-area">
       <Transition name="fade">
         <KeepAlive>
-          <MatchHistoryTabsTitle v-if="route.name === 'match-history'" />
-          <OngoingGameTitle v-else-if="route.name === 'ongoing-game'" />
+          <MatchHistoryTabsTitle v-if="$route.name === 'match-history'" />
+          <OngoingGameTitle v-else-if="$route.name === 'ongoing-game'" />
         </KeepAlive>
       </Transition>
     </div>
     <div class="divider" />
     <CommonButtons />
     <div class="divider" />
-    <!-- 三大金刚按键 -->
     <TrafficButtons />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-
-import FunnyAppLogo from '../easter-eggs/FunnyAppLogo.vue'
 import CommonButtons from './CommonButtons.vue'
 import MatchHistoryTabsTitle from './MatchHistoryTabsTitle.vue'
 import OngoingGameTitle from './OngoingGameTitle.vue'
 import TrafficButtons from './TrafficButtons.vue'
-
-const route = useRoute()
 </script>
 
 <style lang="less" scoped>
@@ -46,6 +39,12 @@ const route = useRoute()
   height: 100%;
   width: 0;
   flex: 1;
+}
+
+.app-name {
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.8);
+  margin-left: 8px;
 }
 
 .divider {

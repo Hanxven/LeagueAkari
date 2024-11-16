@@ -1,0 +1,614 @@
+SettingModal:
+  title: Settings
+
+AnnouncementModal:
+  title: Announcement
+  close: Close
+
+DeclarationModal:
+  title: Declaration
+  close: Close
+  ok: Got it
+  showAgain: Show again
+  line1: League Akari is open-source software designed to provide additional auxiliary features. You should not obtain this software through any paid channels.
+  line2: Please be aware that this software takes no responsibility for any consequences that may arise from its use, including but not limited to game account bans, data corruption, or any other negative impact on your gaming experience.
+  line3: Users should carefully consider and fully assume all risks and consequences associated with using this software.
+
+CommonButtons:
+  announcement: Announcement
+  github: Project GitHub
+  auxWindow: Auxiliary Window
+
+TrafficButtons:
+  minimize: Minimize
+  maximize: Maximize
+  restore: Restore
+  close: Close
+
+  modal:
+    title: Quit League Akari
+    options:
+      minimize-to-tray: Minimize to tray
+      quit: Quit
+    remember: Remember
+    ok: OK
+    cancel: Cancel
+
+OngoingGameTitle:
+  refresh: Refresh
+  orderOptions:
+    default: Default
+    win-rate: W/R Desc
+    kda: KDA Desc
+    akari-score: Score Desc
+
+AppSettings:
+  title: Application
+
+  basic:
+    title: Basic
+
+    mainWindowCloseAction:
+      label: Main Window Close Action
+      description: The action to be executed when the main window is closed
+      options:
+        minimize-to-tray: Minimize to tray
+        quit: Quit
+        ask: Ask every time
+
+  selfUpdate:
+    title: Application Update
+    tip:
+      title: How to choose?
+      gitee: '- Better response speed in mainland China'
+      github: '- Better response speed outside mainland China'
+
+    autoCheckUpdates:
+      label: Auto Check Updates
+      description: Automatically pull the latest version information from the update source when the application starts
+
+    autoDownloadUpdates:
+      label: Auto Download Updates
+      description: Automatically download the update package when a new version is detected
+
+    downloadSource:
+      label: Download Source
+      description: Choose the update package download source
+
+  mainWindowUi:
+    title: Main Window UI
+    useProfileSkinAsBackground:
+      label: Use Profile Skin as Background
+      description: League Akari will use the current player's profile background skin as the background
+
+  lcConnection:
+    title: LCU Connection
+
+    autoConnect:
+      label: Auto Connect
+      description: Automatically connect to the client when there is a unique client
+
+    useWmic:
+      label: Use WMIC
+      description: Use WMIC to get client command line information instead of the default Win32 API method. Requires administrator privileges
+
+  misc:
+    title: Misc
+
+    disableHardwareAcceleration:
+      label: Disable Hardware Acceleration
+      description: Disables hardware acceleration, which may solve some rendering issues, such as font blur
+
+    disableHardwareAccelerationDialog:
+      enableText: Enable Hardware Acceleration
+      disableText: Disable Hardware Acceleration
+      disableConfirmation: Will disable hardware acceleration, restart the application to apply changes
+      enableConfirmation: Will enable hardware acceleration, restart the application to apply changes
+      positiveText: Restart and Quit
+      negativeText: Cancel
+
+MatchHistoryTabsSettings:
+  title: Match History Tabs
+
+  refreshTabsAfterGameEnds:
+    label: Refresh Tabs After Game Ends
+    description: Automatically refresh the match history tabs after the game ends. Due to the latency of the remote server, the refresh may not be on time
+
+  matchHistoryUseSgpApi:
+    label: Use SGP API
+    description: Use SGP API as the data source for the match history page
+    current: 'Current SGP Server: {server}'
+    unsupported: 'Unsupported SGP API: {server}'
+
+OngoingGameSettings:
+  title: Ongoing Game
+
+  enabled:
+    label: Enable
+    description: Perform match analysis when entering champion selection or during a match.
+
+  matchHistoryLoadCount:
+    label: Match History Load Count
+    description: Number of matches to fetch for analyzing each player's performance on the match page.
+
+  premadeTeamThreshold:
+    label: Premade Team Detection Threshold
+    description: A group of players will be considered a premade team if they appear on the same side more than {threshold} times.
+
+  concurrency:
+    label: Concurrent Request Limit
+    description: Limits the total number of concurrent network requests during match analysis. This does not affect the concurrency limits of other modules.
+
+  matchHistoryUseSgpApi:
+    label: Use SGP API
+    description: Prioritizes using the SGP API for match analysis. If the SGP API is unavailable, the LCU API will be used instead.
+    unsupported: 'SGP API is not supported for the current server: {server}'
+
+  matchHistoryTagPreference:
+    label: Queue Filter Preference
+    description: Queue filter preference when loading match history using the SGP API.
+    options:
+      all: All Modes
+      current: Current Mode
+
+AuxWindowSettings:
+  title: Auxiliary Window
+
+  auxWindowEnabled:
+    label: Enable Auxiliary Window
+    description: Use a small window during certain game phases to display status and provide additional actions.
+
+  auxWindowAutoShow:
+    label: Auto Show and Close
+    description: Automatically show or close the auxiliary window during specific game phases.
+
+  auxWindowOpacity:
+    label: Window Opacity
+    description: Adjust the transparency level of the auxiliary window.
+
+  auxWindowShowSkinSelector:
+    label: Skin Selector
+    description: Display a quick access skin selection tool in the auxiliary window.
+
+  auxWindowZoomFactor:
+    label: Zoom
+    description: Adjust the overall size of the auxiliary window.
+
+  resetAuxWindowPosition:
+    label: Reset Window Position
+    description: Reset the position of the auxiliary window to its default location in the center of the main screen.
+    button: Reset
+
+MiscSettings:
+  title: Misc
+
+  respawnTimer:
+    title: Respawn Timer
+
+    enabled:
+      label: Enable
+      description: Display an indicator in the title bar showing the remaining time until respawn.
+
+DebugSettings:
+  title: Debug
+
+  electron:
+    title: Akari's Electron
+
+    devTools:
+      label: Developer Tools
+      description: Toggle DevTools
+      button: Toggle DevTools
+
+    reload:
+      label: Reload Page
+      description: Refresh the League Akari user interface.
+      button: Reload Page
+
+  files:
+    title: File Directories
+
+    logs:
+      label: Logs Directory
+      description: Open the logs directory.
+      button: Logs Directory
+
+    appData:
+      label: Application Data Directory
+      popoverTrigger: Details
+      button: Open Directory
+      description:
+        part1: Open the League Akari application data storage directory. This directory is created when the application is first launched. Deleting it will result in the loss of all stored content.
+        part2: Contains user settings, marked players, and other information.
+        part3: Temporary files for upcoming automatic updates.
+        part4: Configurable setting files.
+        part5: Special configuration files.
+
+  lcuEvent:
+    label: Print LCU Events to Console
+    printAll: Print All Events
+    addRule: Add Rule
+    empty: No Rules
+    enable: Enable
+    rule: Rule
+    delete: Delete
+
+    modal:
+      title: Add Rule
+      button: Add
+      placeholder: Enter a matching rule, such as /path/:name/to
+
+  lcuConnection:
+    titleConnected: LCU
+    titleDisconnected: LCU (Disconnected)
+    port: Port
+    pid: Process ID
+    auth: Auth Key
+    rsoPlatform: Platform
+    region: Region
+
+  gameflow:
+    title: Gameflow
+    unavailable: Unavailable (Disconnected)
+
+    Matchmaking: 'Matchmaking'
+    ChampSelect: 'In Champion Select'
+    ReadyCheck: 'In Ready Check'
+    InProgress: 'Game In Progress'
+    EndOfGame: 'Game End'
+    Lobby: 'Lobby'
+    GameStart: 'Game Start'
+    None: 'None'
+    Reconnect: 'Reconnecting'
+    WaitingForStats: 'Waiting for Stats'
+    PreEndOfGame: 'Before Game End'
+    WatchInProgress: 'Spectating'
+
+  inAdministrator:
+    description: League Akari is running with administrator privileges, required for certain client-specific functionalities.
+
+  kyokoMode:
+    description: Some features are for debugging purposes only.
+
+AboutPane:
+  title: About
+  line1: ' (Version { version }) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
+  line2: Project Reference
+  copyright: © 2024 Hanxven. This software is open-source and follows the GPL-3.0 license.
+
+  checkFrom: Check updates from download source ({ source })
+  checkUpdates: Check Updates
+  newUpdates: New Version
+  lastCheckAt: Last Check at
+
+  updateProcess:
+    label: Update Process
+    description: The ongoing update process
+    downloading: Downloading update package
+    finished: Completed {progress} %
+    remain: Remaining {time}
+    downloadFailed: Download failed
+    unpacking: Unpacking update package
+    unpackFailed: Unpack failed
+    waitingForRestart: Waiting for restart
+    waitingForRestartDescription: The auto-update process will be performed after closing the application
+
+  updateDir:
+    label: Update Directory
+    description: The current location of the downloaded update. If the complete auto-update process cannot be executed, manual update is required
+    open: Open
+
+Automation:
+  title: Automation
+  autoGameflow: Automated Gameflow
+  autoSelect: Auto Pick / Ban
+  autoMisc: Misc
+
+AutoGameflow:
+  title: Gameflow
+
+  autoAcceptEnabled:
+    label: Auto-Accept Enabled
+    description: Automatically accepts the match when players are found.
+  autoAcceptDelaySeconds:
+    label: Auto-Accept Delay (s)
+    description: Delay in seconds before accepting the match after it becomes available.
+  autoHonorEnabled:
+    label: Auto-Honor Enabled
+    description: Automatically gives honors at the end of a match. External tools cannot skip the honor phase, so all votes will be used to complete the phase.
+  autoHonorStrategy:
+    label: Honor Selection Strategy
+    description: Determines which players will receive honors.
+    options:
+      prefer-lobby-member: Prioritize members in the lobby. If there are remaining votes, select other teammates.
+      only-lobby-member: Only pre-made team members.
+      all-member: All teammates.
+      all-member-including-opponent: Consider all players in the current match.
+      opt-out: Do not honor anyone.
+  playAgainEnabled:
+    label: Auto Play Again
+    description:
+      part1: Automatically returns to the lobby after a match.
+      part2: Auto-Honor
+      part3: to complete the honor voting phase.
+  autoMatchmakingEnabled:
+    label: Auto Matchmaking
+    description: Automatically starts matchmaking when available.
+  autoMatchmakingMinimumMembers:
+    label: Minimum Members
+    description: Requires at least {members} members to start matchmaking automatically.
+  autoMatchmakingDelaySeconds:
+    label: Matchmaking Wait Time (s)
+    description: Delay in seconds before starting matchmaking when available.
+  autoMatchmakingWaitForInvitees:
+    label: Wait for Invitees
+    description: Automatically waits for all invited players to respond before starting matchmaking.
+  autoMatchmakingRematchStrategy:
+    label: Stop Matchmaking Strategy
+    description: Defines when to stop matchmaking automatically. Matchmaking will restart if auto matchmaking is enabled.
+    options:
+      never: Never
+      fixed-duration: Fixed Duration
+      estimated-duration: Exceeds Estimated Queue Time
+  autoMatchmakingRematchFixedDuration:
+    label: Exit Matchmaking Time (s)
+    description:
+      fixed-duration: Stops matchmaking after exceeding this time, in seconds.
+      no-fixed-duration: This option only applies if the stop matchmaking strategy is set to Fixed Duration.
+  autoReconnectEnabled:
+    label: Auto Reconnect
+    description: Attempts to reconnect when in a reconnectable state.
+  autoHandleInvitationsEnabled:
+    label: Auto Handle Invitations
+    description: Handles room invitations according to the configured strategy.
+  invitationHandlingStrategies:
+    label: Room Invitation Acceptance Strategy
+    description: Processes room invitations based on the queue mode.
+    options:
+      accept: Accept
+      decline: Decline
+      ignore: Ignore
+    button: Configure
+    queueTypes:
+      default: Default
+
+AutoSelect:
+  normalModeTitle: Auto Champion Select · Normal Mode
+  benchModeTitle: Auto Champion Select · Bench Mode
+  banTitle: Auto Ban
+
+  normalModeEnabled:
+    label: Enable
+    description: Enable auto selection in standard modes, such as Matchmaking, Ranked, or any non-random champion modes.
+
+  showIntent:
+    label: Show Intent
+    description: Preselect the champion that will be automatically chosen.
+
+  selectTeammateIntendedChampion:
+    label: Ignore Teammates' Intent
+    description: When enabled, teammates' intended champions will be ignored. Otherwise, it will avoid conflicts with their selections.
+
+  completed:
+    label: Lock-In Strategy
+    description: Instantly lock in or hover the champion.
+    options:
+      true: Instantly Lock In
+      false: Hover Only
+
+  expectedChampions:
+    label: Intended Champions
+    button: Configure
+    description: |
+      <div style="margin-bottom: 8px">Select champions based on the preset list.</div>
+      <div style="margin-bottom: 8px">If the current mode <span style="font-weight: bold">has no role information</span> or <span style="font-weight: bold">the current role has no champions set</span>, the <span style="font-weight: bold">default</span> list will be used.</div>
+      <div>The selection priority follows the order defined in the list, preferring champions listed earlier.</div>
+
+  benchModeEnabled:
+    label: Enable
+    description: Enable auto selection in random champion modes, such as ARAM or other random modes.
+
+  grabDelaySeconds:
+    label: Minimum Selection Delay (s)
+    description:
+      part1: The cumulative time a target champion is available on the selection bench must reach this value before executing a swap. Time is measured in seconds.
+      part2: When a champion appears on the selection bench, a timer starts for that champion. Auto-swap will only occur if the cumulative time satisfies this value, preventing premature selection, also known as "insta-picking."
+
+  benchSelectFirstAvailableChampion:
+    label: Prioritize First Available Champion
+    description: When enabled, the first available champion from the intended list will always be selected.
+
+  benchExpectedChampions:
+    label: Intended Champions
+
+  banEnabled:
+    label: Enable
+    description: Automatically execute champion bans.
+
+  banTeammateIntendedChampion:
+    label: Ignore Teammates' Intent
+    description: When enabled, teammates' intended champions will not be considered.
+
+  bannedChampions:
+    label: Banned Champions
+    description: |
+      <div style="margin-bottom: 8px">Ban champions based on the preset list.</div>
+      <div style="margin-bottom: 8px">If the current mode <span style="font-weight: bold">has no role information</span> or <span style="font-weight: bold">the current role has no champions set</span>, the <span style="font-weight: bold">default</span> list will be used.</div>
+      <div>The ban priority follows the order defined in the list, prioritizing champions listed earlier.</div>
+
+AutoMisc:
+  autoReply:
+    title: Auto Reply
+
+    enabled:
+      label: Enable
+
+    enableOnAway:
+      label: Only When Away
+      description: Auto-reply will only be active when the game status is set to Away.
+
+    text:
+      label: Reply Text
+      description: The content to be used as the auto-reply message.
+
+SideBarMenu:
+  match-history: Match History Tabs
+  ongoing-game: Ongoing Game
+  automation: Automation
+  toolkit: Toolkit
+  test: Test
+
+SideBarFixed:
+  currentConnected: Current Connected
+  launchedClients: Launched Clients
+  noClientTitle: No Available Client
+  noClient: No available client, please start the game
+  settings: Settings
+
+OrderedChampionList:
+  searchForChampion: Search for Champion
+  edit: Edit
+  unselected: Unselected
+
+RankedTable:
+  queueType: Queue Type
+  tier: Tier
+  leaguePoints: LP
+  ratedRating: Rating
+  wins: Wins
+  losses: Losses
+  previousSeasonEndTier: Previous Season Tier
+  previousSeasonHighestTier: Previous Season Highest Tier
+  highestTier: Highest Tier
+
+RankedDisplay:
+  unranked: Unranked
+  win: W
+  lose: L
+  point: P
+  leaguePoint: LP
+  highest: Highest
+  empty: No Content
+
+DamageMetricsBar:
+  total: Total
+  physical: Physical
+  magic: Magic
+  true: 'True'
+
+MatchHistoryTabsTitle:
+  loading: Loading...
+  search: Search
+
+SearchSummonerModal:
+  title: Summoner Search
+  placeholder: Enter the summoner name
+  sgpServer: Server
+  cancel: Cancel
+  search: Search Player
+  result: Search Results
+  history: Search History
+  validating: Validating players ({current} / {total})
+  validated: Validated {count} possible player records, no matching results found
+  noResult: No matching results found
+  privacy: Career Hidden
+  currentRoute: Current
+  invalidInput: 'The input format is invalid: it should be "GameName#Tag" or "GameName"'
+  hasInvisibleChar: The search text contains invisible characters, which will be filtered out
+  puuidSearch: 'Performing exact search: Searching by specified PUUID'
+  exactSearch: 'Performing exact search: Searching for summoner with specified name and tag'
+  fuzzySearch: 'Performing fuzzy search: Searching for summoners with specified name'
+
+  placeholders:
+    - 'For exact search: AkazaAkari#akari'
+    - 'For fuzzy search - Format: FunamiYui'
+    - 'For PUUID search - Format: <puuid>'
+
+PlayerTagEditModal:
+  title: Edit Player Tag
+  loading: Loading...
+  save: Save
+  cancel: Cancel
+  placeholder: Enter the tag for player {name}
+
+ShortcutSelectionModal:
+  title: Shortcut Recording
+  hint: Press keys to record the shortcut
+  tooComplicated: This shortcut combination is highly complex, please confirm
+  ok: Confirm
+  cancel: Cancel
+
+UpdateModal:
+  newVersion: New Version
+  versionFeatures: Version Features
+  newVersionAvailable: 'New version available: {version} (Current version: {currentVersion})'
+  currentVersion: 'Current Version: {version}'
+  releasePage: Release Page
+  download: Download
+
+common:
+  appName: League Akari
+  default: Default
+  lanes:
+    top: Top
+    jungle: Jungle
+    mid: Mid
+    middle: Mid
+    bot: Bot
+    bottom: Bot
+    support: Support
+    utility: Support
+    TOP: Top
+    JUNGLE: Jungle
+    MID: Mid
+    BOT: Bot
+    SUPPORT: Support
+    UTILITY: Support
+
+  queueTypes:
+    RANKED_SOLO_5x5: Ranked Solo/Duo
+    RANKED_FLEX_SR: Ranked Flex
+    NORMAL: Normal SR
+    ARAM_UNRANKED_5x5: ARAM
+    CHERRY: Arena
+    URF: URF
+    NORMAL_TFT: TFT
+    RANKED_TFT: TFT Ranked
+    RANKED_TFT_TURBO: TFT Turbo
+    RANKED_TFT_DOUBLE_UP: TFT Double Up
+
+  sgpMatchHistoryTags:
+    all: All Modes
+    current: Current Mode
+    q_420: Ranked Solo/Duo
+    q_430: Normal SR
+    q_440: Ranked Flex
+    q_450: ARAM
+    q_490: Quickplay
+    q_900: ARURF
+    q_1700: Arena
+    q_1900: URF
+
+  tiers:
+    IRON: IRON
+    BRONZE: BRONZE
+    SILVER: SILVER
+    GOLD: GOLD
+    PLATINUM: PLATINUM
+    EMERALD: EMERALD
+    DIAMOND: DIAMOND
+    MASTER: MASTER
+    GRANDMASTER: GRANDMASTER
+    CHALLENGER: CHALLENGER
+
+  shortTiers:
+    IRON: IRON
+    BRONZE: BRON
+    SILVER: SILV
+    GOLD: GOLD
+    PLATINUM: PLATN
+    EMERALD: EMERD
+    DIAMOND: DIAMD
+    MASTER: MASTR
+    GRANDMASTER: GMAST
+    CHALLENGER: CHALL

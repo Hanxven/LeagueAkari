@@ -1,5 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { Menu, MenuItem, Tray, app } from 'electron'
+import { Menu, MenuItem, Tray } from 'electron'
 
 import icon from '../../../../resources/LA_ICON.ico?asset'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -68,7 +68,7 @@ export class TrayMain implements IAkariShardInitDispose {
       {
         label: '退出',
         type: 'normal',
-        click: () => app.quit()
+        click: () => this._wm.forceMainWindowQuit()
       }
     ])
 

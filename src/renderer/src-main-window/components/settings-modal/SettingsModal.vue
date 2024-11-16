@@ -6,22 +6,39 @@
     v-model:show="show"
     :class="styles['settings-modal']"
   >
-    <template #header><span class="card-header-title">设置</span></template>
-    <NTabs type="line" animated size="small" v-model:value="tabName">
-      <NTabPane name="basic" tab="应用"><AppSettings /></NTabPane>
-      <NTabPane name="match-history-tabs" tab="战绩页面"><MatchHistoryTabsSettings /></NTabPane>
-      <NTabPane name="ongoing-game" tab="对局分析"><OngoingGameSettings /></NTabPane>
-      <NTabPane name="aux-window" tab="小窗口"><AuxWindowSettings /></NTabPane>
-      <NTabPane name="mics" tab="其他"><MiscSettings /></NTabPane>
-      <NTabPane name="debug" tab="调试"><DebugSettings /></NTabPane>
-      <NTabPane name="about" tab="关于"><AboutPane /></NTabPane>
+    <template #header
+      ><span class="card-header-title">{{ t('SettingModal.title') }}</span></template
+    >
+    <NTabs ref="tabs" type="line" animated size="small" v-model:value="tabName">
+      <NTabPane name="basic" :tab="t('AppSettings.title')">
+        <AppSettings />
+      </NTabPane>
+      <NTabPane name="match-history-tabs" :tab="t('MatchHistoryTabsSettings.title')">
+        <MatchHistoryTabsSettings />
+      </NTabPane>
+      <NTabPane name="ongoing-game" :tab="t('OngoingGameSettings.title')">
+        <OngoingGameSettings />
+      </NTabPane>
+      <NTabPane name="aux-window" :tab="t('AuxWindowSettings.title')">
+        <AuxWindowSettings />
+      </NTabPane>
+      <NTabPane name="misc" :tab="t('MiscSettings.title')">
+        <MiscSettings />
+      </NTabPane>
+      <NTabPane name="debug" :tab="t('DebugSettings.title')">
+        <DebugSettings />
+      </NTabPane>
+      <NTabPane name="about" :tab="t('AboutPane.title')">
+        <AboutPane />
+      </NTabPane>
     </NTabs>
   </NModal>
 </template>
 
 <script setup lang="ts">
 import { NModal, NTabPane, NTabs } from 'naive-ui'
-import { useCssModule } from 'vue'
+import { nextTick, useCssModule, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import AboutPane from './AboutPane.vue'
 import AppSettings from './AppSettings.vue'
@@ -31,10 +48,20 @@ import MatchHistoryTabsSettings from './MatchHistoryTabsSettings.vue'
 import MiscSettings from './MiscSettings.vue'
 import OngoingGameSettings from './OngoingGameSettings.vue'
 
+const { t, locale } = useI18n()
+
 const styles = useCssModule()
 
 const show = defineModel<boolean>('show', { default: false })
 const tabName = defineModel<string>('tabName', { default: 'basic' })
+
+const tabsEl = useTemplateRef('tabs')
+watch(
+  () => locale.value,
+  () => {
+    nextTick(() => tabsEl.value?.syncBarPosition())
+  }
+)
 </script>
 
 <style lang="less" scoped>

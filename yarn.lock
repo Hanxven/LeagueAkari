@@ -1176,6 +1176,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@modyfi/vite-plugin-yaml@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@modyfi/vite-plugin-yaml@npm:1.1.0"
+  dependencies:
+    "@rollup/pluginutils": "npm:5.1.0"
+    js-yaml: "npm:4.1.0"
+    tosource: "npm:2.0.0-alpha.3"
+  peerDependencies:
+    vite: ^3.2.7 || ^4.0.5 || ^5.0.5
+  checksum: 10c0/ae17f6c29fc22c7165ef66cdd65860d62c950abad24087c1f048b33f0b5216372e66973093f80d1e6d0c70c751bb257c5d02baf9431f8e83e0e3c942de3cf9a1
+  languageName: node
+  linkType: hard
+
 "@npmcli/agent@npm:^2.0.0":
   version: 2.2.2
   resolution: "@npmcli/agent@npm:2.2.2"
@@ -1242,6 +1255,22 @@ __metadata:
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
   checksum: 10c0/5bd7576bb1b38a47a7fc7b51ac9f38748e772beebc56200450c4a817d712232b8f1d3ef70532c80840243c657d491cf6a6be1e3a214cff907645819fdc34aadd
+  languageName: node
+  linkType: hard
+
+"@rollup/pluginutils@npm:5.1.0":
+  version: 5.1.0
+  resolution: "@rollup/pluginutils@npm:5.1.0"
+  dependencies:
+    "@types/estree": "npm:^1.0.0"
+    estree-walker: "npm:^2.0.2"
+    picomatch: "npm:^2.3.1"
+  peerDependencies:
+    rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+  peerDependenciesMeta:
+    rollup:
+      optional: true
+  checksum: 10c0/c7bed15711f942d6fdd3470fef4105b73991f99a478605e13d41888963330a6f9e32be37e6ddb13f012bc7673ff5e54f06f59fd47109436c1c513986a8a7612d
   languageName: node
   linkType: hard
 
@@ -1585,6 +1614,13 @@ __metadata:
   version: 1.0.5
   resolution: "@types/estree@npm:1.0.5"
   checksum: 10c0/b3b0e334288ddb407c7b3357ca67dbee75ee22db242ca7c56fe27db4e1a31989cb8af48a84dd401deb787fe10cc6b2ab1ee82dc4783be87ededbe3d53c79c70d
+  languageName: node
+  linkType: hard
+
+"@types/estree@npm:^1.0.0":
+  version: 1.0.6
+  resolution: "@types/estree@npm:1.0.6"
+  checksum: 10c0/cdfd751f6f9065442cd40957c07fd80361c962869aa853c1c2fd03e101af8b9389d8ff4955a43a6fcfa223dd387a089937f95be0f3eec21ca527039fd2d9859a
   languageName: node
   linkType: hard
 
@@ -4369,7 +4405,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^4.1.0":
+"js-yaml@npm:4.1.0, js-yaml@npm:^4.1.0":
   version: 4.1.0
   resolution: "js-yaml@npm:4.1.0"
   dependencies:
@@ -4498,6 +4534,7 @@ __metadata:
     "@electron-toolkit/tsconfig": "npm:^1.0.1"
     "@electron-toolkit/utils": "npm:^3.0.0"
     "@electron/notarize": "npm:^2.5.0"
+    "@modyfi/vite-plugin-yaml": "npm:^1.1.0"
     "@rushstack/eslint-patch": "npm:^1.10.4"
     "@swc/core": "npm:^1.9.1"
     "@trivago/prettier-plugin-sort-imports": "npm:^4.3.0"
@@ -5707,6 +5744,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"picomatch@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "picomatch@npm:2.3.1"
+  checksum: 10c0/26c02b8d06f03206fc2ab8d16f19960f2ff9e81a658f831ecb656d8f17d9edc799e8364b1f4a7873e89d9702dff96204be0fa26fe4181f6843f040f819dac4be
+  languageName: node
+  linkType: hard
+
 "pify@npm:^4.0.1":
   version: 4.0.1
   resolution: "pify@npm:4.0.1"
@@ -6520,6 +6564,13 @@ __metadata:
   version: 2.0.0
   resolution: "to-fast-properties@npm:2.0.0"
   checksum: 10c0/b214d21dbfb4bce3452b6244b336806ffea9c05297148d32ebb428d5c43ce7545bdfc65a1ceb58c9ef4376a65c0cb2854d645f33961658b3e3b4f84910ddcdd7
+  languageName: node
+  linkType: hard
+
+"tosource@npm:2.0.0-alpha.3":
+  version: 2.0.0-alpha.3
+  resolution: "tosource@npm:2.0.0-alpha.3"
+  checksum: 10c0/34f29e963461c5b4eb5b4b8f873c7ac1627a610ea930de6cd61a4351f6c30e6f57eea632e3abd7e0ac0915bddc7c7195f4e331cf8435e560f62ca5d2ffa22a06
   languageName: node
   linkType: hard
 

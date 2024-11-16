@@ -1,5 +1,6 @@
 import { is } from '@electron-toolkit/utils'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { BrowserWindow, Event, Rectangle, dialog, screen, shell } from 'electron'
 import { comparer, computed } from 'mobx'
@@ -17,6 +18,7 @@ import { WindowManagerSettings, WindowManagerState } from './state'
 export class WindowManagerMain implements IAkariShardInitDispose {
   static id = 'window-manager-main'
   static dependencies = [
+    SHARED_GLOBAL_ID,
     'akari-ipc-main',
     'mobx-utils-main',
     'logger-factory-main',
@@ -45,6 +47,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
   private readonly _lc: LeagueClientMain
+  private readonly _shared: AkariSharedGlobalShard
 
   /**
    * 标记位, 用于判断是否是即将退出应用程序 (需要全部窗口关闭)
@@ -62,6 +65,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
     this._mobx = deps['mobx-utils-main']
+    this._shared = deps[SHARED_GLOBAL_ID]
     this._log = deps['logger-factory-main'].create(WindowManagerMain.id)
     this._setting = deps['setting-factory-main'].create(
       WindowManagerMain.id,
@@ -108,9 +112,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       setter()
     })
 
-    const auxBounds = await this._setting._getFromStorage('auxWindowFunctionalityBounds')
-    if (auxBounds) {
-      this.state.setAuxWindowFunctionalityBounds(auxBounds)
+    const auxFBounds = await this._setting._getFromStorage('auxWindowFunctionalityBounds')
+    if (auxFBounds) {
+      this.state.setAuxWindowFunctionalityBounds(auxFBounds)
     }
 
     const auxFunctionality = await this._setting._getFromStorage('auxWindowFauxFunctionality')
@@ -118,7 +122,13 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       this.state.setAuxWindowFunctionality(auxFunctionality)
     }
 
+    const mainWindowSize = await this._setting._getFromStorage('mainWindowSize')
+    if (mainWindowSize) {
+      this.state.setMainWindowSize(mainWindowSize)
+    }
+
     this._handleAuxWindowObservations()
+    this._handleMainWindowObservations()
     this._handleMainWindowIpcCall()
     this._handleAuxWindowIpcCall()
   }
@@ -818,6 +828,16 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     )
   }
 
+  private _handleMainWindowObservations() {
+    this._mobx.reaction(
+      () => this.state.mainWindowSize,
+      (size) => {
+        this._setting._saveToStorage('mainWindowSize', size)
+      },
+      { delay: 500 }
+    )
+  }
+
   createAuxWindow() {
     if (!this._aw || this._aw.isDestroyed()) {
       this._createAuxWindow()
@@ -874,7 +894,15 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     }
   }
 
+  forceMainWindowQuit() {
+    this._willQuit = true
+    this._mw?.close()
+  }
+
   async onFinish() {
+    this._shared.global.events.on('second-instance', () => {
+      this.showOrRestoreMainWindow()
+    })
     this.createMainWindow()
   }
 }

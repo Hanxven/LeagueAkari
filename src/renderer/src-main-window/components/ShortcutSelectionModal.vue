@@ -8,12 +8,16 @@
     :close-on-esc="false"
     @keydown.enter.prevent
     @keydown.space.prevent
-    title="快捷键设定"
+    :title="t('ShortcutSelectionModal.title')"
   >
     <template #footer>
       <div class="action-buttons">
-        <NButton size="small" @click="show = false">取消</NButton>
-        <NButton size="small" type="primary" @click="handleSubmit">确定</NButton>
+        <NButton size="small" @click="show = false">{{
+          t('ShortcutSelectionModal.cancel')
+        }}</NButton>
+        <NButton size="small" type="primary" @click="handleSubmit">{{
+          t('ShortcutSelectionModal.ok')
+        }}</NButton>
       </div>
     </template>
     <div class="keys-outline">
@@ -23,9 +27,11 @@
         </div>
         <span class="plus" v-if="index !== keys.length - 1">+</span>
       </template>
-      <span class="empty" v-if="!keys.length">按下按键以记录快捷键</span>
+      <span class="empty" v-if="!keys.length">{{ t('ShortcutSelectionModal.hint') }}</span>
     </div>
-    <div v-if="keys.length > 4" class="too-complicated">该快捷键组合具有较高复杂度，请确认</div>
+    <div v-if="keys.length > 4" class="too-complicated">
+      {{ t('ShortcutSelectionModal.tooComplicated') }}
+    </div>
   </NModal>
 </template>
 
@@ -34,10 +40,13 @@ import { useInstance } from '@renderer-shared/shards'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
 import { NButton, NModal } from 'naive-ui'
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const emits = defineEmits<{
   submit: [shortcutId: string]
 }>()
+
+const { t } = useI18n()
 
 const kbd = useInstance<KeyboardShortcutsRenderer>('keyboard-shortcuts-renderer')
 

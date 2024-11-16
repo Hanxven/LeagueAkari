@@ -7,31 +7,36 @@
       v-model:show="isCloseConfirmationModelShow"
       :z-index="10000000"
     >
-      <template #header><span class="close-confirmation-header">退出 League Akari</span></template>
+      <template #header
+        ><span class="close-confirmation-header">{{
+          t('TrafficButtons.modal.title')
+        }}</span></template
+      >
       <NRadioGroup v-model:value="closeStrategy" size="small">
         <NFlex vertical>
-          <NRadio value="minimize-to-tray">最小化到托盘区</NRadio>
-          <NRadio value="quit">退出程序</NRadio>
+          <NRadio value="minimize-to-tray">{{
+            t('TrafficButtons.modal.options.minimize-to-tray')
+          }}</NRadio>
+          <NRadio value="quit">{{ t('TrafficButtons.modal.options.quit') }}</NRadio>
         </NFlex>
       </NRadioGroup>
       <NFlex align="center" justify="space-between" style="margin-top: 12px">
-        <NCheckbox v-model:checked="isRememberCloseStrategy" style="margin-right: auto" size="small"
-          >记住选择</NCheckbox
+        <NCheckbox
+          v-model:checked="isRememberCloseStrategy"
+          style="margin-right: auto"
+          size="small"
+          >{{ t('TrafficButtons.modal.remember') }}</NCheckbox
         >
         <NFlex style="gap: 4px">
           <NButton
-            style="font-size: 13px; width: 54px"
+            style="font-size: 13px"
             size="small"
             @click="isCloseConfirmationModelShow = false"
-            >取消</NButton
+            >{{ t('TrafficButtons.modal.cancel') }}</NButton
           >
-          <NButton
-            style="font-size: 13px; width: 54px"
-            size="small"
-            type="primary"
-            @click="handleReallyClose"
-            >确定</NButton
-          >
+          <NButton style="font-size: 13px" size="small" type="primary" @click="handleReallyClose">{{
+            t('TrafficButtons.modal.ok')
+          }}</NButton>
         </NFlex>
       </NFlex>
     </NModal>
@@ -39,7 +44,11 @@
       <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
     </div>
     <div
-      :title="wms.mainWindowStatus === 'normal' ? '最大化' : '还原'"
+      :title="
+        wms.mainWindowStatus === 'normal'
+          ? t('TrafficButtons.maximize')
+          : t('TrafficButtons.restore')
+      "
       class="traffic-button maximize"
       @click="handleMaximize"
     >
@@ -49,7 +58,7 @@
         /><WindowMultiple16FilledIcon v-else />
       </NIcon>
     </div>
-    <div title="关闭" class="traffic-button close" @click="handleClose">
+    <div :title="t('TrafficButtons.close')" class="traffic-button close" @click="handleClose">
       <NIcon><CloseOutlinedIcon /></NIcon>
     </div>
   </div>
@@ -58,8 +67,10 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
-import { MainWindowCloseStrategy } from '@shared/types/modules/app'
+import {
+  MainWindowCloseAction,
+  useWindowManagerStore
+} from '@renderer-shared/shards/window-manager/store'
 import { WindowMultiple16Filled as WindowMultiple16FilledIcon } from '@vicons/fluent'
 import {
   DividerShort20Regular as DividerShort20RegularIcon,
@@ -67,7 +78,10 @@ import {
 } from '@vicons/fluent'
 import { CloseOutlined as CloseOutlinedIcon } from '@vicons/material'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // 交通灯按钮
 const wms = useWindowManagerStore()
@@ -86,7 +100,7 @@ const handleMaximize = async () => {
 }
 
 const isCloseConfirmationModelShow = ref(false)
-const closeStrategy = ref<MainWindowCloseStrategy>('minimize-to-tray')
+const closeStrategy = ref<MainWindowCloseAction>('minimize-to-tray')
 const isRememberCloseStrategy = ref<boolean>(false)
 
 const handleClose = async () => {
@@ -107,6 +121,16 @@ const handleReallyClose = async () => {
 
   isCloseConfirmationModelShow.value = false
 }
+
+watch(
+  () => isCloseConfirmationModelShow.value,
+  (show) => {
+    if (show) {
+      closeStrategy.value = 'minimize-to-tray'
+      isRememberCloseStrategy.value = false
+    }
+  }
+)
 </script>
 
 <style lang="less" scoped>

@@ -1,11 +1,13 @@
 <template>
-  <NScrollbar style="max-height: 65vh" trigger="none">
+  <NScrollbar style="max-height: 65vh">
     <NCard size="small">
-      <template #header><span class="card-header-title">小窗口</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('AuxWindowSettings.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="使用小窗口"
-        label-description="在一些游戏流程中使用小窗口来展示状态以及提供额外操作"
+        :label="t('AuxWindowSettings.auxWindowEnabled.label')"
+        :label-description="t('AuxWindowSettings.auxWindowEnabled.description')"
         :label-width="320"
       >
         <NSwitch
@@ -16,8 +18,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="自动弹出和关闭"
-        label-description="在游戏流程的部分阶段，自动弹出或关闭小窗口"
+        :label="t('AuxWindowSettings.auxWindowAutoShow.label')"
+        :label-description="t('AuxWindowSettings.auxWindowAutoShow.description')"
         :label-width="320"
       >
         <NSwitch
@@ -28,8 +30,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="小窗口不透明度"
-        label-description="小窗口的半透明状态"
+        :label="t('AuxWindowSettings.auxWindowOpacity.label')"
+        :label-description="t('AuxWindowSettings.auxWindowOpacity.description')"
         :label-width="320"
       >
         <NSlider
@@ -45,8 +47,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="皮肤设置器"
-        label-description="在小窗口展示一个设置皮肤的快捷入口"
+        :label="t('AuxWindowSettings.auxWindowShowSkinSelector.label')"
+        :label-description="t('AuxWindowSettings.auxWindowShowSkinSelector.description')"
         :label-width="320"
       >
         <NSwitch
@@ -57,8 +59,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="缩放"
-        label-description="可以调整小窗口的整体大小"
+        :label="t('AuxWindowSettings.auxWindowZoomFactor.label')"
+        :label-description="t('AuxWindowSettings.auxWindowZoomFactor.description')"
         :label-width="320"
       >
         <NInputNumber
@@ -73,13 +75,13 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="重置小窗口位置"
-        label-description="重新设置小窗口的位置，还原到默认主屏幕正中心"
+        :label="t('AuxWindowSettings.resetAuxWindowPosition.label')"
+        :label-description="t('AuxWindowSettings.resetAuxWindowPosition.description')"
         :label-width="320"
       >
-        <NButton size="small" type="warning" secondary @click="() => wm.resetAuxWindowPosition()"
-          >重设</NButton
-        >
+        <NButton size="small" type="warning" secondary @click="() => wm.resetAuxWindowPosition()">{{
+          t('AuxWindowSettings.resetAuxWindowPosition.button')
+        }}</NButton>
       </ControlItem>
     </NCard>
   </NScrollbar>
@@ -91,6 +93,9 @@ import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { NButton, NCard, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const wms = useWindowManagerStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')

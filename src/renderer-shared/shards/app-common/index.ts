@@ -1,4 +1,6 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { effectScope, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -82,4 +84,22 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
+
+  /**
+   * 把它丢到 App 层面的 setup 里面即可
+   */
+  useI18nSync() {
+    const { locale } = useI18n()
+    const store = useAppCommonStore()
+
+    watch(
+      () => store.settings.locale,
+      (lo) => {
+        locale.value = lo
+      },
+      { immediate: true }
+    )
+  }
+
+  async onDispose() {}
 }

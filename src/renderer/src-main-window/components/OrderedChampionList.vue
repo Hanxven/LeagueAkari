@@ -9,14 +9,14 @@
         :options="championOptions"
         :render-source-label="renderSourceLabel"
         :render-target-label="renderTargetLabel"
-        source-filter-placeholder="搜索英雄"
+        :source-filter-placeholder="t('OrderedChampionList.searchForChampion')"
         :filter="(a, b) => isNameMatch(a, b.label as string, b.value as number)"
         source-filterable
       />
     </NModal>
-    <NButton size="tiny" type="primary" style="margin-right: 8px" @click="show = true"
-      >编辑</NButton
-    >
+    <NButton size="tiny" type="primary" style="margin-right: 8px" @click="show = true">{{
+      t('OrderedChampionList.edit')
+    }}</NButton>
     <div class="champions">
       <LcuImage
         :src="championIconUri(c)"
@@ -33,7 +33,9 @@
         :key="c"
       />
       <div class="hint" v-if="champions.length > maxShow">+{{ champions.length - maxShow }}</div>
-      <div class="hint" v-if="champions.length === 0">未选择</div>
+      <div class="hint" v-if="champions.length === 0">
+        {{ t('OrderedChampionList.unselected') }}
+      </div>
     </div>
   </div>
 </template>
@@ -51,8 +53,11 @@ import {
   TransferRenderTargetLabel
 } from 'naive-ui'
 import { computed, h, ref, useCssModule } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
+
+const { t } = useI18n()
 
 const {
   maxShow = 6,

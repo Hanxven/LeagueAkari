@@ -35,7 +35,8 @@ import {
 } from '@vicons/carbon'
 import { TicketSharp as TicketSharpIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
-import { Component as ComponentC, h, ref, watchEffect } from 'vue'
+import { Component as ComponentC, computed, h, ref, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import SidebarFixed from '@main-window/components/sidebar/SidebarFixed.vue'
@@ -46,35 +47,39 @@ const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
 }
 
+const { t } = useI18n()
+
 const currentMenu = ref('match-history')
-const menu = ref([
-  {
-    key: 'match-history',
-    icon: renderIcon(LayersIcon),
-    name: '战绩页面'
-  },
-  {
-    key: 'ongoing-game',
-    icon: renderIcon(TemplateIcon),
-    name: '对局分析'
-  },
-  {
-    key: 'automation',
-    icon: renderIcon(AiStatusIcon),
-    name: '自动操作'
-  },
-  {
-    key: 'toolkit',
-    icon: renderIcon(AppSwitcherIcon),
-    name: '工具集'
-  },
-  {
-    key: 'test',
-    icon: renderIcon(TicketSharpIcon),
-    name: '测试',
-    show: import.meta.env.DEV
-  }
-])
+const menu = computed(() => {
+  return [
+    {
+      key: 'match-history',
+      icon: renderIcon(LayersIcon),
+      name: t('SideBarMenu.match-history')
+    },
+    {
+      key: 'ongoing-game',
+      icon: renderIcon(TemplateIcon),
+      name: t('SideBarMenu.ongoing-game')
+    },
+    {
+      key: 'automation',
+      icon: renderIcon(AiStatusIcon),
+      name: t('SideBarMenu.automation')
+    },
+    {
+      key: 'toolkit',
+      icon: renderIcon(AppSwitcherIcon),
+      name: t('SideBarMenu.toolkit')
+    },
+    {
+      key: 'test',
+      icon: renderIcon(TicketSharpIcon),
+      name: t('SideBarMenu.test'),
+      show: import.meta.env.DEV
+    }
+  ]
+})
 
 const router = useRouter()
 const route = useRoute()

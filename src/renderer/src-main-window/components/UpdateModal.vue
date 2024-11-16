@@ -8,19 +8,25 @@
   >
     <template #header
       ><span class="card-header-title">{{
-        showingNewUpdate ? '新版本' : '版本特性'
+        showingNewUpdate ? t('UpdateModal.newVersion') : t('UpdateModal.versionFeatures')
       }}</span></template
     >
     <div v-if="sus.newUpdates">
       <div v-if="showingNewUpdate" class="para">
-        新版本可用：{{ sus.newUpdates.releaseVersion }} (当前版本：{{
-          sus.newUpdates.currentVersion
-        }})
+        {{
+          t('UpdateModal.newVersionAvailable', {
+            version: sus.newUpdates.releaseVersion,
+            currentVersion: sus.newUpdates.currentVersion
+          })
+        }}
       </div>
-      <div v-else class="para">当前版本：{{ sus.newUpdates.currentVersion }}</div>
+      <div v-else class="para">
+        {{ t('UpdateModal.currentVersion', { version: sus.newUpdates.currentVersion }) }}
+      </div>
       <div>
         <a class="small-link" target="_blank" :href="sus.newUpdates.releaseNotesUrl"
-          >{{ sus.newUpdates.source === 'github' ? 'GitHub' : 'Gitee' }} 发布页面</a
+          >{{ sus.newUpdates.source === 'github' ? 'GitHub' : 'Gitee' }}
+          {{ t('UpdateModal.releasePage') }}</a
         >
         <a
           v-if="sus.newUpdates.downloadUrl"
@@ -28,7 +34,8 @@
           style="margin-left: 8px"
           target="_blank"
           :href="sus.newUpdates.downloadUrl"
-          >{{ sus.newUpdates.source === 'github' ? 'GitHub' : 'Gitee' }} 下载</a
+          >{{ sus.newUpdates.source === 'github' ? 'GitHub' : 'Gitee' }}
+          {{ t('UpdateModal.download') }}</a
         >
       </div>
       <NScrollbar
@@ -47,10 +54,13 @@ import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import { NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 defineProps<{
   showingNewUpdate?: boolean
 }>()
+
+const { t } = useI18n()
 
 const sus = useSelfUpdateStore()
 

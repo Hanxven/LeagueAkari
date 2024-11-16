@@ -1,11 +1,13 @@
 <template>
-  <NScrollbar style="max-height: 65vh" trigger="none">
+  <NScrollbar style="max-height: 65vh">
     <NCard size="small">
-      <template #header><span class="card-header-title">基础</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('AppSettings.basic.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="窗口关闭策略"
-        label-description="当关闭主窗口时所执行的行为"
+        :label="t('AppSettings.basic.mainWindowCloseAction.label')"
+        :label-description="t('AppSettings.basic.mainWindowCloseAction.description')"
         :label-width="320"
       >
         <NSelect
@@ -32,11 +34,13 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">应用更新</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('AppSettings.selfUpdate.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="自动检查更新"
-        label-description="在应用启动时，自动从 Github 拉取最新版本信息"
+        :label="t('AppSettings.selfUpdate.autoCheckUpdates.label')"
+        :label-description="t('AppSettings.selfUpdate.autoCheckUpdates.description')"
         :label-width="320"
       >
         <NSwitch
@@ -47,8 +51,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="自动安装更新"
-        label-description="检测到更新后，尝试下载并安装更新"
+        :label="t('AppSettings.selfUpdate.autoDownloadUpdates.label')"
+        :label-description="t('AppSettings.selfUpdate.autoDownloadUpdates.description')"
         :label-width="320"
       >
         <NSwitch
@@ -59,8 +63,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="更新源"
-        label-description="检查更新或下载更新时所使用的源"
+        :label="t('AppSettings.selfUpdate.downloadSource.label')"
+        :label-description="t('AppSettings.selfUpdate.downloadSource.description')"
         :label-width="320"
       >
         <NFlex align="center">
@@ -72,36 +76,44 @@
             :options="updateDownloadSource"
           />
           <NTooltip>
-            <template #trigger><div class="hover-text">如何选择?</div></template>
+            <template #trigger
+              ><div class="hover-text">
+                {{ t('AppSettings.selfUpdate.tip.title') }}
+              </div></template
+            >
             <div style="font-size: 12px">
               <span style="display: inline-block; width: 44px; font-weight: bold">Gitee</span>
-              - 在中国大陆内拥有较好的响应速度
+              {{ t('AppSettings.selfUpdate.tip.gitee') }}
             </div>
             <div style="font-size: 12px">
               <span style="display: inline-block; width: 44px; font-weight: bold">GitHub</span>
-              - 在中国大陆外拥有较好的响应速度
+              {{ t('AppSettings.selfUpdate.tip.github') }}
             </div>
           </NTooltip>
         </NFlex>
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">主窗口界面</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('AppSettings.mainWindowUi.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="使用生涯皮肤背景"
-        label-description="League Akari 将使用当前玩家的生涯背景皮肤作为背景"
+        :label="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.label')"
+        :label-description="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.description')"
         :label-width="320"
       >
         <NSwitch size="small" v-model:value="muis.settings.useProfileSkinAsBackground" />
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">LCU 连接</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('AppSettings.lcConnection.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="自动连接"
-        label-description="存在唯一的客户端时，则自动连接该客户端"
+        :label="t('AppSettings.lcConnection.autoConnect.label')"
+        :label-description="t('AppSettings.lcConnection.autoConnect.description')"
         :label-width="320"
       >
         <NSwitch
@@ -112,8 +124,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="使用 WMIC"
-        label-description="使用 WMIC 获取客户端命令行信息，而不是默认的 Win32 API 方式。需要管理员权限"
+        :label="t('AppSettings.lcConnection.useWmic.label')"
+        :label-description="t('AppSettings.lcConnection.useWmic.description')"
         :label-width="320"
       >
         <NSwitch
@@ -124,11 +136,13 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">其他</span></template>
+      <template #header
+        ><span class="card-header-title">{{ t('AppSettings.misc.title') }}</span></template
+      >
       <ControlItem
         class="control-item-margin"
-        label="禁用硬件加速"
-        label-description="禁用硬件加速，可能会解决一些渲染问题，如字体模糊"
+        :label="t('AppSettings.misc.disableHardwareAcceleration.label')"
+        :label-description="t('AppSettings.misc.disableHardwareAcceleration.description')"
         :label-width="320"
       >
         <NSwitch
@@ -155,8 +169,12 @@ import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip, useDialog } from 'naive-ui'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
+
+const { t } = useI18n()
 
 const lcus = useLeagueClientUxStore()
 const lcs = useLeagueClientStore()
@@ -171,11 +189,16 @@ const app = useInstance<AppCommonRenderer>('app-common-renderer')
 const lcu = useInstance<LeagueClientUxRenderer>('league-client-ux-renderer')
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
-const closeActions = [
-  { label: '最小化到托盘区', value: 'minimize-to-tray' },
-  { label: '退出程序', value: 'quit' },
-  { label: '每次询问', value: 'ask' }
-]
+const closeActions = computed(() => {
+  return [
+    {
+      label: t('AppSettings.basic.mainWindowCloseAction.options.minimize-to-tray'),
+      value: 'minimize-to-tray'
+    },
+    { label: t('AppSettings.basic.mainWindowCloseAction.options.quit'), value: 'quit' },
+    { label: t('AppSettings.basic.mainWindowCloseAction.options.ask'), value: 'ask' }
+  ]
+})
 
 const updateDownloadSource = [
   { label: 'Gitee', value: 'gitee' },
@@ -183,19 +206,21 @@ const updateDownloadSource = [
 ]
 
 const locales = [
-  { label: '中文', value: 'zh-CN' },
+  { label: '中文', value: 'zh-cn' },
   { label: 'English', value: 'en' }
 ]
 
 const dialog = useDialog()
 const handleDisableHardwareAcceleration = (val: boolean) => {
   dialog.warning({
-    title: `${val ? '禁用' : '启用'}硬件加速`,
+    title: val
+      ? t('AppSettings.misc.disableHardwareAccelerationDialog.disableText')
+      : t('AppSettings.misc.disableHardwareAccelerationDialog.enableText'),
     content: val
-      ? '是否确认禁用硬件加速？将重启应用以应用更改'
-      : '将启用硬件加速，重启应用以应用更改',
-    positiveText: '重启应用并退出',
-    negativeText: '取消',
+      ? t('AppSettings.misc.disableHardwareAccelerationDialog.disableConfirmation')
+      : t('AppSettings.misc.disableHardwareAccelerationDialog.enableConfirmation'),
+    positiveText: t('AppSettings.misc.disableHardwareAccelerationDialog.positiveText'),
+    negativeText: t('AppSettings.misc.disableHardwareAccelerationDialog.negativeText'),
     onPositiveClick: async () => {
       await app.setDisableHardwareAcceleration(val)
     }

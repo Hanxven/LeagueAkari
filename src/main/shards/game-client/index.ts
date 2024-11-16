@@ -101,6 +101,11 @@ export class GameClientMain implements IAkariShardInitDispose {
     this._handleSaveInstallLocation()
   }
 
+  /** under development */
+  private _readRiotInstallLocation() {
+    // C:\ProgramData\Riot Games\RiotClientInstalls.json
+  }
+
   private _handleSaveInstallLocation() {
     this._mobx.reaction(
       () => this._lc.state.connectionState,

@@ -7,7 +7,10 @@
     inline-theme-disabled
     :date-locale="dateZhCN"
   >
-    <NMessageProvider :container-style="{ top: 'calc(var(--title-bar-height) + 12px)' }">
+    <NMessageProvider
+      placement="bottom"
+      :container-style="{ top: 'calc(var(--title-bar-height) + 12px)' }"
+    >
       <NNotificationProvider placement="bottom-right">
         <NDialogProvider>
           <App />

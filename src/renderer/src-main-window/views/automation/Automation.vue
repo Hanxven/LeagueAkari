@@ -3,21 +3,22 @@
     <div class="sections">
       <div class="section-icon-container">
         <NIcon class="section-icon"><AiStatusIcon /></NIcon>
-        <span class="session-label">自动化</span>
+        <span class="session-label">{{ t('Automation.title') }}</span>
       </div>
       <NTabs
+        ref="tabs"
         v-model:value="currentTab"
         :theme-overrides="{ tabGapMediumBar: '18px' }"
         size="medium"
       >
         <NTab name="auto-gameflow">
-          <span class="tab-name">游戏流程</span>
+          <span class="tab-name">{{ t('Automation.autoGameflow') }}</span>
         </NTab>
         <NTab name="auto-select" class="tab-name">
-          <span class="tab-name">英雄选择 / 禁用</span>
+          <span class="tab-name">{{ t('Automation.autoSelect') }}</span>
         </NTab>
         <NTab name="misc" class="tab-name">
-          <span class="tab-name">其他</span>
+          <span class="tab-name">{{ t('Automation.autoMisc') }}</span>
         </NTab>
       </NTabs>
     </div>
@@ -36,13 +37,24 @@
 <script setup lang="tsx">
 import { AiStatus as AiStatusIcon } from '@vicons/carbon'
 import { NIcon, NTab, NTabs } from 'naive-ui'
-import { ref } from 'vue'
+import { nextTick, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import AutoGameflow from './AutoGameflow.vue'
 import AutoMisc from './AutoMisc.vue'
 import AutoSelect from './AutoSelect.vue'
 
 const currentTab = ref('auto-gameflow')
+
+const { t, locale } = useI18n()
+
+const tabsEl = useTemplateRef('tabs')
+watch(
+  () => locale.value,
+  () => {
+    nextTick(() => tabsEl.value?.syncBarPosition())
+  }
+)
 </script>
 
 <style lang="less" scoped>
