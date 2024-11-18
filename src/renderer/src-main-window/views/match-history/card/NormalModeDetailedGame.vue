@@ -14,16 +14,16 @@
         <thead class="team-header">
           <tr>
             <th class="header-info">
-              {{ participants[0].stats.win ? '胜利' : '失败' }} ({{
-                teamId === 100 ? '蓝队' : '红队'
+              {{ participants[0].stats.win ? t('DetailedGame.win') : t('DetailedGame.lose') }} ({{
+                teamId === 100 ? t('common.teams.100') : t('common.teams.200')
               }})
             </th>
-            <th class="header-kda">KDA</th>
-            <th class="header-damage">伤害 / 承受</th>
-            <th class="header-wards">眼</th>
-            <th class="header-cs">补兵数</th>
-            <th class="header-gold">金币</th>
-            <th class="header-items">物品</th>
+            <th class="header-kda">{{ t('DetailedGame.header.kda') }}</th>
+            <th class="header-damage">{{ t('DetailedGame.header.dmg') }}</th>
+            <th class="header-wards">{{ t('DetailedGame.header.ward') }}</th>
+            <th class="header-cs">{{ t('DetailedGame.header.cs') }}</th>
+            <th class="header-gold">{{ t('DetailedGame.header.gold') }}</th>
+            <th class="header-items">{{ t('DetailedGame.header.item') }}</th>
           </tr>
         </thead>
         <tbody class="participants">
@@ -66,9 +66,7 @@
                           p.identity.player.tagLine
                         )
                       }}{{
-                        p.identity.player.puuid === '00000000-0000-0000-0000-000000000000'
-                          ? ' (人机)'
-                          : ''
+                        p.identity.player.puuid === EMPTY_PUUID ? ` (${t('DetailedGame.bot')})` : ''
                       }}</span
                     >
                   </div>
@@ -111,10 +109,19 @@
             </td>
             <td style="width: 40px">
               <div class="wards">
-                <div :title="`控制守卫 ${p.stats.visionWardsBoughtInGame}`">
+                <div
+                  :title="t('DetailedGame.controlWard', { count: p.stats.visionWardsBoughtInGame })"
+                >
                   {{ p.stats.visionWardsBoughtInGame }}
                 </div>
-                <div :title="`放置 ${p.stats.wardsPlaced}, 排除 ${p.stats.wardsKilled}`">
+                <div
+                  :title="
+                    t('DetailedGame.wardPlaced', {
+                      count: p.stats.wardsPlaced,
+                      cleared: p.stats.wardsKilled
+                    })
+                  "
+                >
                   {{ p.stats.wardsPlaced }} / {{ p.stats.wardsKilled }}
                 </div>
               </div>
@@ -132,14 +139,14 @@
                   {{ p.csOverall }}
                 </div>
                 <div>
-                  每分钟
                   {{
-                    (
-                      (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) /
-                      ((game.gameDuration || 1) / 60)
-                    ).toFixed(1)
+                    t('DetailedGame.header.csPerMinute', {
+                      count: (
+                        (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) /
+                        ((game.gameDuration || 1) / 60)
+                      ).toFixed(1)
+                    })
                   }}
-                  个
                 </div>
               </div>
             </td>
@@ -195,12 +202,16 @@ import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game, ParticipantIdentity } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
+
+const { t } = useI18n()
 
 const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
   participants: (typeof match.value.teams)[keyof typeof match.value.teams]

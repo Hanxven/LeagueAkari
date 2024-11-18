@@ -1,11 +1,13 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">召唤师 Profile</span></template>
+    <template #header
+      ><span class="card-header-title">{{ t('SummonerProfile.title') }}</span></template
+    >
     <NModal
       style="width: fit-content"
       preset="card"
       size="small"
-      title="选择皮肤"
+      :title="t('SummonerProfile.skinSelectModal.title')"
       v-model:show="isModalShow"
     >
       <div style="display: flex; gap: 4px; margin-bottom: 8px; width: 340px">
@@ -22,7 +24,7 @@
           @click="handleApplyToProfile"
           :disabled="!currentSkinId"
           :loading="isProceeding"
-          >设置为当前皮肤</NButton
+          >{{ t('SummonerProfile.skinSelectModal.button') }}</NButton
         >
       </div>
       <NSelect
@@ -45,8 +47,8 @@
     </NModal>
     <ControlItem
       class="control-item-margin"
-      label="选择召唤师背景"
-      label-description="查找目标英雄或皮肤"
+      :label="t('SummonerProfile.profileBackground.label')"
+      :label-description="t('SummonerProfile.profileBackground.description')"
       :label-width="200"
     >
       <NButton
@@ -54,13 +56,13 @@
         type="primary"
         @click="isModalShow = true"
         :disabled="lcs.connectionState !== 'connected'"
-        >选择</NButton
+        >{{ t('SummonerProfile.profileBackground.button') }}</NButton
       >
     </ControlItem>
     <ControlItem
       class="control-item-margin"
-      label="切换为上赛季旗帜"
-      label-description="切换为上赛季旗帜，可能会导致旗帜消失"
+      :label="t('SummonerProfile.bannerAccent.label')"
+      :label-description="t('SummonerProfile.bannerAccent.description')"
       :label-width="200"
     >
       <NButton
@@ -68,7 +70,7 @@
         @click="handleUpdatePr"
         :loading="isUpdating"
         size="small"
-        >执行</NButton
+        >{{ t('SummonerProfile.bannerAccent.button') }}</NButton
       >
     </ControlItem>
     <ControlItem
@@ -76,10 +78,12 @@
       :label-description="
         lcs.summoner.me &&
         lcs.summoner.me.summonerLevel <= MINIMUM_SUMMONER_LEVEL_FOR_PRESTIGE_CREST
-          ? `卸下头像框 (召唤师等级需大于等于 525, 当前等级为 ${lcs.summoner.me.summonerLevel})`
-          : '卸下头像框'
+          ? t('SummonerProfile.prestigeCrest.descriptionInsufficientLevel', {
+              level: lcs.summoner.me.summonerLevel
+            })
+          : t('SummonerProfile.prestigeCrest.description')
       "
-      label="卸下头像框"
+      :label="t('SummonerProfile.prestigeCrest.label')"
       :label-width="200"
     >
       <NButton
@@ -87,13 +91,13 @@
         @click="handleRemovePrestigeCrest"
         :loading="isRemovingPrestigeCrest"
         size="small"
-        >执行</NButton
+        >{{ t('SummonerProfile.prestigeCrest.button') }}</NButton
       >
     </ControlItem>
     <ControlItem
       class="control-item-margin"
-      label-description="卸下所有勋章"
-      label="卸下所有勋章"
+      :label-description="t('SummonerProfile.token.description')"
+      :label="t('SummonerProfile.token.label')"
       :label-width="200"
     >
       <NButton
@@ -101,7 +105,7 @@
         @click="handleRemoveTokens"
         :loading="isRemovingTokens"
         size="small"
-        >执行</NButton
+        >{{ t('SummonerProfile.token.button') }}</NButton
       >
     </ControlItem>
   </NCard>
@@ -116,8 +120,11 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { ChampSkin } from '@shared/types/league-client/game-data'
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
 import { VNode, computed, h, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -160,14 +167,14 @@ const skinOptions = computed(() => {
     if (v.skinAugments && v.skinAugments.augments) {
       for (const au of v.skinAugments.augments) {
         augOptions1.push({
-          label: `装饰 ${au.contentId}`,
+          label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
           value: au.contentId
         })
       }
     }
 
     if (augOptions1.length) {
-      augOptions1.unshift({ label: '不设置', value: '' })
+      augOptions1.unshift({ label: t('SummonerProfile.skinSelectModal.unset'), value: '' })
     }
 
     arr.push({
@@ -181,29 +188,29 @@ const skinOptions = computed(() => {
 
     // 收集任务皮肤特殊挂件
     if (v.questSkinInfo && v.questSkinInfo.tiers) {
-      v.questSkinInfo.tiers.forEach((t) => {
-        if (!skinSet.has(t.id)) {
+      v.questSkinInfo.tiers.forEach((ti) => {
+        if (!skinSet.has(ti.id)) {
           const augOptions2: any[] = []
-          if (t.skinAugments && t.skinAugments.augments) {
-            for (const au of t.skinAugments.augments) {
+          if (ti.skinAugments && ti.skinAugments.augments) {
+            for (const au of ti.skinAugments.augments) {
               augOptions2.push({
-                label: `装饰 ${au.contentId}`,
+                label: `${t('SummonerProfile.skinSelectModal.augment')} ${au.contentId}`,
                 value: au.contentId
               })
             }
           }
 
           if (augOptions2.length) {
-            augOptions2.unshift({ label: '不设置', value: '' })
+            augOptions2.unshift({ label: t('SummonerProfile.skinSelectModal.unset'), value: '' })
           }
 
           arr.push({
-            label: t.name,
-            value: t.id,
-            url: t.uncenteredSplashPath || t.splashPath,
+            label: ti.name,
+            value: ti.id,
+            url: ti.uncenteredSplashPath || ti.splashPath,
             augments: augOptions2
           })
-          skinSet.add(t.id)
+          skinSet.add(ti.id)
         }
       })
     }
@@ -291,10 +298,10 @@ const handleApplyToProfile = async () => {
     if (currentAugmentId.value !== undefined) {
       await lc.api.summoner.setSummonerBackgroundAugments(currentAugmentId.value)
     }
-    message.success('成功', { duration: 1000 })
+    message.success(t('SummonerProfile.commonSuccess'), { duration: 1000 })
   } catch (error) {
     console.warn(error)
-    message.warning('无法设置', { duration: 1000 })
+    message.warning(t('SummonerProfile.commonFailed'), { duration: 1000 })
   } finally {
     isProceeding.value = false
   }
@@ -311,9 +318,9 @@ const handleUpdatePr = async () => {
   try {
     isUpdating.value = true
     await lc.api.challenges.updatePlayerPreferences({ bannerAccent: BANNER_ACCENT_A })
-    message.success('请求成功')
+    message.success(t('SummonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning('无法执行')
+    message.warning(t('SummonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isUpdating.value = false
@@ -337,9 +344,9 @@ const handleRemovePrestigeCrest = async () => {
       preferredBannerType: current.data.bannerType,
       selectedPrestigeCrest: FIXED_PRESTIGE_CREST
     })
-    message.success('请求成功')
+    message.success(t('SummonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning('无法执行')
+    message.warning(t('SummonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isRemovingPrestigeCrest.value = false
@@ -359,9 +366,9 @@ const handleRemoveTokens = async () => {
       challengeIds: [],
       bannerAccent: (await lc.api.chat.getMe()).data.lol?.bannerIdSelected
     })
-    message.success('请求成功')
+    message.success(t('SummonerProfile.commonSuccess'))
   } catch (error) {
-    message.warning('无法执行')
+    message.warning(t('SummonerProfile.commonFailed'))
     console.warn(error)
   } finally {
     isRemovingTokens.value = false

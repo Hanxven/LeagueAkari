@@ -190,6 +190,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
         this._mw?.setAlwaysOnTop(flag, level, relativeLevel)
       }
     )
+
+    this._ipc.onCall(WindowManagerMain.id, 'main-window/setBackgroundMaterial', (material) => {
+      this._mw?.setBackgroundMaterial(material)
+    })
   }
 
   private _handleAuxWindowIpcCall() {

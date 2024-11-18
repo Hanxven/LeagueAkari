@@ -1,10 +1,14 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">聊天状态</span></template>
+    <template #header
+      ><span class="card-header-title">
+        {{ t('ChatAvailability.title') }}
+      </span></template
+    >
     <ControlItem
       class="control-item-margin"
-      label="状态"
-      label-description="展示或设置当前聊天状态。部分状态仅在特定情况下可用"
+      :label="t('ChatAvailability.availability.label')"
+      :label-description="t('ChatAvailability.availability.description')"
       :label-width="200"
     >
       <NRadioGroup
@@ -15,13 +19,11 @@
         @update:value="(a) => handleChangeAvailability(a)"
       >
         <NFlex :size="4">
-          <NRadio value="chat">聊天</NRadio>
-          <NRadio value="mobile">在线分组</NRadio>
-          <NRadio value="away">离开</NRadio>
-          <NRadio value="offline" title="离线状态无法被邀请">离线</NRadio>
-          <NRadio value="dnd" title="不在游戏进程中时，通常情况下无法手动切换到此状态"
-            >游戏中</NRadio
-          >
+          <NRadio value="chat">{{ t('ChatAvailability.availability.radio.chat') }}</NRadio>
+          <NRadio value="mobile">{{ t('ChatAvailability.availability.radio.mobile') }}</NRadio>
+          <NRadio value="away">{{ t('ChatAvailability.availability.radio.away') }}</NRadio>
+          <NRadio value="offline">{{ t('ChatAvailability.availability.radio.offline') }}</NRadio>
+          <NRadio value="dnd">{{ t('ChatAvailability.availability.radio.dnd') }}</NRadio>
         </NFlex>
       </NRadioGroup>
     </ControlItem>
@@ -36,6 +38,9 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { AvailabilityType } from '@shared/http-api-axios-helper/league-client/chat'
 import { NCard, NFlex, NRadio, NRadioGroup } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -44,7 +49,12 @@ const handleChangeAvailability = async (availability: string) => {
   try {
     await lc.api.chat.changeAvailability(availability as AvailabilityType)
   } catch (error) {
-    laNotification.warn('聊天状态', `尝试修改状态失败`, error)
+    laNotification.warn(
+      t('ChatAvailability.availability.failedNotification.title'),
+      t('ChatAvailability.availability.failedNotification.description', {
+        reason: (error as Error).message
+      })
+    )
   }
 }
 </script>

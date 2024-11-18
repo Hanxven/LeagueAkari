@@ -499,6 +499,23 @@ DamageMetricsBar:
   magic: 魔法伤害
   true: 真实伤害
 
+SpectateStatus:
+  button: 观战
+  bans: 禁用
+
+  lcuSpectate:
+    label: 使用 LCU API 观战 (可选)
+    description: 使用 LCU API 调起同大区观战流程，而非通过进程调用
+    descriptionNotIdle: 使用 LCU API 观战需要退出房间到空闲状态，当前不是空闲状态。请先退出房间
+    button: LCU API 观战
+
+  tokenSpectate:
+    label: 复制观战口令
+    description: 可以在另一个 League Akari 中调起观战进程
+    button: 复制
+    copied: 已复制观战口令
+    copyFailed: 复制观战口令失败
+
 MatchHistoryTabsTitle:
   loading: 加载中...
   search: 搜索玩家
@@ -548,9 +565,635 @@ UpdateModal:
   releasePage: 发布页面
   download: 下载
 
+Client:
+  leagueClient:
+    title: League Client
+
+    disconnect:
+      label: 断开连接
+      description: 断开 League Akari 与 League Client 的连接
+      button: 断开
+
+    quitClient:
+      label: 关闭客户端进程
+      description: 关闭 League Client
+      button: 关闭 Client 进程
+
+      dialog:
+        title: 退出客户端进程
+        content: 是否退出客户端进程？这将直接关闭游戏。
+        positiveText: 退出
+        negativeText: 取消
+
+  gameClient:
+    title: 游戏端
+
+    terminateGameClientOnAltF4:
+      labelAdminRequired: 使用 Alt+F4 结束游戏端 (需要管理员权限)
+      label: 使用 Alt+F4 结束游戏端
+      description: 当游戏端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏端 (游戏本体) 进程。请注意，此操作为强制结束进程，而非正常的游戏退出流程，可能产生意料之外的副作用
+
+  leagueClientUx:
+    title: League Client UX
+
+    fixWindowMethodAOptions:
+      label: 调整窗口大小
+      labelAdminRequired: 调整窗口大小 (需要管理员权限)
+      description: FixLCUWindow - 以 WinAPI 方式调整窗口的大小。在客户端界面大小不正确时，可尝试此操作
+      button: 调整
+      dialog:
+        title: 调整窗口大小
+        content: 是否调整窗口大小？当客户端无法正常显示时，可尝试执行此操作。
+        positiveText: 调整
+        negativeText: 取消
+
+    restartUx:
+      label: 重启客户端界面
+      description: 立即重启渲染进程。该操作不会影响正在进行中的活动，适用于修复客户端界面错误
+      button: 重启 UX 进程
+      dialog:
+        title: 重启 UX 进程
+        content: 是否重启 UX 进程？当客户端无法正常显示时，可尝试执行此操作。
+        positiveText: 重启
+        negativeText: 取消
+
+    killUx:
+      label: 结束 UX 进程
+      description: 立即关闭渲染进程。该操作不会影响正在进行中的活动
+      button: 结束 UX 进程
+      dialog:
+        title: 结束 UX 进程
+        content: 是否结束 UX 进程？你可能需要重新启动此进程。结束 UX 进程并不会导致游戏退出，但可以显著减少性能占用。
+        positiveText: 结束
+        negativeText: 取消
+
+    launchUx:
+      label: 启动 UX 进程
+      description: 如果渲染进程已经关闭，则立即启动渲染进程
+      button: 启动 UX 进程
+      dialog:
+        title: 启动 UX 进程
+        content: 是否启动 UX 进程？
+        positiveText: 启动
+        negativeText: 取消
+
+Toolkit:
+  title: 工具集
+  client: 客户端 / 游戏端
+  inProcess: 过程中
+  lobby: 房间工具
+  misc: 百宝箱
+
+ChampionBench:
+  title: 英雄选择台
+  reroll: 重随
+  charity: 慈善
+  charityTitle: 进行一次重新随机，但立即拿回之前的英雄
+  notInBenchMode: 当前不在随机模式中
+  notInPhase: 未处于英雄选择过程中
+
+  swapFailedNotification:
+    title: 英雄选择台
+    description: 交换失败，目标英雄可能已经不存在
+
+  rerollFailedNotification:
+    title: 英雄选择台
+    description: 重随失败，重新随机失败
+
+GameflowInProgress:
+  title: 进行时
+
+  dodge:
+    label: 英雄选择秒退
+    description: 立即退出当前英雄选择阶段，但不会关闭客户端
+    button: 秒退
+
+    failedNotification:
+      title: 英雄选择秒退
+      description: 尝试秒退失败 {reason}
+
+  playAgain:
+    label: 退出结算页面
+    description: 立即退出结算界面。适用于由于客户端原因无法退出结算页面的情况
+    button: 回到房间
+
+    failedNotification:
+      title: 退出结算页面
+      description: 尝试退出结算页面失败 {reason}
+
+  leaveLobby:
+    label: 退出房间
+    description: 立即退出当前房间
+    button: 退出房间
+
+LobbyTool:
+  title: 房间工具
+
+  addBot:
+    label: 添加人机
+    description: 在当前自定义或训练房间中添加人机
+    button: 添加
+    failedNotification:
+      title: 添加人机
+      description: 添加人机失败 {reason}
+
+  loadBots:
+    firstUseNote: 为了获取自定义人机列表，你需要进入一次自定义房间
+    failedNotification:
+      title: 加载人机列表
+      description: 加载人机列表失败 {reason}
+
+  createIdLobby:
+    label: 创建队列房间
+    description: 创建一个指定队列 ID 的房间，受制于服务器是否开启目标队列
+    button: 创建
+    selectPlaceholder: 选择或指定 ID
+
+    failedNotification:
+      title: 创建队列房间
+      description: 创建队列房间失败 {reason}
+
+  create5x5PracticeLobby:
+    label: 创建 5v5 训练房间
+    button: 创建
+
+    failedNotification:
+      title: 创建 5v5 训练房间
+      description: 创建 5v5 训练房间失败 {reason}
+
+  loadEligibleQueuesFailedNotification:
+    title: 加载队列失败
+    description: 尝试加载可用队列列表失败 {reason}
+
+  queueOptions:
+    available: 可用队列
+    unavailable: 当前已禁用队列
+
+  difficultyOptions:
+    RSINTRO: 新手
+    RSBEGINNER: 中等
+    RSINTERMEDIATE: 一般
+
+StrawberryTool:
+  title: 无尽狂潮
+  unavailable: 当前不在无尽狂潮模式中
+
+  champion:
+    label: 设置为当前英雄
+    description: 你可以尝试尝试其他英雄
+    button: 设置
+    failedMessage: 设置当前英雄失败 {reason}
+
+  championOptions:
+    modeSpecific: 模式英雄
+    other: 其他英雄
+
+  map:
+    label: 选择地图"
+    description: 目前可用的地图
+    button: 设置
+    failedMessage: 设置地图失败 {reason}
+
+  difficulty:
+    label: 设置难度
+    description: 目前预设的难度包括 [故事]、[困难] 和 [极难], 目前无法设置未解锁的难度等级"
+    button: 设置
+    failedMessage: 设置难度失败 {reason}
+
+  requestSent: 请求已发送
+
+ChatAvailability:
+  title: 聊天状态
+
+  availability:
+    label: 聊天状态
+    description: 展示或设置当前聊天状态。部分状态仅在特定情况下可用
+    radio:
+      chat: 聊天
+      mobile: 在线分组
+      away: 离开
+      dnd: 游戏中
+      offline: 离线
+    failedNotification:
+      title: 设置聊天状态
+      description: 设置聊天状态失败 {reason}
+
+ChatStatusMessage:
+  title: 聊天签名
+
+  message:
+    label: 设置聊天签名
+    button: 设置
+    success: 设置聊天签名成功
+
+    failedNotification:
+      title: 设置聊天签名
+      description: 设置聊天签名失败 {reason}
+
+  text:
+    label: 文本行
+    description: 聊天状态文本。设置空值则为删除
+    placeholder: 输入签名
+
+SummonerProfile:
+  title: 召唤师
+
+  commonSuccess: 操作成功
+  commonFailed: 无法设置
+
+  skinSelectModal:
+    title: 皮肤选择
+    button: 设置为当前皮肤
+    augment: 装饰
+    unset: 不设置
+
+    failedNotification:
+      title: 生涯背景
+      description: 无法应用当前皮肤 {reason}
+
+  profileBackground:
+    label: 选择召唤师背景
+    description: 查找目标英雄或皮肤
+    button: 选择
+
+  bannerAccent:
+    label: 切换为上赛季旗帜
+    description: 切换为上赛季旗帜，可能会导致旗帜消失
+    button: 执行
+
+    failedNotification:
+      title: 切换为上赛季旗帜
+      description: 切换旗帜失败 {reason}
+
+  prestigeCrest:
+    label: 卸下头像框
+    description: 卸下头像框
+    descriptionInsufficientLevel: 卸下头像框 (召唤师等级需大于等于 525, 当前等级为 {level})
+    button: 执行
+
+    failedNotification:
+      title: 卸下头像框
+      description: 卸下头像框失败 {reason}
+
+  token:
+    label: 卸下所有勋章
+    description: 卸下所有勋章
+    button: 执行
+
+    failedNotification:
+      title: 卸下所有勋章
+      description: 卸下所有勋章失败 {reason}
+
+GameView:
+  title: 查看游戏
+
+  game:
+    label: 游戏 ID
+    description: 按照游戏的 ID 拉取并查看对局
+    button: 查看
+
+FakeRanked:
+  title: 聊天卡片伪造段位
+  commonSuccess: 操作成功
+
+  set:
+    label: 立即使生效
+    description: 立即修改聊天卡片状态，在下一次客户端启动前有效
+    button: 修改
+
+    failedNotification:
+      title: 伪造段位
+      description: 伪造段位失败 {reason}
+
+  queue: 队列
+  tier: 段位
+  division: 分段
+
+Spectate:
+  title: 观战
+  leaveButton: 离开房间
+  needToLeaveLobby: 你需要离开当前房间才能观战
+
+  spectate:
+    label: 召唤师观战
+    description: 通过 PUUID 或召唤师名称观战当前大区玩家，前提是玩家正在可观战的对局中
+    button: 调起观战
+    placeholder: 召唤师名称 / PUUID
+    errorNoPlayer: 玩家不存在
+
+    notFoundNotification:
+      title: 观战
+      description: 目标玩家 {name} 未找到
+
+    failedNotification:
+      title: 观战
+      description: 尝试观战失败，该玩家可能不在对局中或目标模式不可观战 {reason}
+
+    successNotification:
+      title: 观战
+      description: 已拉起观战
+
+  token:
+    label: 口令观战
+    description: 通过符合格式的特殊口令，调起游戏端观战进程
+    button: 调起观战
+    placeholder: 令牌
+
+    successNotification:
+      title: 观战
+      description: 已拉起观战
+      useRememberedInstallLocation: 已拉起观战，使用上一次记录的客户端位置
+
+    failedNotification:
+      title: 观战
+      description: 观战失败 {reason}
+
+  failedToLoadFriends: 无法加载好友列表
+
+MatchHistoryTabs:
+  disconnected: 未连接到客户端
+  noActiveTab: 当前没有活跃的战绩页面
+  copiedToClipboard: 已复制到剪贴板
+
+MatchHistoryTab:
+  prevPage: 上一页
+  nextPage: 下一页
+  refreshPage: 刷新页面
+  rankedMore: 更多
+  tagPlayer: 标记玩家
+
+  private:
+    title: 生涯隐藏
+    content: 该玩家设置了生涯不可见
+
+  tagged:
+    title: 被标记
+    content: 该玩家已被标记
+    taggedByOther: 来自其他账号
+    deletePopconfirm: 确认删除该标记？
+
+  matchHistory:
+    empty: 暂无数据
+
+  stats:
+    title: 总览
+    akariScore: Akari Score
+    na: N/A
+    avgKda: 平均 KDA
+    avgKp: 参团率
+    avgDmg: 伤害比
+    avgDmgTaken: 承伤比
+    avgGold: 经济比
+    avgCs: 补刀比
+    winLose: 胜负
+    win: 胜
+    lose: 负
+    wr: 胜率
+    champions: 英雄使用
+    times: 场
+
+  recentPlayers:
+    teammatesTitle: 最近队友
+    opponentsTitle: 最近对手
+    noRecentPlayers: 无最近玩家
+    win: 胜
+    lose: 负
+
+MatchHistoryCard:
+  kprTitle: 在队伍中参与了击杀的程度 {rate}%
+  ddrTitle: 在队伍中对英雄造成的伤害占比 {rate}%
+  dtrTitle: 在队伍中的承受所有伤害占比  {rate}%
+  grTitle: 队伍经济比 {rate}%
+  kpr: 击杀参与率 {rate}%
+  ddr: 队伍伤害 {rate}%
+  dtr: 队伍承伤比 {rate}%
+  gr: 队伍经济 {rate}%
+  misc: 杂项
+  loading: 加载中...
+  error: 无法加载
+
+StandaloneMatchHistoryCardModal:
+  notFound: 未找到对局
+  error: 加载对局失败
+  reload: 重新拉取
+  loading: 加载中...
+
+MiscellaneousPanel:
+  gameId: 对局 ID {gameId}
+  gameDate: 对局日期 {date}
+  server: '区服：{server}'
+  bans: 禁用：
+
+  stats:
+    championId: 英雄
+    spells: 召唤师技能
+    teams: 阵营
+    assists: 助攻
+    causedEarlySurrender: 是重开发起者
+    champLevel: 英雄等级
+    combatPlayerScore: 战斗玩家得分
+    damageDealtToObjectives: 对战略点造成的伤害
+    damageDealtToTurrets: 对防御塔造成的伤害
+    damageSelfMitigated: 自我缓和的伤害
+    deaths: 死亡
+    doubleKills: 双杀
+    earlySurrenderAccomplice: 重开支持者
+    firstBloodAssist: 一血助攻
+    firstBloodKill: 一血
+    firstInhibitorAssist: 首个水晶助攻
+    firstInhibitorKill: 首个水晶摧毁
+    firstTowerAssist: 首座防御塔助攻
+    firstTowerKill: 首座防御塔摧毁
+    gameEndedInEarlySurrender: 重开局
+    gameEndedInSurrender: 游戏以一方投降结束
+    goldEarned: 获得金币
+    goldSpent: 花费金币
+    inhibitorKills: 水晶摧毁
+    item0: 装备0
+    item1: 装备1
+    item2: 装备2
+    item3: 装备3
+    item4: 装备4
+    item5: 装备5
+    item6: 装备6
+    killingSprees: Killing Sprees
+    kills: 击杀
+    largestCriticalStrike: 最大暴击伤害
+    largestKillingSpree: 最大连杀
+    largestMultiKill: 最大多杀
+    longestTimeSpentLiving: 最长存活时间
+    magicDamageDealt: 造成的魔法伤害
+    magicDamageDealtToChampions: 对英雄造成的魔法伤害
+    magicalDamageTaken: 承受的魔法伤害
+    neutralMinionsKilled: 击杀中立单位
+    neutralMinionsKilledEnemyJungle: 击杀敌方野区中立单位
+    neutralMinionsKilledTeamJungle: 击杀己方野区中立单位
+    objectivePlayerScore: 目标玩家得分
+    participantId: 参与者 ID
+    pentaKills: 五杀
+    perk0: 天赋0
+    perk0Var1: 天赋0变量1
+    perk0Var2: 天赋0变量2
+    perk0Var3: 天赋0变量3
+    perk1: 天赋1
+    perk1Var1: 天赋1变量1
+    perk1Var2: 天赋1变量2
+    perk1Var3: 天赋1变量3
+    perk2: 天赋2
+    perk2Var1: 天赋2变量1
+    perk2Var2: 天赋2变量2
+    perk2Var3: 天赋2变量3
+    perk3: 天赋3
+    perk3Var1: 天赋3变量1
+    perk3Var2: 天赋3变量2
+    perk3Var3: 天赋3变量3
+    perk4: 天赋4
+    perk4Var1: 天赋4变量1
+    perk4Var2: 天赋4变量2
+    perk4Var3: 天赋4变量3
+    perk5: 天赋5
+    perk5Var1: 天赋5变量1
+    perk5Var2: 天赋5变量2
+    perk5Var3: 天赋5变量3
+    perkPrimaryStyle: 主要天赋风格
+    perkSubStyle: 次要天赋风格
+    physicalDamageDealt: 造成的物理伤害
+    physicalDamageDealtToChampions: 对英雄造成的物理伤害
+    physicalDamageTaken: 承受的物理伤害
+    playerAugment1: 强化1
+    playerAugment2: 强化2
+    playerAugment3: 强化3
+    playerAugment4: 强化4
+    playerAugment5: 强化5
+    playerAugment6: 强化6
+    playerScore0: 玩家得分0
+    playerScore1: 玩家得分1
+    playerScore2: 玩家得分2
+    playerScore3: 玩家得分3
+    playerScore4: 玩家得分4
+    playerScore5: 玩家得分5
+    playerScore6: 玩家得分6
+    playerScore7: 玩家得分7
+    playerScore8: 玩家得分8
+    playerScore9: 玩家得分9
+    playerSubteamId: 子队阵营
+    quadraKills: 四杀
+    sightWardsBoughtInGame: 视野守卫
+    subteamPlacement: 子队位次
+    teamEarlySurrendered: 团队重开
+    timeCCingOthers: 控制时间
+    totalDamageDealt: 造成的总伤害
+    totalDamageDealtToChampions: 对英雄造成的总伤害
+    totalDamageTaken: 承受的总伤害
+    totalHeal: 总治疗量
+    totalMinionsKilled: 击杀的小兵总数
+    totalPlayerScore: 总玩家得分
+    totalScoreRank: 总分排名
+    totalTimeCrowdControlDealt: 总控制时间
+    totalUnitsHealed: 治疗单位总数
+    tripleKills: 三杀
+    trueDamageDealt: 造成的真实伤害
+    trueDamageDealtToChampions: 对英雄造成的真实伤害
+    trueDamageTaken: 承受的真实伤害
+    turretKills: 防御塔摧毁
+    unrealKills: 虚幻击杀
+    visionScore: 视野得分
+    visionWardsBoughtInGame: 控制守卫
+    wardsKilled: 破坏的守卫
+    wardsPlaced: 放置的守卫
+    win: 胜利
+    currentPlatformId: 当前区服
+    platformId: 区服
+
+DetailedGame:
+  win: 胜利
+  lose: 失败
+  controlWard: 控制守卫
+  wardPlaced: 放置 {count} 个，排除 {cleared} 个
+  csPerMinute: 每分钟 {count} 个
+
+  header:
+    kda: KDA
+    dmg: 伤害 / 承受
+    ward: 眼
+    cs: 补兵数
+    gold: 金币
+    item: 物品
+    augment: 强化
+
+  bot: 人机
+
+CopyableText:
+  copy: 复制
+  copied: 已复制到剪贴板
+
+ItemDisplay:
+  combinePrice: 合成 {gold} G
+
+SummonerSpellDisplay:
+  cooldown: 冷却时间：{time} 秒
+  levelRequirement: 等级需求：{level}
+
+PlayerInfoCard:
+  empty: 无内容
+  top4Rate: 前四率
+  1stRate: 第一率
+  1st: 第一 {rate}%
+
+  cherryWinRatePopover: 在近期 {count} 场对局中，该玩家的胜率为 {winRate}%。其中，斗魂竞技场的 {cherryCount} 场对局中，该玩家的首位率是 {top1Rate}%
+  winRatePopover: 在近期 {count} 场对局中，该玩家的胜率为 {winRate}%
+  kdaPopover: 在近期 {count} 场对局中，该玩家的平均 KDA 是 {kda}
+  premadePopover: 这些玩家在数场对局中都位于同一个阵营，推测他们可能是一支固定的小队。为了区分，将其命名为小队 {team}
+  highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {count} 场的对局中，赢了 {winCount} 场
+  metPopover:
+    title: 曾在 {date} 场对局中遇到过该玩家，共遇到过 {count} 次
+    gameId: 对局 ID
+    date: 对局日期
+  privatePopover: 该玩家设置了生涯为隐藏。这意味着他人无法查看该玩家的个人主页，包括战绩、成就点数等。另外，也不能观战该玩家
+  winningStreakPopover: 截止到现在，该玩家 {count} 连胜，很棒
+  losingStreakPopover: 截止到现在，该玩家 {count} 连败
+  akariLoved:
+    good: 优异
+    great: 极好
+    goodPopover: 该玩家在近期对局中表现优异
+    greatPopover: 该玩家展现了极好的表现
+  champion:
+    winRate: 近期 {count} 场，胜率为 {winRate}%
+    level: '{level} 级'
+    masteryPoints: '{points} 成就点数'
+  matchHistory:
+    winResult:
+      na: -
+      win: 胜
+      lose: 负
+      remake: 重
+      abort: 终
+
+  self: 自己
+  tagged: 已标记
+  premade: 预组队 {team}
+  highWinRate: 极高胜率
+  met: 遇到过
+  private: 生涯隐藏
+  winningStreak: '{count} 连胜'
+  losingStreak: '{count} 连败'
+
+OngoingGame:
+  disconnected: 未连接到客户端
+  waitingForSpectate: 等待观战延迟
+  noOngoingGame: 没有正在进行中的游戏
+  disabled: 对局分析已禁用
+  avgTeamWinRate: 队伍平均胜率
+  avgTeamKda: 队伍平均 KDA
+
 common:
   appName: League Akari
   default: 默认
+
+  yes: 是
+  no: 否
+  na: N/A
+
   lanes:
     top: 上单
     jungle: 打野
@@ -567,6 +1210,25 @@ common:
     SUPPORT: 辅助
     UTILITY: 辅助
 
+  positionAssignmentReason:
+    FILL_SECONDARY: 副选补位
+    FILL_PRIMARY: 主选补位
+    PRIMARY: 主选
+    SECONDARY: 副选
+    AUTOFILL: 系统补位
+
+  teams:
+    all: 所有
+    unknown: 未知
+    100: 蓝队
+    200: 红队
+    our: 我方
+    their: 敌方
+    our-1: 我方 (蓝队)
+    our-2: 我方 (红队)
+    their-1: 敌方 (蓝队)
+    their-2: 敌方 (红队)
+
   queueTypes:
     RANKED_SOLO_5x5: 单双排位
     RANKED_FLEX_SR: 灵活排位
@@ -574,10 +1236,17 @@ common:
     ARAM_UNRANKED_5x5: 极地大乱斗
     CHERRY: 斗魂竞技场
     URF: 无限火力 / 无限乱斗
+    RANKED_FLEX_TT: 灵活排位 3v3
     NORMAL_TFT: 云顶之弈
     RANKED_TFT: 云顶之弈 排位
     RANKED_TFT_TURBO: 云顶之弈 狂暴模式
     RANKED_TFT_DOUBLE_UP: 云顶之弈 双人作战
+
+  gameModes:
+    CLASSIC: 经典
+    ARAM: 极地大乱斗
+    URF: 无限火力
+    TFT: 云顶之弈
 
   sgpMatchHistoryTags:
     all: 所有模式
@@ -592,6 +1261,7 @@ common:
     q_1900: 无限火力
 
   tiers:
+    UNRANKED: 未定级
     IRON: 坚韧黑铁
     BRONZE: 英勇黄铜
     SILVER: 不屈白银
@@ -604,6 +1274,7 @@ common:
     CHALLENGER: 最强王者
 
   shortTiers:
+    UNRANKED: 无
     IRON: 黑铁
     BRONZE: 黄铜
     SILVER: 白银

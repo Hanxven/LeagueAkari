@@ -1,20 +1,26 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">聊天签名</span></template>
-    <ControlItem label="设置聊天签名" class="control-item-margin" :label-width="200">
+    <template #header
+      ><span class="card-header-title">{{ t('ChatStatusMessage.title') }}</span></template
+    >
+    <ControlItem
+      :label="t('ChatStatusMessage.message.label')"
+      class="control-item-margin"
+      :label-width="200"
+    >
       <NButton
         :loading="isSetting"
         @click="handleSetChatStatusMessage"
         type="primary"
         size="small"
         :disabled="lcs.connectionState !== 'connected'"
-        >设置</NButton
+        >{{ t('ChatStatusMessage.message.button') }}</NButton
       >
     </ControlItem>
     <ControlItem
-      label="文本行"
+      :label="t('ChatStatusMessage.text.label')"
       class="control-item-margin"
-      label-description="聊天状态文本。设置空值则为删除"
+      :label-description="t('ChatStatusMessage.text.description')"
       :label-width="200"
     >
       <NInput
@@ -22,7 +28,7 @@
         type="textarea"
         v-model:value="text"
         :autosize="{ maxRows: 3, minRows: 1 }"
-        placeholder="提供文本"
+        :placeholder="t('ChatStatusMessage.text.placeholder')"
         size="small"
       ></NInput>
     </ControlItem>
@@ -36,6 +42,9 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NButton, NCard, NInput, useMessage } from 'naive-ui'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -52,10 +61,14 @@ const handleSetChatStatusMessage = async () => {
   try {
     isSetting.value = true
     await lc.api.chat.setChatStatusMessage(text.value)
-    message.success('已设置')
+    message.success(t('ChatStatusMessage.message.success'))
   } catch (error) {
     console.warn(error)
-    message.warning('尝试设置签名时出现问题')
+    message.warning(
+      t('ChatStatusMessage.message.failedNotification.description', {
+        reason: (error as Error).message
+      })
+    )
   } finally {
     isSetting.value = false
   }

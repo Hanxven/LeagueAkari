@@ -2,18 +2,19 @@
   <NCard size="small">
     <template #header
       ><span class="card-header-title"
-        >观战<span v-if="lcs.gameflow.phase === 'Lobby'" style="color: yellow; font-size: 14px">
-          (需要先退出当前房间)
-          <NButton size="tiny" secondary @click="() => lc.api.lobby.deleteLobby()"
-            >退出房间</NButton
-          ></span
+        >{{ t('Spectate.title')
+        }}<span v-if="lcs.gameflow.phase === 'Lobby'" style="color: yellow; font-size: 14px">
+          {{ t('Spectate.needToLeaveLobby') }}
+          <NButton size="tiny" secondary @click="() => lc.api.lobby.deleteLobby()">{{
+            t('Spectate.leaveButton')
+          }}</NButton></span
         ></span
       ></template
     >
     <ControlItem
       class="control-item-margin"
-      label="召唤师观战"
-      label-description="通过 PUUID 或召唤师名称观战当前大区玩家，前提是玩家正在可观战的对局中"
+      :label="t('Spectate.spectate.label')"
+      :label-description="t('Spectate.spectate.description')"
       :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px">
@@ -26,7 +27,7 @@
           @update:show="handleLoadFriends"
         >
           <NInput
-            placeholder="召唤师名称 / PUUID"
+            :placeholder="t('Spectate.spectate.placeholder')"
             style="width: 200px"
             size="small"
             :disabled="lcs.gameflow.phase !== 'None'"
@@ -39,19 +40,19 @@
           :disabled="spectator.summonerIdentity.length === 0 || lcs.gameflow.phase !== 'None'"
           @click="handleSpectate"
           size="small"
-          >调起观战</NButton
+          >{{ t('Spectate.spectate.button') }}</NButton
         >
       </div>
     </ControlItem>
     <ControlItem
       class="control-item-margin"
-      label="口令观战"
-      label-description="通过符合格式的特殊口令，调起游戏端观战进程"
+      :label="t('Spectate.token.label')"
+      :label-description="t('Spectate.token.description')"
       :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px">
         <NInput
-          placeholder="符合格式的观战口令"
+          :placeholder="t('Spectate.token.placeholder')"
           style="width: 200px; font-family: monospace"
           size="small"
           type="textarea"
@@ -62,7 +63,7 @@
           :disabled="!checkSpectateToken(spectator.token)"
           @click="handleSpectateByToken"
           size="small"
-          >调起观战</NButton
+          >{{ t('Spectate.token.button') }}</NButton
         >
       </div>
     </ControlItem>
@@ -84,6 +85,9 @@ import { useIntervalFn } from '@vueuse/core'
 import { AxiosError } from 'axios'
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
 import { computed, onActivated, onDeactivated, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -116,7 +120,7 @@ const handleSpectate = async () => {
         if (s) {
           targetPuuid = s.puuid
         } else {
-          throw new Error('玩家不存在')
+          throw new Error(t('Spectate.errorNoPlayer'))
         }
       } else {
         const {
@@ -125,7 +129,13 @@ const handleSpectate = async () => {
         targetPuuid = puuid
       }
     } catch (error) {
-      laNotification.warn('观战', `目标玩家 ${spectator.summonerIdentity} 不存在`, error)
+      laNotification.warn(
+        t('Spectate.spectate.notFoundNotification.title'),
+        t('Spectate.spectate.notFoundNotification.description', {
+          name: spectator.summonerIdentity
+        }),
+        error
+      )
 
       spectator.isProcessing = false
       return
@@ -135,12 +145,27 @@ const handleSpectate = async () => {
   try {
     await lc.api.spectator.launchSpectator(targetPuuid)
 
-    laNotification.success('观战', '已拉起观战')
+    laNotification.success(
+      t('Spectate.spectate.successNotification.title'),
+      t('Spectate.spectate.successNotification.description')
+    )
   } catch (error) {
     if ((error as AxiosError).response?.status === 404) {
-      laNotification.warn('观战', '尝试观战失败，玩家不存在', error)
+      laNotification.warn(
+        t('Spectate.spectate.failedNotification.title'),
+        t('Spectate.spectate.failedNotification.description', {
+          reason: spectator.summonerIdentity
+        }),
+        error
+      )
     } else {
-      laNotification.warn('观战', '尝试观战失败，该玩家可能不在对局中或目标模式不可观战', error)
+      laNotification.warn(
+        t('Spectate.spectate.failedNotification.title'),
+        t('Spectate.spectate.failedNotification.description', {
+          reason: (error as Error).message
+        }),
+        error
+      )
     }
   }
 
@@ -158,9 +183,18 @@ const handleSpectatePuuid = async (puuid: string) => {
   try {
     await lc.api.spectator.launchSpectator(puuid)
 
-    laNotification.success('观战', '已拉起观战')
+    laNotification.success(
+      t('Spectate.spectate.successNotification.title'),
+      t('Spectate.spectate.successNotification.description')
+    )
   } catch (error) {
-    laNotification.warn('观战', '尝试观战失败，该玩家可能不在对局中或目标模式不可观战', error)
+    laNotification.warn(
+      t('Spectate.spectate.failedNotification.title'),
+      t('Spectate.spectate.failedNotification.description', {
+        reason: (error as Error).message
+      }),
+      error
+    )
   } finally {
     spectator.isProcessing = false
   }
@@ -180,7 +214,7 @@ const handleLoadFriends = async () => {
   try {
     friends.value = (await lc.api.chat.getFriends()).data
   } catch (error) {
-    console.error('好友列表加载失败', error)
+    console.error(t('Spectate.failedToLoadFriends'), error)
   }
 }
 
@@ -217,12 +251,24 @@ const handleSpectateByToken = async () => {
     })
 
     if (lcs.connectionState === 'connected') {
-      laNotification.success('观战', '已拉起观战')
+      laNotification.success(
+        t('Spectate.token.successNotification.title'),
+        t('Spectate.token.successNotification.description')
+      )
     } else {
-      laNotification.success('观战', '已拉起观战，使用上一次记录的客户端位置')
+      laNotification.success(
+        t('Spectate.token.successNotification.title'),
+        t('Spectate.token.successNotification.useRememberedInstallLocation')
+      )
     }
   } catch (error) {
-    laNotification.warn('观战', (error as any).message, error)
+    laNotification.warn(
+      t('Spectate.token.failedNotification.title'),
+      t('Spectate.token.failedNotification.description', {
+        reason: (error as Error).message
+      }),
+      error
+    )
   }
 }
 

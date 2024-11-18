@@ -37,7 +37,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
       AppCommonMain.id,
       {
         isInKyokoMode: { default: this.settings.isInKyokoMode },
-        showFreeSoftwareDeclaration: { default: this.settings.showFreeSoftwareDeclaration }
+        showFreeSoftwareDeclaration: { default: this.settings.showFreeSoftwareDeclaration },
+        locale: { default: this.settings.locale }
       },
       this.settings
     )

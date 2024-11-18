@@ -4,7 +4,9 @@
       <template v-if="slots.default"><slot></slot></template>
       <template v-else>{{ text }}</template>
     </span>
-    <NIcon title="复制" class="copyable-icon" @click.stop="handleCopy"><CopyIcon /></NIcon>
+    <NIcon :title="t('CopyableText.copy')" class="copyable-icon" @click.stop="handleCopy"
+      ><CopyIcon
+    /></NIcon>
   </div>
 </template>
 
@@ -12,6 +14,7 @@
 import { Copy as CopyIcon } from '@vicons/carbon'
 import { NIcon, useMessage } from 'naive-ui'
 import { useSlots } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const {
   showMessage = true,
@@ -24,6 +27,8 @@ const {
   prefix?: string
   suffix?: string
 }>()
+
+const { t } = useI18n()
 
 const emits = defineEmits<{
   (e: 'copy', text: string): void
@@ -52,7 +57,7 @@ const handleCopy = async () => {
     await navigator.clipboard.writeText(prefix + text + suffix)
 
     if (showMessage) {
-      message.success('已复制', {
+      message.success(t('CopyableText.copied'), {
         duration: 1000
       })
     }

@@ -1,14 +1,16 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">无尽狂潮</span></template>
+    <template #header
+      ><span class="card-header-title">{{ t('StrawberryTool.title') }}</span></template
+    >
     <div v-if="lcs.lobby.lobby?.gameConfig.gameMode !== 'STRAWBERRY'" style="font-size: 13px">
-      当前未处于无尽狂潮房间中
+      {{ t('StrawberryTool.unavailable') }}
     </div>
     <template v-else>
       <ControlItem
         class="control-item-margin"
-        label="设置为当前英雄"
-        label-description="你可以尝试尝试其他英雄"
+        :label="t('StrawberryTool.champion.label')"
+        :label-description="t('StrawberryTool.champion.description')"
         :label-width="200"
       >
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
@@ -26,14 +28,14 @@
             size="small"
             :loading="isSettingChampion"
             :disabled="!currentChampionId"
-            >设置英雄</NButton
+            >{{ t('StrawberryTool.champion.button') }}</NButton
           >
         </div>
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="选择地图"
-        label-description="目前可用的地图"
+        :label="t('StrawberryTool.map.label')"
+        :label-description="t('StrawberryTool.map.description')"
         :label-width="200"
       >
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
@@ -51,14 +53,14 @@
             size="small"
             :loading="isSettingMap"
             :disabled="!currentMapUnionId"
-            >设置地图</NButton
+            >{{ t('StrawberryTool.map.button') }}</NButton
           >
         </div>
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        label="设置难度"
-        label-description="目前预设的难度包括 [故事]、[困难] 和 [极难], 目前无法设置未解锁的难度等级"
+        :label="t('StrawberryTool.difficulty.label')"
+        :label-description="t('StrawberryTool.difficulty.description')"
         :label-width="200"
       >
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
@@ -75,7 +77,8 @@
             size="small"
             :loading="isSettingDifficulty"
             :disabled="!currentDifficulty"
-            >设置难度</NButton
+          >
+            {{ t('StrawberryTool.difficulty.button') }}</NButton
           >
         </div>
       </ControlItem>
@@ -100,6 +103,9 @@ import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NSelect, SelectRenderLabel, useMessage } from 'naive-ui'
 import { h, shallowRef, watchEffect } from 'vue'
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -178,7 +184,7 @@ const strawberryChampions = computed(() => {
   return [
     {
       type: 'group',
-      label: '模式英雄',
+      label: t('StrawberryTool.champion.modeSpecific'),
       children: strawberryChampions.map((c) => ({
         label: c.name,
         value: c.id,
@@ -187,7 +193,7 @@ const strawberryChampions = computed(() => {
     },
     {
       type: 'group',
-      label: '其他英雄',
+      label: t('StrawberryTool.champion.other'),
       children: otherChampions.map((c) => ({
         label: c.name,
         value: c.id,
@@ -240,9 +246,9 @@ const setChampion = async () => {
       mapId || 1,
       difficulty || 1
     )
-    message.success('请求已发送')
+    message.success(t('StrawberryTool.requestSent'))
   } catch (error) {
-    message.warning(`尝试设置英雄时发生错误: ${(error as any).message}`)
+    message.warning(t('StrawberryTool.champion.failedMessage', { reason: (error as any).message }))
   } finally {
     isSettingChampion.value = false
   }
@@ -262,9 +268,9 @@ const setMap = async () => {
   try {
     const [contentId, itemIdRaw] = currentMapUnionId.value.split(',')
     await lc.api.lobby.setStrawberryMapId({ contentId, itemId: Number(itemIdRaw) })
-    message.success('请求已发送')
+    message.success(t('StrawberryTool.requestSent'))
   } catch (error) {
-    message.warning(`尝试设置地图时发生错误: ${(error as any).message}`)
+    message.warning(t('StrawberryTool.map.failedMessage', { reason: (error as any).message }))
   } finally {
     isSettingMap.value = false
   }
@@ -306,9 +312,11 @@ const setDifficulty = async () => {
   try {
     const loadoutsContentId = accountScopeLoadouts.value[0].id
     await lc.api.loadouts.setStrawberryDifficulty(loadoutsContentId, currentDifficulty.value)
-    message.success('请求已发送')
+    message.success(t('StrawberryTool.requestSent'))
   } catch (error) {
-    message.warning(`尝试设置难度时发生错误: ${(error as any).message}`)
+    message.warning(
+      t('StrawberryTool.difficulty.failedMessage', { reason: (error as any).message })
+    )
   } finally {
     isSettingDifficulty.value = false
   }

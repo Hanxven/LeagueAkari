@@ -34,7 +34,7 @@
               round
               class="header-button"
               size="small"
-              title="切换到上一页"
+              :title="t('MatchHistoryTab.prevPage')"
               @click="handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 2) - 1)"
               :disabled="
                 !tab.matchHistoryPage || tab.matchHistoryPage.page <= 1 || tab.isLoadingMatchHistory
@@ -46,7 +46,7 @@
               </template>
             </NButton>
             <NButton
-              title="切换到下一页"
+              :title="t('MatchHistoryTab.nextPage')"
               size="small"
               round
               class="header-button"
@@ -61,7 +61,7 @@
             <NButton
               tertiary
               class="header-button"
-              title="刷新当前页"
+              :title="t('MatchHistoryTab.refreshPage')"
               size="small"
               round
               :loading="isSomethingLoading"
@@ -129,7 +129,7 @@
             <div class="ranked-more">
               <NButton
                 :focusable="false"
-                title="更多"
+                :title="t('MatchHistoryTab.rankedMore')"
                 size="small"
                 secondary
                 @click="isShowingRankedModal = true"
@@ -144,7 +144,7 @@
             <NButton
               secondary
               class="square-button"
-              title="标记"
+              :title="t('MatchHistoryTab.tagPlayer')"
               @click="handleTagPlayer"
               v-if="!isSelfTab && isOnSelfSgpServer"
             >
@@ -155,7 +155,7 @@
             <NButton
               secondary
               class="square-button"
-              title="刷新"
+              :title="t('MatchHistoryTab.refreshPage')"
               :loading="isSomethingLoading"
               @click="handleRefresh"
             >
@@ -179,21 +179,21 @@
           />
           <NButton
             size="small"
-            title="切换到上一页"
+            :title="t('MatchHistoryTab.prevPage')"
             @click="handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 2) - 1)"
             :disabled="
               !tab.matchHistoryPage || tab.matchHistoryPage.page <= 1 || tab.isLoadingMatchHistory
             "
             secondary
-            >上一页</NButton
+            >{{ t('MatchHistoryTab.prevPage') }}</NButton
           >
           <NButton
-            title="切换到下一页"
+            :title="t('MatchHistoryTab.nextPage')"
             size="small"
             @click="() => handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 1) + 1)"
             :disabled="tab.isLoadingMatchHistory"
             secondary
-            >下一页</NButton
+            >{{ t('MatchHistoryTab.nextPage') }}</NButton
           >
           <NSelect
             :value="tab.matchHistoryPage?.pageSize"
@@ -232,7 +232,7 @@
                   />
                   <NButton
                     size="small"
-                    title="切换到上一页"
+                    :title="t('MatchHistoryTab.prevPage')"
                     @click="handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 2) - 1)"
                     :disabled="
                       !tab.matchHistoryPage ||
@@ -240,15 +240,15 @@
                       tab.isLoadingMatchHistory
                     "
                     secondary
-                    >上一页</NButton
+                    >{{ t('MatchHistoryTab.prevPage') }}</NButton
                   >
                   <NButton
-                    title="切换到下一页"
+                    :title="t('MatchHistoryTab.nextrevPage')"
                     size="small"
                     @click="handleLoadMatchHistoryPage((tab.matchHistoryPage?.page || 1) + 1)"
                     :disabled="!tab.matchHistoryPage || tab.isLoadingMatchHistory"
                     secondary
-                    >下一页</NButton
+                    >{{ t('MatchHistoryTab.nextPage') }}</NButton
                   >
                   <NSelect
                     :value="tab.matchHistoryPage?.pageSize"
@@ -277,8 +277,10 @@
               class="left-content-item privacy-private"
               v-if="!isSelfTab && tab.summoner && tab.summoner.privacy === 'PRIVATE'"
             >
-              <div class="left-content-item-title">生涯隐藏</div>
-              <div class="left-content-item-content">该玩家设置了生涯不可见</div>
+              <div class="left-content-item-title">{{ t('MatchHistoryTab.private.title') }}</div>
+              <div class="left-content-item-content">
+                {{ t('MatchHistoryTab.private.content') }}
+              </div>
             </div>
             <div
               v-for="tagInfo of tab.tags"
@@ -286,13 +288,13 @@
               class="left-content-item tagged-player"
             >
               <div class="left-content-item-title">
-                <span>被标记</span>
+                <span> {{ t('MatchHistoryTab.tagged.title') }}</span>
                 <span
                   v-if="!tagInfo.markedBySelf"
                   class="marked-by-other"
                   @click="handleToSummoner(tagInfo.selfPuuid)"
                 >
-                  来自其他账号
+                  {{ t('MatchHistoryTab.tagged.taggedByOther') }}
                 </span>
                 <NPopconfirm
                   type="warning"
@@ -303,7 +305,7 @@
                       <DeleteIcon />
                     </NIcon>
                   </template>
-                  删除该玩家的标记？
+                  {{ t('MatchHistoryTab.tagged.deletePopconfirm') }}
                 </NPopconfirm>
               </div>
               <NScrollbar class="tagged-player-n-scrollbar">
@@ -324,25 +326,25 @@
               />
             </div>
             <div class="left-content-item" v-if="analysis.matchHistory">
-              <div class="left-content-item-title">总览</div>
+              <div class="left-content-item-title">{{ t('MatchHistoryTab.stats.title') }}</div>
               <div class="left-content-item-content">
                 <div class="stat-item" v-if="as.settings.isInKyokoMode" title="Akari's insight">
-                  <span class="stat-item-label">Akari Score</span>
+                  <span class="stat-item-label">{{ t('MatchHistoryTab.stats.akariScore') }}</span>
                   <span class="stat-item-content" :class="{ 'n-a': analysis.akariScore === null }">
                     <template v-if="analysis.akariScore !== null">
                       <LeagueAkariSpan bold :text="analysis.akariScore.total.toFixed(2)" />
                     </template>
-                    <template v-else>N/A</template>
+                    <template v-else>{{ t('MatchHistoryTab.stats.na') }}</template>
                   </span>
                 </div>
                 <div class="stat-item">
-                  <span class="stat-item-label">平均 KDA</span>
+                  <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgKda') }}</span>
                   <span class="stat-item-content">{{
                     analysis.matchHistory.summary.averageKda.toFixed(2)
                   }}</span>
                 </div>
                 <div class="stat-item">
-                  <span class="stat-item-label">平均击杀参与率</span>
+                  <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgKp') }}</span>
                   <span class="stat-item-content"
                     >{{
                       (analysis.matchHistory.summary.averageKillParticipationRate * 100).toFixed()
@@ -351,7 +353,7 @@
                   >
                 </div>
                 <div class="stat-item">
-                  <span class="stat-item-label">平均伤害比</span>
+                  <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgDmg') }}</span>
                   <span class="stat-item-content"
                     >{{
                       (
@@ -362,7 +364,7 @@
                   >
                 </div>
                 <div class="stat-item">
-                  <span class="stat-item-label">平均承受伤害比</span>
+                  <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgDmgTaken') }}</span>
                   <span class="stat-item-content"
                     >{{
                       (analysis.matchHistory.summary.averageDamageTakenShareOfTeam * 100).toFixed()
@@ -371,7 +373,7 @@
                   >
                 </div>
                 <div class="stat-item">
-                  <span class="stat-item-label">平均队伍经济比</span>
+                  <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgGold') }}</span>
                   <span class="stat-item-content"
                     >{{
                       (analysis.matchHistory.summary.averageGoldShareOfTeam * 100).toFixed()
@@ -380,7 +382,7 @@
                   >
                 </div>
                 <div class="stat-item">
-                  <span class="stat-item-label">平均击杀小兵比</span>
+                  <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgCs') }}</span>
                   <span class="stat-item-content"
                     >{{
                       (analysis.matchHistory.summary.averageCsShareOfTeam * 100).toFixed()
@@ -389,17 +391,18 @@
                   >
                 </div>
                 <div class="stat-item">
-                  <span class="stat-item-label">胜负</span>
+                  <span class="stat-item-label">{{ t('MatchHistoryTab.stats.winLose') }}</span>
                   <span class="stat-item-content"
-                    >{{ analysis.matchHistory.summary.win }} 胜
-                    {{ analysis.matchHistory.summary.lose }} 负 ({{
+                    >{{ analysis.matchHistory.summary.win }} {{ t('MatchHistoryTab.stats.win') }}
+                    {{ analysis.matchHistory.summary.lose }}
+                    {{ t('MatchHistoryTab.stats.lose') }} ({{
                       (analysis.matchHistory.summary.winRate * 100).toFixed()
                     }}
                     %)
                   </span>
                 </div>
                 <div class="stat-item" v-if="frequentlyUsedChampions.length">
-                  <span class="stat-item-label">英雄使用</span>
+                  <span class="stat-item-label">{{ t('MatchHistoryTab.stats.champions') }}</span>
                   <div class="stat-item-content-champions">
                     <NPopover
                       v-for="c of frequentlyUsedChampions"
@@ -417,11 +420,19 @@
                         </div>
                       </template>
                       <div class="stat-item-content-champion">
-                        <div>{{ lcs.gameData.champions[c.id]?.name }} · {{ c.count }} 场</div>
+                        <div>
+                          {{ lcs.gameData.champions[c.id]?.name }} · {{ c.count }}
+                          {{ t('MatchHistoryTab.stats.times') }}
+                        </div>
                         <div class="win-lose-box">
-                          <span class="win">{{ c.win }} 胜</span>
-                          <span class="lose">{{ c.lose }} 负</span>
-                          <span>(胜率 {{ (c.winRate * 100).toFixed() }} %)</span>
+                          <span class="win">{{ c.win }} {{ t('MatchHistoryTab.stats.win') }}</span>
+                          <span class="lose"
+                            >{{ c.lose }} {{ t('MatchHistoryTab.stats.lose') }}</span
+                          >
+                          <span
+                            >({{ t('MatchHistoryTab.stats.wr') }}
+                            {{ (c.winRate * 100).toFixed() }} %)</span
+                          >
                         </div>
                       </div>
                     </NPopover>
@@ -430,7 +441,9 @@
               </div>
             </div>
             <div class="left-content-item" v-if="recentlyPlayers.teammates.length">
-              <div class="left-content-item-title">近期队友</div>
+              <div class="left-content-item-title">
+                {{ t('MatchHistoryTab.recentPlayers.teammatesTitle') }}
+              </div>
               <div class="left-content-item-content">
                 <div
                   class="recently-played-item"
@@ -450,12 +463,17 @@
                     <span class="game-name-line">{{ p.targetGameName }}</span>
                     <span class="tag-line">#{{ p.targetTagLine }}</span>
                   </div>
-                  <span class="win-or-lose">{{ p.win }} 胜 {{ p.lose }} 负</span>
+                  <span class="win-or-lose"
+                    >{{ p.win }} {{ t('MatchHistoryTab.recentPlayers.win') }} {{ p.lose }}
+                    {{ t('MatchHistoryTab.recentPlayers.lose') }}</span
+                  >
                 </div>
               </div>
             </div>
             <div class="left-content-item" v-if="recentlyPlayers.opponents.length">
-              <div class="left-content-item-title">近期对手</div>
+              <div class="left-content-item-title">
+                {{ t('MatchHistoryTab.recentPlayers.opponentsTitle') }}
+              </div>
               <div class="left-content-item-content">
                 <div
                   class="recently-played-item"
@@ -475,7 +493,10 @@
                     <span class="game-name-line">{{ p.targetGameName }}</span>
                     <span class="tag-line">#{{ p.targetTagLine }}</span>
                   </div>
-                  <span class="win-or-lose">{{ p.win }} 胜 {{ p.lose }} 负</span>
+                  <span class="win-or-lose"
+                    >{{ p.win }} {{ t('MatchHistoryTab.recentPlayers.win') }} {{ p.lose }}
+                    {{ t('MatchHistoryTab.recentPlayers.lose') }}</span
+                  >
                 </div>
               </div>
             </div>
@@ -499,7 +520,7 @@
               v-if="!tab.matchHistoryPage || tab.matchHistoryPage.games.length === 0"
             >
               <NSpin v-if="tab.isLoadingMatchHistory" />
-              <span v-else>暂无数据</span>
+              <span v-else>{{ t('MatchHistoryTab.matchHistory.empty') }}</span>
             </div>
           </div>
         </div>
@@ -555,6 +576,7 @@ import {
   useNotification
 } from 'naive-ui'
 import { computed, markRaw, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import RankedTable from '@main-window/components/RankedTable.vue'
@@ -573,6 +595,8 @@ import SpectateStatus from './widgets/SpectateStatus.vue'
 const { tab } = defineProps<{
   tab: TabState
 }>()
+
+const { t } = useI18n()
 
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
@@ -890,7 +914,7 @@ const scrollToRightElTop = () => {
 const handleRefresh = async () => {
   try {
     const mhFn = async () => {
-      loadMatchHistory()
+      await loadMatchHistory()
       scrollToRightElTop()
     }
 
@@ -1074,7 +1098,7 @@ const frequentlyUsedChampions = computed(() => {
 const recentlyPlayers = computed(() => {
   const relationship = analysis.value.playerRelationship
 
-  function processPlayers(isOpponent: boolean) {
+  const processPlayers = (isOpponent: boolean) => {
     return Object.values(relationship)
       .filter((a) => a.games.length >= RECENTLY_PLAYED_PLAYER_THRESHOLD)
       .map((a) => {
@@ -1713,20 +1737,5 @@ defineExpose({
   .lose {
     color: #c76713;
   }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.fade-enter-to,
-.fade-leave-from {
-  opacity: 1;
 }
 </style>

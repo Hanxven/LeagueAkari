@@ -1,10 +1,14 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">进行时</span></template>
+    <template #header
+      ><span class="card-header-title">
+        {{ t('GameflowInProgress.title') }}
+      </span></template
+    >
     <ControlItem
       class="control-item-margin"
-      label="英雄选择秒退"
-      label-description="立即退出当前英雄选择阶段，但不会关闭客户端"
+      :label="t('GameflowInProgress.dodge.label')"
+      :label-description="t('GameflowInProgress.dodge.description')"
       :label-width="200"
     >
       <NButton
@@ -12,30 +16,30 @@
         :disabled="lcs.gameflow.phase !== 'ChampSelect'"
         @click="handleDodge"
         size="small"
-        >秒退</NButton
+        >{{ t('GameflowInProgress.dodge.button') }}</NButton
       >
     </ControlItem>
     <ControlItem
       class="control-item-margin"
-      label="退出结算页面"
-      label-description="立即退出结算界面。适用于由于客户端原因无法退出结算页面的情况"
+      :label="t('GameflowInProgress.playAgain.label')"
+      :label-description="t('GameflowInProgress.playAgain.description')"
       :label-width="200"
     >
-      <NButton type="primary" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="small"
-        >回到房间</NButton
-      >
+      <NButton type="primary" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="small">{{
+        t('GameflowInProgress.playAgain.button')
+      }}</NButton>
     </ControlItem>
     <ControlItem
       class="control-item-margin"
-      label="退出当前房间"
-      label-description="立即退出当前房间"
+      :label="t('GameflowInProgress.leaveLobby.label')"
+      :label-description="t('GameflowInProgress.leaveLobby.description')"
       :label-width="200"
     >
       <NButton
         :disabled="lcs.gameflow.phase !== 'Lobby'"
         @click="() => lc.api.lobby.deleteLobby()"
         size="small"
-        >退出房间</NButton
+        >{{ t('GameflowInProgress.leaveLobby.button') }}</NButton
       >
     </ControlItem>
   </NCard>
@@ -49,6 +53,9 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NButton, NCard } from 'naive-ui'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -57,7 +64,13 @@ const handleDodge = async () => {
   try {
     await lc.api.login.dodge()
   } catch (error) {
-    laNotification.warn('过程中', '尝试秒退失败', error)
+    laNotification.warn(
+      t('GameflowInProgress.dodge.failedNotification.title'),
+      t('GameflowInProgress.dodge.failedNotification.description', {
+        reason: (error as Error).message
+      }),
+      error
+    )
   }
 }
 
@@ -73,7 +86,13 @@ const handlePlayAgain = async () => {
   try {
     await lc.api.lobby.playAgain()
   } catch (error) {
-    laNotification.warn('过程中', '尝试重新回到房间失败', error)
+    laNotification.warn(
+      t('GameflowInProgress.playAgain.failedNotification.title'),
+      t('GameflowInProgress.playAgain.failedNotification.description', {
+        reason: (error as Error).message
+      }),
+      error
+    )
   }
 }
 </script>

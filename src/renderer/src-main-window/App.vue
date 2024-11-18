@@ -31,7 +31,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
-import { useNotification } from 'naive-ui'
+import { useMessage, useNotification } from 'naive-ui'
 import { provide, ref, watchEffect } from 'vue'
 
 import AnnouncementModal from './components/AnnouncementModal.vue'
@@ -135,8 +135,13 @@ useKeyboardCombo(KYOKO_MODE_KEY_SEQUENCE, {
   maxInterval: 500
 })
 
+const message = useMessage()
+
 useKeyboardCombo('AKARI', {
   onFinish: () => {
+    message.info('League Akari!', {
+      duration: 100000
+    })
     notification.success({
       title: 'League Akari',
       content: 'League Akari!',

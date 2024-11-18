@@ -1,21 +1,28 @@
 <template>
   <div class="standalone-card-wrapper">
     <div class="meta">
-      <CopyableText :text="game.gameId">对局 ID: {{ game.gameId }}</CopyableText>
-      <span>对局时间: {{ dayjs(game.gameCreation).format('YYYY-MM-DD HH:mm:ss') }}</span>
-      <span
-        >区服:
-        {{
-          TENCENT_RSO_PLATFORM_NAME[game.platformId]
+      <CopyableText :text="game.gameId">{{
+        t('MiscellaneousPanel.gameId', { gameId: game.gameId })
+      }}</CopyableText>
+      <span>{{
+        t('MiscellaneousPanel.gameDate', {
+          date: dayjs(game.gameCreation).format('YYYY-MM-DD HH:mm:ss')
+        })
+      }}</span>
+      <span>{{
+        t('MiscellaneousPanel.server', {
+          server: TENCENT_RSO_PLATFORM_NAME[game.platformId]
             ? `${TENCENT_RSO_PLATFORM_NAME[game.platformId]} (${game.platformId}) (TENCENT)`
             : REGION_NAME[game.platformId]
               ? `${REGION_NAME[game.platformId]} (${game.platformId})`
               : game.platformId
-        }}</span
-      >
+        })
+      }}</span>
     </div>
     <div v-if="hasBan" class="bans">
-      <span style="margin-right: 12px; font-weight: bold; columns: #fff">禁用：</span>
+      <span style="margin-right: 12px; font-weight: bold; columns: #fff">{{
+        t('MiscellaneousPanel.bans')
+      }}</span>
       <div v-for="t of game.teams.filter((a) => a.bans.length)" :key="t.teamId" class="team-bans">
         <span>{{ formatTeam(t.teamId) }}</span>
         <LcuImage
@@ -57,10 +64,13 @@ import dayjs from 'dayjs'
 import { DataTableColumns, NDataTable } from 'naive-ui'
 import { RowData } from 'naive-ui/es/data-table/src/interface'
 import { computed, h } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   game: Game
 }>()
+
+const { t } = useI18n()
 
 const hasBan = computed(() => {
   return props.game.teams.some((t) => t.bans.length)
@@ -107,9 +117,9 @@ const platformDisplay = (platformId: string) => TENCENT_RSO_PLATFORM_NAME[platfo
 
 const formatTeam = (id: number) => {
   if (id === 100) {
-    return '蓝队'
+    return t('common.teams.100')
   } else if (id === 200) {
-    return '红队'
+    return t('common.teams.200')
   } else {
     return id.toString()
   }
@@ -119,128 +129,145 @@ const renderTeam = (teamId: number) => {
   return h('span', formatTeam(teamId))
 }
 
-const statsConfigMap = {
-  championId: { name: '英雄', render: championDisplay },
-  spells: { name: '召唤师技能', render: spellsDisplay },
-  teams: { name: '阵营', render: renderTeam },
-  assists: { name: '助攻' },
-  causedEarlySurrender: { name: '是重开发起者' },
-  champLevel: { name: '英雄等级' },
-  combatPlayerScore: { name: '战斗玩家得分' },
-  damageDealtToObjectives: { name: '对战略点造成的伤害' },
-  damageDealtToTurrets: { name: '对防御塔造成的伤害' },
-  damageSelfMitigated: { name: '自我缓和的伤害' },
-  deaths: { name: '死亡' },
-  doubleKills: { name: '双杀' },
-  earlySurrenderAccomplice: { name: '重开支持者' },
-  firstBloodAssist: { name: '一血助攻' },
-  firstBloodKill: { name: '一血' },
-  firstInhibitorAssist: { name: '首个水晶助攻' },
-  firstInhibitorKill: { name: '首个水晶摧毁' },
-  firstTowerAssist: { name: '首座防御塔助攻' },
-  firstTowerKill: { name: '首座防御塔摧毁' },
-  gameEndedInEarlySurrender: { name: '重开局' },
-  gameEndedInSurrender: { name: '游戏以一方投降结束' },
-  goldEarned: { name: '获得金币' },
-  goldSpent: { name: '花费金币' },
-  inhibitorKills: { name: '水晶摧毁' },
-  item0: { name: '装备0', render: itemDisplay },
-  item1: { name: '装备1', render: itemDisplay },
-  item2: { name: '装备2', render: itemDisplay },
-  item3: { name: '装备3', render: itemDisplay },
-  item4: { name: '装备4', render: itemDisplay },
-  item5: { name: '装备5', render: itemDisplay },
-  item6: { name: '装备6', render: itemDisplay },
-  killingSprees: { name: 'Killing Sprees' },
-  kills: { name: '击杀' },
-  largestCriticalStrike: { name: '最大暴击伤害' },
-  largestKillingSpree: { name: '最大连杀' },
-  largestMultiKill: { name: '最大多杀' },
-  longestTimeSpentLiving: { name: '最长存活时间' },
-  magicDamageDealt: { name: '造成的魔法伤害' },
-  magicDamageDealtToChampions: { name: '对英雄造成的魔法伤害' },
-  magicalDamageTaken: { name: '承受的魔法伤害' },
-  neutralMinionsKilled: { name: '击杀中立单位' },
-  neutralMinionsKilledEnemyJungle: { name: '击杀敌方野区中立单位' },
-  neutralMinionsKilledTeamJungle: { name: '击杀己方野区中立单位' },
-  objectivePlayerScore: { name: '目标玩家得分' },
-  participantId: { name: '参与者 ID' },
-  pentaKills: { name: '五杀' },
-  // 天赋梦路!
-  perk0: { name: '天赋0', render: perkDisplay },
-  perk0Var1: { name: '天赋0变量1' },
-  perk0Var2: { name: '天赋0变量2' },
-  perk0Var3: { name: '天赋0变量3' },
-  perk1: { name: '天赋1', render: perkDisplay },
-  perk1Var1: { name: '天赋1变量1' },
-  perk1Var2: { name: '天赋1变量2' },
-  perk1Var3: { name: '天赋1变量3' },
-  perk2: { name: '天赋2', render: perkDisplay },
-  perk2Var1: { name: '天赋2变量1' },
-  perk2Var2: { name: '天赋2变量2' },
-  perk2Var3: { name: '天赋2变量3' },
-  perk3: { name: '天赋3', render: perkDisplay },
-  perk3Var1: { name: '天赋3变量1' },
-  perk3Var2: { name: '天赋3变量2' },
-  perk3Var3: { name: '天赋3变量3' },
-  perk4: { name: '天赋4', render: perkDisplay },
-  perk4Var1: { name: '天赋4变量1' },
-  perk4Var2: { name: '天赋4变量2' },
-  perk4Var3: { name: '天赋4变量3' },
-  perk5: { name: '天赋5', render: perkDisplay },
-  perk5Var1: { name: '天赋5变量1' },
-  perk5Var2: { name: '天赋5变量2' },
-  perk5Var3: { name: '天赋5变量3' },
-  perkPrimaryStyle: { name: '主要天赋风格', render: perkstyleDisplay },
-  perkSubStyle: { name: '次要天赋风格', render: perkstyleDisplay },
-  physicalDamageDealt: { name: '造成的物理伤害' },
-  physicalDamageDealtToChampions: { name: '对英雄造成的物理伤害' },
-  physicalDamageTaken: { name: '承受的物理伤害' },
-  playerAugment1: { name: '强化1', render: augmentDisplay },
-  playerAugment2: { name: '强化2', render: augmentDisplay },
-  playerAugment3: { name: '强化3', render: augmentDisplay },
-  playerAugment4: { name: '强化4', render: augmentDisplay },
-  playerAugment5: { name: '强化5', render: augmentDisplay },
-  playerAugment6: { name: '强化6', render: augmentDisplay },
-  playerScore0: { name: '玩家得分0' },
-  playerScore1: { name: '玩家得分1' },
-  playerScore2: { name: '玩家得分2' },
-  playerScore3: { name: '玩家得分3' },
-  playerScore4: { name: '玩家得分4' },
-  playerScore5: { name: '玩家得分5' },
-  playerScore6: { name: '玩家得分6' },
-  playerScore7: { name: '玩家得分7' },
-  playerScore8: { name: '玩家得分8' },
-  playerScore9: { name: '玩家得分9' },
-  playerSubteamId: { name: '子队阵营' },
-  quadraKills: { name: '四杀' },
-  sightWardsBoughtInGame: { name: '视野守卫' },
-  subteamPlacement: { name: '子队位次' },
-  teamEarlySurrendered: { name: '团队重开' },
-  timeCCingOthers: { name: '控制时间' },
-  totalDamageDealt: { name: '造成的总伤害' },
-  totalDamageDealtToChampions: { name: '对英雄造成的总伤害' },
-  totalDamageTaken: { name: '承受的总伤害' },
-  totalHeal: { name: '总治疗量' },
-  totalMinionsKilled: { name: '击杀的小兵总数' },
-  totalPlayerScore: { name: '总玩家得分' },
-  totalScoreRank: { name: '总分排名' },
-  totalTimeCrowdControlDealt: { name: '总控制时间' },
-  totalUnitsHealed: { name: '治疗单位总数' },
-  tripleKills: { name: '三杀' },
-  trueDamageDealt: { name: '造成的真实伤害' },
-  trueDamageDealtToChampions: { name: '对英雄造成的真实伤害' },
-  trueDamageTaken: { name: '承受的真实伤害' },
-  turretKills: { name: '防御塔摧毁' },
-  unrealKills: { name: '虚幻击杀' },
-  visionScore: { name: '视野得分' },
-  visionWardsBoughtInGame: { name: '控制守卫' },
-  wardsKilled: { name: '破坏的守卫' },
-  wardsPlaced: { name: '放置的守卫' },
-  win: { name: '胜利' },
-  currentPlatformId: { name: '当前区服', render: platformDisplay },
-  platformId: { name: '区服', render: platformDisplay }
-}
+const statsConfigMap = computed(() => {
+  return {
+    championId: { name: t('MiscellaneousPanel.stats.championId'), render: championDisplay },
+    spells: { name: t('MiscellaneousPanel.stats.spells'), render: spellsDisplay },
+    teams: { name: t('MiscellaneousPanel.stats.teams'), render: renderTeam },
+    assists: { name: t('MiscellaneousPanel.stats.assists') },
+    causedEarlySurrender: { name: t('MiscellaneousPanel.stats.causedEarlySurrender') },
+    champLevel: { name: t('MiscellaneousPanel.stats.champLevel') },
+    combatPlayerScore: { name: t('MiscellaneousPanel.stats.combatPlayerScore') },
+    damageDealtToObjectives: { name: t('MiscellaneousPanel.stats.damageDealtToObjectives') },
+    damageDealtToTurrets: { name: t('MiscellaneousPanel.stats.damageDealtToTurrets') },
+    damageSelfMitigated: { name: t('MiscellaneousPanel.stats.damageSelfMitigated') },
+    deaths: { name: t('MiscellaneousPanel.stats.deaths') },
+    doubleKills: { name: t('MiscellaneousPanel.stats.doubleKills') },
+    earlySurrenderAccomplice: { name: t('MiscellaneousPanel.stats.earlySurrenderAccomplice') },
+    firstBloodAssist: { name: t('MiscellaneousPanel.stats.firstBloodAssist') },
+    firstBloodKill: { name: t('MiscellaneousPanel.stats.firstBloodKill') },
+    firstInhibitorAssist: { name: t('MiscellaneousPanel.stats.firstInhibitorAssist') },
+    firstInhibitorKill: { name: t('MiscellaneousPanel.stats.firstInhibitorKill') },
+    firstTowerAssist: { name: t('MiscellaneousPanel.stats.firstTowerAssist') },
+    firstTowerKill: { name: t('MiscellaneousPanel.stats.firstTowerKill') },
+    gameEndedInEarlySurrender: { name: t('MiscellaneousPanel.stats.gameEndedInEarlySurrender') },
+    gameEndedInSurrender: { name: t('MiscellaneousPanel.stats.gameEndedInSurrender') },
+    goldEarned: { name: t('MiscellaneousPanel.stats.goldEarned') },
+    goldSpent: { name: t('MiscellaneousPanel.stats.goldSpent') },
+    inhibitorKills: { name: t('MiscellaneousPanel.stats.inhibitorKills') },
+    item0: { name: t('MiscellaneousPanel.stats.item0'), render: itemDisplay },
+    item1: { name: t('MiscellaneousPanel.stats.item1'), render: itemDisplay },
+    item2: { name: t('MiscellaneousPanel.stats.item2'), render: itemDisplay },
+    item3: { name: t('MiscellaneousPanel.stats.item3'), render: itemDisplay },
+    item4: { name: t('MiscellaneousPanel.stats.item4'), render: itemDisplay },
+    item5: { name: t('MiscellaneousPanel.stats.item5'), render: itemDisplay },
+    item6: { name: t('MiscellaneousPanel.stats.item6'), render: itemDisplay },
+    killingSprees: { name: t('MiscellaneousPanel.stats.killingSprees') },
+    kills: { name: t('MiscellaneousPanel.stats.kills') },
+    largestCriticalStrike: { name: t('MiscellaneousPanel.stats.largestCriticalStrike') },
+    largestKillingSpree: { name: t('MiscellaneousPanel.stats.largestKillingSpree') },
+    largestMultiKill: { name: t('MiscellaneousPanel.stats.largestMultiKill') },
+    longestTimeSpentLiving: { name: t('MiscellaneousPanel.stats.longestTimeSpentLiving') },
+    magicDamageDealt: { name: t('MiscellaneousPanel.stats.magicDamageDealt') },
+    magicDamageDealtToChampions: {
+      name: t('MiscellaneousPanel.stats.magicDamageDealtToChampions')
+    },
+    magicalDamageTaken: { name: t('MiscellaneousPanel.stats.magicalDamageTaken') },
+    neutralMinionsKilled: { name: t('MiscellaneousPanel.stats.neutralMinionsKilled') },
+    neutralMinionsKilledEnemyJungle: {
+      name: t('MiscellaneousPanel.stats.neutralMinionsKilledEnemyJungle')
+    },
+    neutralMinionsKilledTeamJungle: {
+      name: t('MiscellaneousPanel.stats.neutralMinionsKilledTeamJungle')
+    },
+    objectivePlayerScore: { name: t('MiscellaneousPanel.stats.objectivePlayerScore') },
+    participantId: { name: t('MiscellaneousPanel.stats.participantId') },
+    pentaKills: { name: t('MiscellaneousPanel.stats.pentaKills') },
+    perk0: { name: t('MiscellaneousPanel.stats.perk0'), render: perkDisplay },
+    perk0Var1: { name: t('MiscellaneousPanel.stats.perk0Var1') },
+    perk0Var2: { name: t('MiscellaneousPanel.stats.perk0Var2') },
+    perk0Var3: { name: t('MiscellaneousPanel.stats.perk0Var3') },
+    perk1: { name: t('MiscellaneousPanel.stats.perk1'), render: perkDisplay },
+    perk1Var1: { name: t('MiscellaneousPanel.stats.perk1Var1') },
+    perk1Var2: { name: t('MiscellaneousPanel.stats.perk1Var2') },
+    perk1Var3: { name: t('MiscellaneousPanel.stats.perk1Var3') },
+    perk2: { name: t('MiscellaneousPanel.stats.perk2'), render: perkDisplay },
+    perk2Var1: { name: t('MiscellaneousPanel.stats.perk2Var1') },
+    perk2Var2: { name: t('MiscellaneousPanel.stats.perk2Var2') },
+    perk2Var3: { name: t('MiscellaneousPanel.stats.perk2Var3') },
+    perk3: { name: t('MiscellaneousPanel.stats.perk3'), render: perkDisplay },
+    perk3Var1: { name: t('MiscellaneousPanel.stats.perk3Var1') },
+    perk3Var2: { name: t('MiscellaneousPanel.stats.perk3Var2') },
+    perk3Var3: { name: t('MiscellaneousPanel.stats.perk3Var3') },
+    perk4: { name: t('MiscellaneousPanel.stats.perk4'), render: perkDisplay },
+    perk4Var1: { name: t('MiscellaneousPanel.stats.perk4Var1') },
+    perk4Var2: { name: t('MiscellaneousPanel.stats.perk4Var2') },
+    perk4Var3: { name: t('MiscellaneousPanel.stats.perk4Var3') },
+    perk5: { name: t('MiscellaneousPanel.stats.perk5'), render: perkDisplay },
+    perk5Var1: { name: t('MiscellaneousPanel.stats.perk5Var1') },
+    perk5Var2: { name: t('MiscellaneousPanel.stats.perk5Var2') },
+    perk5Var3: { name: t('MiscellaneousPanel.stats.perk5Var3') },
+    perkPrimaryStyle: {
+      name: t('MiscellaneousPanel.stats.perkPrimaryStyle'),
+      render: perkstyleDisplay
+    },
+    perkSubStyle: { name: t('MiscellaneousPanel.stats.perkSubStyle'), render: perkstyleDisplay },
+    physicalDamageDealt: { name: t('MiscellaneousPanel.stats.physicalDamageDealt') },
+    physicalDamageDealtToChampions: {
+      name: t('MiscellaneousPanel.stats.physicalDamageDealtToChampions')
+    },
+    physicalDamageTaken: { name: t('MiscellaneousPanel.stats.physicalDamageTaken') },
+    playerAugment1: { name: t('MiscellaneousPanel.stats.playerAugment1'), render: augmentDisplay },
+    playerAugment2: { name: t('MiscellaneousPanel.stats.playerAugment2'), render: augmentDisplay },
+    playerAugment3: { name: t('MiscellaneousPanel.stats.playerAugment3'), render: augmentDisplay },
+    playerAugment4: { name: t('MiscellaneousPanel.stats.playerAugment4'), render: augmentDisplay },
+    playerAugment5: { name: t('MiscellaneousPanel.stats.playerAugment5'), render: augmentDisplay },
+    playerAugment6: { name: t('MiscellaneousPanel.stats.playerAugment6'), render: augmentDisplay },
+    playerScore0: { name: t('MiscellaneousPanel.stats.playerScore0') },
+    playerScore1: { name: t('MiscellaneousPanel.stats.playerScore1') },
+    playerScore2: { name: t('MiscellaneousPanel.stats.playerScore2') },
+    playerScore3: { name: t('MiscellaneousPanel.stats.playerScore3') },
+    playerScore4: { name: t('MiscellaneousPanel.stats.playerScore4') },
+    playerScore5: { name: t('MiscellaneousPanel.stats.playerScore5') },
+    playerScore6: { name: t('MiscellaneousPanel.stats.playerScore6') },
+    playerScore7: { name: t('MiscellaneousPanel.stats.playerScore7') },
+    playerScore8: { name: t('MiscellaneousPanel.stats.playerScore8') },
+    playerScore9: { name: t('MiscellaneousPanel.stats.playerScore9') },
+    playerSubteamId: { name: t('MiscellaneousPanel.stats.playerSubteamId') },
+    quadraKills: { name: t('MiscellaneousPanel.stats.quadraKills') },
+    sightWardsBoughtInGame: { name: t('MiscellaneousPanel.stats.sightWardsBoughtInGame') },
+    subteamPlacement: { name: t('MiscellaneousPanel.stats.subteamPlacement') },
+    teamEarlySurrendered: { name: t('MiscellaneousPanel.stats.teamEarlySurrendered') },
+    timeCCingOthers: { name: t('MiscellaneousPanel.stats.timeCCingOthers') },
+    totalDamageDealt: { name: t('MiscellaneousPanel.stats.totalDamageDealt') },
+    totalDamageDealtToChampions: {
+      name: t('MiscellaneousPanel.stats.totalDamageDealtToChampions')
+    },
+    totalDamageTaken: { name: t('MiscellaneousPanel.stats.totalDamageTaken') },
+    totalHeal: { name: t('MiscellaneousPanel.stats.totalHeal') },
+    totalMinionsKilled: { name: t('MiscellaneousPanel.stats.totalMinionsKilled') },
+    totalPlayerScore: { name: t('MiscellaneousPanel.stats.totalPlayerScore') },
+    totalScoreRank: { name: t('MiscellaneousPanel.stats.totalScoreRank') },
+    totalTimeCrowdControlDealt: { name: t('MiscellaneousPanel.stats.totalTimeCrowdControlDealt') },
+    totalUnitsHealed: { name: t('MiscellaneousPanel.stats.totalUnitsHealed') },
+    tripleKills: { name: t('MiscellaneousPanel.stats.tripleKills') },
+    trueDamageDealt: { name: t('MiscellaneousPanel.stats.trueDamageDealt') },
+    trueDamageDealtToChampions: { name: t('MiscellaneousPanel.stats.trueDamageDealtToChampions') },
+    trueDamageTaken: { name: t('MiscellaneousPanel.stats.trueDamageTaken') },
+    turretKills: { name: t('MiscellaneousPanel.stats.turretKills') },
+    unrealKills: { name: t('MiscellaneousPanel.stats.unrealKills') },
+    visionScore: { name: t('MiscellaneousPanel.stats.visionScore') },
+    visionWardsBoughtInGame: { name: t('MiscellaneousPanel.stats.visionWardsBoughtInGame') },
+    wardsKilled: { name: t('MiscellaneousPanel.stats.wardsKilled') },
+    wardsPlaced: { name: t('MiscellaneousPanel.stats.wardsPlaced') },
+    win: { name: t('MiscellaneousPanel.stats.win') },
+    currentPlatformId: {
+      name: t('MiscellaneousPanel.stats.currentPlatformId'),
+      render: platformDisplay
+    },
+    platformId: { name: t('MiscellaneousPanel.stats.platformId'), render: platformDisplay }
+  }
+})
 
 // 暂未使用
 // const timelineNameMap = {
@@ -312,17 +339,17 @@ const columns = computed(() => {
         const propKey = data.propKey as string
 
         const renderer =
-          statsConfigMap[propKey]?.render ||
+          statsConfigMap.value[propKey]?.render ||
           ((content: any) => {
             if (typeof content === 'boolean') {
-              return content ? '是' : '否'
+              return content ? t('common.yes') : t('common.no')
             } else if (typeof content === 'number') {
               return content.toLocaleString()
             } else if (typeof content === 'string') {
               return content
             }
 
-            return 'N/A'
+            return t('common.na')
           })
         return renderer(data[p.participantId], participantStatsMap.value[p.participantId])
       }
@@ -339,13 +366,13 @@ const tableData = computed(() => {
     return []
   }
 
-  const champions: RowData = { propName: statsConfigMap['championId']?.name }
+  const champions: RowData = { propName: statsConfigMap.value['championId']?.name }
   props.game.participants.forEach((p) => {
     champions[p.participantId] = p.championId
     champions['propKey'] = 'championId'
   })
 
-  const spells: RowData = { propName: statsConfigMap['spells']?.name }
+  const spells: RowData = { propName: statsConfigMap.value['spells']?.name }
   props.game.participants.forEach((p) => {
     spells[p.participantId] = {
       spell1Id: p.spell1Id,
@@ -360,13 +387,13 @@ const tableData = computed(() => {
     cp['propKey'] = 'currentPlatformId'
   })
 
-  const pi: RowData = { propName: statsConfigMap['platformId']?.name }
+  const pi: RowData = { propName: statsConfigMap.value['platformId']?.name }
   props.game.participants.forEach((p) => {
     pi[p.participantId] = participantInfoMap.value[p.participantId].platformId
     pi['propKey'] = 'platformId'
   })
 
-  const teams: RowData = { propName: statsConfigMap['teams']?.name }
+  const teams: RowData = { propName: statsConfigMap.value['teams']?.name }
   props.game.participants.forEach((p) => {
     teams[p.participantId] = p.teamId
     teams['propKey'] = 'teams'
@@ -379,7 +406,7 @@ const tableData = computed(() => {
   statsNames.forEach((n) => {
     const row: RowData = {}
 
-    row['propName'] = statsConfigMap[n]?.name || n
+    row['propName'] = statsConfigMap.value[n]?.name || n
     row['propKey'] = n
 
     props.game.participants.forEach((p) => {

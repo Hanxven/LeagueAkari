@@ -50,7 +50,7 @@
                   }}</span>
                 </div>
                 <div class="ranked-item unranked" v-else>
-                  <span class="text">未定级</span>
+                  <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
                 </div>
                 <div
                   class="ranked-item"
@@ -66,7 +66,7 @@
                   }}</span>
                 </div>
                 <div class="ranked-item unranked" v-else>
-                  <span class="text">未定级</span>
+                  <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
                 </div>
               </template>
               <template v-else>
@@ -75,19 +75,19 @@
                   v-if="rankedSoloFlex.cherry && rankedSoloFlex.cherry.ratedRating"
                 >
                   <span class="text"
-                    >斗魂竞技场
+                    >{{ t('common.queueTypes.CHERRY') }}
                     <span style="font-weight: bold">{{ rankedSoloFlex.cherry.ratedRating }}</span>
                     分</span
                   >
                 </div>
                 <div class="ranked-item unranked cherry" v-else>
-                  <span class="text">未定级</span>
+                  <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
                 </div>
               </template>
             </div>
           </template>
           <RankedTable v-if="rankedStats" :rankedStats="rankedStats" />
-          <div v-else style="font-size: 12px">暂无数据</div>
+          <div v-else style="font-size: 12px">{{ t('common.PlayerInfoCard.empty') }}</div>
         </NPopover>
       </div>
     </div>
@@ -102,21 +102,27 @@
                 'gt-47-lt-53': analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
                 'lte-47': analysis.summary.winRate <= 0.47
               }"
-              title="前四率 & 第一率"
+              :title="`${t('PlayerInfoCard.top4Rate')} & ${t('PlayerInfoCard.1stRate')}`"
               v-if="analysis"
             >
               {{ analysis.summary.winRate.toFixed() }} %
               <span class="first-rate"
-                >(第一 {{ analysis.summary.cherry.top1Rate.toFixed() }} %)</span
+                >({{
+                  t('PlayerInfoCard.1st', { rate: analysis.summary.cherry.top1Rate.toFixed() })
+                }})</span
               >
             </div>
             <div v-else class="win-rate">— %</div>
           </template>
           <div class="popover-text" v-if="analysis">
-            在近期 {{ analysis.summary.count }} 场对局中，该玩家的胜率为
-            {{ (analysis.summary.winRate * 100).toFixed() }}
-            %。其中，斗魂竞技场的 {{ analysis.summary.cherry.count }} 场对局中，该玩家的首位率是
-            {{ analysis.summary.cherry.top1Rate }} %
+            {{
+              t('PlayerInfoCard.cherryWinRatePopover', {
+                count: analysis.summary.count,
+                winRate: (analysis.summary.winRate * 100).toFixed(),
+                cherryCount: analysis.summary.cherry.count,
+                top1Rate: analysis.summary.cherry.top1Rate
+              })
+            }}
           </div>
         </NPopover>
       </template>
@@ -132,13 +138,17 @@
                 'lte-47': analysis.summary.winRate <= 0.47
               }"
             >
-              {{ (analysis.summary.winRate * 100).toFixed() }} %
+              {{ (analysis.summary.winRate * 100).toFixed() }}%
             </div>
             <div class="win-rate" v-else>— %</div>
           </template>
           <div class="popover-text" v-if="analysis">
-            在近期 {{ analysis.summary.count }} 场对局中，该玩家的胜率为
-            {{ (analysis.summary.winRate * 100).toFixed() }} %
+            {{
+              t('PlayerInfoCard.winRatePopover', {
+                count: analysis.summary.count,
+                winRate: (analysis.summary.winRate * 100).toFixed()
+              })
+            }}
           </div>
         </NPopover>
       </template>
@@ -147,8 +157,12 @@
           <div class="kda">{{ analysis?.summary.averageKda.toFixed(2) || '—' }}</div>
         </template>
         <div class="popover-text" v-if="analysis">
-          在近期 {{ analysis.summary.count }} 场对局中，该玩家的平均 KDA 是
-          {{ analysis.summary.averageKda.toFixed(2) }}
+          {{
+            t('PlayerInfoCard.kdaPopover', {
+              count: analysis.summary.count,
+              kda: analysis.summary.averageKda.toFixed(2)
+            })
+          }}
         </div>
       </NPopover>
       <div
@@ -168,14 +182,13 @@
           v-if="position.role"
           :style="{
             'background-color':
-              POSITION_ASSIGNMENT_REASON[position.role.assignmentReason]?.color || '#5b4694',
+              positionAssignmentReason[position.role.assignmentReason]?.color || '#5b4694',
             color:
-              POSITION_ASSIGNMENT_REASON[position.role.assignmentReason]?.foregroundColor ||
-              '#ffffff'
+              positionAssignmentReason[position.role.assignmentReason]?.foregroundColor || '#ffffff'
           }"
         >
           {{
-            POSITION_ASSIGNMENT_REASON[position.role.assignmentReason]?.name ||
+            positionAssignmentReason[position.role.assignmentReason]?.name ||
             position.role.assignmentReason
           }}
         </div>
@@ -194,10 +207,10 @@
       </div>
     </div>
     <div class="tags">
-      <div class="tag self" v-if="isSelf">自己</div>
+      <div class="tag self" v-if="isSelf">{{ t('PlayerInfoCard.self') }}</div>
       <NPopover v-if="savedInfo && !isSelf && savedInfo.tag" :delay="50" style="max-height: 240px">
         <template #trigger>
-          <div class="tag tagged">已标记</div>
+          <div class="tag tagged">{{ t('PlayerInfoCard.tagged') }}</div>
         </template>
         <div class="tagged-text" style="max-width: 260px">
           {{ savedInfo.tag }}
@@ -213,12 +226,11 @@
             }"
             ref="pre-made-tag-el"
           >
-            预组队 {{ premadeTeamId }}
+            {{ t('PlayerInfoCard.premade', { team: premadeTeamId }) }}
           </div>
         </template>
         <div class="popover-text">
-          这些玩家在数场对局中都位于同一个阵营，推测他们可能是一支固定的小队。为了区分，将其命名为小队
-          {{ premadeTeamId }}
+          {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
         </div>
       </NPopover>
       <NPopover
@@ -227,11 +239,15 @@
         v-if="analysis && analysis.summary.count >= 16 && analysis.summary.winRate >= 0.85"
       >
         <template #trigger>
-          <div class="tag win-rate-team">极高胜率</div>
+          <div class="tag win-rate-team">{{ t('PlayerInfoCard.highWinRate') }}</div>
         </template>
         <div class="popover-text">
-          该玩家的胜率高到不可置信。在近期 {{ analysis.summary.count }} 场的对局中，赢了
-          {{ analysis.summary.win }} 场
+          {{
+            t('PlayerInfoCard.highWinRatePopover', {
+              count: analysis.summary.count,
+              winCount: analysis.summary.win
+            })
+          }}
         </div>
       </NPopover>
       <NPopover
@@ -241,12 +257,15 @@
         style="max-height: 240px"
       >
         <template #trigger>
-          <div class="tag have-met">遇到过</div>
+          <div class="tag have-met">{{ t('PlayerInfoCard.met') }}</div>
         </template>
         <div class="popover-text have-met-popover">
           <div style="margin-bottom: 4px">
             {{
-              `曾在 ${dayjs(savedInfo.lastMetAt).locale('zh-cn').fromNow()} 遇见过，共遇见过 ${savedInfo.encounteredGames.length} 次`
+              t('PlayerInfoCard.metPopover.title', {
+                date: dayjs(savedInfo.lastMetAt).locale(locale).format('YYYY-MM-DD HH:mm:ss'),
+                count: savedInfo.encounteredGames.length
+              })
             }}
           </div>
           <table class="encountered-game-table">
@@ -255,8 +274,8 @@
             </colgroup>
             <thead>
               <tr>
-                <th>对局 ID</th>
-                <th>记载日期</th>
+                <th>{{ t('PlayerInfoCard.metPopover.gameId') }}</th>
+                <th>{{ t('PlayerInfoCard.metPopover.date') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -266,7 +285,7 @@
                 </td>
                 <td>
                   {{ dayjs(item.updateAt).format('MM-DD HH:mm:ss') }} ({{
-                    dayjs(item.updateAt).locale('zh-cn').fromNow()
+                    dayjs(item.updateAt).locale(locale).fromNow()
                   }})
                 </td>
               </tr>
@@ -280,10 +299,10 @@
         :delay="50"
       >
         <template #trigger>
-          <div class="tag privacy-private">生涯隐藏</div>
+          <div class="tag privacy-private">{{ t('PlayerInfoCard.private') }}</div>
         </template>
         <div class="popover-text">
-          该玩家设置了生涯为隐藏。这意味着他人无法查看该玩家的个人主页，包括战绩、成就点数等。另外，也不能观战该玩家
+          {{ t('PlayerInfoCard.privatePopover') }}
         </div>
       </NPopover>
       <NPopover
@@ -292,10 +311,20 @@
         :delay="50"
       >
         <template #trigger>
-          <div class="tag winning-streak">{{ analysis.summary.winningStreak }} 连胜</div>
+          <div class="tag winning-streak">
+            {{
+              t('PlayerInfoCard.winningStreak', {
+                count: analysis.summary.winningStreak
+              })
+            }}
+          </div>
         </template>
         <div class="popover-text">
-          截止到现在，该玩家 {{ analysis.summary.winningStreak }} 连胜，很棒
+          {{
+            t('PlayerInfoCard.winningStreakPopover', {
+              count: analysis.summary.winningStreak
+            })
+          }}
         </div>
       </NPopover>
       <NPopover
@@ -304,10 +333,20 @@
         :delay="50"
       >
         <template #trigger>
-          <div class="tag losing-streak">{{ analysis.summary.losingStreak }} 连败</div>
+          <div class="tag losing-streak">
+            {{
+              t('PlayerInfoCard.losingStreak', {
+                count: analysis.summary.losingStreak
+              })
+            }}
+          </div>
         </template>
         <div class="popover-text">
-          截止到现在，该玩家已经 {{ analysis.summary.losingStreak }} 连败了
+          {{
+            t('PlayerInfoCard.losingStreakPopover', {
+              count: analysis.summary.losingStreak
+            })
+          }}
         </div>
       </NPopover>
       <NPopover
@@ -316,14 +355,18 @@
         :delay="50"
       >
         <template #trigger>
-          <div class="tag akari-loved" v-if="analysis.akariScore.great">非常突出</div>
-          <div class="tag akari-loved" v-else-if="analysis.akariScore.good">优异</div>
+          <div class="tag akari-loved" v-if="analysis.akariScore.great">
+            {{ t('PlayerInfoCard.akariLoved.great') }}
+          </div>
+          <div class="tag akari-loved" v-else-if="analysis.akariScore.good">
+            {{ t('PlayerInfoCard.akariLoved.great') }}
+          </div>
         </template>
         <div class="popover-text" v-if="analysis.akariScore.great">
-          该玩家的水平可能远超当前分段
+          {{ t('PlayerInfoCard.akariLoved.greatPopover') }}
         </div>
         <div class="popover-text" v-else-if="analysis.akariScore.good">
-          该玩家在近期对局中表现优异
+          {{ t('PlayerInfoCard.akariLoved.goodPopover') }}
         </div>
       </NPopover>
       <NPopover
@@ -375,14 +418,25 @@
             <div class="champion-name">{{ lcs.gameData.champions[c.id]?.name || c.id }}</div>
           </div>
           <div class="recent-plays">
-            近期 {{ c.count }} 场，胜率为 {{ (c.winRate * 100).toFixed() }} %
+            {{
+              t('PlayerInfoCard.champion.winRate', {
+                count: c.count,
+                winRate: (c.winRate * 100).toFixed()
+              })
+            }}
           </div>
           <template v-if="championMastery && championMastery[c.id]">
             <div class="mastery-points">
-              <span class="level">{{ championMastery[c.id].championLevel }} 级</span>
-              <span class="points"
-                >{{ championMastery[c.id].championPoints.toLocaleString() }} 成就点数</span
-              >
+              <span class="level">{{
+                t('PlayerInfoCard.champion.level', {
+                  level: championMastery[c.id].championLevel
+                })
+              }}</span>
+              <span class="points">{{
+                t('PlayerInfoCard.champion.masteryPoints', {
+                  points: championMastery[c.id].championPoints.toLocaleString()
+                })
+              }}</span>
             </div>
             <div class="milestones">
               <span
@@ -426,7 +480,7 @@
           </div>
         </template>
       </NVirtualList>
-      <div class="placeholder" v-else>无战绩</div>
+      <div class="placeholder" v-else>{{ t('PlayerInfoCard.empty') }}</div>
     </div>
   </div>
 </template>
@@ -452,6 +506,7 @@ import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NPopover, NVirtualList } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import RankedTable from '@main-window/components/RankedTable.vue'
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
@@ -459,7 +514,6 @@ import PositionIcon from '@main-window/components/icons/position-icons/PositionI
 import {
   CHINESE_NUMBERS,
   FIXED_CARD_WIDTH_PX_LITERAL,
-  POSITION_ASSIGNMENT_REASON,
   PREMADE_TEAM_COLORS,
   RANKED_MEDAL_MAP
 } from './ongoing-game-utils'
@@ -492,6 +546,8 @@ const emits = defineEmits<{
   showSavedInfo: [puuid: string]
   highlight: [premadeTeamId: string, boolean]
 }>()
+
+const { t, locale } = useI18n()
 
 const premadeTagElHovering = useElementHover(useTemplateRef('pre-made-tag-el'))
 watch(premadeTagElHovering, (h) => {
@@ -582,6 +638,36 @@ const MILESTONE_ORDER = [
   'D-'
 ]
 
+export const positionAssignmentReason = computed(() => {
+  return {
+    FILL_SECONDARY: {
+      name: t('common.positionAssignmentReason.FILL_SECONDARY'),
+      color: '#82613b',
+      foregroundColor: '#ffffff'
+    },
+    FILL_PRIMARY: {
+      name: t('common.positionAssignmentReason.FILL_PRIMARY'),
+      color: '#5b4694',
+      foregroundColor: '#ffffff'
+    },
+    PRIMARY: {
+      name: t('common.positionAssignmentReason.PRIMARY'),
+      color: '#5b4694',
+      foregroundColor: '#ffffff'
+    },
+    SECONDARY: {
+      name: t('common.positionAssignmentReason.SECONDARY'),
+      color: '#5b4694',
+      foregroundColor: '#ffffff'
+    },
+    AUTOFILL: {
+      name: t('common.positionAssignmentReason.AUTOFILL'),
+      color: '#944646',
+      foregroundColor: '#ffffff'
+    }
+  }
+})
+
 const toSortedMilestoneGrades = (arr: string[]) => {
   const deduplicated = Array.from(new Set(arr))
 
@@ -607,6 +693,16 @@ const toSortedMilestoneGrades = (arr: string[]) => {
   return newArr
 }
 
+const formatI18nOrdinal = (n: number) => {
+  if (locale.value === 'zh-cn') {
+    return CHINESE_NUMBERS[n - 1] ?? ' ? '
+  } else {
+    const suffix = ['th', 'st', 'nd', 'rd']
+    const v = n % 100
+    return n + (suffix[(v - 20) % 10] || suffix[v] || suffix[0])
+  }
+}
+
 const getWinLoseClassName = (match: SelfParticipantGame) => {
   if (match.game.gameMode === 'PRACTICETOOL') {
     return 'na'
@@ -625,15 +721,15 @@ const getWinLoseClassName = (match: SelfParticipantGame) => {
 
 const getWinResultText = (match: SelfParticipantGame) => {
   if (match.game.gameMode === 'PRACTICETOOL') {
-    return '—'
+    return t('PlayerInfoCard.matchHistory.winResult.na')
   }
 
   if (match.game.endOfGameResult === 'Abort_AntiCheatExit') {
-    return '终'
+    return t('PlayerInfoCard.matchHistory.winResult.abort')
   }
 
   if (match.selfParticipant.stats.gameEndedInEarlySurrender) {
-    return '重'
+    return t('PlayerInfoCard.matchHistory.winResult.remake')
   }
 
   if (match.game.gameMode === 'CHERRY') {
@@ -641,10 +737,12 @@ const getWinResultText = (match: SelfParticipantGame) => {
       return '?'
     }
 
-    return CHINESE_NUMBERS[Math.max(match.selfParticipant.stats.subteamPlacement - 1, 0)]
+    return formatI18nOrdinal(match.selfParticipant.stats.subteamPlacement)
   }
 
-  return match.selfParticipant.stats.win ? '胜' : '败'
+  return match.selfParticipant.stats.win
+    ? t('PlayerInfoCard.matchHistory.winResult.win')
+    : t('PlayerInfoCard.matchHistory.winResult.lose')
 }
 
 const matches = computed(() => {

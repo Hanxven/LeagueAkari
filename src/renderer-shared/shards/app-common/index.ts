@@ -74,13 +74,6 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
       (v) => (store.tempAkariSubscriptionInfo = v)
     )
 
-    await this._setting.autoSavePropVue(
-      AppCommonRenderer.id,
-      'tempAkariSubscriptionInfo',
-      () => store.tempAkariSubscriptionInfo,
-      (v) => (store.tempAkariSubscriptionInfo = v)
-    )
-
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }

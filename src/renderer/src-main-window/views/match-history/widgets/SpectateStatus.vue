@@ -18,19 +18,19 @@
                 <PlayCircleFilledIcon />
               </NIcon>
             </template>
-            观战</NButton
+            {{ t('SpectateStatus.button') }}</NButton
           >
         </template>
         <ControlItem
           style="margin-bottom: 8px"
           v-if="!isCrossRegion"
-          label="使用 LCU API 观战 (可选)"
+          :label="t('SpectateStatus.lcuSpectate.label')"
           :label-width="240"
         >
           <template #labelDescription>
-            <div>使用 LCU API 调起同大区观战流程，而非通过进程调用</div>
+            <div>{{ t('SpectateStatus.lcuSpectate.description') }}</div>
             <div class="warn-text" v-if="lcs.gameflow.phase !== 'None'">
-              使用 LCU API 观战需要退出房间到空闲状态，当前不是空闲状态。请先退出房间
+              {{ t('SpectateStatus.lcuSpectate.descriptionNotIdle') }}
             </div>
           </template>
           <NButton
@@ -44,13 +44,13 @@
                 <PlayCircleFilledIcon />
               </NIcon>
             </template>
-            LCU API 观战</NButton
+            {{ t('SpectateStatus.lcuSpectate.button') }}</NButton
           >
         </ControlItem>
         <ControlItem
-          label="复制观战口令"
+          :label="t('SpectateStatus.tokenSpectate.label')"
           :label-width="240"
-          label-description="可以在另一个 League Akari 中调起观战进程"
+          :label-description="t('SpectateStatus.tokenSpectate.description')"
         >
           <NButton
             class="launch-spectator"
@@ -63,7 +63,7 @@
                 <CopyAllFilledIcon />
               </NIcon>
             </template>
-            复制</NButton
+            {{ t('SpectateStatus.tokenSpectate.button') }}</NButton
           >
         </ControlItem>
       </NPopover>
@@ -79,7 +79,7 @@
         <div class="team-name">
           <span v-if="name">{{ name }}</span>
           <div class="bans" v-if="bans && bans.length">
-            <span class="bans-hint">禁用</span>
+            <span class="bans-hint">{{ t('SpectateStatus.bans') }}</span>
             <LcuImage
               class="champion-icon"
               v-for="ban of bans"
@@ -124,7 +124,7 @@
       class="cherry-bans"
       v-if="data.game.gameMode === 'CHERRY' && data.game.bannedChampions.length"
     >
-      <span class="bans-hint">禁用</span>
+      <span class="bans-hint">{{ t('SpectateStatus.bans') }}</span>
       <div class="bans-wrap">
         <LcuImage
           class="champion-icon"
@@ -168,10 +168,13 @@ import { createReusableTemplate, useIntervalFn, useTimeoutFn } from '@vueuse/cor
 import dayjs from 'dayjs'
 import { NButton, NIcon, NPopover, useMessage } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
 
 import IndicatorPulse from './IndicatorPulse.vue'
+
+const { t } = useI18n()
 
 const emits = defineEmits<{
   toSummoner: [puuid: string, setCurrent?: boolean]
@@ -219,7 +222,7 @@ const teams = computed(() => {
     return {
       team1: {
         id: 0,
-        name: '全体',
+        name: t('common.teams.all'),
         players: data.game.teamOne
       }
     }
@@ -236,13 +239,13 @@ const teams = computed(() => {
   return {
     team1: {
       id: 100,
-      name: '蓝队',
+      name: t('common.teams.100'),
       players: data.game.teamOne,
       bans: data.game.bannedChampions.filter((ban) => ban.teamId === 100)
     },
     team2: {
       id: 200,
-      name: '红队',
+      name: t('common.teams.200'),
       players: data.game.teamTwo,
       bans: data.game.bannedChampions.filter((ban) => ban.teamId === 200)
     }
@@ -330,10 +333,10 @@ const handleCopyToken = () => {
   navigator.clipboard
     .writeText(str)
     .then(() => {
-      message.success('已复制观战口令')
+      message.success(t('SpectateStatus.tokenSpectate.copied'))
     })
     .catch(() => {
-      message.error('复制观战口令失败')
+      message.error(t('SpectateStatus.tokenSpectate.copyFailed'))
     })
 }
 </script>

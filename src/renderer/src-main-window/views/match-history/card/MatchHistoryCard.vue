@@ -151,24 +151,27 @@
       <div class="summary" v-if="self.summary && game.gameMode !== 'STRAWBERRY'">
         <div
           class="kpr"
-          :title="`在队伍中参与了击杀的程度 ${(self.summary.kpr * 100).toFixed(3)} %`"
+          :title="t('MatchHistoryCard.kprTitle', { rate: (self.summary.kpr * 100).toFixed(3) })"
         >
-          击杀参与率 {{ (self.summary.kpr * 100).toFixed() }} %
+          {{ t('MatchHistoryCard.kpr', { rate: (self.summary.kpr * 100).toFixed() }) }}
         </div>
         <div
           class="ddr"
-          :title="`在队伍中对英雄造成的伤害占比 ${(self.summary.ddr * 100).toFixed(3)} %`"
+          :title="t('MatchHistoryCard.ddrTitle', { rate: (self.summary.ddr * 100).toFixed(3) })"
         >
-          队伍伤害比 {{ (self.summary.ddr * 100).toFixed() }} %
+          {{ t('MatchHistoryCard.ddr', { rate: (self.summary.ddr * 100).toFixed() }) }}
         </div>
         <div
           class="dtr"
-          :title="`在队伍中的承受所有伤害占比 ${(self.summary.dtr * 100).toFixed(3)} %`"
+          :title="t('MatchHistoryCard.dtrTitle', { rate: (self.summary.ddr * 100).toFixed(3) })"
         >
-          队伍承伤比 {{ (self.summary.dtr * 100).toFixed() }} %
+          {{ t('MatchHistoryCard.dtr', { rate: (self.summary.dtr * 100).toFixed() }) }}
         </div>
-        <div class="gr" :title="`在队伍中的金币占比 ${(self.summary.gr * 100).toFixed(3)} %`">
-          队伍经济比 {{ (self.summary.gr * 100).toFixed() }} %
+        <div
+          class="gr"
+          :title="t('MatchHistoryCard.grTitle', { rate: (self.summary.ddr * 100).toFixed(3) })"
+        >
+          {{ t('MatchHistoryCard.gr', { rate: (self.summary.gr * 100).toFixed() }) }}
         </div>
       </div>
       <div class="players">
@@ -218,7 +221,7 @@
       <NIcon
         class="icon standalone-misc-btn-icon"
         @click.stop="() => handleShowMiscellaneous()"
-        title="杂项"
+        :title="t('MatchHistoryCard.misc')"
         ><ListIcon
       /></NIcon>
     </div>
@@ -246,8 +249,8 @@
           @to-summoner="(puuid, setCurrent) => emits('toSummoner', puuid, setCurrent)"
         />
       </template>
-      <div v-else-if="isLoading" class="loading">加载中...</div>
-      <div v-else class="loading">无法加载</div>
+      <div v-else-if="isLoading" class="loading">{{ t('MatchHistoryCard.loading') }}</div>
+      <div v-else class="loading">{{ t('MatchHistoryCard.error') }}</div>
     </template>
   </div>
 </template>
@@ -264,14 +267,12 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Game, ParticipantIdentity } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
-import {
-  ChevronDown as ChevronDownIcon,
-  List as ListIcon
-} from '@vicons/ionicons5'
+import { ChevronDown as ChevronDownIcon, List as ListIcon } from '@vicons/ionicons5'
 import { createReusableTemplate, useTimeoutPoll } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NIcon, NModal } from 'naive-ui'
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import '../lol-view.less'
 import CherryModeDetailedGame from './CherryModeDetailedGame.vue'
@@ -286,6 +287,8 @@ const props = defineProps<{
   isDetailed: boolean
   game: Game
 }>()
+
+const { t } = useI18n()
 
 const emits = defineEmits<{
   setShowDetailedGame: [gameId: number, expand: boolean]

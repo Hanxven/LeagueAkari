@@ -1,6 +1,8 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">英雄选择台</span></template>
+    <template #header
+      ><span class="card-header-title">{{ t('ChampionBench.title') }}</span></template
+    >
     <div class="outer" v-if="benchChampions !== null">
       <div class="operations">
         <NButton
@@ -8,14 +10,14 @@
           :disabled="rerollsRemaining === 0 || isRerolling"
           size="small"
           type="primary"
-          >重随 ({{ rerollsRemaining }})</NButton
+          >{{ t('ChampionBench.reroll') }} ({{ rerollsRemaining }})</NButton
         >
         <NButton
           :disabled="rerollsRemaining === 0 || isRerolling"
           @click="() => handleReroll(true)"
           size="small"
-          title="进行一次重新随机，但立即拿回之前的英雄"
-          >慈善</NButton
+          :title="t('ChampionBench.charity')"
+          >{{ t('ChampionBench.charity') }}</NButton
         >
         <LcuImage
           class="champion-image"
@@ -42,7 +44,11 @@
       </div>
     </div>
     <div style="font-size: 13px" v-else>
-      {{ lcs.gameflow.phase === 'ChampSelect' ? '当前模式不可用' : '未处于英雄选择过程中' }}
+      {{
+        lcs.gameflow.phase === 'ChampSelect'
+          ? t('ChampionBench.notInBenchMode')
+          : t('ChampionBench.notInPhase')
+      }}
     </div>
   </NCard>
 </template>
@@ -57,6 +63,9 @@ import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { NButton, NCard, NDivider } from 'naive-ui'
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -109,7 +118,11 @@ const handleBenchSwap = async (championId: number) => {
   try {
     await lc.api.champSelect.benchSwap(championId)
   } catch (error) {
-    laNotification.warn('英雄选择台', '交换失败，目标英雄可能已经不存在', error)
+    laNotification.warn(
+      t('ChampionBench.swapFailedNotification.title'),
+      t('ChampionBench.swapFailedNotification.description'),
+      error
+    )
   } finally {
     isSwapping.value = false
   }
@@ -135,7 +148,11 @@ const handleReroll = async (grabBack = false) => {
       }, 25)
     }
   } catch (error) {
-    laNotification.warn('英雄选择台', '重新随机失败', error)
+    laNotification.warn(
+      t('ChampionBench.rerollFailedNotification.title'),
+      t('ChampionBench.rerollFailedNotification.description'),
+      error
+    )
   } finally {
     isRerolling.value = false
   }

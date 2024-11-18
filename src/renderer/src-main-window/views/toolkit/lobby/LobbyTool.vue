@@ -1,16 +1,19 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">房间工具</span></template>
+    <template #header
+      ><span class="card-header-title">{{ t('LobbyTool.title') }}</span></template
+    >
     <ControlItem
       class="control-item-margin"
-      label="添加人机"
-      label-description="在当前自定义或训练房间中添加人机"
+      :label="t('LobbyTool.addBot.label')"
+      :label-description="t('LobbyTool.addBot.description')"
       :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
         <NSelect
           style="width: 140px"
           size="small"
+          :consistent-menu-width="false"
           v-model:value="botSettings.championId"
           @update:show="handleLoadAvailableBots"
           :options="availableBotOptions"
@@ -18,33 +21,36 @@
         <NSelect
           style="width: 80px"
           size="small"
+          :consistent-menu-width="false"
           v-model:value="botSettings.difficulty"
           :options="difficultyOptions"
         ></NSelect>
         <NSelect
           style="width: 100px"
           size="small"
+          :consistent-menu-width="false"
           v-model:value="botSettings.team"
           :options="teamOptions"
         ></NSelect>
-        <NButton :disabled="lcs.gameflow.phase !== 'Lobby'" @click="handleAddBot" size="small"
-          >添加</NButton
-        >
+        <NButton :disabled="lcs.gameflow.phase !== 'Lobby'" @click="handleAddBot" size="small">{{
+          t('LobbyTool.addBot.button')
+        }}</NButton>
       </div>
     </ControlItem>
     <ControlItem
       class="control-item-margin"
-      label="创建队列房间"
-      label-description="创建一个指定队列 ID 的房间，受制于服务器是否开启目标队列"
+      :label="t('LobbyTool.createIdLobby.label')"
+      :label-description="t('LobbyTool.createIdLobby.description')"
       :label-width="200"
     >
       <div style="display: flex; align-items: center; gap: 8px">
         <NSelect
-          placeholder="选择或指定 ID"
+          :placeholder="t('LobbyTool.createIdLobby.selectPlaceholder')"
           style="width: 180px"
           @update:show="handleLoadEligibleQueues"
           size="small"
           filterable
+          :consistent-menu-width="false"
           tag
           v-model:value="queueLobbySettings.queueId"
           :options="queueOptions"
@@ -57,18 +63,22 @@
           "
           @click="handleCreateQueueLobby"
           size="small"
-          >创建</NButton
+          >{{ t('LobbyTool.createIdLobby.button') }}</NButton
         >
       </div>
     </ControlItem>
-    <ControlItem class="control-item-margin" label="创建 5v5 训练房间" :label-width="200">
+    <ControlItem
+      class="control-item-margin"
+      :label="t('LobbyTool.create5x5PracticeLobby.label')"
+      :label-width="200"
+    >
       <NFlex>
         <NButton
           @click="handleCreatePractice5v5"
           size="small"
           :disabled="lcs.connectionState !== 'connected'"
           :loading="isCreatingPractice5v5"
-          >创建</NButton
+          >{{ t('LobbyTool.create5x5PracticeLobby.button') }}</NButton
         >
         <NInput
           :status="practice5v5LobbyName.length ? 'success' : 'warning'"
@@ -91,6 +101,9 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { AvailableBot, QueueEligibility } from '@shared/types/league-client/lobby'
 import { NButton, NCard, NFlex, NInput, NSelect, useMessage } from 'naive-ui'
 import { computed, reactive, ref, shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -116,7 +129,13 @@ const handleCreatePractice5v5 = async () => {
     await lc.api.lobby.createPractice5x5(practice5v5LobbyName.value)
     practice5v5LobbyName.value = getRandomLobbyName()
   } catch (error) {
-    laNotification.warn('房间工具', '尝试创建房间失败', error)
+    laNotification.warn(
+      t('LobbyTool.create5x5PracticeLobby.failedNotification.title'),
+      t('LobbyTool.create5x5PracticeLobby.failedNotification.description', {
+        reason: (error as Error).message
+      }),
+      error
+    )
   } finally {
     isCreatingPractice5v5.value = false
   }
@@ -129,7 +148,13 @@ const handleAddBot = async () => {
   try {
     await lc.api.lobby.addBot(botSettings.difficulty, botSettings.championId, botSettings.team)
   } catch (error) {
-    laNotification.warn('房间工具', '尝试添加人机失败', error)
+    laNotification.warn(
+      t('LobbyTool.addBot.failedNotification.title'),
+      t('LobbyTool.addBot.failedNotification.description', {
+        reason: (error as Error).message
+      }),
+      error
+    )
   }
 }
 
@@ -145,7 +170,13 @@ const handleLoadEligibleQueues = async (show: boolean) => {
       eligiblePartyQueues.value = d1
       eligibleSelfQueues.value = d2
     } catch (error) {
-      laNotification.warn('房间工具', '尝试加载可用队列列表失败', error)
+      laNotification.warn(
+        t('LobbyTool.loadEligibleQueuesFailedNotification.title'),
+        t('LobbyTool.loadEligibleQueuesFailedNotification.description', {
+          reason: (error as Error).message
+        }),
+        error
+      )
     }
   }
 }
@@ -169,24 +200,29 @@ const queueOptions = computed(() => {
     }
   }
 
-  const options = [
-    {
-      label: '可用队列',
+  const options: any[] = []
+
+  if (availableQueues.length > 0) {
+    options.push({
+      label: t('LobbyTool.queueOptions.available'),
       type: 'group',
       children: availableQueues.map((k) => ({
         value: k,
         label: `${lcs.gameData.queues[k].name} (${k})`
       }))
-    },
-    {
-      label: '当前已禁用队列',
+    })
+  }
+
+  if (unavailableQueues.length > 0) {
+    options.push({
+      label: t('LobbyTool.queueOptions.unavailable'),
       type: 'group',
       children: unavailableQueues.map((k) => ({
         value: k,
         label: `${lcs.gameData.queues[k].name} (${k})`
       }))
-    }
-  ]
+    })
+  }
 
   return options
 })
@@ -209,54 +245,60 @@ const availableBotOptions = computed(() => {
     }))
 })
 
-const difficultyOptions = [
-  {
-    value: 'RSINTRO',
-    label: '新手'
-  },
-  {
-    value: 'RSBEGINNER',
-    label: '中等'
-  },
-  {
-    value: 'RSINTERMEDIATE',
-    label: '一般'
-  }
-]
+const difficultyOptions = computed(() => {
+  return [
+    {
+      value: 'RSINTRO',
+      label: t('LobbyTool.difficultyOptions.RSINTRO')
+    },
+    {
+      value: 'RSBEGINNER',
+      label: t('LobbyTool.difficultyOptions.RSBEGINNER')
+    },
+    {
+      value: 'RSINTERMEDIATE',
+      label: t('LobbyTool.difficultyOptions.RSINTERMEDIATE')
+    }
+  ]
+})
 
-const positionOptions = [
-  {
-    value: 'TOP',
-    label: '上单'
-  },
-  {
-    value: 'JUNGLE',
-    label: '打野'
-  },
-  {
-    value: 'MIDDLE',
-    label: '中单'
-  },
-  {
-    value: 'BOTTOM',
-    label: '下路'
-  },
-  {
-    value: 'UTILITY',
-    label: '辅助'
-  }
-]
+const positionOptions = computed(() => {
+  return [
+    {
+      value: 'TOP',
+      label: t('common.lanes.TOP')
+    },
+    {
+      value: 'JUNGLE',
+      label: t('common.lanes.JUNGLE')
+    },
+    {
+      value: 'MIDDLE',
+      label: t('common.lanes.MIDDLE')
+    },
+    {
+      value: 'BOTTOM',
+      label: t('common.lanes.BOTTOM')
+    },
+    {
+      value: 'UTILITY',
+      label: t('common.lanes.UTILITY')
+    }
+  ]
+})
 
-const teamOptions = [
-  {
-    value: '100',
-    label: '蓝队'
-  },
-  {
-    value: '200',
-    label: '红队'
-  }
-]
+const teamOptions = computed(() => {
+  return [
+    {
+      value: '100',
+      label: t('common.teams.100')
+    },
+    {
+      value: '200',
+      label: t('common.teams.200')
+    }
+  ]
+})
 
 const botSettings = reactive({
   difficulty: 'RSINTERMEDIATE',
@@ -276,7 +318,13 @@ const handleCreateQueueLobby = async () => {
   try {
     await lc.api.lobby.createQueueLobby(queueLobbySettings.queueId)
   } catch (error) {
-    laNotification.warn('房间工具', `尝试创建队列房间失败，${(error as any).message}`, error)
+    laNotification.warn(
+      t('LobbyTool.createIdLobby.failedNotification.title'),
+      t('LobbyTool.createIdLobby.failedNotification.description', {
+        reason: (error as Error).message
+      }),
+      error
+    )
   }
 }
 
@@ -290,14 +338,19 @@ const handleLoadAvailableBots = async (show: boolean) => {
       availableBots.value = bots
 
       if (!acknowledged && bots.length === 0) {
-        message.info('为了获取自定义人机列表，你需要进入一次自定义房间', {
+        message.info(t('LobbyTool.loadBots.firstUseNote'), {
           closable: true,
           duration: 5000
         })
         acknowledged = true
       }
     } catch (error) {
-      laNotification.warn('房间工具', '尝试加载可用人机列表失败', error)
+      laNotification.warn(
+        t('LobbyTool.loadBots.failedNotification.title'),
+        t('LobbyTool.loadBots.failedNotification.description', {
+          reason: (error as Error).message
+        })
+      )
     }
   }
 }

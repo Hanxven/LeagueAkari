@@ -3,7 +3,7 @@
     <div class="sections">
       <div class="section-icon-container">
         <NIcon class="section-icon"><AppSwitcherIcon /></NIcon>
-        <span class="session-label">工具集</span>
+        <span class="session-label">{{ t('Toolkit.title') }}</span>
       </div>
       <NTabs
         v-model:value="currentTab"
@@ -11,16 +11,16 @@
         size="medium"
       >
         <NTab name="client">
-          <span class="tab-name">客户端 / 游戏端</span>
+          <span class="tab-name">{{ t('Toolkit.client') }}</span>
         </NTab>
         <NTab name="in-process" class="tab-name">
-          <span class="tab-name">过程中</span>
+          <span class="tab-name">{{ t('Toolkit.inProcess') }}</span>
         </NTab>
         <NTab name="lobby" class="tab-name">
-          <span class="tab-name">房间工具</span>
+          <span class="tab-name">{{ t('Toolkit.lobby') }}</span>
         </NTab>
         <NTab name="misc" class="tab-name">
-          <span class="tab-name">百宝箱</span>
+          <span class="tab-name">{{ t('Toolkit.misc') }}</span>
         </NTab>
       </NTabs>
     </div>
@@ -37,15 +37,18 @@
   </div>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { AppSwitcher as AppSwitcherIcon } from '@vicons/carbon'
 import { NIcon, NTab, NTabs } from 'naive-ui'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import Client from './client/Client.vue'
 import InProcess from './in-process/InProcess.vue'
 import Lobby from './lobby/Lobby.vue'
 import Misc from './misc/Misc.vue'
+
+const { t } = useI18n()
 
 const currentTab = ref('client')
 </script>

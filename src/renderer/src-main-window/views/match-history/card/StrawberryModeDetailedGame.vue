@@ -11,13 +11,13 @@
         <thead class="team-header">
           <tr>
             <th class="header-info">
-              {{ participants[0].stats.win ? '胜利' : '失败' }}
+              {{ participants[0].stats.win ? t('DetailedGame.win') : t('DetailedGame.lose') }}
             </th>
-            <th class="header-kda">KDA</th>
-            <th class="header-augments">强化</th>
-            <th class="header-damage">伤害 & 承受</th>
-            <th class="header-gold">金币</th>
-            <th class="header-items">物品</th>
+            <th class="header-kda">{{ t('DetailedGame.header.kda') }}</th>
+            <th class="header-augments">{{ t('DetailedGame.header.augment') }}</th>
+            <th class="header-damage">{{ t('DetailedGame.header.dmg') }}</th>
+            <th class="header-gold">{{ t('DetailedGame.header.gold') }}</th>
+            <th class="header-items">{{ t('DetailedGame.header.item') }}</th>
           </tr>
         </thead>
         <tbody class="participants">
@@ -51,7 +51,9 @@
                         p.identity.player.gameName || p.identity.player.summonerName,
                         p.identity.player.tagLine
                       )
-                    }}{{ p.identity.player.puuid === EMPTY_PUUID ? ' (人机)' : '' }}
+                    }}{{
+                      p.identity.player.puuid === EMPTY_PUUID ? ` (${t('DetailedGame.bot')})` : ''
+                    }}
                   </div>
                 </div>
               </div>
@@ -121,8 +123,11 @@ import { Game, Participant, ParticipantIdentity } from '@shared/types/league-cli
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
+
+const { t } = useI18n()
 
 const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
   participants: ParticipantWithIdentity[]

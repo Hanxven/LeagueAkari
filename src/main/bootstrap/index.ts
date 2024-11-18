@@ -36,6 +36,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { app, dialog } from 'electron'
 import { configure } from 'mobx'
 import EventEmitter from 'node:events'
+import os from 'node:os'
 import { Logger } from 'winston'
 
 import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
@@ -60,6 +61,11 @@ declare module '@shared/akari-shard/manager' {
      * 是否是管理员权限
      */
     isAdministrator: boolean
+
+    /**
+     * 是否是 Windows 11 22H2 或更高版本
+     */
+    isWindows11_22H2_OrHigher: boolean
 
     /**
      * 基础全局设置
@@ -100,6 +106,20 @@ function handleUnhandledErrors(logger: Logger) {
       namespace: 'error-handling'
     })
   })
+}
+
+/**
+ * 支持 Mica 的版本
+ */
+export function isWindows11_22H2_OrHigher() {
+  const release = os.release() // e.g., '10.0.22621'
+  const [major, minor, build] = release.split('.').map(Number)
+
+  // Check if it's Windows 11 (major 10, minor 0) and build is 22621 or higher
+  if (major === 10 && minor === 0 && build >= 22621) {
+    return true
+  }
+  return false
 }
 
 export const isAdministrator = tools.isElevated()
@@ -154,6 +174,7 @@ export function bootstrap() {
     }
     manager.global.isAdministrator = isAdministrator
     manager.global.version = app.getVersion()
+    manager.global.isWindows11_22H2_OrHigher = isWindows11_22H2_OrHigher()
     manager.global.quit = () => app.quit()
     manager.global.restart = () => {
       app.relaunch()

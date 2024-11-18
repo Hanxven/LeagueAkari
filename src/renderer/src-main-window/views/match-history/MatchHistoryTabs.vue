@@ -13,9 +13,11 @@
     <div v-else class="tabs-placeholder">
       <div class="centered">
         <LeagueAkariSpan bold class="akari-text" />
-        <div v-if="lcs.connectionState !== 'connected'" class="disconnected">未连接到客户端</div>
+        <div v-if="lcs.connectionState !== 'connected'" class="disconnected">
+          {{ t('MatchHistoryTabs.disconnected') }}
+        </div>
         <template v-if="lcs.summoner.me && mhs.tabs.length === 0">
-          <div class="no-tab">当前没有活跃的战绩页面</div>
+          <div class="no-tab">{{ t('MatchHistoryTabs.noActiveTab') }}</div>
           <div class="shortcut" @click="handleOpenSelfTab">
             <LcuImage
               class="shortcut-profile-icon"
@@ -41,6 +43,7 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useMessage } from 'naive-ui'
 import { computed, onActivated, onDeactivated, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 // import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
@@ -48,6 +51,8 @@ import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 
@@ -161,7 +166,7 @@ const { stop, start } = useKeyboardCombo('PUUID', {
       navigator.clipboard.writeText(
         `${mhs.currentTab.sgpServerId}\nPUUID: ${mhs.currentTab.puuid}\nSummoner ID: ${mhs.currentTab.summoner?.summonerId}\n${mhs.currentTab.summoner?.gameName}#${mhs.currentTab.summoner?.tagLine}`
       )
-      message.success('已复制 PUUID 到剪贴板')
+      message.success(t('MatchHistoryTabs.copiedToClipboard'))
     }
   },
   immediate: false

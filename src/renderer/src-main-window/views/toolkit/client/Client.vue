@@ -3,11 +3,13 @@
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
         <NCard size="small">
-          <template #header><span class="card-header-title">League Client</span></template>
+          <template #header
+            ><span class="card-header-title">{{ t('Client.leagueClient.title') }}</span></template
+          >
           <ControlItem
             class="control-item-margin"
-            label="断开连接"
-            label-description="断开 League Akari 与 League Client 的连接"
+            :label="t('Client.leagueClient.disconnect.label')"
+            :label-description="t('Client.leagueClient.disconnect.description')"
             :label-width="320"
           >
             <NButton
@@ -16,13 +18,13 @@
               secondary
               type="warning"
               @click="handleDisconnect"
-              >断开</NButton
+              >{{ t('Client.leagueClient.disconnect.button') }}</NButton
             >
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            label="关闭客户端进程"
-            label-description="关闭 League Client"
+            :label="t('Client.leagueClient.quitClient.label')"
+            :label-description="t('Client.leagueClient.quitClient.description')"
             :label-width="320"
           >
             <NButton
@@ -31,20 +33,22 @@
               secondary
               type="warning"
               @click="handleQuitClient"
-              >关闭 Client 进程</NButton
+              >{{ t('Client.leagueClient.quitClient.button') }}</NButton
             >
           </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
-          <template #header><span class="card-header-title">游戏端</span></template>
+          <template #header
+            ><span class="card-header-title">{{ t('Client.gameClient.title') }}</span></template
+          >
           <ControlItem
             class="control-item-margin"
-            label-description="当游戏端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏端 (游戏本体) 进程。请注意，此操作为强制结束进程，而非正常的游戏退出流程，可能产生意料之外的副作用"
+            :label-description="t('Client.gameClient.terminateGameClientOnAltF4.description')"
             :disabled="!as.isAdministrator"
             :label="
               as.isAdministrator
-                ? '使用 Alt+F4 结束游戏端'
-                : '使用 Alt+F4 结束游戏端 (需要管理员权限)'
+                ? t('Client.gameClient.terminateGameClientOnAltF4.label')
+                : t('Client.gameClient.terminateGameClientOnAltF4.labelAdminRequired')
             "
             :label-width="320"
           >
@@ -58,12 +62,18 @@
           </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
-          <template #header><span class="card-header-title">League Client UX</span></template>
+          <template #header
+            ><span class="card-header-title">{{ t('Client.leagueClientUx.title') }}</span></template
+          >
           <ControlItem
             class="control-item-margin"
             :disabled="!as.isAdministrator"
-            :label="as.isAdministrator ? '调整窗口大小' : '调整窗口大小 (需要管理员权限)'"
-            label-description="FixLCUWindow - 以 WinAPI 方式调整窗口的大小。在客户端界面大小不正确时，可尝试此操作"
+            :label="
+              as.isAdministrator
+                ? t('Client.leagueClientUx.fixWindowMethodAOptions.label')
+                : t('Client.leagueClientUx.fixWindowMethodAOptions.labelAdminRequired')
+            "
+            :label-description="t('Client.leagueClientUx.fixWindowMethodAOptions.description')"
             :label-width="320"
           >
             <div class="control" style="display: flex; gap: 4px; align-items: baseline">
@@ -95,14 +105,14 @@
                 secondary
                 type="warning"
                 @click="handleFixWindowMethodA"
-                >调整</NButton
+                >{{ t('Client.leagueClientUx.fixWindowMethodAOptions.button') }}</NButton
               >
             </div>
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            label="重启 UX 进程"
-            label-description="立即重启渲染进程。该操作不会影响正在进行中的活动，适用于修复客户端界面错误"
+            :label="t('Client.leagueClientUx.restartUx.label')"
+            :label-description="t('Client.leagueClientUx.restartUx.description')"
             :label-width="320"
           >
             <NButton
@@ -111,13 +121,13 @@
               secondary
               type="warning"
               @click="handleRestartUx"
-              >重启 UX 进程</NButton
+              >{{ t('Client.leagueClientUx.restartUx.button') }}</NButton
             >
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            label="结束 UX 进程"
-            label-description="立即关闭渲染进程。该操作不会影响正在进行中的活动"
+            :label="t('Client.leagueClientUx.killUx.label')"
+            :label-description="t('Client.leagueClientUx.killUx.description')"
             :label-width="320"
           >
             <NButton
@@ -126,13 +136,13 @@
               secondary
               size="small"
               @click="handleKillUx"
-              >结束 UX 进程</NButton
+              >{{ t('Client.leagueClientUx.killUx.button') }}</NButton
             >
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            label="启动 UX 进程"
-            label-description="如果渲染进程已经关闭，则立即启动渲染进程"
+            :label="t('Client.leagueClientUx.launchUx.label')"
+            :label-description="t('Client.leagueClientUx.launchUx.description')"
             :label-width="320"
           >
             <NButton
@@ -141,7 +151,7 @@
               secondary
               size="small"
               @click="handleLaunchUx"
-              >启动 UX 进程</NButton
+              >{{ t('Client.leagueClientUx.launchUx.button') }}</NButton
             >
           </ControlItem>
         </NCard>
@@ -159,7 +169,10 @@ import { useGameClientStore } from '@renderer-shared/shards/game-client/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NButton, NCard, NInputNumber, NScrollbar, NSwitch, useDialog } from 'naive-ui'
-import { reactive, ref, toRaw, useTemplateRef } from 'vue'
+import { reactive, toRaw, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
@@ -172,10 +185,10 @@ const dialog = useDialog()
 
 const handleQuitClient = async () => {
   dialog.warning({
-    title: '退出客户端进程',
-    content: '是否退出客户端进程？这将直接关闭游戏。',
-    positiveText: '退出',
-    negativeText: '取消',
+    title: t('Client.leagueClient.quitClient.dialog.title'),
+    content: t('Client.leagueClient.quitClient.dialog.content'),
+    positiveText: t('Client.leagueClient.quitClient.dialog.positiveText'),
+    negativeText: t('Client.leagueClient.quitClient.dialog.negativeText'),
     onPositiveClick: async () => {
       try {
         await lc.api.processControl.quit()
@@ -192,10 +205,10 @@ const handleDisconnect = async () => {
 
 const handleRestartUx = async () => {
   dialog.warning({
-    title: '重启 UX 进程',
-    content: '是否重启 UX 进程？当客户端无法正常显示时，可尝试执行此操作。',
-    positiveText: '重启',
-    negativeText: '取消',
+    title: t('Client.leagueClientUx.restartUx.dialog.title'),
+    content: t('Client.leagueClientUx.restartUx.dialog.content'),
+    positiveText: t('Client.leagueClientUx.restartUx.dialog.positiveText'),
+    negativeText: t('Client.leagueClientUx.restartUx.dialog.negativeText'),
     onPositiveClick: async () => {
       try {
         await lc.api.riotclient.restartUx()
@@ -208,11 +221,10 @@ const handleRestartUx = async () => {
 
 const handleKillUx = async () => {
   dialog.warning({
-    title: '结束 UX 进程',
-    content:
-      '是否结束 UX 进程？你可能需要重新启动此进程。结束 UX 进程并不会导致游戏退出，但可以显著减少性能占用。',
-    positiveText: '结束',
-    negativeText: '取消',
+    title: t('Client.leagueClientUx.killUx.dialog.title'),
+    content: t('Client.leagueClientUx.killUx.dialog.content'),
+    positiveText: t('Client.leagueClientUx.killUx.dialog.positiveText'),
+    negativeText: t('Client.leagueClientUx.killUx.dialog.negativeText'),
     onPositiveClick: async () => {
       try {
         await lc.api.riotclient.killUx()
@@ -225,10 +237,10 @@ const handleKillUx = async () => {
 
 const handleLaunchUx = async () => {
   dialog.warning({
-    title: '启动 UX 进程',
-    content: '是否启动 UX 进程？',
-    positiveText: '启动',
-    negativeText: '取消',
+    title: t('Client.leagueClientUx.launchUx.dialog.title'),
+    content: t('Client.leagueClientUx.launchUx.dialog.content'),
+    positiveText: t('Client.leagueClientUx.launchUx.dialog.positiveText'),
+    negativeText: t('Client.leagueClientUx.launchUx.dialog.negativeText'),
     onPositiveClick: async () => {
       try {
         await lc.api.riotclient.launchUx()
@@ -248,10 +260,10 @@ const fixWindowMethodAOptions = reactive({
 
 const handleFixWindowMethodA = async () => {
   dialog.warning({
-    title: '修复客户端窗口',
-    content: '修复客户端窗口？当客户端无法正常显示时，可尝试执行此操作。',
-    positiveText: '执行',
-    negativeText: '取消',
+    title: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.title'),
+    content: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.content'),
+    positiveText: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.content.positiveText'),
+    negativeText: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.content.negativeText'),
     onPositiveClick: async () => {
       try {
         await lc.fixWindowMethodA(toRaw(fixWindowMethodAOptions))

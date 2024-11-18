@@ -14,7 +14,11 @@
       />
       <div class="placeholder" v-else>
         <span>{{
-          isFailedToLoad ? (isNotFound ? '对局不存在' : '无法拉取对局') : '加载中...'
+          isFailedToLoad
+            ? isNotFound
+              ? t('StandaloneMatchHistoryCardModal.notFound')
+              : t('StandaloneMatchHistoryCardModal.error')
+            : t('StandaloneMatchHistoryCardModal.loading')
         }}</span>
         <NButton
           :disabled="!props.gameId || isNotFound"
@@ -22,7 +26,7 @@
           secondary
           v-if="isFailedToLoad"
           @click="() => handleReload()"
-          >重新拉取</NButton
+          >{{ t('StandaloneMatchHistoryCardModal.reload') }}</NButton
         >
       </div>
     </div>
@@ -39,9 +43,9 @@ import { Game } from '@shared/types/league-client/match-history'
 import { AxiosError } from 'axios'
 import { NButton, NModal } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
-// TODO CHANGE IT ALL
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 import MatchHistoryCard from './MatchHistoryCard.vue'
@@ -51,6 +55,8 @@ const props = defineProps<{
   gameId?: number
   selfPuuid?: string
 }>()
+
+const { t } = useI18n()
 
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const sgp = useInstance<SgpRenderer>('sgp-renderer')

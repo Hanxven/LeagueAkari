@@ -1,4 +1,9 @@
-import { Game, Participant, ParticipantIdentity, isPveQueue } from '@shared/types/league-client/match-history'
+import {
+  Game,
+  Participant,
+  ParticipantIdentity,
+  isPveQueue
+} from '@shared/types/league-client/match-history'
 
 const WIN_RATE_TEAM_THRESHOLD = 0.9418
 
@@ -1052,8 +1057,8 @@ export function calculateAkariScore(analyses: {
     goldScore,
     participationScore,
     total,
-    good: total >= 25.0,
-    great: total >= 28.0
+    good: total >= 26.0,
+    great: total >= 30.0
   }
 }
 

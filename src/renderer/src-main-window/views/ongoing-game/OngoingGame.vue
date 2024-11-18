@@ -12,19 +12,19 @@
           <span class="title">{{ formatTeamText(team).name }}</span>
           <div class="analysis" v-if="og.playerStats?.teams[team] && players.length >= 1">
             <span
-              title="队伍平均胜率"
+              :title="t('OngoingGame.avgTeamWinRate')"
               class="win-rate"
               :class="{
                 'gte-50': og.playerStats.teams[team].averageWinRate >= 0.5,
                 'lt-50': og.playerStats.teams[team].averageWinRate < 0.5
               }"
-              >{{ (og.playerStats.teams[team].averageWinRate * 100).toFixed() }} %</span
+              >{{ (og.playerStats.teams[team].averageWinRate * 100).toFixed() }}%</span
             >
-            <span title="队伍平均 KDA">{{
+            <span :title="t('OngoingGame.avgTeamKda')">{{
               og.playerStats?.teams[team].averageKda.toFixed(2)
             }}</span>
             <span
-              title="队伍平均 Akari Score"
+              title="Avg Akari Score"
               style="color: #ff65ce"
               v-if="app.settings.isInKyokoMode"
               >{{ og.playerStats.teams[team].averageAkariScore.toFixed(2) }}</span
@@ -71,13 +71,15 @@
       <div class="centered">
         <LeagueAkariSpan bold class="akari-text" />
         <div v-if="og.settings.enabled" class="no-ongoing-game-text">
-          <template v-if="lc.connectionState !== 'connected'">未连接到客户端</template>
-          <template v-else-if="lc.champSelect.session && lc.champSelect.session.isSpectating"
-            >等待观战延迟</template
-          >
-          <template v-else>没有正在进行中的游戏</template>
+          <template v-if="lc.connectionState !== 'connected'">{{
+            t('OngoingGame.disconnected')
+          }}</template>
+          <template v-else-if="lc.champSelect.session && lc.champSelect.session.isSpectating">{{
+            t('OngoingGame.waitingForSpectate')
+          }}</template>
+          <template v-else>{{ t('OngoingGame.noOngoingGame') }}</template>
         </div>
-        <div v-else class="no-ongoing-game-text">对局分析已禁用</div>
+        <div v-else class="no-ongoing-game-text">{{ t('OngoingGame.disabled') }}</div>
       </div>
     </div>
   </div>
@@ -88,13 +90,12 @@ import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Game } from '@shared/types/league-client/match-history'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
-import { NButton, NScrollbar, NSelect } from 'naive-ui'
+import { NScrollbar } from 'naive-ui'
 import { computed, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
@@ -102,28 +103,21 @@ import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMat
 import PlayerInfoCard from './PlayerInfoCard.vue'
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,
-  PRE_MADE_TEAMS as PREMADE_TEAMS,
-  TEAM_NAMES,
+  PREMADE_TEAMS,
   TeamMeta,
-  useIdleState,
-  useOrderOptions,
-  useSgpTagOptions
+  useIdleState
 } from './ongoing-game-utils'
 
 const lc = useLeagueClientStore()
 const app = useAppCommonStore()
 
+const { t } = useI18n()
+
 const og = useOngoingGameStore()
-const sgp = useSgpStore()
-const ogs = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
 
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
 const isInIdleState = useIdleState()
-
-const canUseSgpApi = computed(() => {
-  return og.settings.matchHistoryUseSgpApi && sgp.availability.serversSupported.matchHistory
-})
 
 const sortedTeams = computed(() => {
   if (!og.teams) {
@@ -188,18 +182,18 @@ const formatTeamText = (team: string): TeamMeta => {
   if (og.gameInfo?.queueType === 'CHERRY') {
     if (lc.gameflow.phase === 'ChampSelect') {
       return {
-        name: team.startsWith('our') ? '我方小队' : '敌方小队',
+        name: team.startsWith('our') ? t(`common.teams.our`) : t(`common.teams.their`),
         side: -1
       }
     } else {
       if (team === 'all') {
-        return { name: '所有玩家', side: -1 }
+        return { name: t(`common.teams.all`), side: -1 }
       }
 
-      return { name: '全体', side: -1 }
+      return { name: t(`common.teams.unknown`), side: -1 }
     }
   } else {
-    return TEAM_NAMES[team] || { name: '队伍', side: -1 }
+    return { name: t(`common.teams.${team}`, team), side: -1 }
   }
 }
 

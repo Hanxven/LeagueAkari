@@ -12,7 +12,9 @@
 </template>
 
 <script setup lang="ts">
+import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import { useMessage } from 'naive-ui'
 import { watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -36,6 +38,16 @@ watch(
   },
   { immediate: true }
 )
+
+const message = useMessage()
+useKeyboardCombo('AKARI', {
+  onFinish: () => {
+    message.info('League Akari!')
+  },
+  requireSameEl: true,
+  caseSensitive: false,
+  maxInterval: 250
+})
 </script>
 
 <style lang="less">

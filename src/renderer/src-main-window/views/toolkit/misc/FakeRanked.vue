@@ -1,10 +1,12 @@
 <template>
   <NCard size="small">
-    <template #header><span class="card-header-title">聊天卡片段位修改</span></template>
+    <template #header
+      ><span class="card-header-title">{{ t('FakeRanked.title') }}</span></template
+    >
     <ControlItem
       class="control-item-margin"
-      label="立即使生效"
-      label-description="立即修改聊天卡片状态，在下一次客户端启动前有效"
+      :label="t('FakeRanked.set.label')"
+      :label-description="t('FakeRanked.set.description')"
       :label-width="200"
     >
       <NButton
@@ -12,10 +14,10 @@
         type="primary"
         :disabled="lcs.connectionState !== 'connected'"
         @click="() => handleSet()"
-        >修改</NButton
+        >{{ t('FakeRanked.set.button') }}</NButton
       >
     </ControlItem>
-    <ControlItem class="control-item-margin" label="队列" :label-width="200">
+    <ControlItem class="control-item-margin" :label="t('FakeRanked.queue')" :label-width="200">
       <NSelect
         :options="queueOptions"
         style="width: 180px"
@@ -23,7 +25,7 @@
         size="small"
       ></NSelect>
     </ControlItem>
-    <ControlItem class="control-item-margin" label="段位" :label-width="200">
+    <ControlItem class="control-item-margin" :label="t('FakeRanked.tier')" :label-width="200">
       <NSelect
         :options="tierOptions"
         style="width: 180px"
@@ -31,7 +33,7 @@
         size="small"
       ></NSelect>
     </ControlItem>
-    <ControlItem class="control-item-margin" label="分级" :label-width="200">
+    <ControlItem class="control-item-margin" :label="t('FakeRanked.division')" :label-width="200">
       <NSelect
         :options="divisionOptions"
         :disabled="
@@ -52,7 +54,10 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -74,54 +79,62 @@ const handleSet = async () => {
         ? undefined
         : state.division
     )
-    message.success('成功', { duration: 1000 })
+    message.success(t('FakeRanked.commonSuccess'), { duration: 1000 })
   } catch (error) {
-    laNotification.warn('聊天状态伪造', '尝试提交数据时失败', error)
+    laNotification.warn(
+      t('FakeRanked.set.failedNotification.title'),
+      t('FakeRanked.set.failedNotification.description', {
+        reason: (error as Error).message
+      }),
+      error
+    )
   }
 }
 
-const tierOptions = [
-  {
-    label: '坚韧黑铁',
-    value: 'IRON'
-  },
-  {
-    label: '英勇黄铜',
-    value: 'BRONZE'
-  },
-  {
-    label: '不屈白银',
-    value: 'SILVER'
-  },
-  {
-    label: '荣耀黄金',
-    value: 'GOLD'
-  },
-  {
-    label: '华贵铂金',
-    value: 'PLATINUM'
-  },
-  {
-    label: '流光翡翠',
-    value: 'EMERALD'
-  },
-  {
-    label: '璀璨钻石',
-    value: 'DIAMOND'
-  },
-  {
-    label: '超凡大师',
-    value: 'MASTER'
-  },
-  {
-    label: '傲世宗师',
-    value: 'GRANDMASTER'
-  },
-  {
-    label: '最强王者',
-    value: 'CHALLENGER'
-  }
-]
+const tierOptions = computed(() => {
+  return [
+    {
+      label: t('common.tiers.IRON'),
+      value: 'IRON'
+    },
+    {
+      label: t('common.tiers.BRONZE'),
+      value: 'BRONZE'
+    },
+    {
+      label: t('common.tiers.SILVER'),
+      value: 'SILVER'
+    },
+    {
+      label: t('common.tiers.GOLD'),
+      value: 'GOLD'
+    },
+    {
+      label: t('common.tiers.PLATINUM'),
+      value: 'PLATINUM'
+    },
+    {
+      label: t('common.tiers.EMERALD'),
+      value: 'EMERALD'
+    },
+    {
+      label: t('common.tiers.DIAMOND'),
+      value: 'DIAMOND'
+    },
+    {
+      label: t('common.tiers.MASTER'),
+      value: 'MASTER'
+    },
+    {
+      label: t('common.tiers.GRANDMASTER'),
+      value: 'GRANDMASTER'
+    },
+    {
+      label: t('common.tiers.CHALLENGER'),
+      value: 'CHALLENGER'
+    }
+  ]
+})
 
 const divisionOptions = [
   {
@@ -142,36 +155,38 @@ const divisionOptions = [
   }
 ]
 
-const queueOptions = [
-  {
-    label: '单排 / 双排',
-    value: 'RANKED_SOLO_5x5'
-  },
-  {
-    label: '灵活排位',
-    value: 'RANKED_FLEX_SR'
-  },
-  {
-    label: '云顶之弈',
-    value: 'RANKED_TFT'
-  },
-  {
-    label: '灵活排位 3x3',
-    value: 'RANKED_FLEX_TT'
-  },
-  {
-    label: '竞技场',
-    value: 'CHERRY'
-  },
-  {
-    label: '云顶之弈 狂暴模式',
-    value: 'RANKED_TFT_TURBO'
-  },
-  {
-    label: '云顶之弈 双人作战',
-    value: 'RANKED_TFT_DOUBLE_UP'
-  }
-]
+const queueOptions = computed(() => {
+  return [
+    {
+      label: t('common.queueTypes.RANKED_SOLO_5x5'),
+      value: 'RANKED_SOLO_5x5'
+    },
+    {
+      label: t('common.queueTypes.RANKED_FLEX_SR'),
+      value: 'RANKED_FLEX_SR'
+    },
+    {
+      label: t('common.queueTypes.RANKED_TFT'),
+      value: 'RANKED_TFT'
+    },
+    {
+      label: t('common.queueTypes.RANKED_FLEX_TT'),
+      value: 'RANKED_FLEX_TT'
+    },
+    {
+      label: t('common.queueTypes.CHERRY'),
+      value: 'CHERRY'
+    },
+    {
+      label: t('common.queueTypes.RANKED_TFT_TURBO'),
+      value: 'RANKED_TFT_TURBO'
+    },
+    {
+      label: t('common.queueTypes.RANKED_TFT_DOUBLE_UP'),
+      value: 'RANKED_TFT_DOUBLE_UP'
+    }
+  ]
+})
 </script>
 
 <style lang="less" scoped>

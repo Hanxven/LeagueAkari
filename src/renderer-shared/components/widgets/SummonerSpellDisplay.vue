@@ -10,8 +10,20 @@
     </template>
     <div style="max-width: 240px">
       <div class="name">{{ lcs.gameData.summonerSpells[spellId].name }}</div>
-      <div class="cooldown">冷却时间: {{ lcs.gameData.summonerSpells[spellId].cooldown }} 秒</div>
-      <div class="level">等级需求: {{ lcs.gameData.summonerSpells[spellId].summonerLevel }}</div>
+      <div class="cooldown">
+        {{
+          t('SummonerSpellDisplay.cooldown', {
+            time: lcs.gameData.summonerSpells[spellId].cooldown
+          })
+        }}
+      </div>
+      <div class="level">
+        {{
+          t('SummonerSpellDisplay.levelRequirement', {
+            level: lcs.gameData.summonerSpells[spellId].summonerLevel
+          })
+        }}
+      </div>
       <div class="description">{{ lcs.gameData.summonerSpells[spellId].description }}</div>
     </div>
   </NPopover>
@@ -26,6 +38,7 @@
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NPopover } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 
 import LcuImage from '../LcuImage.vue'
 
@@ -33,6 +46,8 @@ const { size = 20 } = defineProps<{
   spellId?: number
   size?: number
 }>()
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 </script>

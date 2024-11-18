@@ -22,7 +22,9 @@
           {{ lcs.gameData.items[itemId].priceTotal }} G
           {{
             lcs.gameData.items[itemId].price !== lcs.gameData.items[itemId].priceTotal
-              ? `(合成 ${lcs.gameData.items[itemId].price}  G)`
+              ? t('ItemDisplay.combinePrice', {
+                  price: lcs.gameData.items[itemId].price
+                })
               : ''
           }}
         </div>
@@ -65,6 +67,7 @@
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NPopover } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 
 import LcuImage from '../LcuImage.vue'
 
@@ -78,6 +81,8 @@ const {
   maxWidth?: number
   size?: number
 }>()
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 </script>
@@ -115,7 +120,7 @@ const lcs = useLeagueClientStore()
   margin-bottom: 4px;
 
   &::before {
-    content: '组成 =';
+    content: '=';
   }
 }
 
@@ -123,7 +128,7 @@ const lcs = useLeagueClientStore()
   margin-bottom: 8px;
 
   &::before {
-    content: '可合成 ⇒';
+    content: '⇒';
   }
 }
 

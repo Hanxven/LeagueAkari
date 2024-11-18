@@ -373,13 +373,13 @@ AutoGameflow:
       default: Default
 
 AutoSelect:
-  normalModeTitle: Auto Champion Select · Normal Mode
-  benchModeTitle: Auto Champion Select · Bench Mode
+  normalModeTitle: Auto Pick · Normal Mode
+  benchModeTitle: Auto Pick · Bench Mode
   banTitle: Auto Ban
 
   normalModeEnabled:
     label: Enable
-    description: Enable auto selection in standard modes, such as Matchmaking, Ranked, or any non-random champion modes.
+    description: Enable auto pick in standard modes, such as Matchmaking, Ranked, or any non-random champion modes.
 
   showIntent:
     label: Show Intent
@@ -391,10 +391,10 @@ AutoSelect:
 
   completed:
     label: Lock-In Strategy
-    description: Instantly lock in or hover the champion.
+    description: Instantly lock in or just show the champion.
     options:
       true: Instantly Lock In
-      false: Hover Only
+      false: Just Show
 
   expectedChampions:
     label: Intended Champions
@@ -459,7 +459,7 @@ SideBarMenu:
   test: Test
 
 SideBarFixed:
-  currentConnected: Current Connected
+  currentConnected: Connected
   launchedClients: Launched Clients
   noClientTitle: No Available Client
   noClient: No available client, please start the game
@@ -495,6 +495,23 @@ DamageMetricsBar:
   physical: Physical
   magic: Magic
   true: 'True'
+
+SpectateStatus:
+  button: Spectate
+  bans: Bans
+
+  lcuSpectate:
+    label: Using LCU API (Optional)
+    description: Use the LCU API to start spectating on the same server instead of using a process call.
+    descriptionNotIdle: Spectating using the LCU API requires being in an idle state. You are not currently idle. Please leave the lobby first.
+    button: Spectate
+
+  tokenSpectate:
+    label: Copy Token
+    description: Can be used to start the spectate process in another instance of League Akari.
+    button: Copy
+    copied: Spectate token copied
+    copyFailed: Failed to copy spectate token
 
 MatchHistoryTabsTitle:
   loading: Loading...
@@ -546,6 +563,624 @@ UpdateModal:
   releasePage: Release Page
   download: Download
 
+Client:
+  leagueClient:
+    title: League Client
+
+    disconnect:
+      label: Disconnect
+      description: Disconnect League Akari from the League Client.
+      button: Disconnect
+
+    quitClient:
+      label: Quit Client Process
+      description: Close the League Client.
+      button: Quit Client Process
+
+      dialog:
+        title: Quit Client Process
+        content: Are you sure you want to quit the client process? This will directly close the game.
+        positiveText: Quit
+        negativeText: Cancel
+
+  gameClient:
+    title: Game Client
+
+    terminateGameClientOnAltF4:
+      labelAdminRequired: Terminate Game Client with Alt+F4 (Admin Required)
+      label: Terminate Game Client with Alt+F4
+      description: When the game client is running and in the foreground, using the Alt+F4 shortcut can forcibly terminate the game client process. Please note that this action forcefully ends the process and is not a normal game exit procedure, potentially leading to unexpected side effects.
+
+  leagueClientUx:
+    title: League Client UX
+
+    fixWindowMethodAOptions:
+      label: Adjust Window Size
+      labelAdminRequired: Adjust Window Size (Admin Required)
+      description: FixLCUWindow - Adjust the window size using WinAPI. This can be attempted when the client interface size is incorrect.
+      button: Adjust
+      dialog:
+        title: Adjust Window Size
+        content: Do you want to adjust the window size? Try this operation if the client is not displaying properly.
+        positiveText: Adjust
+        negativeText: Cancel
+
+    restartUx:
+      label: Restart Client UI
+      description: Immediately restart the rendering process. This operation does not affect ongoing activities and can be used to fix client UI errors.
+      button: Restart UX Process
+      dialog:
+        title: Restart UX Process
+        content: Do you want to restart the UX process? Try this operation if the client is not displaying properly.
+        positiveText: Restart
+        negativeText: Cancel
+
+    killUx:
+      label: Kill UX Process
+      description: Immediately terminate the rendering process. This operation does not affect ongoing activities.
+      button: Kill UX Process
+      dialog:
+        title: Kill UX Process
+        content: Are you sure you want to kill the UX process? You might need to restart this process. Killing the UX process will not cause the game to exit but can significantly reduce resource usage.
+        positiveText: Kill
+        negativeText: Cancel
+
+    launchUx:
+      label: Launch UX Process
+      description: Immediately launch the rendering process if it has been closed.
+      button: Launch UX Process
+      dialog:
+        title: Launch UX Process
+        content: Do you want to launch the UX process?
+        positiveText: Launch
+        negativeText: Cancel
+
+Toolkit:
+  title: Toolkit
+  client: League Client / Game Client
+  inProcess: In Process
+  lobby: Lobby Tools
+  misc: Misc
+
+ChampionBench:
+  title: Champion Bench
+  reroll: Reroll
+  charity: Charity
+  charityTitle: Perform a reroll but immediately reclaim the previously assigned champion
+  notInBenchMode: Not currently in a random mode
+  notInPhase: Not in the champion selection phase
+
+  swapFailedNotification:
+    title: Champion Bench
+    description: Failed to swap champions, maybe the champion is no longer available
+
+  rerollFailedNotification:
+    title: Champion Bench
+    description: Failed to reroll, maybe the champion is no longer available
+
+GameflowInProgress:
+  title: In Progress
+
+  dodge:
+    label: Dodge Champion Select
+    description: Immediately exit the current champion selection phase without closing the client.
+    button: Dodge
+
+    failedNotification:
+      title: Dodge Champion Select
+      description: 'Failed to dodge champion select: {reason}'
+
+  playAgain:
+    label: Exit Post-Game Screen
+    description: Immediately exit the post-game screen. Useful when the client cannot exit the post-game screen properly.
+    button: Return to Lobby
+
+    failedNotification:
+      title: Exit Post-Game Screen
+      description: 'Failed to exit the post-game screen: {reason}'
+
+  leaveLobby:
+    label: Leave Lobby
+    description: Immediately leave the current lobby.
+    button: Leave Lobby
+
+LobbyTool:
+  title: Lobby Tool
+
+  addBot:
+    label: Add Bot
+    description: Add a bot to the current custom or practice lobby.
+    button: Add
+    failedNotification:
+      title: Add Bot
+      description: 'Failed to add bot: {reason}'
+
+  loadBots:
+    firstUseNote: To fetch the custom bot list, you need to enter a custom lobby once.
+    failedNotification:
+      title: Load Bot List
+      description: 'Failed to load bot list: {reason}'
+
+  createIdLobby:
+    label: Create Queue Lobby
+    description: Create a lobby for a specific queue ID, subject to server availability for the target queue.
+    button: Create
+    selectPlaceholder: Select or specify ID
+
+    failedNotification:
+      title: Create Queue Lobby
+      description: 'Failed to create queue lobby: {reason}'
+
+  create5x5PracticeLobby:
+    label: Create 5v5 Practice Lobby
+    button: Create
+
+    failedNotification:
+      title: Create 5v5 Practice Lobby
+      description: 'Failed to create 5v5 practice lobby: {reason}'
+
+  loadEligibleQueuesFailedNotification:
+    title: Load Queues Failed
+    description: 'Failed to load the list of available queues: {reason}'
+
+  queueOptions:
+    available: Available Queues
+    unavailable: Currently Disabled Queues
+
+  difficultyOptions:
+    RSINTRO: Beginner
+    RSBEGINNER: Intermediate
+    RSINTERMEDIATE: Standard
+
+StrawberryTool:
+  title: Swarm
+  unavailable: Currently not in Swarm mode
+
+  champion:
+    label: Set as Current Champion
+    description: You can try selecting other champions.
+    button: Set
+    failedMessage: 'Failed to set the current champion: {reason}'
+
+  championOptions:
+    modeSpecific: Mode-Specific Champions
+    other: Other Champions
+
+  map:
+    label: Select Map
+    description: Maps currently available.
+    button: Set
+    failedMessage: 'Failed to set map: {reason}'
+
+  difficulty:
+    label: Set Difficulty
+    description: The preset difficulty levels include [Story], [Hard], and [Extreme]. Currently, you cannot set an unlocked difficulty level.
+    button: Set
+    failedMessage: 'Failed to set difficulty: {reason}'
+
+  requestSent: Request sent
+
+ChatAvailability:
+  title: Chat Status
+
+  availability:
+    label: Chat Status
+    description: Display or set the current chat status. Some statuses are only available under specific conditions.
+    radio:
+      chat: Chat
+      mobile: Online (Mobile)
+      away: Away
+      dnd: DND
+      offline: Offline
+    failedNotification:
+      title: Set Chat Status
+      description: 'Failed to set chat status: {reason}'
+
+ChatStatusMessage:
+  title: Chat Status Message
+
+  message:
+    label: Set Chat Message
+    button: Set
+    success: Chat message set successfully
+
+    failedNotification:
+      title: Set Chat Message
+      description: 'Failed to set chat message: {reason}'
+
+  text:
+    label: Text Line
+    description: Chat status text. Setting an empty value will delete the message.
+    placeholder: Enter message
+
+SummonerProfile:
+  title: Summoner
+
+  commonSuccess: Action Successful
+  commonFailed: Unable to Apply
+
+  skinSelectModal:
+    title: Skin Selection
+    button: Set as Current Skin
+    augment: Augment
+    unset: Unset
+
+    failedNotification:
+      title: Profile Background
+      description: 'Failed to apply the current skin: {reason}'
+
+  profileBackground:
+    label: Select Summoner Background
+    description: Search for the target champion or skin.
+    button: Select
+
+  bannerAccent:
+    label: Switch to Last Season's Banner
+    description: Switch to last season's banner; this may cause the banner to disappear.
+    button: Execute
+
+    failedNotification:
+      title: Switch to Last Season's Banner
+      description: 'Failed to switch banner: {reason}'
+
+  prestigeCrest:
+    label: Remove Prestige Frame
+    description: Remove the prestige frame.
+    descriptionInsufficientLevel: 'Remove the prestige frame (Summoner level must be 525 or higher; current level: {level})'
+    button: Execute
+
+    failedNotification:
+      title: Remove Prestige Frame
+      description: 'Failed to remove prestige frame: {reason}'
+
+  token:
+    label: Remove All Tokens
+    description: Remove all tokens.
+    button: Execute
+
+    failedNotification:
+      title: Remove All Tokens
+      description: 'Failed to remove all tokens: {reason}'
+
+GameView:
+  title: View Game
+
+  game:
+    label: Game ID
+    description: Fetch and view the game using its ID.
+    button: View
+
+FakeRanked:
+  title: Fake Ranked Chat Card
+  commonSuccess: Action Successful
+
+  set:
+    label: Apply Immediately
+    description: Modify the chat card status immediately, effective until the next client restart.
+    button: Fake it
+
+    failedNotification:
+      title: Fake Ranked
+      description: 'Failed to fake ranked status: {reason}'
+
+  queue: Queue
+  tier: Tier
+  division: Division
+
+Spectate:
+  title: Spectate
+  leaveButton: Leave Lobby
+  needToLeaveLobby: You need to leave the current lobby to spectate.
+
+  spectate:
+    label: Summoner Spectate
+    description: Spectate a player on the current server by PUUID or summoner name, provided the player is in a spectatable game.
+    button: Start Spectating
+    placeholder: Summoner Name / PUUID
+    errorNoPlayer: Player does not exist.
+
+    notFoundNotification:
+      title: Spectate
+      description: Target player {name} not found.
+
+    failedNotification:
+      title: Spectate
+      description: 'Failed to start spectating. The player may not be in a game or the target mode is unspectatable: {reason}'
+
+    successNotification:
+      title: Spectate
+      description: Spectating has started.
+
+  token:
+    label: Token Spectate
+    description: Use a special token in the correct format to launch the spectate process in the game client.
+    button: Start Spectating
+    placeholder: Token
+
+    successNotification:
+      title: Spectate
+      description: Spectating has started.
+      useRememberedInstallLocation: Spectating has started, using the last remembered client location.
+
+    failedNotification:
+      title:
+
+MatchHistoryTabs:
+  disconnected: Not connected to the client
+  noActiveTab: No active match history tab
+  copiedToClipboard: Copied to clipboard
+
+MatchHistoryTab:
+  prevPage: Previous Page
+  nextPage: Next Page
+  refreshPage: Refresh Page
+  rankedMore: More
+  tagPlayer: Tag Player
+
+  private:
+    title: Profile Hidden
+    content: This player has set their profile to be hidden.
+
+  tagged:
+    title: Tagged
+    content: This player has been tagged.
+    taggedByOther: Tagged by another account.
+    deletePopconfirm: Confirm to delete this tag?
+
+  matchHistory:
+    empty: No data available.
+
+  stats:
+    title: Overview
+    akariScore: Akari Score
+    na: N/A
+    avgKda: Average KDA
+    avgKp: Kill Participation
+    avgDmg: Damage Share
+    avgDmgTaken: Damage Taken Share
+    avgGold: Gold Share
+    avgCs: CS Share
+    winLose: Wins & Losses
+    win: Win
+    lose: Loss
+    wr: Win Rate
+    champions: Champion Usage
+    times: Matches
+
+  recentPlayers:
+    teammatesTitle: Recent Teammates
+    opponentsTitle: Recent Opponents
+    noRecentPlayers: No recent players
+    win: Win
+    lose: Loss
+
+MatchHistoryCard:
+  kprTitle: 'Kill participation in team: {rate}%'
+  ddrTitle: 'Damage dealt to heroes: {rate}%'
+  dtrTitle: 'Damage taken in team: {rate}%'
+  grTitle: 'Team gold share: {rate}%'
+  kpr: KPR {rate}%
+  ddr: DMG {rate}%
+  dtr: DMG Taken {rate}%
+  gr: Gold {rate}%
+  misc: Misc
+  loading: Loading...
+  error: Failed to load
+
+StandaloneMatchHistoryCardModal:
+  notFound: Game not found
+  error: Failed to load game
+  reload: Reload
+  loading: Loading...
+
+MiscellaneousPanel:
+  gameId: Game ID {gameId}
+  gameDate: Game Date {date}
+  server: 'Server: {server}'
+  bans: 'Bans:'
+
+  stats:
+    championId: Champion
+    spells: Summoner Spells
+    teams: Team
+    assists: Assists
+    causedEarlySurrender: Early Surrender Initiator
+    champLevel: Champion Level
+    combatPlayerScore: Combat Player Score
+    damageDealtToObjectives: Damage to Objectives
+    damageDealtToTurrets: Damage to Turrets
+    damageSelfMitigated: Damage Self Mitigated
+    deaths: Deaths
+    doubleKills: Double Kills
+    earlySurrenderAccomplice: Early Surrender Accomplice
+    firstBloodAssist: First Blood Assist
+    firstBloodKill: First Blood
+    firstInhibitorAssist: First Inhibitor Assist
+    firstInhibitorKill: First Inhibitor Destroyed
+    firstTowerAssist: First Tower Assist
+    firstTowerKill: First Tower Destroyed
+    gameEndedInEarlySurrender: Ended in Early Surrender
+    gameEndedInSurrender: Ended in Surrender
+    goldEarned: Gold Earned
+    goldSpent: Gold Spent
+    inhibitorKills: Inhibitors Destroyed
+    item0: Item 0
+    item1: Item 1
+    item2: Item 2
+    item3: Item 3
+    item4: Item 4
+    item5: Item 5
+    item6: Item 6
+    killingSprees: Killing Sprees
+    kills: Kills
+    largestCriticalStrike: Largest Critical Strike
+    largestKillingSpree: Largest Killing Spree
+    largestMultiKill: Largest Multi Kill
+    longestTimeSpentLiving: Longest Time Alive
+    magicDamageDealt: Magic Damage Dealt
+    magicDamageDealtToChampions: Magic Damage to Champions
+    magicalDamageTaken: Magic Damage Taken
+    neutralMinionsKilled: Neutral Minions Killed
+    neutralMinionsKilledEnemyJungle: Neutral Minions Killed (Enemy Jungle)
+    neutralMinionsKilledTeamJungle: Neutral Minions Killed (Team Jungle)
+    objectivePlayerScore: Objective Player Score
+    participantId: Participant ID
+    pentaKills: Penta Kills
+    perk0: Perk 0
+    perk0Var1: Perk 0 Var 1
+    perk0Var2: Perk 0 Var 2
+    perk0Var3: Perk 0 Var 3
+    perk1: Perk 1
+    perk1Var1: Perk 1 Var 1
+    perk1Var2: Perk 1 Var 2
+    perk1Var3: Perk 1 Var 3
+    perk2: Perk 2
+    perk2Var1: Perk 2 Var 1
+    perk2Var2: Perk 2 Var 2
+    perk2Var3: Perk 2 Var 3
+    perk3: Perk 3
+    perk3Var1: Perk 3 Var 1
+    perk3Var2: Perk 3 Var 2
+    perk3Var3: Perk 3 Var 3
+    perk4: Perk 4
+    perk4Var1: Perk 4 Var 1
+    perk4Var2: Perk 4 Var 2
+    perk4Var3: Perk 4 Var 3
+    perk5: Perk 5
+    perk5Var1: Perk 5 Var 1
+    perk5Var2: Perk 5 Var 2
+    perk5Var3: Perk 5 Var 3
+    perkPrimaryStyle: Primary Perk Style
+    perkSubStyle: Secondary Perk Style
+    physicalDamageDealt: Physical Damage Dealt
+    physicalDamageDealtToChampions: Physical Damage to Champions
+    physicalDamageTaken: Physical Damage Taken
+    playerAugment1: Augment 1
+    playerAugment2: Augment 2
+    playerAugment3: Augment 3
+    playerAugment4: Augment 4
+    playerAugment5: Augment 5
+    playerAugment6: Augment 6
+    playerScore0: Player Score 0
+    playerScore1: Player Score 1
+    playerScore2: Player Score 2
+    playerScore3: Player Score 3
+    playerScore4: Player Score 4
+    playerScore5: Player Score 5
+    playerScore6: Player Score 6
+    playerScore7: Player Score 7
+    playerScore8: Player Score 8
+    playerScore9: Player Score 9
+    playerSubteamId: Subteam ID
+    quadraKills: Quadra Kills
+    sightWardsBoughtInGame: Sight Wards Bought
+    subteamPlacement: Subteam Placement
+    teamEarlySurrendered: Team Early Surrendered
+    timeCCingOthers: Time CCing Others
+    totalDamageDealt: Total Damage Dealt
+    totalDamageDealtToChampions: Total Damage to Champions
+    totalDamageTaken: Total Damage Taken
+    totalHeal: Total Healing
+    totalMinionsKilled: Total Minions Killed
+    totalPlayerScore: Total Player Score
+    totalScoreRank: Total Score Rank
+    totalTimeCrowdControlDealt: Total Crowd Control Time
+    totalUnitsHealed: Total Units Healed
+    tripleKills: Triple Kills
+    trueDamageDealt: True Damage Dealt
+    trueDamageDealtToChampions: True Damage to Champions
+    trueDamageTaken: True Damage Taken
+    turretKills: Turrets Destroyed
+    unrealKills: Unreal Kills
+    visionScore: Vision Score
+    visionWardsBoughtInGame: Control Wards Bought
+    wardsKilled: Wards Killed
+    wardsPlaced: Wards Placed
+    win: Win
+    currentPlatformId: Current Server
+    platformId: Platform ID
+
+DetailedGame:
+  win: Win
+  lose: Loss
+  controlWard: Control Wards
+  wardPlaced: Placed {count}, Cleared {cleared}
+  csPerMinute: '{count} per minute'
+  bot: Bot
+
+  header:
+    kda: KDA
+    dmg: Damage / Taken
+    ward: Wards
+    cs: CS
+    gold: Gold
+    item: Items
+    augment: Augments
+
+SummonerSpellDisplay:
+  cooldown: 'Cooldown: {cooldown}s'
+  levelRequirement: 'Level: {level} Required'
+
+CopyableText:
+  copy: Copy
+  copied: Copied to clipboard
+
+ItemDisplay:
+  combinePrice: Combine for {gold} G
+
+PlayerInfoCard:
+  empty: No Content
+  top4Rate: Top 4 Rate
+  1stRate: First Place Rate
+  1st: First {rate}%
+
+  cherryWinRatePopover: In the recent {count} games, this player's win rate is {winRate}%. Among {cherryCount} games in Arena Mode, their first place rate is {top1Rate}%.
+  winRatePopover: In the recent {count} games, this player's win rate is {winRate}%.
+  kdaPopover: In the recent {count} games, this player's average KDA is {kda}.
+  premadePopover: These players have been on the same team in multiple matches, suggesting they may be a premade group. They are labeled as Team {team}.
+  highWinRatePopover: This player's win rate is exceptionally high. In the recent {count} games, they have won {winCount} games.
+  metPopover:
+    title: Previously encountered this player in {date}, a total of {count} times.
+    gameId: Game ID
+    date: Match Date
+  privatePopover: This player has set their career profile to private, preventing others from viewing their profile, match history, and achievements. Additionally, they cannot be spectated.
+  winningStreakPopover: Currently on a winning streak of {count} games. Great job!
+  losingStreakPopover: Currently on a losing streak of {count} games.
+  akariLoved:
+    good: Good
+    great: Excellent
+    goodPopover: This player has performed well in recent games.
+    greatPopover: This player has shown exceptional performance in recent games.
+  champion:
+    winRate: 'Recent {count} games, win rate: {winRate}%'
+    level: 'Level {level}'
+    masteryPoints: '{points} Mastery Points'
+  matchHistory:
+    winResult:
+      na: -
+      win: Win
+      lose: Loss
+      remake: Remake
+      abort: Abort
+
+  self: Self
+  tagged: Tagged
+  premade: Premade Team {team}
+  highWinRate: High Win Rate
+  met: Met Before
+  private: Career Hidden
+  winningStreak: '{count} Wins in a Row'
+  losingStreak: '{count} Losses in a Row'
+
+OngoingGame:
+  disconnected: Not connected to client
+  waitingForSpectate: Waiting for spectate delay
+  noOngoingGame: No ongoing game
+  disabled: Game analysis disabled
+  avgTeamWinRate: Average Team Win Rate
+  avgTeamKda: Average Team KDA
+
+
 common:
   appName: League Akari
   default: Default
@@ -565,6 +1200,25 @@ common:
     SUPPORT: Support
     UTILITY: Support
 
+  positionAssignmentReason:
+    FILL_SECONDARY: FILLPRMY
+    FILL_PRIMARY: FILLSCND
+    PRIMARY: PRIMARY
+    SECONDARY: SCNDARY
+    AUTOFILL: AUTOFILL
+
+  teams:
+    all: All
+    100: Blue Team
+    200: Red Team
+    unknown: Unknown
+    our: Our
+    their: Their
+    our-1: Our (Blue Team)
+    our-2: Our (Red Team)
+    their-1: Their (Blue Team)
+    their-2: Their (Red Team)
+
   queueTypes:
     RANKED_SOLO_5x5: Ranked Solo/Duo
     RANKED_FLEX_SR: Ranked Flex
@@ -572,10 +1226,17 @@ common:
     ARAM_UNRANKED_5x5: ARAM
     CHERRY: Arena
     URF: URF
+    RANKED_FLEX_TT: Ranked Flex TT
     NORMAL_TFT: TFT
     RANKED_TFT: TFT Ranked
     RANKED_TFT_TURBO: TFT Turbo
     RANKED_TFT_DOUBLE_UP: TFT Double Up
+
+  gameModes:
+    CLASSIC: Classic
+    ARAM: ARAM
+    URF: URF
+    TFT: TFT
 
   sgpMatchHistoryTags:
     all: All Modes
@@ -590,6 +1251,7 @@ common:
     q_1900: URF
 
   tiers:
+    UNRANKED: UNRANKED
     IRON: IRON
     BRONZE: BRONZE
     SILVER: SILVER
@@ -602,13 +1264,14 @@ common:
     CHALLENGER: CHALLENGER
 
   shortTiers:
+    UNRANKED: N/A
     IRON: IRON
     BRONZE: BRON
     SILVER: SILV
     GOLD: GOLD
-    PLATINUM: PLATN
+    PLATINUM: PLAT
     EMERALD: EMERD
     DIAMOND: DIAMD
     MASTER: MASTR
-    GRANDMASTER: GMAST
+    GRANDMASTER: GM
     CHALLENGER: CHALL

@@ -35,6 +35,7 @@ export type UseTabsReturn<T> = {
 
 /**
  * 用于管理 tabs 的底层数据结构封装
+ * @deprecated
  * @returns
  */
 export function useTabs<T = any>(): UseTabsReturn<T> {
