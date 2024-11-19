@@ -5,7 +5,7 @@
     <NScrollbar>
       <div class="card-area" v-if="info">
         <div class="card-content">
-          <div class="first-line" :title="info.id === 893 ? '兔兔好可爱' : ''">
+          <div class="first-line" :title="info.id === 893 ? t('OpggChampion.adorableRabi') : ''">
             <ChampionIcon ring round class="image" :champion-id="info.id" />
             <div class="name-tier">
               <div class="name">
@@ -15,34 +15,34 @@
                 {{ tierText }}
               </div>
               <div class="position" v-if="props.position && props.position !== 'none'">
-                {{ POSITION_TEXT[props.position] || props.position }}
+                {{ t(`Opgg.positions.${props.position}`) || props.position }}
               </div>
             </div>
             <div class="prop-groups">
               <div class="prop-field" v-if="info.total_place && info.play">
-                <div class="prop">平均排名</div>
+                <div class="prop">{{ t('OpggChampion.avgPlace') }}</div>
                 <div class="value">{{ (info.total_place / (info.play || 1)).toFixed(2) }}</div>
               </div>
               <div class="prop-field" v-if="info.first_place && info.play">
-                <div class="prop">第一</div>
+                <div class="prop">{{ t('OpggChampion.1st') }}</div>
                 <div class="value">
                   {{ ((info.first_place / (info.play || 1)) * 100).toFixed(2) }}%
                 </div>
               </div>
               <div class="prop-field" v-if="info.win_rate">
-                <div class="prop">胜率</div>
+                <div class="prop">{{ t('OpggChampion.winRate') }}</div>
                 <div class="value">{{ (info.win_rate * 100).toFixed(2) }}%</div>
               </div>
               <div class="prop-field" v-if="info.play && info.win">
-                <div class="prop">胜率</div>
+                <div class="prop">{{ t('OpggChampion.winRate') }}</div>
                 <div class="value">{{ ((info.win / (info.play || 1)) * 100).toFixed(2) }}%</div>
               </div>
               <div class="prop-field" v-if="info.pick_rate">
-                <div class="prop">登场率</div>
+                <div class="prop">{{ t('OpggChampion.pickRate') }}</div>
                 <div class="value">{{ (info.pick_rate * 100).toFixed(2) }}%</div>
               </div>
               <div class="prop-field" v-if="info.ban_rate">
-                <div class="prop">禁用率</div>
+                <div class="prop">{{ t('OpggChampion.banRate') }}</div>
                 <div class="value">{{ (info.ban_rate * 100).toFixed(2) }}%</div>
               </div>
             </div>
@@ -57,7 +57,7 @@
         "
       >
         <div class="card-title">
-          {{ isCountersExpanded ? '全部对位' : '劣势对位' }}
+          {{ isCountersExpanded ? t('OpggChampion.allCounters') : t('OpggChampion.counter') }}
           <NSwitch
             size="small"
             v-model:value="isCountersExpanded"
@@ -69,8 +69,8 @@
               })
             "
           >
-            <template #checked>全部</template>
-            <template #unchecked>劣势</template>
+            <template #checked>{{ t('OpggChampion.allC') }}</template>
+            <template #unchecked>{{ t('OpggChampion.counterC') }}</template>
           </NSwitch>
         </div>
         <div class="card-content" v-if="!isCountersExpanded">
@@ -82,13 +82,19 @@
               @click="() => emits('showChampion', c.champion_id)"
             >
               <LcuImage class="image" :src="championIconUri(c.champion_id)" />
-              <div class="win-rate" title="胜率">
+              <div class="win-rate" :title="t('OpggChampion.winRate')">
                 {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
               </div>
-              <div class="play">{{ c.play.toLocaleString() }} 场</div>
+              <div class="play">
+                {{
+                  t('OpggChampion.times', {
+                    times: c.play.toLocaleString()
+                  })
+                }}
+              </div>
             </div>
           </div>
-          <div class="counter-empty" v-else>暂无数据</div>
+          <div class="counter-empty" v-else>{{ t('OpggChampion.empty') }}</div>
         </div>
         <div class="card-content" v-if="isCountersExpanded">
           <div class="counters" v-if="data && data.data.counters && data.data.counters.length">
@@ -101,13 +107,23 @@
               :key="c.champion_id"
             >
               <LcuImage class="image" :src="championIconUri(c.champion_id)" />
-              <div class="win-rate" title="胜率" :class="{ win: c.win / (c.play || 1) > 0.5 }">
+              <div
+                class="win-rate"
+                :title="t('OpggChampion.winRate')"
+                :class="{ win: c.win / (c.play || 1) > 0.5 }"
+              >
                 {{ ((c.win / (c.play || 1)) * 100).toFixed(2) }}%
               </div>
-              <div class="play">{{ c.play.toLocaleString() }} 场</div>
+              <div class="play">
+                {{
+                  t('OpggChampion.times', {
+                    times: c.play.toLocaleString()
+                  })
+                }}
+              </div>
             </div>
           </div>
-          <div class="counter-empty" v-else>暂无数据</div>
+          <div class="counter-empty" v-else>{{ t('OpggChampion.empty') }}</div>
         </div>
       </div>
       <div
@@ -115,8 +131,10 @@
         v-if="data && data.data.summoner_spells && data.data.summoner_spells.length"
       >
         <div class="card-title">
-          召唤师技能
-          <NCheckbox size="small" v-model:checked="isSummonerSpellsExpanded">展示全部</NCheckbox>
+          {{ t('OpggChampion.spells') }}
+          <NCheckbox size="small" v-model:checked="isSummonerSpellsExpanded">
+            {{ t('OpggChampion.showAll') }}</NCheckbox
+          >
         </div>
         <div class="card-content">
           <div
@@ -132,10 +150,18 @@
             </div>
             <div class="desc">
               <div class="pick">
-                <span class="pick-rate" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
+                <span class="pick-rate" :title="t('OpggChampion.pickRate')"
+                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >
+                <span class="pick-play" :title="t('OpggChampion.plays')">
+                  {{
+                    t('OpggChampion.times', {
+                      times: s.play.toLocaleString()
+                    })
+                  }}</span
+                >
               </div>
-              <div class="win-rate" title="胜率">
+              <div class="win-rate" :title="t('OpggChampion.winRate')">
                 {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
               </div>
               <div class="buttons">
@@ -145,8 +171,8 @@
                   type="primary"
                   secondary
                   :disabled="lcs.gameflow.phase !== 'ChampSelect'"
-                  title="点按以设置为此召唤师技能"
-                  >应用</NButton
+                >
+                  {{ t('OpggChampion.apply') }}</NButton
                 >
               </div>
             </div>
@@ -155,7 +181,10 @@
       </div>
       <div class="card-area" v-if="data && data.data.runes && data.data.runes.length">
         <div class="card-title">
-          符文配法<NCheckbox size="small" v-model:checked="isRunesExpanded">展示全部</NCheckbox>
+          {{ t('OpggChampion.runes')
+          }}<NCheckbox size="small" v-model:checked="isRunesExpanded">
+            {{ t('OpggChampion.showAll') }}</NCheckbox
+          >
         </div>
         <div class="card-content">
           <div
@@ -196,10 +225,18 @@
             </div>
             <div class="desc">
               <div class="pick">
-                <span class="pick-rate" title="登场率">{{ (r.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="pick-play" title="总场次">{{ r.play.toLocaleString() }} 场</span>
+                <span class="pick-rate" :title="t('OpggChampion.pickRate')"
+                  >{{ (r.pick_rate * 100).toFixed(2) }}%</span
+                >
+                <span class="pick-play" :title="t('OpggChampion.plays')">
+                  {{
+                    t('OpggChampion.times', {
+                      times: r.play.toLocaleString()
+                    })
+                  }}</span
+                >
               </div>
-              <div class="win-rate" title="胜率">
+              <div class="win-rate" :title="t('OpggChampion.winRate')">
                 {{ ((r.win / (r.play || 1)) * 100).toFixed(2) }}%
               </div>
               <div class="buttons">
@@ -209,8 +246,7 @@
                   type="primary"
                   :disabled="lcs.connectionState !== 'connected'"
                   secondary
-                  title="点按以设置为此符文配法"
-                  >应用</NButton
+                  >{{ t('OpggChampion.apply') }}</NButton
                 >
               </div>
             </div>
@@ -219,7 +255,9 @@
       </div>
       <div class="card-area" v-if="data && data.data.synergies && data.data.synergies.length">
         <div class="card-title">
-          伙伴<NCheckbox size="small" v-model:checked="isSynergiesExpanded">展示全部</NCheckbox>
+          {{t('OpggChampion.synergies')}}<NCheckbox size="small" v-model:checked="isSynergiesExpanded">{{
+            t('OpggChampion.showAll')
+          }}</NCheckbox>
         </div>
         <div class="card-content">
           <div
@@ -234,21 +272,31 @@
             <div class="desc">
               <div class="value-text">
                 <span class="value">{{ (s.total_place / (s.play || 1)).toFixed(2) }}</span>
-                <span class="text">平均排名</span>
+                <span class="text">{{ t('OpggChampion.avgPlace') }} </span>
               </div>
               <div class="value-text">
                 <span class="value">{{ ((s.first_place / (s.play || 1)) * 100).toFixed(2) }}%</span>
-                <span class="text">第一名</span>
+                <span class="text">{{ t('OpggChampion.1st') }}</span>
               </div>
               <div class="value-text">
-                <span class="value" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="text" title="总场次">{{ s.play.toLocaleString() }} 场</span>
+                <span class="value" :title="t('OpggChampion.pickRate')"
+                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >
+                <span class="text" :title="t('OpggChampion.plays')">
+                  {{
+                    t('OpggChampion.times', {
+                      times: s.play.toLocaleString()
+                    })
+                  }}</span
+                >
               </div>
               <div class="value-text">
-                <span class="value" title="胜率"
+                <span class="value" :title="t('OpggChampion.winRate')"
                   >{{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%</span
                 >
-                <span class="text" title="胜率">胜率</span>
+                <span class="text" :title="t('OpggChampion.winRate')">{{
+                  t('OpggChampion.winRate')
+                }}</span>
               </div>
             </div>
           </div>
@@ -257,11 +305,13 @@
       <div class="card-area" v-if="augments && Object.keys(augments).length">
         <NTabs v-model:value="augmentTab" size="small" :animated="false">
           <template #suffix>
-            <NCheckbox size="small" v-model:checked="isAugmentsExpanded">展示全部</NCheckbox>
+            <NCheckbox size="small" v-model:checked="isAugmentsExpanded">{{
+              t('OpggChampion.showAll')
+            }}</NCheckbox>
           </template>
           <NTabPane name="silver" v-if="augments && augments[1]">
             <template #tab>
-              <span class="augments-tab-title">白银阶</span>
+              <span class="augments-tab-title">{{ t('OpggChampion.augmentGold') }}</span>
             </template>
 
             <div
@@ -275,12 +325,18 @@
               </div>
               <div class="desc">
                 <div class="pick">
-                  <span class="pick-rate" title="登场率"
+                  <span class="pick-rate" :title="t('OpggChampion.pickRate')"
                     >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ a.play.toLocaleString() }} 场</span>
+                  <span class="pick-play" :title="t('OpggChampion.plays')">
+                    {{
+                      t('OpggChampion.times', {
+                        times: a.play.toLocaleString()
+                      })
+                    }}</span
+                  >
                 </div>
-                <div class="win-rate" title="胜率">
+                <div class="win-rate" :title="t('OpggChampion.winRate')">
                   {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
                 </div>
               </div>
@@ -288,7 +344,7 @@
           </NTabPane>
           <NTabPane name="gold" v-if="augments && augments[4]">
             <template #tab>
-              <span class="augments-tab-title">黄金阶</span>
+              <span class="augments-tab-title">{{ t('OpggChampion.augmentGold') }}</span>
             </template>
             <div
               class="augments-group"
@@ -301,12 +357,18 @@
               </div>
               <div class="desc">
                 <div class="pick">
-                  <span class="pick-rate" title="登场率"
+                  <span class="pick-rate" :title="t('OpggChampion.pickRate')"
                     >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ a.play.toLocaleString() }} 场</span>
+                  <span class="pick-play" :title="t('OpggChampion.plays')">
+                    {{
+                      t('OpggChampion.times', {
+                        times: a.play.toLocaleString()
+                      })
+                    }}</span
+                  >
                 </div>
-                <div class="win-rate" title="胜率">
+                <div class="win-rate" :title="t('OpggChampion.winRate')">
                   {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
                 </div>
               </div>
@@ -314,7 +376,7 @@
           </NTabPane>
           <NTabPane name="prism" v-if="augments && augments[8]">
             <template #tab>
-              <span class="augments-tab-title">棱彩阶</span>
+              <span class="augments-tab-title">{{ t('OpggChampion.augmentPrism') }}</span>
             </template>
 
             <div
@@ -328,12 +390,18 @@
               </div>
               <div class="desc">
                 <div class="pick">
-                  <span class="pick-rate" title="登场率"
+                  <span class="pick-rate" :title="t('OpggChampion.pickRate')"
                     >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ a.play.toLocaleString() }} 场</span>
+                  <span class="pick-play" :title="t('OpggChampion.plays')">
+                    {{
+                      t('OpggChampion.times', {
+                        times: a.play.toLocaleString()
+                      })
+                    }}</span
+                  >
                 </div>
-                <div class="win-rate" title="胜率">
+                <div class="win-rate" :title="t('OpggChampion.winRate')">
                   {{ ((a.win / (a.play || 1)) * 100).toFixed(2) }}%
                 </div>
               </div>
@@ -346,11 +414,12 @@
         v-if="data && data.data.skill_masteries && data.data.skill_masteries.length"
       >
         <div class="card-title">
-          技能点法<NCheckbox
+          {{ t('OpggChampion.abilityBuild')
+          }}<NCheckbox
             v-if="data.data.skill_masteries.length > 2"
             size="small"
             v-model:checked="isSkillMasteriesExpanded"
-            >展示全部</NCheckbox
+            >{{ t('OpggChampion.showAll') }}</NCheckbox
           >
         </div>
         <div class="card-content">
@@ -368,10 +437,10 @@
                   <div
                     class="skill"
                     :class="{
-                      w: s === 'W',
-                      q: s === 'Q',
-                      e: s === 'E',
-                      r: s === 'R'
+                      w: s.startsWith('W'),
+                      q: s.startsWith('Q'),
+                      e: s.startsWith('E'),
+                      r: s.startsWith('R')
                     }"
                   >
                     {{ s }}
@@ -386,10 +455,10 @@
                 <div
                   class="skill"
                   :class="{
-                    w: s === 'W',
-                    q: s === 'Q',
-                    e: s === 'E',
-                    r: s === 'R'
+                    w: s.startsWith('W'),
+                    q: s.startsWith('Q'),
+                    e: s.startsWith('E'),
+                    r: s.startsWith('R')
                   }"
                   v-for="s of m.builds[0].order"
                 >
@@ -399,10 +468,18 @@
             </div>
             <div class="desc">
               <div class="pick">
-                <span class="pick-rate" title="登场率">{{ (m.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="pick-play" title="总场次">{{ m.play.toLocaleString() }} 场</span>
+                <span class="pick-rate" :title="t('OpggChampion.pickRate')"
+                  >{{ (m.pick_rate * 100).toFixed(2) }}%</span
+                >
+                <span class="pick-play" :title="t('OpggChampion.plays')">
+                  {{
+                    t('OpggChampion.times', {
+                      times: m.play.toLocaleString()
+                    })
+                  }}</span
+                >
               </div>
-              <div class="win-rate" title="胜率">
+              <div class="win-rate" :title="t('OpggChampion.winRate')">
                 {{ ((m.win / (m.play || 1)) * 100).toFixed(2) }}%
               </div>
             </div>
@@ -411,36 +488,23 @@
       </div>
       <!-- inline styled :( -->
       <div class="card-area" v-if="isAbleToAddToItemSet">
-        <div class="card-title">方案应用</div>
+        <div class="card-title">{{ t('OpggChampion.applyRunesText') }}</div>
         <div class="card-content">
           <div
             style="display: flex; align-items: center; justify-content: space-between; height: 38px"
           >
-            <span style="font-size: 13px">导入当前装备方案</span>
-            <div style="width: 76px; display: flex; justify-content: center">
+            <span style="font-size: 13px">{{ t('OpggChampion.applyRunes') }}</span>
+            <div style="min-width: 76px; display: flex; justify-content: center">
               <NButton
                 size="tiny"
                 type="primary"
                 secondary
                 @click="handleAddToItemSet"
                 :disabled="lcs.connectionState !== 'connected'"
-                >导入</NButton
+                >{{ t('OpggChampion.apply') }}</NButton
               >
             </div>
           </div>
-          <!-- <div
-            style="display: flex; align-items: center; justify-content: space-between; height: 38px"
-          >
-            <span style="font-size: 13px">自动应用出场率最高的方案</span>
-            <div style="width: 76px; display: flex; justify-content: center">
-              <NCheckbox
-                size="small"
-                type="primary"
-                secondary
-                v-model:checked="autoApply"
-              ></NCheckbox>
-            </div>
-          </div> -->
         </div>
       </div>
       <div
@@ -448,11 +512,12 @@
         v-if="data && data.data.starter_items && data.data.starter_items.length"
       >
         <div class="card-title">
-          初始装备<NCheckbox
+          {{ t('OpggChampion.starterItemText')
+          }}<NCheckbox
             v-if="data.data.starter_items.length > 4"
             size="small"
             v-model:checked="isStarterItemsExpanded"
-            >展示全部</NCheckbox
+            >{{ t('OpggChampion.showAll') }}</NCheckbox
           >
         </div>
         <div class="card-content">
@@ -472,10 +537,18 @@
             </template>
             <div class="desc">
               <div class="pick">
-                <span class="pick-rate" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
+                <span class="pick-rate" :title="t('OpggChampion.pickRate')"
+                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >
+                <span class="pick-play" :title="t('OpggChampion.plays')">
+                  {{
+                    t('OpggChampion.times', {
+                      times: s.play.toLocaleString()
+                    })
+                  }}</span
+                >
               </div>
-              <div class="win-rate" title="胜率">
+              <div class="win-rate" :title="t('OpggChampion.winRate')">
                 {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
               </div>
             </div>
@@ -488,7 +561,7 @@
             v-if="data.data.boots.length > 4"
             size="small"
             v-model:checked="isBootsExpanded"
-            >展示全部</NCheckbox
+            >{{ t('OpggChampion.showAll') }}</NCheckbox
           >
         </div>
         <div class="card-content">
@@ -506,12 +579,18 @@
               </template>
               <div class="desc">
                 <div class="pick">
-                  <span class="pick-rate" title="登场率"
+                  <span class="pick-rate" :title="t('OpggChampion.pickRate')"
                     >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
+                  <span class="pick-play" :title="t('OpggChampion.plays')">
+                    {{
+                      t('OpggChampion.times', {
+                        times: s.play.toLocaleString()
+                      })
+                    }}
+                  </span>
                 </div>
-                <div class="win-rate" title="胜率">
+                <div class="win-rate" :title="t('OpggChampion.winRate')">
                   {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
                 </div>
               </div>
@@ -521,11 +600,12 @@
       </div>
       <div class="card-area" v-if="data && data.data.prism_items && data.data.prism_items.length">
         <div class="card-title">
-          棱彩阶装备<NCheckbox
+          {{ t('OpggChampion.prismItemText')
+          }}<NCheckbox
             v-if="data.data.prism_items.length > 4"
             size="small"
             v-model:checked="isPrismItemsExpanded"
-            >展示全部</NCheckbox
+            >{{ t('OpggChampion.showAll') }}</NCheckbox
           >
         </div>
         <div class="card-content">
@@ -543,12 +623,18 @@
               </template>
               <div class="desc">
                 <div class="pick">
-                  <span class="pick-rate" title="登场率"
+                  <span class="pick-rate" :title="t('OpggChampion.pickRate')"
                     >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
+                  <span class="pick-play" :title="t('OpggChampion.plays')">
+                    {{
+                      t('OpggChampion.times', {
+                        times: s.play.toLocaleString()
+                      })
+                    }}</span
+                  >
                 </div>
-                <div class="win-rate" title="胜率">
+                <div class="win-rate" :title="t('OpggChampion.winRate')">
                   {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
                 </div>
               </div>
@@ -558,11 +644,12 @@
       </div>
       <div class="card-area" v-if="data && data.data.starter_items && data.data.core_items.length">
         <div class="card-title">
-          核心装备<NCheckbox
+          {{ t('OpggChampion.coreItemText')
+          }}<NCheckbox
             v-if="data.data.core_items.length > 4"
             size="small"
             v-model:checked="isCoreItemsExpanded"
-            >展示全部</NCheckbox
+            >{{ t('OpggChampion.showAll') }}</NCheckbox
           >
         </div>
         <div class="card-content">
@@ -579,10 +666,16 @@
             </template>
             <div class="desc">
               <div class="pick">
-                <span class="pick-rate" title="登场率">{{ (s.pick_rate * 100).toFixed(2) }}%</span>
-                <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
+                <span class="pick-rate" :title="t('OpggChampion.pickRate')"
+                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >
+                <span class="pick-play" :title="t('OpggChampion.plays')">{{
+                  t('OpggChampion.times', {
+                    times: s.play.toLocaleString()
+                  })
+                }}</span>
               </div>
-              <div class="win-rate" title="胜率">
+              <div class="win-rate" :title="t('OpggChampion.winRate')">
                 {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
               </div>
             </div>
@@ -591,11 +684,12 @@
       </div>
       <div class="card-area" v-if="data && data.data.starter_items && data.data.last_items.length">
         <div class="card-title">
-          装备<NCheckbox
+          {{ t('OpggChampion.itemText')
+          }}<NCheckbox
             v-if="data.data.last_items.length > 8"
             size="small"
             v-model:checked="isLastItemsExpanded"
-            >展示全部</NCheckbox
+            >{{ t('OpggChampion.showAll') }}</NCheckbox
           >
         </div>
         <div class="card-content">
@@ -613,12 +707,18 @@
               </template>
               <div class="desc">
                 <div class="pick">
-                  <span class="pick-rate" title="登场率"
+                  <span class="pick-rate" :title="t('OpggChampion.pickRate')"
                     >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
-                  <span class="pick-play" title="总场次">{{ s.play.toLocaleString() }} 场</span>
+                  <span class="pick-play" :title="t('OpggChampion.plays')"
+                    >{{
+                      t('OpggChampion.times', {
+                        times: s.play.toLocaleString()
+                      })
+                    }}
+                  </span>
                 </div>
-                <div class="win-rate" title="胜率">
+                <div class="win-rate" :title="t('OpggChampion.winRate')">
                   {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
                 </div>
               </div>
@@ -656,8 +756,7 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
-
-import { MODE_TEXT, POSITION_TEXT } from './text'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   region?: string
@@ -683,6 +782,8 @@ const emits = defineEmits<{
     }
   ]
 }>()
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -797,7 +898,9 @@ const tierText = computed(() => {
     return 'OP'
   }
 
-  return `T${info.value.tier} 级`
+  return t('OpggChampion.tierText', {
+    tier: info.value.tier
+  })
 })
 
 if (import.meta.env.DEV) {
@@ -875,7 +978,7 @@ const handleAddToItemSet = async () => {
   try {
     const itemGroups: Array<{ title: string; items: number[] }> = []
     const positionName =
-      props.position && props.position !== 'none' ? POSITION_TEXT[props.position] || '' : ''
+      props.position && props.position !== 'none' ? t(`Opgg.positions.${props.position}`) || '' : ''
 
     const newUid = toItemSetsUid({
       championId: props.champion.id,
@@ -889,7 +992,10 @@ const handleAddToItemSet = async () => {
     if (props.data.data.starter_items && props.data.data.starter_items.length) {
       props.data.data.starter_items.slice(0, 3).forEach((s: any, i: number) => {
         itemGroups.push({
-          title: `初始装备 #${i + 1} | 出场率 ${(s.pick_rate * 100).toFixed(2)}%`,
+          title: t('OpggChampion.starterItem', {
+            index: i + 1,
+            pickRate: (s.pick_rate * 100).toFixed(2)
+          }),
           items: s.ids
         })
       })
@@ -897,7 +1003,7 @@ const handleAddToItemSet = async () => {
 
     if (props.data.data.boots && props.data.data.boots.length) {
       itemGroups.push({
-        title: `鞋子 (按出场率排序)`,
+        title: t('OpggChampion.bootsDesc'),
         items: props.data.data.boots.reduce((acc: number[], cur: any) => {
           acc.push(...cur.ids)
           return acc
@@ -907,7 +1013,7 @@ const handleAddToItemSet = async () => {
 
     if (props.data.data.prism_items && props.data.data.prism_items.length) {
       itemGroups.push({
-        title: `棱彩阶装备 (按出场率排序)`,
+        title: t('OpggChampion.prismItemsDesc'),
         items: props.data.data.prism_items.reduce((acc: number[], cur: any) => {
           acc.push(...cur.ids)
           return acc
@@ -918,7 +1024,10 @@ const handleAddToItemSet = async () => {
     if (props.data.data.core_items && props.data.data.core_items.length) {
       props.data.data.core_items.slice(0, 4).forEach((s: any, i: number) => {
         itemGroups.push({
-          title: `核心装备 #${i + 1} | 出场率 ${(s.pick_rate * 100).toFixed(2)}%`,
+          title: t('OpggChampion.coreItem', {
+            index: i + 1,
+            pickRate: (s.pick_rate * 100).toFixed(2)
+          }),
           items: s.ids
         })
       })
@@ -926,7 +1035,7 @@ const handleAddToItemSet = async () => {
 
     if (props.data.data.last_items && props.data.data.last_items.length) {
       itemGroups.push({
-        title: `装备 (按出场率排序)`,
+        title: t('OpggChampion.itemsDesc'),
         items: props.data.data.last_items.reduce((acc: number[], cur: any) => {
           acc.push(...cur.ids)
           return acc
@@ -937,7 +1046,7 @@ const handleAddToItemSet = async () => {
     await lc.writeItemSetsToDisk([
       {
         uid: newUid,
-        title: `[OP.GG] ${lcs.gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${props.mode === 'arena' || props.mode === 'nexus_blitz' ? ` ${MODE_TEXT[props.mode]}` : ''}`,
+        title: `[OP.GG] ${lcs.gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${props.mode === 'arena' || props.mode === 'nexus_blitz' ? ` ${t(`Opgg.modes.${props.position}`)}` : ''}`,
         sortrank: 0,
         type: 'global',
         map: 'any',
@@ -955,20 +1064,26 @@ const handleAddToItemSet = async () => {
       }
     ])
 
-    message.success('已写入到文件中')
+    message.success(t('OpggChampion.writtenToDisk'))
 
     if (lcs.chat.conversations.championSelect) {
       lc.api.chat
         .chatSend(
           lcs.chat.conversations.championSelect.id,
-          `[League Akari] 已写入到装备方案: [OP.GG] ${lcs.gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+          t('OpggChampion.writeToDisk', {
+            name: `[OP.GG] ${lcs.gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`
+          }),
           'celebration'
         )
         .catch(() => {})
     }
   } catch (error) {
     log.warn('view:OpggChampion', `[OP.GG] 添加到物品集失败: ${(error as any).message}`, error)
-    message.warning(`添加到装备方案失败: ${(error as any).message}`)
+    message.warning(
+      t('OpggChampion.writeFileFailedMessage', {
+        error: (error as any).message
+      })
+    )
   }
 }
 </script>
@@ -1018,15 +1133,19 @@ const handleAddToItemSet = async () => {
   gap: 4px;
   margin-bottom: 8px;
   align-items: center;
+  flex-wrap: wrap;
 
   .skill {
+    position: relative;
+    padding: 0 2px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    width: 24px;
+    min-width: 24px;
     height: 24px;
     border-radius: 4px;
+    box-sizing: border-box;
   }
 
   .separator {
@@ -1038,15 +1157,19 @@ const handleAddToItemSet = async () => {
 .skill-details {
   display: flex;
   gap: 2px;
+  flex-wrap: wrap;
 
   .skill {
+    position: relative;
     display: flex;
+    padding: 0 2px;
     align-items: center;
     justify-content: center;
-    width: 16px;
+    min-width: 16px;
     height: 16px;
     font-size: 10px;
     border-radius: 2px;
+    box-sizing: border-box;
   }
 }
 
@@ -1148,7 +1271,7 @@ const handleAddToItemSet = async () => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 76px;
+    min-width: 76px;
 
     .pick-rate {
       font-size: 12px;
@@ -1159,11 +1282,12 @@ const handleAddToItemSet = async () => {
     .pick-play {
       font-size: 12px;
       color: #bebebe;
+      text-align: center;
     }
   }
 
   .win-rate {
-    width: 76px;
+    min-width: 76px;
     font-size: 12px;
     color: #a0c6f8;
     font-weight: bold;
@@ -1172,7 +1296,7 @@ const handleAddToItemSet = async () => {
 
   .buttons {
     display: flex;
-    width: 76px;
+    min-width: 76px;
     justify-content: center;
   }
 }
@@ -1257,6 +1381,7 @@ const handleAddToItemSet = async () => {
     .play {
       font-size: 10px;
       color: #a4a4a4;
+      text-align: center;
     }
   }
 }
@@ -1264,7 +1389,7 @@ const handleAddToItemSet = async () => {
 .skills-group {
   display: flex;
   align-items: center;
-  height: 56px;
+  min-height: 56px;
 
   &:not(:last-child) {
     margin-bottom: 8px;
@@ -1279,7 +1404,7 @@ const handleAddToItemSet = async () => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 76px;
+      min-width: 76px;
 
       .pick-rate {
         font-size: 12px;
@@ -1290,11 +1415,12 @@ const handleAddToItemSet = async () => {
       .pick-play {
         font-size: 12px;
         color: #bebebe;
+        text-align: center;
       }
     }
 
     .win-rate {
-      width: 76px;
+      min-width: 76px;
       font-size: 12px;
       color: #a0c6f8;
       font-weight: bold;
@@ -1338,7 +1464,7 @@ const handleAddToItemSet = async () => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 76px;
+      min-width: 76px;
 
       .pick-rate {
         font-size: 12px;
@@ -1349,11 +1475,12 @@ const handleAddToItemSet = async () => {
       .pick-play {
         font-size: 12px;
         color: #bebebe;
+        text-align: center;
       }
     }
 
     .win-rate {
-      width: 76px;
+      min-width: 76px;
       font-size: 12px;
       color: #a0c6f8;
       font-weight: bold;
@@ -1362,7 +1489,7 @@ const handleAddToItemSet = async () => {
 
     .buttons {
       display: flex;
-      width: 76px;
+      min-width: 76px;
       justify-content: center;
     }
   }
@@ -1388,7 +1515,7 @@ const handleAddToItemSet = async () => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 76px;
+      min-width: 76px;
 
       .pick-rate {
         font-size: 12px;
@@ -1399,11 +1526,12 @@ const handleAddToItemSet = async () => {
       .pick-play {
         font-size: 12px;
         color: #bebebe;
+        text-align: center;
       }
     }
 
     .win-rate {
-      width: 76px;
+      min-width: 76px;
       font-size: 12px;
       color: #a0c6f8;
       font-weight: bold;
@@ -1448,7 +1576,7 @@ const handleAddToItemSet = async () => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 76px;
+      min-width: 76px;
 
       .value {
         font-size: 12px;
@@ -1506,7 +1634,7 @@ const handleAddToItemSet = async () => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 76px;
+      min-width: 76px;
 
       .pick-rate {
         font-size: 12px;
@@ -1517,11 +1645,12 @@ const handleAddToItemSet = async () => {
       .pick-play {
         font-size: 12px;
         color: #bebebe;
+        text-align: center;
       }
     }
 
     .win-rate {
-      width: 76px;
+      min-width: 76px;
       font-size: 12px;
       color: #a0c6f8;
       font-weight: bold;

@@ -52,7 +52,7 @@
         </div>
         <div
           class="begin-time"
-          :title="dayjs(game.gameCreation).locale('zh-cn').format('YYYY-MM-DD HH:mm:ss')"
+          :title="dayjs(game.gameCreation).locale(locale).format('YYYY-MM-DD HH:mm:ss')"
         >
           {{ formattedGameCreationRelativeTime }}
         </div>
@@ -67,8 +67,8 @@
           {{
             dayjs
               .duration(game.gameDuration * 1000)
-              .locale('zh-cn')
-              .format('m 分 s 秒')
+              .locale(locale)
+              .format(locale === 'zh-cn' ? 'm 分 s 秒' : 'm [m] s [s]')
           }}
         </div>
       </div>
@@ -265,13 +265,14 @@ import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDispl
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
+import { formatI18nOrdinal } from '@shared/i18n'
 import { Game, ParticipantIdentity } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
 import { ChevronDown as ChevronDownIcon, List as ListIcon } from '@vicons/ionicons5'
 import { createReusableTemplate, useTimeoutPoll } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NIcon, NModal } from 'naive-ui'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import '../lol-view.less'
@@ -288,7 +289,7 @@ const props = defineProps<{
   game: Game
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const emits = defineEmits<{
   setShowDetailedGame: [gameId: number, expand: boolean]
@@ -306,11 +307,20 @@ const formattedGameCreationRelativeTime = ref('')
 useTimeoutPoll(
   () => {
     formattedGameCreationRelativeTime.value = dayjs(props.game.gameCreation)
-      .locale('zh-cn')
+      .locale(locale.value)
       .fromNow()
   },
   60000,
   { immediate: true }
+)
+
+watch(
+  () => locale.value,
+  (locale) => {
+    formattedGameCreationRelativeTime.value = dayjs(props.game.gameCreation)
+      .locale(locale)
+      .fromNow()
+  }
 )
 
 const self = computed(() => {
@@ -365,18 +375,13 @@ const self = computed(() => {
   }
 })
 
-const chineseNumber = ['一', '二', '三', '四', '五', '六', '七', '八', '九']
 const formattedResultText = computed(() => {
   if (!self.value) {
     return null
   }
 
   if (props.game.gameMode === 'CHERRY') {
-    const ranking = self.value.participant.stats.subteamPlacement
-    if (ranking < 1) {
-      return `第 ? 名 (数据错误)`
-    }
-    return `第${chineseNumber[self.value.participant.stats.subteamPlacement - 1]}名`
+    return formatI18nOrdinal(self.value.participant.stats.subteamPlacement, locale.value)
   }
 
   if (props.game.gameMode === 'PRACTICETOOL') {
@@ -384,18 +389,20 @@ const formattedResultText = computed(() => {
   }
 
   if (props.game.endOfGameResult === 'Abort_AntiCheatExit') {
-    return `被终止`
+    return t('MatchHistoryCard.abort')
   }
 
   // 重开局
   if (self.value.participant.stats.gameEndedInEarlySurrender) {
-    return `重开 (${self.value.participant.stats.win ? '胜利' : '失败'})`
+    return `${t('MatchHistoryCard.remake')} (${self.value.participant.stats.win ? t('MatchHistoryCard.win') : t('MatchHistoryCard.lose')})`
   }
 
   if (self.value.participant.stats.win) {
-    return '胜利'
+    return t('MatchHistoryCard.win')
   } else {
-    return self.value.participant.stats.gameEndedInSurrender ? '投降' : '失败'
+    return self.value.participant.stats.gameEndedInSurrender
+      ? t('MatchHistoryCard.surrender')
+      : t('MatchHistoryCard.lose')
   }
 })
 
@@ -421,7 +428,7 @@ const composedResultClass = computed(() => {
 
 const formattedModeText = computed(() => {
   return props.game.gameMode === 'PRACTICETOOL'
-    ? '训练模式'
+    ? t('MatchHistoryCard.practiceTool')
     : (lcs.gameData.queues[props.game.queueId]?.name ?? props.game.queueId)
 })
 

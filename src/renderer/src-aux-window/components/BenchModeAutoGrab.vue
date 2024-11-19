@@ -2,13 +2,17 @@
   <NCard v-if="as2.settings.benchModeEnabled && isBenchMode" size="small">
     <NFlex align="center" class="min-height-container" v-if="as2.upcomingGrab">
       <LcuImage class="image" :src="championIconUri(as2.upcomingGrab?.championId)" />
-      <span class="label">即将选择 {{ willGrabIn.toFixed(1) }} s</span>
+      <span class="label">{{
+        t('BenchModeAutoGrab.grabbing', {
+          seconds: willGrabIn.toFixed(1)
+        })
+      }}</span>
     </NFlex>
     <NFlex align="center" class="min-height-container" v-else>
-      <span class="label" v-if="as2.settings.benchExpectedChampions.length === 0"
-        >自动选择没有设置期望英雄列表</span
-      >
-      <span class="label" v-else>自动选择无可用英雄</span>
+      <span class="label" v-if="as2.settings.benchExpectedChampions.length === 0">{{
+        t('BenchModeAutoGrab.noExpectedChampions')
+      }}</span>
+      <span class="label" v-else>{{ t('BenchModeAutoGrab.noCandidate') }}</span>
     </NFlex>
   </NCard>
 </template>
@@ -22,6 +26,9 @@ import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { useIntervalFn } from '@vueuse/core'
 import { NCard, NFlex } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const as2 = useAutoSelectStore()
 const lcs = useLeagueClientStore()

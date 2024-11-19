@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store';
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { onActivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -13,7 +13,7 @@ const router = useRouter()
 
 // 在 indicator 主页面，根据当前的 phase 跳转到对应的页面
 const routeTo = (phase: string | null) => {
-  if (!route.matched.some((record) => record.name === 'indicator')) {
+  if (route.name !== 'indicator') {
     return
   }
 

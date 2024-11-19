@@ -2,13 +2,13 @@
   <div class="title-bar" :class="{ blurred: wms.auxWindowFocus === 'blurred' }">
     <div class="text-area">
       <div
-        title="League Akari 的小窗口"
+        :title="t('AuxWindowTitleBar.indicatorTitle')"
         class="shortcut"
         v-if="!isInIndicatorView"
         @click="handleBackToIndicatorView"
       >
         <NIcon class="shortcut-icon"><ArrowBackIosFilledIcon /></NIcon>
-        <span class="shortcut-text">小窗</span>
+        <span class="shortcut-text">{{ t('AuxWindowTitleBar.indicator') }}</span>
       </div>
       <template v-else>
         <div
@@ -24,7 +24,9 @@
     </div>
     <div class="traffic">
       <div
-        :title="wms.settings.auxWindowPinned ? `取消置顶` : `置顶`"
+        :title="
+          wms.settings.auxWindowPinned ? t('AuxWindowTitleBar.unpin') : t('AuxWindowTitleBar.pin')
+        "
         class="traffic-button pin"
         :class="{ pinned: wms.settings.auxWindowPinned }"
         @click="() => handlePin(!wms.settings.auxWindowPinned)"
@@ -51,7 +53,10 @@ import { Close as CloseIcon } from '@vicons/ionicons5'
 import { ArrowBackIosFilled as ArrowBackIosFilledIcon } from '@vicons/material'
 import { NIcon } from 'naive-ui'
 import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
+
+const { t } = useI18n()
 
 const wms = useWindowManagerStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
@@ -69,17 +74,18 @@ const handlePin = (b: boolean) => {
 }
 
 const route = useRoute()
-const router = useRouter()
 
-const shortcuts = [
-  {
-    label: '使用 OP.GG',
-    description: '集成的 OP.GG',
-    toggle: () => {
-      wm.setAuxWindowFunctionality('opgg')
+const shortcuts = computed(() => {
+  return [
+    {
+      label: t('AuxWindowTitleBar.opgg'),
+      description: t('AuxWindowTitleBar.opggTitle'),
+      toggle: () => {
+        wm.setAuxWindowFunctionality('opgg')
+      }
     }
-  }
-]
+  ]
+})
 
 const isInIndicatorView = computed(() => {
   return route.matched.some((record) => record.name === 'indicator')
@@ -118,7 +124,7 @@ const handleBackToIndicatorView = () => {
     align-items: center;
     justify-content: center;
     gap: 2px;
-    width: 76px;
+    min-width: 76px;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.08);
     -webkit-app-region: none;

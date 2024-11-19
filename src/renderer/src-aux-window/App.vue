@@ -15,7 +15,7 @@
 import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { useMessage } from 'naive-ui'
-import { watch, watchEffect } from 'vue'
+import { watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AuxWindowTitleBar from './components/AuxWindowTitleBar.vue'

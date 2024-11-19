@@ -140,7 +140,7 @@
                 </div>
                 <div>
                   {{
-                    t('DetailedGame.header.csPerMinute', {
+                    t('DetailedGame.csPerMinute', {
                       count: (
                         (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) /
                         ((game.gameDuration || 1) / 60)

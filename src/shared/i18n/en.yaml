@@ -528,7 +528,7 @@ SearchSummonerModal:
   validating: Validating players ({current} / {total})
   validated: Validated {count} possible player records, no matching results found
   noResult: No matching results found
-  privacy: Career Hidden
+  privacy: Private
   currentRoute: Current
   invalidInput: 'The input format is invalid: it should be "GameName#Tag" or "GameName"'
   hasInvisibleChar: The search text contains invisible characters, which will be filtered out
@@ -911,15 +911,15 @@ MatchHistoryTabs:
   copiedToClipboard: Copied to clipboard
 
 MatchHistoryTab:
-  prevPage: Previous Page
-  nextPage: Next Page
+  prevPage: Previous
+  nextPage: Next
   refreshPage: Refresh Page
   rankedMore: More
   tagPlayer: Tag Player
 
   private:
     title: Profile Hidden
-    content: This player has set their profile to be hidden.
+    content: This player has set his/her profile to be private.
 
   tagged:
     title: Tagged
@@ -945,7 +945,7 @@ MatchHistoryTab:
     lose: Loss
     wr: Win Rate
     champions: Champion Usage
-    times: Matches
+    times: Games
 
   recentPlayers:
     teammatesTitle: Recent Teammates
@@ -966,6 +966,12 @@ MatchHistoryCard:
   misc: Misc
   loading: Loading...
   error: Failed to load
+  practiceTool: Practice
+  win: Win
+  lose: Loss
+  remake: Remake
+  abort: Aborted
+  surrender: Surrender
 
 StandaloneMatchHistoryCardModal:
   notFound: Game not found
@@ -1105,7 +1111,7 @@ DetailedGame:
   lose: Loss
   controlWard: Control Wards
   wardPlaced: Placed {count}, Cleared {cleared}
-  csPerMinute: '{count} per minute'
+  csPerMinute: '{count} / min'
   bot: Bot
 
   header:
@@ -1152,12 +1158,12 @@ PlayerInfoCard:
     goodPopover: This player has performed well in recent games.
     greatPopover: This player has shown exceptional performance in recent games.
   champion:
-    winRate: 'Recent {count} games, win rate: {winRate}%'
+    winRate: 'Recent {count} games, win rate {winRate}%'
     level: 'Level {level}'
-    masteryPoints: '{points} Mastery Points'
+    masteryPoints: '{points} mastery points'
   matchHistory:
     winResult:
-      na: -
+      na: '-'
       win: Win
       lose: Loss
       remake: Remake
@@ -1165,25 +1171,265 @@ PlayerInfoCard:
 
   self: Self
   tagged: Tagged
-  premade: Premade Team {team}
+  premade: Premade {team}
   highWinRate: High Win Rate
   met: Met Before
-  private: Career Hidden
-  winningStreak: '{count} Wins in a Row'
-  losingStreak: '{count} Losses in a Row'
+  private: Private
+  winningStreak: '{count} Wins'
+  losingStreak: '{count} Losses'
 
 OngoingGame:
-  disconnected: Not connected to client
+  disconnected: Not connected to the client
   waitingForSpectate: Waiting for spectate delay
   noOngoingGame: No ongoing game
   disabled: Game analysis disabled
   avgTeamWinRate: Average Team Win Rate
   avgTeamKda: Average Team KDA
 
+AuxWindowTitleBar:
+  opgg: OP.GG View
+  opggTitle: View on OP.GG
+  indicator: Aux Win.
+  indicatorTitle: Auxiliary Window of League Akari
+  pin: Pin
+  unpin: Unpin
+
+BenchChampionsMini:
+  title: Champion Bench
+  reroll: 'Reroll (Remaining: {count})'
+  charity: 'Reroll and Take back (Remaining: {count})'
+  notInBenchMode: Not currently in a bench mode
+  notInPhase: Not in the champion selection phase
+
+BenchModeAutoGrab:
+  grabbing: Selecting in {seconds}s
+  noExpectedChampions: No expected champion list set for auto-selection
+  noCandidate: No available champions for auto-selection
+
+ChampSelectActions:
+  picked: Picked
+  voted: Voted
+  banned: Banned
+  autoPick: Auto Pick
+  autoBan: Auto Ban
+  picking: Picking
+  banning: Banning
+  voting: Voting
+  tenBansRevealing: bans Revealing
+  inProgress: In Progress
+  completed: Completed
+
+ChampSelectOperations:
+  dodge:
+    label: Exit Champion Select
+    button: Dodge Now
+    popconfirm: This will exit the champion select phase.
+    positiveText: Exit
+    negativeText: Cancel
+
+  dodgeAtLastSecond:
+    label: Last-Second Dodge Threshold
+    waitingForTiming: Last-Second Dodge (Waiting)
+    waiting: Dodge in {seconds} s
+    text: 'Last-Second Dodge'
+    thresholdWarning: A threshold that is too low ({seconds} s) may result in dodge failure
+
+  autos:
+    autoPick: Auto Pick
+    autoBan: Auto Ban
+    autoGrab: Auto Grab
+
+LoungeOperations:
+  immediately: Immediately
+  second: s
+
+  autoAccept:
+    label: Auto Accept
+    unavailable: Unavailable
+
+  autoMatchmaking:
+    label: Auto Matchmaking
+    unavailable: Unavailable
+
+  autoMatchmakingMinimumMembers:
+    label: Minimum Members
+
+  autoMatchmakingDelaySeconds:
+    label: Pre-Matchmaking Delay
+
+  autoMatchmakingWaitForInvitees:
+    label: Wait for Invitees
+
+SkinSelectionMini:
+  skins: '{count} skins available'
+  button: Apply
+  success: Skin applied successfully
+  failed: Skin application failed
+
+Lounge:
+  map: Map
+  gameMode: Game Mode
+  wait: Wait
+  atMost: At Most
+
+  autoAccept:
+    acceptIn: Accept in {seconds} s
+    cancelButton: Cancel auto-accept
+    declineButton: Decline
+    acceptButton: Accept
+    accepted: Accepted
+    pending: Waiting to accept
+    subtitle1: Can still be declined
+    subtitle2: Can still be accepted
+    declined: Declined
+
+Placeholder:
+  inProgress: In Progress
+  idle: No active activities
+
+Opgg:
+  toOpgg: Go to OP.GG
+  refresh: Refresh
+  close: Close
+  tier: Tier
+  champion: Champion
+  empty: None
+  mode: Mode
+  region: Region
+  rankTier: Rank Tier
+  position: Position
+  version: Version
+  replace: Provide
+  create: Create
+
+  settings:
+    button: Settings
+    title: OP.GG Mini-window Settings
+
+    flashPosition:
+      label: Flash Position Preference
+      description: When setting summoner spells, prioritize the position for Flash if it is selected
+      auto: Auto
+      options:
+        d: Default Flash position is D
+        f: Default Flash position is F
+        auto: Decide based on the current Flash position
+
+  success: Request sent
+  loadVersionsFailedMessage: 'Failed to fetch version data: {reason}'
+  loadTierFailedMessage: 'Failed to fetch tier data: {reason}'
+  loadChampionFailedMessage: 'Failed to fetch champion data: {reason}'
+  setSpellsFailedMessage: 'Failed to set summoner spells: {reason}'
+  setRunesFailedMessage: 'Failed to set rune builds: {reason}'
+  spellsSet: '[League Akari] Summoner spells set: [OP.GG] {spell1} | {spell2}'
+  runesSet: '[League Akari] {action} rune build: {name}'
+
+  modes:
+    ranked: 'Ranked'
+    aram: 'ARAM'
+    arena: 'Arena'
+    nexus_blitz: 'Nexus Blitz'
+    urf: 'URF'
+
+  positions:
+    top: 'Top'
+    jungle: 'Jungle'
+    mid: 'Mid'
+    adc: 'Adc'
+    support: 'Support'
+    none: 'None'
+
+  regions:
+    global: 'Global'
+    na: 'North America'
+    euw: 'Europe West'
+    kr: 'Korea'
+    br: 'Brazil'
+    eune: 'Europe Nordic & East'
+    jp: 'Japan'
+    lan: 'Latin America North'
+    las: 'Latin America South'
+    oce: 'Oceania'
+    tr: 'Turkey'
+    ru: 'Russia'
+    sg: 'Singapore'
+    id: 'Indonesia'
+    ph: 'Philippines'
+    th: 'Thailand'
+    vn: 'Vietnam'
+    tw: 'Taiwan'
+    me: 'Middle East'
+
+  tiers:
+    all: 'All Tiers'
+    ibsg: 'Gold -'
+    gold_plus: 'Gold +'
+    platinum_plus: 'Platinum +'
+    emerald_plus: 'Emerald +'
+    diamond_plus: 'Diamond +'
+    master: 'Master'
+    master_plus: 'Master +'
+    grandmaster: 'Grandmaster'
+    challenger: 'Challenger'
+
+OpggTier:
+  searchPlaceholder: Search for name
+  columns:
+    champion: Name
+    tier: Tier
+    winRate: W/R
+    pickRate: P/R
+    counter: Counters
+    banRate: B/R
+
+OpggChampion:
+  adorableRabi: Kawaii Bunny
+  avgPlace: Avg. Rank
+  1st: 1st Place
+  winRate: Win Rate
+  pickRate: Pick Rate
+  plays: Total Games
+  banRate: Ban Rate
+  counter: Counter
+  allCounters: All
+  counterC: Counter
+  allC: All
+  empty: No Data Available
+  times: '{times} Games'
+  showAll: Show All
+  spells: Summoner Spells
+  apply: Apply
+  runes: Rune Builds
+  abilityBuild: Ability Leveling
+  starterItemText: Starting Items
+  prismItemText: Prism Tier Items
+  coreItemText: Core Items
+  itemText: Items
+  tierText: T{tier}
+  applyRunes: Import Current Item Build
+  applyRunesText: Build Applied
+  augmentGold: Gold
+  augmentSilver: Silver
+  augmentPrism: Prism
+  synergies: Synergies
+
+  writeToDisk: '[League Akari] Written to item build: {name}'
+  writtenToDisk: Successfully written to file
+  writeFileFailedMessage: Failed to write file {reason}
+  bootsDesc: Boots (sorted by pick rate)
+  prismItemsDesc: Prism Tier Items (sorted by pick rate)
+  itemsDesc: Items (sorted by pick rate)
+  coreItem: 'Core Item #{index} | Pick Rate {pickRate}%'
+  starterItem: 'Starting Item #{index} | Pick Rate {pickRate}%'
 
 common:
   appName: League Akari
   default: Default
+
+  yes: yes
+  no: no
+  na: N/A
+
   lanes:
     top: Top
     jungle: Jungle

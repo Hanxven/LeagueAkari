@@ -12,25 +12,25 @@
         <template v-if="a[0].completed">
           <div class="solution completed" v-if="a[0].type === 'pick'">
             <LcuImage class="image" :src="championIconUri(a[0].championId)" />
-            <span class="label">已选择</span>
+            <span class="label">{{ t('ChampSelectActions.picked') }}</span>
           </div>
           <div class="solution completed" v-else-if="a[0].type === 'vote'">
             <LcuImage class="image" :src="championIconUri(a[0].championId)" />
-            <span class="label">已投票</span>
+            <span class="label">{{ t('ChampSelectActions.voted') }}</span>
           </div>
           <div class="solution completed" v-else-if="a[0].type === 'ban'">
             <LcuImage class="image" :src="championIconUri(a[0].championId)" />
-            <span class="label">已禁用</span>
+            <span class="label">{{ t('ChampSelectActions.banned') }}</span>
           </div>
         </template>
         <template v-else>
           <div class="solution" v-if="as2.upcomingPick && as2.upcomingPick.action.id === a[0].id">
             <LcuImage class="image" :src="championIconUri(as2.upcomingPick.championId)" />
-            <span class="label">自动选择</span>
+            <span class="label">{{ t('ChampSelectActions.autoPick') }}</span>
           </div>
           <div class="solution" v-if="as2.upcomingBan && as2.upcomingBan.action.id === a[0].id">
             <LcuImage class="image" :src="championIconUri(as2.upcomingBan.championId)" />
-            <span class="label">自动禁用</span>
+            <span class="label">{{ t('ChampSelectActions.autoBan') }}</span>
           </div>
         </template>
       </NTimelineItem>
@@ -46,6 +46,9 @@ import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Action } from '@shared/types/league-client/champ-select'
 import { NCard, NTimeline, NTimelineItem } from 'naive-ui'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const as2 = useAutoSelectStore()
@@ -79,16 +82,16 @@ const formatActionTypeText = (action: Action) => {
   let actionName: string
   switch (action.type) {
     case 'pick':
-      actionName = '英雄选择'
+      actionName = t('ChampSelectActions.picking')
       break
     case 'ban':
-      actionName = '英雄禁用'
+      actionName = t('ChampSelectActions.banning')
       break
     case 'vote':
-      actionName = '投票'
+      actionName = t('ChampSelectActions.voting')
       break
     case 'ten_bans_reveal':
-      actionName = '系统 · 禁用展示'
+      actionName = t('ChampSelectActions.tenBansRevealing')
       break
 
     default:
@@ -97,9 +100,9 @@ const formatActionTypeText = (action: Action) => {
 
   let finishStatus: string = ''
   if (action.isInProgress) {
-    finishStatus = '进行中'
+    finishStatus = t('ChampSelectActions.inProgress')
   } else if (action.completed) {
-    finishStatus = '已完成'
+    finishStatus = t('ChampSelectActions.completed')
   }
 
   return finishStatus ? `${actionName} (${finishStatus})` : actionName

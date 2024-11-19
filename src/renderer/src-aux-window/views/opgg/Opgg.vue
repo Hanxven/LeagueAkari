@@ -1,29 +1,40 @@
 <template>
   <div class="opgg-panel" ref="opgg-panel">
     <div class="tabs-area">
-      <a href="https://op.gg" title="转到 OP.GG" target="_blank"><OpggIcon class="opgg-icon" /></a>
+      <a href="https://op.gg" :title="t('Opgg.toOpgg')" target="_blank"
+        ><OpggIcon class="opgg-icon"
+      /></a>
       <NButton
         secondary
         class="square-button"
-        title="刷新"
+        :title="t('Opgg.refresh')"
         :loading="isLoading"
-        @click="() => loadAll()"
+        @click="loadAll"
       >
         <template #icon>
           <NIcon><RefreshIcon /></NIcon>
         </template>
       </NButton>
-      <NButton secondary class="square-button" title="设置" @click="isSettingsLayerShow = true">
+      <NButton
+        secondary
+        class="square-button"
+        :title="t('Opgg.settings.button')"
+        @click="isSettingsLayerShow = true"
+      >
         <template #icon>
           <NIcon><SettingsIcon /></NIcon>
         </template>
       </NButton>
       <NTabs class="tabs" v-model:value="currentTab" type="segment" size="small">
-        <NTab title="梯队" name="tier" tab="梯队" />
+        <NTab name="tier" :tab="t('Opgg.tier')" />
         <NTab
-          title="英雄"
+          :title="t('Opgg.champion')"
           name="champion"
-          :tab="championId ? lcs.gameData.champions[championId]?.name || '无' : '无'"
+          :tab="
+            championId
+              ? lcs.gameData.champions[championId]?.name || t('Opgg.empty')
+              : t('Opgg.empty')
+          "
           :disabled="!championId"
         />
       </NTabs>
@@ -31,7 +42,7 @@
     <div class="filters">
       <NSelect
         size="small"
-        placeholder="模式"
+        :placeholder="t('Opgg.mode')"
         :options="modeOptions"
         :value="mode"
         @update:value="handleModeChange"
@@ -42,7 +53,7 @@
       />
       <NSelect
         size="small"
-        placeholder="地区"
+        :placeholder="t('Opgg.region')"
         :options="regionOptions"
         :value="region"
         @update:value="handleRegionChange"
@@ -53,7 +64,7 @@
       />
       <NSelect
         size="small"
-        placeholder="段位"
+        :placeholder="t('Opgg.rankTier')"
         :options="tierOptions"
         :value="tier"
         @update:value="handleTierChange"
@@ -64,7 +75,7 @@
       />
       <NSelect
         size="small"
-        placeholder="位置"
+        :placeholder="t('Opgg.position')"
         :options="positionOptions"
         :value="position"
         @update:value="handlePositionChange"
@@ -75,7 +86,7 @@
       />
       <NSelect
         size="small"
-        placeholder="版本"
+        :placeholder="t('Opgg.version')"
         :value="version"
         :options="versionOptions"
         @update:value="handleVersionChange"
@@ -120,8 +131,8 @@
         @click.self="isSettingsLayerShow = false"
       >
         <div class="header">
-          <span class="title">小窗 OP.GG 设置</span>
-          <div class="close-btn" @click="isSettingsLayerShow = false" title="关闭">
+          <span class="title">{{ t('Opgg.settings.title') }}</span>
+          <div class="close-btn" @click="isSettingsLayerShow = false" :title="t('Opgg.close')">
             <NIcon class="close-icon"><CloseIcon /></NIcon>
           </div>
         </div>
@@ -129,32 +140,19 @@
           <ControlItem
             class="control-item-margin"
             style="justify-content: space-between"
-            label="闪现位置偏好"
-            label-description="设置召唤师技能时，若存在闪现技能，优先选择的位置"
+            :label="t('Opgg.settings.flashPosition.label')"
+            :label-description="t('Opgg.settings.flashPosition.description')"
             :label-width="300"
           >
             <NRadioGroup size="small" v-model:value="flashPosition">
               <NFlex style="gap: 4px" :vertical="isSmallWidth">
-                <NRadio value="d" title="闪现位置默认在 D">D</NRadio>
-                <NRadio value="f" title="闪现位置默认在 F">F</NRadio>
-                <NRadio value="auto" title="根据当前闪现的位置决定">自动</NRadio>
+                <NRadio value="d" :title="t('Opgg.settings.flashPosition.options.d')">D</NRadio>
+                <NRadio value="f" :title="t('Opgg.settings.flashPosition.options.f')">F</NRadio>
+                <NRadio value="auto" :title="t('Opgg.settings.flashPosition.options.auto')">
+                  {{ t('Opgg.settings.flashPosition.auto') }}
+                </NRadio>
               </NFlex>
             </NRadioGroup>
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
-            style="justify-content: space-between"
-            label="自动应用"
-            :label-width="300"
-            v-if="false"
-          >
-            <template #labelDescription>
-              <div>
-                在锁定英雄时，自动应用出场率最高的召唤师技能组、出场率最高的符文以及精简的装备方案
-              </div>
-              <div class="settings-aux-window-only">⚠️ 仅在小窗口启用时生效</div>
-            </template>
-            <NSwitch size="small" v-model:checked="autoApplySpellsAndRunesAndItems" />
           </ControlItem>
         </div>
       </div>
@@ -195,17 +193,18 @@ import {
   NRadio,
   NRadioGroup,
   NSelect,
-  NSwitch,
   NTab,
   NTabs,
   SelectRenderLabel,
   useMessage
 } from 'naive-ui'
 import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
-import { MODE_TEXT, POSITION_TEXT, REGION_TEXT, TIER_TEXT } from './text'
+
+const { t } = useI18n()
 
 const currentTab = ref('tier')
 
@@ -320,7 +319,7 @@ const loadVersionsData = async () => {
       return
     }
 
-    message.warning(`获取版本数据失败: ${(error as any).message}`)
+    message.warning(t('Opgg.loadVersionsFailedMessage', { reason: (error as any).message }))
     log.warn('view:Opgg', `获取版本数据失败: ${(error as any).message}`, error)
   } finally {
     isLoadingVersions.value = false
@@ -348,7 +347,7 @@ const loadTierData = async () => {
       return
     }
 
-    message.warning(`获取 tier 数据失败: ${(error as any).message}`)
+    message.warning(t('Opgg.loadTierFailedMessage', { reason: (error as any).message }))
     log.warn('view:Opgg', `获取 tier 数据失败: ${(error as any).message}`, error)
   } finally {
     isLoadingTier.value = false
@@ -382,7 +381,7 @@ const loadChampionData = async () => {
       return
     }
 
-    message.warning(`获取英雄数据失败: ${(error as any).message}`)
+    message.warning(t('Opgg.loadChampionFailedMessage', { reason: (error as any).message }))
     log.warn('view:Opgg', `获取英雄数据失败: ${(error as any).message}`, error)
   } finally {
     isLoadingChampion.value = false
@@ -449,57 +448,57 @@ const championItem = computed(() => {
   return tierData.value?.data.find((c) => c.id === championId.value)
 })
 
-const modeOptions = [
-  { label: MODE_TEXT['ranked'], value: 'ranked' },
-  { label: MODE_TEXT['aram'], value: 'aram' },
-  { label: MODE_TEXT['arena'], value: 'arena' },
-  { label: MODE_TEXT['nexus_blitz'], value: 'nexus_blitz' },
-  { label: MODE_TEXT['urf'], value: 'urf' }
-]
-
-const positionOptions = computed(() => [
-  { label: POSITION_TEXT['top'], value: 'top' },
-  { label: POSITION_TEXT['jungle'], value: 'jungle' },
-  { label: POSITION_TEXT['mid'], value: 'mid' },
-  { label: POSITION_TEXT['adc'], value: 'adc' },
-  { label: POSITION_TEXT['support'], value: 'support' },
-  { label: POSITION_TEXT['none'], value: 'none', disabled: mode.value === 'ranked' }
+const modeOptions = computed(() => [
+  { label: t('Opgg.modes.ranked'), value: 'ranked' },
+  { label: t('Opgg.modes.aram'), value: 'aram' },
+  { label: t('Opgg.modes.arena'), value: 'arena' },
+  { label: t('Opgg.modes.nexus_blitz'), value: 'nexus_blitz' },
+  { label: t('Opgg.modes.urf'), value: 'urf' }
 ])
 
-const regionOptions = [
-  { label: REGION_TEXT['global'], value: 'global' },
-  { label: REGION_TEXT['na'], value: 'na' },
-  { label: REGION_TEXT['euw'], value: 'euw' },
-  { label: REGION_TEXT['kr'], value: 'kr' },
-  { label: REGION_TEXT['br'], value: 'br' },
-  { label: REGION_TEXT['eune'], value: 'eune' },
-  { label: REGION_TEXT['jp'], value: 'jp' },
-  { label: REGION_TEXT['lan'], value: 'lan' },
-  { label: REGION_TEXT['las'], value: 'las' },
-  { label: REGION_TEXT['oce'], value: 'oce' },
-  { label: REGION_TEXT['tr'], value: 'tr' },
-  { label: REGION_TEXT['ru'], value: 'ru' },
-  { label: REGION_TEXT['sg'], value: 'sg' },
-  { label: REGION_TEXT['id'], value: 'id' },
-  { label: REGION_TEXT['ph'], value: 'ph' },
-  { label: REGION_TEXT['th'], value: 'th' },
-  { label: REGION_TEXT['vn'], value: 'vn' },
-  { label: REGION_TEXT['tw'], value: 'tw' },
-  { label: REGION_TEXT['me'], value: 'me' }
-]
+const positionOptions = computed(() => [
+  { label: t('Opgg.positions.top'), value: 'top' },
+  { label: t('Opgg.positions.jungle'), value: 'jungle' },
+  { label: t('Opgg.positions.mid'), value: 'mid' },
+  { label: t('Opgg.positions.adc'), value: 'adc' },
+  { label: t('Opgg.positions.support'), value: 'support' },
+  { label: t('Opgg.positions.none'), value: 'none', disabled: mode.value === 'ranked' }
+])
 
-const tierOptions = [
-  { label: TIER_TEXT['all'], value: 'all' },
-  { label: TIER_TEXT['ibsg'], value: 'ibsg' },
-  { label: TIER_TEXT['gold_plus'], value: 'gold_plus' },
-  { label: TIER_TEXT['platinum_plus'], value: 'platinum_plus' },
-  { label: TIER_TEXT['emerald_plus'], value: 'emerald_plus' },
-  { label: TIER_TEXT['diamond_plus'], value: 'diamond_plus' },
-  { label: TIER_TEXT['master'], value: 'master' },
-  { label: TIER_TEXT['master_plus'], value: 'master_plus' },
-  { label: TIER_TEXT['grandmaster'], value: 'grandmaster' },
-  { label: TIER_TEXT['challenger'], value: 'challenger' }
-]
+const regionOptions = computed(() => [
+  { label: t('Opgg.regions.global'), value: 'global' },
+  { label: t('Opgg.regions.na'), value: 'na' },
+  { label: t('Opgg.regions.euw'), value: 'euw' },
+  { label: t('Opgg.regions.kr'), value: 'kr' },
+  { label: t('Opgg.regions.br'), value: 'br' },
+  { label: t('Opgg.regions.eune'), value: 'eune' },
+  { label: t('Opgg.regions.jp'), value: 'jp' },
+  { label: t('Opgg.regions.lan'), value: 'lan' },
+  { label: t('Opgg.regions.las'), value: 'las' },
+  { label: t('Opgg.regions.oce'), value: 'oce' },
+  { label: t('Opgg.regions.tr'), value: 'tr' },
+  { label: t('Opgg.regions.ru'), value: 'ru' },
+  { label: t('Opgg.regions.sg'), value: 'sg' },
+  { label: t('Opgg.regions.id'), value: 'id' },
+  { label: t('Opgg.regions.ph'), value: 'ph' },
+  { label: t('Opgg.regions.th'), value: 'th' },
+  { label: t('Opgg.regions.vn'), value: 'vn' },
+  { label: t('Opgg.regions.tw'), value: 'tw' },
+  { label: t('Opgg.regions.me'), value: 'me' }
+])
+
+const tierOptions = computed(() => [
+  { label: t('Opgg.tiers.all'), value: 'all' },
+  { label: t('Opgg.tiers.ibsg'), value: 'ibsg' },
+  { label: t('Opgg.tiers.gold_plus'), value: 'gold_plus' },
+  { label: t('Opgg.tiers.platinum_plus'), value: 'platinum_plus' },
+  { label: t('Opgg.tiers.emerald_plus'), value: 'emerald_plus' },
+  { label: t('Opgg.tiers.diamond_plus'), value: 'diamond_plus' },
+  { label: t('Opgg.tiers.master'), value: 'master' },
+  { label: t('Opgg.tiers.master_plus'), value: 'master_plus' },
+  { label: t('Opgg.tiers.grandmaster'), value: 'grandmaster' },
+  { label: t('Opgg.tiers.challenger'), value: 'challenger' }
+])
 
 const versionOptions = computed(() => {
   return versions.value.map((v) => ({ label: v, value: v }))
@@ -622,7 +621,7 @@ const setSummonerSpells = async (ids: number[]) => {
       spell1Id: newSpell1Id,
       spell2Id: newSpell2Id
     })
-    message.success('请求已发送')
+    message.success(t('Opgg.success'))
 
     console.log(lcs.chat.conversations.championSelect)
 
@@ -630,14 +629,17 @@ const setSummonerSpells = async (ids: number[]) => {
       lc.api.chat
         .chatSend(
           lcs.chat.conversations.championSelect.id,
-          `[League Akari] 已设置召唤师技能: [OP.GG] ${lcs.gameData.summonerSpells[newSpell1Id]?.name} | ${lcs.gameData.summonerSpells[newSpell2Id]?.name}`,
+          t('Opgg.spellsSet', {
+            spell1: lcs.gameData.summonerSpells[newSpell1Id]?.name || newSpell1Id,
+            spell2: lcs.gameData.summonerSpells[newSpell2Id]?.name || newSpell2Id
+          }),
           'celebration'
         )
         .catch(() => {})
     }
   } catch (error) {
     log.warn('view:Opgg', `设置召唤师技能失败: ${(error as any).message}`, error)
-    message.warning(`设置召唤师技能失败: ${(error as any).message}`)
+    message.warning(t('Opgg.setSpellsFailedMessage', { reason: (error as any).message }))
   }
 }
 
@@ -652,7 +654,7 @@ const setRunes = async (r: {
     const inventory = (await lc.api.perks.getPerkInventory()).data
     let addedNew = false
     const positionName =
-      position.value && position.value !== 'none' ? POSITION_TEXT[position.value] || '' : ''
+      position.value && position.value !== 'none' ? t(`Opgg.positions.${position.value}`) || '' : ''
 
     if (inventory.canAddCustomPage) {
       const { data: added } = await lc.api.perks.postPerkPage({
@@ -690,18 +692,21 @@ const setRunes = async (r: {
       await lc.api.perks.putCurrentPage(page1.id)
     }
 
-    message.success('请求已发送')
+    message.success(t('Opgg.success'))
 
     if (lcs.chat.conversations.championSelect) {
       lc.api.chat.chatSend(
         lcs.chat.conversations.championSelect.id,
-        `[League Akari] 已${addedNew ? '添加' : '替换'}符文页: [OP.GG] ${lcs.gameData.champions[championId?.value || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+        t('Opgg.runesSet', {
+          name: `[OP.GG] ${lcs.gameData.champions[championId?.value || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`,
+          action: addedNew ? t('Opgg.create') : t('Opgg.replace')
+        }),
         'celebration'
       )
     }
   } catch (error) {
     log.warn('view:Opgg', `设置符文配法失败: ${(error as any).message}`, error)
-    message.warning(`设置符文配法失败: ${(error as any).message}`)
+    message.warning(t('Opgg.setRunesFailedMessage', { reason: (error as any).message }))
   }
 }
 </script>

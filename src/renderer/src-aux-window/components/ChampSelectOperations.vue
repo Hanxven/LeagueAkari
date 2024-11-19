@@ -1,18 +1,20 @@
 <template>
   <NCard v-if="isCustomGame !== null" size="small">
     <NFlex align="center" v-if="!isCustomGame" class="control-item">
-      <span class="label" style="flex: 1">退出英雄选择</span>
+      <span class="label" style="flex: 1">{{ t('ChampSelectOperations.dodge.label') }}</span>
       <NPopconfirm
         @positive-click="handleDodge"
         :positive-button-props="{ type: 'error', size: 'tiny' }"
         :negative-button-props="{ size: 'tiny' }"
-        negative-text="取消"
-        positive-text="退出"
+        :negative-text="t('ChampSelectOperations.dodge.negativeText')"
+        :positive-text="t('ChampSelectOperations.dodge.positiveText')"
       >
         <template #trigger>
-          <NButton size="tiny" type="warning" secondary style="font-size: 10px">立即秒退</NButton>
+          <NButton size="tiny" type="warning" secondary style="font-size: 10px">{{
+            t('ChampSelectOperations.dodge.button')
+          }}</NButton>
         </template>
-        <span style="font-size: 12px">这将退出英雄选择阶段</span>
+        <span style="font-size: 12px">{{ t('ChampSelectOperations.dodge.popconfirm') }}</span>
       </NPopconfirm>
     </NFlex>
     <NFlex align="center" class="control-item" v-if="!isCustomGame">
@@ -24,7 +26,9 @@
       />
     </NFlex>
     <NFlex align="center" class="control-item" v-if="!isCustomGame">
-      <span class="label" style="flex: 1">最后一秒秒退阈值</span>
+      <span class="label" style="flex: 1">{{
+        t('ChampSelectOperations.dodgeAtLastSecond.label')
+      }}</span>
       <NInputNumber
         size="tiny"
         :min="0"
@@ -36,7 +40,7 @@
       />
     </NFlex>
     <NFlex align="center" v-if="!isBenchMode" class="control-item">
-      <span class="label" style="flex: 1">自动选择</span>
+      <span class="label" style="flex: 1">{{ t('ChampSelectOperations.autos.autoPick') }}</span>
       <NSwitch
         size="small"
         :value="as2.settings.normalModeEnabled"
@@ -44,7 +48,7 @@
       />
     </NFlex>
     <NFlex align="center" v-if="!isBenchMode" class="control-item">
-      <span class="label" style="flex: 1">自动禁用</span>
+      <span class="label" style="flex: 1">{{ t('ChampSelectOperations.autos.autoBan') }}</span>
       <NSwitch
         size="small"
         :value="as2.settings.banEnabled"
@@ -52,7 +56,7 @@
       />
     </NFlex>
     <NFlex align="center" v-if="isBenchMode" class="control-item">
-      <span class="label" style="flex: 1">自动选择</span>
+      <span class="label" style="flex: 1">{{ t('ChampSelectOperations.autos.autoGrab') }}</span>
       <NSwitch
         size="small"
         :value="as2.settings.benchModeEnabled"
@@ -74,6 +78,9 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { NButton, NCard, NFlex, NInputNumber, NPopconfirm, NSwitch, useMessage } from 'naive-ui'
 import { computed, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const as2 = useAutoSelectStore()
@@ -107,13 +114,15 @@ const { countdownTime } = useCountdownSeconds(
 const dodgeAtLastSecondLabelText = computed(() => {
   if (agfs.willDodgeAtLastSecond) {
     if (agfs.willDodgeAt < 0) {
-      return `最后一秒秒退 (等待时机)`
+      return t('ChampSelectOperations.dodgeAtLastSecond.waitingForTiming')
     }
 
-    return `最后一秒秒退 (${countdownTime.value.toFixed(1)} s)`
+    return t('ChampSelectOperations.dodgeAtLastSecond.waiting', {
+      seconds: countdownTime.value.toFixed(1)
+    })
   }
 
-  return '最后一秒秒退'
+  return t('ChampSelectOperations.dodgeAtLastSecond.text')
 })
 
 const message = useMessage()
@@ -123,7 +132,9 @@ watchEffect(() => {
   if (agfs.settings.dodgeAtLastSecondThreshold <= 1.5 && !isShownWarning) {
     isShownWarning = true
     message.warning(
-      `过低的阈值 (${agfs.settings.dodgeAtLastSecondThreshold.toFixed(1)} s) 可能会导致秒退失败`
+      t('ChampSelectOperations.dodgeAtLastSecond.thresholdWarning', {
+        seconds: agfs.settings.dodgeAtLastSecondThreshold
+      })
     )
   }
 })

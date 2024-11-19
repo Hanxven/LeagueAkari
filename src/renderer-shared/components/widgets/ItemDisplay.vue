@@ -22,9 +22,9 @@
           {{ lcs.gameData.items[itemId].priceTotal }} G
           {{
             lcs.gameData.items[itemId].price !== lcs.gameData.items[itemId].priceTotal
-              ? t('ItemDisplay.combinePrice', {
-                  price: lcs.gameData.items[itemId].price
-                })
+              ? `(${t('ItemDisplay.combinePrice', {
+                  gold: lcs.gameData.items[itemId].price
+                })})`
               : ''
           }}
         </div>

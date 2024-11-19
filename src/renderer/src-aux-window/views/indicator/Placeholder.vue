@@ -1,14 +1,19 @@
 <template>
   <div class="la-placeholder">
     <LeagueAkariSpan />
-    <span class="sub" v-if="lcs.gameflow.phase === 'InProgress'">游戏进行中</span>
-    <span class="sub" v-else>当前没有进行中的活动</span>
+    <span class="sub" v-if="lcs.gameflow.phase === 'InProgress'">{{
+      t('Placeholder.inProgress')
+    }}</span>
+    <span class="sub" v-else>{{ t('Placeholder.idle') }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 </script>

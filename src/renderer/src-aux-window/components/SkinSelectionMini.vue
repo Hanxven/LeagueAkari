@@ -14,11 +14,20 @@
         :render-tag="renderTag"
         style="flex: 1"
         v-model:value="currentSkinId"
-        :placeholder="`${skinOptions.length} 款皮肤可用`"
+        :placeholder="
+          t('SkinSelectionMini.skins', {
+            count: skinOptions.length
+          })
+        "
         :options="skinOptions"
       />
-      <NButton :loading="isSettingSkin" type="primary" size="tiny" secondary @click="handleSetSkin"
-        >应用</NButton
+      <NButton
+        :loading="isSettingSkin"
+        type="primary"
+        size="tiny"
+        secondary
+        @click="handleSetSkin"
+        >{{ t('SkinSelectionMini.button') }}</NButton
       >
     </NFlex>
   </NCard>
@@ -42,6 +51,9 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, h, ref, shallowRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const wms = useWindowManagerStore()
 const lcs = useLeagueClientStore()
@@ -194,9 +206,9 @@ const handleSetSkin = async () => {
 
   try {
     await lc.api.champSelect.setSkin(currentSkinId.value)
-    message.success('成功设置皮肤')
+    message.success(t('SkinSelectionMini.success'))
   } catch (error) {
-    message.warning('无法设置皮肤')
+    message.warning(t('SkinSelectionMini.failed'))
   } finally {
     isSettingSkin.value = false
   }

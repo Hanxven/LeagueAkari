@@ -8,39 +8,41 @@
       />
       <template v-if="lcs.gameflow.phase === 'ReadyCheck'">
         <template v-if="agfs.willAccept">
-          <span class="main-text">自动接受 {{ willAcceptIn.toFixed(1) }} s</span>
-          <NButton type="primary" secondary size="tiny" @click="() => handleCancelAutoAccept()"
-            >取消本次自动接受</NButton
-          >
+          <span class="main-text">{{
+            t('Lounge.autoAccept.acceptIn', { seconds: willAcceptIn.toFixed(1) })
+          }}</span>
+          <NButton type="primary" secondary size="tiny" @click="() => handleCancelAutoAccept()">{{
+            t('Lounge.autoAccept.cancelButton')
+          }}</NButton>
         </template>
         <template v-else-if="lcs.matchmaking.readyCheck?.playerResponse === 'Accepted'">
-          <span class="main-text">对局已接受</span>
-          <span class="sub-text">已经接受的对局仍可拒绝</span>
-          <NButton type="warning" secondary size="tiny" @click="() => handleDecline()"
-            >拒绝对局</NButton
-          >
+          <span class="main-text">{{ t('Lounge.autoAccept.accepted') }}</span>
+          <span class="sub-text">{{ t('Lounge.autoAccept.subtitle1') }}</span>
+          <NButton type="warning" secondary size="tiny" @click="() => handleDecline()">{{
+            t('Lounge.autoAccept.declineButton')
+          }}</NButton>
         </template>
         <template v-else-if="lcs.matchmaking.readyCheck?.playerResponse === 'Declined'">
-          <span class="main-text">对局已拒绝</span>
-          <span class="sub-text">已经取消的对局仍可接受</span>
-          <NButton type="primary" secondary size="tiny" @click="() => handleAccept()"
-            >接受对局</NButton
-          >
+          <span class="main-text">{{ t('Lounge.autoAccept.declined') }}</span>
+          <span class="sub-text">{{ t('Lounge.autoAccept.subtitle2') }}</span>
+          <NButton type="primary" secondary size="tiny" @click="() => handleAccept()">{{
+            t('Lounge.autoAccept.acceptButton')
+          }}</NButton>
         </template>
         <template v-else>
-          <span class="main-text">等待接受对局</span>
+          <span class="main-text">{{ t('Lounge.autoAccept.pending') }}</span>
           <div class="btn-group">
-            <NButton type="primary" secondary size="tiny" @click="() => handleAccept()"
-              >接受对局</NButton
-            >
-            <NButton type="warning" secondary size="tiny" @click="() => handleDecline()"
-              >拒绝对局</NButton
-            >
+            <NButton type="primary" secondary size="tiny" @click="() => handleAccept()">{{
+              t('Lounge.autoAccept.acceptButton')
+            }}</NButton>
+            <NButton type="warning" secondary size="tiny" @click="() => handleDecline()">{{
+              t('Lounge.autoAccept.declineButton')
+            }}</NButton>
           </div>
         </template>
       </template>
       <template v-else-if="lcs.gameflow.phase === 'Matchmaking'">
-        <span class="main-text">匹配中</span>
+        <span class="main-text">"{{ t('Lounge.matchmaking.searching') }}"</span>
         <span class="sub-text" v-if="lcs.matchmaking.search">{{
           formatMatchmakingSearchText(lcs.matchmaking.search)
         }}</span>
@@ -50,32 +52,50 @@
           secondary
           size="tiny"
           @click="() => handleCancelSearching()"
-          ><template v-if="agfs.settings.autoMatchmakingEnabled">停止匹配并取消自动匹配</template
-          ><template v-else>停止匹配</template></NButton
+          ><template v-if="agfs.settings.autoMatchmakingEnabled">{{
+            t('Lounge.matchmaking.stopAndDisable')
+          }}</template
+          ><template v-else>{{ t('Lounge.matchmaking.stop') }}</template></NButton
         >
       </template>
       <template v-else-if="agfs.willSearchMatch">
-        <span class="main-text">匹配对局 {{ willSearchMatchIn.toFixed(1) }} s</span>
-        <NButton type="primary" secondary size="tiny" @click="() => handleCancelAutoSearchMatch()"
-          >取消本次自动匹配</NButton
+        <span class="main-text">
+          {{
+            t('Lounge.matchmaking.searchIn', {
+              seconds: willSearchMatchIn.toFixed(1)
+            })
+          }}
+        </span>
+        <NButton
+          type="primary"
+          secondary
+          size="tiny"
+          @click="() => handleCancelAutoSearchMatch()"
+          >{{ t('Lounge.matchmaking.cancel') }}</NButton
         >
       </template>
       <template v-else>
         <span
           class="main-text-2"
-          :title="`${lcs.gameflow.session?.map.gameModeName || '模式中'} · ${lcs.gameflow.session?.map.name || '地图'}`"
+          :title="`${lcs.gameflow.session?.map.gameModeName || t('Lounge.gameMode')} · ${lcs.gameflow.session?.map.name || t('Lounge.map')}`"
           >{{ formatMapModeText() }}</span
         >
         <template v-if="agfs.settings.autoMatchmakingEnabled">
-          <span class="sub-text" v-if="penaltyTime"
-            >等待秒退计时器 {{ penaltyTime.toFixed() }} s</span
-          >
-          <span class="sub-text" v-else-if="agfs.activityStartStatus === 'insufficient-members'"
-            >自动匹配需达到 {{ agfs.settings.autoMatchmakingMinimumMembers }} 人</span
-          >
-          <span class="sub-text" v-else-if="agfs.activityStartStatus === 'waiting-for-invitees'"
-            >正在等待受邀请的玩家</span
-          >
+          <span class="sub-text" v-if="penaltyTime">{{
+            t('Lounge.matchmaking.penaltyTime', {
+              seconds: penaltyTime.toFixed()
+            })
+          }}</span>
+          <span class="sub-text" v-else-if="agfs.activityStartStatus === 'insufficient-members'">
+            {{
+              t('Lounge.matchmaking.waitingForMembers', {
+                count: agfs.settings.autoMatchmakingMinimumMembers
+              })
+            }}
+          </span>
+          <span class="sub-text" v-else-if="agfs.activityStartStatus === 'waiting-for-invitees'">{{
+            t('Lounge.matchmaking.waitingForInvitees')
+          }}</span>
         </template>
       </template>
     </div>
@@ -97,6 +117,9 @@ import { GetSearch } from '@shared/types/league-client/matchmaking'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const agfs = useAutoGameflowStore()
 const lcs = useLeagueClientStore()
@@ -195,8 +218,8 @@ watch(
 )
 
 const formatMapModeText = () => {
-  const gameModeName = lcs.gameflow.session?.map.gameModeName || '模式中'
-  const mapName = lcs.gameflow.session?.map.name || '地图'
+  const gameModeName = lcs.gameflow.session?.map.gameModeName || t('Lounge.gameMode')
+  const mapName = lcs.gameflow.session?.map.name || t('Lounge.map')
 
   if (gameModeName === mapName) {
     return gameModeName
@@ -213,11 +236,11 @@ const formatNumber = (num: number, precision = 1) => {
 
 const formatMatchmakingSearchText = (search: GetSearch) => {
   if (search.lowPriorityData && search.lowPriorityData.penaltyTime) {
-    return `等待 ${formatNumber(search.lowPriorityData.penaltyTimeRemaining)} s (${formatNumber(search.lowPriorityData.penaltyTime)} s) `
+    return `${t('Lounge.wait')} ${formatNumber(search.lowPriorityData.penaltyTimeRemaining)} s (${formatNumber(search.lowPriorityData.penaltyTime)} s) `
   }
 
   if (agfs.settings.autoMatchmakingRematchStrategy === 'fixed-duration') {
-    return `${search.timeInQueue.toFixed(1)} s (最多 ${agfs.settings.autoMatchmakingRematchFixedDuration.toFixed()} s) / ${search.estimatedQueueTime.toFixed(1)} s`
+    return `${search.timeInQueue.toFixed(1)} s (${t('Lounge.atMost')} ${agfs.settings.autoMatchmakingRematchFixedDuration.toFixed()} s) / ${search.estimatedQueueTime.toFixed(1)} s`
   }
 
   return `${search.timeInQueue.toFixed(1)} s / ${search.estimatedQueueTime.toFixed(1)} s`

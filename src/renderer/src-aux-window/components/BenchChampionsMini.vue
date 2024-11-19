@@ -24,7 +24,7 @@
               v-for="b of championAdjustment(lcs.champSelect.currentChampion)?.sortedAdjustments"
               :key="b.type"
             >
-              <span class="balance-item-name">{{ BALANCE_TYPES[b.type]?.name || b.type }}</span>
+              <span class="balance-item-name">{{ balanceTypes[b.type]?.name || b.type }}</span>
               <span class="balance-item-value" :class="b.effect">{{ b.formattedValue }}</span>
             </div>
             <div class="balance-data-source-name">{{ SOURCE_NAME[source] }}</div>
@@ -35,7 +35,11 @@
             @click="() => handleReroll()"
             :disabled="rerollsRemaining === 0 || isRerolling"
             size="tiny"
-            :title="`随机一次 (剩余 ${rerollsRemaining})`"
+            :title="
+              t('BenchChampionsMini.reroll', {
+                count: rerollsRemaining
+              })
+            "
             circle
             secondary
             type="primary"
@@ -47,7 +51,11 @@
           <NButton
             :disabled="rerollsRemaining === 0 || isRerolling"
             @click="() => handleReroll(true)"
-            :title="`随机一次并立即取回 (剩余 ${rerollsRemaining})`"
+            :title="
+              t('BenchChampionsMini.charity', {
+                count: rerollsRemaining
+              })
+            "
             secondary
             circle
             size="tiny"
@@ -115,9 +123,11 @@ import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
 import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
-
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 // currently only support fandom
@@ -132,54 +142,50 @@ const gameMode = computed(() => {
   return lcs.gameflow.session.gameData.queue.gameMode
 })
 
-const BALANCE_TYPES: Record<
-  string,
-  {
-    name: string
-    order: number
+const balanceTypes = computed(() => {
+  return {
+    'damage-dealt': {
+      name: t('BenchChampionsMini.balanceTypes.damage-dealt'),
+      order: 0
+    },
+    'damage-taken': {
+      name: t('BenchChampionsMini.balanceTypes.damage-taken'),
+      order: 1
+    },
+    healing: {
+      name: t('BenchChampionsMini.balanceTypes.healing'),
+      order: 2
+    },
+    shielding: {
+      name: t('BenchChampionsMini.balanceTypes.shielding'),
+      order: 3
+    },
+    'ability-haste': {
+      name: t('BenchChampionsMini.balanceTypes.ability-haste'),
+      order: 4
+    },
+    'mana-regen': {
+      name: t('BenchChampionsMini.balanceTypes.mana-regen'),
+      order: 5
+    },
+    'energy-regen': {
+      name: t('BenchChampionsMini.balanceTypes.energy-regen'),
+      order: 6
+    },
+    'attack-speed': {
+      name: t('BenchChampionsMini.balanceTypes.attack-speed'),
+      order: 7
+    },
+    'movement-speed': {
+      name: t('BenchChampionsMini.balanceTypes.movement-speed'),
+      order: 8
+    },
+    tenacity: {
+      name: t('BenchChampionsMini.balanceTypes.tenacity'),
+      order: 9
+    }
   }
-> = {
-  'damage-dealt': {
-    name: '造成伤害',
-    order: 0
-  },
-  'damage-taken': {
-    name: '承受伤害',
-    order: 1
-  },
-  healing: {
-    name: '治疗效果',
-    order: 2
-  },
-  shielding: {
-    name: '护盾效果',
-    order: 3
-  },
-  'ability-haste': {
-    name: '技能急速',
-    order: 4
-  },
-  'mana-regen': {
-    name: '法力回复',
-    order: 5
-  },
-  'energy-regen': {
-    name: '能量回复',
-    order: 6
-  },
-  'attack-speed': {
-    name: '攻击速度',
-    order: 7
-  },
-  'movement-speed': {
-    name: '移动速度',
-    order: 8
-  },
-  tenacity: {
-    name: '韧性',
-    order: 9
-  }
-}
+})
 
 const SOURCE_NAME = {
   fandom: 'Fandom Wiki',
@@ -220,8 +226,8 @@ const championAdjustment = (championId: number) => {
     ...modeAdjustment,
     sortedAdjustments: modeAdjustment.adjustments
       .toSorted((a, b) => {
-        const aBalanceOrder = BALANCE_TYPES[a.type]?.order ?? 0
-        const bBalanceOrder = BALANCE_TYPES[b.type]?.order ?? 0
+        const aBalanceOrder = balanceTypes.value[a.type]?.order ?? 0
+        const bBalanceOrder = balanceTypes.value[b.type]?.order ?? 0
 
         if (aBalanceOrder !== bBalanceOrder) {
           return aBalanceOrder - bBalanceOrder
@@ -235,7 +241,7 @@ const championAdjustment = (championId: number) => {
 
       .map((item) => ({
         ...item,
-        name: BALANCE_TYPES[item.type]?.name || item.type,
+        name: balanceTypes.value[item.type]?.name || item.type,
         formattedValue: formatValue(item)
       }))
   }
@@ -296,7 +302,7 @@ const handleBenchSwap = async (championId: number) => {
     await lc.api.champSelect.benchSwap(championId)
   } catch (error) {
     console.error(error)
-    message.warning('尝试交换英雄失败')
+    message.warning(t('BenchChampionsMini.rerollFailed'))
   } finally {
     isSwapping.value = false
   }
@@ -322,7 +328,7 @@ const handleReroll = async (grabBack = false) => {
       }, 25)
     }
   } catch (error) {
-    message.warning('尝试重新随机英雄失败')
+    message.warning(t('BenchChampionsMini.rerollFailed'))
   } finally {
     isRerolling.value = false
   }

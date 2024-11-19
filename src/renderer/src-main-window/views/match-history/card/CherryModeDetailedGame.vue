@@ -11,8 +11,7 @@
         <thead class="team-header">
           <tr>
             <th class="header-info">
-              {{ formatI18nOrdinal(participants[0].stats.subteamPlacement) }}
-              ({{
+              {{ formatI18nOrdinal(participants[0].stats.subteamPlacement, locale) }} ({{
                 participants[0].stats.subteamPlacement <= match.maxPlacement / 2
                   ? t('DetailedGame.win')
                   : t('DetailedGame.lose')
@@ -154,6 +153,7 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { EMPTY_PUUID } from '@shared/constants/common'
+import { formatI18nOrdinal } from '@shared/i18n'
 import { Game, Participant, ParticipantIdentity } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
@@ -177,18 +177,6 @@ const props = defineProps<{
 const emits = defineEmits<{
   toSummoner: [puuid: string, setCurrent?: boolean]
 }>()
-
-const chineseNumber = ['一', '二', '三', '四', '五', '六', '七', '八', '九']
-
-const formatI18nOrdinal = (n: number) => {
-  if (locale.value === 'zh-cn') {
-    return chineseNumber[n - 1] ?? ' ? '
-  } else {
-    const suffix = ['th', 'st', 'nd', 'rd']
-    const v = n % 100
-    return n + (suffix[(v - 20) % 10] || suffix[v] || suffix[0])
-  }
-}
 
 const match = computed(() => {
   const identities: Record<string, ParticipantIdentity> = {}

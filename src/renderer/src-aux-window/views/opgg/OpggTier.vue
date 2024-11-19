@@ -2,7 +2,7 @@
   <div class="standalone-card-wrapper">
     <NInput
       v-model:value="filterText"
-      placeholder="查找英雄"
+      :placeholder="t('OpggTier.searchPlaceholder')"
       size="small"
       style="font-size: 12px; margin-bottom: 4px"
       clearable
@@ -36,6 +36,7 @@ import {
   NInput
 } from 'naive-ui'
 import { computed, h, ref, useCssModule } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   championId?: number
@@ -51,6 +52,8 @@ const props = defineProps<{
 const emits = defineEmits<{
   (e: 'toChampion', championId: number): void
 }>()
+
+const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const eas = useExtraAssetsStore()
@@ -87,7 +90,7 @@ const columns: DataTableColumns<any> = [
     }
   },
   {
-    title: '英雄',
+    title: t('OpggTier.columns.champion'),
     key: 'name',
     align: 'center',
     className: styles['column-title'],
@@ -124,7 +127,7 @@ const columns: DataTableColumns<any> = [
     }
   },
   {
-    title: '强度',
+    title: t('OpggTier.columns.tier'),
     key: 'tier',
     align: 'center',
     width: 76,
@@ -182,7 +185,7 @@ const columns: DataTableColumns<any> = [
     }
   },
   {
-    title: '胜率',
+    title: t('OpggTier.columns.winRate'),
     key: 'winRate',
     align: 'center',
     width: 76,
@@ -243,7 +246,7 @@ const columns: DataTableColumns<any> = [
     }
   },
   {
-    title: '登场率',
+    title: t('OpggTier.columns.pickRate'),
     key: 'pickRate',
     align: 'center',
     width: 86,
@@ -291,7 +294,7 @@ const columns: DataTableColumns<any> = [
 ]
 
 const countersColumn: DataTableColumn<any> = {
-  title: '劣势对位',
+  title: t('OpggTier.columns.counter'),
   key: 'counters',
   align: 'center',
   width: 90,
@@ -330,7 +333,7 @@ const countersColumn: DataTableColumn<any> = {
 }
 
 const banRateColumn: DataTableColumn<any> = {
-  title: '禁用率',
+  title: t('OpggTier.columns.banRate'),
   key: 'banRate',
   align: 'center',
   width: 86,

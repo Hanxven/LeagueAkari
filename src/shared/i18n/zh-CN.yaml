@@ -971,6 +971,12 @@ MatchHistoryCard:
   misc: 杂项
   loading: 加载中...
   error: 无法加载
+  practiceTool: 训练模式
+  win: 胜利
+  lose: 失败
+  remake: 重开
+  abort: 被终止
+  surrender: 投降
 
 StandaloneMatchHistoryCardModal:
   notFound: 未找到对局
@@ -1163,7 +1169,7 @@ PlayerInfoCard:
     masteryPoints: '{points} 成就点数'
   matchHistory:
     winResult:
-      na: -
+      na: '-'
       win: 胜
       lose: 负
       remake: 重
@@ -1185,6 +1191,262 @@ OngoingGame:
   disabled: 对局分析已禁用
   avgTeamWinRate: 队伍平均胜率
   avgTeamKda: 队伍平均 KDA
+
+AuxWindowTitleBar:
+  opgg: 使用 OP.GG
+  opggTitle: 集成的 OP.GG
+  indicator: 小窗
+  indicatorTitle: League Akari 的小型辅助功能窗口
+  pin: 置顶
+  unpin: 取消置顶
+
+BenchChampionsMini:
+  reroll: Reroll (Remaining {count})
+  rerollFailed: Reroll failed
+  charity: Reroll and grab back (Remaining {count})
+
+  balanceTypes:
+    damage-dealt: Damage Dealt
+    damage-taken: Damage Taken
+    healing: Healing Effect
+    shielding: Shielding Effect
+    ability-haste: Ability Haste
+    mana-regen: Mana Regen
+    health-regen: Energy Regen
+    attack-speed: Attack Speed
+    movement-speed: Movement Speed
+    tenacity: Tenacity
+
+BenchModeAutoGrab:
+  grabbing: 即将选择 {seconds} s
+  noExpectedChampions: 自动选择没有设置期望英雄列表
+  noCandidate: 自动选择无可用英雄
+
+ChampSelectActions:
+  picked: 已选择
+  voted: 已投票
+  banned: 已禁用
+  autoPick: 自动选择
+  autoBan: 自动禁用
+  picking: 英雄选择
+  banning: 英雄禁用
+  voting: 投票
+  tenBansRevealing: 系统 · 禁用展示
+  inProgress: 进行中
+  completed: 已完成
+
+ChampSelectOperations:
+  dodge:
+    label: 退出英雄选择
+    button: 立即秒退
+    popconfirm: 这将退出英雄选择阶段
+    positiveText: 退出
+    negativeText: 取消
+
+  dodgeAtLastSecond:
+    label: 最后一秒秒退阈值
+    waitingForTiming: 最后一秒秒退 (等待时机)
+    waiting: 最后一秒秒退 ({seconds} s)
+    text: '最后一秒秒退'
+    thresholdWarning: 过低的阈值 ({seconds} s) 可能会导致秒退失败
+
+  autos:
+    autoPick: 自动选择
+    autoBan: 自动禁用
+    autoGrab: 自动选择
+
+LoungeOperations:
+  immediately: 立即
+  second: 秒
+
+  autoAccept:
+    label: 自动接受
+    unavailable: 模式不适用
+
+  autoMatchmaking:
+    label: 自动匹配
+    unavailable: 模式不适用
+
+  autoMatchmakingMinimumMembers:
+    label: 最低人数
+
+  autoMatchmakingDelaySeconds:
+    label: 匹配前等待时间
+
+  autoMatchmakingWaitForInvitees:
+    label: 等待邀请中成员
+
+SkinSelectionMini:
+  skins: '{count} 款皮肤可用'
+  button: 应用
+  success: 应用皮肤成功
+  failed: 应用皮肤失败
+
+Lounge:
+  map: 地图
+  gameMode: 模式中
+  wait: 等待
+  atMost: 最多
+
+  autoAccept:
+    acceptIn: 自动接受 {seconds} s
+    cancelButton: 取消本次自动接受
+    declineButton: 拒绝对局
+    acceptButton: 接受对局
+    accepted: 已接受
+    pending: 等待接受对局
+    subtitle1: 已经接受的对局仍可拒绝
+    subtitle2: 已经取消的对局仍可接受
+    declined: 已拒绝
+
+  matchmaking:
+    stopAndDisable: 停止匹配并取消自动匹配
+    stop: 停止匹配
+    cancel: 取消本次自动匹配
+    searching: 匹配中
+    searchIn: 匹配中 {seconds} s
+    waitingForPenalty: 等待秒退计时器 {seconds} s
+    waitingForMembers: 自动匹配需达到 {count} 人
+    waitingForInvitees: 等待邀请中成员
+
+Placeholder:
+  inProgress: 游戏进行中
+  idle: 当前没有进行中的活动
+
+Opgg:
+  toOpgg: 转到 OP.GG
+  refresh: 刷新
+  close: 关闭
+  tier: 梯队
+  champion: 英雄
+  empty: 无
+  mode: 模式
+  region: 地区
+  rankTier: 段位
+  position: 位置
+  version: 版本
+  replace: 提供
+  create: 创建
+
+  settings:
+    button: 设置
+    title: 小窗 OP.GG 设置
+
+    flashPosition:
+      label: 闪现位置偏好
+      description: 设置召唤师技能时，若存在闪现技能，优先选择的位置"
+      auto: 自动
+      options:
+        d: 闪现位置默认在 D
+        f: 闪现位置默认在 F
+        auto: 根据当前闪现的位置决定
+
+  success: 请求已发送
+  loadVersionsFailedMessage: 获取版本数据失败：{reason}
+  loadTierFailedMessage: 获取梯队数据失败：{reason}
+  loadChampionFailedMessage: 获取英雄数据失败：{reason}
+  setSpellsFailedMessage: 设置召唤师技能失败：{reason}
+  setRunesFailedMessage: 设置符文配法失败：{reason}
+  spellsSet: '[League Akari] 已设置召唤师技能: {spell1} | {spell2}'
+  runesSet: '[League Akari] 已{action}符文配法: {name}'
+
+  modes:
+    ranked: '排位'
+    aram: '极地大乱斗'
+    arena: '斗魂竞技场'
+    nexus_blitz: '极限闪击'
+    urf: '无限火力'
+
+  positions:
+    top: '上单'
+    jungle: '打野'
+    mid: '中单'
+    adc: '下路'
+    support: '辅助'
+    none: '无'
+
+  regions:
+    global: '全球'
+    na: '北美'
+    euw: '欧洲西'
+    kr: '韩国'
+    br: '巴西'
+    eune: '欧洲东北'
+    jp: '日本'
+    lan: '拉丁美洲北'
+    las: '拉丁美洲南'
+    oce: '大洋洲'
+    tr: '土耳其'
+    ru: '俄罗斯'
+    sg: '新加坡'
+    id: '印尼'
+    ph: '菲律宾'
+    th: '泰国'
+    vn: '越南'
+    tw: '台湾'
+    me: '中东'
+
+  tiers:
+    all: '全部段位'
+    ibsg: '黄金 -'
+    gold_plus: '黄金 +'
+    platinum_plus: '铂金 +'
+    emerald_plus: '翡翠 +'
+    diamond_plus: '钻石 +'
+    master: '大师'
+    master_plus: '大师 +'
+    grandmaster: '宗师'
+    challenger: '王者'
+
+OpggTier:
+  searchPlaceholder: 查找英雄
+  columns:
+    champion: 英雄
+    tier: 梯队
+    winRate: 胜率
+    pickRate: 登场率
+    counter: 劣势对位
+    banRate: 禁用率
+
+OpggChampion:
+  adorableRabi: 兔兔好可爱
+  avgPlace: 平均排名
+  1st: 第一
+  winRate: 胜率
+  pickRate: 登场率
+  plays: 总场次
+  banRate: 禁用率
+  counter: 劣势对位
+  allCounters: 所有对位
+  counterC: 劣势
+  allC: 所有
+  empty: 暂无数据
+  times: '{times} 场'
+  showAll: 展示全部
+  spells: 召唤师技能
+  apply: 应用
+  runes: 符文配法
+  abilityBuild: 技能点法
+  starterItemText: 初始装备
+  prismItemText: 棱彩阶装备
+  coreItemText: 核心装备
+  itemText: 装备
+  tierText: T{tier} 级别
+  applyRunes: 导入当前装备方案
+  applyRunesText: 方案应用
+  augmentGold: 黄金阶
+  augmentSilver: 白银阶
+  augmentPrism: 棱彩阶
+  synergies: 搭配
+
+  writeToDisk: '[League Akari] 已写入到装备方案：{name}'
+  writtenToDisk: 已写入到文件中
+  writeFileFailedMessage: 写入文件失败 {reason}
+  bootsDesc: 鞋子 (按出场率排序)
+  prismItemsDesc: 棱彩阶装备 (按出场率排序)
+  itemsDesc: 装备 (按出场率排序)
+  coreItem: '核心装备 #{index} | 出场率 {pickRate}%'
+  starterItem: '初始装备 #{index} | 出场率 {pickRate}%'
 
 common:
   appName: League Akari

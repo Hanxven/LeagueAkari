@@ -43,11 +43,7 @@
                   "
                 >
                   <img class="image" :src="RANKED_MEDAL_MAP[rankedSoloFlex.solo.tier]" alt="rank" />
-                  <span class="text">{{
-                    rankedSoloFlex.solo.division && rankedSoloFlex.solo.division !== 'NA'
-                      ? `${TIER_TEXT[rankedSoloFlex.solo.tier]} ${rankedSoloFlex.solo.division}`
-                      : `${TIER_TEXT[rankedSoloFlex.solo.tier]}`
-                  }}</span>
+                  <span class="text">{{ rankedSoloFlex.solo.text }}</span>
                 </div>
                 <div class="ranked-item unranked" v-else>
                   <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
@@ -59,11 +55,7 @@
                   "
                 >
                   <img class="image" :src="RANKED_MEDAL_MAP[rankedSoloFlex.flex.tier]" alt="rank" />
-                  <span class="text">{{
-                    rankedSoloFlex.flex.division && rankedSoloFlex.flex.division !== 'NA'
-                      ? `${TIER_TEXT[rankedSoloFlex.flex.tier]} ${rankedSoloFlex.flex.division}`
-                      : `${TIER_TEXT[rankedSoloFlex.flex.tier]}`
-                  }}</span>
+                  <span class="text">{{ rankedSoloFlex.flex.text }}</span>
                 </div>
                 <div class="ranked-item unranked" v-else>
                   <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
@@ -490,6 +482,7 @@ import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SavedInfo } from '@renderer-shared/shards/ongoing-game/store'
+import { formatI18nOrdinal } from '@shared/i18n'
 import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { Game } from '@shared/types/league-client/match-history'
 import { RankedStats } from '@shared/types/league-client/ranked'
@@ -501,7 +494,6 @@ import {
   withSelfParticipantMatchHistory
 } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
-import { TIER_TEXT } from '@shared/utils/ranked'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { NPopover, NVirtualList } from 'naive-ui'
@@ -512,7 +504,6 @@ import RankedTable from '@main-window/components/RankedTable.vue'
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
 
 import {
-  CHINESE_NUMBERS,
   FIXED_CARD_WIDTH_PX_LITERAL,
   PREMADE_TEAM_COLORS,
   RANKED_MEDAL_MAP
@@ -598,14 +589,26 @@ const rankedSoloFlex = computed(() => {
   const cherry = rankedStats.queueMap['CHERRY']
 
   if (solo) {
+    const soloText =
+      solo.division && solo.division !== 'NA'
+        ? `${t(`common.shortTiers.${solo.tier}`)} ${solo.division}`
+        : `${t(`common.shortTiers.${solo.tier}`)}`
+
     result.solo = {
+      text: soloText,
       tier: solo.tier,
       division: solo.division
     }
   }
 
   if (flex) {
+    const flexText =
+      flex.division && flex.division !== 'NA'
+        ? `${t(`common.shortTiers.${flex.tier}`)} ${flex.division}`
+        : `${t(`common.shortTiers.${flex.tier}`)}`
+
     result.flex = {
+      text: flexText,
       tier: flex.tier,
       division: flex.division
     }
@@ -638,7 +641,7 @@ const MILESTONE_ORDER = [
   'D-'
 ]
 
-export const positionAssignmentReason = computed(() => {
+const positionAssignmentReason = computed(() => {
   return {
     FILL_SECONDARY: {
       name: t('common.positionAssignmentReason.FILL_SECONDARY'),
@@ -693,16 +696,6 @@ const toSortedMilestoneGrades = (arr: string[]) => {
   return newArr
 }
 
-const formatI18nOrdinal = (n: number) => {
-  if (locale.value === 'zh-cn') {
-    return CHINESE_NUMBERS[n - 1] ?? ' ? '
-  } else {
-    const suffix = ['th', 'st', 'nd', 'rd']
-    const v = n % 100
-    return n + (suffix[(v - 20) % 10] || suffix[v] || suffix[0])
-  }
-}
-
 const getWinLoseClassName = (match: SelfParticipantGame) => {
   if (match.game.gameMode === 'PRACTICETOOL') {
     return 'na'
@@ -737,7 +730,7 @@ const getWinResultText = (match: SelfParticipantGame) => {
       return '?'
     }
 
-    return formatI18nOrdinal(match.selfParticipant.stats.subteamPlacement)
+    return formatI18nOrdinal(match.selfParticipant.stats.subteamPlacement, locale.value)
   }
 
   return match.selfParticipant.stats.win

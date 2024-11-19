@@ -2,8 +2,10 @@
   <NCard size="small">
     <NFlex align="center" class="control-item">
       <span class="label" style="flex: 1"
-        >自动接受 ({{
-          isCustomGame ? '模式不适用' : formatDelayText(agfs.settings.autoAcceptDelaySeconds)
+        >{{ t('LoungeOperations.autoAccept.label') }} ({{
+          isCustomGame
+            ? t('LoungeOperations.autoAccept.unavailable')
+            : formatDelayText(agfs.settings.autoAcceptDelaySeconds)
         }})</span
       >
       <NSwitch
@@ -17,9 +19,9 @@
         <NFlex align="center" class="control-item">
           <div style="flex: 1; display: flex; justify-content: flex-start; align-items: center">
             <span class="label"
-              >自动匹配 ({{
+              >{{ t('LoungeOperations.autoMatchmaking.label') }} ({{
                 isCustomGame
-                  ? '模式不适用'
+                  ? t('LoungeOperations.autoMatchmaking.unavailable')
                   : formatDelayText(agfs.settings.autoMatchmakingDelaySeconds)
               }})</span
             >
@@ -36,7 +38,9 @@
       </template>
       <NFlex class="more" vertical>
         <NFlex align="center" class="control-item">
-          <span class="label" style="flex: 1">最低人数</span>
+          <span class="label" style="flex: 1">{{
+            t('LoungeOperations.autoMatchmakingMinimumMembers.label')
+          }}</span>
           <NInputNumber
             :value="agfs.settings.autoMatchmakingMinimumMembers"
             @update:value="(val) => agf.setAutoMatchmakingMinimumMembers(val || 1)"
@@ -47,18 +51,22 @@
           />
         </NFlex>
         <NFlex align="center" class="control-item">
-          <span class="label" style="flex: 1">匹配前等待时间</span>
+          <span class="label" style="flex: 1">{{
+            t('LoungeOperations.autoMatchmakingDelaySeconds.label')
+          }}</span>
           <NInputNumber
             :value="agfs.settings.autoMatchmakingDelaySeconds"
             @update:value="(value) => agf.setAutoMatchmakingDelaySeconds(value || 0)"
-            placeholder="秒"
+            :placeholder="t('LoungeOperations.second')"
             :min="0"
             size="tiny"
             style="width: 80px"
           />
         </NFlex>
         <NFlex align="center" class="control-item">
-          <span class="label" style="flex: 1">等待邀请中成员</span>
+          <span class="label" style="flex: 1">{{
+            t('LoungeOperations.autoMatchmakingWaitForInvitees.label')
+          }}</span>
           <NSwitch
             :value="agfs.settings.autoMatchmakingWaitForInvitees"
             @update:value="(val) => agf.setAutoMatchmakingWaitForInvitees(val)"
@@ -78,6 +86,9 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { ExpandMoreSharp as ExpandMoreSharpIcon } from '@vicons/material'
 import { NCard, NFlex, NIcon, NInputNumber, NPopover, NSwitch } from 'naive-ui'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const agfs = useAutoGameflowStore()
 const lcs = useLeagueClientStore()
@@ -94,7 +105,7 @@ const isCustomGame = computed(() => {
 
 const formatDelayText = (d: number) => {
   if (d <= 0.05) {
-    return `立即`
+    return t('LoungeOperations.immediately')
   }
   return `${d.toFixed(1)} s`
 }
