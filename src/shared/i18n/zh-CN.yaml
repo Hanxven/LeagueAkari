@@ -1201,21 +1201,22 @@ AuxWindowTitleBar:
   unpin: 取消置顶
 
 BenchChampionsMini:
-  reroll: Reroll (Remaining {count})
-  rerollFailed: Reroll failed
-  charity: Reroll and grab back (Remaining {count})
+  reroll: '重随 (剩余: {count})'
+  charity: '重随并立即取回 (剩余: {count})'
+  notInBenchMode: 当前不在随机模式中
+  notInPhase: 未处于英雄选择过程中
 
   balanceTypes:
-    damage-dealt: Damage Dealt
-    damage-taken: Damage Taken
-    healing: Healing Effect
-    shielding: Shielding Effect
-    ability-haste: Ability Haste
-    mana-regen: Mana Regen
-    health-regen: Energy Regen
-    attack-speed: Attack Speed
-    movement-speed: Movement Speed
-    tenacity: Tenacity
+    damage-dealt: 造成伤害
+    damage-taken: 承受伤害
+    healing: 治疗效果
+    shielding: 护盾效果
+    ability-haste: 技能急速
+    mana-regen: 法力回复
+    health-regen: 能量回复
+    attack-speed: 攻击速度
+    movement-speed: 移动速度
+    tenacity: 韧性
 
 BenchModeAutoGrab:
   grabbing: 即将选择 {seconds} s

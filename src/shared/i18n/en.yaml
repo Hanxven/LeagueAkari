@@ -1201,6 +1201,18 @@ BenchChampionsMini:
   notInBenchMode: Not currently in a bench mode
   notInPhase: Not in the champion selection phase
 
+  balanceTypes:
+    damage-dealt: Damage Dealt
+    damage-taken: Damage Taken
+    healing: Healing
+    shielding: Shielding
+    ability-haste: Ability Haste
+    mana-regen: Mana Regen
+    health-regen: Health Regen
+    attack-speed: Attack Speed
+    movement-speed: Movement Speed
+    tenacity: Tenacity
+
 BenchModeAutoGrab:
   grabbing: Selecting in {seconds}s
   noExpectedChampions: No expected champion list set for auto-selection
