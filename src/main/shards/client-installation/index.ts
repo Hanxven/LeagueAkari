@@ -48,7 +48,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       'leagueClientExecutablePaths',
       'tencentInstallationPath',
       'weGameExecutablePath',
-      'defaultRiotClientExecutablePath'
+      'officialRiotClientExecutablePath'
     ])
   }
 
@@ -75,6 +75,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
         return
       }
 
+      this._log.info('检测到 TCLS 客户端安装位置', p.value)
       this.state.setTencentInstallationPath(p.value as string)
     }
 
@@ -90,9 +91,14 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
           return
         }
 
+        this._log.info('检测到 WeGame 安装位置', match[1])
         this.state.setWeGameExecutablePath(match[1])
       }
     }
+  }
+
+  private async _maybeOfficialRiotClient(p: string) {
+    return p.includes('Riot Games') && !p.includes('英雄联盟')
   }
 
   private async _updateLeagueClientInstallationByFile() {
@@ -136,15 +142,15 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
         }
 
         this.state.setLeagueClientExecutablePaths(result)
-      }
 
-      if (typeof json.rc_default === 'string') {
-        try {
-          await fs.promises.access(json.rc_default)
+        const riotInstallations = Object.values(json.associated_client as Record<string, string>)
 
-          this.state.setDefaultRiotClientExecutablePath(json.rc_default)
-        } catch (error) {
-          this._log.info('检测到默认的 RiotClient 但无法访问, 可能并不存在', json.rc_default)
+        for (const p of riotInstallations) {
+          if (await this._maybeOfficialRiotClient(p)) {
+            this.state.setOfficialRiotClientExecutablePath(p)
+            this._log.info('检测到直营服 RiotClient 安装位置', p)
+            break
+          }
         }
       }
     } catch (error) {
@@ -188,10 +194,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   }
 
   private _launchDefaultRiotClient() {
-    if (!this.state.defaultRiotClientExecutablePath) {
+    if (!this.state.officialRiotClientExecutablePath) {
       return
     }
 
-    this._spawnDetached(this.state.defaultRiotClientExecutablePath)
+    this._spawnDetached(this.state.officialRiotClientExecutablePath)
   }
 }

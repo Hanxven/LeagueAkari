@@ -19,7 +19,7 @@ export class ClientInstallationState {
   /**
    * 获取默认的 RiotClient 的路径
    */
-  defaultRiotClientExecutablePath: string | null = null
+  officialRiotClientExecutablePath: string | null = null
 
   setLeagueClientExecutablePaths(clients: string[]) {
     this.leagueClientExecutablePaths = clients
@@ -33,8 +33,8 @@ export class ClientInstallationState {
     this.weGameExecutablePath = path
   }
 
-  setDefaultRiotClientExecutablePath(path: string) {
-    this.defaultRiotClientExecutablePath = path
+  setOfficialRiotClientExecutablePath(path: string) {
+    this.officialRiotClientExecutablePath = path
   }
 
   constructor() {

@@ -23,6 +23,7 @@ import { RiotClientHttpApi } from './riotclient'
 import { SpectatorHttpApi } from './spectator'
 import { SummonerHttpApi } from './summoner'
 import { PerksHttpApi } from './perks'
+import { MissionsHttpApi } from './missions'
 
 /**
  * 基于 Axios 封装的调用
@@ -51,6 +52,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly loadouts: LoadoutsHttpApi
   public readonly challenges: ChallengesHttpApi
   public readonly perks: PerksHttpApi
+  public readonly missions: MissionsHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -76,5 +78,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.loadouts = new LoadoutsHttpApi(this._http)
     this.challenges = new ChallengesHttpApi(this._http)
     this.perks = new PerksHttpApi(this._http)
+    this.missions = new MissionsHttpApi(this._http)
   }
 }

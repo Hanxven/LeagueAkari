@@ -57,7 +57,7 @@ const launchItem = computed(() => {
     })
   }
 
-  if (cis.defaultRiotClientExecutablePath) {
+  if (cis.officialRiotClientExecutablePath) {
     arr.push({
       name: t('EasyToLaunch.riotClient'),
       imgUrl: riotClient,
