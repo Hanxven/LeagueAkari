@@ -7,6 +7,7 @@ import { AutoGameflowMain } from '@main/shards/auto-gameflow'
 import { AutoReplyMain } from '@main/shards/auto-reply'
 import { AutoRuneMain } from '@main/shards/auto-rune'
 import { AutoSelectMain } from '@main/shards/auto-select'
+import { ClientInstallationMain } from '@main/shards/client-installation'
 import { ExtraAssetsMain } from '@main/shards/extra-assets'
 import { GameClientMain } from '@main/shards/game-client'
 import { InGameSendMain } from '@main/shards/in-game-send'
@@ -207,6 +208,7 @@ export function bootstrap() {
       RiotClientMain,
 
       // application specific shards
+      ClientInstallationMain,
       WindowManagerMain,
       TrayMain,
       KeyboardShortcutsMain,

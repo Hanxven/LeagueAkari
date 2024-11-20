@@ -209,10 +209,17 @@
         </template>
       </div>
       <div class="show-more" @click="() => handleToggleShowDetailedGame()">
-        <NIcon class="icon" @click.stop="() => handleShowMiscellaneous()" title="杂项"
+        <NIcon
+          class="icon"
+          @click.stop="() => handleShowMiscellaneous()"
+          :title="t('MatchHistoryCard.misc')"
           ><ListIcon
         /></NIcon>
-        <NIcon class="icon" :class="{ rotated: isExpanded }" :title="isExpanded ? '收起' : '展开'">
+        <NIcon
+          class="icon"
+          :class="{ rotated: isExpanded }"
+          :title="isExpanded ? t('MatchHistoryCard.collapse') : t('MatchHistoryCard.expand')"
+        >
           <ChevronDownIcon />
         </NIcon>
       </div>

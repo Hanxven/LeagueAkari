@@ -13,9 +13,10 @@
     <div v-else class="tabs-placeholder">
       <div class="centered">
         <LeagueAkariSpan bold class="akari-text" />
-        <div v-if="lcs.connectionState !== 'connected'" class="disconnected">
-          {{ t('MatchHistoryTabs.disconnected') }}
-        </div>
+        <template v-if="lcs.connectionState !== 'connected'">
+          <span class="disconnected">{{ t('MatchHistoryTabs.disconnected') }}</span>
+          <EasyToLaunch />
+        </template>
         <template v-if="lcs.summoner.me && mhs.tabs.length === 0">
           <div class="no-tab">{{ t('MatchHistoryTabs.noActiveTab') }}</div>
           <div class="shortcut" @click="handleOpenSelfTab">
@@ -46,6 +47,7 @@ import { computed, onActivated, onDeactivated, useTemplateRef, watch } from 'vue
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import EasyToLaunch from '@main-window/components/EasyToLaunch.vue'
 // import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
@@ -219,7 +221,6 @@ mh.events.on('screenshot-tab', (tabId: string) => {
     font-size: 14px;
     font-weight: normal;
     color: rgba(255, 255, 255, 0.4);
-    margin-top: 8px;
   }
 
   .no-tab {
@@ -269,9 +270,10 @@ mh.events.on('screenshot-tab', (tabId: string) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -65%);
+  gap: 16px;
 }
 </style>

@@ -63,6 +63,9 @@ import { computed, ref, useTemplateRef, watch } from 'vue'
 const show = defineModel('show', { default: false })
 const balance = ref(0) // 单位是厘
 
+// 很遗憾, 没有 i18n
+// const { t } = useI18n()
+
 const emits = defineEmits<{
   purchased: [item: ItemType]
   notEnough: [item: ItemType]
@@ -72,6 +75,7 @@ const { current = 'basic' } = defineProps<{
   current?: string
 }>()
 
+// 必须一口气点完, 否则回到解放前
 watch(
   () => show.value,
   (value) => {
@@ -99,6 +103,7 @@ interface ItemType {
   privileges: { level: number; text: string }[]
 }
 
+// 三种套餐都是一样的, 仔细一看没有区别
 const commonPart = [
   { level: 1, text: '战绩查询以及跨区查询' },
   { level: 1, text: '玩家 ID 查询' },
@@ -154,6 +159,7 @@ const handleBuy = (item: any) => {
 
 const btnEl = useTemplateRef('btn')
 
+// 生产小粒子, 提供视觉效果
 const createSmallParticle = (text: string = '1') => {
   const el = btnEl.value?.$el
 
@@ -202,6 +208,7 @@ let clickCount = 0
 let is棒triggered = false
 let is牛triggered = false
 
+// 拼多多 —— implemented by League Akari
 const handleTopUp = () => {
   const now = Date.now()
 
@@ -243,6 +250,7 @@ const handleTopUp = () => {
   }
 }
 
+// 小数位先藏起来, 以免一开始就露馅
 const formatCredit = computed(() => {
   return parseFloat(balance.value.toFixed(4).toString())
 })

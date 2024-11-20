@@ -1,10 +1,14 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { SpectatorData } from '@shared/data-sources/sgp/types'
 import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game-client'
 import axios from 'axios'
 import cp from 'child_process'
 import https from 'https'
+import path from 'node:path'
+import { list } from 'regedit'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
+import { ClientInstallationMain } from '../client-installation'
 import { AkariIpcMain } from '../ipc'
 import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
@@ -12,13 +16,17 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { SgpMain } from '../sgp'
 import { GameClientSettings } from './state'
 
 export interface LaunchSpectatorConfig {
   locale?: string
   sgpServerId: string
   puuid: string
+  observerEncryptionKey: string
+  observerServerPort: number
+  observerServerIp: string
+  gameId: number
+  gameMode: string
 }
 
 /**
@@ -30,10 +38,10 @@ export class GameClientMain implements IAkariShardInitDispose {
     'akari-ipc-main',
     'logger-factory-main',
     'setting-factory-main',
-    'sgp-main',
     'league-client-main',
     'mobx-utils-main',
-    'keyboard-shortcuts-main'
+    'keyboard-shortcuts-main',
+    'client-installation-main'
   ]
 
   static GAME_CLIENT_PROCESS_NAME = 'League of Legends.exe'
@@ -45,10 +53,10 @@ export class GameClientMain implements IAkariShardInitDispose {
   private readonly _settingFactory: SettingFactoryMain
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
-  private readonly _sgp: SgpMain
   private readonly _lc: LeagueClientMain
   private readonly _kbd: KeyboardShortcutsMain
   private readonly _mobx: MobxUtilsMain
+  private readonly _ci: ClientInstallationMain
 
   private readonly _http = axios.create({
     baseURL: GameClientMain.GAME_CLIENT_BASE_URL,
@@ -69,15 +77,16 @@ export class GameClientMain implements IAkariShardInitDispose {
     this._log = this._loggerFactory.create(GameClientMain.id)
     this._settingFactory = deps['setting-factory-main']
     this._api = new GameClientHttpApiAxiosHelper(this._http)
-    this._sgp = deps['sgp-main']
     this._lc = deps['league-client-main']
     this._kbd = deps['keyboard-shortcuts-main']
     this._mobx = deps['mobx-utils-main']
+    this._ci = deps['client-installation-main']
 
     this._setting = this._settingFactory.create(
       GameClientMain.id,
       {
-        terminateGameClientOnAltF4: { default: this.settings.terminateGameClientOnAltF4 }
+        terminateGameClientOnAltF4: { default: this.settings.terminateGameClientOnAltF4 },
+        shortcut: { default: this.settings.shortcut }
       },
       this.settings
     )
@@ -94,47 +103,40 @@ export class GameClientMain implements IAkariShardInitDispose {
   async onInit() {
     await this._setting.applyToState()
     this._mobx.propSync(GameClientMain.id, 'settings', this.settings, [
-      'terminateGameClientOnAltF4'
+      'terminateGameClientOnAltF4',
+      'shortcut'
     ])
     this._handleIpcCall()
-    this._handleTerminateGameClientOnAltF4()
-    this._handleSaveInstallLocation()
+    this._handleShortcuts()
   }
 
-  /** under development */
-  private _readRiotInstallLocation() {
-    // C:\ProgramData\Riot Games\RiotClientInstalls.json
-  }
-
-  private _handleSaveInstallLocation() {
+  private _handleShortcuts() {
     this._mobx.reaction(
-      () => this._lc.state.connectionState,
-      async (state) => {
-        if (state === 'connected') {
-          try {
-            const { data: location } = await this._lc.http.get<{
-              gameExecutablePath: string
-              gameInstallRoot: string
-            }>('/lol-patch/v1/products/league_of_legends/install-location')
-            await this._setting._saveToStorage('x:installLocation', location)
-            this._log.info('保存游戏安装目录', location)
-          } catch (error) {
-            this._log.warn('保存游戏安装目录失败', error)
-          }
+      () => this.settings.shortcut,
+      async (shortcut) => {
+        if (!shortcut) {
+          this._kbd.unregisterByTargetId(`${GameClientMain.id}/terminate-game-client`)
+          return
         }
-      }
-    )
-  }
 
-  private _handleTerminateGameClientOnAltF4() {
-    // 松手时触发, 而非按下时触发
-    this._kbd.events.on('last-active-shortcut', ({ id }) => {
-      if (this.settings.terminateGameClientOnAltF4) {
-        if (id === 'LeftAlt+F4' || id === 'RightAlt+F4') {
-          this._terminateGameClient()
+        try {
+          this._kbd.register(
+            `${GameClientMain.id}/terminate-game-client`,
+            shortcut,
+            'last-active',
+            () => {
+              if (this.settings.terminateGameClientOnAltF4) {
+                this._terminateGameClient()
+              }
+            }
+          )
+        } catch {
+          this._log.warn('注册快捷键失败', shortcut)
+          this.settings.setShortcut(null)
         }
-      }
-    })
+      },
+      { fireImmediately: true } // 立即加入到其中
+    )
   }
 
   private _handleIpcCall() {
@@ -162,49 +164,98 @@ export class GameClientMain implements IAkariShardInitDispose {
     })
   }
 
-  async launchSpectator(config: LaunchSpectatorConfig) {
-    const gf = await this._sgp.getSpectatorGameflow(config.puuid, config.sgpServerId)
-
-    if (!gf) {
-      const err = new Error('未找到游戏')
-      err.name = 'GameNotFound'
-      throw err
-    }
-
+  /**
+   * 已连接的情况下, 可通过 API 当场获取观战凭据
+   * 未连接的情况下, 需要传入观战凭据
+   * 已连接且请求失败的情况下, 会尝试一次未连接的应对方式
+   * @param config
+   * @returns
+   */
+  private async _completeSpectatorCredential(config: LaunchSpectatorConfig) {
     const {
-      game: { gameMode },
-      playerCredentials: { observerServerIp, observerServerPort, observerEncryptionKey, gameId }
-    } = gf
+      puuid,
+      sgpServerId,
+      gameId,
+      gameMode,
+      locale = 'zh_CN',
+      observerEncryptionKey,
+      observerServerIp,
+      observerServerPort
+    } = config
 
-    let location: { gameExecutablePath: string; gameInstallRoot: string }
-    // 如果客户端没有启动, 那么会考虑记录的安装目录, 尝试之
-    if (this._lc.state.connectionState === 'connected') {
-      const { data: location2 } = await this._lc.http.get<{
-        gameExecutablePath: string
-        gameInstallRoot: string
-      }>('/lol-patch/v1/products/league_of_legends/install-location')
-      await this._setting._saveToStorage('x:installLocation', location2)
-      location = location2
+    if (this._ci.state.tencentInstallationPath) {
+      const gameExecutablePath = path.resolve(
+        this._ci.state.tencentInstallationPath,
+        'Game',
+        'League of Legends.exe'
+      )
+
+      const gameInstallRoot = path.resolve(this._ci.state.tencentInstallationPath, 'Game')
+
+      return {
+        puuid,
+        sgpServerId,
+        gameId,
+        gameMode,
+        locale,
+        observerEncryptionKey,
+        observerServerIp,
+        observerServerPort,
+        gameInstallRoot,
+        gameExecutablePath
+      }
     } else {
-      const location2 = await this._setting._getFromStorage('x:installLocation')
-      if (location2) {
-        location = location2
+      if (this._lc.state.connectionState === 'connected') {
+        try {
+          const { data: location } = await this._lc.http.get<{
+            gameExecutablePath: string
+            gameInstallRoot: string
+          }>('/lol-patch/v1/products/league_of_legends/install-location')
+
+          return {
+            puuid,
+            sgpServerId,
+            gameId,
+            gameMode,
+            locale,
+            observerEncryptionKey,
+            observerServerIp,
+            observerServerPort,
+            gameInstallRoot: location.gameInstallRoot,
+            gameExecutablePath: location.gameExecutablePath
+          }
+        } catch (error) {
+          const err = new Error('Cannot get game installation path')
+          err.name = 'CannotGetGameInstallationPath'
+          throw err
+        }
       } else {
-        const err = new Error('LCU 未连接')
-        err.name = 'LeagueClientNotConnected'
+        const err = new Error('No Tencent Installation Path')
+        err.name = 'NoTencentInstallationPath'
         throw err
       }
     }
+  }
 
-    // 记录之, 以保证下次启动即使没有连接客户端, 也会尝试启动
+  async launchSpectator(config: LaunchSpectatorConfig) {
+    const {
+      gameExecutablePath,
+      gameInstallRoot,
+      gameId,
+      gameMode,
+      locale,
+      observerEncryptionKey,
+      observerServerIp,
+      observerServerPort,
+      sgpServerId
+    } = await this._completeSpectatorCredential(config)
 
-    // sgpServerId 格式为 region_platformId, 或 region
-    const [region, rsoPlatformId] = config.sgpServerId.split('_')
+    const [region, rsoPlatformId] = sgpServerId.split('_')
 
     const cmds = [
       `spectator ${observerServerIp}:${observerServerPort} ${observerEncryptionKey} ${gameId} ${region}`,
-      `-GameBaseDir=${location.gameInstallRoot}`,
-      `-Locale=${config.locale || 'zh_CN'}`,
+      `-GameBaseDir=${gameInstallRoot}`,
+      `-Locale=${locale || 'zh_CN'}`,
       `-GameID=${gameId}`,
       `-Region=${region}`,
       `-UseNewX3D=1`,
@@ -222,8 +273,8 @@ export class GameClientMain implements IAkariShardInitDispose {
       cmds.push(`-PlatformId=${rsoPlatformId}`)
     }
 
-    const p = cp.spawn(location.gameExecutablePath, cmds, {
-      cwd: location.gameInstallRoot,
+    const p = cp.spawn(gameExecutablePath, cmds, {
+      cwd: gameInstallRoot,
       detached: true
     })
 

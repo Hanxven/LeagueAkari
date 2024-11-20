@@ -902,7 +902,7 @@ Spectate:
     successNotification:
       title: 观战
       description: 已拉起观战
-      useRememberedInstallLocation: 已拉起观战，使用上一次记录的客户端位置
+      useRememberedInstallLocation: 已拉起观战，使用检测到的客户端位置
 
     failedNotification:
       title: 观战
@@ -921,6 +921,7 @@ MatchHistoryTab:
   refreshPage: 刷新页面
   rankedMore: 更多
   tagPlayer: 标记玩家
+  itemPerPage: '{count} 项'
 
   private:
     title: 生涯隐藏
@@ -969,6 +970,8 @@ MatchHistoryCard:
   dtr: 队伍承伤比 {rate}%
   gr: 队伍经济 {rate}%
   misc: 杂项
+  expand: 展开
+  collapse: 收起
   loading: 加载中...
   error: 无法加载
   practiceTool: 训练模式
@@ -1448,6 +1451,13 @@ OpggChampion:
   itemsDesc: 装备 (按出场率排序)
   coreItem: '核心装备 #{index} | 出场率 {pickRate}%'
   starterItem: '初始装备 #{index} | 出场率 {pickRate}%'
+
+EasyToLaunch:
+  tcls: TCLS 客户端
+  weGame: WeGame
+  riotClient: Riot 客户端
+  successMessage: 已启动进程：{name}
+  failedMessage: 无法启动进程 {name}：{reason}
 
 common:
   appName: League Akari

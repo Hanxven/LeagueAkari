@@ -900,7 +900,7 @@ Spectate:
     successNotification:
       title: Spectate
       description: Spectating has started.
-      useRememberedInstallLocation: Spectating has started, using the last remembered client location.
+      useRememberedInstallLocation: Spectating has started, using the detected client location.
 
     failedNotification:
       title:
@@ -916,6 +916,7 @@ MatchHistoryTab:
   refreshPage: Refresh Page
   rankedMore: More
   tagPlayer: Tag Player
+  itemPerPage: '{count}'
 
   private:
     title: Profile Hidden
@@ -964,6 +965,8 @@ MatchHistoryCard:
   dtr: DMG Taken {rate}%
   gr: Gold {rate}%
   misc: Misc
+  expand: Expand
+  collapse: Collapse
   loading: Loading...
   error: Failed to load
   practiceTool: Practice
@@ -1124,7 +1127,7 @@ DetailedGame:
     augment: Augments
 
 SummonerSpellDisplay:
-  cooldown: 'Cooldown: {cooldown}s'
+  cooldown: 'Cooldown: {time} s'
   levelRequirement: 'Level: {level} Required'
 
 CopyableText:
@@ -1433,6 +1436,13 @@ OpggChampion:
   itemsDesc: Items (sorted by pick rate)
   coreItem: 'Core Item #{index} | Pick Rate {pickRate}%'
   starterItem: 'Starting Item #{index} | Pick Rate {pickRate}%'
+
+EasyToLaunch:
+  tcls: TCLS Client
+  weGame: WeGame
+  riotClient: Riot Client
+  successMessage: 'Successfully launched: {name}'
+  failedMessage: 'Failed to launch {name}: {reason}'
 
 common:
   appName: League Akari

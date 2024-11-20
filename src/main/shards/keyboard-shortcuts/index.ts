@@ -4,7 +4,7 @@ import EventEmitter from 'node:events'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
-import { KeyDefinition, UNIFIED_KEY_ID, VKEY_MAP, isModifierKey } from './definitions'
+import { UNIFIED_KEY_ID, VKEY_MAP, isModifierKey } from './definitions'
 
 interface ShortcutDetails {
   keyCodes: number[]
@@ -14,8 +14,8 @@ interface ShortcutDetails {
 }
 
 /**
- * 处理键盘快捷键的模块
- * 通过较为 Native 的方式, 使其可以在程序外任何地方使用, 前提是程序有管理员权限
+ * 管理员权限下, 处理全局范围的键盘快捷键的模块
+ * 提供订阅和事件分发服务
  */
 export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   static id = 'keyboard-shortcuts-main'
@@ -64,6 +64,17 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
      */
     'last-active-shortcut': [details: ShortcutDetails]
   }>()
+
+  private _registrationMap = new Map<
+    string,
+    {
+      type: 'last-active' | 'normal'
+      targetId: string
+      cb: (details: ShortcutDetails) => void
+    }
+  >()
+
+  private _targetIdMap = new Map<string, string>()
 
   constructor(deps: any) {
     this._common = deps['app-common-main']
@@ -131,7 +142,19 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
             ].join('+')
 
             this._lastActiveShortcut = keyCodes
+
             this.events.emit('shortcut', { keyCodes, keys, id: combined, unifiedId: unified })
+
+            const registration = this._registrationMap.get(combined)
+            if (registration && registration.type === 'normal') {
+              registration.cb({
+                keyCodes: this._lastActiveShortcut,
+                keys,
+                id: combined,
+                unifiedId: unified
+              })
+            }
+
             this._ipc.sendEvent(KeyboardShortcutsMain.id, 'shortcut', {
               keyCodes,
               keys,
@@ -164,16 +187,89 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
             id: combined,
             unifiedId: unified
           })
+
           this._ipc.sendEvent(KeyboardShortcutsMain.id, 'last-active-shortcut', {
             keyCodes: this._lastActiveShortcut,
             keys,
             id: combined,
             unifiedId: unified
           })
+
+          const registration = this._registrationMap.get(combined)
+          if (registration && registration.type === 'last-active') {
+            registration.cb({
+              keyCodes: this._lastActiveShortcut,
+              keys,
+              id: combined,
+              unifiedId: unified
+            })
+          }
+
           this._lastActiveShortcut = []
         }
       })
     }
+
+    this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistration', (shortcutId: string) => {
+      return this.getRegistration(shortcutId)
+    })
+
+    this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistrationByTargetId', (targetId: string) => {
+      return this.getRegistrationByTargetId(targetId)
+    })
+  }
+
+  /**
+   * 注册一个精准快捷键, 松手后触发的那种 (避免和当前按键冲突)
+   */
+  register(
+    targetId: string,
+    shortcutId: string,
+    type: 'last-active' | 'normal',
+    cb: (details: ShortcutDetails) => void
+  ) {
+    const options = this._registrationMap.get(shortcutId)
+
+    if (options && options.targetId !== targetId) {
+      throw new Error(`Shortcut ${shortcutId} is already registered by ${options.targetId}`)
+    }
+
+    this._registrationMap.set(shortcutId, { type, targetId, cb })
+    this._targetIdMap.set(targetId, shortcutId)
+  }
+
+  unregister(shortcutId: string) {
+    const options = this._registrationMap.get(shortcutId)
+    if (options) {
+      this._registrationMap.delete(shortcutId)
+      this._targetIdMap.delete(options.targetId)
+      return true
+    }
+
+    return false
+  }
+
+  unregisterByTargetId(targetId: string) {
+    const shortcutId = this._targetIdMap.get(targetId)
+    if (shortcutId) {
+      this._registrationMap.delete(shortcutId)
+      this._targetIdMap.delete(targetId)
+      return true
+    }
+
+    return false
+  }
+
+  getRegistration(shortcutId: string) {
+    return this._registrationMap.get(shortcutId) || null
+  }
+
+  getRegistrationByTargetId(targetId: string) {
+    const shortcutId = this._targetIdMap.get(targetId)
+    if (shortcutId) {
+      return this._registrationMap.get(shortcutId) || null
+    }
+    return null
   }
 
   async onDispose() {
@@ -181,5 +277,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       input.stopHook()
     }
     this.events.removeAllListeners()
+    this._registrationMap.clear()
+    this._targetIdMap.clear()
   }
 }

@@ -209,22 +209,14 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       // 通过 IPC 调用的网络请求，则是不完整的可序列化信息
       try {
         const { config: c, request, ...rest } = await this._http!.request(config)
-
-        return {
-          ...rest,
-          config: { data: c.data, url: c.url }
-        }
+        return { ...rest, config: { data: c.data, url: c.url } }
       } catch (error) {
         if (isAxiosError(error) && error.response) {
           const { config: c, request, ...rest } = error.response
-          return {
-            ...rest,
-            config: { data: c.data, url: c.url }
-          }
+          return { ...rest, config: { data: c.data, url: c.url } }
         }
 
         this._log.warn('LeagueClient HTTP 客户端错误', error)
-
         throw error
       }
     })

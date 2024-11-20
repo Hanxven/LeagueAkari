@@ -325,7 +325,12 @@ const handleCopyToken = () => {
   const token = {
     akariVersion: as.version,
     sgpServerId,
-    puuid
+    puuid,
+    observerEncryptionKey: data.playerCredentials.observerEncryptionKey,
+    observerServerPort: data.playerCredentials.observerServerPort,
+    observerServerIp: data.playerCredentials.observerServerIp,
+    gameId: data.game.id,
+    gameMode: data.game.gameMode
   }
 
   const str = JSON.stringify(token)

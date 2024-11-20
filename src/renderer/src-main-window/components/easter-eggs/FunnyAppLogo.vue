@@ -1,6 +1,6 @@
 <template>
   <div class="funny-app-logo" @click="show = true">
-    <!-- 彩蛋页面, 仅用于 .rabi 版本 -->
+    <!-- 彩蛋页面, 仅用于 .rabi.1 版本 -->
     <FunnyPricing
       v-model:show="show"
       @purchased="handlePurchased"

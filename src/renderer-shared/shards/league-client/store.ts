@@ -37,6 +37,7 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
   const connectionState = shallowRef<LcConnectionStateType>('disconnected')
   const auth = shallowRef<UxCommandLine | null>(null)
   const connectingClient = shallowRef<UxCommandLine | null>(null)
+  const installedClients = shallowRef<string[]>([])
 
   const isConnected = computed(() => connectionState.value === 'connected')
   const isConnecting = computed(() => connectionState.value === 'connecting')
@@ -124,6 +125,7 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     isConnecting, // for convenience
     isDisconnected, // for convenience
     auth,
-    connectingClient
+    connectingClient,
+    installedClients
   }
 })

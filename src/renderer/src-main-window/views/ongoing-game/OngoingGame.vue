@@ -70,15 +70,16 @@
     <div v-else class="no-ongoing-game">
       <div class="centered">
         <LeagueAkariSpan bold class="akari-text" />
-        <div v-if="og.settings.enabled" class="no-ongoing-game-text">
-          <template v-if="lc.connectionState !== 'connected'">{{
-            t('OngoingGame.disconnected')
-          }}</template>
+        <template v-if="og.settings.enabled">
+          <template v-if="lc.connectionState !== 'connected'">
+            <span class="no-ongoing-game-text">{{ t('OngoingGame.disconnected') }}</span>
+            <EasyToLaunch />
+          </template>
           <template v-else-if="lc.champSelect.session && lc.champSelect.session.isSpectating">{{
             t('OngoingGame.waitingForSpectate')
           }}</template>
           <template v-else>{{ t('OngoingGame.noOngoingGame') }}</template>
-        </div>
+        </template>
         <div v-else class="no-ongoing-game-text">{{ t('OngoingGame.disabled') }}</div>
       </div>
     </div>
@@ -97,6 +98,7 @@ import { NScrollbar } from 'naive-ui'
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import EasyToLaunch from '@main-window/components/EasyToLaunch.vue'
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
 import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMatchHistoryCardModal.vue'
@@ -359,7 +361,6 @@ const columnsNeed = computed(() => {
   height: 100%;
   display: flex;
   position: relative;
-  top: calc(var(--title-bar-height) * -0.5);
 
   .akari-text {
     font-size: 22px;
@@ -369,7 +370,6 @@ const columnsNeed = computed(() => {
     font-size: 14px;
     font-weight: normal;
     color: rgba(255, 255, 255, 0.4);
-    margin-top: 8px;
   }
 }
 
@@ -377,9 +377,10 @@ const columnsNeed = computed(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -65%);
+  gap: 16px;
 }
 </style>

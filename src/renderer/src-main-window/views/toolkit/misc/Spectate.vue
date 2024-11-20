@@ -223,6 +223,11 @@ interface SpectateToken {
   locale?: string
   sgpServerId: string
   puuid: string
+  observerEncryptionKey: string
+  observerServerPort: number
+  observerServerIp: string
+  gameId: number
+  gameMode: string
 }
 
 const checkSpectateToken = (str: string) => {
@@ -233,6 +238,11 @@ const checkSpectateToken = (str: string) => {
       typeof obj.akariVersion === 'string' &&
       typeof obj.sgpServerId === 'string' &&
       typeof obj.puuid === 'string' &&
+      typeof obj.observerEncryptionKey === 'string' &&
+      typeof obj.observerServerPort === 'number' &&
+      typeof obj.observerServerIp === 'string' &&
+      typeof obj.gameId === 'number' &&
+      typeof obj.gameMode === 'string' &&
       (typeof obj.locale === 'undefined' || typeof obj.locale === 'string')
     )
   } catch (error) {
@@ -244,23 +254,12 @@ const handleSpectateByToken = async () => {
   const obj = JSON.parse(spectator.token) as SpectateToken
 
   try {
-    await gc.launchSpectator({
-      locale: obj.locale,
-      sgpServerId: obj.sgpServerId,
-      puuid: obj.puuid
-    })
+    await gc.launchSpectator(obj)
 
-    if (lcs.connectionState === 'connected') {
-      laNotification.success(
-        t('Spectate.token.successNotification.title'),
-        t('Spectate.token.successNotification.description')
-      )
-    } else {
-      laNotification.success(
-        t('Spectate.token.successNotification.title'),
-        t('Spectate.token.successNotification.useRememberedInstallLocation')
-      )
-    }
+    laNotification.success(
+      t('Spectate.token.successNotification.title'),
+      t('Spectate.token.successNotification.description')
+    )
   } catch (error) {
     laNotification.warn(
       t('Spectate.token.failedNotification.title'),

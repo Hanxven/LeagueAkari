@@ -203,6 +203,7 @@
             size="small"
             style="width: 108px"
             :options="pageSizeOptions"
+            :consistent-menu-width="false"
           ></NSelect>
           <NSelect
             v-if="mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.matchHistory"
@@ -256,7 +257,9 @@
                     :disabled="tab.isLoadingMatchHistory"
                     class="page-select"
                     size="small"
+                    placeholder=""
                     style="width: 86px"
+                    :consistent-menu-width="false"
                     :options="pageSizeOptions"
                   ></NSelect>
                 </div>
@@ -339,9 +342,16 @@
                 </div>
                 <div class="stat-item">
                   <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgKda') }}</span>
-                  <span class="stat-item-content">{{
-                    analysis.matchHistory.summary.averageKda.toFixed(2)
-                  }}</span>
+                  <NPopover>
+                    <template #trigger>
+                      <span class="stat-item-content">{{
+                        analysis.matchHistory.summary.averageKda.toFixed(2)
+                      }}</span>
+                    </template>
+                    {{ analysis.matchHistory.summary.totalKills }} /
+                    {{ analysis.matchHistory.summary.totalDeaths }} /
+                    {{ analysis.matchHistory.summary.totalAssists }}
+                  </NPopover>
                 </div>
                 <div class="stat-item">
                   <span class="stat-item-label">{{ t('MatchHistoryTab.stats.avgKp') }}</span>
@@ -939,36 +949,36 @@ const handleInputBlur = () => {
   inputtingPage.value = tab.matchHistoryPage?.page
 }
 
-const pageSizeOptions = [
+const pageSizeOptions = computed(() => [
   {
-    label: '10 项',
+    label: t('MatchHistoryTab.itemPerPage', { count: 10 }),
     value: 10
   },
   {
-    label: '20 项',
+    label: t('MatchHistoryTab.itemPerPage', { count: 20 }),
     value: 20
   },
   {
-    label: '30 项',
+    label: t('MatchHistoryTab.itemPerPage', { count: 30 }),
     value: 30
   },
   {
-    label: '40 项',
+    label: t('MatchHistoryTab.itemPerPage', { count: 40 }),
     value: 40
   },
   {
-    label: '50 项',
+    label: t('MatchHistoryTab.itemPerPage', { count: 50 }),
     value: 50
   },
   {
-    label: '100 项',
+    label: t('MatchHistoryTab.itemPerPage', { count: 100 }),
     value: 100
   },
   {
-    label: '200 项', // DOM 压力爆炸
+    label: t('MatchHistoryTab.itemPerPage', { count: 200 }),
     value: 200
   }
-]
+])
 
 const handleChangePageSize = async (pageSize: number) => {
   await loadMatchHistory(tab.matchHistoryPage?.page, pageSize, tab.matchHistoryPage?.tag)

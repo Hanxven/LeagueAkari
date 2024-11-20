@@ -70,7 +70,7 @@
 
 <script lang="ts" setup>
 import { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
-import { QUEUE_TYPE_TEXT, TIER_TEXT } from '@shared/utils/ranked'
+import { TIER_TEXT } from '@shared/utils/ranked'
 import { useI18n } from 'vue-i18n'
 
 import BronzeMedal from '@main-window/assets/ranked-icons/bronze.png'
@@ -113,7 +113,6 @@ const QUEUE_TYPE_ORDER: Record<string, number> = {
 }
 
 const formatQueueName = (queueType: string) => {
-
   return t(`common.queueTypes.${queueType}`, queueType)
 }
 
@@ -175,10 +174,10 @@ const formatTierDivision = (entry: RankedEntry, type: string) => {
   }
 
   if (!division || division === 'NA') {
-    return TIER_TEXT[tier] || tier
+    return t(`common.tiers.${tier}`, tier)
   }
 
-  return `${TIER_TEXT[tier] || tier} ${division}`
+  return `${t(`common.tiers.${tier}`, tier)} ${division}`
 }
 
 const formatLosses = (losses: number) => {

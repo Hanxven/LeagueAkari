@@ -14,7 +14,6 @@ files:
   - '!images'
   - '!pictures'
   - '!addons'
-  - '!.git-origin'
 
 asarUnpack:
   - resources/**
