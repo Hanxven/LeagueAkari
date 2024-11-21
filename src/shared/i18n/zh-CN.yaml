@@ -554,12 +554,17 @@ PlayerTagEditModal:
   save: 保存
   cancel: 取消
 
-ShortcutSelectionModal:
+ShortcutSelector:
   title: 快捷键设定
   hint: 按下按键以记录快捷键
+  clear: 清除
+  unset: 未设置
+  beingOccupied: 此快捷键被占用
+  unchanged: (未变化)
   tooComplicated: 该快捷键组合具有较高复杂度，请确认
   ok: 确认
   cancel: 取消
+  select: 选择
 
 UpdateModal:
   newVersion: 新版本
@@ -596,6 +601,10 @@ Client:
       labelAdminRequired: 使用 Alt+F4 结束游戏端 (需要管理员权限)
       label: 使用 Alt+F4 结束游戏端
       description: 当游戏端正在运行且在前台时，使用 Alt+F4 快捷键可强制结束游戏端 (游戏本体) 进程。请注意，此操作为强制结束进程，而非正常的游戏退出流程，可能产生意料之外的副作用
+    terminateShortcut:
+      label: 快捷键
+      labelAdminRequired: 快捷键 (需要管理员权限)
+      description: 设置快捷键
 
   leagueClientUx:
     title: League Client UX

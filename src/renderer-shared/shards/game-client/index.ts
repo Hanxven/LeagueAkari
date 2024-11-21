@@ -26,6 +26,8 @@ export class GameClientRenderer implements IAkariShardInitDispose {
   private readonly _pm: PiniaMobxUtilsRenderer
   private readonly _setting: SettingUtilsRenderer
 
+  static SHORTCUT_ID_TERMINATE_GAME_CLIENT = `${MAIN_SHARD_NAMESPACE}/terminate-game-client`
+
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-renderer']
     this._pm = deps['pinia-mobx-utils-renderer']
@@ -44,5 +46,9 @@ export class GameClientRenderer implements IAkariShardInitDispose {
 
   setTerminateGameClientOnAltF4(value: boolean) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'terminateGameClientOnAltF4', value)
+  }
+
+  setTerminateShortcut(shortcut: string | null) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'terminateShortcut', shortcut)
   }
 }

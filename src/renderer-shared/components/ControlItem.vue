@@ -34,7 +34,7 @@ defineProps<{
   .label-area {
     flex-grow: 1;
     margin-right: 24px;
-    flex-shrink: 1;
+    flex-shrink: 0;
   }
 
   .label {

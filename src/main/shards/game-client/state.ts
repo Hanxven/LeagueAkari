@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 
 export class GameClientSettings {
   terminateGameClientOnAltF4 = false
-  shortcut: string | null = null
+  terminateShortcut: string | null = null
 
   constructor() {
     makeAutoObservable(this)
@@ -12,7 +12,7 @@ export class GameClientSettings {
     this.terminateGameClientOnAltF4 = value
   }
 
-  setShortcut(shortcut: string | null) {
-    this.shortcut = shortcut
+  setTerminateShortcut(shortcut: string | null) {
+    this.terminateShortcut = shortcut
   }
 }

@@ -37,5 +37,12 @@ export class KeyboardShortcutsRenderer implements IAkariShardInitDispose {
     return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'last-active-shortcut', fn)
   }
 
+  getRegistration(shortcutId: string): Promise<{
+    type: 'last-active' | 'normal'
+    targetId: string
+  }> {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getRegistration', shortcutId)
+  }
+
   async onInit() {}
 }

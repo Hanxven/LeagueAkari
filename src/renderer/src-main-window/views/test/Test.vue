@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ShortcutSelectionModal v-model:show="show" @submit="(id) => showIt(id)" />
+    <ShortcutSelector v-model:show="show" @submit="(id) => showIt(id)" />
     <SearchSummonerModal v-model:show="show2" />
     <FunnyPricing v-model:show="show3" />
     <NButton @click="show = true">快捷键对话框</NButton>
@@ -10,10 +10,10 @@
 </template>
 
 <script setup lang="ts">
-import { NButton } from 'naive-ui'
+import { NButton, useMessage } from 'naive-ui'
 import { ref } from 'vue'
 
-import ShortcutSelectionModal from '@main-window/components/ShortcutSelectionModal.vue'
+import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 import FunnyPricing from '@main-window/components/easter-eggs/FunnyPricing.vue'
 import SearchSummonerModal from '@main-window/components/search-summoner-modal/SearchSummonerModal.vue'
 
@@ -21,7 +21,9 @@ const show = ref(false)
 const show2 = ref(false)
 const show3 = ref(false)
 
+const message = useMessage()
 const showIt = (id: string) => {
   show.value = false
+  message.success(`快捷键 ${id}`)
 }
 </script>

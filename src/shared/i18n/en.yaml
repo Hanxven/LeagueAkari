@@ -552,12 +552,17 @@ PlayerTagEditModal:
   cancel: Cancel
   placeholder: Enter the tag for player {name}
 
-ShortcutSelectionModal:
+ShortcutSelector:
   title: Shortcut Recording
   hint: Press keys to record the shortcut
+  clear: Clear
+  unset: Unset
   tooComplicated: This shortcut combination is highly complex, please confirm
+  beingOccupied: This shortcut combination is already in use
+  unchanged: (Unchanged)
   ok: Confirm
   cancel: Cancel
+  select: Select
 
 UpdateModal:
   newVersion: New Version
@@ -594,6 +599,10 @@ Client:
       labelAdminRequired: Terminate Game Client with Alt+F4 (Admin Required)
       label: Terminate Game Client with Alt+F4
       description: When the game client is running and in the foreground, using the Alt+F4 shortcut can forcibly terminate the game client process. Please note that this action forcefully ends the process and is not a normal game exit procedure, potentially leading to unexpected side effects.
+    terminateShortcut:
+      label: Shortcut
+      labelAdminRequired: Shortcut (Admin Required)
+      description: Set a custom shortcut to forcibly terminate the game client process.
 
   leagueClientUx:
     title: League Client UX

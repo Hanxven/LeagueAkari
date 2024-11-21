@@ -404,8 +404,13 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
     this.state.setMainWindowShow(WindowManagerMain.MAIN_WINDOW_INITIAL_SHOW)
 
+    // 屏蔽一些不可控的快捷键, 会干扰到某些逻辑
     this._mw.webContents.on('before-input-event', (event, input) => {
-      if (input.key === 'w' && input.control) {
+      if (
+        (input.control && input.key.toLowerCase() === 'w') ||
+        (input.control && input.key.toLowerCase() === 'r') ||
+        (input.meta && input.key.toLowerCase() === 'r')
+      ) {
         event.preventDefault()
       }
     })
@@ -533,7 +538,11 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     })
 
     this._aw.webContents.on('before-input-event', (event, input) => {
-      if (input.key === 'w' && input.control) {
+      if (
+        (input.control && input.key.toLowerCase() === 'w') ||
+        (input.control && input.key.toLowerCase() === 'r') ||
+        (input.meta && input.key.toLowerCase() === 'r')
+      ) {
         event.preventDefault()
       }
     })

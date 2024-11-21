@@ -97,16 +97,31 @@ export class SetterSettingService {
         setter: async (v?: any) => {
           if (v === undefined) {
             runInAction(() => _.set(this._obj, key, newValue))
-            await this._ins._saveToStorage(this._namespace, key as any, newValue)
+
+            if (newValue === null) {
+              await this._ins._removeFromStorage(this._namespace, key)
+            } else {
+              await this._ins._saveToStorage(this._namespace, key as any, newValue)
+            }
           } else {
             runInAction(() => _.set(this._obj, key, v))
-            await this._ins._saveToStorage(this._namespace, key as any, v)
+
+            if (v === null) {
+              await this._ins._removeFromStorage(this._namespace, key)
+            } else {
+              await this._ins._saveToStorage(this._namespace, key as any, v)
+            }
           }
         }
       })
     } else {
       runInAction(() => _.set(this._obj, key, newValue))
-      await this._ins._saveToStorage(this._namespace, key, newValue)
+
+      if (newValue === null) {
+        await this._ins._removeFromStorage(this._namespace, key)
+      } else {
+        await this._ins._saveToStorage(this._namespace, key, newValue)
+      }
     }
   }
 

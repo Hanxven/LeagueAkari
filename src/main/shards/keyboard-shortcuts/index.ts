@@ -211,11 +211,25 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     }
 
     this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistration', (shortcutId: string) => {
-      return this.getRegistration(shortcutId)
+      const r = this.getRegistration(shortcutId)
+
+      if (!r) {
+        return null
+      }
+
+      const { cb, ...rest } = r
+      return rest
     })
 
     this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistrationByTargetId', (targetId: string) => {
-      return this.getRegistrationByTargetId(targetId)
+      const r = this.getRegistrationByTargetId(targetId)
+
+      if (!r) {
+        return null
+      }
+
+      const { cb, ...rest } = r
+      return rest
     })
   }
 

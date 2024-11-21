@@ -60,6 +60,24 @@
               @update:value="(v) => gc.setTerminateGameClientOnAltF4(v)"
             />
           </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            :label-description="t('Client.gameClient.terminateShortcut.description')"
+            :disabled="!as.isAdministrator"
+            :label="
+              as.isAdministrator
+                ? t('Client.gameClient.terminateShortcut.label')
+                : t('Client.gameClient.terminateShortcut.labelAdminRequired')
+            "
+            :label-width="320"
+          >
+            <ShortcutSelector
+              :target-id="GameClientRenderer.SHORTCUT_ID_TERMINATE_GAME_CLIENT"
+              :shortcut-id="gcs.settings.terminateShortcut"
+              @update:shortcut-id="(v) => gc.setTerminateShortcut(v)"
+              :disabled="!as.isAdministrator"
+            />
+          </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
           <template #header
@@ -171,6 +189,8 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { NButton, NCard, NInputNumber, NScrollbar, NSwitch, useDialog } from 'naive-ui'
 import { reactive, toRaw, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
 const { t } = useI18n()
 

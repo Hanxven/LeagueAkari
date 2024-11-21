@@ -86,7 +86,7 @@ export class GameClientMain implements IAkariShardInitDispose {
       GameClientMain.id,
       {
         terminateGameClientOnAltF4: { default: this.settings.terminateGameClientOnAltF4 },
-        shortcut: { default: this.settings.shortcut }
+        terminateShortcut: { default: this.settings.terminateShortcut }
       },
       this.settings
     )
@@ -104,7 +104,7 @@ export class GameClientMain implements IAkariShardInitDispose {
     await this._setting.applyToState()
     this._mobx.propSync(GameClientMain.id, 'settings', this.settings, [
       'terminateGameClientOnAltF4',
-      'shortcut'
+      'terminateShortcut'
     ])
     this._handleIpcCall()
     this._handleShortcuts()
@@ -112,7 +112,7 @@ export class GameClientMain implements IAkariShardInitDispose {
 
   private _handleShortcuts() {
     this._mobx.reaction(
-      () => this.settings.shortcut,
+      () => this.settings.terminateShortcut,
       async (shortcut) => {
         if (!shortcut) {
           this._kbd.unregisterByTargetId(`${GameClientMain.id}/terminate-game-client`)
@@ -133,7 +133,7 @@ export class GameClientMain implements IAkariShardInitDispose {
           )
         } catch {
           this._log.warn('注册快捷键失败', shortcut)
-          this.settings.setShortcut(null)
+          this.settings.setTerminateShortcut(null)
         }
       },
       { fireImmediately: true } // 立即加入到其中
