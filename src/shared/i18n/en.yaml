@@ -502,6 +502,7 @@ DamageMetricsBar:
 SpectateStatus:
   button: Spectate
   bans: Bans
+  startFrom: Started from {date} ({relativeTime})
 
   lcuSpectate:
     label: Using LCU API (Optional)
@@ -960,7 +961,7 @@ MatchHistoryTab:
 
 MatchHistoryCard:
   kprTitle: 'Kill participation in team: {rate}%'
-  ddrTitle: 'Damage dealt to heroes: {rate}%'
+  ddrTitle: 'Damage dealt to champions: {rate}%'
   dtrTitle: 'Damage taken in team: {rate}%'
   grTitle: 'Team gold share: {rate}%'
   kpr: KPR {rate}%
@@ -1142,6 +1143,7 @@ ItemDisplay:
 
 PlayerInfoCard:
   empty: No Content
+  loadingMatchHistory: Loading...
   top4Rate: Top 4 Rate
   1stRate: First Place Rate
   1st: First {rate}%

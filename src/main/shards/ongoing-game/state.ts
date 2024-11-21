@@ -374,6 +374,13 @@ export class OngoingGameState {
    */
   matchHistoryLoadingState: Record<string, string> = {}
 
+  setMatchHistoryLoadingState(player: string, state: string) {
+    this.matchHistoryLoadingState = {
+      ...this.matchHistoryLoadingState,
+      [player]: state
+    }
+  }
+
   /**
    * 每名玩家的召唤师信息
    * 手动同步

@@ -1,6 +1,8 @@
 import { AvailableServersMap } from '@shared/data-sources/sgp'
 import { makeAutoObservable } from 'mobx'
 
+import { LeagueClientSyncedData } from '../league-client/lc-state'
+
 export class SgpState {
   availability = {
     region: '',
@@ -37,13 +39,15 @@ export class SgpState {
     }
   }
 
-  isTokenReady = false
+  get isTokenReady() {
+    if (this._lcData.lolLeagueSession.token && this._lcData.entitlements.token) {
+      return true
+    }
 
-  setTokenReady(ready: boolean) {
-    this.isTokenReady = ready
+    return false
   }
 
-  constructor() {
+  constructor(private readonly _lcData: LeagueClientSyncedData) {
     makeAutoObservable(this)
   }
 }

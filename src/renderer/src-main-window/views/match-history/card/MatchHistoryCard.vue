@@ -163,13 +163,13 @@
         </div>
         <div
           class="dtr"
-          :title="t('MatchHistoryCard.dtrTitle', { rate: (self.summary.ddr * 100).toFixed(3) })"
+          :title="t('MatchHistoryCard.dtrTitle', { rate: (self.summary.dtr * 100).toFixed(3) })"
         >
           {{ t('MatchHistoryCard.dtr', { rate: (self.summary.dtr * 100).toFixed() }) }}
         </div>
         <div
           class="gr"
-          :title="t('MatchHistoryCard.grTitle', { rate: (self.summary.ddr * 100).toFixed(3) })"
+          :title="t('MatchHistoryCard.grTitle', { rate: (self.summary.gr * 100).toFixed(3) })"
         >
           {{ t('MatchHistoryCard.gr', { rate: (self.summary.gr * 100).toFixed() }) }}
         </div>

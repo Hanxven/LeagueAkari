@@ -472,6 +472,9 @@
           </div>
         </template>
       </NVirtualList>
+      <div class="placeholder" v-else-if="matchHistoryLoading === 'loading'">
+        {{ t('PlayerInfoCard.loadingMatchHistory') }}
+      </div>
       <div class="placeholder" v-else>{{ t('PlayerInfoCard.empty') }}</div>
     </div>
   </div>
@@ -526,6 +529,7 @@ const { puuid, analysis, matchHistory, position, premadeTeamId, summoner, ranked
     rankedStats?: RankedStats
     championMastery?: Record<number, Mastery>
     matchHistory?: MatchHistoryGameWithState[]
+    matchHistoryLoading?: string
     analysis?: MatchHistoryGamesAnalysisAll
     savedInfo?: SavedInfo
   }>()

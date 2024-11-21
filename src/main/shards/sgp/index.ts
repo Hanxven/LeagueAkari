@@ -87,7 +87,7 @@ export class SgpMain implements IAkariShardInitDispose {
 
   static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v7.json'
 
-  public readonly state = new SgpState()
+  public readonly state: SgpState
 
   private _loggerFactory: LoggerFactoryMain
   private _settingFactory: SettingFactoryMain
@@ -107,6 +107,8 @@ export class SgpMain implements IAkariShardInitDispose {
     this._ipc = deps['akari-ipc-main']
     this._log = this._loggerFactory.create(SgpMain.id)
     this._setting = this._settingFactory.create(SgpMain.id, {}, {})
+
+    this.state = new SgpState(this._lc.data)
   }
 
   async onInit() {
@@ -116,19 +118,6 @@ export class SgpMain implements IAkariShardInitDispose {
     this._handleUpdateSupportedInfo()
     this._maintainEntitlementsToken()
     this._maintainLolLeagueSessionToken()
-
-    // 是否 token 准备好
-    this._mobx.reaction(
-      () => [this._lc.data.lolLeagueSession.token, this._lc.data.entitlements.token] as const,
-      ([t1, t2]) => {
-        if (t1 && t2) {
-          this.state.setTokenReady(true)
-        } else {
-          this.state.setTokenReady(false)
-        }
-      },
-      { equals: comparer.shallow }
-    )
   }
 
   private async _loadAvailableServersFromLocalFile() {

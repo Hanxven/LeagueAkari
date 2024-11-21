@@ -126,6 +126,7 @@ export class GameClientMain implements IAkariShardInitDispose {
             'last-active',
             () => {
               if (this.settings.terminateGameClientOnAltF4) {
+                this._log.info('强制进程结束关闭游戏')
                 this._terminateGameClient()
               }
             }

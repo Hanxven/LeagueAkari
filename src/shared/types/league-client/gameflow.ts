@@ -11,6 +11,7 @@ export type GameflowPhase =
   | 'WaitingForStats' // 等待结果
   | 'PreEndOfGame' // 结束游戏之前
   | 'WatchInProgress' // 在观战中
+  | 'TerminatedInError' // 错误终止
 
 export interface GameflowSession {
   gameClient: GameClient

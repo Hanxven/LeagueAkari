@@ -69,9 +69,12 @@
       </NPopover>
     </div>
     <div class="time">
-      于 {{ dayjs(data.playerCredentials.gameCreateDate).format('MM-DD HH:mm:ss') }} 开始 ({{
-        relativeText
-      }})
+      {{
+        t('SpectateStatus.startFrom', {
+          date: dayjs(data.playerCredentials.gameCreateDate).format('MM-DD HH:mm:ss'),
+          relativeTime: relativeText
+        })
+      }}
     </div>
     <div class="divider"></div>
     <DefineTeamSide v-slot="{ bans, players, name, id }">
@@ -174,7 +177,7 @@ import PositionIcon from '@main-window/components/icons/position-icons/PositionI
 
 import IndicatorPulse from './IndicatorPulse.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const emits = defineEmits<{
   toSummoner: [puuid: string, setCurrent?: boolean]
@@ -252,13 +255,22 @@ const teams = computed(() => {
   }
 })
 
-const relativeText = ref(dayjs(data.playerCredentials.gameCreateDate).locale('zh-cn').fromNow())
+const relativeText = ref(
+  dayjs(data.playerCredentials.gameCreateDate).locale(locale.value).fromNow()
+)
 useIntervalFn(
   () => {
-    relativeText.value = dayjs(data.playerCredentials.gameCreateDate).locale('zh-cn').fromNow()
+    relativeText.value = dayjs(data.playerCredentials.gameCreateDate).locale(locale.value).fromNow()
   },
   1000 * 10,
   { immediate: true, immediateCallback: true }
+)
+
+watch(
+  () => locale.value,
+  (locale) => {
+    relativeText.value = dayjs(data.playerCredentials.gameCreateDate).locale(locale).fromNow()
+  }
 )
 
 const updatedSummonerInfo = shallowRef<Record<string, { gameName: string; tagLine: string }>>({})

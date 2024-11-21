@@ -4,6 +4,7 @@ import { ChallengesHttpApi } from './challenges'
 import { ChampSelectHttpApi } from './champ-select'
 import { ChampionMasteryHttpApi } from './champion-mastery'
 import { ChatHttpApi } from './chat'
+import { EndOfGameHttpApi } from './end-of-game'
 import { EntitlementsHttpApi } from './entitlements'
 import { GameDataHttpApi } from './game-data'
 import { GameflowHttpApi } from './gameflow'
@@ -15,6 +16,8 @@ import { LolLeagueSessionHttpApi } from './lol-league-session'
 import { LootHttpApi } from './loot'
 import { MatchHistoryHttpApi } from './match-history'
 import { MatchmakingHttpApi } from './matchmaking'
+import { MissionsHttpApi } from './missions'
+import { PerksHttpApi } from './perks'
 import { PlayerNotificationsHttpApi } from './player-notifications'
 import { ProcessControlHttpApi } from './process-control'
 import { RankedHttpApi } from './ranked'
@@ -22,8 +25,6 @@ import { RegaliaHttpApi } from './regalia'
 import { RiotClientHttpApi } from './riotclient'
 import { SpectatorHttpApi } from './spectator'
 import { SummonerHttpApi } from './summoner'
-import { PerksHttpApi } from './perks'
-import { MissionsHttpApi } from './missions'
 
 /**
  * 基于 Axios 封装的调用
@@ -53,6 +54,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly challenges: ChallengesHttpApi
   public readonly perks: PerksHttpApi
   public readonly missions: MissionsHttpApi
+  public readonly endOfGame: EndOfGameHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -79,5 +81,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.challenges = new ChallengesHttpApi(this._http)
     this.perks = new PerksHttpApi(this._http)
     this.missions = new MissionsHttpApi(this._http)
+    this.endOfGame = new EndOfGameHttpApi(this._http)
   }
 }

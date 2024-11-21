@@ -193,6 +193,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => [this.state.queryStage, this.settings.enabled, this._sgp.state.isTokenReady] as const,
       ([stage, enabled, tokenReady]) => {
+        this._log.debug(
+          '处理自动战绩加载等逻辑',
+          `queryStage=${JSON.stringify(this.state.queryStage, null, 2)}`,
+          `enabled=${this.settings.enabled}`,
+          `tokenReady=${this._sgp.state.isTokenReady}`
+        )
+
         if (this._controller) {
           this._controller.abort()
           this._controller = null
@@ -229,7 +236,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           })
         }
       },
-      { equals: comparer.shallow }
+      { equals: comparer.shallow, fireImmediately: true }
     )
   }
 
@@ -415,7 +422,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       current && // 在存在值的情况下
       current.targetCount === count && // 必要条件之一: 加载数量没有变化
       current.source === (isAbleToUseSgpApi ? 'sgp' : 'lcu') && // 必要条件之一: 数据来源没有变化
-      (!isAbleToUseSgpApi || current.tag === tag) // 必要条件之一: SGP API 时, tag 也必须一致 (LCU API 将忽略 tag, 本来也没用)
+      (!isAbleToUseSgpApi || (current.tag === 'all' ? undefined : current.tag) === current.tag) // 必要条件之一: SGP API 时, tag 也必须一致 (LCU API 将忽略 tag, 本来也没用)
     ) {
       // 以上不需要重新加载的前提, 是假设在一个对局期间, 这些数据都不会发生变化
       // ) 事实上在一个对局期间, 大部分情况是不会发生变化的
@@ -432,6 +439,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         }
       }
 
+      this.state.setMatchHistoryLoadingState(puuid, 'loading')
       const data = await this._mhQueue
         .add(() => this._sgp.getMatchHistoryLcuFormat(puuid, 0, count, tag), {
           signal,
@@ -452,13 +460,15 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
       runInAction(() => (this.state.matchHistory[puuid] = toBeLoaded))
       this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
+      this.state.setMatchHistoryLoadingState(puuid, 'loaded')
     } else {
+      this.state.setMatchHistoryLoadingState(puuid, 'loading')
       const res = await this._queue
         .add(() => this._lc.api.matchHistory.getMatchHistory(puuid, 0, count - 1), {
           signal,
           priority: OngoingGameMain.LOADING_PRIORITY.MATCH_HISTORY
         })
-        .catch((error) => this._handleError(error, 'match-history'))
+        .catch((error) => this._handleMatchHistoryError(error, puuid))
 
       if (!res) {
         return
@@ -474,6 +484,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
       runInAction(() => (this.state.matchHistory[puuid] = toBeLoaded))
       this._ipc.sendEvent(OngoingGameMain.id, 'match-history-loaded', puuid, toBeLoaded)
+      this.state.setMatchHistoryLoadingState(puuid, 'loaded')
     }
   }
 
@@ -851,6 +862,16 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     }
 
     this._log.warn('在尝试加载时出现错误', e, mark)
+    return
+  }
+
+  private _handleMatchHistoryError(e: any, puuid: string) {
+    if (e instanceof Error && e.name === 'AbortError') {
+      this.state.setMatchHistoryLoadingState(puuid, 'aborted')
+      return
+    }
+
+    this._log.warn('在尝试加载战绩时出现错误', e, puuid)
     return
   }
 }

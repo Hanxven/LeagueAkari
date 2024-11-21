@@ -505,6 +505,7 @@ DamageMetricsBar:
 SpectateStatus:
   button: 观战
   bans: 禁用
+  startFrom: 于 {date} 开始 ({relativeTime})
 
   lcuSpectate:
     label: 使用 LCU API 观战 (可选)
@@ -1148,6 +1149,7 @@ SummonerSpellDisplay:
 
 PlayerInfoCard:
   empty: 无内容
+  loadingMatchHistory: 加载中...
   top4Rate: 前四率
   1stRate: 第一率
   1st: 第一 {rate}%

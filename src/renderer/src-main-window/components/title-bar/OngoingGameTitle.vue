@@ -4,6 +4,7 @@
       <NSelect
         class="order-select"
         size="tiny"
+        :consistent-menu-width="false"
         :options="orderOptions"
         v-model:value="ogs.settings.orderPlayerBy"
       />
@@ -11,6 +12,7 @@
         class="queue-tag-select"
         size="tiny"
         :value="ogs.matchHistoryTag"
+        :consistent-menu-width="false"
         @update:value="(val) => og.setMatchHistoryTag(val)"
         :options="sgpTagOptions"
       />

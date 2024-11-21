@@ -41,6 +41,7 @@
             :match-history="
               og.matchHistory[player]?.data.map((g) => ({ isDetailed: true, game: g }))
             "
+            :match-history-loading="og.matchHistoryLoadingState[player]"
             :summoner="og.summoner[player]?.data"
             :ranked-stats="og.rankedStats[player]?.data"
             :saved-info="og.savedInfo[player]"
