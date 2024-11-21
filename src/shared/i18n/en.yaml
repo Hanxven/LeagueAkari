@@ -595,10 +595,10 @@ Client:
   gameClient:
     title: Game Client
 
-    terminateGameClientOnAltF4:
-      labelAdminRequired: Terminate Game Client with Alt+F4 (Admin Required)
-      label: Terminate Game Client with Alt+F4
-      description: When the game client is running and in the foreground, using the Alt+F4 shortcut can forcibly terminate the game client process. Please note that this action forcefully ends the process and is not a normal game exit procedure, potentially leading to unexpected side effects.
+    terminateGameClientWithShortcut:
+      labelAdminRequired: Terminate Game Client with shortcut (Admin Required)
+      label: Terminate Game Client with shortcut
+      description: When the game client is running and in the foreground, using the shortcut can forcibly terminate the game client process. Please note that this action forcefully ends the process and is not a normal game exit procedure, potentially leading to unexpected side effects.
     terminateShortcut:
       label: Shortcut
       labelAdminRequired: Shortcut (Admin Required)

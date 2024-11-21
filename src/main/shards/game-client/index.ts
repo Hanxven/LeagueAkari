@@ -85,7 +85,7 @@ export class GameClientMain implements IAkariShardInitDispose {
     this._setting = this._settingFactory.create(
       GameClientMain.id,
       {
-        terminateGameClientOnAltF4: { default: this.settings.terminateGameClientOnAltF4 },
+        terminateGameClientWithShortcut: { default: this.settings.terminateGameClientWithShortcut },
         terminateShortcut: { default: this.settings.terminateShortcut }
       },
       this.settings
@@ -103,7 +103,7 @@ export class GameClientMain implements IAkariShardInitDispose {
   async onInit() {
     await this._setting.applyToState()
     this._mobx.propSync(GameClientMain.id, 'settings', this.settings, [
-      'terminateGameClientOnAltF4',
+      'terminateGameClientWithShortcut',
       'terminateShortcut'
     ])
     this._handleIpcCall()
@@ -125,7 +125,7 @@ export class GameClientMain implements IAkariShardInitDispose {
             shortcut,
             'last-active',
             () => {
-              if (this.settings.terminateGameClientOnAltF4) {
+              if (this.settings.terminateGameClientWithShortcut) {
                 this._log.info('强制进程结束关闭游戏')
                 this._terminateGameClient()
               }

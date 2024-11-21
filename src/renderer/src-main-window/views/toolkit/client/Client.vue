@@ -43,12 +43,12 @@
           >
           <ControlItem
             class="control-item-margin"
-            :label-description="t('Client.gameClient.terminateGameClientOnAltF4.description')"
+            :label-description="t('Client.gameClient.terminateGameClientWithShortcut.description')"
             :disabled="!as.isAdministrator"
             :label="
               as.isAdministrator
-                ? t('Client.gameClient.terminateGameClientOnAltF4.label')
-                : t('Client.gameClient.terminateGameClientOnAltF4.labelAdminRequired')
+                ? t('Client.gameClient.terminateGameClientWithShortcut.label')
+                : t('Client.gameClient.terminateGameClientWithShortcut.labelAdminRequired')
             "
             :label-width="320"
           >
@@ -56,8 +56,8 @@
               :disabled="!as.isAdministrator"
               size="small"
               type="warning"
-              :value="gcs.settings.terminateGameClientOnAltF4"
-              @update:value="(v) => gc.setTerminateGameClientOnAltF4(v)"
+              :value="gcs.settings.terminateGameClientWithShortcut"
+              @update:value="(v) => gc.setTerminateGameClientWithShortcut(v)"
             />
           </ControlItem>
           <ControlItem

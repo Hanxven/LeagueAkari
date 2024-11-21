@@ -44,8 +44,8 @@ export class GameClientRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchSpectator', config)
   }
 
-  setTerminateGameClientOnAltF4(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'terminateGameClientOnAltF4', value)
+  setTerminateGameClientWithShortcut(value: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'terminateGameClientWithShortcut', value)
   }
 
   setTerminateShortcut(shortcut: string | null) {
