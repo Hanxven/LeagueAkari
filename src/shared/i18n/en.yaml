@@ -465,6 +465,9 @@ SideBarFixed:
   noClient: No available client, please start the game
   settings: Settings
 
+  respawnTimer:
+    timeLeft: Respawn in {seconds} s
+
 OrderedChampionList:
   searchForChampion: Search for Champion
   edit: Edit
@@ -1283,20 +1286,30 @@ SkinSelectionMini:
 
 Lounge:
   map: Map
-  gameMode: Game Mode
-  wait: Wait
+  gameMode: Mode
+  wait: Waiting
   atMost: At Most
 
   autoAccept:
-    acceptIn: Accept in {seconds} s
-    cancelButton: Cancel auto-accept
-    declineButton: Decline
-    acceptButton: Accept
+    acceptIn: Auto-accept in {seconds} s
+    cancelButton: Cancel this auto-accept
+    declineButton: Decline Match
+    acceptButton: Accept Match
     accepted: Accepted
-    pending: Waiting to accept
-    subtitle1: Can still be declined
-    subtitle2: Can still be accepted
+    pending: Waiting to accept match
+    subtitle1: Matches already accepted can still be declined
+    subtitle2: Matches already canceled can still be accepted
     declined: Declined
+
+  matchmaking:
+    stopAndDisable: Stop matchmaking and disable auto-matchmaking
+    stop: Stop matchmaking
+    cancel: Cancel this auto-matchmaking
+    searching: Searching
+    searchIn: Searching {seconds} s
+    waitingForPenalty: Waiting for dodge timer {seconds} s
+    waitingForMembers: Auto-matchmaking requires {count} players
+    waitingForInvitees: Waiting for invited members
 
 Placeholder:
   inProgress: In Progress

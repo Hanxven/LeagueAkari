@@ -127,7 +127,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'premadeTeams',
       'queryStage',
       'teams',
-      'matchHistoryTag'
+      'matchHistoryTag',
+      'matchHistoryLoadingState',
+      'summonerLoadingState',
+      'savedInfoLoadingState',
+      'rankedStatsLoadingState',
+      'championMasteryLoadingState'
     ])
   }
 

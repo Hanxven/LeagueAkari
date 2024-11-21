@@ -42,7 +42,7 @@
         </template>
       </template>
       <template v-else-if="lcs.gameflow.phase === 'Matchmaking'">
-        <span class="main-text">"{{ t('Lounge.matchmaking.searching') }}"</span>
+        <span class="main-text">{{ t('Lounge.matchmaking.searching') }}</span>
         <span class="sub-text" v-if="lcs.matchmaking.search">{{
           formatMatchmakingSearchText(lcs.matchmaking.search)
         }}</span>

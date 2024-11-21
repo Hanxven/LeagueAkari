@@ -8,7 +8,7 @@
         @update:current="(key) => handleMenuChange(key)"
       />
       <div class="dragging-zone"></div>
-      <SidebarFixed @summoner-click="handleSummonerClick" :summoner="lcs.summoner.me" />
+      <SidebarFixed />
     </div>
     <div class="right-side-content">
       <RouterView v-slot="{ Component }">
@@ -94,13 +94,6 @@ const handleMenuChange = async (val: string) => {
   } catch (error) {
     console.error('routing', error)
   }
-}
-
-const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
-const { navigateToTabByPuuid } = mh.useNavigateToTab()
-
-const handleSummonerClick = (summoner: SummonerInfo) => {
-  navigateToTabByPuuid(summoner.puuid)
 }
 
 const lcs = useLeagueClientStore()

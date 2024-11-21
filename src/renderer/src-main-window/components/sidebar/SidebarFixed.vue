@@ -1,20 +1,45 @@
 <template>
   <div class="sidebar-fixed">
+    <NPopover placement="right" v-if="rts.settings.enabled && rts.info.isDead">
+      <template #trigger>
+        <div class="menu-item">
+          <div class="menu-item-inner">
+            <NProgress
+              type="circle"
+              :gap-offset-degree="180"
+              :stroke-width="4"
+              :percentage="(rts.info.timeLeft / rts.info.totalTime) * 100"
+              status="success"
+            >
+              <span class="respawn-timer-countdown">{{ formattedCountdown }}</span>
+            </NProgress>
+            <NIcon class="respawn-timer-hourglass"><HourglassIcon /></NIcon>
+          </div>
+        </div>
+      </template>
+      <div>
+        {{ t('SideBarFixed.respawnTimer.timeLeft', { seconds: rts.info.timeLeft }) }} ({{
+          rts.info.totalTime
+        }})
+      </div>
+    </NPopover>
     <NPopover placement="right">
       <template #trigger>
         <div class="menu-item">
           <div class="menu-item-inner">
             <NProgress
-              v-if="summoner"
-              @click="emits('summonerClick', summoner)"
+              v-if="lcs.summoner.me"
+              @click="handleSummonerClick(lcs.summoner.me)"
               type="circle"
               :stroke-width="4"
-              :percentage="(summoner.xpSinceLastLevel / summoner.xpUntilNextLevel) * 100"
+              :percentage="
+                (lcs.summoner.me.xpSinceLastLevel / lcs.summoner.me.xpUntilNextLevel) * 100
+              "
               :gap-degree="45"
             >
               <LcuImage
                 class="summoner-profile-icon"
-                :src="profileIconUri(summoner.profileIconId)"
+                :src="profileIconUri(lcs.summoner.me.profileIconId)"
               />
             </NProgress>
             <NBadge v-else dot processing :show="lcs.isDisconnected && clients.others.length > 0">
@@ -24,12 +49,12 @@
         </div>
       </template>
       <span class="menu-item-popover">
-        <div class="summoner-name" v-if="summoner">
-          <span class="game-name-line">{{ summoner.gameName }}</span>
-          <span class="tag-line">#{{ summoner.tagLine }}</span>
+        <div class="summoner-name" v-if="lcs.summoner.me">
+          <span class="game-name-line">{{ lcs.summoner.me.gameName }}</span>
+          <span class="tag-line">#{{ lcs.summoner.me.tagLine }}</span>
         </div>
         <template v-if="clients.current">
-          <div class="separator" v-if="summoner"></div>
+          <div class="separator" v-if="lcs.summoner.me"></div>
           <div class="title-label">
             <NIcon class="icon"><BareMetalServerIcon /></NIcon>
             <span>{{ t('SideBarFixed.currentConnected') }}</span>
@@ -106,33 +131,42 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { UxCommandLine, useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import { BareMetalServer as BareMetalServerIcon, Settings as SettingsIcon } from '@vicons/carbon'
 import { PlugDisconnected24Filled as PlugDisconnected24FilledIcon } from '@vicons/fluent'
+import { Hourglass as HourglassIcon } from '@vicons/ionicons5'
 import { NBadge, NIcon, NPopover, NProgress, NScrollbar, NSpin, NTooltip } from 'naive-ui'
 import { computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
 const { t } = useI18n()
 
 const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
+const rts = useRespawnTimerStore()
 
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
-const emits = defineEmits<{
-  summonerClick: [summoner: SummonerInfo]
-}>()
+const formattedCountdown = computed(() => {
+  const seconds = 850
+  return seconds > 99 ? '99+' : `${seconds}`
+})
+
+const { navigateToTabByPuuid } = mh.useNavigateToTab()
+
+const handleSummonerClick = (summoner: SummonerInfo) => {
+  navigateToTabByPuuid(summoner.puuid)
+}
 
 const { openSettingsModal } = inject('app') as any
 const handleOpenSettingsModal = () => {
   openSettingsModal()
 }
-
-const { summoner } = defineProps<{
-  summoner?: SummonerInfo | null
-}>()
 
 const clients = computed(() => {
   const current = lcs.auth
@@ -188,6 +222,7 @@ const handleConnectToLeagueClient = (auth: UxCommandLine) => {
   }
 
   .menu-item-inner {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -338,5 +373,34 @@ const handleConnectToLeagueClient = (auth: UxCommandLine) => {
 .no-client {
   font-size: 12px;
   color: rgba(255, 255, 255, 1);
+}
+
+.respawn-timer-countdown {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.respawn-timer-hourglass {
+  color: rgba(255, 255, 255, 0.4);
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 16px;
+  transform: translate(25%, 25%);
+  animation: hourglass-rotate 6s ease infinite;
+}
+
+@keyframes hourglass-rotate {
+  0%,
+  40% {
+    transform: translate(25%, 25%) rotate(0deg); /* 保持静止 */
+  }
+  50%,
+  90% {
+    transform: translate(25%, 25%) rotate(180deg); /* 保持静止 */
+  }
+  100% {
+    transform: translate(25%, 25%) rotate(360deg); /* 快速复原 */
+  }
 }
 </style>

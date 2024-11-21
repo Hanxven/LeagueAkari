@@ -29,6 +29,7 @@ watch(
   (fun) => {
     switch (fun) {
       case 'indicator':
+        console.log('route to indicator')
         router.replace({ name: 'indicator' })
         break
       case 'opgg':

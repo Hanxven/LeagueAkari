@@ -48,7 +48,9 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       'leagueClientExecutablePaths',
       'tencentInstallationPath',
       'weGameExecutablePath',
-      'officialRiotClientExecutablePath'
+      'officialRiotClientExecutablePath',
+      'hasTcls',
+      'hasWeGameLauncher'
     ])
   }
 
@@ -71,12 +73,30 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       try {
         await fs.promises.access(p.value as string)
       } catch {
-        this._log.info('检测到 TCLS 客户端但无法访问, 可能并不存在', p.value)
+        this._log.info('检测到腾讯服英雄联盟安装位置但无法访问, 可能并不存在', p.value)
         return
       }
 
-      this._log.info('检测到 TCLS 客户端安装位置', p.value)
+      this._log.info('腾讯服英雄联盟安装位置', p.value)
       this.state.setTencentInstallationPath(p.value as string)
+
+      try {
+        const tclsPath = path.resolve(p.value as string, 'TCLS', 'client.exe')
+        await fs.promises.access(tclsPath)
+        this.state.setHasTcls(true)
+      } catch {
+        this._log.info('TCLS 无法访问, 可能并不存在', p.value)
+        return
+      }
+
+      try {
+        const weGamePath = path.resolve(p.value as string, 'WeGameLauncher', 'launcher.exe')
+        await fs.promises.access(weGamePath)
+        this.state.setHasWeGameLauncher(true)
+      } catch {
+        this._log.info('WeGame 启动器无法访问, 可能并不存在', p.value)
+        return
+      }
     }
 
     if (item2 && item2.exists) {
@@ -170,10 +190,14 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     this._ipc.onCall(ClientInstallationMain.id, 'launchDefaultRiotClient', async () => {
       this._launchDefaultRiotClient()
     })
+
+    this._ipc.onCall(ClientInstallationMain.id, 'launchWeGameLeagueOfLegends', async () => {
+      this._launchWeGameLeagueOfLegends()
+    })
   }
 
-  private _spawnDetached(location: string) {
-    const p = cp.spawn(location, { detached: true })
+  private _spawnDetached(location: string, args: string[] = []) {
+    const p = cp.spawn(location, args, { detached: true })
     p.unref()
   }
 
@@ -182,6 +206,18 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
     const location = path.resolve(this.state.tencentInstallationPath, 'TCLS', 'client.exe')
+    this._spawnDetached(location)
+  }
+
+  private _launchWeGameLeagueOfLegends() {
+    if (!this.state.tencentInstallationPath) {
+      return
+    }
+    const location = path.resolve(
+      this.state.tencentInstallationPath,
+      'WeGameLauncher',
+      'launcher.exe'
+    )
     this._spawnDetached(location)
   }
 
@@ -198,6 +234,9 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    this._spawnDetached(this.state.officialRiotClientExecutablePath)
+    this._spawnDetached(this.state.officialRiotClientExecutablePath, [
+      '--launch-product=league_of_legends',
+      '--launch-patchline=live'
+    ])
   }
 }

@@ -41,7 +41,7 @@ const launchItem = computed(() => {
     launch: () => any | Promise<any>
   }[] = []
 
-  if (cis.tencentInstallationPath) {
+  if (cis.hasTcls) {
     arr.push({
       name: t('EasyToLaunch.tcls'),
       imgUrl: leagueIco,
@@ -49,13 +49,24 @@ const launchItem = computed(() => {
     })
   }
 
-  if (cis.weGameExecutablePath) {
+  if (cis.hasWeGameLauncher) {
     arr.push({
       name: t('EasyToLaunch.weGame'),
       imgUrl: weGameIco,
-      launch: () => launchIt(ci.launchWeGame.bind(ci), t('EasyToLaunch.weGame'))
+      launch: () =>
+        launchIt(ci.launchWeGameLeagueOfLegends.bind(ci), t('EasyToLaunch.weGame'))
     })
   }
+
+  // 大概不需要这个, 这是 WeGame 主程序
+  // 若启用, 需同步更新 i18n 词条
+  // if (cis.weGameExecutablePath) {
+  //   arr.push({
+  //     name: t('EasyToLaunch.weGame'),
+  //     imgUrl: weGameIco,
+  //     launch: () => launchIt(ci.launchWeGame.bind(ci), t('EasyToLaunch.weGame'))
+  //   })
+  // }
 
   if (cis.officialRiotClientExecutablePath) {
     arr.push({

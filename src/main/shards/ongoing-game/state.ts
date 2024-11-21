@@ -370,6 +370,11 @@ export class OngoingGameState {
   > = {}
 
   /**
+   * 玩家战绩加载情况, 可为 'loaded' | 'loading' | 'error'
+   */
+  matchHistoryLoadingState: Record<string, string> = {}
+
+  /**
    * 每名玩家的召唤师信息
    * 手动同步
    */
@@ -382,6 +387,11 @@ export class OngoingGameState {
   > = {}
 
   /**
+   * 玩家召唤师信息加载情况, 可为 'loaded' | 'loading' | 'error'
+   */
+  summonerLoadingState: Record<string, string> = {}
+
+  /**
    * 每名玩家的段位
    * 手动同步
    */
@@ -392,6 +402,11 @@ export class OngoingGameState {
       data: RankedStats
     }
   > = {}
+
+  /**
+   * 玩家段位加载情况, 可为 'loaded' | 'loading' | 'error'
+   */
+  rankedStatsLoadingState: Record<string, string> = {}
 
   /**
    * 每名玩家的段位
@@ -412,7 +427,17 @@ export class OngoingGameState {
     }
   > = {}
 
+  /**
+   * 英雄成就加载情况, 可为 'loaded' | 'loading' | 'error'
+   */
+  championMasteryLoadingState: Record<string, string> = {}
+
   savedInfo: Record<string, SavedPlayer> = {}
+
+  /**
+   * 已记录信息加载情况, 可为 'loaded' | 'loading' | 'error'
+   */
+  savedInfoLoadingState: Record<string, string> = {}
 
   clear() {
     this.playerStats = null
@@ -423,6 +448,11 @@ export class OngoingGameState {
     this.rankedStats = {}
     this.championMastery = {}
     this.matchHistoryTag = 'all'
+    this.matchHistoryLoadingState = {}
+    this.summonerLoadingState = {}
+    this.savedInfoLoadingState = {}
+    this.rankedStatsLoadingState = {}
+    this.championMasteryLoadingState = {}
   }
 
   constructor(private readonly _lcData: LeagueClientSyncedData) {
@@ -432,6 +462,12 @@ export class OngoingGameState {
       summoner: observable.shallow,
       rankedStats: observable.shallow,
       savedInfo: observable.shallow,
+
+      // ref object, override only, no modification
+      matchHistoryLoadingState: observable.ref,
+      summonerLoadingState: observable.ref,
+      rankedStatsLoadingState: observable.ref,
+      savedInfoLoadingState: observable.ref,
 
       // structured data
       championSelections: computed.struct,

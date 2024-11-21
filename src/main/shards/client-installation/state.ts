@@ -11,6 +11,9 @@ export class ClientInstallationState {
    */
   tencentInstallationPath: string | null = null
 
+  hasTcls: boolean = false
+  hasWeGameLauncher: boolean = false
+
   /**
    * 额外检测 WeGame 的安装情况
    */
@@ -35,6 +38,14 @@ export class ClientInstallationState {
 
   setOfficialRiotClientExecutablePath(path: string) {
     this.officialRiotClientExecutablePath = path
+  }
+
+  setHasTcls(has: boolean) {
+    this.hasTcls = has
+  }
+
+  setHasWeGameLauncher(has: boolean) {
+    this.hasWeGameLauncher = has
   }
 
   constructor() {

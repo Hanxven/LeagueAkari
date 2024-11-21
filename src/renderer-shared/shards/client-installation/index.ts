@@ -32,6 +32,11 @@ export class ClientInstallationRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchTencentTcls')
   }
 
+  launchWeGameLeagueOfLegends() {
+    this._log.info(ClientInstallationRenderer.id, '启动 WeGame 客户端')
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchWeGameLeagueOfLegends')
+  }
+
   launchWeGame() {
     this._log.info(ClientInstallationRenderer.id, '启动 WeGame 客户端')
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'launchWeGame')

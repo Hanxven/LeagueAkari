@@ -78,9 +78,11 @@
           <template v-else-if="lc.champSelect.session && lc.champSelect.session.isSpectating">{{
             t('OngoingGame.waitingForSpectate')
           }}</template>
-          <template v-else>{{ t('OngoingGame.noOngoingGame') }}</template>
+          <template v-else>
+            <span class="no-ongoing-game-text"> {{ t('OngoingGame.noOngoingGame') }}</span>
+          </template>
         </template>
-        <div v-else class="no-ongoing-game-text">{{ t('OngoingGame.disabled') }}</div>
+        <span v-else class="no-ongoing-game-text">{{ t('OngoingGame.disabled') }}</span>
       </div>
     </div>
   </div>
@@ -378,9 +380,9 @@ const columnsNeed = computed(() => {
   flex-direction: column;
   align-items: center;
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
-  transform: translate(-50%, -65%);
+  transform: translate(-50%, -50%);
   gap: 16px;
 }
 </style>

@@ -126,6 +126,12 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const championMastery = shallowRef<Record<string, ChampionMasteryPlayer>>({})
   const savedInfo = shallowRef<Record<string, SavedInfo>>({})
 
+  const matchHistoryLoadingState = shallowRef<Record<string, string>>({})
+  const summonerLoadingState = shallowRef<Record<string, string>>({})
+  const savedInfoLoadingState = shallowRef<Record<string, string>>({})
+  const rankedStatsLoadingState = shallowRef<Record<string, string>>({})
+  const championMasteryLoadingState = shallowRef<Record<string, string>>({})
+
   return {
     settings,
 
@@ -143,6 +149,12 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     summoner,
     rankedStats,
     championMastery,
-    savedInfo
+    savedInfo,
+
+    matchHistoryLoadingState,
+    summonerLoadingState,
+    savedInfoLoadingState,
+    rankedStatsLoadingState,
+    championMasteryLoadingState
   }
 })

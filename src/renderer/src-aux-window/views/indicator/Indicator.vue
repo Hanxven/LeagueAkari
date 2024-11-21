@@ -1,23 +1,21 @@
 <template>
-  <RouterView />
+  <ChampSelect v-if="currentPage === 'champ-select'" />
+  <Lounge v-else-if="currentPage === 'lounge'" />
+  <Placeholder v-else />
 </template>
 
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { onActivated, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed } from 'vue'
+
+import ChampSelect from './ChampSelect.vue'
+import Lounge from './Lounge.vue'
+import Placeholder from './Placeholder.vue'
 
 const lcs = useLeagueClientStore()
-const route = useRoute()
-const router = useRouter()
 
-// 在 indicator 主页面，根据当前的 phase 跳转到对应的页面
-const routeTo = (phase: string | null) => {
-  if (route.name !== 'indicator') {
-    return
-  }
-
-  switch (phase) {
+const currentPage = computed(() => {
+  switch (lcs.gameflow.phase) {
     case null:
     case 'None':
     case 'EndOfGame':
@@ -27,28 +25,16 @@ const routeTo = (phase: string | null) => {
     case 'InProgress':
     case 'WaitingForStats':
     case 'Reconnect':
-      router.replace({ name: 'placeholder' })
-      break
+      return 'placeholder'
+
     case 'Matchmaking':
     case 'ReadyCheck':
     case 'Lobby':
-      router.replace({ name: 'lounge' })
-      break
+      return 'lounge'
+
     case 'ChampSelect':
-      router.replace({ name: 'champ-select' })
+      return 'champ-select'
   }
-}
-
-watch(
-  () => lcs.gameflow.phase,
-  (phase) => {
-    routeTo(phase)
-  },
-  { immediate: true }
-)
-
-onActivated(() => {
-  routeTo(lcs.gameflow.phase)
 })
 </script>
 

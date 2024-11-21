@@ -591,8 +591,8 @@ const rankedSoloFlex = computed(() => {
   if (solo) {
     const soloText =
       solo.division && solo.division !== 'NA'
-        ? `${t(`common.shortTiers.${solo.tier}`)} ${solo.division}`
-        : `${t(`common.shortTiers.${solo.tier}`)}`
+        ? `${t(`common.shortTiers.${solo.tier || 'UNRANKED'}`)} ${solo.division}`
+        : `${t(`common.shortTiers.${solo.tier || 'UNRANKED'}`)}`
 
     result.solo = {
       text: soloText,
@@ -604,8 +604,8 @@ const rankedSoloFlex = computed(() => {
   if (flex) {
     const flexText =
       flex.division && flex.division !== 'NA'
-        ? `${t(`common.shortTiers.${flex.tier}`)} ${flex.division}`
-        : `${t(`common.shortTiers.${flex.tier}`)}`
+        ? `${t(`common.shortTiers.${flex.tier || 'UNRANKED'}`)} ${flex.division}`
+        : `${t(`common.shortTiers.${flex.tier || 'UNRANKED'}`)}`
 
     result.flex = {
       text: flexText,

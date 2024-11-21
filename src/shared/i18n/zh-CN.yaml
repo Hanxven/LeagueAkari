@@ -468,6 +468,9 @@ SideBarFixed:
   noClient: 当前无可用客户端，请启动游戏
   settings: 设置
 
+  respawnTimer:
+    timeLeft: 距离重生还有 {seconds} s
+
 OrderedChampionList:
   searchForChampion: 搜索英雄
   edit: 编辑

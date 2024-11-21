@@ -7,10 +7,15 @@ export const useClientInstallationStore = defineStore('shard:client-installation
   const weGameExecutablePath = ref<string | null>(null)
   const officialRiotClientExecutablePath = ref<string | null>(null)
 
+  const hasTcls = ref(false)
+  const hasWeGameLauncher = ref(false)
+
   return {
     leagueClientExecutablePaths,
     tencentInstallationPath,
     weGameExecutablePath,
-    officialRiotClientExecutablePath
+    officialRiotClientExecutablePath,
+    hasTcls,
+    hasWeGameLauncher
   }
 })
