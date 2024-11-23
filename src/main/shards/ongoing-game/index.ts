@@ -191,8 +191,14 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
   private _handleLoad() {
     this._mobx.reaction(
-      () => [this.state.queryStage, this.settings.enabled, this._sgp.state.isTokenReady] as const,
-      ([stage, enabled, tokenReady]) => {
+      () =>
+        [
+          this.state.queryStage,
+          this.settings.enabled,
+          this._sgp.state.isTokenReady,
+          this.settings.matchHistoryUseSgpApi
+        ] as const,
+      ([stage, enabled, tokenReady, useSgpApi]) => {
         this._log.debug(
           '处理自动战绩加载等逻辑',
           `queryStage=${JSON.stringify(this.state.queryStage, null, 2)}`,
@@ -212,7 +218,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
         this._debouncedUpdateMatchHistoryFn.cancel()
 
-        if (stage.phase === 'unavailable' || !enabled || !tokenReady) {
+        if (stage.phase === 'unavailable' || !enabled || (useSgpApi && !tokenReady)) {
           this.state.clear()
           this.state.setMatchHistoryTag('all')
           this._ipc.sendEvent(OngoingGameMain.id, 'clear')
@@ -258,6 +264,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this._mhController = controller
 
     const puuids = this.getPuuidsToLoadForPlayers()
+
     puuids.forEach((puuid) => {
       this._loadPlayerMatchHistory(puuid, {
         signal: controller.signal,
@@ -422,7 +429,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       current && // 在存在值的情况下
       current.targetCount === count && // 必要条件之一: 加载数量没有变化
       current.source === (isAbleToUseSgpApi ? 'sgp' : 'lcu') && // 必要条件之一: 数据来源没有变化
-      (!isAbleToUseSgpApi || (current.tag === 'all' ? undefined : current.tag) === current.tag) // 必要条件之一: SGP API 时, tag 也必须一致 (LCU API 将忽略 tag, 本来也没用)
+      (!isAbleToUseSgpApi || (tag === 'all' ? undefined : tag) === current.tag) // 必要条件之一: SGP API 时, tag 也必须一致 (LCU API 将忽略 tag, 本来也没用)
     ) {
       // 以上不需要重新加载的前提, 是假设在一个对局期间, 这些数据都不会发生变化
       // ) 事实上在一个对局期间, 大部分情况是不会发生变化的

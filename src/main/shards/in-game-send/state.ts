@@ -1,19 +1,66 @@
 import { makeAutoObservable, observable } from 'mobx'
 
-interface CustomSend {
+export interface CustomSend {
+  id: string
+  name: string
   enabled: boolean
-  shortcut: string | null
   message: string
+  shortcut: string | null
 }
 
 export class InGameSendSettings {
   customSend: CustomSend[] = []
 
-  sendKdaShortcut: string | null = null
+  sendStatsEnabled: boolean = false
+  sendStatsTemplate = {
+    template: '',
+    isValid: false
+  }
+  sendStatsUseDefaultTemplate = true
+  sendAllyShortcut: string | null = null
+  sendEnemyShortcut: string | null = null
+  sendAllAlliesShortcut: string | null = null
+  sendAllEnemiesShortcut: string | null = null
+
+  setSendStatsEnabled(enabled: boolean) {
+    this.sendStatsEnabled = enabled
+  }
+
+  setSendStatsUseDefaultTemplate(useDefault: boolean) {
+    this.sendStatsUseDefaultTemplate = useDefault
+  }
+
+  setSendAllyShortcut(shortcut: string | null) {
+    this.sendAllyShortcut = shortcut
+  }
+
+  setSendEnemyShortcut(shortcut: string | null) {
+    this.sendEnemyShortcut = shortcut
+  }
+
+  setSendAllAlliesShortcut(shortcut: string | null) {
+    this.sendAllAlliesShortcut = shortcut
+  }
+
+  setSendAllEnemiesShortcut(shortcut: string | null) {
+    this.sendAllEnemiesShortcut = shortcut
+  }
+
+  setSendStatsTemplate(template: string, valid: boolean) {
+    this.sendStatsTemplate = {
+      template,
+      isValid: valid
+    }
+  }
+
+  setCustomSend(customSend: CustomSend[]) {
+    this.customSend = customSend
+  }
 
   constructor() {
     makeAutoObservable(this, {
-      customSend: observable.ref
+      customSend: observable.ref,
+      sendStatsTemplate: observable.ref
     })
   }
 }

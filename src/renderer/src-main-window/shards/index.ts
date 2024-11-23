@@ -6,6 +6,7 @@ import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { ExtraAssetsRenderer } from '@renderer-shared/shards/extra-assets'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
+import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -36,6 +37,7 @@ manager.use(
   ClientInstallationRenderer,
   ExtraAssetsRenderer,
   GameClientRenderer,
+  InGameSendRenderer,
   KeyboardShortcutsRenderer,
   LeagueClientRenderer,
   LeagueClientUxRenderer,

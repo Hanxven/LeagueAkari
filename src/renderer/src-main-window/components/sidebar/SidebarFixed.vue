@@ -18,9 +18,9 @@
         </div>
       </template>
       <div>
-        {{ t('SideBarFixed.respawnTimer.timeLeft', { seconds: rts.info.timeLeft }) }} ({{
-          rts.info.totalTime
-        }})
+        {{ t('SideBarFixed.respawnTimer.timeLeft', { seconds: rts.info.timeLeft.toFixed(0) }) }} ({{
+          rts.info.totalTime.toFixed(0)
+        }} s)
       </div>
     </NPopover>
     <NPopover placement="right">
@@ -153,8 +153,8 @@ const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
 const formattedCountdown = computed(() => {
-  const seconds = 850
-  return seconds > 99 ? '99+' : `${seconds}`
+  const seconds = rts.info.timeLeft
+  return seconds > 99 ? '99+' : `${seconds.toFixed(0)}`
 })
 
 const { navigateToTabByPuuid } = mh.useNavigateToTab()

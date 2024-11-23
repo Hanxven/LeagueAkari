@@ -10,6 +10,7 @@
       />
       <NSelect
         class="queue-tag-select"
+        v-if="ogs.settings.matchHistoryUseSgpApi"
         size="tiny"
         :value="ogs.matchHistoryTag"
         :consistent-menu-width="false"

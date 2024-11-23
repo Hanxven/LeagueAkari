@@ -234,7 +234,8 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   /**
-   * 注册一个精准快捷键, 松手后触发的那种 (避免和当前按键冲突)
+   * 注册一个精准快捷键
+   * 同 targetId 的快捷键允许被覆盖, 否则会抛出异常
    */
   register(
     targetId: string,
@@ -242,10 +243,16 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     type: 'last-active' | 'normal',
     cb: (details: ShortcutDetails) => void
   ) {
-    const options = this._registrationMap.get(shortcutId)
-
-    if (options && options.targetId !== targetId) {
-      throw new Error(`Shortcut ${shortcutId} is already registered by ${options.targetId}`)
+    const originShortcut = this._targetIdMap.get(targetId)
+    if (originShortcut) {
+      const options = this._registrationMap.get(originShortcut)
+      if (options) {
+        if (options.targetId === targetId) {
+          this._registrationMap.delete(originShortcut)
+        } else {
+          throw new Error(`Shortcut with targetId ${targetId} already exists`)
+        }
+      }
     }
 
     this._registrationMap.set(shortcutId, { type, targetId, cb })

@@ -7,7 +7,7 @@
     abstract
     inline-theme-disabled
   >
-    <NMessageProvider :container-style="{ top: 'calc(var(--title-bar-height) + 12px)' }">
+    <NMessageProvider :container-style="{ top: 'calc(var(--title-bar-height) + 12px)' }" placement="top-right">
       <NNotificationProvider placement="bottom-right">
         <NDialogProvider>
           <App />
@@ -54,7 +54,10 @@ const themeOverrides: GlobalThemeOverrides = {
     colorModal: '#232329'
   },
   Message: {
-    color: '#272727'
+    colorInfo: 'rgba(45, 45, 55, 1)',
+    colorSuccess: 'rgba(45, 45, 55, 1)',
+    colorWarning: 'rgba(45, 45, 55, 1)',
+    colorError: 'rgba(45, 45, 55, 1)'
   },
   Menu: {
     padding: '1px'

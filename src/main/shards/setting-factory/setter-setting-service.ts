@@ -51,6 +51,7 @@ export class SetterSettingService {
     Object.entries(items).forEach(([key, value]) => {
       _.set(this._obj, key, value)
     })
+
     return items
   }
 

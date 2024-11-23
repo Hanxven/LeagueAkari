@@ -190,7 +190,7 @@ MiscSettings:
 
     enabled:
       label: 启用
-      description: 在标题栏展示一个距离重生剩余时间的指示器
+      description: 在侧边栏展示一个距离重生剩余时间的指示器
 
 DebugSettings:
   title: 调试
@@ -653,7 +653,8 @@ Client:
 Toolkit:
   title: 工具集
   client: 客户端 / 游戏端
-  inProcess: 过程中
+  in-process: 过程中
+  in-game-send: 游戏内发送
   lobby: 房间工具
   misc: 百宝箱
 
@@ -1472,6 +1473,61 @@ EasyToLaunch:
   riotClient: Riot 客户端
   successMessage: 已启动进程：{name}
   failedMessage: 无法启动进程 {name}：{reason}
+
+InGameSend:
+  sendStats:
+    title: 对局玩家信息发送
+    enabled:
+      label: 启用
+      description: 在英雄选择或对局中，发送队友或敌方的数据统计分析
+    sendAllyShortcut:
+      label: 发送己方快捷键
+      description: 设置快捷键，以发送己方数据统计分析
+    sendEnemyShortcut:
+      label: 发送敌方快捷键
+      description: 设置快捷键，以发送敌方数据统计分析
+    sendAllAlliesShortcut:
+      label: 发送全局己方快捷键
+      description: 设置快捷键，以发送全局己方数据统计分析。发送的内容每行会添加 /all 前缀
+    sendAllEnemiesShortcut:
+      label: 发送全局敌方快捷键
+      description: 设置快捷键，以发送全局敌方数据统计分析。发送的内容每行会添加 /all 前缀
+    sendStatsUseDefaultTemplate:
+      label: 使用默认模板
+      description: 使用默认的发送模板，发送基础的 KDA 信息
+    sendStatsTemplate:
+      label: 自定义模板
+      inputPlaceholder: 提供发送模板
+      submitButton: 更新模板
+      cancelButton: 取消更改
+      description: 发送条目将使用自定义模板，要求遵循 EJS 式 (ETA) 格式语法。最终的输出内容应该为按行分割的文本，空行将被忽略
+    dryRun:
+      label: 试运行
+      description: 当前时间节点的即将输出内容
+      button: 试运行
+
+  customSend:
+    title: 自定义发送
+    newItem: 新项
+    unnamed: (未命名)
+    enabled: 启用
+    name: 名称
+    shortcut: 设置快捷键
+    message: 设置发送文本行
+    delete:
+      label: 删除
+      button: 删除
+      popconfirm: 确认删除该自定义发送项目？
+
+  saved: 已保存
+  invalidTemplate: 所提供的模板无效，请检查语法
+
+  # message dry-run
+  not-complied: 模板未编译，请检查模板语法
+  stage-unavailable: 未处于对局查询阶段中
+  execution-error: 执行模板时出错，请检查模板逻辑正确性
+  error: 未知错误
+  confirm: 确认
 
 common:
   appName: League Akari

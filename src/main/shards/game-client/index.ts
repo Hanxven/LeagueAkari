@@ -1,11 +1,10 @@
+import tools from '@main/native/la-tools-win64.node'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { SpectatorData } from '@shared/data-sources/sgp/types'
 import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game-client'
 import axios from 'axios'
 import cp from 'child_process'
 import https from 'https'
 import path from 'node:path'
-import { list } from 'regedit'
 
 import toolkit from '../../native/laToolkitWin32x64.node'
 import { ClientInstallationMain } from '../client-installation'
@@ -111,33 +110,46 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   private _handleShortcuts() {
-    this._mobx.reaction(
-      () => this.settings.terminateShortcut,
-      async (shortcut) => {
-        if (!shortcut) {
-          this._kbd.unregisterByTargetId(`${GameClientMain.id}/terminate-game-client`)
-          return
-        }
+    if (this.settings.terminateShortcut) {
+      try {
+        this._kbd.register(
+          `${GameClientMain.id}/terminate-game-client`,
+          this.settings.terminateShortcut,
+          'last-active',
+          () => {
+            if (this.settings.terminateGameClientWithShortcut) {
+              this._terminateGameClient()
+            }
+          }
+        )
+      } catch (error) {
+        this._log.warn('初始化注册快捷键失败', this.settings.terminateShortcut)
+      }
+    }
 
+    this._setting.onChange('terminateShortcut', async (value, { setter }) => {
+      if (value === null) {
+        this._kbd.unregisterByTargetId(`${GameClientMain.id}/terminate-game-client`)
+      } else {
         try {
           this._kbd.register(
             `${GameClientMain.id}/terminate-game-client`,
-            shortcut,
+            value,
             'last-active',
             () => {
               if (this.settings.terminateGameClientWithShortcut) {
-                this._log.info('强制进程结束关闭游戏')
                 this._terminateGameClient()
               }
             }
           )
-        } catch {
-          this._log.warn('注册快捷键失败', shortcut)
-          this.settings.setTerminateShortcut(null)
+        } catch (error) {
+          this._log.warn('注册快捷键失败', value)
+          await setter(null)
         }
-      },
-      { fireImmediately: true } // 立即加入到其中
-    )
+      }
+
+      await setter()
+    })
   }
 
   private _handleIpcCall() {
@@ -188,7 +200,7 @@ export class GameClientMain implements IAkariShardInitDispose {
       const gameExecutablePath = path.resolve(
         this._ci.state.tencentInstallationPath,
         'Game',
-        'League of Legends.exe'
+        GameClientMain.GAME_CLIENT_PROCESS_NAME
       )
 
       const gameInstallRoot = path.resolve(this._ci.state.tencentInstallationPath, 'Game')
@@ -280,5 +292,11 @@ export class GameClientMain implements IAkariShardInitDispose {
     })
 
     p.unref()
+  }
+
+  static isGameClientForeground() {
+    return toolkit
+      .getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+      .some((pid) => toolkit.isProcessForeground(pid))
   }
 }

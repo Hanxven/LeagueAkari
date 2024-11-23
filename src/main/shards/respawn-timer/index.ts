@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { riotId, summonerName } from '@shared/utils/name'
 import { comparer, computed, runInAction } from 'mobx'
 
 import { GameClientMain } from '../game-client'
@@ -27,7 +28,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
   private readonly _gameClient: GameClientMain
   private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger
-  private readonly _leagueClient: LeagueClientMain
+  private readonly _lc: LeagueClientMain
   private readonly _mobx: MobxUtilsMain
   private readonly _settingFactory: SettingFactoryMain
   private readonly _setting: SetterSettingService
@@ -39,7 +40,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
     this._gameClient = deps['game-client-main']
     this._loggerFactory = deps['logger-factory-main']
     this._log = this._loggerFactory.create(RespawnTimerMain.id)
-    this._leagueClient = deps['league-client-main']
+    this._lc = deps['league-client-main']
     this._mobx = deps['mobx-utils-main']
     this._settingFactory = deps['setting-factory-main']
     this._setting = this._settingFactory.create(
@@ -49,14 +50,14 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
       },
       this.settings
     )
-    this.state = new RespawnTimerState(this._leagueClient.data)
+    this.state = new RespawnTimerState(this._lc.data)
   }
 
   async onInit() {
     await this._setting.applyToState()
 
     this._setting.onChange('enabled', async (v, { setter }) => {
-      if (v && this._leagueClient.data.gameflow.phase === 'InProgress') {
+      if (v && this._lc.data.gameflow.phase === 'InProgress') {
         this._startRespawnTimerPoll()
       } else if (v === false) {
         this._stopRespawnTimerPoll()
@@ -70,7 +71,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
     this._mobx.propSync(RespawnTimerMain.id, 'settings', this.settings, ['enabled'])
 
     this._mobx.reaction(
-      () => [this._leagueClient.data.gameflow.phase, this.settings.enabled],
+      () => [this._lc.data.gameflow.phase, this.settings.enabled],
       ([phase, enabled]) => {
         if (phase === 'InProgress') {
           if (enabled) {
@@ -87,7 +88,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
           this._stopRespawnTimerPoll()
         }
       },
-      { equals: comparer.shallow }
+      { equals: comparer.shallow, fireImmediately: true }
     )
   }
 
@@ -96,7 +97,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
   }
 
   private async _queryRespawnTime() {
-    if (!this._leagueClient.data.summoner.me) {
+    if (!this._lc.data.summoner.me) {
       this._log.warn('当前不存在召唤师信息, 可能是未加载')
       return
     }
@@ -104,28 +105,15 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
     try {
       const playerList = (await this._gameClient.api.getLiveClientDataPlayerList()).data
       const self = playerList.find((p) => {
-        // 2024-04-27 之后，有 Tag 了
-        if (!p.summonerName.includes('#')) {
-          return (
-            p.summonerName === this._leagueClient.data.summoner.me?.gameName ||
-            this._leagueClient.data.summoner.me?.displayName
-          )
+        if (p.riotId) {
+          return p.riotId === riotId(this._lc.data.summoner.me)
         }
 
-        const isNameEqualed =
-          p.summonerName === this._leagueClient.data.summoner.me?.gameName ||
-          this._leagueClient.data.summoner.me?.displayName
-
-        // 额外保险步骤
-        const championId = this.state.selfChampionInGameSelection
-        if (championId && this._leagueClient.data.gameData.champions) {
-          return (
-            isNameEqualed &&
-            this._leagueClient.data.gameData.champions[championId]?.name === p.championName
-          )
+        if (p.summonerName) {
+          return summonerName(p.summonerName) === riotId(this._lc.data.summoner.me)
         }
 
-        return isNameEqualed
+        return p.summonerName === this._lc.data.summoner.me?.internalName
       })
 
       if (self) {

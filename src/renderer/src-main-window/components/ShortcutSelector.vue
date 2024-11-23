@@ -78,7 +78,7 @@ const shortcutId = defineModel<string | null>('shortcutId', { default: null })
 
 const currentShortcutId = ref<string | null>(null)
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   shortcutId.value = currentShortcutId.value
   show.value = false
 }
@@ -134,6 +134,7 @@ watch(
   async (shortcut) => {
     if (shortcut) {
       isOccupiedBy.value = await kbd.getRegistration(shortcut)
+      console.log(isOccupiedBy.value)
     } else {
       isOccupiedBy.value = null
     }
@@ -143,8 +144,12 @@ watch(
 
 watch(
   () => show.value,
-  () => {
+  async () => {
     if (show.value) {
+      if (currentShortcutId.value) {
+        isOccupiedBy.value = await kbd.getRegistration(currentShortcutId.value)
+      }
+
       currentShortcutId.value = shortcutId.value
       handler = kbd.onShortcut((event) => {
         currentShortcutId.value = event.id
@@ -153,6 +158,7 @@ watch(
     } else {
       handler?.()
       window.removeEventListener('keydown', preventFn)
+      isOccupiedBy.value = null
     }
   },
   { immediate: true }

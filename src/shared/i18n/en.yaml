@@ -187,7 +187,7 @@ MiscSettings:
 
     enabled:
       label: Enable
-      description: Display an indicator in the title bar showing the remaining time until respawn.
+      description: Display an indicator in the side bar showing the remaining time until respawn.
 
 DebugSettings:
   title: Debug
@@ -651,7 +651,8 @@ Client:
 Toolkit:
   title: Toolkit
   client: League Client / Game Client
-  inProcess: In Process
+  in-process: In Process
+  in-game-send: In-Game Send
   lobby: Lobby Tools
   misc: Misc
 
@@ -1467,6 +1468,61 @@ EasyToLaunch:
   riotClient: Riot Client
   successMessage: 'Successfully launched: {name}'
   failedMessage: 'Failed to launch {name}: {reason}'
+
+InGameSend:
+  sendStats:
+    title: Player Stats Sending
+    enabled:
+      label: Enable
+      description: Send statistical analysis of teammates or enemies during champion selection or in-game
+    sendAllyShortcut:
+      label: Send Ally Shortcut
+      description: Set a shortcut key to send ally statistical analysis
+    sendEnemyShortcut:
+      label: Send Enemy Shortcut
+      description: Set a shortcut key to send enemy statistical analysis
+    sendAllAlliesShortcut:
+      label: Send /all Ally Shortcut
+      description: Set a shortcut key to send global ally statistical analysis. The content sent will include the `/all` prefix on each line
+    sendAllEnemiesShortcut:
+      label: Send /all Enemy Shortcut
+      description: Set a shortcut key to send global enemy statistical analysis. The content sent will include the `/all` prefix on each line
+    sendStatsUseDefaultTemplate:
+      label: Use Default Template
+      description: Use the default sending template to send basic KDA information
+    sendStatsTemplate:
+      label: Custom Template
+      inputPlaceholder: Provide a sending template
+      submitButton: Update Template
+      cancelButton: Cancel Changes
+      description: The entries sent will use a custom template following EJS-style (ETA) format syntax. The final output should be text divided by lines, and blank lines will be ignored
+    dryRun:
+      label: Dry Run
+      description: Preview the output at the current point in time
+      button: Dry Run
+
+  customSend:
+    title: Custom Sending
+    newItem: New Item
+    unnamed: (Unnamed)
+    enabled: Enable
+    name: Name
+    shortcut: Set Shortcut
+    message: Set Text to Send
+    delete:
+      label: Delete
+      button: Delete
+      popconfirm: Confirm deletion of this custom sending item?
+
+  saved: Saved
+  invalidTemplate: The provided template is invalid. Please check the syntax
+
+  # message dry-run
+  not-complied: Template not compiled. Please check the syntax
+  stage-unavailable: Not in a match query stage
+  execution-error: Error occurred while executing the template. Please check the template logic for correctness
+  error: Unknown error
+  confirm: Confirm
 
 common:
   appName: League Akari

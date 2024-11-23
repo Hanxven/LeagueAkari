@@ -7,6 +7,9 @@ export interface PlayerList {
   position: string
   rawChampionName: string
   respawnTimer: number
+  riotId: string
+  riotIdGameName: string
+  riotIdTagLine: string
   runes: Runes
   scores: Scores
   skinID: number

@@ -76,9 +76,9 @@
             <span class="no-ongoing-game-text">{{ t('OngoingGame.disconnected') }}</span>
             <EasyToLaunch />
           </template>
-          <template v-else-if="lc.champSelect.session && lc.champSelect.session.isSpectating">{{
-            t('OngoingGame.waitingForSpectate')
-          }}</template>
+          <template v-else-if="lc.champSelect.session && lc.champSelect.session.isSpectating">
+            <span class="no-ongoing-game-text"> {{ t('OngoingGame.waitingForSpectate') }}</span>
+          </template>
           <template v-else>
             <span class="no-ongoing-game-text"> {{ t('OngoingGame.noOngoingGame') }}</span>
           </template>
@@ -381,7 +381,7 @@ const columnsNeed = computed(() => {
   flex-direction: column;
   align-items: center;
   position: absolute;
-  top: 45%;
+  top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
   gap: 16px;

@@ -82,7 +82,7 @@
         >
         <template v-if="agfs.settings.autoMatchmakingEnabled">
           <span class="sub-text" v-if="penaltyTime">{{
-            t('Lounge.matchmaking.penaltyTime', {
+            t('Lounge.matchmaking.waitingForPenalty', {
               seconds: penaltyTime.toFixed()
             })
           }}</span>

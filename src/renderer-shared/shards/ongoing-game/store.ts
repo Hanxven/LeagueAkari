@@ -8,7 +8,7 @@ import {
 } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
-import { shallowReactive, shallowRef, watchEffect } from 'vue'
+import { shallowReactive, shallowRef } from 'vue'
 
 // copied from main shard
 interface OngoingGameInfo {
@@ -131,10 +131,6 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const savedInfoLoadingState = shallowRef<Record<string, string>>({}) // 未实装
   const rankedStatsLoadingState = shallowRef<Record<string, string>>({}) // 未实装
   const championMasteryLoadingState = shallowRef<Record<string, string>>({}) // 未实装
-
-  watchEffect(() => {
-    console.log(matchHistoryLoadingState.value)
-  })
 
   return {
     settings,

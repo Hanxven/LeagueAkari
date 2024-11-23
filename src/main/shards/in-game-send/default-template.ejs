@@ -1,0 +1,20 @@
+<%
+const kdaLines = () => {
+  if (!it.playerStats) return []
+
+  const puuids = it.options.target === 'all' ? it.allMembers : (it.options.target === 'ally' ? it.allyMembers : it.enemyMembers)
+  const items = puuids.map((puuid) => {
+    const summonerName = it.summoner[puuid]?.data.gameName || '未知召唤师'
+    const {
+      averageKda = 0,
+      count = 0,
+      winRate = 0
+    } = it.playerStats.players[puuid]?.summary || {}
+    return { puuid, summonerName, averageKda, count, winRate }
+  })
+  .map(({ summonerName, averageKda, count, winRate }) => `${summonerName}：近${count}场KDA ${averageKda.toFixed(2)} 胜率 ${(winRate * 100).toFixed(0)}%`)
+
+  return items
+}
+%>
+<%= kdaLines().join('\n') %>

@@ -13,8 +13,11 @@
         <NTab name="client">
           <span class="tab-name">{{ t('Toolkit.client') }}</span>
         </NTab>
+        <NTab name="in-game-send" class="tab-name">
+          <span class="tab-name">{{ t('Toolkit.in-game-send') }}</span>
+        </NTab>
         <NTab name="in-process" class="tab-name">
-          <span class="tab-name">{{ t('Toolkit.inProcess') }}</span>
+          <span class="tab-name">{{ t('Toolkit.in-process') }}</span>
         </NTab>
         <NTab name="lobby" class="tab-name">
           <span class="tab-name">{{ t('Toolkit.lobby') }}</span>
@@ -28,6 +31,7 @@
       <Transition name="move-fade">
         <KeepAlive>
           <Client v-if="currentTab === 'client'" />
+          <InGameSend v-else-if="currentTab === 'in-game-send'" />
           <InProcess v-else-if="currentTab === 'in-process'" />
           <Lobby v-else-if="currentTab === 'lobby'" />
           <Misc v-else-if="currentTab === 'misc'" />
@@ -44,6 +48,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import Client from './client/Client.vue'
+import InGameSend from './in-game-send/InGameSend.vue'
 import InProcess from './in-process/InProcess.vue'
 import Lobby from './lobby/Lobby.vue'
 import Misc from './misc/Misc.vue'

@@ -271,7 +271,7 @@ mh.events.on('screenshot-tab', (tabId: string) => {
   flex-direction: column;
   align-items: center;
   position: absolute;
-  top: 45%;
+  top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
   gap: 16px;
