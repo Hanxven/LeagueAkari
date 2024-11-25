@@ -126,7 +126,7 @@
           <div class="popover-text" v-if="analysis">
             {{
               t('PlayerInfoCard.cherryWinRatePopover', {
-                count: analysis.summary.count,
+                countV: analysis.summary.count,
                 winRate: (analysis.summary.winRate * 100).toFixed(),
                 cherryCount: analysis.summary.cherry.count,
                 top1Rate: analysis.summary.cherry.top1Rate
@@ -154,7 +154,7 @@
           <div class="popover-text" v-if="analysis">
             {{
               t('PlayerInfoCard.winRatePopover', {
-                count: analysis.summary.count,
+                countV: analysis.summary.count,
                 winRate: (analysis.summary.winRate * 100).toFixed()
               })
             }}
@@ -168,7 +168,7 @@
         <div class="popover-text" v-if="analysis">
           {{
             t('PlayerInfoCard.kdaPopover', {
-              count: analysis.summary.count,
+              countV: analysis.summary.count,
               kda: analysis.summary.averageKda.toFixed(2)
             })
           }}
@@ -236,7 +236,7 @@
         <div class="popover-text">
           {{
             t('PlayerInfoCard.highWinRatePopover', {
-              count: analysis.summary.count,
+              countV: analysis.summary.count,
               winCount: analysis.summary.win
             })
           }}
@@ -255,8 +255,10 @@
           <div style="margin-bottom: 4px">
             {{
               t('PlayerInfoCard.metPopover.title', {
-                date: dayjs(savedInfo.lastMetAt).locale(locale).format('YYYY-MM-DD HH:mm:ss'),
-                count: savedInfo.encounteredGames.length
+                date: dayjs(savedInfo.lastMetAt)
+                  .locale(as.settings.locale.toLowerCase())
+                  .format('YYYY-MM-DD HH:mm:ss'),
+                countV: savedInfo.encounteredGames.length
               })
             }}
           </div>
@@ -277,7 +279,7 @@
                 </td>
                 <td>
                   {{ dayjs(item.updateAt).format('MM-DD HH:mm:ss') }} ({{
-                    dayjs(item.updateAt).locale(locale).fromNow()
+                    dayjs(item.updateAt).locale(as.settings.locale.toLowerCase()).fromNow()
                   }})
                 </td>
               </tr>
@@ -306,7 +308,7 @@
           <div class="tag winning-streak">
             {{
               t('PlayerInfoCard.winningStreak', {
-                count: analysis.summary.winningStreak
+                countV: analysis.summary.winningStreak
               })
             }}
           </div>
@@ -314,7 +316,7 @@
         <div class="popover-text">
           {{
             t('PlayerInfoCard.winningStreakPopover', {
-              count: analysis.summary.winningStreak
+              countV: analysis.summary.winningStreak
             })
           }}
         </div>
@@ -328,7 +330,7 @@
           <div class="tag losing-streak">
             {{
               t('PlayerInfoCard.losingStreak', {
-                count: analysis.summary.losingStreak
+                countV: analysis.summary.losingStreak
               })
             }}
           </div>
@@ -336,7 +338,7 @@
         <div class="popover-text">
           {{
             t('PlayerInfoCard.losingStreakPopover', {
-              count: analysis.summary.losingStreak
+              countV: analysis.summary.losingStreak
             })
           }}
         </div>
@@ -412,7 +414,7 @@
           <div class="recent-plays">
             {{
               t('PlayerInfoCard.champion.winRate', {
-                count: c.count,
+                countV: c.count,
                 winRate: (c.winRate * 100).toFixed()
               })
             }}
@@ -499,9 +501,9 @@ import {
 import { ParsedRole } from '@shared/utils/ranked'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
+import { useTranslation } from 'i18next-vue'
 import { NPopover, NVirtualList } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import RankedTable from '@main-window/components/RankedTable.vue'
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
@@ -542,7 +544,7 @@ const emits = defineEmits<{
   highlight: [premadeTeamId: string, boolean]
 }>()
 
-const { t, locale } = useI18n()
+const { t } = useTranslation()
 
 const premadeTagElHovering = useElementHover(useTemplateRef('pre-made-tag-el'))
 watch(premadeTagElHovering, (h) => {
@@ -734,7 +736,7 @@ const getWinResultText = (match: SelfParticipantGame) => {
       return '?'
     }
 
-    return formatI18nOrdinal(match.selfParticipant.stats.subteamPlacement, locale.value)
+    return formatI18nOrdinal(match.selfParticipant.stats.subteamPlacement, as.settings.locale)
   }
 
   return match.selfParticipant.stats.win

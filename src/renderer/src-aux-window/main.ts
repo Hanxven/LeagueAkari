@@ -1,8 +1,9 @@
-import { i18n } from '@renderer-shared/i18n'
+import { i18next } from '@renderer-shared/i18n'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import I18nextVue from 'i18next-vue'
 import { createPinia } from 'pinia'
 import 'vfonts/Lato.css'
 import { createApp } from 'vue'
@@ -16,7 +17,11 @@ try {
   dayjs.extend(relativeTime)
   dayjs.extend(duration)
 
-  const app = createApp(NaiveUIProviderApp).use(router).use(createPinia()).use(i18n).use(manager)
+  const app = createApp(NaiveUIProviderApp)
+    .use(router)
+    .use(createPinia())
+    .use(I18nextVue, { i18next })
+    .use(manager)
   await manager.setup()
   app.mount('#app')
 } catch (error) {

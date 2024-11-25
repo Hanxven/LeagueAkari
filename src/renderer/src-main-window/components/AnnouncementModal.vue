@@ -10,7 +10,11 @@
       ><span class="card-header-title"
         >{{ t('AnnouncementModal.title')
         }}<span style="font-size: 12px" v-if="sus.currentAnnouncement">
-          ({{ dayjs(sus.currentAnnouncement.updateAt).locale(locale).fromNow() }})</span
+          ({{
+            dayjs(sus.currentAnnouncement.updateAt)
+              .locale(as.settings.locale.toLowerCase())
+              .fromNow()
+          }})</span
         ></span
       ></template
     >
@@ -38,15 +42,18 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import dayjs from 'dayjs'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 
-const { t, locale } = useI18n()
+const { t } = useTranslation()
+
+const as = useAppCommonStore()
 
 const sus = useSelfUpdateStore()
 const aum = useInstance<SelfUpdateRenderer>('self-update-renderer')

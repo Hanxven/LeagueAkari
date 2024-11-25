@@ -16,7 +16,7 @@
         v-model:value="currentSkinId"
         :placeholder="
           t('SkinSelectionMini.skins', {
-            count: skinOptions.length
+            countV: skinOptions.length
           })
         "
         :options="skinOptions"
@@ -51,9 +51,10 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, h, ref, shallowRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const wms = useWindowManagerStore()
 const lcs = useLeagueClientStore()

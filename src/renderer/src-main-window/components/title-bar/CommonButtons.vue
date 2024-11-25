@@ -43,9 +43,10 @@ import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { NIcon, NTooltip } from 'naive-ui'
 import { inject } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const wms = useWindowManagerStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')

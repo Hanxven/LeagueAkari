@@ -24,11 +24,12 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { NButton, NCard, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import StandaloneMatchHistoryCardModal from '../../match-history/card/StandaloneMatchHistoryCardModal.vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const gameId = ref<number>()
 const viewingGameId = ref<number>()

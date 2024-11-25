@@ -79,9 +79,10 @@ import {
 import { CloseOutlined as CloseOutlinedIcon } from '@vicons/material'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
 import { ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 // 交通灯按钮
 const wms = useWindowManagerStore()

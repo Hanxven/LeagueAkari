@@ -117,7 +117,7 @@
                 :placeholder="t('InGameSend.sendStats.sendStatsTemplate.inputPlaceholder')"
                 v-model:value="tempTemplateInput"
                 ref="use-template-input"
-                style="width: 360px; font-family: monospace; font-size: 12px"
+                style="width: 420px; font-family: monospace; font-size: 12px"
                 size="small"
                 :status="igs.settings.sendStatsTemplate.isValid ? 'success' : 'warning'"
                 type="textarea"
@@ -210,7 +210,7 @@
                     :placeholder="t('InGameSend.customSend.name')"
                     v-model:value="tempNameInput[s.id]"
                     @blur="() => handleSaveName(s.id, tempNameInput[s.id])"
-                    style="width: 360px"
+                    style="width: 420px"
                     size="small"
                   ></NInput>
                 </ControlItem>
@@ -239,7 +239,7 @@
                     :placeholder="t('InGameSend.customSend.message')"
                     v-model:value="tempMessageInput[s.id]"
                     @blur="() => handleSaveMessage(s.id, tempMessageInput[s.id])"
-                    style="width: 360px; font-family: monospace"
+                    style="width: 420px; font-family: monospace"
                     size="small"
                     :disabled="!as.isAdministrator"
                     type="textarea"
@@ -286,6 +286,7 @@ import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NCard,
@@ -300,11 +301,10 @@ import {
   useMessage
 } from 'naive-ui'
 import { h, reactive, ref, useTemplateRef, watch, watchEffect } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
-const { t } = useI18n()
+const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()

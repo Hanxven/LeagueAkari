@@ -190,11 +190,12 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NButton, NCard, NInputNumber, NScrollbar, NSwitch, useDialog } from 'naive-ui'
 import { reactive, toRaw, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()

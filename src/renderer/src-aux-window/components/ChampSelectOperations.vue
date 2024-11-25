@@ -78,9 +78,10 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { NButton, NCard, NFlex, NInputNumber, NPopconfirm, NSwitch, useMessage } from 'naive-ui'
 import { computed, watchEffect } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const as2 = useAutoSelectStore()

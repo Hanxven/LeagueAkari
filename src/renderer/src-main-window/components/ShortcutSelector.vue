@@ -62,14 +62,15 @@ import { useInstance } from '@renderer-shared/shards'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
 import { NButton, NModal } from 'naive-ui'
 import { computed, onDeactivated, onUnmounted, ref, shallowRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 defineProps<{
   disabled?: boolean
   targetId?: string
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const kbd = useInstance<KeyboardShortcutsRenderer>('keyboard-shortcuts-renderer')
 

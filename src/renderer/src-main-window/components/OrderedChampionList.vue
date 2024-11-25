@@ -53,11 +53,12 @@ import {
   TransferRenderTargetLabel
 } from 'naive-ui'
 import { computed, h, ref, useCssModule } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const {
   maxShow = 6,

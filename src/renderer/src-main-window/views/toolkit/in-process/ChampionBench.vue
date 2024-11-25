@@ -63,9 +63,10 @@ import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { NButton, NCard, NDivider } from 'naive-ui'
 import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')

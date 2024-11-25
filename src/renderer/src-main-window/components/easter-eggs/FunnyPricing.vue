@@ -57,6 +57,7 @@
 
 <script lang="ts" setup>
 import { Checkmark as CheckmarkIcon } from '@vicons/carbon'
+import { useTranslation } from 'i18next-vue';
 import { NButton, NIcon, NModal } from 'naive-ui'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
@@ -64,7 +65,8 @@ const show = defineModel('show', { default: false })
 const balance = ref(0) // 单位是厘
 
 // 很遗憾, 没有 i18n
-// const { t } = useI18n()
+//
+const { t } = useTranslation()
 
 const emits = defineEmits<{
   purchased: [item: ItemType]

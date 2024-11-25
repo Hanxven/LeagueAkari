@@ -117,9 +117,10 @@ import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const ogs = useOngoingGameStore()
 const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')

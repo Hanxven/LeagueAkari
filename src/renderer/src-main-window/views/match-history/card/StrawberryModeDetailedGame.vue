@@ -123,11 +123,12 @@ import { Game, Participant, ParticipantIdentity } from '@shared/types/league-cli
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
   participants: ParticipantWithIdentity[]

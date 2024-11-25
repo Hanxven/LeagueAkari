@@ -101,9 +101,10 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { AvailableBot, QueueEligibility } from '@shared/types/league-client/lobby'
 import { NButton, NCard, NFlex, NInput, NSelect, useMessage } from 'naive-ui'
 import { computed, reactive, ref, shallowRef } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')

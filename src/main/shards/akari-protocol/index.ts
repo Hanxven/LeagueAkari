@@ -1,8 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { protocol, session } from 'electron'
-import { Mime } from 'mime'
-import fs from 'node:fs'
-import path from 'node:path'
 import { Readable } from 'node:stream'
 
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -28,15 +25,12 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
     (uri: string, req: Request) => Promise<Response> | Response
   >()
 
-  private _mime: Mime
-
   constructor(deps: any) {
     this._loggerFactory = deps['logger-factory-main']
     this._log = this._loggerFactory.create(AkariProtocolMain.id)
   }
 
   async onInit() {
-    this._mime = (await import('mime')).default
     this._handlePartitionAkariProtocol(WindowManagerMain.MAIN_WINDOW_PARTITION)
     this._handlePartitionAkariProtocol(WindowManagerMain.AUX_WINDOW_PARTITION)
   }
@@ -70,52 +64,6 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
           status: 404
         })
       })
-  }
-
-  /** unused yet */
-  private async _toLocalFileResponse(uri: string) {
-    const filePath = path.resolve(uri)
-
-    try {
-      await fs.promises.access(filePath, fs.constants.F_OK | fs.constants.R_OK)
-
-      const stats = await fs.promises.stat(filePath)
-
-      if (stats.isDirectory()) {
-        return new Response(`Cannot read directory: ${uri}`, {
-          headers: { 'Content-Type': 'text/plain' },
-          status: 403
-        })
-      }
-
-      return new Response(fs.createReadStream(filePath), {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          Connection: 'keep-alive',
-          'Content-Type': this._mime.getType(filePath) || 'application/octet-stream',
-          'Cache-Control': 'no-cache',
-          'Content-Length': stats.size.toString(),
-          Date: new Date().toUTCString()
-        }
-      })
-    } catch (error) {
-      if ((error as any).code === 'ENOENT') {
-        return new Response((error as Error).message, {
-          headers: { 'Content-Type': 'text/plain' },
-          status: 404
-        })
-      } else if ((error as any).code === 'EACCES') {
-        return new Response((error as Error).message, {
-          headers: { 'Content-Type': 'text/plain' },
-          status: 403
-        })
-      } else {
-        return new Response((error as Error).message, {
-          headers: { 'Content-Type': 'text/plain' },
-          status: 500
-        })
-      }
-    }
   }
 
   static convertWebStreamToNodeStream(readableStream: ReadableStream) {

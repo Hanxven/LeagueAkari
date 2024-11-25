@@ -2,7 +2,7 @@
   <NConfigProvider
     :theme-overrides="themeOverrides"
     :theme="darkTheme"
-    :locale="zhCN"
+    :locale="naiveUiLocale"
     abstract
     inline-theme-disabled
     :date-locale="dateZhCN"
@@ -18,8 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { useInstance } from '@renderer-shared/shards'
-import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   GlobalThemeOverrides,
   NConfigProvider,
@@ -33,15 +32,10 @@ import {
   zhCN
 } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import App from './App.vue'
 
-const app = useInstance<AppCommonRenderer>('app-common-renderer')
-
-app.useI18nSync()
-
-const { locale } = useI18n()
+const as = useAppCommonStore()
 
 const themeOverrides: GlobalThemeOverrides = {
   Notification: { padding: '12px' },
@@ -61,7 +55,7 @@ const themeOverrides: GlobalThemeOverrides = {
 }
 
 const NAIVE_UI_LOCALE = {
-  'zh-cn': {
+  'zh-CN': {
     dateLocale: dateZhCN,
     locale: zhCN
   },
@@ -72,7 +66,7 @@ const NAIVE_UI_LOCALE = {
 }
 
 const naiveUiLocale = computed(() => {
-  return NAIVE_UI_LOCALE[locale.value] || NAIVE_UI_LOCALE['en']
+  return NAIVE_UI_LOCALE[as.settings.locale] || NAIVE_UI_LOCALE['en']
 })
 </script>
 

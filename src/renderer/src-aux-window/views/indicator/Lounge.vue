@@ -89,7 +89,7 @@
           <span class="sub-text" v-else-if="agfs.activityStartStatus === 'insufficient-members'">
             {{
               t('Lounge.matchmaking.waitingForMembers', {
-                count: agfs.settings.autoMatchmakingMinimumMembers
+                countV: agfs.settings.autoMatchmakingMinimumMembers
               })
             }}
           </span>
@@ -117,9 +117,10 @@ import { GetSearch } from '@shared/types/league-client/matchmaking'
 import { useIntervalFn } from '@vueuse/core'
 import { NButton } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const agfs = useAutoGameflowStore()
 const lcs = useLeagueClientStore()

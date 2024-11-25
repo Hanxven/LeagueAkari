@@ -117,14 +117,15 @@ import { CloseRound as CloseRoundIcon, RefreshRound as RefreshRoundIcon } from '
 import { NBadge, NDropdown, NIcon, NPopover, NScrollbar, NSpin } from 'naive-ui'
 import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { computed, h, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import { TabState, useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 import SearchSummonerModal from '../search-summoner-modal/SearchSummonerModal.vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const mhs = useMatchHistoryTabsStore()
 const sgps = useSgpStore()

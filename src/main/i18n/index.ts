@@ -3,15 +3,15 @@ import zhCN from '@shared/i18n/zh-cn.yaml'
 import i18next from 'i18next'
 
 i18next.init({
-  lng: 'en',
+  lng: 'zh-CN',
+  debug: process.env.NODE_ENV === 'development',
   fallbackLng: 'zh-CN',
-  debug: import.meta.env.DEV,
   interpolation: {
     escapeValue: false
   },
   resources: {
-    'zh-CN': { translation: zhCN },
-    en: { translation: en }
+    en: { translation: en },
+    'zh-CN': { translation: zhCN }
   }
 })
 

@@ -26,9 +26,10 @@ import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { useIntervalFn } from '@vueuse/core'
 import { NCard, NFlex } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const as2 = useAutoSelectStore()
 const lcs = useLeagueClientStore()

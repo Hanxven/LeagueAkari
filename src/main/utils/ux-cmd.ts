@@ -1,4 +1,4 @@
-import toolkit from '@main/native/laToolkitWin32x64.node'
+import toolkit from '@main/native/la-tools-win64.node'
 import { SpawnOptionsWithoutStdio, spawn } from 'node:child_process'
 import fs from 'node:fs'
 

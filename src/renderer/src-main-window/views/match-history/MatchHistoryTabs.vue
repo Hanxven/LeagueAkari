@@ -44,7 +44,7 @@ import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useMessage } from 'naive-ui'
 import { computed, onActivated, onDeactivated, useTemplateRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import EasyToLaunch from '@main-window/components/EasyToLaunch.vue'
@@ -54,7 +54,8 @@ import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 

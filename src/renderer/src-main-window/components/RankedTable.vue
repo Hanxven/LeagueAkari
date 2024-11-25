@@ -70,7 +70,7 @@
 
 <script lang="ts" setup>
 import { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import BronzeMedal from '@main-window/assets/ranked-icons/bronze.png'
 import ChallengerMedal from '@main-window/assets/ranked-icons/challenger.png'
@@ -87,7 +87,8 @@ const { rankedStats } = defineProps<{
   rankedStats: RankedStats
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const RANKED_MEDAL_MAP: Record<string, string> = {
   IRON: IronMedal,

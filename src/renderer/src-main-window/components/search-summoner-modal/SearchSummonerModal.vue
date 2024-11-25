@@ -159,7 +159,7 @@
       <NCollapseTransition class="section" :show="isEmpty">
         <div class="section-title">{{ t('SearchSummonerModal.result') }}</div>
         <div class="empty-result" v-if="searchProgress.type === 'fuzzy'">
-          {{ t('SearchSummonerModal.validated', { count: searchProgress.finish }) }}
+          {{ t('SearchSummonerModal.validated', { countV: searchProgress.finish }) }}
           <span style="font-weight: bold">{{ searchText }}</span>
         </div>
         <div class="empty-result" v-else>
@@ -194,12 +194,13 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, markRaw, nextTick, reactive, ref, shallowRef, useTemplateRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 import { useRoute } from 'vue-router'
 
 import { MatchHistoryTabsRenderer, SearchHistoryItem } from '@main-window/shards/match-history-tabs'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const show = defineModel<boolean>('show', { default: false })
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')

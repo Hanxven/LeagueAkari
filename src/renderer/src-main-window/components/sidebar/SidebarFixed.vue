@@ -139,11 +139,12 @@ import { PlugDisconnected24Filled as PlugDisconnected24FilledIcon } from '@vicon
 import { Hourglass as HourglassIcon } from '@vicons/ionicons5'
 import { NBadge, NIcon, NPopover, NProgress, NScrollbar, NSpin, NTooltip } from 'naive-ui'
 import { computed, inject } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()

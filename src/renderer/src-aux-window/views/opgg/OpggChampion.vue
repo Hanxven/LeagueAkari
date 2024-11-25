@@ -756,7 +756,7 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 const props = defineProps<{
   region?: string
@@ -783,7 +783,8 @@ const emits = defineEmits<{
   ]
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
@@ -1055,7 +1056,7 @@ const handleAddToItemSet = async () => {
           type: g.title,
           items: g.items.map((i) => ({
             id: i.toString(),
-            count: 1
+            countV: 1
           }))
         })),
         associatedChampions: [],

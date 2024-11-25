@@ -44,7 +44,7 @@ import { Game } from '@shared/types/league-client/match-history'
 import { AxiosError } from 'axios'
 import { NButton, NModal } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
@@ -57,7 +57,8 @@ const props = defineProps<{
   selfPuuid?: string
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const sgp = useInstance<SgpRenderer>('sgp-renderer')

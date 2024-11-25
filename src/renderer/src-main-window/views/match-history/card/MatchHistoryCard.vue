@@ -52,7 +52,11 @@
         </div>
         <div
           class="begin-time"
-          :title="dayjs(game.gameCreation).locale(locale).format('YYYY-MM-DD HH:mm:ss')"
+          :title="
+            dayjs(game.gameCreation)
+              .locale(as.settings.locale.toLowerCase())
+              .format('YYYY-MM-DD HH:mm:ss')
+          "
         >
           {{ formattedGameCreationRelativeTime }}
         </div>
@@ -67,8 +71,8 @@
           {{
             dayjs
               .duration(game.gameDuration * 1000)
-              .locale(locale)
-              .format(locale === 'zh-cn' ? 'm 分 s 秒' : 'm [m] s [s]')
+              .locale(as.settings.locale.toLowerCase())
+              .format(as.settings.locale === 'zh-CN' ? 'm 分 s 秒' : 'm [m] s [s]')
           }}
         </div>
       </div>
@@ -270,6 +274,7 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { formatI18nOrdinal } from '@shared/i18n'
@@ -278,9 +283,9 @@ import { summonerName } from '@shared/utils/name'
 import { ChevronDown as ChevronDownIcon, List as ListIcon } from '@vicons/ionicons5'
 import { createReusableTemplate, useTimeoutPoll } from '@vueuse/core'
 import dayjs from 'dayjs'
+import { useTranslation } from 'i18next-vue'
 import { NIcon, NModal } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import '../lol-view.less'
 import CherryModeDetailedGame from './CherryModeDetailedGame.vue'
@@ -296,7 +301,7 @@ const props = defineProps<{
   game: Game
 }>()
 
-const { t, locale } = useI18n()
+const { t } = useTranslation()
 
 const emits = defineEmits<{
   setShowDetailedGame: [gameId: number, expand: boolean]
@@ -309,12 +314,14 @@ const [DefineSubTeam, SubTeam] = createReusableTemplate<{
   mode: string
 }>({ inheritAttrs: true })
 
+const as = useAppCommonStore()
+
 // 定期更新相对时间
 const formattedGameCreationRelativeTime = ref('')
 useTimeoutPoll(
   () => {
     formattedGameCreationRelativeTime.value = dayjs(props.game.gameCreation)
-      .locale(locale.value)
+      .locale(as.settings.locale.toLowerCase())
       .fromNow()
   },
   60000,
@@ -322,10 +329,10 @@ useTimeoutPoll(
 )
 
 watch(
-  () => locale.value,
+  () => as.settings.locale,
   (locale) => {
     formattedGameCreationRelativeTime.value = dayjs(props.game.gameCreation)
-      .locale(locale)
+      .locale(locale.toLowerCase())
       .fromNow()
   }
 )
@@ -388,7 +395,7 @@ const formattedResultText = computed(() => {
   }
 
   if (props.game.gameMode === 'CHERRY') {
-    return formatI18nOrdinal(self.value.participant.stats.subteamPlacement, locale.value)
+    return formatI18nOrdinal(self.value.participant.stats.subteamPlacement, as.settings.locale)
   }
 
   if (props.game.gameMode === 'PRACTICETOOL') {

@@ -36,7 +36,7 @@ import {
 import { TicketSharp as TicketSharpIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { Component as ComponentC, computed, h, ref, watchEffect } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import SidebarFixed from '@main-window/components/sidebar/SidebarFixed.vue'
@@ -47,7 +47,8 @@ const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
 }
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const currentMenu = ref('match-history')
 const menu = computed(() => {

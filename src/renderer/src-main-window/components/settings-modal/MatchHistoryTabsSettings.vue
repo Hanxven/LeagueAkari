@@ -52,11 +52,12 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const mhs = useMatchHistoryTabsStore()
 const sgps = useSgpStore()

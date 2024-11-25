@@ -1,4 +1,3 @@
-import tools from '@main/native/la-tools-win64.node'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game-client'
 import axios from 'axios'
@@ -6,7 +5,7 @@ import cp from 'child_process'
 import https from 'https'
 import path from 'node:path'
 
-import toolkit from '../../native/laToolkitWin32x64.node'
+import toolkit from '@main/native/la-tools-win64.node'
 import { ClientInstallationMain } from '../client-installation'
 import { AkariIpcMain } from '../ipc'
 import { KeyboardShortcutsMain } from '../keyboard-shortcuts'

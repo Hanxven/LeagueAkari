@@ -63,7 +63,7 @@
             >
             <span v-if="sus.lastCheckAt" style="font-size: 12px"
               >{{ t('AboutPane.lastCheckAt') }}
-              {{ dayjs(sus.lastCheckAt).locale(locale).fromNow() }}</span
+              {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span
             >
           </NFlex>
         </ControlItem>
@@ -167,16 +167,16 @@ import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import dayjs from 'dayjs'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NFlex, NScrollbar, NStep, NSteps, useMessage } from 'naive-ui'
 import { computed, h, inject } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 const UPDATE_SOURCE_MAP = {
   github: 'GitHub',
   gitee: 'Gitee'
 }
 
-const { t, locale } = useI18n()
+const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const sus = useSelfUpdateStore()

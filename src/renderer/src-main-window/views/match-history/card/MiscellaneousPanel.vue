@@ -64,13 +64,14 @@ import dayjs from 'dayjs'
 import { DataTableColumns, NDataTable } from 'naive-ui'
 import { RowData } from 'naive-ui/es/data-table/src/interface'
 import { computed, h } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 const props = defineProps<{
   game: Game
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const hasBan = computed(() => {
   return props.game.teams.some((t) => t.bans.length)

@@ -45,7 +45,7 @@
 import { AppSwitcher as AppSwitcherIcon } from '@vicons/carbon'
 import { NIcon, NTab, NTabs } from 'naive-ui'
 import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import Client from './client/Client.vue'
 import InGameSend from './in-game-send/InGameSend.vue'
@@ -53,7 +53,8 @@ import InProcess from './in-process/InProcess.vue'
 import Lobby from './lobby/Lobby.vue'
 import Misc from './misc/Misc.vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const currentTab = ref('client')
 </script>

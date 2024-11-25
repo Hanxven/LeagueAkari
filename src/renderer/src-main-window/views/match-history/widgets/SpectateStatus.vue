@@ -169,15 +169,16 @@ import {
 } from '@vicons/material'
 import { createReusableTemplate, useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import dayjs from 'dayjs'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NPopover, useMessage } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
 
 import IndicatorPulse from './IndicatorPulse.vue'
 
-const { t, locale } = useI18n()
+const { t } = useTranslation()
+const as = useAppCommonStore()
 
 const emits = defineEmits<{
   toSummoner: [puuid: string, setCurrent?: boolean]
@@ -213,7 +214,6 @@ const isTftMode = computed(() => {
 })
 
 const lcs = useLeagueClientStore()
-const as = useAppCommonStore()
 const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
 
 const teams = computed(() => {
@@ -256,20 +256,24 @@ const teams = computed(() => {
 })
 
 const relativeText = ref(
-  dayjs(data.playerCredentials.gameCreateDate).locale(locale.value).fromNow()
+  dayjs(data.playerCredentials.gameCreateDate).locale(as.settings.locale.toLowerCase()).fromNow()
 )
 useIntervalFn(
   () => {
-    relativeText.value = dayjs(data.playerCredentials.gameCreateDate).locale(locale.value).fromNow()
+    relativeText.value = dayjs(data.playerCredentials.gameCreateDate)
+      .locale(as.settings.locale.toLowerCase())
+      .fromNow()
   },
   1000 * 10,
   { immediate: true, immediateCallback: true }
 )
 
 watch(
-  () => locale.value,
+  () => as.settings.locale,
   (locale) => {
-    relativeText.value = dayjs(data.playerCredentials.gameCreateDate).locale(locale).fromNow()
+    relativeText.value = dayjs(data.playerCredentials.gameCreateDate)
+      .locale(locale.toLowerCase())
+      .fromNow()
   }
 )
 

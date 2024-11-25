@@ -55,9 +55,10 @@ import { useInstance } from '@renderer-shared/shards'
 import { AutoReplyRenderer } from '@renderer-shared/shards/auto-reply'
 import { useAutoReplyStore } from '@renderer-shared/shards/auto-reply/store'
 import { NCard, NInput, NScrollbar, NSwitch } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const ar = useAutoReplyStore()
 const arm = useInstance<AutoReplyRenderer>('auto-reply-renderer')

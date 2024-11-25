@@ -53,10 +53,11 @@ import { Close as CloseIcon } from '@vicons/ionicons5'
 import { ArrowBackIosFilled as ArrowBackIosFilledIcon } from '@vicons/material'
 import { NIcon } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 import { useRoute } from 'vue-router'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const wms = useWindowManagerStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')

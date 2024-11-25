@@ -170,11 +170,12 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip, useDialog } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcus = useLeagueClientUxStore()
 const lcs = useLeagueClientStore()
@@ -206,7 +207,7 @@ const updateDownloadSource = [
 ]
 
 const locales = [
-  { label: '中文', value: 'zh-cn' },
+  { label: '中文', value: 'zh-CN' },
   { label: 'English', value: 'en' }
 ]
 

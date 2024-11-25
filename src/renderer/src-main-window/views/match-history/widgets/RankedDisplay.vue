@@ -50,7 +50,7 @@
 <script lang="ts" setup>
 import { RankedEntry } from '@shared/types/league-client/ranked'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import RankedBronze from '@main-window/assets/ranked-icons-large/bronze.png'
 import RankedChallenger from '@main-window/assets/ranked-icons-large/challenger.png'
@@ -79,7 +79,8 @@ const props = defineProps<{
   small?: boolean
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const rankedImageMap: Record<string, string> = {
   UNRANKED: RankedNone,

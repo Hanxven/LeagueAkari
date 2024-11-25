@@ -99,7 +99,7 @@ import { Game } from '@shared/types/league-client/match-history'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
 import { NScrollbar } from 'naive-ui'
 import { computed, reactive, ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import EasyToLaunch from '@main-window/components/EasyToLaunch.vue'
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
@@ -116,7 +116,8 @@ import {
 const lc = useLeagueClientStore()
 const app = useAppCommonStore()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const og = useOngoingGameStore()
 

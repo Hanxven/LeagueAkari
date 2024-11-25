@@ -37,7 +37,7 @@
             size="tiny"
             :title="
               t('BenchChampionsMini.reroll', {
-                count: rerollsRemaining
+                countV: rerollsRemaining
               })
             "
             circle
@@ -53,7 +53,7 @@
             @click="() => handleReroll(true)"
             :title="
               t('BenchChampionsMini.charity', {
-                count: rerollsRemaining
+                countV: rerollsRemaining
               })
             "
             secondary
@@ -123,9 +123,10 @@ import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
 import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
 import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')

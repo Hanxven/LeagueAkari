@@ -199,12 +199,13 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watchEffect } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const currentTab = ref('tier')
 

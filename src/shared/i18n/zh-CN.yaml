@@ -120,8 +120,8 @@ MatchHistoryTabsSettings:
   matchHistoryUseSgpApi:
     label: 使用 SGP API
     description: 战绩页面使用 SGP API 作为数据源
-    current: '当前 SGP Server: {server}'
-    unsupported: '暂不支持当前服务器使用 SGP API: {server}'
+    current: '当前 SGP Server: {{server}}'
+    unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
 
 OngoingGameSettings:
   title: 对局分析
@@ -136,7 +136,7 @@ OngoingGameSettings:
 
   premadeTeamThreshold:
     label: 预组队判定阈值
-    description: 目标玩家群体出现在同一阵营超过 {threshold} 次时，则判定为预组队
+    description: 目标玩家群体出现在同一阵营超过 {{threshold}} 次时，则判定为预组队
 
   concurrency:
     label: 并发请求数量
@@ -145,7 +145,7 @@ OngoingGameSettings:
   matchHistoryUseSgpApi:
     label: 使用 SGP API
     description: 对局分析优先使用 SGP API 查询对局，若当前 SGP API 不可用，则使用 LCU API
-    unsupported: '暂不支持当前服务器使用 SGP API: {server}'
+    unsupported: '暂不支持当前服务器使用 SGP API: {{server}}'
 
   matchHistoryTagPreference:
     label: 队列筛选偏好
@@ -275,11 +275,11 @@ DebugSettings:
 
 AboutPane:
   title: 关于
-  line1: ' (联盟阿卡林，Version { version }) 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖'
+  line1: ' (联盟阿卡林，Version {{ version }}) 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖'
   line2: 项目参考
   copyright: © 2024 Hanxven. 本软件是开源软件，遵循 GPL-3.0 许可证。
 
-  checkFrom: 从下载源中 ({ source }) 检查更新
+  checkFrom: 从下载源中 ({{ source }}) 检查更新
   checkUpdates: 检查更新
   newUpdates: 新版本内容
   lastCheckAt: 上次检查
@@ -288,8 +288,8 @@ AboutPane:
     label: 更新流程
     description: 正在进行的更新流程
     downloading: 下载更新包
-    finished: 已完成 {progress} %
-    remain: 剩余 {time}
+    finished: 已完成 {{progress}} %
+    remain: 剩余 {{time}}
     downloadFailed: 下载出错
     unpacking: 解压更新包
     unpackFailed: 解压出错
@@ -339,7 +339,7 @@ AutoGameflow:
     description: 在可匹配对局时，将自动开始匹配对局
   autoMatchmakingMinimumMembers:
     label: 最低人数
-    description: 自动开始匹配需满足人数达到 {members} 人
+    description: 自动开始匹配需满足人数达到 {{members}} 人
   autoMatchmakingDelaySeconds:
     label: 匹配前等待时间 (s)
     description: 在可匹配对局时，预留的等待时间，单位为秒
@@ -469,7 +469,7 @@ SideBarFixed:
   settings: 设置
 
   respawnTimer:
-    timeLeft: 距离重生还有 {seconds} s
+    timeLeft: 距离重生还有 {{seconds}} s
 
 OrderedChampionList:
   searchForChampion: 搜索英雄
@@ -505,7 +505,7 @@ DamageMetricsBar:
 SpectateStatus:
   button: 观战
   bans: 禁用
-  startFrom: 于 {date} 开始 ({relativeTime})
+  startFrom: 于 {{date}} 开始 ({{relativeTime}})
 
   lcuSpectate:
     label: 使用 LCU API 观战 (可选)
@@ -532,8 +532,8 @@ SearchSummonerModal:
   search: 搜索玩家
   result: 搜索结果
   history: 历史搜索
-  validating: 正在验证玩家 ({current} / {total})
-  validated: 验证了 {count} 条可能的玩家记录，无搜索结果符合
+  validating: 正在验证玩家 ({{current}} / {{total}})
+  validated: 验证了 {{countV}} 条可能的玩家记录，无搜索结果符合
   noResult: 无搜索结果符合
   privacy: 生涯隐藏
   currentRoute: 当前
@@ -569,8 +569,8 @@ ShortcutSelector:
 UpdateModal:
   newVersion: 新版本
   versionFeatures: 版本特性
-  newVersionAvailable: 新版本可用：{version} (当前版本：{currentVersion})
-  currentVersion: 当前版本：{version}
+  newVersionAvailable: 新版本可用：{{version}} (当前版本：{{currentVersion}})
+  currentVersion: 当前版本：{{version}}
   releasePage: 发布页面
   download: 下载
 
@@ -684,7 +684,7 @@ GameflowInProgress:
 
     failedNotification:
       title: 英雄选择秒退
-      description: 尝试秒退失败 {reason}
+      description: 尝试秒退失败 {{reason}}
 
   playAgain:
     label: 退出结算页面
@@ -693,7 +693,7 @@ GameflowInProgress:
 
     failedNotification:
       title: 退出结算页面
-      description: 尝试退出结算页面失败 {reason}
+      description: 尝试退出结算页面失败 {{reason}}
 
   leaveLobby:
     label: 退出房间
@@ -709,13 +709,13 @@ LobbyTool:
     button: 添加
     failedNotification:
       title: 添加人机
-      description: 添加人机失败 {reason}
+      description: 添加人机失败 {{reason}}
 
   loadBots:
     firstUseNote: 为了获取自定义人机列表，你需要进入一次自定义房间
     failedNotification:
       title: 加载人机列表
-      description: 加载人机列表失败 {reason}
+      description: 加载人机列表失败 {{reason}}
 
   createIdLobby:
     label: 创建队列房间
@@ -725,7 +725,7 @@ LobbyTool:
 
     failedNotification:
       title: 创建队列房间
-      description: 创建队列房间失败 {reason}
+      description: 创建队列房间失败 {{reason}}
 
   create5x5PracticeLobby:
     label: 创建 5v5 训练房间
@@ -733,11 +733,11 @@ LobbyTool:
 
     failedNotification:
       title: 创建 5v5 训练房间
-      description: 创建 5v5 训练房间失败 {reason}
+      description: 创建 5v5 训练房间失败 {{reason}}
 
   loadEligibleQueuesFailedNotification:
     title: 加载队列失败
-    description: 尝试加载可用队列列表失败 {reason}
+    description: 尝试加载可用队列列表失败 {{reason}}
 
   queueOptions:
     available: 可用队列
@@ -756,7 +756,7 @@ StrawberryTool:
     label: 设置为当前英雄
     description: 你可以尝试尝试其他英雄
     button: 设置
-    failedMessage: 设置当前英雄失败 {reason}
+    failedMessage: 设置当前英雄失败 {{reason}}
 
   championOptions:
     modeSpecific: 模式英雄
@@ -766,13 +766,13 @@ StrawberryTool:
     label: 选择地图"
     description: 目前可用的地图
     button: 设置
-    failedMessage: 设置地图失败 {reason}
+    failedMessage: 设置地图失败 {{reason}}
 
   difficulty:
     label: 设置难度
     description: 目前预设的难度包括 [故事]、[困难] 和 [极难], 目前无法设置未解锁的难度等级"
     button: 设置
-    failedMessage: 设置难度失败 {reason}
+    failedMessage: 设置难度失败 {{reason}}
 
   requestSent: 请求已发送
 
@@ -790,7 +790,7 @@ ChatAvailability:
       offline: 离线
     failedNotification:
       title: 设置聊天状态
-      description: 设置聊天状态失败 {reason}
+      description: 设置聊天状态失败 {{reason}}
 
 ChatStatusMessage:
   title: 聊天签名
@@ -802,7 +802,7 @@ ChatStatusMessage:
 
     failedNotification:
       title: 设置聊天签名
-      description: 设置聊天签名失败 {reason}
+      description: 设置聊天签名失败 {{reason}}
 
   text:
     label: 文本行
@@ -823,7 +823,7 @@ SummonerProfile:
 
     failedNotification:
       title: 生涯背景
-      description: 无法应用当前皮肤 {reason}
+      description: 无法应用当前皮肤 {{reason}}
 
   profileBackground:
     label: 选择召唤师背景
@@ -837,17 +837,17 @@ SummonerProfile:
 
     failedNotification:
       title: 切换为上赛季旗帜
-      description: 切换旗帜失败 {reason}
+      description: 切换旗帜失败 {{reason}}
 
   prestigeCrest:
     label: 卸下头像框
     description: 卸下头像框
-    descriptionInsufficientLevel: 卸下头像框 (召唤师等级需大于等于 525, 当前等级为 {level})
+    descriptionInsufficientLevel: 卸下头像框 (召唤师等级需大于等于 525, 当前等级为 {{level}})
     button: 执行
 
     failedNotification:
       title: 卸下头像框
-      description: 卸下头像框失败 {reason}
+      description: 卸下头像框失败 {{reason}}
 
   token:
     label: 卸下所有勋章
@@ -856,7 +856,7 @@ SummonerProfile:
 
     failedNotification:
       title: 卸下所有勋章
-      description: 卸下所有勋章失败 {reason}
+      description: 卸下所有勋章失败 {{reason}}
 
 GameView:
   title: 查看游戏
@@ -877,7 +877,7 @@ FakeRanked:
 
     failedNotification:
       title: 伪造段位
-      description: 伪造段位失败 {reason}
+      description: 伪造段位失败 {{reason}}
 
   queue: 队列
   tier: 段位
@@ -897,11 +897,11 @@ Spectate:
 
     notFoundNotification:
       title: 观战
-      description: 目标玩家 {name} 未找到
+      description: 目标玩家 {{name}} 未找到
 
     failedNotification:
       title: 观战
-      description: 尝试观战失败，该玩家可能不在对局中或目标模式不可观战 {reason}
+      description: 尝试观战失败，该玩家可能不在对局中或目标模式不可观战 {{reason}}
 
     successNotification:
       title: 观战
@@ -920,7 +920,7 @@ Spectate:
 
     failedNotification:
       title: 观战
-      description: 观战失败 {reason}
+      description: 观战失败 {{reason}}
 
   failedToLoadFriends: 无法加载好友列表
 
@@ -935,7 +935,7 @@ MatchHistoryTab:
   refreshPage: 刷新页面
   rankedMore: 更多
   tagPlayer: 标记玩家
-  itemPerPage: '{count} 项'
+  itemPerPage: '{{countV}} 项'
 
   private:
     title: 生涯隐藏
@@ -975,14 +975,14 @@ MatchHistoryTab:
     lose: 负
 
 MatchHistoryCard:
-  kprTitle: 在队伍中参与了击杀的程度 {rate}%
-  ddrTitle: 在队伍中对英雄造成的伤害占比 {rate}%
-  dtrTitle: 在队伍中的承受所有伤害占比  {rate}%
-  grTitle: 队伍经济比 {rate}%
-  kpr: 击杀参与率 {rate}%
-  ddr: 队伍伤害 {rate}%
-  dtr: 队伍承伤比 {rate}%
-  gr: 队伍经济 {rate}%
+  kprTitle: 在队伍中参与了击杀的程度 {{rate}}%
+  ddrTitle: 在队伍中对英雄造成的伤害占比 {{rate}}%
+  dtrTitle: 在队伍中的承受所有伤害占比  {{rate}}%
+  grTitle: 队伍经济比 {{rate}}%
+  kpr: 击杀参与率 {{rate}}%
+  ddr: 队伍伤害 {{rate}}%
+  dtr: 队伍承伤比 {{rate}}%
+  gr: 队伍经济 {{rate}}%
   misc: 杂项
   expand: 展开
   collapse: 收起
@@ -1002,9 +1002,9 @@ StandaloneMatchHistoryCardModal:
   loading: 加载中...
 
 MiscellaneousPanel:
-  gameId: 对局 ID {gameId}
-  gameDate: 对局日期 {date}
-  server: '区服：{server}'
+  gameId: 对局 ID {{gameId}}
+  gameDate: 对局日期 {{date}}
+  server: '区服：{{server}}'
   bans: 禁用：
 
   stats:
@@ -1132,8 +1132,8 @@ DetailedGame:
   win: 胜利
   lose: 失败
   controlWard: 控制守卫
-  wardPlaced: 放置 {count} 个，排除 {cleared} 个
-  csPerMinute: 每分钟 {count} 个
+  wardPlaced: 放置 {{countV}} 个，排除 {{cleared}} 个
+  csPerMinute: 每分钟 {{countV}} 个
 
   header:
     kda: KDA
@@ -1151,40 +1151,40 @@ CopyableText:
   copied: 已复制到剪贴板
 
 ItemDisplay:
-  combinePrice: 合成 {gold} G
+  combinePrice: 合成 {{gold}} G
 
 SummonerSpellDisplay:
-  cooldown: 冷却时间：{time} 秒
-  levelRequirement: 等级需求：{level}
+  cooldown: 冷却时间：{{time}} 秒
+  levelRequirement: 等级需求：{{level}}
 
 PlayerInfoCard:
   empty: 无内容
   loadingMatchHistory: 加载中...
   top4Rate: 前四率
   1stRate: 第一率
-  1st: 第一 {rate}%
+  1st: 第一 {{rate}}%
 
-  cherryWinRatePopover: 在近期 {count} 场对局中，该玩家的胜率为 {winRate}%。其中，斗魂竞技场的 {cherryCount} 场对局中，该玩家的首位率是 {top1Rate}%
-  winRatePopover: 在近期 {count} 场对局中，该玩家的胜率为 {winRate}%
-  kdaPopover: 在近期 {count} 场对局中，该玩家的平均 KDA 是 {kda}
-  premadePopover: 这些玩家在数场对局中都位于同一个阵营，推测他们可能是一支固定的小队。为了区分，将其命名为小队 {team}
-  highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {count} 场的对局中，赢了 {winCount} 场
+  cherryWinRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%。其中，斗魂竞技场的 {{cherryCount}} 场对局中，该玩家的首位率是 {{top1Rate}}%
+  winRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%
+  kdaPopover: 在近期 {{countV}} 场对局中，该玩家的平均 KDA 是 {{kda}}
+  premadePopover: 这些玩家在数场对局中都位于同一个阵营，推测他们可能是一支固定的小队。为了区分，将其命名为小队 {{team}}
+  highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {{countV}} 场的对局中，赢了 {{winCount}} 场
   metPopover:
-    title: 曾在 {date} 场对局中遇到过该玩家，共遇到过 {count} 次
+    title: 曾在 {{date}} 场对局中遇到过该玩家，共遇到过 {{countV}} 次
     gameId: 对局 ID
     date: 对局日期
   privatePopover: 该玩家设置了生涯为隐藏。这意味着他人无法查看该玩家的个人主页，包括战绩、成就点数等。另外，也不能观战该玩家
-  winningStreakPopover: 截止到现在，该玩家 {count} 连胜，很棒
-  losingStreakPopover: 截止到现在，该玩家 {count} 连败
+  winningStreakPopover: 截止到现在，该玩家 {{countV}} 连胜，很棒
+  losingStreakPopover: 截止到现在，该玩家 {{countV}} 连败
   akariLoved:
     good: 优异
     great: 极好
     goodPopover: 该玩家在近期对局中表现优异
     greatPopover: 该玩家展现了极好的表现
   champion:
-    winRate: 近期 {count} 场，胜率为 {winRate}%
-    level: '{level} 级'
-    masteryPoints: '{points} 成就点数'
+    winRate: 近期 {{countV}} 场，胜率为 {{winRate}}%
+    level: '{{level}} 级'
+    masteryPoints: '{{points}} 成就点数'
   matchHistory:
     winResult:
       na: '-'
@@ -1195,12 +1195,12 @@ PlayerInfoCard:
 
   self: 自己
   tagged: 已标记
-  premade: 预组队 {team}
+  premade: 预组队 {{team}}
   highWinRate: 极高胜率
   met: 遇到过
   private: 生涯隐藏
-  winningStreak: '{count} 连胜'
-  losingStreak: '{count} 连败'
+  winningStreak: '{{countV}} 连胜'
+  losingStreak: '{{countV}} 连败'
 
 OngoingGame:
   disconnected: 未连接到客户端
@@ -1219,8 +1219,8 @@ AuxWindowTitleBar:
   unpin: 取消置顶
 
 BenchChampionsMini:
-  reroll: '重随 (剩余: {count})'
-  charity: '重随并立即取回 (剩余: {count})'
+  reroll: '重随 (剩余: {{countV}})'
+  charity: '重随并立即取回 (剩余: {{countV}})'
   notInBenchMode: 当前不在随机模式中
   notInPhase: 未处于英雄选择过程中
 
@@ -1237,7 +1237,7 @@ BenchChampionsMini:
     tenacity: 韧性
 
 BenchModeAutoGrab:
-  grabbing: 即将选择 {seconds} s
+  grabbing: 即将选择 {{seconds}} s
   noExpectedChampions: 自动选择没有设置期望英雄列表
   noCandidate: 自动选择无可用英雄
 
@@ -1265,9 +1265,9 @@ ChampSelectOperations:
   dodgeAtLastSecond:
     label: 最后一秒秒退阈值
     waitingForTiming: 最后一秒秒退 (等待时机)
-    waiting: 最后一秒秒退 ({seconds} s)
+    waiting: 最后一秒秒退 ({{seconds}} s)
     text: '最后一秒秒退'
-    thresholdWarning: 过低的阈值 ({seconds} s) 可能会导致秒退失败
+    thresholdWarning: 过低的阈值 ({{seconds}} s) 可能会导致秒退失败
 
   autos:
     autoPick: 自动选择
@@ -1296,7 +1296,7 @@ LoungeOperations:
     label: 等待邀请中成员
 
 SkinSelectionMini:
-  skins: '{count} 款皮肤可用'
+  skins: '{{countV}} 款皮肤可用'
   button: 应用
   success: 应用皮肤成功
   failed: 应用皮肤失败
@@ -1308,7 +1308,7 @@ Lounge:
   atMost: 最多
 
   autoAccept:
-    acceptIn: 自动接受 {seconds} s
+    acceptIn: 自动接受 {{seconds}} s
     cancelButton: 取消本次自动接受
     declineButton: 拒绝对局
     acceptButton: 接受对局
@@ -1323,9 +1323,9 @@ Lounge:
     stop: 停止匹配
     cancel: 取消本次自动匹配
     searching: 匹配中
-    searchIn: 匹配中 {seconds} s
-    waitingForPenalty: 等待秒退计时器 {seconds} s
-    waitingForMembers: 自动匹配需达到 {count} 人
+    searchIn: 匹配中 {{seconds}} s
+    waitingForPenalty: 等待秒退计时器 {{seconds}} s
+    waitingForMembers: 自动匹配需达到 {{countV}} 人
     waitingForInvitees: 等待邀请中成员
 
 Placeholder:
@@ -1361,13 +1361,13 @@ Opgg:
         auto: 根据当前闪现的位置决定
 
   success: 请求已发送
-  loadVersionsFailedMessage: 获取版本数据失败：{reason}
-  loadTierFailedMessage: 获取梯队数据失败：{reason}
-  loadChampionFailedMessage: 获取英雄数据失败：{reason}
-  setSpellsFailedMessage: 设置召唤师技能失败：{reason}
-  setRunesFailedMessage: 设置符文配法失败：{reason}
-  spellsSet: '[League Akari] 已设置召唤师技能: {spell1} | {spell2}'
-  runesSet: '[League Akari] 已{action}符文配法: {name}'
+  loadVersionsFailedMessage: 获取版本数据失败：{{reason}}
+  loadTierFailedMessage: 获取梯队数据失败：{{reason}}
+  loadChampionFailedMessage: 获取英雄数据失败：{{reason}}
+  setSpellsFailedMessage: 设置召唤师技能失败：{{reason}}
+  setRunesFailedMessage: 设置符文配法失败：{{reason}}
+  spellsSet: '[League Akari] 已设置召唤师技能: {{spell1}} | {{spell2}}'
+  runesSet: '[League Akari] 已{{action}}符文配法: {{name}}'
 
   modes:
     ranked: '排位'
@@ -1440,7 +1440,7 @@ OpggChampion:
   counterC: 劣势
   allC: 所有
   empty: 暂无数据
-  times: '{times} 场'
+  times: '{{times}} 场'
   showAll: 展示全部
   spells: 召唤师技能
   apply: 应用
@@ -1450,7 +1450,7 @@ OpggChampion:
   prismItemText: 棱彩阶装备
   coreItemText: 核心装备
   itemText: 装备
-  tierText: T{tier} 级别
+  tierText: T{{tier}} 级别
   applyRunes: 导入当前装备方案
   applyRunesText: 方案应用
   augmentGold: 黄金阶
@@ -1458,21 +1458,21 @@ OpggChampion:
   augmentPrism: 棱彩阶
   synergies: 搭配
 
-  writeToDisk: '[League Akari] 已写入到装备方案：{name}'
+  writeToDisk: '[League Akari] 已写入到装备方案：{{name}}'
   writtenToDisk: 已写入到文件中
-  writeFileFailedMessage: 写入文件失败 {reason}
+  writeFileFailedMessage: 写入文件失败 {{reason}}
   bootsDesc: 鞋子 (按出场率排序)
   prismItemsDesc: 棱彩阶装备 (按出场率排序)
   itemsDesc: 装备 (按出场率排序)
-  coreItem: '核心装备 #{index} | 出场率 {pickRate}%'
-  starterItem: '初始装备 #{index} | 出场率 {pickRate}%'
+  coreItem: '核心装备 #{{index}} | 出场率 {{pickRate}}%'
+  starterItem: '初始装备 #{{index}} | 出场率 {{pickRate}}%'
 
 EasyToLaunch:
   tcls: TCLS 客户端
   weGame: WeGame
   riotClient: Riot 客户端
-  successMessage: 已启动进程：{name}
-  failedMessage: 无法启动进程 {name}：{reason}
+  successMessage: 已启动进程：{{name}}
+  failedMessage: 无法启动进程 {{name}}：{{reason}}
 
 InGameSend:
   sendStats:
@@ -1530,12 +1530,24 @@ InGameSend:
   error: 未知错误
   confirm: 确认
 
+tray:
+  quit: 退出
+  auxWindow: 辅助窗口
+  dev:
+    toggleMainWindowDevtools: Toggle DevTools - 主窗口
+    toggleAuxWindowDevtools: Toggle DevTools - 辅助窗口
+
+windowOpenHandler:
+  toAkari: 将转到 League Akari 的项目主页 ❤️
+  toExternalLink: 将跳转到外部链接 {{target}}
+
 common:
   appName: League Akari
   default: 默认
 
   yes: 是
   no: 否
+  confirm: 确认
   na: N/A
 
   lanes:

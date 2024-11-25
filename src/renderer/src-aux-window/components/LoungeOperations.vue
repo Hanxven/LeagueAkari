@@ -86,9 +86,10 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { ExpandMoreSharp as ExpandMoreSharpIcon } from '@vicons/material'
 import { NCard, NFlex, NIcon, NInputNumber, NPopover, NSwitch } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const agfs = useAutoGameflowStore()
 const lcs = useLeagueClientStore()

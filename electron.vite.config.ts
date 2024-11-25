@@ -44,7 +44,7 @@ const LC_CUSTOM_TAGS = new Set([
 export default defineConfig({
   main: {
     // https://electron-vite.org/guide/typescript-decorator
-    plugins: [swcPlugin(), externalizeDepsPlugin()],
+    plugins: [swcPlugin(), yaml(), externalizeDepsPlugin()],
     build: {
       minify
     },

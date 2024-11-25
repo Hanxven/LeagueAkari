@@ -35,10 +35,11 @@
 </template>
 
 <script setup lang="tsx">
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { AiStatus as AiStatusIcon } from '@vicons/carbon'
+import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
-import { nextTick, ref, useTemplateRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { nextTick, ref, useTemplateRef } from 'vue'
 
 import AutoGameflow from './AutoGameflow.vue'
 import AutoMisc from './AutoMisc.vue'
@@ -46,15 +47,16 @@ import AutoSelect from './AutoSelect.vue'
 
 const currentTab = ref('auto-gameflow')
 
-const { t, locale } = useI18n()
+const { t } = useTranslation()
+const as = useAppCommonStore()
 
 const tabsEl = useTemplateRef('tabs')
-watch(
-  () => locale.value,
-  () => {
-    nextTick(() => tabsEl.value?.syncBarPosition())
-  }
-)
+// watch(
+//   () => locale.value,
+//   () => {
+//     nextTick(() => tabsEl.value?.syncBarPosition())
+//   }
+// )
 </script>
 
 <style lang="less" scoped>

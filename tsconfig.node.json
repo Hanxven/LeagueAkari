@@ -11,7 +11,7 @@
     "target": "ESNext",
     "lib": ["ESNext"],
     "composite": true,
-    "types": ["electron-vite/node"],
+    "types": ["electron-vite/node", "@modyfi/vite-plugin-yaml/modules"],
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["src/shared/*"],

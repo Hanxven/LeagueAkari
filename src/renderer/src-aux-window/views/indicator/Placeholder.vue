@@ -11,9 +11,10 @@
 <script setup lang="ts">
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 </script>

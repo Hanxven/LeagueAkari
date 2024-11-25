@@ -1,4 +1,5 @@
 import { optimizer } from '@electron-toolkit/utils'
+import '@main/i18n'
 import { initAppLogger } from '@main/logger'
 import tools from '@main/native/la-tools-win64.node'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'

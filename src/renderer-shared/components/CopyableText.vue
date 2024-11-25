@@ -14,7 +14,7 @@
 import { Copy as CopyIcon } from '@vicons/carbon'
 import { NIcon, useMessage } from 'naive-ui'
 import { useSlots } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 const {
   showMessage = true,
@@ -28,7 +28,8 @@ const {
   suffix?: string
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const emits = defineEmits<{
   (e: 'copy', text: string): void

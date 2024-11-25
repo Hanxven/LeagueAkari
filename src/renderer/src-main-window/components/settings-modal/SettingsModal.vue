@@ -40,9 +40,9 @@
 
 <script setup lang="ts">
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { useTranslation } from 'i18next-vue'
 import { NModal, NTabPane, NTabs } from 'naive-ui'
 import { nextTick, useCssModule, useTemplateRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import AboutPane from './AboutPane.vue'
 import AppSettings from './AppSettings.vue'
@@ -53,7 +53,7 @@ import MiscSettings from './MiscSettings.vue'
 import OngoingGameSettings from './OngoingGameSettings.vue'
 import StorageSettings from './StorageSettings.vue'
 
-const { t, locale } = useI18n()
+const { t } = useTranslation()
 
 const styles = useCssModule()
 
@@ -64,9 +64,11 @@ const as = useAppCommonStore()
 
 const tabsEl = useTemplateRef('tabs')
 watch(
-  () => locale.value,
+  () => as.settings.locale,
   () => {
-    nextTick(() => tabsEl.value?.syncBarPosition())
+    requestAnimationFrame(() => {
+      tabsEl.value?.syncBarPosition()
+    })
   }
 )
 </script>

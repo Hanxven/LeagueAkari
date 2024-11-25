@@ -54,13 +54,14 @@ import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
 import { NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 defineProps<{
   showingNewUpdate?: boolean
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const sus = useSelfUpdateStore()
 

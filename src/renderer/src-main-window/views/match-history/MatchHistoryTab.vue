@@ -586,7 +586,7 @@ import {
   useNotification
 } from 'naive-ui'
 import { computed, markRaw, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import RankedTable from '@main-window/components/RankedTable.vue'
@@ -606,7 +606,8 @@ const { tab } = defineProps<{
   tab: TabState
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
@@ -953,31 +954,31 @@ const handleInputBlur = () => {
 
 const pageSizeOptions = computed(() => [
   {
-    label: t('MatchHistoryTab.itemPerPage', { count: 10 }),
+    label: t('MatchHistoryTab.itemPerPage', { countV: 10 }),
     value: 10
   },
   {
-    label: t('MatchHistoryTab.itemPerPage', { count: 20 }),
+    label: t('MatchHistoryTab.itemPerPage', { countV: 20 }),
     value: 20
   },
   {
-    label: t('MatchHistoryTab.itemPerPage', { count: 30 }),
+    label: t('MatchHistoryTab.itemPerPage', { countV: 30 }),
     value: 30
   },
   {
-    label: t('MatchHistoryTab.itemPerPage', { count: 40 }),
+    label: t('MatchHistoryTab.itemPerPage', { countV: 40 }),
     value: 40
   },
   {
-    label: t('MatchHistoryTab.itemPerPage', { count: 50 }),
+    label: t('MatchHistoryTab.itemPerPage', { countV: 50 }),
     value: 50
   },
   {
-    label: t('MatchHistoryTab.itemPerPage', { count: 100 }),
+    label: t('MatchHistoryTab.itemPerPage', { countV: 100 }),
     value: 100
   },
   {
-    label: t('MatchHistoryTab.itemPerPage', { count: 200 }),
+    label: t('MatchHistoryTab.itemPerPage', { countV: 200 }),
     value: 200
   }
 ])

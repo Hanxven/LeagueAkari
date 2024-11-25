@@ -1,6 +1,7 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import i18next from 'i18next'
+import { useTranslation } from 'i18next-vue'
 import { effectScope, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -21,10 +22,24 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
   private readonly _pm: PiniaMobxUtilsRenderer
   private readonly _setting: SettingUtilsRenderer
 
+  private readonly _scope = effectScope()
+
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-renderer']
     this._pm = deps['pinia-mobx-utils-renderer']
     this._setting = deps['setting-utils-renderer']
+
+    this._scope.run(() => {
+      const store = useAppCommonStore()
+
+      watch(
+        () => store.settings.locale,
+        (lo) => {
+          i18next.changeLanguage(lo)
+        },
+        { immediate: true }
+      )
+    })
   }
 
   onSecondInstance(fn: (commandLine: string[], workingDirectory: string) => void) {
@@ -78,21 +93,7 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
-  /**
-   * 把它丢到 App 层面的 setup 里面即可
-   */
-  useI18nSync() {
-    const { locale } = useI18n()
-    const store = useAppCommonStore()
-
-    watch(
-      () => store.settings.locale,
-      (lo) => {
-        locale.value = lo
-      },
-      { immediate: true }
-    )
+  async onDispose() {
+    this._scope.stop()
   }
-
-  async onDispose() {}
 }

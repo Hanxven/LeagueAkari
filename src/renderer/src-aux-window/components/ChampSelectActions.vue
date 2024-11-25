@@ -46,9 +46,10 @@ import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Action } from '@shared/types/league-client/champ-select'
 import { NCard, NTimeline, NTimelineItem } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const as2 = useAutoSelectStore()

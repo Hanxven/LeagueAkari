@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 const {
   baselineDamage = 1,
@@ -110,7 +110,8 @@ const {
   height?: number
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const INNER_WIDTH = 140
 

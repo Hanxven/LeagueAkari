@@ -128,7 +128,7 @@ export type TemplateEnv = {
   target: 'ally' | 'enemy' | 'all'
 
   /**
-   * currently only zh-cn or en
+   * currently only zh-CN or en
    */
   locale: string
 

@@ -84,9 +84,10 @@ import { useIntervalFn } from '@vueuse/core'
 import { AxiosError } from 'axios'
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
 import { computed, onActivated, onDeactivated, reactive, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')

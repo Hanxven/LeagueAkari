@@ -26,9 +26,10 @@ import { useInstance } from '@renderer-shared/shards'
 import { RespawnTimerRenderer } from '@renderer-shared/shards/respawn-timer'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
 import { NCard, NScrollbar, NSwitch } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const rts = useRespawnTimerStore()
 const rt = useInstance<RespawnTimerRenderer>('respawn-timer-renderer')

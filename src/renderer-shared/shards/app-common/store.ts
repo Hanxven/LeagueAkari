@@ -9,7 +9,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   const settings = shallowReactive({
     showFreeSoftwareDeclaration: false,
     isInKyokoMode: false,
-    locale: 'zh-cn'
+    locale: 'zh-CN'
   })
 
   const version = ref('0.0.0')

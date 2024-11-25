@@ -247,11 +247,12 @@ import {
   NTable
 } from 'naive-ui'
 import { computed, h, nextTick, ref, useTemplateRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import { LCU_ENDPOINTS } from './lcu-endpoints'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lc = useLeagueClientStore()
 const rds = useRendererDebugStore()

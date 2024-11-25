@@ -39,9 +39,10 @@ import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { RefreshRound as RefreshIcon } from '@vicons/material'
 import { NButton, NIcon, NSelect, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 

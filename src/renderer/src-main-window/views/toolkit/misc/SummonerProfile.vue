@@ -120,11 +120,12 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { ChampSkin } from '@shared/types/league-client/game-data'
 import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
 import { VNode, computed, h, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')

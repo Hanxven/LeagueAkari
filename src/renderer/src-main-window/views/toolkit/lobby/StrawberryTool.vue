@@ -103,9 +103,10 @@ import { isChampionNameMatch } from '@shared/utils/string-match'
 import { NButton, NCard, NSelect, SelectRenderLabel, useMessage } from 'naive-ui'
 import { h, shallowRef, watchEffect } from 'vue'
 import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')

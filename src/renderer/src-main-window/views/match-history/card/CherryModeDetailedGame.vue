@@ -11,7 +11,10 @@
         <thead class="team-header">
           <tr>
             <th class="header-info">
-              {{ formatI18nOrdinal(participants[0].stats.subteamPlacement, locale) }} ({{
+              {{
+                formatI18nOrdinal(participants[0].stats.subteamPlacement, as.settings.locale)
+              }}
+              ({{
                 participants[0].stats.subteamPlacement <= match.maxPlacement / 2
                   ? t('DetailedGame.win')
                   : t('DetailedGame.lose')
@@ -151,18 +154,20 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { formatI18nOrdinal } from '@shared/i18n'
 import { Game, Participant, ParticipantIdentity } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 
-const { t, locale } = useI18n()
+const { t } = useTranslation()
+const as = useAppCommonStore()
 
 const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
   participants: typeof match.value.teams.placement1

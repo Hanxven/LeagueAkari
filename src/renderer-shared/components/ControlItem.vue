@@ -30,9 +30,9 @@ defineProps<{
   display: flex;
   align-items: center;
   width: fit-content;
+  width: 100%;
 
   .label-area {
-    flex-grow: 1;
     margin-right: 24px;
     flex-shrink: 0;
   }
@@ -57,6 +57,10 @@ defineProps<{
 
   .label-description.disabled {
     color: rgb(97, 97, 97);
+  }
+
+  .control {
+    flex: 1;
   }
 }
 </style>

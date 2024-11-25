@@ -308,7 +308,7 @@ import {
   NSwitch
 } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 const store = useAutoGameflowStore()
 const shard = useInstance<AutoGameflowRenderer>('auto-gameflow-renderer')
@@ -331,7 +331,8 @@ const handleChangeInvitationStrategies = (value: string[]) => {
   shard.setInvitationHandlingStrategies(newStrategies)
 }
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const queueTypes = computed(() => {
   return {

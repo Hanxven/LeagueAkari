@@ -117,8 +117,8 @@ MatchHistoryTabsSettings:
   matchHistoryUseSgpApi:
     label: Use SGP API
     description: Use SGP API as the data source for the match history page
-    current: 'Current SGP Server: {server}'
-    unsupported: 'Unsupported SGP API: {server}'
+    current: 'Current SGP Server: {{server}}'
+    unsupported: 'Unsupported SGP API: {{server}}'
 
 OngoingGameSettings:
   title: Ongoing Game
@@ -133,7 +133,7 @@ OngoingGameSettings:
 
   premadeTeamThreshold:
     label: Premade Team Detection Threshold
-    description: A group of players will be considered a premade team if they appear on the same side more than {threshold} times.
+    description: A group of players will be considered a premade team if they appear on the same side more than {{threshold}} times.
 
   concurrency:
     label: Concurrent Request Limit
@@ -142,7 +142,7 @@ OngoingGameSettings:
   matchHistoryUseSgpApi:
     label: Use SGP API
     description: Prioritizes using the SGP API for match analysis. If the SGP API is unavailable, the LCU API will be used instead.
-    unsupported: 'SGP API is not supported for the current server: {server}'
+    unsupported: 'SGP API is not supported for the current server: {{server}}'
 
   matchHistoryTagPreference:
     label: Queue Filter Preference
@@ -272,11 +272,11 @@ DebugSettings:
 
 AboutPane:
   title: About
-  line1: ' (联盟阿卡林, Version { version }) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
+  line1: ' (联盟阿卡林, Version {{version}}) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
   line2: Project Reference
   copyright: © 2024 Hanxven. This software is open-source and follows the GPL-3.0 license.
 
-  checkFrom: Check updates from download source ({ source })
+  checkFrom: Check updates from download source ({{source}})
   checkUpdates: Check Updates
   newUpdates: New Version
   lastCheckAt: Last Check at
@@ -285,8 +285,8 @@ AboutPane:
     label: Update Process
     description: The ongoing update process
     downloading: Downloading update package
-    finished: Completed {progress} %
-    remain: Remaining {time}
+    finished: Completed {{progress}} %
+    remain: Remaining {{time}}
     downloadFailed: Download failed
     unpacking: Unpacking update package
     unpackFailed: Unpack failed
@@ -336,7 +336,7 @@ AutoGameflow:
     description: Automatically starts matchmaking when available.
   autoMatchmakingMinimumMembers:
     label: Minimum Members
-    description: Requires at least {members} members to start matchmaking automatically.
+    description: Requires at least {{members}} members to start matchmaking automatically.
   autoMatchmakingDelaySeconds:
     label: Matchmaking Wait Time (s)
     description: Delay in seconds before starting matchmaking when available.
@@ -466,7 +466,7 @@ SideBarFixed:
   settings: Settings
 
   respawnTimer:
-    timeLeft: Respawn in {seconds} s
+    timeLeft: Respawn in {{seconds}} s
 
 OrderedChampionList:
   searchForChampion: Search for Champion
@@ -502,7 +502,7 @@ DamageMetricsBar:
 SpectateStatus:
   button: Spectate
   bans: Bans
-  startFrom: Started from {date} ({relativeTime})
+  startFrom: Started from {{date}} ({{relativeTime}})
 
   lcuSpectate:
     label: Using LCU API (Optional)
@@ -529,8 +529,8 @@ SearchSummonerModal:
   search: Search Player
   result: Search Results
   history: Search History
-  validating: Validating players ({current} / {total})
-  validated: Validated {count} possible player records, no matching results found
+  validating: Validating players ({{current}} / {{total}})
+  validated: Validated {{countV}} possible player records, no matching results found
   noResult: No matching results found
   privacy: Private
   currentRoute: Current
@@ -550,7 +550,7 @@ PlayerTagEditModal:
   loading: Loading...
   save: Save
   cancel: Cancel
-  placeholder: Enter the tag for player {name}
+  placeholder: Enter the tag for player {{name}}
 
 ShortcutSelector:
   title: Shortcut Recording
@@ -567,8 +567,8 @@ ShortcutSelector:
 UpdateModal:
   newVersion: New Version
   versionFeatures: Version Features
-  newVersionAvailable: 'New version available: {version} (Current version: {currentVersion})'
-  currentVersion: 'Current Version: {version}'
+  newVersionAvailable: 'New version available: {{version}} (Current version: {{currentVersion}})'
+  currentVersion: 'Current Version: {{version}}'
   releasePage: Release Page
   download: Download
 
@@ -682,7 +682,7 @@ GameflowInProgress:
 
     failedNotification:
       title: Dodge Champion Select
-      description: 'Failed to dodge champion select: {reason}'
+      description: 'Failed to dodge champion select: {{reason}}'
 
   playAgain:
     label: Exit Post-Game Screen
@@ -691,7 +691,7 @@ GameflowInProgress:
 
     failedNotification:
       title: Exit Post-Game Screen
-      description: 'Failed to exit the post-game screen: {reason}'
+      description: 'Failed to exit the post-game screen: {{reason}}'
 
   leaveLobby:
     label: Leave Lobby
@@ -707,13 +707,13 @@ LobbyTool:
     button: Add
     failedNotification:
       title: Add Bot
-      description: 'Failed to add bot: {reason}'
+      description: 'Failed to add bot: {{reason}}'
 
   loadBots:
     firstUseNote: To fetch the custom bot list, you need to enter a custom lobby once.
     failedNotification:
       title: Load Bot List
-      description: 'Failed to load bot list: {reason}'
+      description: 'Failed to load bot list: {{reason}}'
 
   createIdLobby:
     label: Create Queue Lobby
@@ -723,7 +723,7 @@ LobbyTool:
 
     failedNotification:
       title: Create Queue Lobby
-      description: 'Failed to create queue lobby: {reason}'
+      description: 'Failed to create queue lobby: {{reason}}'
 
   create5x5PracticeLobby:
     label: Create 5v5 Practice Lobby
@@ -731,11 +731,11 @@ LobbyTool:
 
     failedNotification:
       title: Create 5v5 Practice Lobby
-      description: 'Failed to create 5v5 practice lobby: {reason}'
+      description: 'Failed to create 5v5 practice lobby: {{reason}}'
 
   loadEligibleQueuesFailedNotification:
     title: Load Queues Failed
-    description: 'Failed to load the list of available queues: {reason}'
+    description: 'Failed to load the list of available queues: {{reason}}'
 
   queueOptions:
     available: Available Queues
@@ -754,7 +754,7 @@ StrawberryTool:
     label: Set as Current Champion
     description: You can try selecting other champions.
     button: Set
-    failedMessage: 'Failed to set the current champion: {reason}'
+    failedMessage: 'Failed to set the current champion: {{reason}}'
 
   championOptions:
     modeSpecific: Mode-Specific Champions
@@ -764,13 +764,13 @@ StrawberryTool:
     label: Select Map
     description: Maps currently available.
     button: Set
-    failedMessage: 'Failed to set map: {reason}'
+    failedMessage: 'Failed to set map: {{reason}}'
 
   difficulty:
     label: Set Difficulty
     description: The preset difficulty levels include [Story], [Hard], and [Extreme]. Currently, you cannot set an unlocked difficulty level.
     button: Set
-    failedMessage: 'Failed to set difficulty: {reason}'
+    failedMessage: 'Failed to set difficulty: {{reason}}'
 
   requestSent: Request sent
 
@@ -788,7 +788,7 @@ ChatAvailability:
       offline: Offline
     failedNotification:
       title: Set Chat Status
-      description: 'Failed to set chat status: {reason}'
+      description: 'Failed to set chat status: {{reason}}'
 
 ChatStatusMessage:
   title: Chat Status Message
@@ -800,7 +800,7 @@ ChatStatusMessage:
 
     failedNotification:
       title: Set Chat Message
-      description: 'Failed to set chat message: {reason}'
+      description: 'Failed to set chat message: {{reason}}'
 
   text:
     label: Text Line
@@ -821,7 +821,7 @@ SummonerProfile:
 
     failedNotification:
       title: Profile Background
-      description: 'Failed to apply the current skin: {reason}'
+      description: 'Failed to apply the current skin: {{reason}}'
 
   profileBackground:
     label: Select Summoner Background
@@ -835,17 +835,17 @@ SummonerProfile:
 
     failedNotification:
       title: Switch to Last Season's Banner
-      description: 'Failed to switch banner: {reason}'
+      description: 'Failed to switch banner: {{reason}}'
 
   prestigeCrest:
     label: Remove Prestige Frame
     description: Remove the prestige frame.
-    descriptionInsufficientLevel: 'Remove the prestige frame (Summoner level must be 525 or higher; current level: {level})'
+    descriptionInsufficientLevel: 'Remove the prestige frame (Summoner level must be 525 or higher; current level: {{level}})'
     button: Execute
 
     failedNotification:
       title: Remove Prestige Frame
-      description: 'Failed to remove prestige frame: {reason}'
+      description: 'Failed to remove prestige frame: {{reason}}'
 
   token:
     label: Remove All Tokens
@@ -854,7 +854,7 @@ SummonerProfile:
 
     failedNotification:
       title: Remove All Tokens
-      description: 'Failed to remove all tokens: {reason}'
+      description: 'Failed to remove all tokens: {{reason}}'
 
 GameView:
   title: View Game
@@ -875,7 +875,7 @@ FakeRanked:
 
     failedNotification:
       title: Fake Ranked
-      description: 'Failed to fake ranked status: {reason}'
+      description: 'Failed to fake ranked status: {{reason}}'
 
   queue: Queue
   tier: Tier
@@ -895,11 +895,11 @@ Spectate:
 
     notFoundNotification:
       title: Spectate
-      description: Target player {name} not found.
+      description: Target player {{name}} not found.
 
     failedNotification:
       title: Spectate
-      description: 'Failed to start spectating. The player may not be in a game or the target mode is unspectatable: {reason}'
+      description: 'Failed to start spectating. The player may not be in a game or the target mode is unspectatable: {{reason}}'
 
     successNotification:
       title: Spectate
@@ -930,7 +930,7 @@ MatchHistoryTab:
   refreshPage: Refresh Page
   rankedMore: More
   tagPlayer: Tag Player
-  itemPerPage: '{count}'
+  itemPerPage: '{{countV}}'
 
   private:
     title: Profile Hidden
@@ -970,14 +970,14 @@ MatchHistoryTab:
     lose: Loss
 
 MatchHistoryCard:
-  kprTitle: 'Kill participation in team: {rate}%'
-  ddrTitle: 'Damage dealt to champions: {rate}%'
-  dtrTitle: 'Damage taken in team: {rate}%'
-  grTitle: 'Team gold share: {rate}%'
-  kpr: KPR {rate}%
-  ddr: DMG {rate}%
-  dtr: DMG Taken {rate}%
-  gr: Gold {rate}%
+  kprTitle: 'Kill participation in team: {{rate}}%'
+  ddrTitle: 'Damage dealt to champions: {{rate}}%'
+  dtrTitle: 'Damage taken in team: {{rate}}%'
+  grTitle: 'Team gold share: {{rate}}%'
+  kpr: KPR {{rate}}%
+  ddr: DMG {{rate}}%
+  dtr: DMG Taken {{rate}}%
+  gr: Gold {{rate}}%
   misc: Misc
   expand: Expand
   collapse: Collapse
@@ -997,9 +997,9 @@ StandaloneMatchHistoryCardModal:
   loading: Loading...
 
 MiscellaneousPanel:
-  gameId: Game ID {gameId}
-  gameDate: Game Date {date}
-  server: 'Server: {server}'
+  gameId: Game ID {{gameId}}
+  gameDate: Game Date {{date}}
+  server: 'Server: {{server}}'
   bans: 'Bans:'
 
   stats:
@@ -1127,8 +1127,8 @@ DetailedGame:
   win: Win
   lose: Loss
   controlWard: Control Wards
-  wardPlaced: Placed {count}, Cleared {cleared}
-  csPerMinute: '{count} / min'
+  wardPlaced: Placed {{countV}}, Cleared {{cleared}}
+  csPerMinute: '{{countV}} / min'
   bot: Bot
 
   header:
@@ -1141,44 +1141,44 @@ DetailedGame:
     augment: Augments
 
 SummonerSpellDisplay:
-  cooldown: 'Cooldown: {time} s'
-  levelRequirement: 'Level: {level} Required'
+  cooldown: 'Cooldown: {{time}} s'
+  levelRequirement: 'Level: {{level}} Required'
 
 CopyableText:
   copy: Copy
   copied: Copied to clipboard
 
 ItemDisplay:
-  combinePrice: Combine for {gold} G
+  combinePrice: Combine for {{gold}} G
 
 PlayerInfoCard:
   empty: No Content
   loadingMatchHistory: Loading...
   top4Rate: Top 4 Rate
   1stRate: First Place Rate
-  1st: First {rate}%
+  1st: First {{rate}}%
 
-  cherryWinRatePopover: In the recent {count} games, this player's win rate is {winRate}%. Among {cherryCount} games in Arena Mode, their first place rate is {top1Rate}%.
-  winRatePopover: In the recent {count} games, this player's win rate is {winRate}%.
-  kdaPopover: In the recent {count} games, this player's average KDA is {kda}.
-  premadePopover: These players have been on the same team in multiple games, suggesting they may be a premade group. They are labeled as Team {team}.
-  highWinRatePopover: This player's win rate is exceptionally high. In the recent {count} games, they have won {winCount} games.
+  cherryWinRatePopover: In the recent {{countV}} games, this player's win rate is {{winRate}}%. Among {{cherryCount}} games in Arena Mode, their first place rate is {{top1Rate}}%.
+  winRatePopover: In the recent {{countV}} games, this player's win rate is {{winRate}}%.
+  kdaPopover: In the recent {{countV}} games, this player's average KDA is {{kda}}.
+  premadePopover: These players have been on the same team in multiple games, suggesting they may be a premade group. They are labeled as Team {{team}}.
+  highWinRatePopover: This player's win rate is exceptionally high. In the recent {{countV}} games, they have won {{winCount}} games.
   metPopover:
-    title: Previously encountered this player in {date}, a total of {count} times.
+    title: Previously encountered this player in {{date}}, a total of {{countV}} times.
     gameId: Game ID
     date: Match Date
   privatePopover: This player has set their career profile to private, preventing others from viewing their profile, match history, and achievements. Additionally, they cannot be spectated.
-  winningStreakPopover: Currently on a winning streak of {count} games. Great job!
-  losingStreakPopover: Currently on a losing streak of {count} games.
+  winningStreakPopover: Currently on a winning streak of {{countV}} games. Great job!
+  losingStreakPopover: Currently on a losing streak of {{countV}} games.
   akariLoved:
     good: Good
     great: Excellent
     goodPopover: This player has performed well in recent games.
     greatPopover: This player has shown exceptional performance in recent games.
   champion:
-    winRate: 'Recent {count} games, win rate {winRate}%'
-    level: 'Level {level}'
-    masteryPoints: '{points} mastery points'
+    winRate: 'Recent {{countV}} games, win rate {{winRate}}%'
+    level: 'Level {{level}}'
+    masteryPoints: '{{points}} mastery points'
   matchHistory:
     winResult:
       na: '-'
@@ -1189,12 +1189,12 @@ PlayerInfoCard:
 
   self: Self
   tagged: Tagged
-  premade: Team {team}
+  premade: Team {{team}}
   highWinRate: High Win Rate
   met: Met
   private: Private
-  winningStreak: '{count} Wins'
-  losingStreak: '{count} Losses'
+  winningStreak: '{{countV}} Wins'
+  losingStreak: '{{countV}} Losses'
 
 OngoingGame:
   disconnected: Not connected to the client
@@ -1214,8 +1214,8 @@ AuxWindowTitleBar:
 
 BenchChampionsMini:
   title: Champion Bench
-  reroll: 'Reroll (Remaining: {count})'
-  charity: 'Reroll and Take back (Remaining: {count})'
+  reroll: 'Reroll (Remaining: {{countV}})'
+  charity: 'Reroll and Take back (Remaining: {{countV}})'
   notInBenchMode: Not currently in a bench mode
   notInPhase: Not in the champion selection phase
 
@@ -1232,7 +1232,7 @@ BenchChampionsMini:
     tenacity: Tenacity
 
 BenchModeAutoGrab:
-  grabbing: Selecting in {seconds}s
+  grabbing: Selecting in {{seconds}}s
   noExpectedChampions: No expected champion list set for auto-selection
   noCandidate: No available champions for auto-selection
 
@@ -1260,9 +1260,9 @@ ChampSelectOperations:
   dodgeAtLastSecond:
     label: Last-Second Dodge Threshold
     waitingForTiming: Last-Second Dodge (Waiting)
-    waiting: Dodge in {seconds} s
+    waiting: Dodge in {{seconds}} s
     text: 'Last-Second Dodge'
-    thresholdWarning: A threshold that is too low ({seconds} s) may result in dodge failure
+    thresholdWarning: A threshold that is too low ({{seconds}} s) may result in dodge failure
 
   autos:
     autoPick: Auto Pick
@@ -1291,7 +1291,7 @@ LoungeOperations:
     label: Wait for Invitees
 
 SkinSelectionMini:
-  skins: '{count} skins available'
+  skins: '{{countV}} skins available'
   button: Apply
   success: Skin applied successfully
   failed: Skin application failed
@@ -1303,7 +1303,7 @@ Lounge:
   atMost: At Most
 
   autoAccept:
-    acceptIn: Auto-accept in {seconds} s
+    acceptIn: Auto-accept in {{seconds}} s
     cancelButton: Cancel this auto-accept
     declineButton: Decline Match
     acceptButton: Accept Match
@@ -1318,9 +1318,9 @@ Lounge:
     stop: Stop matchmaking
     cancel: Cancel this auto-matchmaking
     searching: Searching
-    searchIn: Searching {seconds} s
-    waitingForPenalty: Waiting for dodge timer {seconds} s
-    waitingForMembers: Auto-matchmaking requires {count} players
+    searchIn: Searching {{seconds}} s
+    waitingForPenalty: Waiting for dodge timer {{seconds}} s
+    waitingForMembers: Auto-matchmaking requires {{countV}} players
     waitingForInvitees: Waiting for invited members
 
 Placeholder:
@@ -1356,13 +1356,13 @@ Opgg:
         auto: Decide based on the current Flash position
 
   success: Request sent
-  loadVersionsFailedMessage: 'Failed to fetch version data: {reason}'
-  loadTierFailedMessage: 'Failed to fetch tier data: {reason}'
-  loadChampionFailedMessage: 'Failed to fetch champion data: {reason}'
-  setSpellsFailedMessage: 'Failed to set summoner spells: {reason}'
-  setRunesFailedMessage: 'Failed to set rune builds: {reason}'
-  spellsSet: '[League Akari] Summoner spells set: [OP.GG] {spell1} | {spell2}'
-  runesSet: '[League Akari] {action} rune build: {name}'
+  loadVersionsFailedMessage: 'Failed to fetch version data: {{reason}}'
+  loadTierFailedMessage: 'Failed to fetch tier data: {{reason}}'
+  loadChampionFailedMessage: 'Failed to fetch champion data: {{reason}}'
+  setSpellsFailedMessage: 'Failed to set summoner spells: {{reason}}'
+  setRunesFailedMessage: 'Failed to set rune builds: {{reason}}'
+  spellsSet: '[League Akari] Summoner spells set: [OP.GG] {{spell1}} | {{spell2}}'
+  runesSet: '[League Akari] {{action}} rune build: {{name}}'
 
   modes:
     ranked: 'Ranked'
@@ -1435,7 +1435,7 @@ OpggChampion:
   counterC: Counter
   allC: All
   empty: No Data Available
-  times: '{times} Games'
+  times: '{{times}} Games'
   showAll: Show All
   spells: Summoner Spells
   apply: Apply
@@ -1445,7 +1445,7 @@ OpggChampion:
   prismItemText: Prism Tier Items
   coreItemText: Core Items
   itemText: Items
-  tierText: T{tier}
+  tierText: T{{tier}}
   applyRunes: Import Current Item Build
   applyRunesText: Build Applied
   augmentGold: Gold
@@ -1453,21 +1453,21 @@ OpggChampion:
   augmentPrism: Prism
   synergies: Synergies
 
-  writeToDisk: '[League Akari] Written to item build: {name}'
+  writeToDisk: '[League Akari] Written to item build: {{name}}'
   writtenToDisk: Successfully written to file
-  writeFileFailedMessage: Failed to write file {reason}
+  writeFileFailedMessage: Failed to write file {{reason}}
   bootsDesc: Boots (sorted by pick rate)
   prismItemsDesc: Prism Tier Items (sorted by pick rate)
   itemsDesc: Items (sorted by pick rate)
-  coreItem: 'Core Item #{index} | Pick Rate {pickRate}%'
-  starterItem: 'Starting Item #{index} | Pick Rate {pickRate}%'
+  coreItem: 'Core Item #{{index}} | Pick Rate {{pickRate}}%'
+  starterItem: 'Starting Item #{{index}} | Pick Rate {{pickRate}}%'
 
 EasyToLaunch:
   tcls: TCLS Client
   weGame: WeGame
   riotClient: Riot Client
-  successMessage: 'Successfully launched: {name}'
-  failedMessage: 'Failed to launch {name}: {reason}'
+  successMessage: 'Successfully launched: {{name}}'
+  failedMessage: 'Failed to launch {{name}}: {{reason}}'
 
 InGameSend:
   sendStats:
@@ -1527,12 +1527,24 @@ InGameSend:
   error: Unknown error
   confirm: Confirm
 
+tray:
+  quit: Quit
+  auxWindow: Aux Window
+  dev:
+    toggleMainWindowDevtools: Toggle DevTools - Main Window
+    toggleAuxWindowDevtools: Toggle DevTools - Aux Window
+
+windowOpenHandler:
+  toAkari: To League Akari GitHub ❤️
+  toExternalLink: To external site {{target}}
+
 common:
   appName: League Akari
   default: Default
 
   yes: yes
   no: no
+  confirm: Confirm
   na: N/A
 
   lanes:

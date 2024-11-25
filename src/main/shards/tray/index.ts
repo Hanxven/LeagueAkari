@@ -1,7 +1,9 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { Menu, MenuItem, Tray } from 'electron'
+import i18next from 'i18next'
 
 import icon from '../../../../resources/LA_ICON.ico?asset'
+import { AppCommonMain } from '../app-common'
 import { MobxUtilsMain } from '../mobx-utils'
 import { WindowManagerMain } from '../window-manager'
 
@@ -10,42 +12,53 @@ import { WindowManagerMain } from '../window-manager'
  */
 export class TrayMain implements IAkariShardInitDispose {
   static id = 'tray-main'
-  static dependencies = ['window-manager-main', 'mobx-utils-main']
+  static dependencies = ['window-manager-main', 'mobx-utils-main', 'app-common-main']
 
   private readonly _wm: WindowManagerMain
   private readonly _mobx: MobxUtilsMain
 
-  private readonly _tray: Tray
-  private readonly _auxWindowTrayItem: MenuItem
-  private readonly _auxWindowTrayDevItem: MenuItem
-  private readonly _contextMenu: Menu
+  private readonly _app: AppCommonMain
+
+  private _tray: Tray | null = null
+  private _mainWindowDevTrayItem: MenuItem
+  private _auxWindowTrayItem: MenuItem
+  private _auxWindowTrayDevItem: MenuItem
+  private _quitTrayItem: MenuItem
+  private _contextMenu: Menu
 
   constructor(deps: any) {
     this._wm = deps['window-manager-main']
     this._mobx = deps['mobx-utils-main']
+    this._app = deps['app-common-main']
+  }
 
+  private _buildTray() {
     this._tray = new Tray(icon)
+
     this._auxWindowTrayItem = new MenuItem({
-      label: '小窗口',
+      label: i18next.t('tray.auxWindow'),
       type: 'normal',
       click: () => this._wm.showOrRestoreAuxWindow()
     })
 
     this._auxWindowTrayDevItem = new MenuItem({
-      label: 'Toggle DevTools - 辅助窗口',
+      id: 'aux-window-dev',
+      label: i18next.t('tray.dev.toggleAuxWindowDevtools'),
       type: 'normal',
       click: () => this._wm.toggleDevtoolsAuxWindow()
     })
 
-    const devSubMenu = new Menu()
-    devSubMenu.append(
-      new MenuItem({
-        label: 'Toggle DevTools - 主窗口',
-        type: 'normal',
-        click: () => this._wm.toggleDevtoolsMainWindow()
-      })
-    )
-    devSubMenu.append(this._auxWindowTrayDevItem)
+    this._mainWindowDevTrayItem = new MenuItem({
+      label: i18next.t('tray.dev.toggleMainWindowDevtools'),
+      type: 'normal',
+      click: () => this._wm.showOrRestoreMainWindow()
+    })
+
+    this._quitTrayItem = new MenuItem({
+      label: i18next.t('tray.quit'),
+      type: 'normal',
+      click: () => this._wm.forceMainWindowQuit()
+    })
 
     this._contextMenu = Menu.buildFromTemplate([
       {
@@ -59,17 +72,13 @@ export class TrayMain implements IAkariShardInitDispose {
       {
         label: 'Dev',
         type: 'submenu',
-        submenu: devSubMenu
+        submenu: Menu.buildFromTemplate([this._mainWindowDevTrayItem, this._auxWindowTrayDevItem])
       },
       {
         type: 'separator'
       },
       this._auxWindowTrayItem,
-      {
-        label: '退出',
-        type: 'normal',
-        click: () => this._wm.forceMainWindowQuit()
-      }
+      this._quitTrayItem
     ])
 
     this._tray.setToolTip('League Akari')
@@ -90,9 +99,22 @@ export class TrayMain implements IAkariShardInitDispose {
         }
       }
     )
+
+    this._mobx.reaction(
+      () => this._app.settings.locale,
+      (_locale) => {
+        if (this._tray) {
+          this._tray.destroy()
+        }
+
+        this._buildTray()
+      }
+    )
+
+    this._buildTray()
   }
 
   async onDispose() {
-    this._tray.destroy()
+    this._tray?.destroy()
   }
 }

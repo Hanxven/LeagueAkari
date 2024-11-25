@@ -235,11 +235,12 @@ import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const store = useAutoSelectStore()
 const as = useInstance<AutoSelectRenderer>('auto-select-renderer')

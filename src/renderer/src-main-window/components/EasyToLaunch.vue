@@ -13,13 +13,14 @@ import { ClientInstallationRenderer } from '@renderer-shared/shards/client-insta
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
 import { useMessage } from 'naive-ui'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import leagueIco from '@main-window/assets/ico/league.ico'
 import riotClient from '@main-window/assets/ico/riotclient.ico'
 import weGameIco from '@main-window/assets/ico/wegame.ico'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const ci = useInstance<ClientInstallationRenderer>('client-installation-renderer')
 const cis = useClientInstallationStore()

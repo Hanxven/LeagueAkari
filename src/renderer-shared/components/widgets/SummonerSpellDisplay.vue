@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { NPopover } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 import LcuImage from '../LcuImage.vue'
 
@@ -47,7 +47,8 @@ const { size = 20 } = defineProps<{
   size?: number
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 </script>

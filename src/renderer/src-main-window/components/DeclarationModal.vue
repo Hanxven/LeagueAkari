@@ -34,9 +34,10 @@
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { NButton, NCheckbox, NFlex, NModal } from 'naive-ui'
 import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const emits = defineEmits<{
   (e: 'confirm', notShowAgain: boolean): void

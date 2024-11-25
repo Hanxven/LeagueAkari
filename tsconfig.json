@@ -2,6 +2,7 @@
   "files": [],
   "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.web.json" }],
   "compilerOptions": {
+    "types": ["@modyfi/vite-plugin-yaml/modules"],
     "target": "ESNext",
     "lib": ["ESNext"],
     "noUnusedLocals": false,

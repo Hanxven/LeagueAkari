@@ -36,7 +36,7 @@ import {
   NInput
 } from 'naive-ui'
 import { computed, h, ref, useCssModule } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
 const props = defineProps<{
   championId?: number
@@ -53,7 +53,8 @@ const emits = defineEmits<{
   (e: 'toChampion', championId: number): void
 }>()
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const eas = useExtraAssetsStore()

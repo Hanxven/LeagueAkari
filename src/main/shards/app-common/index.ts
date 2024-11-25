@@ -1,3 +1,4 @@
+import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 import { app, nativeImage, shell } from 'electron'
@@ -100,6 +101,14 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
   async onInit() {
     await this._handleState()
+
+    this._mobx.reaction(
+      () => this.settings.locale,
+      (locale) => {
+        i18next.changeLanguage(locale)
+      },
+      { fireImmediately: true }
+    )
 
     this._ipc.onCall(AppCommonMain.id, 'setDisableHardwareAcceleration', (s: boolean) => {
       this._setDisableHardwareAccelerationAndRelaunch(s)

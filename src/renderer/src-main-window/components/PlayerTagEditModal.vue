@@ -48,9 +48,10 @@ import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { summonerName } from '@shared/utils/name'
 import { NButton, NInput, NModal } from 'naive-ui'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useTranslation } from 'i18next-vue'
 
-const { t } = useI18n()
+
+const { t } = useTranslation()
 
 const show = defineModel<boolean>('show', { default: false })
 

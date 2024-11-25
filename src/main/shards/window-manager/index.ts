@@ -1,4 +1,5 @@
 import { is } from '@electron-toolkit/utils'
+import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
@@ -486,12 +487,14 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       dialog
         .showMessageBox(this._mw!, {
           type: 'question',
-          buttons: ['Yes', 'No'],
+          buttons: [i18next.t('common.yes'), i18next.t('common.no')],
           defaultId: 0,
-          title: '确认',
+          title: i18next.t('common.confirm'),
           message: details.url.startsWith(LEAGUE_AKARI_GITHUB)
-            ? '将转到 League Akari 的项目主页 ❤️'
-            : `将跳转到外部链接 ${new URL(details.url).origin}`,
+            ? i18next.t('windowOpenHandler.toAkari')
+            : i18next.t('windowOpenHandler.toExternalLink', {
+                target: new URL(details.url).origin
+              }),
           detail: details.url
         })
         .then((r) => {
@@ -565,12 +568,14 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       dialog
         .showMessageBox(this._aw!, {
           type: 'question',
-          buttons: ['Yes', 'No'],
+          buttons: [i18next.t('common.yes'), i18next.t('common.no')],
           defaultId: 0,
-          title: '确认',
+          title: i18next.t('common.confirm'),
           message: details.url.startsWith(LEAGUE_AKARI_GITHUB)
-            ? '将转到 League Akari 的项目主页 ❤️'
-            : `将跳转到外部链接 ${new URL(details.url).origin}`,
+            ? i18next.t('windowOpenHandler.toAkari')
+            : i18next.t('windowOpenHandler.toExternalLink', {
+                target: new URL(details.url).origin
+              }),
           detail: details.url
         })
         .then((r) => {

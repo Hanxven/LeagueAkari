@@ -141,7 +141,7 @@
                 <div>
                   {{
                     t('DetailedGame.csPerMinute', {
-                      count: (
+                      countV: (
                         (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) /
                         ((game.gameDuration || 1) / 60)
                       ).toFixed(1)
@@ -206,12 +206,12 @@ import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game, ParticipantIdentity } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
 
-const { t } = useI18n()
+const { t } = useTranslation()
 
 const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
   participants: (typeof match.value.teams)[keyof typeof match.value.teams]
