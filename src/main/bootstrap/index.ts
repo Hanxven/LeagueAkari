@@ -99,7 +99,7 @@ function handleUnhandledErrors(logger: Logger) {
       namespace: 'error-handling'
     })
     dialog.showErrorBox('Uncaught Exception', formatError(error))
-    app.quit()
+    app.exit(10003)
   })
 
   process.on('unhandledRejection', (error) => {

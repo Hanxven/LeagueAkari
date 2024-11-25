@@ -222,7 +222,6 @@ interface SpectateToken {
   akariVersion: string
   locale?: string
   sgpServerId: string
-  puuid: string
   observerEncryptionKey: string
   observerServerPort: number
   observerServerIp: string
@@ -237,7 +236,6 @@ const checkSpectateToken = (str: string) => {
     return (
       typeof obj.akariVersion === 'string' &&
       typeof obj.sgpServerId === 'string' &&
-      typeof obj.puuid === 'string' &&
       typeof obj.observerEncryptionKey === 'string' &&
       typeof obj.observerServerPort === 'number' &&
       typeof obj.observerServerIp === 'string' &&

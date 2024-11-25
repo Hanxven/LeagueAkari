@@ -341,7 +341,6 @@ const handleCopyToken = () => {
   const token = {
     akariVersion: as.version,
     sgpServerId,
-    puuid,
     observerEncryptionKey: data.playerCredentials.observerEncryptionKey,
     observerServerPort: data.playerCredentials.observerServerPort,
     observerServerIp: data.playerCredentials.observerServerIp,

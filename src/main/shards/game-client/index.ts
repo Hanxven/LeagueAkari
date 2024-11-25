@@ -19,7 +19,6 @@ import { GameClientSettings } from './state'
 export interface LaunchSpectatorConfig {
   locale?: string
   sgpServerId: string
-  puuid: string
   observerEncryptionKey: string
   observerServerPort: number
   observerServerIp: string
@@ -185,7 +184,6 @@ export class GameClientMain implements IAkariShardInitDispose {
    */
   private async _completeSpectatorCredential(config: LaunchSpectatorConfig) {
     const {
-      puuid,
       sgpServerId,
       gameId,
       gameMode,
@@ -205,7 +203,6 @@ export class GameClientMain implements IAkariShardInitDispose {
       const gameInstallRoot = path.resolve(this._ci.state.tencentInstallationPath, 'Game')
 
       return {
-        puuid,
         sgpServerId,
         gameId,
         gameMode,
@@ -225,7 +222,6 @@ export class GameClientMain implements IAkariShardInitDispose {
           }>('/lol-patch/v1/products/league_of_legends/install-location')
 
           return {
-            puuid,
             sgpServerId,
             gameId,
             gameMode,

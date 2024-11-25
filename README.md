@@ -65,8 +65,9 @@ Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/H
 支持腾讯服以及非腾讯服客户端。
 
 > [!NOTE]
-> 一旦检测到游戏客户端，则会自动连接。无需考虑启动顺序。
-> League Akari 会很好地处理中途启动的情况。
+> 一旦检测到游戏客户端，则会自动连接，无需考虑启动顺序。
+>
+> League Akari 会很好地处理中途启动的情景，并始终维持合适的连接状态。
 
 ## 1.3 企鹅群组
 

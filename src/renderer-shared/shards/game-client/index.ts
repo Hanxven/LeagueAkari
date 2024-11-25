@@ -9,7 +9,11 @@ import { useGameClientStore } from './store'
 interface LaunchSpectatorConfig {
   locale?: string
   sgpServerId: string
-  puuid: string
+  observerEncryptionKey: string
+  observerServerPort: number
+  observerServerIp: string
+  gameId: number
+  gameMode: string
 }
 
 const MAIN_SHARD_NAMESPACE = 'game-client-main'
