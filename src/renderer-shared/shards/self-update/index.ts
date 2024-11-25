@@ -30,6 +30,10 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'checkUpdates')
   }
 
+  checkUpdatesDebug() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'checkUpdatesDebug')
+  }
+
   startUpdate() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'startUpdate')
   }

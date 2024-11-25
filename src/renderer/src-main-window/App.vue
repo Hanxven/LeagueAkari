@@ -28,6 +28,7 @@ import { setupNaiveUiNotificationEvents } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
@@ -45,8 +46,10 @@ setupNaiveUiNotificationEvents()
 
 const muis = useMainWindowUiStore()
 
-const su = useSelfUpdateStore()
+const sus = useSelfUpdateStore()
 const as = useAppCommonStore()
+
+const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
 
 const app = useInstance<AppCommonRenderer>('app-common-renderer')
 
@@ -61,7 +64,7 @@ provide('app', {
   },
   openUpdateModal: () => {
     isShowingNewUpdateModal.value = true
-    if (su.newUpdates) {
+    if (sus.newUpdates) {
       isShowingNewUpdate.value = true
     } else {
       isShowingNewUpdate.value = false
@@ -86,14 +89,14 @@ watchEffect(() => {
 })
 
 watchEffect(() => {
-  if (su.currentAnnouncement && !su.currentAnnouncement.isRead) {
-    console.log(su.currentAnnouncement)
+  if (sus.currentAnnouncement && !sus.currentAnnouncement.isRead) {
+    console.log(sus.currentAnnouncement)
     isShowingAnnouncementModal.value = true
   }
 })
 
 watchEffect(() => {
-  if (su.newUpdates) {
+  if (sus.newUpdates) {
     isShowingNewUpdateModal.value = true
     isShowingNewUpdate.value = true
   } else {
@@ -147,6 +150,18 @@ useKeyboardCombo('AKARI', {
       content: 'League Akari!',
       duration: 6000
     })
+  },
+  requireSameEl: true,
+  caseSensitive: false,
+  maxInterval: 250
+})
+
+useKeyboardCombo('intintint', {
+  onFinish: () => {
+    message.info('启用测试性更新', {
+      duration: 10000
+    })
+    su.checkUpdatesDebug()
   },
   requireSameEl: true,
   caseSensitive: false,

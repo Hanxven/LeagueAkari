@@ -572,6 +572,7 @@ import {
 } from '@vicons/material'
 import { useIntervalFn, useMediaQuery } from '@vueuse/core'
 import { toBlob } from 'html-to-image'
+import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NIcon,
@@ -586,7 +587,6 @@ import {
   useNotification
 } from 'naive-ui'
 import { computed, markRaw, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import RankedTable from '@main-window/components/RankedTable.vue'
@@ -605,7 +605,6 @@ import SpectateStatus from './widgets/SpectateStatus.vue'
 const { tab } = defineProps<{
   tab: TabState
 }>()
-
 
 const { t } = useTranslation()
 
@@ -1228,16 +1227,22 @@ const handleLaunchSpectator = async (_: string, useLcuApi: boolean) => {
         duration: 4000
       })
     } else {
-      await gc.launchSpectator({
-        locale: 'zh_CN',
-        puuid: tab.puuid,
-        sgpServerId: tab.sgpServerId
-      })
-      notification.success({
-        title: '观战',
-        content: '已调起进程。注意，调起观战可能会出现黑屏情况，若长时间黑屏，届时请手动结束进程',
-        duration: 4000
-      })
+      if (tab.spectatorData) {
+        await gc.launchSpectator({
+          locale: 'zh_CN',
+          gameId: tab.spectatorData.game.id,
+          gameMode: tab.spectatorData.game.gameMode,
+          observerEncryptionKey: tab.spectatorData.playerCredentials.observerEncryptionKey,
+          observerServerIp: tab.spectatorData.playerCredentials.observerServerIp,
+          observerServerPort: tab.spectatorData.playerCredentials.observerServerPort,
+          sgpServerId: tab.sgpServerId
+        })
+        notification.success({
+          title: '观战',
+          content: '已调起进程。注意，调起观战可能会出现黑屏情况，若长时间黑屏，届时请手动结束进程',
+          duration: 4000
+        })
+      }
     }
   } catch (error) {
     notification.warning({

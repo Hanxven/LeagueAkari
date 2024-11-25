@@ -907,7 +907,7 @@ export class LeagueClientSyncedData {
         }
 
         this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-summoner')
-        this._log.warn(`获取召唤师信息失败 ${formatError(error)}`)
+        this._log.warn(`获取召唤师信息失败，最大重试次数达到`)
       }
     }
 

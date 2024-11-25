@@ -87,7 +87,7 @@ export function initAppLogger() {
         format: format.combine(
           format.timestamp(),
           format.printf(({ level, message, namespace, timestamp }) => {
-            return `[${dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss:SSS')}] [${namespace}] [${level}] ${message}`
+            return `[${dayjs(timestamp as any).format('YYYY-MM-DD HH:mm:ss:SSS')}] [${namespace}] [${level}] ${message}`
           })
         )
       }),
@@ -96,7 +96,7 @@ export function initAppLogger() {
         format: format.combine(
           format.timestamp(),
           format.printf(({ level, message, namespace, timestamp }) => {
-            const timestampColored = `${STYLES.white}[${dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss:SSS')}]${STYLES.reset}`
+            const timestampColored = `${STYLES.white}[${dayjs(timestamp as any).format('YYYY-MM-DD HH:mm:ss:SSS')}]${STYLES.reset}`
             const namespaceColored = `${STYLES.brightBlue}${STYLES.bold}[${namespace}]${STYLES.reset}`
             const levelColor = LEVEL_COLORS[level] || STYLES.reset
             const levelColored = `${levelColor}[${level}]${STYLES.reset}`

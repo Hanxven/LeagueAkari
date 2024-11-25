@@ -138,6 +138,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   }
 
   async onDispose() {
+    this._manuallyDisconnected = true
     this._disconnect()
     this.events.clear()
     this._protocol.unregisterDomain('league-client')

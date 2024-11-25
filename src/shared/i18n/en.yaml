@@ -281,11 +281,11 @@ AboutPane:
   newUpdates: New Version
   lastCheckAt: Last Check at
 
-  updateProcess:
+  updateProgress:
     label: Update Process
     description: The ongoing update process
     downloading: Downloading update package
-    finished: Completed {{progress}} %
+    finished: Completed {{progress}}%
     remain: Remaining {{time}}
     downloadFailed: Download failed
     unpacking: Unpacking update package

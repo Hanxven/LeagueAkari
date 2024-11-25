@@ -9,16 +9,9 @@ set "SOURCE_A=%~1"
 set "TARGET_C=%~2"
 set "EXECUTABLE_NAME=%~3"
 
-:: Wait for a specific process to end
-echo Waiting for process %EXECUTABLE_NAME% to end...
-:WAIT_PROCESS
-set "PROCESS_NAME=%EXECUTABLE_NAME%"
-tasklist | find /i "%PROCESS_NAME%" >nul
-if not errorlevel 1 (
-    timeout /t 1 >nul
-    goto :WAIT_PROCESS
-)
+timeout /t 5 >nul
 
+echo League Akari Update Script...
 echo Process %EXECUTABLE_NAME% has ended.
 
 :: Get directory B (the parent directory of C)

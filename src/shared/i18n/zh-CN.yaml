@@ -275,7 +275,7 @@ DebugSettings:
 
 AboutPane:
   title: 关于
-  line1: ' (联盟阿卡林，Version {{ version }}) 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖'
+  line1: ' (联盟阿卡林，Version {{version}}) 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖'
   line2: 项目参考
   copyright: © 2024 Hanxven. 本软件是开源软件，遵循 GPL-3.0 许可证。
 
@@ -284,11 +284,11 @@ AboutPane:
   newUpdates: 新版本内容
   lastCheckAt: 上次检查
 
-  updateProcess:
+  updateProgress:
     label: 更新流程
     description: 正在进行的更新流程
     downloading: 下载更新包
-    finished: 已完成 {{progress}} %
+    finished: 已完成 {{progress}}%
     remain: 剩余 {{time}}
     downloadFailed: 下载出错
     unpacking: 解压更新包

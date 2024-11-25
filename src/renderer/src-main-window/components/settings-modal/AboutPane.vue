@@ -70,8 +70,8 @@
         <ControlItem
           v-if="sus.updateProgressInfo"
           class="control-item-margin"
-          :label="t('AboutPane.updateProcess.label')"
-          :label-description="t('AboutPane.updateProcess.description')"
+          :label="t('AboutPane.updateProgress.label')"
+          :label-description="t('AboutPane.updateProgress.description')"
           :label-width="180"
         >
           <NSteps
@@ -83,12 +83,12 @@
             <NStep>
               <template #title
                 ><span class="step-title">{{
-                  t('AboutPane.updateProcess.downloading')
+                  t('AboutPane.updateProgress.downloading')
                 }}</span></template
               >
               <div class="step-description">
                 {{
-                  t('AboutPane.updateProcess.finished', {
+                  t('AboutPane.updateProgress.finished', {
                     progress: (sus.updateProgressInfo.downloadingProgress * 100).toFixed()
                   })
                 }}
@@ -115,7 +115,7 @@
               >
               <div class="step-description">
                 {{
-                  t('AboutPane.updateProgress.finish', {
+                  t('AboutPane.updateProgress.finished', {
                     progress: (sus.updateProgressInfo.unpackingProgress * 100).toFixed()
                   })
                 }}
@@ -169,7 +169,7 @@ import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NFlex, NScrollbar, NStep, NSteps, useMessage } from 'naive-ui'
-import { computed, h, inject } from 'vue'
+import { computed, h, inject, watchEffect } from 'vue'
 
 const UPDATE_SOURCE_MAP = {
   github: 'GitHub',
@@ -181,6 +181,10 @@ const { t } = useTranslation()
 const as = useAppCommonStore()
 const sus = useSelfUpdateStore()
 const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
+
+watchEffect(() => {
+  console.log(sus.updateProgressInfo, sus.newUpdates)
+})
 
 const message = useMessage()
 
