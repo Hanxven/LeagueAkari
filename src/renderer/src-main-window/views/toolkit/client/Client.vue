@@ -91,9 +91,11 @@
                 ? t('Client.leagueClientUx.fixWindowMethodAOptions.label')
                 : t('Client.leagueClientUx.fixWindowMethodAOptions.labelAdminRequired')
             "
-            :label-description="t('Client.leagueClientUx.fixWindowMethodAOptions.description')"
             :label-width="320"
           >
+            <template #labelDescription>
+              <div v-html="t('Client.leagueClientUx.fixWindowMethodAOptions.description')"></div>
+            </template>
             <div class="control" style="display: flex; gap: 4px; align-items: baseline">
               <NInputNumber
                 style="width: 80px"
@@ -274,16 +276,16 @@ const handleLaunchUx = async () => {
 const fixWindowInputButton2 = useTemplateRef('input-2')
 
 const fixWindowMethodAOptions = reactive({
-  baseWidth: 720,
-  baseHeight: 1280
+  baseWidth: 1280,
+  baseHeight: 720
 })
 
 const handleFixWindowMethodA = async () => {
   dialog.warning({
     title: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.title'),
     content: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.content'),
-    positiveText: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.content.positiveText'),
-    negativeText: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.content.negativeText'),
+    positiveText: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.positiveText'),
+    negativeText: t('Client.leagueClientUx.fixWindowMethodAOptions.dialog.negativeText'),
     onPositiveClick: async () => {
       try {
         await lc.fixWindowMethodA(toRaw(fixWindowMethodAOptions))

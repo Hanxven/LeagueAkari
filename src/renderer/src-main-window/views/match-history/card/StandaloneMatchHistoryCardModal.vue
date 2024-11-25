@@ -37,6 +37,7 @@
 import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Game } from '@shared/types/league-client/match-history'
@@ -62,13 +63,10 @@ const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const sgp = useInstance<SgpRenderer>('sgp-renderer')
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 const sgps = useSgpStore()
+const lcs = useLeagueClientStore()
 
 // 和战绩页面的设置共享
 const mhs = useMatchHistoryTabsStore()
-
-const willUseSgpApi = computed(() => {
-  return mhs.settings.matchHistoryUseSgpApi && sgps.availability.serversSupported.matchHistory
-})
 
 const show = defineModel<boolean>('show', { default: false })
 
@@ -77,6 +75,14 @@ const isExpanded = ref(true)
 const isLoading = ref(false)
 const isFailedToLoad = ref(false)
 const isNotFound = ref(false)
+
+const isAbleToUseSgpApi = computed(() => {
+  return (
+    mhs.settings.matchHistoryUseSgpApi &&
+    sgps.availability.serversSupported.matchHistory &&
+    sgps.isTokenReady
+  )
+})
 
 const showingGame = computed(() => {
   return props.game || uncontrolledData.value || null
@@ -120,11 +126,11 @@ const handleReload = async () => {
   if (!props.gameId || props.game) {
     return
   }
-  await fetchGame(props.gameId, willUseSgpApi.value)
+  await fetchGame(props.gameId, isAbleToUseSgpApi.value)
 }
 
 watch(
-  [() => props.game, () => props.gameId, () => props.selfPuuid, () => willUseSgpApi.value],
+  [() => props.game, () => props.gameId, () => props.selfPuuid, () => isAbleToUseSgpApi.value],
   ([game, gameId, _selfId, useSgpApi]) => {
     if (game) {
       return
@@ -132,7 +138,7 @@ watch(
 
     uncontrolledData.value = null
 
-    if (gameId) {
+    if (gameId && lcs.isConnected) {
       fetchGame(gameId, useSgpApi)
       isExpanded.value = true
     } else {

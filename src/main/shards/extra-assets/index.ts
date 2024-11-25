@@ -8,7 +8,7 @@ import { MobxUtilsMain } from '../mobx-utils'
 import { ExtraAssetsStateFandom, ExtraAssetsStateGtimg } from './state'
 
 /**
- * 一些额外资源的拉取, 通常不属于 Akari 的一部分
+ * 一些额外资源的拉取, 通常不属于 Akari 的一部分, 不影响核心逻辑, 可有可无
  */
 export class ExtraAssetsMain implements IAkariShardInitDispose {
   static id = 'extra-assets-main'

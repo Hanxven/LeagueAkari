@@ -9,7 +9,7 @@
       class="control-item-margin"
       :label="t('GameflowInProgress.dodge.label')"
       :label-description="t('GameflowInProgress.dodge.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <NButton
         type="warning"
@@ -23,7 +23,7 @@
       class="control-item-margin"
       :label="t('GameflowInProgress.playAgain.label')"
       :label-description="t('GameflowInProgress.playAgain.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <NButton type="primary" :disabled="!isInEndgamePhase" @click="handlePlayAgain" size="small">{{
         t('GameflowInProgress.playAgain.button')
@@ -33,7 +33,7 @@
       class="control-item-margin"
       :label="t('GameflowInProgress.leaveLobby.label')"
       :label-description="t('GameflowInProgress.leaveLobby.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <NButton
         :disabled="lcs.gameflow.phase !== 'Lobby'"

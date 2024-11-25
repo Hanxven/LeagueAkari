@@ -41,3 +41,8 @@ export interface UpdateTagDto {
   rsoPlatformId: string
   region: string
 }
+
+export interface QueryAllSavedPlayersDto {
+  page: number
+  pageSize: number
+}

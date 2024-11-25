@@ -5,7 +5,7 @@
         <slot name="label" :disabled="disabled"></slot>
       </div>
       <div v-else class="label" :class="{ disabled: disabled }">{{ label }}</div>
-      <div v-if="$slots.labelDescription" class="label-description">
+      <div v-if="$slots.labelDescription" class="label-description" :class="{ disabled: disabled }">
         <slot name="labelDescription" :disabled="disabled"></slot>
       </div>
       <div v-else-if="labelDescription" class="label-description" :class="{ disabled: disabled }">

@@ -1,6 +1,8 @@
 import input from '@main/native/la-input-win64.node'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
+import { isBotQueue } from '@shared/types/league-client/game-data'
+import { isPveQueue } from '@shared/types/league-client/match-history'
 import { sleep } from '@shared/utils/sleep'
 import { Eta } from 'eta'
 import { TemplateFunction } from 'eta/dist/types/compile'
@@ -206,13 +208,24 @@ export class InGameSendMain implements IAkariShardInitDispose {
       : []
     const allMembers = [...allyMembers, ...enemyMembers]
 
+    const targetMembers =
+      options.target === 'all' ? allMembers : options.target === 'ally' ? allyMembers : enemyMembers
+
     return {
-      options,
+      ...options,
       locale: this._app.settings.locale,
+      utils: {
+        isBotQueue,
+        isPveQueue
+      },
+      region: this._lc.state.auth?.region,
+      rsoPlatformId: this._lc.state.auth?.rsoPlatformId,
+      selfPuuid: this._lc.data.summoner.me?.puuid,
       gameData: toJS(this._lc.data.gameData),
       allyMembers: allyMembers,
       enemyMembers: enemyMembers,
       allMembers: allMembers,
+      targetMembers: targetMembers,
       teams: toJS(this._og.state.teams),
       matchHistory: toJS(this._og.state.matchHistory),
       rankedStats: toJS(this._og.state.rankedStats),
@@ -255,7 +268,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
           .call(this._eta, this._createTemplateEnv(options))
           .split('\n')
           .filter((m) => m.trim().length > 0)
-          .map((m) => (options.prefix ? `${options.prefix} ${m}` : m))
+          .map((m) => (options.prefix && sendType === 'keyboard' ? `${options.prefix} ${m}` : m))
 
         await this._sendSeparatedStringLines(messages, 'send-stats', sendType)
       } catch (error) {
@@ -278,6 +291,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
         await this._sendSeparatedStringLines(messages, 'send-stats', sendType)
       } catch (error) {
+        this._ipc.sendEvent(InGameSendMain.id, 'send-stats-error', (error as Error).message)
         this._log.warn('发送时模板发生错误', error)
       }
     }
@@ -596,6 +610,17 @@ export class InGameSendMain implements IAkariShardInitDispose {
       // 大无语事件发生, 理论来说不太可能出现的情况
       this._defaultCompliedFn = null
       this._log.error('发生了预料之外的情况，默认发送模板无法编译成功', error)
+    }
+
+    if (this.settings.sendStatsTemplate.isValid) {
+      try {
+        this._customCompiledFn = this._eta.compile(this.settings.sendStatsTemplate.template)
+        this._log.info('编译自定义发送模板')
+      } catch (error) {
+        this.settings.setSendStatsTemplate(this.settings.sendStatsTemplate.template, false)
+        this._customCompiledFn = null
+        this._log.warn('自定义发送模板无法编译成功', error)
+      }
     }
   }
 

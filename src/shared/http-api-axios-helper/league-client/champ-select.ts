@@ -69,7 +69,7 @@ export class ChampSelectHttpApi {
   }
 
   getCarouselSkins() {
-    return this._http.get<CarouselSkins[]>('/lol-champ-select/v1/carousel-skins')
+    return this._http.get<CarouselSkins[]>('/lol-champ-select/v1/skin-carousel-skins')
   }
 
   getMySelections() {

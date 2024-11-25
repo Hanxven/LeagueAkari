@@ -90,4 +90,8 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   > {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'dryRunStatsSend')
   }
+
+  onSendError(cb: (message: string) => void) {
+    this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'send-stats-error', cb)
+  }
 }

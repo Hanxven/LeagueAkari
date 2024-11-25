@@ -35,6 +35,8 @@ const currentPage = computed(() => {
     case 'ChampSelect':
       return 'champ-select'
   }
+
+  return 'placeholder'
 })
 </script>
 

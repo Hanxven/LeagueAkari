@@ -568,7 +568,7 @@ const handleToggleShowDetailedGame = () => {
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  width: 240px;
+  width: 212px;
 
   .stats {
     display: flex;

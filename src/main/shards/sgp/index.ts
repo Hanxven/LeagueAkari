@@ -114,6 +114,8 @@ export class SgpMain implements IAkariShardInitDispose {
   async onInit() {
     await this._loadAvailableServersFromLocalFile()
 
+    this._mobx.propSync(SgpMain.id, 'state', this.state, ['availability', 'isTokenReady'])
+
     this._handleIpcCall()
     this._handleUpdateSupportedInfo()
     this._maintainEntitlementsToken()
@@ -162,8 +164,6 @@ export class SgpMain implements IAkariShardInitDispose {
   }
 
   private _handleUpdateSupportedInfo() {
-    this._mobx.propSync(SgpMain.id, 'state', this.state, ['availability'])
-
     this._mobx.reaction(
       () => this._lc.state.auth,
       async (auth) => {

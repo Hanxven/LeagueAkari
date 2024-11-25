@@ -11,7 +11,7 @@
         class="control-item-margin"
         :label="t('StrawberryTool.champion.label')"
         :label-description="t('StrawberryTool.champion.description')"
-        :label-width="200"
+        :label-width="260"
       >
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
           <NSelect
@@ -36,7 +36,7 @@
         class="control-item-margin"
         :label="t('StrawberryTool.map.label')"
         :label-description="t('StrawberryTool.map.description')"
-        :label-width="200"
+        :label-width="260"
       >
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
           <NSelect
@@ -61,7 +61,7 @@
         class="control-item-margin"
         :label="t('StrawberryTool.difficulty.label')"
         :label-description="t('StrawberryTool.difficulty.description')"
-        :label-width="200"
+        :label-width="260"
       >
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
           <NSelect

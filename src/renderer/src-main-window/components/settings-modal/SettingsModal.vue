@@ -28,6 +28,9 @@
       <NTabPane name="debug" :tab="t('DebugSettings.title')">
         <DebugSettings />
       </NTabPane>
+      <NTabPane v-if="as.settings.isInKyokoMode" name="storage" :tab="`存储`">
+        <StorageSettings />
+      </NTabPane>
       <NTabPane name="about" :tab="t('AboutPane.title')">
         <AboutPane />
       </NTabPane>
@@ -36,6 +39,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { NModal, NTabPane, NTabs } from 'naive-ui'
 import { nextTick, useCssModule, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -47,6 +51,7 @@ import DebugSettings from './DebugSettings.vue'
 import MatchHistoryTabsSettings from './MatchHistoryTabsSettings.vue'
 import MiscSettings from './MiscSettings.vue'
 import OngoingGameSettings from './OngoingGameSettings.vue'
+import StorageSettings from './StorageSettings.vue'
 
 const { t, locale } = useI18n()
 
@@ -54,6 +59,8 @@ const styles = useCssModule()
 
 const show = defineModel<boolean>('show', { default: false })
 const tabName = defineModel<string>('tabName', { default: 'basic' })
+
+const as = useAppCommonStore()
 
 const tabsEl = useTemplateRef('tabs')
 watch(
@@ -103,6 +110,7 @@ watch(
 <style lang="less" module>
 .settings-modal {
   width: 90%;
-  max-width: 840px;
+  min-width: 720px;
+  max-width: 1000px;
 }
 </style>

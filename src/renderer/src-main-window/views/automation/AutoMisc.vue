@@ -9,7 +9,7 @@
           <ControlItem
             :label="t('AutoMisc.autoReply.enabled.label')"
             class="control-item-margin"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
               @update:value="(v) => arm.setEnabled(v)"
@@ -21,7 +21,7 @@
             :label="t('AutoMisc.autoReply.enableOnAway.label')"
             class="control-item-margin"
             :label-description="t('AutoMisc.autoReply.enableOnAway.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
               @update:value="(v) => arm.setEnableOnAway(v)"
@@ -33,7 +33,7 @@
             :label="t('AutoMisc.autoReply.text.label')"
             class="control-item-margin"
             :label-description="t('AutoMisc.autoReply.text.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NInput
               :status="ar.settings.text.length === 0 && ar.settings.enabled ? 'warning' : 'success'"

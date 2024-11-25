@@ -73,7 +73,7 @@ export class OngoingGameState {
   get championSelections() {
     if (this.queryStage.phase === 'champ-select') {
       if (!this._lcData.champSelect.session) {
-        return null
+        return {}
       }
 
       const selections: Record<string, number> = {}
@@ -92,7 +92,7 @@ export class OngoingGameState {
       return selections
     } else if (this.queryStage.phase === 'in-game') {
       if (!this._lcData.gameflow.session) {
-        return null
+        return {}
       }
 
       const selections: Record<string, number> = {}
@@ -117,13 +117,13 @@ export class OngoingGameState {
       return selections
     }
 
-    return null
+    return {}
   }
 
   get positionAssignments() {
     if (this.queryStage.phase === 'champ-select') {
       if (!this._lcData.champSelect.session) {
-        return null
+        return {}
       }
 
       const assignments: Record<
@@ -155,7 +155,7 @@ export class OngoingGameState {
       return assignments
     } else if (this.queryStage.phase === 'in-game') {
       if (!this._lcData.gameflow.session) {
-        return null
+        return {}
       }
 
       const assignments: Record<
@@ -187,7 +187,7 @@ export class OngoingGameState {
       return assignments
     }
 
-    return null
+    return {}
   }
 
   /**
@@ -196,7 +196,7 @@ export class OngoingGameState {
   get teams() {
     if (this.queryStage.phase === 'champ-select') {
       if (!this._lcData.champSelect.session) {
-        return null
+        return {}
       }
 
       const teams: Record<string, string[]> = {}
@@ -224,7 +224,7 @@ export class OngoingGameState {
       return teams
     } else if (this.queryStage.phase === 'in-game') {
       if (!this._lcData.gameflow.session) {
-        return null
+        return {}
       }
 
       const teams: Record<string, string[]> = {
@@ -247,7 +247,7 @@ export class OngoingGameState {
       return teams
     }
 
-    return null
+    return {}
   }
 
   /**
@@ -266,7 +266,7 @@ export class OngoingGameState {
       this._lcData.champSelect.session
     ) {
       return {
-        phase: 'champ-select',
+        phase: 'champ-select' as 'champ-select' | 'in-game',
         gameInfo: {
           queueId: this._lcData.gameflow.session.gameData.queue.id,
           queueType: this._lcData.gameflow.session.gameData.queue.type,
@@ -286,7 +286,7 @@ export class OngoingGameState {
         this._lcData.gameflow.session.phase === 'Reconnect')
     ) {
       return {
-        phase: 'in-game',
+        phase: 'in-game' as 'champ-select' | 'in-game',
         gameInfo: {
           queueId: this._lcData.gameflow.session.gameData.queue.id,
           queueType: this._lcData.gameflow.session.gameData.queue.type,
@@ -297,7 +297,7 @@ export class OngoingGameState {
     }
 
     return {
-      phase: 'unavailable',
+      phase: 'unavailable' as const,
       gameInfo: null
     }
   }
@@ -316,9 +316,9 @@ export class OngoingGameState {
   /**
    * 计算出来的预设队伍
    */
-  premadeTeams: Record<string, string[][]> | null = null
+  premadeTeams: Record<string, string[][]> = {}
 
-  setPremadeTeams(value: Record<string, string[][]> | null) {
+  setPremadeTeams(value: Record<string, string[][]>) {
     this.premadeTeams = value
   }
 

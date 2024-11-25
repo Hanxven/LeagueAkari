@@ -70,7 +70,6 @@
 
 <script lang="ts" setup>
 import { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
-import { TIER_TEXT } from '@shared/utils/ranked'
 import { useI18n } from 'vue-i18n'
 
 import BronzeMedal from '@main-window/assets/ranked-icons/bronze.png'

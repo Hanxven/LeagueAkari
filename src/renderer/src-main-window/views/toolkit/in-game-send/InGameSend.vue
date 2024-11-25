@@ -3,10 +3,15 @@
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
         <NCard size="small">
-          <template #header
-            ><span class="card-header-title">{{ t('InGameSend.sendStats.title') }}</span></template
-          >
+          <template #header>
+            <span class="card-header-title">{{
+              as.isAdministrator
+                ? t('InGameSend.sendStats.title')
+                : t('InGameSend.sendStats.titleRequireAdmin')
+            }}</span>
+          </template>
           <ControlItem
+            :disabled="!as.isAdministrator"
             :label-width="260"
             class="control-item-margin"
             :label="t('InGameSend.sendStats.enabled.label')"
@@ -16,59 +21,69 @@
               @update:value="(val) => ig.setSendStatsEnabled(val)"
               :value="igs.settings.sendStatsEnabled"
               size="small"
+              :disabled="!as.isAdministrator"
               secondary
               type="warning"
             ></NSwitch>
           </ControlItem>
           <ControlItem
+            :disabled="!as.isAdministrator"
             :label-width="260"
             class="control-item-margin"
             :label="t('InGameSend.sendStats.sendAllyShortcut.label')"
             :label-description="t('InGameSend.sendStats.sendAllyShortcut.description')"
           >
             <ShortcutSelector
+              :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.sendAllyShortcut"
               @update:shortcut-id="(id) => ig.setSendAllyShortcut(id)"
             />
           </ControlItem>
           <ControlItem
+            :disabled="!as.isAdministrator"
             :label-width="260"
             class="control-item-margin"
             :label="t('InGameSend.sendStats.sendEnemyShortcut.label')"
             :label-description="t('InGameSend.sendStats.sendEnemyShortcut.description')"
           >
             <ShortcutSelector
+              :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ENEMY"
               :shortcut-id="igs.settings.sendEnemyShortcut"
               @update:shortcut-id="(id) => ig.setSendEnemyShortcut(id)"
             />
           </ControlItem>
           <ControlItem
+            :disabled="!as.isAdministrator"
             :label-width="260"
             class="control-item-margin"
             :label="t('InGameSend.sendStats.sendAllAlliesShortcut.label')"
             :label-description="t('InGameSend.sendStats.sendAllAlliesShortcut.description')"
           >
             <ShortcutSelector
+              :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALL_ALLIES"
               :shortcut-id="igs.settings.sendAllAlliesShortcut"
               @update:shortcut-id="(id) => ig.setSendAllAlliesShortcut(id)"
             />
           </ControlItem>
           <ControlItem
+            :disabled="!as.isAdministrator"
             :label-width="260"
             class="control-item-margin"
             :label="t('InGameSend.sendStats.sendAllEnemiesShortcut.label')"
             :label-description="t('InGameSend.sendStats.sendAllEnemiesShortcut.description')"
           >
             <ShortcutSelector
+              :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALL_ENEMIES"
               :shortcut-id="igs.settings.sendAllEnemiesShortcut"
               @update:shortcut-id="(id) => ig.setSendAllEnemiesShortcut(id)"
             />
           </ControlItem>
           <ControlItem
+            :disabled="!as.isAdministrator"
             :label-width="260"
             class="control-item-margin"
             :label="t('InGameSend.sendStats.sendStatsUseDefaultTemplate.label')"
@@ -78,19 +93,27 @@
               @update:value="(val) => ig.setSendStatsUseDefaultTemplate(val)"
               :value="igs.settings.sendStatsUseDefaultTemplate"
               size="small"
+              :disabled="!as.isAdministrator"
               secondary
               type="warning"
             ></NSwitch>
           </ControlItem>
           <ControlItem
+            :disabled="!as.isAdministrator"
             :label-width="260"
             class="control-item-margin"
             :label="t('InGameSend.sendStats.sendStatsTemplate.label')"
-            :label-description="t('InGameSend.sendStats.sendStatsTemplate.description')"
             v-show="!igs.settings.sendStatsUseDefaultTemplate"
           >
+            <template #labelDescription>
+              <div>{{ t('InGameSend.sendStats.sendStatsTemplate.description') }}</div>
+              <div style="font-weight: bold">
+                {{ t('InGameSend.sendStats.sendStatsTemplate.descriptionDanger') }}
+              </div>
+            </template>
             <div>
               <NInput
+                :disabled="!as.isAdministrator"
                 :placeholder="t('InGameSend.sendStats.sendStatsTemplate.inputPlaceholder')"
                 v-model:value="tempTemplateInput"
                 ref="use-template-input"
@@ -102,11 +125,13 @@
               />
               <div style="margin-top: 4px; display: flex; gap: 4px">
                 <NButton
+                  :disabled="!as.isAdministrator"
                   size="tiny"
                   @click="tempTemplateInput = igs.settings.sendStatsTemplate.template"
                   >{{ t('InGameSend.sendStats.sendStatsTemplate.cancelButton') }}</NButton
                 >
                 <NButton
+                  :disabled="!as.isAdministrator"
                   size="tiny"
                   type="primary"
                   @click="handleSaveTemplate(tempTemplateInput)"
@@ -116,30 +141,36 @@
             </div>
           </ControlItem>
           <ControlItem
+            :disabled="!as.isAdministrator"
             :label-width="260"
             class="control-item-margin"
             :label="t('InGameSend.sendStats.dryRun.label')"
             :label-description="t('InGameSend.sendStats.dryRun.description')"
           >
-            <NButton size="tiny" @click="handleDryRun" secondary>{{
+            <NButton :disabled="!as.isAdministrator" size="tiny" @click="handleDryRun" secondary>{{
               t('InGameSend.sendStats.dryRun.button')
             }}</NButton>
           </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
           <template #header>
-            <span class="card-header-title">{{ t('InGameSend.customSend.title') }}</span>
+            <span class="card-header-title">{{
+              as.isAdministrator
+                ? t('InGameSend.customSend.title')
+                : t('InGameSend.customSend.titleRequireAdmin')
+            }}</span>
           </template>
           <NTabs
             size="small"
             v-model:value="currentCustomSendTab"
-            :addable="igs.settings.customSend.length < 50"
+            :addable="as.isAdministrator && igs.settings.customSend.length < 50"
             type="card"
             @add="handleAddCustomSend"
             placement="left"
             style="max-height: 1000px"
           >
             <NTabPane
+              :disabled="!as.isAdministrator"
               display-directive="show"
               v-for="s of igs.settings.customSend"
               :key="s.id"
@@ -156,22 +187,26 @@
                 <ControlItem
                   :label-width="120"
                   class="control-item-margin"
+                  :disabled="!as.isAdministrator"
                   :label="t('InGameSend.customSend.enabled')"
                 >
                   <NSwitch
                     @update:value="(val) => ig.updateCustomSend(s.id, { enabled: val })"
                     :value="s.enabled"
                     size="small"
+                    :disabled="!as.isAdministrator"
                     secondary
                     type="warning"
                   ></NSwitch>
                 </ControlItem>
                 <ControlItem
                   :label-width="120"
+                  :disabled="!as.isAdministrator"
                   class="control-item-margin"
                   :label="t('InGameSend.customSend.name')"
                 >
                   <NInput
+                    :disabled="!as.isAdministrator"
                     :placeholder="t('InGameSend.customSend.name')"
                     v-model:value="tempNameInput[s.id]"
                     @blur="() => handleSaveName(s.id, tempNameInput[s.id])"
@@ -181,17 +216,20 @@
                 </ControlItem>
                 <ControlItem
                   :label-width="120"
+                  :disabled="!as.isAdministrator"
                   class="control-item-margin"
                   :label="t('InGameSend.customSend.shortcut')"
                   :label-description="``"
                 >
                   <ShortcutSelector
+                    :disabled="!as.isAdministrator"
                     :target-id="ig.shortcutTargetId(s.id)"
                     :shortcut-id="s.shortcut"
                     @update:shortcut-id="(id) => ig.updateCustomSend(s.id, { shortcut: id })"
                   />
                 </ControlItem>
                 <ControlItem
+                  :disabled="!as.isAdministrator"
                   :label-width="120"
                   class="control-item-margin"
                   :label="t('InGameSend.customSend.message')"
@@ -203,22 +241,25 @@
                     @blur="() => handleSaveMessage(s.id, tempMessageInput[s.id])"
                     style="width: 360px; font-family: monospace"
                     size="small"
+                    :disabled="!as.isAdministrator"
                     type="textarea"
                     :autosize="{ minRows: 5, maxRows: 5 }"
                   ></NInput>
                 </ControlItem>
                 <ControlItem
+                  :disabled="!as.isAdministrator"
                   :label-width="120"
                   class="control-item-margin"
                   :label="t('InGameSend.customSend.delete.label')"
                   :label-description="``"
                 >
                   <NPopconfirm
+                    :disabled="!as.isAdministrator"
                     :positive-button-props="{ type: 'error' }"
                     @positive-click="() => ig.deleteCustomSend(s.id)"
                   >
                     <template #trigger>
-                      <NButton type="error" size="tiny">{{
+                      <NButton :disabled="!as.isAdministrator" type="error" size="tiny">{{
                         t('InGameSend.customSend.delete.button')
                       }}</NButton>
                     </template>
@@ -236,6 +277,7 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
@@ -249,17 +291,15 @@ import {
   NCard,
   NEllipsis,
   NInput,
-  NInputNumber,
   NPopconfirm,
   NScrollbar,
   NSwitch,
-  NTab,
   NTabPane,
   NTabs,
   useDialog,
   useMessage
 } from 'naive-ui'
-import { h, nextTick, reactive, ref, toRaw, useTemplateRef, watch, watchEffect } from 'vue'
+import { h, reactive, ref, useTemplateRef, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
@@ -346,11 +386,11 @@ const handleSaveTemplate = async (template: string) => {
 
 const handleDryRun = async () => {
   const { data, error, reason } = await ig.dryRunStatsSend()
-
   if (error) {
+    console.log(data, error, reason)
     switch (reason) {
-      case 'not-complied':
-        message.error(t('InGameSend.not-complied'))
+      case 'not-compiled':
+        message.error(t('InGameSend.not-compiled'))
         break
       case 'stage-unavailable':
         message.error(t('InGameSend.stage-unavailable'))
@@ -368,12 +408,17 @@ const handleDryRun = async () => {
       content: () =>
         h(
           'div',
+          { style: { 'user-select': 'text' } },
           data.map((line) => h('div', line))
         ),
       positiveText: t('InGameSend.confirm')
     })
   }
 }
+
+ig.onSendError((message) => {
+  laNotification.warn(t('InGameSend.error'), message)
+})
 </script>
 
 <style lang="less" scoped>

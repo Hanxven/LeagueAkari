@@ -10,10 +10,10 @@
             class="control-item-margin"
             :label="t('AutoSelect.normalModeEnabled.label')"
             :label-description="t('AutoSelect.normalModeEnabled.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
-              @update:value="(v) => shard.setNormalModeEnabled(v)"
+              @update:value="(v) => as.setNormalModeEnabled(v)"
               :value="store.settings.normalModeEnabled"
               size="small"
             ></NSwitch>
@@ -22,23 +22,23 @@
             class="control-item-margin"
             :label="t('AutoSelect.showIntent.label')"
             :label-description="t('AutoSelect.showIntent.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
               type="pick"
               size="small"
               :value="store.settings.showIntent"
-              @update:value="(val) => shard.setShowIntent(val)"
+              @update:value="(val) => as.setShowIntent(val)"
             />
           </ControlItem>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoSelect.selectTeammateIntendedChampion.label')"
             :label-description="t('AutoSelect.selectTeammateIntendedChampion.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
-              @update:value="(v) => shard.setSelectTeammateIntendedChampion(v)"
+              @update:value="(v) => as.setSelectTeammateIntendedChampion(v)"
               :value="store.settings.selectTeammateIntendedChampion"
               size="small"
             />
@@ -47,11 +47,11 @@
             class="control-item-margin"
             :label="t('AutoSelect.completed.label')"
             :label-description="t('AutoSelect.completed.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NRadioGroup
               :value="store.settings.completed"
-              @update:value="(v) => shard.setCompleted(v)"
+              @update:value="(v) => as.setCompleted(v)"
             >
               <NRadio :value="true">{{ t('AutoSelect.completed.options.true') }}</NRadio>
               <NRadio :value="false">{{ t('AutoSelect.completed.options.false') }}</NRadio>
@@ -60,7 +60,7 @@
           <ControlItem
             class="control-item-margin"
             :label="t('AutoSelect.expectedChampions.label')"
-            :label-width="200"
+            :label-width="260"
           >
             <template #labelDescription>
               <div v-html="t('AutoSelect.expectedChampions.description')"></div>
@@ -81,8 +81,8 @@
                       :champions="store.settings.expectedChampions[role.key]"
                       @update:champions="
                         (list) =>
-                          shard.setExpectedChampions({
-                            ...store.settings.bannedChampions,
+                          as.setExpectedChampions({
+                            ...store.settings.expectedChampions,
                             [role.key]: list
                           })
                       "
@@ -101,10 +101,10 @@
             class="control-item-margin"
             :label="t('AutoSelect.benchModeEnabled.label')"
             :label-description="t('AutoSelect.benchModeEnabled.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
-              @update:value="(v) => shard.setBenchModeEnabled(v)"
+              @update:value="(v) => as.setBenchModeEnabled(v)"
               :value="store.settings.benchModeEnabled"
               size="small"
             ></NSwitch>
@@ -112,7 +112,7 @@
           <ControlItem
             class="control-item-margin"
             :label="t('AutoSelect.grabDelaySeconds.label')"
-            :label-width="200"
+            :label-width="260"
           >
             <template #labelDescription>
               {{ t('AutoSelect.grabDelaySeconds.description.part1') }}
@@ -131,17 +131,17 @@
               :min="0"
               size="small"
               :value="store.settings.grabDelaySeconds"
-              @update:value="(v) => shard.setGrabDelaySeconds(v || 0)"
+              @update:value="(v) => as.setGrabDelaySeconds(v || 0)"
             />
           </ControlItem>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoSelect.benchSelectFirstAvailableChampion.label')"
             :label-description="t('AutoSelect.benchSelectFirstAvailableChampion.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
-              @update:value="(v) => shard.setBenchSelectFirstAvailableChampion(v)"
+              @update:value="(v) => as.setBenchSelectFirstAvailableChampion(v)"
               :value="store.settings.benchSelectFirstAvailableChampion"
               size="small"
             ></NSwitch>
@@ -149,12 +149,12 @@
           <ControlItem
             class="control-item-margin"
             :label="t('AutoSelect.benchExpectedChampions.label')"
-            :label-width="200"
+            :label-width="260"
           >
             <OrderedChampionList
               type="pick"
               :champions="store.settings.benchExpectedChampions"
-              @update:champions="(list) => shard.setBenchExpectedChampions(list)"
+              @update:champions="(list) => as.setBenchExpectedChampions(list)"
             />
           </ControlItem>
         </NCard>
@@ -166,10 +166,10 @@
             class="control-item-margin"
             :label="t('AutoSelect.banEnabled.label')"
             :label-description="t('AutoSelect.banEnabled.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
-              @update:value="(v) => shard.setBanEnabled(v)"
+              @update:value="(v) => as.setBanEnabled(v)"
               :value="store.settings.banEnabled"
               size="small"
             ></NSwitch>
@@ -178,10 +178,10 @@
             class="control-item-margin"
             :label="t('AutoSelect.banTeammateIntendedChampion.label')"
             :label-description="t('AutoSelect.banTeammateIntendedChampion.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
-              @update:value="(v) => shard.setBanTeammateIntendedChampion(v)"
+              @update:value="(v) => as.setBanTeammateIntendedChampion(v)"
               :value="store.settings.banTeammateIntendedChampion"
               size="small"
             ></NSwitch>
@@ -189,7 +189,7 @@
           <ControlItem
             class="control-item-margin"
             :label="t('AutoSelect.bannedChampions.label')"
-            :label-width="200"
+            :label-width="260"
           >
             <template #labelDescription>
               <div v-html="t('AutoSelect.bannedChampions.description')"></div>
@@ -211,7 +211,7 @@
                       :champions="store.settings.bannedChampions[role.key]"
                       @update:champions="
                         (list) =>
-                          shard.setBannedChampions({
+                          as.setBannedChampions({
                             ...store.settings.bannedChampions,
                             [role.key]: list
                           })
@@ -242,7 +242,7 @@ import OrderedChampionList from '@main-window/components/OrderedChampionList.vue
 const { t } = useI18n()
 
 const store = useAutoSelectStore()
-const shard = useInstance<AutoSelectRenderer>('auto-select-renderer')
+const as = useInstance<AutoSelectRenderer>('auto-select-renderer')
 
 const roles = computed(() => {
   return [

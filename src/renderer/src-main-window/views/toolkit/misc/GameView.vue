@@ -8,7 +8,7 @@
       class="control-item-margin"
       :label="t('GameView.game.label')"
       :label-description="t('GameView.game.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <div style="display: flex; align-items: center; gap: 8px">
         <NInputNumber :show-button="false" v-model:value="gameId" size="small" />

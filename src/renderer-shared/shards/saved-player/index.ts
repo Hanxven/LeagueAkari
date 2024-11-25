@@ -1,3 +1,6 @@
+import { SummonerInfo } from '@shared/types/league-client/summoner'
+import LRUMap from 'quick-lru'
+
 import { AkariIpcRenderer } from '../ipc'
 
 const MAIN_SHARD_NAMESPACE = 'saved-player-main'
@@ -33,6 +36,10 @@ export class SavedPlayerRenderer {
 
   private readonly _ipc: AkariIpcRenderer
 
+  public readonly summonerLruMap = new LRUMap<string, SummonerInfo>({
+    maxSize: 200
+  })
+
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-renderer']
   }
@@ -47,5 +54,18 @@ export class SavedPlayerRenderer {
 
   updatePlayerTag<T extends UpdateTagDto>(dto: T) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updatePlayerTag', dto)
+  }
+
+  deleteSavedPlayer(dto: SavedPlayerQueryDto) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'deleteSavedPlayer', dto)
+  }
+
+  queryAllSavedPlayers(dto: object): Promise<{
+    count: number
+    page: number
+    pageSize: number
+    data: any[]
+  }> {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'queryAllSavedPlayers', dto)
   }
 }

@@ -15,7 +15,7 @@
       class="control-item-margin"
       :label="t('Spectate.spectate.label')"
       :label-description="t('Spectate.spectate.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <div style="display: flex; align-items: center; gap: 8px">
         <NDropdown
@@ -48,7 +48,7 @@
       class="control-item-margin"
       :label="t('Spectate.token.label')"
       :label-description="t('Spectate.token.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <div style="display: flex; align-items: center; gap: 8px">
         <NInput
@@ -79,7 +79,6 @@ import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { Friend } from '@shared/types/league-client/chat'
-import { resolveSummonerName } from '@shared/utils/identity'
 import { summonerName } from '@shared/utils/name'
 import { useIntervalFn } from '@vueuse/core'
 import { AxiosError } from 'axios'
@@ -115,7 +114,7 @@ const handleSpectate = async () => {
     try {
       if (lcs.summoner.me?.tagLine) {
         const s = await lc.api.summoner.getSummonerAlias(
-          ...resolveSummonerName(spectator.summonerIdentity)
+          ...(spectator.summonerIdentity.split('#') as [string, string])
         )
         if (s) {
           targetPuuid = s.puuid

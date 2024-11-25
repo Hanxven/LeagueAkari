@@ -612,7 +612,7 @@ Client:
     fixWindowMethodAOptions:
       label: 调整窗口大小
       labelAdminRequired: 调整窗口大小 (需要管理员权限)
-      description: FixLCUWindow - 以 WinAPI 方式调整窗口的大小。在客户端界面大小不正确时，可尝试此操作
+      description: <a target="_blank" href="https://github.com/LeagueTavern/fix-lcu-window">FixLCUWindow</a> - 以 WinAPI 方式调整窗口的大小。在客户端界面大小不正确时，可尝试此操作
       button: 调整
       dialog:
         title: 调整窗口大小
@@ -1501,6 +1501,7 @@ InGameSend:
       submitButton: 更新模板
       cancelButton: 取消更改
       description: 发送条目将使用自定义模板，要求遵循 EJS 式 (ETA) 格式语法。最终的输出内容应该为按行分割的文本，空行将被忽略
+      descriptionDanger: 该模板的内容指令会被应用执行，拥有较高的权限。请始终确认其安全性
     dryRun:
       label: 试运行
       description: 当前时间节点的即将输出内容
@@ -1523,7 +1524,7 @@ InGameSend:
   invalidTemplate: 所提供的模板无效，请检查语法
 
   # message dry-run
-  not-complied: 模板未编译，请检查模板语法
+  not-compiled: 模板未编译，请检查模板语法
   stage-unavailable: 未处于对局查询阶段中
   execution-error: 执行模板时出错，请检查模板逻辑正确性
   error: 未知错误

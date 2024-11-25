@@ -2,13 +2,13 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { Equal } from 'typeorm'
 
 import { AkariIpcMain } from '../ipc'
-import { LeagueClientMain } from '../league-client'
 import { StorageMain } from '../storage'
 import { EncounteredGame } from '../storage/entities/EncounteredGame'
 import { SavedPlayer } from '../storage/entities/SavedPlayers'
 import {
   EncounteredGameQueryDto,
   EncounteredGameSaveDto,
+  QueryAllSavedPlayersDto,
   SavedPlayerQueryDto,
   SavedPlayerSaveDto,
   UpdateTagDto,
@@ -74,6 +74,16 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     return this._storage.dataSource.manager.save(g)
   }
 
+  async queryAllSavedPlayers(query: QueryAllSavedPlayersDto) {
+    const data = await this._storage.dataSource.manager.find(SavedPlayer, {
+      take: query.pageSize,
+      skip: (query.page - 1) * query.pageSize
+    })
+    const count = await this._storage.dataSource.manager.count(SavedPlayer)
+
+    return { data, count, page: query.page, pageSize: query.pageSize }
+  }
+
   async querySavedPlayer(query: SavedPlayerQueryDto) {
     if (!query.puuid || !query.selfPuuid) {
       throw new Error('puuid, selfPuuid cannot be empty')
@@ -112,6 +122,9 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     if (!query.puuid || !query.selfPuuid) {
       throw new Error('puuid, selfPuuid or region cannot be empty')
     }
+
+    query.region = 'TENCENT'
+    query.rsoPlatformId = 'HN10'
 
     return this._storage.dataSource.manager.remove(SavedPlayer, query)
   }
@@ -243,5 +256,13 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     this._ipc.onCall(SavedPlayerMain.id, 'updatePlayerTag', (dto: UpdateTagDto) => {
       return this.updatePlayerTag(dto)
     })
+
+    this._ipc.onCall(
+      SavedPlayerMain.id,
+      'queryAllSavedPlayers',
+      (query: QueryAllSavedPlayersDto) => {
+        return this.queryAllSavedPlayers(query)
+      }
+    )
   }
 }

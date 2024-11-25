@@ -7,7 +7,7 @@
       class="control-item-margin"
       :label="t('LobbyTool.addBot.label')"
       :label-description="t('LobbyTool.addBot.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
         <NSelect
@@ -41,7 +41,7 @@
       class="control-item-margin"
       :label="t('LobbyTool.createIdLobby.label')"
       :label-description="t('LobbyTool.createIdLobby.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <div style="display: flex; align-items: center; gap: 8px">
         <NSelect
@@ -70,7 +70,7 @@
     <ControlItem
       class="control-item-margin"
       :label="t('LobbyTool.create5x5PracticeLobby.label')"
-      :label-width="200"
+      :label-width="260"
     >
       <NFlex>
         <NButton

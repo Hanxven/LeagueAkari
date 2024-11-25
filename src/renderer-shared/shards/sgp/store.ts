@@ -1,6 +1,6 @@
 import { AvailableServersMap } from '@shared/data-sources/sgp'
 import { defineStore } from 'pinia'
-import { shallowRef } from 'vue'
+import { ref, shallowRef } from 'vue'
 
 export const useSgpStore = defineStore('shard:sgp-renderer', () => {
   const availability = shallowRef<{
@@ -28,7 +28,10 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
     }
   })
 
+  const isTokenReady = ref(false)
+
   return {
-    availability
+    availability,
+    isTokenReady
   }
 })

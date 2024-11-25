@@ -180,25 +180,35 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
 
   private _handleIpcCall() {
     this._ipc.onCall(ClientInstallationMain.id, 'launchTencentTcls', async () => {
-      this._launchTencentTcls()
+      await this._launchTencentTcls()
     })
 
     this._ipc.onCall(ClientInstallationMain.id, 'launchWeGame', async () => {
-      this._launchWeGame()
+      await this._launchWeGame()
     })
 
     this._ipc.onCall(ClientInstallationMain.id, 'launchDefaultRiotClient', async () => {
-      this._launchDefaultRiotClient()
+      await this._launchDefaultRiotClient()
     })
 
     this._ipc.onCall(ClientInstallationMain.id, 'launchWeGameLeagueOfLegends', async () => {
-      this._launchWeGameLeagueOfLegends()
+      await this._launchWeGameLeagueOfLegends()
     })
   }
 
   private _spawnDetached(location: string, args: string[] = []) {
-    const p = cp.spawn(location, args, { detached: true })
-    p.unref()
+    return new Promise<void>((resolve, reject) => {
+      const p = cp.spawn(location, args, { detached: true, shell: true })
+
+      p.on('error', (error) => {
+        reject(error)
+      })
+
+      setImmediate(() => {
+        p.unref()
+        resolve()
+      })
+    })
   }
 
   private _launchTencentTcls() {
@@ -206,7 +216,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
     const location = path.resolve(this.state.tencentInstallationPath, 'TCLS', 'client.exe')
-    this._spawnDetached(location)
+    return this._spawnDetached(location)
   }
 
   private _launchWeGameLeagueOfLegends() {
@@ -218,7 +228,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       'WeGameLauncher',
       'launcher.exe'
     )
-    this._spawnDetached(location)
+    return this._spawnDetached(location)
   }
 
   private _launchWeGame() {
@@ -226,7 +236,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    this._spawnDetached(this.state.weGameExecutablePath)
+    return this._spawnDetached(this.state.weGameExecutablePath)
   }
 
   private _launchDefaultRiotClient() {
@@ -234,7 +244,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    this._spawnDetached(this.state.officialRiotClientExecutablePath, [
+    return this._spawnDetached(this.state.officialRiotClientExecutablePath, [
       '--launch-product=league_of_legends',
       '--launch-patchline=live'
     ])

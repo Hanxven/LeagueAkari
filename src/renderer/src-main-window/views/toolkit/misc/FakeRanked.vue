@@ -7,7 +7,7 @@
       class="control-item-margin"
       :label="t('FakeRanked.set.label')"
       :label-description="t('FakeRanked.set.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <NButton
         size="small"
@@ -17,7 +17,7 @@
         >{{ t('FakeRanked.set.button') }}</NButton
       >
     </ControlItem>
-    <ControlItem class="control-item-margin" :label="t('FakeRanked.queue')" :label-width="200">
+    <ControlItem class="control-item-margin" :label="t('FakeRanked.queue')" :label-width="260">
       <NSelect
         :options="queueOptions"
         style="width: 180px"
@@ -25,7 +25,7 @@
         size="small"
       ></NSelect>
     </ControlItem>
-    <ControlItem class="control-item-margin" :label="t('FakeRanked.tier')" :label-width="200">
+    <ControlItem class="control-item-margin" :label="t('FakeRanked.tier')" :label-width="260">
       <NSelect
         :options="tierOptions"
         style="width: 180px"
@@ -33,7 +33,7 @@
         size="small"
       ></NSelect>
     </ControlItem>
-    <ControlItem class="control-item-margin" :label="t('FakeRanked.division')" :label-width="200">
+    <ControlItem class="control-item-margin" :label="t('FakeRanked.division')" :label-width="260">
       <NSelect
         :options="divisionOptions"
         :disabled="

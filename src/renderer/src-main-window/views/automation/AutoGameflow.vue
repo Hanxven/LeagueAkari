@@ -10,7 +10,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.autoAcceptEnabled.label')"
             :label-description="t('AutoGameflow.autoAcceptEnabled.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
               :value="store.settings.autoAcceptEnabled"
@@ -22,7 +22,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.autoAcceptDelaySeconds.label')"
             :label-description="t('AutoGameflow.autoAcceptDelaySeconds.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NInputNumber
               style="width: 80px"
@@ -38,7 +38,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.autoHonorEnabled.label')"
             :label-description="t('AutoGameflow.autoHonorEnabled.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
               :value="store.settings.autoHonorEnabled"
@@ -51,7 +51,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.autoHonorStrategy.label')"
             :label-description="t('AutoGameflow.autoHonorStrategy.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NRadioGroup
               size="small"
@@ -82,7 +82,7 @@
           <ControlItem
             class="control-item-margin"
             :label="t('AutoGameflow.playAgainEnabled.label')"
-            :label-width="200"
+            :label-width="260"
           >
             <template #labelDescription>
               {{ t('AutoGameflow.playAgainEnabled.description.part1') }}
@@ -105,7 +105,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.autoMatchmakingEnabled.label')"
             :label-description="t('AutoGameflow.autoMatchmakingEnabled.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
               :value="store.settings.autoMatchmakingEnabled"
@@ -121,7 +121,7 @@
                 members: store.settings.autoMatchmakingMinimumMembers
               })
             "
-            :label-width="200"
+            :label-width="260"
           >
             <NInputNumber
               :value="store.settings.autoMatchmakingMinimumMembers"
@@ -136,7 +136,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.autoMatchmakingDelaySeconds.label')"
             :label-description="t('AutoGameflow.autoMatchmakingDelaySeconds.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NInputNumber
               style="width: 80px"
@@ -151,7 +151,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.autoMatchmakingWaitForInvitees.label')"
             :label-description="t('AutoGameflow.autoMatchmakingWaitForInvitees.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
               :value="store.settings.autoMatchmakingWaitForInvitees"
@@ -163,7 +163,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.autoMatchmakingRematchStrategy.label')"
             :label-description="t('AutoGameflow.autoMatchmakingRematchStrategy.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NRadioGroup
               :value="store.settings.autoMatchmakingRematchStrategy"
@@ -194,7 +194,7 @@
                 : t('AutoGameflow.autoMatchmakingRematchFixedDuration.description.fixed-duration')
             "
             :disabled="store.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'"
-            :label-width="200"
+            :label-width="260"
           >
             <NInputNumber
               :disabled="store.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'"
@@ -210,7 +210,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.autoReconnectEnabled.label')"
             :label-description="t('AutoGameflow.autoReconnectEnabled.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
               :value="store.settings.autoReconnectEnabled"
@@ -223,7 +223,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.autoHandleInvitationsEnabled.label')"
             :label-description="t('AutoGameflow.autoHandleInvitationsEnabled.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NSwitch
               :value="store.settings.autoHandleInvitationsEnabled"
@@ -235,7 +235,7 @@
             class="control-item-margin"
             :label="t('AutoGameflow.invitationHandlingStrategies.label')"
             :label-description="t('AutoGameflow.invitationHandlingStrategies.description')"
-            :label-width="200"
+            :label-width="260"
           >
             <NFlex vertical align="flex-start">
               <table>
@@ -275,6 +275,7 @@
               <NPopselect
                 :options="queueTypeOptions"
                 multiple
+                trigger="click"
                 :value="invitationStrategiesPopselectArray"
                 @update:value="handleChangeInvitationStrategies"
               >

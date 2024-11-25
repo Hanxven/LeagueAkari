@@ -20,19 +20,36 @@
           ring-color="#ffffff50"
           class="champion"
         />
+        <div class="level" v-if="summoner">{{ summoner.summonerLevel }}</div>
       </div>
       <div class="name-group">
-        <div class="name-tag" @click="() => emits('toSummoner', puuid)">
-          <span
-            class="name"
-            :style="{
-              color: premadeTeamId ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor : undefined
-            }"
-            >{{ summoner?.gameName || summoner?.displayName || '—' }}</span
+        <div class="name-tag" @click="() => emits('toSummoner', puuid)" ref="pre-made-tag-el">
+          <NPopover
+            :keep-alive-on-hover="false"
+            :delay="50"
+            :disabled="premadeTeamId === undefined"
           >
-          <span class="tag-line">#{{ summoner?.tagLine || '—' }}</span>
+            <template #trigger>
+              <!-- 内部容器用于平衡 popover 的位置 -->
+              <div class="name-tag-inner">
+                <span
+                  class="name"
+                  :style="{
+                    color: premadeTeamId
+                      ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
+                      : undefined
+                  }"
+                  >{{ summoner?.gameName || summoner?.displayName || '—' }}</span
+                >
+                <span class="tag-line">#{{ summoner?.tagLine || '—' }}</span>
+              </div>
+            </template>
+            <div class="popover-text">
+              {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
+            </div>
+          </NPopover>
         </div>
-        <NPopover :delay="50">
+        <NPopover :keep-alive-on-hover="false" :delay="50">
           <template #trigger>
             <div class="ranked">
               <template v-if="queueType !== 'CHERRY'">
@@ -206,23 +223,6 @@
         </template>
         <div class="tagged-text" style="max-width: 260px">
           {{ savedInfo.tag }}
-        </div>
-      </NPopover>
-      <NPopover :keep-alive-on-hover="false" :delay="50" v-if="premadeTeamId">
-        <template #trigger>
-          <div
-            class="tag"
-            :style="{
-              'background-color': PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor || '#ffffff',
-              color: PREMADE_TEAM_COLORS[premadeTeamId]?.color || '#000000'
-            }"
-            ref="pre-made-tag-el"
-          >
-            {{ t('PlayerInfoCard.premade', { team: premadeTeamId }) }}
-          </div>
-        </template>
-        <div class="popover-text">
-          {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
         </div>
       </NPopover>
       <NPopover
@@ -771,7 +771,7 @@ const matches = computed(() => {
   }
 
   &.highlighting {
-    filter: brightness(1.2);
+    filter: brightness(1.1);
   }
 }
 
@@ -781,12 +781,24 @@ const matches = computed(() => {
 
   .profile-icon {
     position: relative;
+    position: relative;
     margin-right: 8px;
   }
 
   .champion {
     width: 42px;
     height: 42px;
+  }
+
+  .level {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translateX(35%);
+    background-color: #00000080;
+    font-size: 10px;
+    border-radius: 4px;
+    padding: 0 4px;
   }
 
   .position-icon {
@@ -806,11 +818,17 @@ const matches = computed(() => {
     gap: 4px;
 
     .name-tag {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
       transition: filter 0.3s;
       cursor: pointer;
+
+      // 内部容器用于平衡 popover 的位置
+      .name-tag-inner {
+        max-width: 100%;
+        width: fit-content;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
       &:hover {
         filter: brightness(1.2);
@@ -879,10 +897,6 @@ const matches = computed(() => {
     font-size: 16px;
     align-items: center;
 
-    &.complete {
-      margin-left: 16px;
-    }
-
     &.incomplete {
       flex: 1;
       justify-content: center;
@@ -938,7 +952,8 @@ const matches = computed(() => {
   .kda {
     flex: 1;
     font-size: 13px;
-    color: #dfdfdf;
+    color: #ffffffe0;
+    font-weight: bold;
     text-align: center;
   }
 }
@@ -969,7 +984,7 @@ const matches = computed(() => {
     }
 
     &.have-met {
-      background-color: #64bcff;
+      background-color: #5cacea;
       color: #000;
     }
 
@@ -978,8 +993,8 @@ const matches = computed(() => {
     }
 
     &.winning-streak {
-      background-color: #59e8b8;
-      color: #000;
+      background-color: #18571c;
+      color: #fff;
     }
 
     &.losing-streak {
@@ -1038,7 +1053,7 @@ const matches = computed(() => {
     }
 
     &.win {
-      background-color: #2369ca40;
+      background-color: #2369ca20;
 
       .win-lose {
         color: #4cc69d;
@@ -1046,7 +1061,7 @@ const matches = computed(() => {
     }
 
     &.lose {
-      background-color: #c94f4f40;
+      background-color: #c94f4f20;
 
       .win-lose {
         color: #ff6161;
@@ -1054,7 +1069,7 @@ const matches = computed(() => {
     }
 
     &.na {
-      border-left-color: #c0c0c0;
+      border-left-color: #c0c0c020;
 
       .win-lose {
         color: #c0c0c0;
@@ -1118,7 +1133,7 @@ const matches = computed(() => {
 
 .popover-text.have-met-popover {
   max-width: unset;
-  width: fit-content;
+  width: min-content;
 }
 
 .champion-stats {
@@ -1192,6 +1207,7 @@ const matches = computed(() => {
     border: 1px solid #ffffff40;
     padding: 0 8px;
     text-align: center;
+    white-space: nowrap;
   }
 
   .game-id-col {

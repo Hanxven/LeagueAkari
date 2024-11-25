@@ -49,7 +49,7 @@
       class="control-item-margin"
       :label="t('SummonerProfile.profileBackground.label')"
       :label-description="t('SummonerProfile.profileBackground.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <NButton
         size="small"
@@ -63,7 +63,7 @@
       class="control-item-margin"
       :label="t('SummonerProfile.bannerAccent.label')"
       :label-description="t('SummonerProfile.bannerAccent.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <NButton
         :disabled="lcs.connectionState !== 'connected'"
@@ -84,7 +84,7 @@
           : t('SummonerProfile.prestigeCrest.description')
       "
       :label="t('SummonerProfile.prestigeCrest.label')"
-      :label-width="200"
+      :label-width="260"
     >
       <NButton
         :disabled="lcs.connectionState !== 'connected'"
@@ -98,7 +98,7 @@
       class="control-item-margin"
       :label-description="t('SummonerProfile.token.description')"
       :label="t('SummonerProfile.token.label')"
-      :label-width="200"
+      :label-width="260"
     >
       <NButton
         :disabled="lcs.connectionState !== 'connected'"

@@ -6,7 +6,7 @@
     <ControlItem
       :label="t('ChatStatusMessage.message.label')"
       class="control-item-margin"
-      :label-width="200"
+      :label-width="260"
     >
       <NButton
         :loading="isSetting"
@@ -21,7 +21,7 @@
       :label="t('ChatStatusMessage.text.label')"
       class="control-item-margin"
       :label-description="t('ChatStatusMessage.text.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <NInput
         style="width: 360px; font-family: monospace"

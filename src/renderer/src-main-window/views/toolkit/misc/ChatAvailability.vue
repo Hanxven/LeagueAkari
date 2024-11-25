@@ -9,7 +9,7 @@
       class="control-item-margin"
       :label="t('ChatAvailability.availability.label')"
       :label-description="t('ChatAvailability.availability.description')"
-      :label-width="200"
+      :label-width="260"
     >
       <NRadioGroup
         size="small"

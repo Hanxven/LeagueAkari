@@ -484,9 +484,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
     this._mw.webContents.setWindowOpenHandler((details) => {
       dialog
-        .showMessageBox({
+        .showMessageBox(this._mw!, {
           type: 'question',
-          buttons: ['是', '否'],
+          buttons: ['Yes', 'No'],
           defaultId: 0,
           title: '确认',
           message: details.url.startsWith(LEAGUE_AKARI_GITHUB)
@@ -563,9 +563,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
     this._aw.webContents.setWindowOpenHandler((details) => {
       dialog
-        .showMessageBox({
+        .showMessageBox(this._aw!, {
           type: 'question',
-          buttons: ['是', '否'],
+          buttons: ['Yes', 'No'],
           defaultId: 0,
           title: '确认',
           message: details.url.startsWith(LEAGUE_AKARI_GITHUB)

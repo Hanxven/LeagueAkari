@@ -776,6 +776,8 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
           (page - 1) * pageSize,
           page * pageSize - 1
         )
+        console.log('lcu', data)
+
         tab.matchHistoryPage = {
           page,
           pageSize,

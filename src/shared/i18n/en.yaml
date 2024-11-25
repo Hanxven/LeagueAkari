@@ -10,7 +10,7 @@ DeclarationModal:
   close: Close
   ok: Got it
   showAgain: Show again
-  line1: League Akari is open-source software designed to provide additional auxiliary features. You should not obtain this software through any paid channels.
+  line1: (联盟阿卡林) is open-source software designed to provide additional auxiliary features. You should not obtain this software through any paid channels.
   line2: Please be aware that this software takes no responsibility for any consequences that may arise from its use, including but not limited to game account bans, data corruption, or any other negative impact on your gaming experience.
   line3: Users should carefully consider and fully assume all risks and consequences associated with using this software.
 
@@ -272,7 +272,7 @@ DebugSettings:
 
 AboutPane:
   title: About
-  line1: ' (Version { version }) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
+  line1: ' (联盟阿卡林, Version { version }) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
   line2: Project Reference
   copyright: © 2024 Hanxven. This software is open-source and follows the GPL-3.0 license.
 
@@ -610,7 +610,7 @@ Client:
     fixWindowMethodAOptions:
       label: Adjust Window Size
       labelAdminRequired: Adjust Window Size (Admin Required)
-      description: FixLCUWindow - Adjust the window size using WinAPI. This can be attempted when the client interface size is incorrect.
+      description: '<a target="_blank" href="https://github.com/LeagueTavern/fix-lcu-window">FixLCUWindow</a> - Adjust the window size using WinAPI. This can be attempted when the client interface size is incorrect.'
       button: Adjust
       dialog:
         title: Adjust Window Size
@@ -1161,7 +1161,7 @@ PlayerInfoCard:
   cherryWinRatePopover: In the recent {count} games, this player's win rate is {winRate}%. Among {cherryCount} games in Arena Mode, their first place rate is {top1Rate}%.
   winRatePopover: In the recent {count} games, this player's win rate is {winRate}%.
   kdaPopover: In the recent {count} games, this player's average KDA is {kda}.
-  premadePopover: These players have been on the same team in multiple matches, suggesting they may be a premade group. They are labeled as Team {team}.
+  premadePopover: These players have been on the same team in multiple games, suggesting they may be a premade group. They are labeled as Team {team}.
   highWinRatePopover: This player's win rate is exceptionally high. In the recent {count} games, they have won {winCount} games.
   metPopover:
     title: Previously encountered this player in {date}, a total of {count} times.
@@ -1182,16 +1182,16 @@ PlayerInfoCard:
   matchHistory:
     winResult:
       na: '-'
-      win: Win
-      lose: Loss
-      remake: Remake
-      abort: Abort
+      win: W
+      lose: L
+      remake: R
+      abort: Abrt
 
   self: Self
   tagged: Tagged
-  premade: Premade {team}
+  premade: Team {team}
   highWinRate: High Win Rate
-  met: Met Before
+  met: Met
   private: Private
   winningStreak: '{count} Wins'
   losingStreak: '{count} Losses'
@@ -1472,6 +1472,7 @@ EasyToLaunch:
 InGameSend:
   sendStats:
     title: Player Stats Sending
+    titleRequireAdmin: Player Stats Sending (Admin Required)
     enabled:
       label: Enable
       description: Send statistical analysis of teammates or enemies during champion selection or in-game
@@ -1496,6 +1497,7 @@ InGameSend:
       submitButton: Update Template
       cancelButton: Cancel Changes
       description: The entries sent will use a custom template following EJS-style (ETA) format syntax. The final output should be text divided by lines, and blank lines will be ignored
+      descriptionDanger: The content of this template will be executed by the application and has high privileges. Please always confirm its safety
     dryRun:
       label: Dry Run
       description: Preview the output at the current point in time
@@ -1503,6 +1505,7 @@ InGameSend:
 
   customSend:
     title: Custom Sending
+    titleRequireAdmin: Custom Sending (Admin Required)
     newItem: New Item
     unnamed: (Unnamed)
     enabled: Enable
@@ -1518,7 +1521,7 @@ InGameSend:
   invalidTemplate: The provided template is invalid. Please check the syntax
 
   # message dry-run
-  not-complied: Template not compiled. Please check the syntax
+  not-compiled: Template not compiled. Please check the syntax
   stage-unavailable: Not in a match query stage
   execution-error: Error occurred while executing the template. Please check the template logic for correctness
   error: Unknown error
