@@ -40,11 +40,6 @@ export class WindowManagerSettings {
    */
   auxWindowShowSkinSelector: boolean = false
 
-  /**
-   * 辅助窗口缩放因子
-   */
-  auxWindowZoomFactor: number = 1.0
-
   setAuxWindowOpacity(opacity: number) {
     this.auxWindowOpacity = opacity
   }
@@ -57,16 +52,16 @@ export class WindowManagerSettings {
     this.auxWindowShowSkinSelector = show
   }
 
-  setAuxWindowZoomFactor(factor: number) {
-    this.auxWindowZoomFactor = factor
-  }
-
   setMainWindowCloseAction(action: MainWindowCloseAction) {
     this.mainWindowCloseAction = action
   }
 
   setAutoShowAuxWindow(autoShow: boolean) {
     this.auxWindowAutoShow = autoShow
+  }
+
+  setAuxWindowEnabled(enabled: boolean) {
+    this.auxWindowEnabled = enabled
   }
 
   constructor() {
@@ -88,6 +83,8 @@ export class WindowManagerState {
   auxWindowBounds: Rectangle | null = null
   auxWindowFunctionalityBounds: Record<string, Partial<Rectangle>> = {}
   auxWindowFunctionality: 'indicator' | 'opgg' = 'indicator'
+
+  supportsMica: boolean = false
 
   setMainWindowStatus(status: 'normal' | 'maximized' | 'minimized') {
     this.mainWindowStatus = status
@@ -135,6 +132,10 @@ export class WindowManagerState {
 
   setAuxWindowFunctionalityBounds(fb: Record<string, Partial<Rectangle>>) {
     this.auxWindowFunctionalityBounds = fb
+  }
+
+  setSupportsMica(supports: boolean) {
+    this.supportsMica = supports
   }
 
   constructor() {

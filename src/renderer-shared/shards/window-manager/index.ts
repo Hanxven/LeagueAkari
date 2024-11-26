@@ -134,7 +134,21 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'auxWindowShowSkinSelector', value)
   }
 
-  setAuxWindowZoomFactor(value: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'auxWindowZoomFactor', value)
+  setMainWindowBackgroundMaterial(value: string) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'main-window/setBackgroundMaterial', value)
+  }
+
+  setAuxWindowBackgroundMaterial(value: string) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'aux-window/setBackgroundMaterial', value)
+  }
+
+  mainWindowOpenDialog(
+    properties = ['openFile'],
+    filters: {
+      extensions: string[]
+      name: string
+    }[] = [{ name: 'All Files', extensions: ['*'] }]
+  ) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'main-window/openDialog', properties, filters)
   }
 }

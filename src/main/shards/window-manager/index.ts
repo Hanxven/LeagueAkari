@@ -75,8 +75,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
         auxWindowAutoShow: { default: this.settings.auxWindowAutoShow },
         auxWindowOpacity: { default: this.settings.auxWindowOpacity },
         auxWindowPinned: { default: this.settings.auxWindowPinned },
-        auxWindowShowSkinSelector: { default: this.settings.auxWindowShowSkinSelector },
-        auxWindowZoomFactor: { default: this.settings.auxWindowZoomFactor }
+        auxWindowShowSkinSelector: { default: this.settings.auxWindowShowSkinSelector }
       },
       this.settings
     )
@@ -85,6 +84,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
   async onInit() {
     await this._setting.applyToState()
+
+    if (this._shared.global.isWindows11_22H2_OrHigher) {
+      this.state.setSupportsMica(true)
+    }
 
     this._mobx.propSync(WindowManagerMain.id, 'state', this.state, [
       'mainWindowFocus',
@@ -102,8 +105,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       'auxWindowAutoShow',
       'auxWindowOpacity',
       'auxWindowPinned',
-      'auxWindowShowSkinSelector',
-      'auxWindowZoomFactor'
+      'auxWindowShowSkinSelector'
     ])
 
     this._setting.onChange('auxWindowPinned', (value, { setter }) => {
@@ -195,6 +197,30 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._ipc.onCall(WindowManagerMain.id, 'main-window/setBackgroundMaterial', (material) => {
       this._mw?.setBackgroundMaterial(material)
     })
+
+    this._ipc.onCall(
+      WindowManagerMain.id,
+      'main-window/openDialog',
+      async (
+        properties = ['openFile'],
+        filters: {
+          extensions: string[]
+          name: string
+        }[] = []
+      ) => {
+        if (!this._mw) {
+          return
+        }
+
+        const result = await dialog.showOpenDialog(this._mw, {
+          title: 'Select a file',
+          properties,
+          filters
+        })
+
+        return result.filePaths
+      }
+    )
   }
 
   private _handleAuxWindowIpcCall() {
@@ -249,6 +275,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._ipc.onCall(WindowManagerMain.id, 'aux-window/getWindowSize', () => {
       const [width, height] = this._aw?.getSize() || []
       return { width, height }
+    })
+
+    this._ipc.onCall(WindowManagerMain.id, 'aux-window/setBackgroundMaterial', (material) => {
+      this._aw?.setBackgroundMaterial(material)
     })
 
     this._ipc.onCall(
@@ -483,6 +513,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
     this._mw.on('page-title-updated', (e) => e.preventDefault())
 
+    this._mw.webContents.on('did-finish-load', () => {
+      this._aw?.webContents.setZoomFactor(1.0)
+    })
+
     this._mw.webContents.setWindowOpenHandler((details) => {
       dialog
         .showMessageBox(this._mw!, {
@@ -561,7 +595,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._aw.setAlwaysOnTop(this.settings.auxWindowPinned, 'normal')
 
     this._aw.webContents.on('did-finish-load', () => {
-      this._aw?.webContents.setZoomFactor(this.settings.auxWindowZoomFactor)
+      this._aw?.webContents.setZoomFactor(1.0)
     })
 
     this._aw.webContents.setWindowOpenHandler((details) => {
@@ -694,11 +728,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       }
 
       const bounds = this._aw.getBounds()
-      const p = this._getCenteredRectangle(
-        bounds.width * this.settings.auxWindowZoomFactor,
-        bounds.height * this.settings.auxWindowZoomFactor
-      )
-      this._aw.webContents.setZoomFactor(this.settings.auxWindowZoomFactor)
+      const p = this._getCenteredRectangle(bounds.width, bounds.height)
       this._aw.setPosition(p.x, p.y)
     }
 
@@ -798,13 +828,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       () => this.state.auxWindowFunctionality,
       (f) => {
         this._setting._saveToStorage('auxWindowFunctionality', f)
-      }
-    )
-
-    this._mobx.reaction(
-      () => this.settings.auxWindowZoomFactor,
-      (f) => {
-        this._aw?.webContents.setZoomFactor(f)
       }
     )
 

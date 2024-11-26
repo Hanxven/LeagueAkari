@@ -59,22 +59,6 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('AuxWindowSettings.auxWindowZoomFactor.label')"
-        :label-description="t('AuxWindowSettings.auxWindowZoomFactor.description')"
-        :label-width="320"
-      >
-        <NInputNumber
-          style="width: 100px"
-          size="small"
-          :min="1"
-          :max="3"
-          step="0.1"
-          :value="wms.settings.auxWindowZoomFactor"
-          @update:value="(val) => wm.setAuxWindowZoomFactor(val || 1.0)"
-        />
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
         :label="t('AuxWindowSettings.resetAuxWindowPosition.label')"
         :label-description="t('AuxWindowSettings.resetAuxWindowPosition.description')"
         :label-width="320"
@@ -92,9 +76,8 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
-import { NButton, NCard, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 import { useTranslation } from 'i18next-vue'
-
+import { NButton, NCard, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 const { t } = useTranslation()
 

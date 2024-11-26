@@ -1,7 +1,7 @@
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
-import { app, nativeImage, shell } from 'electron'
+import { app, dialog, nativeImage, shell } from 'electron'
 import { clipboard } from 'electron'
 
 import { AkariIpcMain } from '../ipc'

@@ -18,11 +18,13 @@ export const useWindowManagerStore = defineStore('shard:window-manager-renderer'
   const mainWindowStatus = ref('normal')
   const mainWindowFocus = ref('focused')
   const mainWindowShow = ref(true)
-  
+
   const auxWindowStatus = ref('normal')
   const auxWindowFocus = ref('focused')
   const auxWindowShow = ref(true)
   const auxWindowFunctionality = ref('indicator')
+
+  const supportsMica = ref(false)
 
   return {
     settings,
