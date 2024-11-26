@@ -38,6 +38,7 @@ OngoingGameTitle:
   refresh: Refresh
   orderOptions:
     default: Default
+    position: Position
     win-rate: W/R Desc
     kda: KDA Desc
     akari-score: Score Desc
@@ -1537,6 +1538,17 @@ tray:
 windowOpenHandler:
   toAkari: To League Akari GitHub ❤️
   toExternalLink: To external site {{target}}
+
+auto-gameflow-main:
+  error-auto-honor: 'Auto honor failed: {{reason}}'
+  error-accept-match: 'Auto accept match failed: {{reason}}'
+  error-matchmaking: 'Auto matchmaking could not start: {{reason}}'
+
+auto-select-main:
+  error-pick: 'Failed to auto select champion, target champion {{champion}}: {{reason}}'
+  error-pre-pick: 'Failed to auto pre-select champion, target champion {{champion}}: {{reason}}'
+  error-ban: 'Failed to auto ban champion, target champion {{champion}}: {{reason}}'
+  error-bench-swap: 'Failed to auto swap champion, target champion {{champion}}: {{reason}}'
 
 common:
   appName: League Akari

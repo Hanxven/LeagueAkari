@@ -1,7 +1,8 @@
+import { i18next } from '@main/i18n'
 import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
-import { formatError } from '@shared/utils/errors'
+import { formatError, formatErrorMessage } from '@shared/utils/errors'
 import { randomInt } from '@shared/utils/random'
 import { comparer, computed } from 'mobx'
 
@@ -405,6 +406,14 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
             this._log.info(`自动点赞：给玩家 ${candidates.join(', ')} 点赞, 对局 ID: ${h.gameId}`)
           } catch (error) {
             this._ipc.sendEvent(AutoGameflowMain.id, 'error-auto-honor', formatError(error))
+            this._lc.api.playerNotifications
+              .createTitleDetailsNotification(
+                i18next.t('common.appName'),
+                i18next.t('error-auto-honor', {
+                  reason: formatErrorMessage(error)
+                })
+              )
+              .catch(() => {})
             this._log.warn(`自动点赞出现错误 ${formatError(error)}`)
           }
         }
@@ -524,7 +533,15 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       await this._lc.api.matchmaking.accept()
     } catch (error) {
       this._ipc.sendEvent(AutoGameflowMain.id, 'error-accept-match', formatError(error))
-      this._log.warn(`无法接受对局 ${formatError(error)}`)
+      this._lc.api.playerNotifications
+        .createTitleDetailsNotification(
+          i18next.t('common.appName'),
+          i18next.t('error-accept-match', {
+            reason: formatErrorMessage(error)
+          })
+        )
+        .catch(() => {})
+      this._log.warn(`无法接受对局`, error)
     }
     this.state.clearAutoAccept()
     this._autoSearchMatchTimerId = null
@@ -541,7 +558,15 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       await this._lc.api.lobby.searchMatch()
     } catch (error) {
       this._ipc.sendEvent(AutoGameflowMain.id, 'error-matchmaking', formatError(error))
-      this._log.warn(`无法开始匹配 ${formatError(error)}`)
+      this._lc.api.playerNotifications
+        .createTitleDetailsNotification(
+          i18next.t('common.appName'),
+          i18next.t('error-matchmaking', {
+            reason: formatErrorMessage(error)
+          })
+        )
+        .catch(() => {})
+      this._log.warn(`无法开始匹配`, error)
     }
   }
 

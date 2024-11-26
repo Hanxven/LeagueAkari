@@ -1,5 +1,6 @@
+import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { formatError } from '@shared/utils/errors'
+import { formatError, formatErrorMessage } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
 
 import { AkariIpcMain } from '../ipc'
@@ -124,6 +125,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             )
           } catch (error) {
             this._ipc.sendEvent(AutoSelectMain.id, 'error-pick', pick.championId)
+            this._lc.api.playerNotifications
+              .createTitleDetailsNotification(
+                i18next.t('common.appName'),
+                i18next.t('error-pick', {
+                  champion:
+                    this._lc.data.gameData.champions[pick.championId]?.name || pick.championId,
+                  reason: formatErrorMessage(error)
+                })
+              )
+              .catch(() => {})
             this._log.warn(`尝试自动执行 pick 时失败, 目标英雄: ${pick.championId}`, error)
           }
 
@@ -156,6 +167,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             await this._lc.api.champSelect.action(pick.action.id, { championId: pick.championId })
           } catch (error) {
             this._ipc.sendEvent(AutoSelectMain.id, 'error-pre-pick', pick.championId)
+            this._lc.api.playerNotifications
+              .createTitleDetailsNotification(
+                i18next.t('common.appName'),
+                i18next.t('error-pre-pick', {
+                  champion:
+                    this._lc.data.gameData.champions[pick.championId]?.name || pick.championId,
+                  reason: formatErrorMessage(error)
+                })
+              )
+              .catch(() => {})
             this._log.warn(`尝试自动执行预选时失败, 目标英雄: ${pick.championId}`, error)
           }
           return
@@ -175,6 +196,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             await this._lc.api.champSelect.pickOrBan(ban.championId, true, 'ban', ban.action.id)
           } catch (error) {
             this._ipc.sendEvent(AutoSelectMain.id, 'error-ban', ban.championId)
+            this._lc.api.playerNotifications
+              .createTitleDetailsNotification(
+                i18next.t('common.appName'),
+                i18next.t('error-ban', {
+                  champion:
+                    this._lc.data.gameData.champions[ban.championId]?.name || ban.championId,
+                  reason: formatErrorMessage(error)
+                })
+              )
+              .catch(() => {})
             this._log.warn(`尝试自动执行 pick 时失败, 目标英雄: ${ban.championId}`, error)
           }
         }
@@ -492,6 +523,17 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       this._log.info(`已交换英雄: ${this.state.upcomingGrab.championId}`)
     } catch (error) {
       this._ipc.sendEvent(AutoSelectMain.id, 'error-bench-swap', this.state.upcomingGrab.championId)
+      this._lc.api.playerNotifications
+        .createTitleDetailsNotification(
+          i18next.t('common.appName'),
+          i18next.t('error-bench-swap', {
+            champion:
+              this._lc.data.gameData.champions[this.state.upcomingGrab.championId]?.name ||
+              this.state.upcomingGrab.championId,
+            reason: formatErrorMessage(error)
+          })
+        )
+        .catch(() => {})
       this._log.warn(`在尝试交换英雄时发生错误`, error)
     } finally {
       this._grabTimerId = null

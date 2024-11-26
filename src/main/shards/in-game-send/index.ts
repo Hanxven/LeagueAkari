@@ -198,15 +198,21 @@ export class InGameSendMain implements IAkariShardInitDispose {
   }) {
     const selfPuuid = this._lc.data.summoner.me?.puuid
     const teams = this._og.state.teams || {}
-    const teamMembersList = Object.values(teams)
-    const selfTeamMembers = selfPuuid
-      ? teamMembersList.find((members) => members.includes(selfPuuid))
+    const teamEntries = Object.entries(teams)
+
+    const selfTeamEntry = selfPuuid
+      ? teamEntries.find(([, members]) => members.includes(selfPuuid))
       : null
-    const allyMembers = selfTeamMembers ? [...selfTeamMembers] : teamMembersList.flat()
+
+    const selfTeamId = selfTeamEntry ? selfTeamEntry[0] : null
+    const selfTeamMembers = selfTeamEntry ? selfTeamEntry[1] : null
+
+    const allMembers = teamEntries.flatMap(([, members]) => members)
+
+    const allyMembers = selfTeamMembers ? [...selfTeamMembers] : []
     const enemyMembers = selfTeamMembers
-      ? teamMembersList.filter((members) => members !== selfTeamMembers).flat()
-      : []
-    const allMembers = [...allyMembers, ...enemyMembers]
+      ? teamEntries.filter(([teamId]) => teamId !== selfTeamId).flatMap(([, members]) => members)
+      : allMembers
 
     const targetMembers =
       options.target === 'all' ? allMembers : options.target === 'ally' ? allyMembers : enemyMembers
@@ -221,6 +227,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       region: this._lc.state.auth?.region,
       rsoPlatformId: this._lc.state.auth?.rsoPlatformId,
       selfPuuid: this._lc.data.summoner.me?.puuid,
+      selfTeamId,
       gameData: toJS(this._lc.data.gameData),
       allyMembers: allyMembers,
       enemyMembers: enemyMembers,
@@ -657,7 +664,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       return { error: false, reason: null, data: messages }
     } catch (error) {
       this._log.warn('Dry-Run: 执行模板发生错误', error)
-      return { error: true, reason: 'execution-error', data: [] }
+      return { error: true, reason: 'execution-error', data: [], extra: (error as Error).message }
     }
   }
 

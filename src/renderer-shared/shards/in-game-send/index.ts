@@ -86,7 +86,10 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   dryRunStatsSend(): Promise<
     {
       data: string[]
-    } & ({ error: true; reason: string } | { error: false; reason: null })
+    } & (
+      | { error: true; reason: string; extra: string }
+      | { error: false; reason: null; extra: string }
+    )
   > {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'dryRunStatsSend')
   }

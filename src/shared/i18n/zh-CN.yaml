@@ -40,6 +40,7 @@ OngoingGameTitle:
   refresh: 刷新对局页面
   orderOptions:
     default: 楼层顺序
+    position: 分路顺序
     win-rate: 胜率降序
     kda: KDA 降序
     akari-score: 评分降序
@@ -1540,6 +1541,17 @@ tray:
 windowOpenHandler:
   toAkari: 将转到 League Akari 的项目主页 ❤️
   toExternalLink: 将跳转到外部链接 {{target}}
+
+auto-gameflow-main:
+  error-auto-honor: 自动点赞失败：{{reason}}
+  error-accept-match: 自动接受对局失败：{{reason}}
+  error-matchmaking: 自动匹配无法开始匹配 {{reason}}
+
+auto-select-main:
+  error-pick: 尝试自动选择英雄时失败，目标英雄 {{champion}}：{{reason}}
+  error-pre-pick: 尝试自动预选英雄失败，目标英雄 {{champion}}：{{reason}}
+  error-ban: 尝试自动禁用英雄时失败，目标英雄 {{champion}}：{{reason}}
+  error-bench-swap: 尝试自动交换英雄时失败，目标英雄 {{champion}}：{{reason}}
 
 common:
   appName: League Akari

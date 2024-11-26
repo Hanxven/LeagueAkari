@@ -48,4 +48,34 @@ export class PerksHttpApi {
       }
     })
   }
+
+  getRecommendedChampionPositions() {
+    return this._http.get('/lol-perks/v1/recommended-champion-positions')
+  }
+
+  getRecommendedPagesPosition(championId: number) {
+    return this._http.get(`/lol-perks/v1/recommended-pages-position/champion/${championId}`)
+  }
+
+  postRecommendedPagePosition(championId: number, position: string) {
+    return this._http.post(
+      `/lol-perks/v1/recommended-pages-position/champion/${championId}/position/${position}`
+    )
+  }
+
+  getRecommendedPages(championId: number, position: string, mapId: number) {
+    return this._http.get(
+      `/lol-perks/v1/recommended-pages/champion/${championId}/position/${position}/map/${mapId}`
+    )
+  }
+
+  getRuneRecommenderAutoSelect(championId: number, position: string, mapId: number) {
+    return this._http.get(
+      `/lol-perks/v1/rune-recommender-auto-select/champion/${championId}/position/${position}/map/${mapId}`
+    )
+  }
+
+  postRuneRecommenderAutoSelect(data: object) {
+    return this._http.post(`/lol-perks/v1/rune-recommender-auto-select`, data)
+  }
 }

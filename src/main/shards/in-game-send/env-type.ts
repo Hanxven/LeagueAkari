@@ -152,6 +152,11 @@ export type TemplateEnv = {
   selfPuuid: string
 
   /**
+   * Self Team Id, if not in any team, it will be null.
+   */
+  selfTeamId: string | null
+
+  /**
    * League Client Game Data Assets, not a completed list.
    * includes:
    * - summonerSpells
@@ -165,7 +170,7 @@ export type TemplateEnv = {
   gameData: GameDataEnv
 
   /**
-   * Ally members.
+   * Ally members. If not in a team, it will be empty.
    */
   allyMembers: string[]
 

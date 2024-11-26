@@ -11,3 +11,11 @@ export function formatError(e: any) {
 
   return e
 }
+
+export function formatErrorMessage(e: any) {
+  if (e instanceof Error) {
+    return e.message
+  }
+
+  return 'Error'
+}

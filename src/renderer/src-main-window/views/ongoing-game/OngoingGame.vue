@@ -97,9 +97,9 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { Game } from '@shared/types/league-client/match-history'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { NScrollbar } from 'naive-ui'
 import { computed, reactive, ref, useTemplateRef } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import EasyToLaunch from '@main-window/components/EasyToLaunch.vue'
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
@@ -116,7 +116,6 @@ import {
 const lc = useLeagueClientStore()
 const app = useAppCommonStore()
 
-
 const { t } = useTranslation()
 
 const og = useOngoingGameStore()
@@ -124,6 +123,15 @@ const og = useOngoingGameStore()
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
 const isInIdleState = useIdleState()
+
+const POSITION_ORDER = {
+  NONE: 0,
+  TOP: 1,
+  JUNGLE: 2,
+  MIDDLE: 3,
+  BOTTOM: 4,
+  UTILITY: 5
+}
 
 const sortedTeams = computed(() => {
   if (!og.teams) {
@@ -138,6 +146,13 @@ const sortedTeams = computed(() => {
     }
 
     sorted[team] = players.toSorted((a, b) => {
+      if (og.settings.orderPlayerBy === 'position') {
+        const pa = og.positionAssignments[a]?.position || 'NONE'
+        const pb = og.positionAssignments[b]?.position || 'NONE'
+
+        return POSITION_ORDER[pa] - POSITION_ORDER[pb]
+      }
+
       const statsA = og.playerStats?.players[a]
       const statsB = og.playerStats?.players[b]
 

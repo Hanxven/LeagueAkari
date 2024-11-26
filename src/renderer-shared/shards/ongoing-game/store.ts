@@ -92,26 +92,28 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     matchHistoryTagPreference: 'current' as 'current' | 'all',
 
     // renderer only
-    orderPlayerBy: 'default' as 'win-rate' | 'kda' | 'default' | 'akari-score'
+    orderPlayerBy: 'default' as 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position'
   })
 
   const gameInfo = shallowRef<OngoingGameInfo | null>(null)
-  const championSelections = shallowRef<Record<string, number> | null>(null)
-  const positionAssignments = shallowRef<Record<
-    string,
-    {
-      position: string
-      role: ParsedRole | null
-    }
-  > | null>(null)
-  const teams = shallowRef<Record<string, string[]> | null>(null)
+  const championSelections = shallowRef<Record<string, number>>({})
+  const positionAssignments = shallowRef<
+    Record<
+      string,
+      {
+        position: string
+        role: ParsedRole | null
+      }
+    >
+  >({})
+  const teams = shallowRef<Record<string, string[]>>({})
 
   // untyped
   const queryStage = shallowRef<{
     phase: 'unavailable' | 'champ-select' | 'in-game'
   }>({ phase: 'unavailable' })
   const isInEog = shallowRef(false)
-  const premadeTeams = shallowRef<Record<string, string[][]> | null>(null)
+  const premadeTeams = shallowRef<Record<string, string[][]>>({})
 
   const playerStats = shallowRef<{
     players: Record<string, MatchHistoryGamesAnalysisAll>

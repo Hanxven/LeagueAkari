@@ -385,7 +385,7 @@ const handleSaveTemplate = async (template: string) => {
 }
 
 const handleDryRun = async () => {
-  const { data, error, reason } = await ig.dryRunStatsSend()
+  const { data, error, reason, extra } = await ig.dryRunStatsSend()
   if (error) {
     console.log(data, error, reason)
     switch (reason) {
@@ -396,7 +396,7 @@ const handleDryRun = async () => {
         message.error(t('InGameSend.stage-unavailable'))
         break
       case 'execution-error':
-        message.error(t('InGameSend.execution-error'))
+        message.error(`${t('InGameSend.execution-error')}: ${extra}`)
         break
       default:
         message.error(t('InGameSend.error'))

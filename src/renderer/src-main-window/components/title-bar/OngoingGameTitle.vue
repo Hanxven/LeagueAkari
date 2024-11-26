@@ -37,10 +37,9 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { RefreshRound as RefreshIcon } from '@vicons/material'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NSelect, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 
@@ -55,6 +54,10 @@ const orderOptions = computed(() => {
     {
       label: t('OngoingGameTitle.orderOptions.default'),
       value: 'default'
+    },
+    {
+      label: t('OngoingGameTitle.orderOptions.position'),
+      value: 'position'
     },
     {
       label: t('OngoingGameTitle.orderOptions.win-rate'),
