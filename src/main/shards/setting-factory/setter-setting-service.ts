@@ -73,6 +73,10 @@ export class SetterSettingService {
    * @param extra
    */
   onChange(key: string, fn: OnChangeCallback) {
+    if (!this._schema[key]) {
+      throw new Error(`key ${key} not found in schema`)
+    }
+
     const _fn = this._schema[key].onChange
     // 重复设置, 会报错
     if (_fn) {

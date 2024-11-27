@@ -7,7 +7,7 @@ import {
   Queue,
   SummonerSpell
 } from '@shared/types/league-client/game-data'
-import { Game } from '@shared/types/league-client/match-history'
+import { Game, GameTimeline } from '@shared/types/league-client/match-history'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
@@ -38,21 +38,28 @@ interface MatchHistoryEnv {
     source: 'lcu' | 'sgp'
     tag?: string
     targetCount: number
-    data: Game[] // lcu game object
+    data: Game[] // lcu game object, detailed
   }
 }
 
 interface RankedStatsEnv {
   [key: string]: {
-    source: 'lcu' | 'sgp'
+    source: 'lcu'
     data: RankedStats
   }
 }
 
 interface SummonerEnv {
   [key: string]: {
-    source: 'lcu' | 'sgp'
+    source: 'lcu'
     data: SummonerInfo
+  }
+}
+
+interface GameTimelineEnv {
+  [key: number]: {
+    source: 'lcu'
+    data: GameTimeline
   }
 }
 
@@ -245,4 +252,14 @@ export type TemplateEnv = {
    * Premade teams
    */
   premadeTeams: PremadeTeamsEnv
+
+  /**
+   * Game timeline environment including game timeline data for a certain count of games.
+   */
+  gameTimeline: GameTimelineEnv
+
+  /**
+   * Settings from shard ongoing-game-main (including only non-function fields)
+   */
+  settings: Record<string, any>
 }

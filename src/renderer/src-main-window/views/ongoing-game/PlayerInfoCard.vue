@@ -596,7 +596,7 @@ const positionInfo = computed(() => {
     recent: [] as { position: string; count: number }[]
   }
 
-  if (!position) {
+  if (!position || position.position === 'NONE') {
     return null
   }
 
@@ -613,10 +613,6 @@ const positionInfo = computed(() => {
   }
 
   return info
-})
-
-watchEffect(() => {
-  console.log(positionInfo.value)
 })
 
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9

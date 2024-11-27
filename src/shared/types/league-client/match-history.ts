@@ -263,3 +263,49 @@ export function isPveQueue(queueId: number) {
 
   return pveQueues.has(queueId)
 }
+
+export interface GameTimeline {
+  frames: GameTimelineFrame[]
+}
+
+interface GameTimelineFrame {
+  events: Event[]
+  participantFrames: Record<number, ParticipantFrame>
+  timestamp: number
+}
+
+interface ParticipantFrame {
+  currentGold: number
+  dominionScore: number
+  jungleMinionsKilled: number
+  level: number
+  minionsKilled: number
+  participantId: number
+  position: Position
+  teamScore: number
+  totalGold: number
+  xp: number
+}
+
+interface Event {
+  assistingParticipantIds: number[]
+  buildingType: string
+  itemId: number
+  killerId: number
+  laneType: string
+  monsterSubType: string
+  monsterType: string
+  participantId: number
+  position: Position
+  skillSlot: number
+  teamId: number
+  timestamp: number
+  towerType: string
+  type: string
+  victimId: number
+}
+
+interface Position {
+  x: number
+  y: number
+}

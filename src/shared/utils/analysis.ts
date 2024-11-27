@@ -1,5 +1,6 @@
 import {
   Game,
+  GameTimeline,
   Participant,
   ParticipantIdentity,
   isPveQueue
@@ -311,6 +312,10 @@ export interface MatchHistoryGamesAnalysis {
 
   // SGP 数据字段 teamPosition, 若不存在则为空字符串
   position: string | null
+
+  // timeline
+  soloKills: number | null
+  soloDeaths: number | null
 }
 
 export interface MatchHistoryGamesAnalysisSummary {
@@ -422,20 +427,18 @@ export interface MatchHistoryGamesAnalysisAll {
  * @param selfPuuid 玩家 PUUID
  */
 export function analyzeMatchHistory(
-  games: MatchHistoryGameWithState[],
+  games: Game[],
   selfPuuid: string,
-  queueType?: number[]
+  queueType: number[] = [],
+  gameTimeline: Record<number, GameTimeline> = {}
 ): MatchHistoryGamesAnalysisAll | null {
-  // 仅分析详细战绩，因为简略战绩会大幅减少分析的准确性
-  const detailedGames = games
-    .filter((g) => g.isDetailed)
-    .filter((g) => !queueType || queueType.includes(g.game.queueId))
-    .filter((g) => !g.game.participants.some((p) => p.stats.gameEndedInEarlySurrender))
-    .filter((g) => g.game.endOfGameResult !== 'Abort_AntiCheatExit')
-    .filter((g) => g.game.gameType === 'MATCHED_GAME' && !isPveQueue(g.game.queueId))
-    .map((g) => g.game)
+  games = games
+    .filter((g) => !queueType || queueType.includes(g.queueId))
+    .filter((g) => !g.participants.some((p) => p.stats.gameEndedInEarlySurrender))
+    .filter((g) => g.endOfGameResult !== 'Abort_AntiCheatExit')
+    .filter((g) => g.gameType === 'MATCHED_GAME' && !isPveQueue(g.queueId))
 
-  if (detailedGames.length === 0) {
+  if (games.length === 0) {
     return null
   }
 
@@ -453,8 +456,8 @@ export function analyzeMatchHistory(
   const champions: Record<number, MatchHistoryChampionAnalysis> = {}
 
   const gameAnalyses: [number, MatchHistoryGamesAnalysis][] = []
-  for (let i = 0; i < detailedGames.length; i++) {
-    const game = detailedGames[i]
+  for (let i = 0; i < games.length; i++) {
+    const game = games[i]
 
     // 确定玩家在这场游戏中的参与者 ID
     const selfIdentity = game.participantIdentities.find((p) => p.player.puuid === selfPuuid)
@@ -562,7 +565,11 @@ export function analyzeMatchHistory(
       championId: watashi.championId,
 
       // sgp only
-      position: watashi.stats.teamPosition || null
+      position: watashi.stats.teamPosition || null,
+
+      // timeline
+      soloKills: null,
+      soloDeaths: null
     }
 
     let maxDamageDealt = 0
@@ -785,6 +792,33 @@ export function analyzeMatchHistory(
     champions[watashi.championId].cherry.winRate =
       champions[watashi.championId].cherry.win / champions[watashi.championId].cherry.count
 
+    // timeline 分析
+    const thisGameTimeline = gameTimeline[game.gameId]
+
+    if (thisGameTimeline) {
+      const timelineAnalysis = {
+        soloKills: 0,
+        soloDeaths: 0
+      }
+
+      for (const frame of thisGameTimeline.frames) {
+        frame.events.forEach((event) => {
+          // 单杀
+          if (event.type === 'CHAMPION_KILL' && !event.assistingParticipantIds.length) {
+            if (watashi.participantId === event.killerId) {
+              timelineAnalysis.soloKills++
+            }
+
+            if (watashi.participantId === event.victimId) {
+              timelineAnalysis.soloDeaths++
+            }
+          }
+        })
+      }
+
+      Object.assign(gameAnalysis, timelineAnalysis)
+    }
+
     gameAnalyses.push([game.gameId, gameAnalysis])
   }
 
@@ -842,7 +876,7 @@ export function analyzeMatchHistory(
     winningStreak: winningStreak,
     losingStreak: losingStreak,
 
-    count: detailedGames.length,
+    count: games.length,
 
     cherry: {
       count: cherryCount,

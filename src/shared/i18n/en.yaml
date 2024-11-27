@@ -152,6 +152,10 @@ OngoingGameSettings:
       all: All Modes
       current: Current Mode
 
+  gameTimelineLoadCount:
+    label: Game Timeline Load Count
+    description: Will additionally load the timeline information for the first {{countV}} matches for game analysis.
+
 AuxWindowSettings:
   title: Auxiliary Window
 

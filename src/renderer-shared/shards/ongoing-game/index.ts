@@ -55,6 +55,10 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'matchHistoryTagPreference', value)
   }
 
+  setGameTimelineLoadCount(value: number) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'gameTimelineLoadCount', value)
+  }
+
   reload() {
     this._ipc.call(MAIN_SHARD_NAMESPACE, 'reload')
   }

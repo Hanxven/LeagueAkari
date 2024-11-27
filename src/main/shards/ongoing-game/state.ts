@@ -1,5 +1,5 @@
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { Game } from '@shared/types/league-client/match-history'
+import { Game, GameTimeline } from '@shared/types/league-client/match-history'
 import { RankedStats } from '@shared/types/league-client/ranked'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
@@ -16,7 +16,12 @@ export class OngoingGameSettings {
   enabled: boolean = true
   premadeTeamThreshold: number = 3
   matchHistoryLoadCount: number = 20
-  concurrency: number = 3
+
+  /**
+   * 会拉取战绩中前 n 局的时间线数量
+   */
+  gameTimelineLoadCount: number = 6
+  concurrency: number = 4
 
   /**
    * 查询战绩时是否优先使用 SGP API
@@ -46,6 +51,10 @@ export class OngoingGameSettings {
 
   setMatchHistoryUseSgpApi(value: boolean) {
     this.matchHistoryUseSgpApi = value
+  }
+
+  setGameTimelineLoadCount(value: number) {
+    this.gameTimelineLoadCount = value
   }
 
   constructor() {
@@ -446,6 +455,19 @@ export class OngoingGameState {
    */
   savedInfoLoadingState: Record<string, string> = {}
 
+  /**
+   * 游戏时间线, 暂未实装
+   */
+  gameTimeline: Record<
+    number,
+    {
+      source: 'lcu' | 'sgp'
+      data: GameTimeline
+    }
+  > = {}
+
+  gameTimelineLoadingState: Record<number, string> = {}
+
   clear() {
     this.playerStats = null
     this.premadeTeams = {}
@@ -460,6 +482,7 @@ export class OngoingGameState {
     this.savedInfoLoadingState = {}
     this.rankedStatsLoadingState = {}
     this.championMasteryLoadingState = {}
+    this.gameTimeline = {}
   }
 
   constructor(private readonly _lcData: LeagueClientSyncedData) {
@@ -469,12 +492,15 @@ export class OngoingGameState {
       summoner: observable.shallow,
       rankedStats: observable.shallow,
       savedInfo: observable.shallow,
+      championMastery: observable.shallow,
+      gameTimeline: observable.shallow,
 
       // ref object, override only, no modification
       matchHistoryLoadingState: observable.ref,
       summonerLoadingState: observable.ref,
       rankedStatsLoadingState: observable.ref,
       savedInfoLoadingState: observable.ref,
+      gameTimelineLoadingState: observable.ref,
 
       // structured data
       championSelections: computed.struct,

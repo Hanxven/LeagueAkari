@@ -155,6 +155,10 @@ OngoingGameSettings:
       all: 所有模式
       current: 当前模式
 
+  gameTimelineLoadCount:
+    label: 时间线信息加载数量
+    description: 会额外加载前 {{countV}} 场对局的时间线信息，用于对局分析
+
 AuxWindowSettings:
   title: 小窗口
 

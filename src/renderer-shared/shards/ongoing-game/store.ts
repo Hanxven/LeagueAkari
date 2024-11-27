@@ -106,6 +106,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     concurrency: 3,
     matchHistoryUseSgpApi: true,
     matchHistoryTagPreference: 'current' as 'current' | 'all',
+    gameTimelineLoadCount: 0,
 
     // renderer only
     orderPlayerBy: 'default' as 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position'

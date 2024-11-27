@@ -752,6 +752,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
       switch (this._lc.data.gameflow.phase) {
         case 'ChampSelect':
+          if (this._lc.data.champSelect.session?.isSpectating) {
+            return 'ignore'
+          }
         case 'Lobby':
         case 'Matchmaking':
         case 'ReadyCheck':

@@ -1,4 +1,4 @@
-import { Game, MatchHistory } from '@shared/types/league-client/match-history'
+import { Game, GameTimeline, MatchHistory } from '@shared/types/league-client/match-history'
 import { AxiosInstance } from 'axios'
 
 export class MatchHistoryHttpApi {
@@ -24,6 +24,6 @@ export class MatchHistoryHttpApi {
   }
 
   getTimeline(gameId: number) {
-    return this._http.get<any>(`/lol-match-history/v1/game-timelines/${gameId}`)
+    return this._http.get<GameTimeline>(`/lol-match-history/v1/game-timelines/${gameId}`)
   }
 }

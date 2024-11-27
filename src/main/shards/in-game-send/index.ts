@@ -191,6 +191,18 @@ export class InGameSendMain implements IAkariShardInitDispose {
     await this._sendSeparatedStringLines(messages, s.id)
   }
 
+  static mapNonFunctionObject<T extends Record<string, any>>(obj: T) {
+    const result: Record<string, any> = {}
+
+    for (const [key, value] of Object.entries(obj)) {
+      if (typeof value !== 'function') {
+        result[key] = value
+      }
+    }
+
+    return result
+  }
+
   private _createTemplateEnv(options: {
     akariVersion: string
     prefix?: string
@@ -233,6 +245,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       enemyMembers: enemyMembers,
       allMembers: allMembers,
       targetMembers: targetMembers,
+      settings: InGameSendMain.mapNonFunctionObject(this._og.settings),
       teams: toJS(this._og.state.teams),
       matchHistory: toJS(this._og.state.matchHistory),
       rankedStats: toJS(this._og.state.rankedStats),
@@ -243,6 +256,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       championSelections: toJS(this._og.state.championSelections),
       positionAssignments: toJS(this._og.state.positionAssignments),
       playerStats: toJS(this._og.state.playerStats),
+      gameTimeline: toJS(this._og.state.gameTimeline),
       premadeTeams: toJS(this._og.state.premadeTeams)
     }
   }

@@ -65,6 +65,24 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        :label="t('OngoingGameSettings.gameTimelineLoadCount.label')"
+        :label-description="
+          t('OngoingGameSettings.gameTimelineLoadCount.description', {
+            countV: ogs.settings.gameTimelineLoadCount
+          })
+        "
+        :label-width="320"
+      >
+        <NInputNumber
+          style="width: 100px"
+          size="small"
+          :min="0"
+          :value="ogs.settings.gameTimelineLoadCount"
+          @update:value="(val) => og.setGameTimelineLoadCount(val || 0)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         :label="t('OngoingGameSettings.matchHistoryUseSgpApi.label')"
         :label-width="320"
       >
@@ -116,9 +134,8 @@ import { useInstance } from '@renderer-shared/shards'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
 import { useTranslation } from 'i18next-vue'
-
+import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
 
 const { t } = useTranslation()
 
