@@ -280,12 +280,8 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { GameClientRenderer } from '@renderer-shared/shards/game-client'
-import { useGameClientStore } from '@renderer-shared/shards/game-client/store'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
-import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
 import {
   NButton,
@@ -307,17 +303,11 @@ import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 const { t } = useTranslation()
 
 const as = useAppCommonStore()
-const lcs = useLeagueClientStore()
-const gcs = useGameClientStore()
 const igs = useInGameSendStore()
 
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
-const gc = useInstance<GameClientRenderer>('game-client-renderer')
 const ig = useInstance<InGameSendRenderer>('in-game-send-renderer')
 
 const dialog = useDialog()
-
-const idDryRunModalShow = ref(false)
 
 const currentCustomSendTab = ref('')
 
@@ -376,7 +366,7 @@ const handleSaveTemplate = async (template: string) => {
   const { isValid } = await ig.updateSendStatsTemplate(template)
 
   if (isValid) {
-    message.success(t('InGameSend.saved'))
+    message.success(t('InGameSend.compiled'))
   } else {
     message.error(t('InGameSend.invalidTemplate'))
   }

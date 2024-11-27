@@ -1521,6 +1521,7 @@ InGameSend:
       button: 删除
       popconfirm: 确认删除该自定义发送项目？
 
+  compiled: 已编译
   saved: 已保存
   invalidTemplate: 所提供的模板无效，请检查语法
 

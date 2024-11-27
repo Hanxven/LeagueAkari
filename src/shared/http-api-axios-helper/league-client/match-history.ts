@@ -22,4 +22,8 @@ export class MatchHistoryHttpApi {
   getGame(gameId: number) {
     return this._http.get<Game>(`/lol-match-history/v1/games/${gameId}`)
   }
+
+  getTimeline(gameId: number) {
+    return this._http.get<any>(`/lol-match-history/v1/game-timelines/${gameId}`)
+  }
 }

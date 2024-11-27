@@ -168,12 +168,11 @@ import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import { useTranslation } from 'i18next-vue'
 import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip, useDialog } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
-
 
 const { t } = useTranslation()
 

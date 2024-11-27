@@ -72,7 +72,7 @@
             dayjs
               .duration(game.gameDuration * 1000)
               .locale(as.settings.locale.toLowerCase())
-              .format(as.settings.locale === 'zh-CN' ? 'm 分 s 秒' : 'm [m] s [s]')
+              .format(as.settings.locale.startsWith('zh') ? 'm 分 s 秒' : 'm [m] s [s]')
           }}
         </div>
       </div>

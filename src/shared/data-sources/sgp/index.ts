@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { AxiosRetry } from 'axios-retry'
+import { Readable } from 'stream'
 
 import {
   SgpGameDetailsLol,
@@ -262,5 +263,26 @@ export class SgpApi {
         Authorization: `Bearer ${this._lolLeagueSessionToken}`
       }
     })
+  }
+
+  getMatchHistoryReplayStream(sgpServerId: string, gameId: number) {
+    if (!this._lolLeagueSessionToken) {
+      throw new Error('jwt token is not set')
+    }
+
+    const sgpServer = this._getSgpServer(sgpServerId)
+
+    const subId = this._getSubId(sgpServerId)
+
+    return this._http.get<Readable>(
+      `/match-history-query/v3/product/lol/matchId/${subId.toUpperCase()}_${gameId}/infoType/replay`,
+      {
+        baseURL: sgpServer.matchHistory,
+        headers: {
+          Authorization: `Bearer ${this._lolLeagueSessionToken}`
+        },
+        responseType: 'stream'
+      }
+    )
   }
 }

@@ -1518,6 +1518,7 @@ InGameSend:
       button: Delete
       popconfirm: Confirm deletion of this custom sending item?
 
+  compiled: Compiled
   saved: Saved
   invalidTemplate: The provided template is invalid. Please check the syntax
 

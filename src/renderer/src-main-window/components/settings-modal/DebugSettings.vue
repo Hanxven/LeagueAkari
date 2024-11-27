@@ -140,8 +140,8 @@
       <template #header
         ><span class="card-header-title">{{
           lc.connectionState === 'connected'
-            ? t('DebugSettings.lcuConnection.titleDisconnected')
-            : t('DebugSettings.lcuConnection.titleConnected')
+            ? t('DebugSettings.lcuConnection.titleConnected')
+            : t('DebugSettings.lcuConnection.titleDisconnected')
         }}</span></template
       >
       <NTable size="small" bordered>

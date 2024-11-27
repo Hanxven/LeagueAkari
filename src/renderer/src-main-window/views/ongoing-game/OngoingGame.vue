@@ -127,8 +127,8 @@ const isInIdleState = useIdleState()
 const POSITION_ORDER = {
   NONE: 0,
   TOP: 1,
-  JUNGLE: 2,
-  MIDDLE: 3,
+  MIDDLE: 2,
+  JUNGLE: 3,
   BOTTOM: 4,
   UTILITY: 5
 }

@@ -1,5 +1,5 @@
 import en from '@shared/i18n/en.yaml'
-import zhCN from '@shared/i18n/zh-cn.yaml'
+import zhCN from '@shared/i18n/zh-CN.yaml'
 import i18next from 'i18next'
 
 i18next.init({

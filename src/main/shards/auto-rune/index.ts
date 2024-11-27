@@ -7,6 +7,10 @@ import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AutoRuneSettings, AutoRuneState } from './state'
 
+/**
+ * [暂未实装]
+ * 自动符文
+ */
 export class AutoRuneMain implements IAkariShardInitDispose {
   static id = 'auto-rune-main'
   static dependencies = [

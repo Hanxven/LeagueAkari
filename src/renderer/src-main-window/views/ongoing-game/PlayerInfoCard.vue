@@ -762,7 +762,7 @@ const matches = computed(() => {
   height: 360px;
   border-radius: 4px;
   box-sizing: border-box;
-  border: 1px solid #ffffff40;
+  border: 1px solid #ffffff20;
   background-color: #11111180;
   width: v-bind(FIXED_CARD_WIDTH_PX_LITERAL);
 
