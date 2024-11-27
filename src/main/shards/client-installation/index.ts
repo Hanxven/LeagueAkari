@@ -244,9 +244,8 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    return this._spawnDetached(this.state.officialRiotClientExecutablePath, [
-      '--launch-product=league_of_legends',
-      '--launch-patchline=live'
-    ])
+    return this._spawnDetached(
+      `"${this.state.officialRiotClientExecutablePath}" --launch-product=league_of_legends --launch-patchline=live`
+    )
   }
 }

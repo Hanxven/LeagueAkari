@@ -42,7 +42,6 @@ export class GameClientMain implements IAkariShardInitDispose {
   ]
 
   static GAME_CLIENT_PROCESS_NAME = 'League of Legends.exe'
-  static TERMINATE_DELAY = 200
   static GAME_CLIENT_BASE_URL = 'https://127.0.0.1:2999'
 
   private readonly _ipc: AkariIpcMain
@@ -115,7 +114,10 @@ export class GameClientMain implements IAkariShardInitDispose {
           this.settings.terminateShortcut,
           'last-active',
           () => {
+            console.log('打算1')
             if (this.settings.terminateGameClientWithShortcut) {
+              console.log('打算2')
+
               this._terminateGameClient()
             }
           }
@@ -161,17 +163,16 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   private _terminateGameClient() {
+    this._log.info('尝试终止游戏客户端进程')
     toolkit.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME).forEach((pid) => {
+      this._log.info('存在进程', pid)
       if (!toolkit.isProcessForeground(pid)) {
+        this._log.info('进程非在前台', pid)
         return
       }
 
       this._log.info(`终止游戏客户端进程 ${pid}`)
-
-      // 这里设置 200 ms，用于使客户端消耗 Alt+F4 事件，避免穿透
-      setTimeout(() => {
-        toolkit.terminateProcess(pid)
-      }, GameClientMain.TERMINATE_DELAY)
+      toolkit.terminateProcess(pid)
     })
   }
 

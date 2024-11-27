@@ -308,6 +308,9 @@ export interface MatchHistoryGamesAnalysis {
 
   // -
   championId: number
+
+  // SGP 数据字段 teamPosition, 若不存在则为空字符串
+  position: string | null
 }
 
 export interface MatchHistoryGamesAnalysisSummary {
@@ -390,10 +393,26 @@ export interface MatchHistoryChampionAnalysis {
   }
 }
 
+export interface MatchHistoryChampionPositionAnalysis {
+  /**
+   * 提供了位置信息的比赛数量
+   */
+  total: number
+
+  positions: {
+    TOP: number
+    JUNGLE: number
+    MIDDLE: number
+    BOTTOM: number
+    UTILITY: number
+  }
+}
+
 export interface MatchHistoryGamesAnalysisAll {
   games: Record<number, MatchHistoryGamesAnalysis>
   summary: MatchHistoryGamesAnalysisSummary
   champions: Record<number, MatchHistoryChampionAnalysis>
+  positions: MatchHistoryChampionPositionAnalysis | null
   akariScore: AkariScore
 }
 
@@ -540,7 +559,10 @@ export function analyzeMatchHistory(
       goldShareOfTeam: 0,
 
       // -
-      championId: 0
+      championId: watashi.championId,
+
+      // sgp only
+      position: watashi.stats.teamPosition || null
     }
 
     let maxDamageDealt = 0
@@ -719,8 +741,6 @@ export function analyzeMatchHistory(
     gameAnalysis.goldShareToTop = watashi.stats.goldEarned / (maxGold || 1)
     gameAnalysis.goldShareOfTeam = watashi.stats.goldEarned / (totalGold || 1)
 
-    gameAnalysis.championId = watashi.championId
-
     if (!champions[watashi.championId]) {
       champions[watashi.championId] = {
         id: watashi.championId,
@@ -870,6 +890,9 @@ export function analyzeMatchHistory(
   let totalGoldShareToTop = 0
   let totalGoldShareOfTeam = 0
 
+  let positionCount = 0
+  const positions: Record<string, number> = {}
+
   for (const [_gameId, analysis] of gameAnalyses) {
     totalDamageShareToTop += analysis.damageShareToTop
     totalPhysicalDamageShareToTop += analysis.physicalDamageShareToTop
@@ -913,6 +936,11 @@ export function analyzeMatchHistory(
 
     totalGoldShareToTop += analysis.goldShareToTop
     totalGoldShareOfTeam += analysis.goldShareOfTeam
+
+    if (analysis.position) {
+      positionCount++
+      positions[analysis.position] = (positions[analysis.position] || 0) + 1
+    }
   }
 
   // for summary calculation
@@ -978,6 +1006,16 @@ export function analyzeMatchHistory(
     games: gamesAnalysisMap,
     summary: summary,
     champions: champions,
+    positions: {
+      total: positionCount,
+      positions: {
+        TOP: positions.TOP || 0,
+        JUNGLE: positions.JUNGLE || 0,
+        MIDDLE: positions.MIDDLE || 0,
+        BOTTOM: positions.BOTTOM || 0,
+        UTILITY: positions.UTILITY || 0
+      }
+    },
     akariScore: calculateAkariScore({ games: gamesAnalysisMap, summary, champions })
   }
 }

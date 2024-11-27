@@ -1,5 +1,5 @@
 <template>
-  <NIcon :title="POSITION_NAMES[position.toUpperCase()] || POSITION_NAMES['ALL']">
+  <NIcon>
     <component :is="POSITIONS[position.toUpperCase()] || POSITIONS['ALL']" />
   </NIcon>
 </template>
@@ -27,21 +27,6 @@ const POSITIONS = {
   UTILITY: PositionSupport,
   ADC: PositionBottom,
   SUPPORT: PositionSupport
-}
-
-const POSITION_NAMES = {
-  ALL: '无',
-  FILL: '补位',
-  BOTTOM: '下路',
-  BOT: '下路',
-  JUNGLE: '打野',
-  JUG: '打野',
-  MID: '中路',
-  MIDDLE: '中路',
-  TOP: '上路',
-  UTILITY: '辅助',
-  ADC: '下路',
-  SUPPORT: '辅助'
 }
 
 const { position = 'ALL' } = defineProps<{

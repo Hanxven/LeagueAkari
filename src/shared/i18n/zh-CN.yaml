@@ -1164,6 +1164,9 @@ PlayerInfoCard:
   top4Rate: 前四率
   1stRate: 第一率
   1st: 第一 {{rate}}%
+  position:
+    recentlyPlayed: 近期偏好：
+    selection: 位置选择：
 
   cherryWinRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%。其中，斗魂竞技场的 {{cherryCount}} 场对局中，该玩家的首位率是 {{top1Rate}}%
   winRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%
@@ -1564,6 +1567,8 @@ common:
   na: N/A
 
   lanes:
+    all: None
+    ALL: None
     top: 上单
     jungle: 打野
     mid: 中单
@@ -1575,6 +1580,8 @@ common:
     TOP: 上单
     JUNGLE: 打野
     MID: 中单
+    MIDDLE: 中单
+    BOTTOM: 下路
     BOT: 下路
     SUPPORT: 辅助
     UTILITY: 辅助

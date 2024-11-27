@@ -82,6 +82,22 @@ export interface SavedInfo {
   encounteredGames: EncounteredGame[]
 }
 
+// copied from main shard
+export type QueryStage =
+  | {
+      phase: 'champ-select' | 'in-game'
+      gameInfo: {
+        queueId: number
+        queueType: string
+        gameId: number
+        gameMode: string
+      }
+    }
+  | {
+      phase: 'unavailable'
+      gameInfo: null
+    }
+
 export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', () => {
   const settings = shallowReactive({
     enabled: false,
@@ -109,9 +125,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const teams = shallowRef<Record<string, string[]>>({})
 
   // untyped
-  const queryStage = shallowRef<{
-    phase: 'unavailable' | 'champ-select' | 'in-game'
-  }>({ phase: 'unavailable' })
+  const queryStage = shallowRef<QueryStage>({ phase: 'unavailable', gameInfo: null })
   const isInEog = shallowRef(false)
   const premadeTeams = shallowRef<Record<string, string[][]>>({})
 

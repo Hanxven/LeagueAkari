@@ -10,24 +10,24 @@
       <div class="team-wrapper">
         <div class="team-header">
           <span class="title">{{ formatTeamText(team).name }}</span>
-          <div class="analysis" v-if="og.playerStats?.teams[team] && players.length >= 1">
+          <div class="analysis" v-if="ogs.playerStats?.teams[team] && players.length >= 1">
             <span
               :title="t('OngoingGame.avgTeamWinRate')"
               class="win-rate"
               :class="{
-                'gte-50': og.playerStats.teams[team].averageWinRate >= 0.5,
-                'lt-50': og.playerStats.teams[team].averageWinRate < 0.5
+                'gte-50': ogs.playerStats.teams[team].averageWinRate >= 0.5,
+                'lt-50': ogs.playerStats.teams[team].averageWinRate < 0.5
               }"
-              >{{ (og.playerStats.teams[team].averageWinRate * 100).toFixed() }}%</span
+              >{{ (ogs.playerStats.teams[team].averageWinRate * 100).toFixed() }}%</span
             >
             <span :title="t('OngoingGame.avgTeamKda')">{{
-              og.playerStats?.teams[team].averageKda.toFixed(2)
+              ogs.playerStats?.teams[team].averageKda.toFixed(2)
             }}</span>
             <span
               title="Avg Akari Score"
               style="color: #ff65ce"
               v-if="app.settings.isInKyokoMode"
-              >{{ og.playerStats.teams[team].averageAkariScore.toFixed(2) }}</span
+              >{{ ogs.playerStats.teams[team].averageAkariScore.toFixed(2) }}</span
             >
           </div>
         </div>
@@ -37,19 +37,20 @@
             :puuid="player"
             :key="player"
             :is-self="player === lc.summoner.me?.puuid"
-            :champion-id="og.championSelections?.[player]"
+            :champion-id="ogs.championSelections?.[player]"
             :match-history="
-              og.matchHistory[player]?.data.map((g) => ({ isDetailed: true, game: g }))
+              ogs.matchHistory[player]?.data.map((g) => ({ isDetailed: true, game: g }))
             "
-            :match-history-loading="og.matchHistoryLoadingState[player]"
-            :summoner="og.summoner[player]?.data"
-            :ranked-stats="og.rankedStats[player]?.data"
-            :saved-info="og.savedInfo[player]"
-            :champion-mastery="og.championMastery[player]?.data"
-            :analysis="og.playerStats?.players[player]"
-            :position="og.positionAssignments?.[player]"
+            :match-history-loading="ogs.matchHistoryLoadingState[player]"
+            :summoner="ogs.summoner[player]?.data"
+            :ranked-stats="ogs.rankedStats[player]?.data"
+            :saved-info="ogs.savedInfo[player]"
+            :champion-mastery="ogs.championMastery[player]?.data"
+            :analysis="ogs.playerStats?.players[player]"
+            :position="ogs.positionAssignments?.[player]"
             :premade-team-id="premadeTeamInfo.players[player]"
             :currentHighlightingPremadeTeamId="currentHighlightingPremadeTeamIdD"
+            :query-stage="ogs.queryStage"
             @show-game="handleShowGame"
             @show-game-by-id="handleShowGameById"
             @to-summoner="handleToSummoner"
@@ -58,7 +59,7 @@
         </div>
       </div>
     </DefineOngoingTeam>
-    <NScrollbar v-if="!isInIdleState && og.settings.enabled" x-scrollable>
+    <NScrollbar v-if="!isInIdleState && ogs.settings.enabled" x-scrollable>
       <div class="inner-container" :class="{ 'fit-content': columnsNeed >= 4 }">
         <OngoingTeam
           v-for="(players, team) of sortedTeams"
@@ -71,7 +72,7 @@
     <div v-else class="no-ongoing-game">
       <div class="centered">
         <LeagueAkariSpan bold class="akari-text" />
-        <template v-if="og.settings.enabled">
+        <template v-if="ogs.settings.enabled">
           <template v-if="lc.connectionState !== 'connected'">
             <span class="no-ongoing-game-text">{{ t('OngoingGame.disconnected') }}</span>
             <EasyToLaunch />
@@ -118,7 +119,7 @@ const app = useAppCommonStore()
 
 const { t } = useTranslation()
 
-const og = useOngoingGameStore()
+const ogs = useOngoingGameStore()
 
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
@@ -134,37 +135,37 @@ const POSITION_ORDER = {
 }
 
 const sortedTeams = computed(() => {
-  if (!og.teams) {
+  if (!ogs.teams) {
     return {}
   }
 
   const sorted: Record<string, string[]> = {}
 
-  Object.entries(og.teams).forEach(([team, players]) => {
+  Object.entries(ogs.teams).forEach(([team, players]) => {
     if (!players.length) {
       return
     }
 
     sorted[team] = players.toSorted((a, b) => {
-      if (og.settings.orderPlayerBy === 'position') {
-        const pa = og.positionAssignments[a]?.position || 'NONE'
-        const pb = og.positionAssignments[b]?.position || 'NONE'
+      if (ogs.settings.orderPlayerBy === 'position') {
+        const pa = ogs.positionAssignments[a]?.position || 'NONE'
+        const pb = ogs.positionAssignments[b]?.position || 'NONE'
 
         return POSITION_ORDER[pa] - POSITION_ORDER[pb]
       }
 
-      const statsA = og.playerStats?.players[a]
-      const statsB = og.playerStats?.players[b]
+      const statsA = ogs.playerStats?.players[a]
+      const statsB = ogs.playerStats?.players[b]
 
-      if (og.settings.orderPlayerBy === 'akari-score') {
+      if (ogs.settings.orderPlayerBy === 'akari-score') {
         return (statsB?.akariScore.total || 0) - (statsA?.akariScore.total || 0)
       }
 
-      if (og.settings.orderPlayerBy === 'kda') {
+      if (ogs.settings.orderPlayerBy === 'kda') {
         return (statsB?.summary.averageKda || 0) - (statsA?.summary.averageKda || 0)
       }
 
-      if (og.settings.orderPlayerBy === 'win-rate') {
+      if (ogs.settings.orderPlayerBy === 'win-rate') {
         return (statsB?.summary.winRate || 0) - (statsA?.summary.winRate || 0)
       }
 
@@ -185,7 +186,7 @@ const premadeTeamInfo = computed(() => {
   }
 
   let groupIndex = 0
-  Object.entries(og.premadeTeams || {}).forEach(([_, groups]) => {
+  Object.entries(ogs.premadeTeams || {}).forEach(([_, groups]) => {
     groups.forEach((g) => {
       const groupId = PREMADE_TEAMS[groupIndex++]
       playerMap.groups[groupId] = g
@@ -200,7 +201,7 @@ const premadeTeamInfo = computed(() => {
 })
 
 const formatTeamText = (team: string): TeamMeta => {
-  if (og.gameInfo?.queueType === 'CHERRY') {
+  if (ogs.gameInfo?.queueType === 'CHERRY') {
     if (lc.gameflow.phase === 'ChampSelect') {
       return {
         name: team.startsWith('our') ? t(`common.teams.our`) : t(`common.teams.their`),
@@ -271,7 +272,7 @@ const handleToSummoner = (puuid: string) => {
 // 注意, 这建立在卡片元素在 240px 宽度的基础上, 同时行间隔为 4px. 如果任意一个条件发生变化, 列数需要重新调整
 const { width } = useElementSize(useTemplateRef('page-el'))
 const columnsNeed = computed(() => {
-  const teamColumns = Object.values(og.teams || {})
+  const teamColumns = Object.values(ogs.teams || {})
     .map((t) => t.length)
     .reduce((a, b) => Math.max(a, b), 0)
 

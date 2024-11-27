@@ -86,7 +86,7 @@
                   <span class="text"
                     >{{ t('common.queueTypes.CHERRY') }}
                     <span style="font-weight: bold">{{ rankedSoloFlex.cherry.ratedRating }}</span>
-                    分</span
+                    Pt</span
                   >
                 </div>
                 <div class="ranked-item unranked cherry" v-else>
@@ -149,7 +149,7 @@
             >
               {{ (analysis.summary.winRate * 100).toFixed() }}%
             </div>
-            <div class="win-rate" v-else>— %</div>
+            <div class="win-rate" v-else>—%</div>
           </template>
           <div class="popover-text" v-if="analysis">
             {{
@@ -174,46 +174,71 @@
           }}
         </div>
       </NPopover>
-      <div
-        class="position-info"
-        :class="{
-          complete: position.role,
-          incomplete: !position.role
-        }"
-        v-if="
-          position &&
-          ((position.position && position.position !== 'NONE') ||
-            (position.role && position.role.current !== 'NONE'))
-        "
-      >
-        <div
-          class="assignment-reason"
-          v-if="position.role"
-          :style="{
-            'background-color':
-              positionAssignmentReason[position.role.assignmentReason]?.color || '#5b4694',
-            color:
-              positionAssignmentReason[position.role.assignmentReason]?.foregroundColor || '#ffffff'
-          }"
-        >
-          {{
-            positionAssignmentReason[position.role.assignmentReason]?.name ||
-            position.role.assignmentReason
-          }}
-        </div>
-        <PositionIcon
-          v-if="position.position !== 'NONE' || position.role?.current !== 'NONE'"
-          :position="position.position || position.role?.current"
-        />
-        <template v-if="position.role">
-          <div class="divider"></div>
-          <PositionIcon :position="position.role.primary" />
-          <PositionIcon
-            v-if="position.role.secondary !== 'UNSELECTED'"
-            :position="position.role.secondary"
-          />
+      <NPopover v-if="positionInfo">
+        <template #trigger>
+          <div class="position-info">
+            <!-- Left Current Position -->
+            <PositionIcon
+              v-if="positionInfo.current && positionInfo.current !== 'NONE'"
+              :position="positionInfo.current"
+            />
+            <!-- Right Side Auxiliary Information -->
+            <template v-if="positionInfo.recent && positionInfo.recent.length">
+              <div class="divider"></div>
+              <PositionIcon v-for="p of positionInfo.recent.slice(0, 2)" :position="p.position" />
+            </template>
+            <template v-else-if="positionInfo.role">
+              <div class="divider"></div>
+              <PositionIcon :position="positionInfo.role.primary" />
+              <PositionIcon
+                v-if="positionInfo.role.secondary !== 'UNSELECTED'"
+                :position="positionInfo.role.secondary"
+              />
+            </template>
+          </div>
         </template>
-      </div>
+        <div class="position-info-popover">
+          <div class="name-line">
+            <PositionIcon class="position-icon" :position="positionInfo.current || 'ALL'" />
+            <span class="position-name">{{
+              t(`common.lanes.${positionInfo.current || 'ALL'}`)
+            }}</span>
+            <div
+              class="assignment-reason"
+              v-if="positionInfo.role"
+              :style="{
+                'background-color':
+                  positionAssignmentReason[positionInfo.role.assignmentReason]?.color || '#5b4694',
+                color:
+                  positionAssignmentReason[positionInfo.role.assignmentReason]?.foregroundColor ||
+                  '#ffffff'
+              }"
+            >
+              {{
+                positionAssignmentReason[positionInfo.role.assignmentReason]?.name ||
+                positionInfo.role.assignmentReason
+              }}
+            </div>
+          </div>
+          <div v-if="positionInfo.recent && positionInfo.recent.length" class="recent-play">
+            <span class="label">{{ t('PlayerInfoCard.position.recentlyPlayed') }}</span>
+            <PositionIcon
+              class="position-icon"
+              v-for="p of positionInfo.recent"
+              :position="p.position"
+            />
+          </div>
+          <div v-if="positionInfo.role" class="assignment">
+            <span class="label">{{ t('PlayerInfoCard.position.selection') }}</span>
+            <PositionIcon class="position-icon" :position="positionInfo.role.primary" />
+            <PositionIcon
+              class="position-icon"
+              v-if="positionInfo.role.secondary !== 'UNSELECTED'"
+              :position="positionInfo.role.secondary"
+            />
+          </div>
+        </div>
+      </NPopover>
     </div>
     <div class="tags">
       <div class="tag self" v-if="isSelf">{{ t('PlayerInfoCard.self') }}</div>
@@ -486,7 +511,7 @@
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { SavedInfo } from '@renderer-shared/shards/ongoing-game/store'
+import { QueryStage, SavedInfo } from '@renderer-shared/shards/ongoing-game/store'
 import { formatI18nOrdinal } from '@shared/i18n'
 import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { Game } from '@shared/types/league-client/match-history'
@@ -503,7 +528,7 @@ import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NPopover, NVirtualList } from 'naive-ui'
-import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
+import { computed, onDeactivated, useTemplateRef, watch, watchEffect } from 'vue'
 
 import RankedTable from '@main-window/components/RankedTable.vue'
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
@@ -534,6 +559,7 @@ const { puuid, analysis, matchHistory, position, premadeTeamId, summoner, ranked
     matchHistoryLoading?: string
     analysis?: MatchHistoryGamesAnalysisAll
     savedInfo?: SavedInfo
+    queryStage: QueryStage
   }>()
 
 const emits = defineEmits<{
@@ -562,6 +588,36 @@ onDeactivated(() => {
 
 const lcs = useLeagueClientStore()
 const as = useAppCommonStore()
+
+const positionInfo = computed(() => {
+  const info = {
+    current: null as string | null,
+    role: null as ParsedRole | null,
+    recent: [] as { position: string; count: number }[]
+  }
+
+  if (!position) {
+    return null
+  }
+
+  info.current = position.position
+  info.role = position.role
+
+  if (analysis?.positions) {
+    const recentPositions = Object.entries(analysis.positions.positions)
+      .map(([position, count]) => ({ position, count }))
+      .filter((p) => p.count > 0)
+      .toSorted((a, b) => b.count - a.count)
+
+    info.recent = recentPositions
+  }
+
+  return info
+})
+
+watchEffect(() => {
+  console.log(positionInfo.value)
+})
 
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 
@@ -898,19 +954,9 @@ const matches = computed(() => {
     gap: 2px;
     font-size: 16px;
     align-items: center;
-
-    &.incomplete {
-      flex: 1;
-      justify-content: center;
-    }
-
-    .assignment-reason {
-      font-size: 11px;
-      line-height: 11px;
-      color: #ffffff;
-      padding: 2px 4px;
-      border-radius: 2px;
-    }
+    flex: 1;
+    justify-content: center;
+    margin-left: 16px;
 
     .divider {
       margin: 0 2px;
@@ -1194,6 +1240,47 @@ const matches = computed(() => {
       font-size: 11px;
       padding: 0 4px;
     }
+  }
+}
+
+.position-info-popover {
+  .name-line {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+
+    .position-name {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .assignment-reason {
+      margin-left: 8px;
+      font-size: 11px;
+      line-height: 11px;
+      color: #ffffff;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    margin-bottom: 8px;
+  }
+
+  .recent-play,
+  .assignment {
+    display: flex;
+    align-items: center;
+  }
+
+  .label {
+    font-size: 12px;
+    margin-right: 8px;
+    width: 64px;
+  }
+
+  .position-icon {
+    font-size: 18px;
+    color: #fff;
   }
 }
 

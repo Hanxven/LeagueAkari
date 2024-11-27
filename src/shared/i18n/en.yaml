@@ -1158,6 +1158,9 @@ PlayerInfoCard:
   top4Rate: Top 4 Rate
   1stRate: First Place Rate
   1st: First {{rate}}%
+  position:
+    recentlyPlayed: 'Preference:'
+    selection: 'Selection:'
 
   cherryWinRatePopover: In the recent {{countV}} games, this player's win rate is {{winRate}}%. Among {{cherryCount}} games in Arena Mode, their first place rate is {{top1Rate}}%.
   winRatePopover: In the recent {{countV}} games, this player's win rate is {{winRate}}%.
@@ -1561,27 +1564,31 @@ common:
   na: N/A
 
   lanes:
+    all: None
+    ALL: None
     top: Top
     jungle: Jungle
-    mid: Mid
-    middle: Mid
-    bot: Bot
-    bottom: Bot
+    mid: Middle
+    middle: Middle
+    bot: Bottom
+    bottom: Bottom
     support: Support
     utility: Support
     TOP: Top
     JUNGLE: Jungle
-    MID: Mid
-    BOT: Bot
+    MID: Middle
+    BOT: Bottom
+    MIDDLE: Middle
+    BOTTOM: Bottom
     SUPPORT: Support
     UTILITY: Support
 
   positionAssignmentReason:
-    FILL_SECONDARY: FILLPRMY
-    FILL_PRIMARY: FILLSCND
-    PRIMARY: PRIMARY
-    SECONDARY: SCNDARY
-    AUTOFILL: AUTOFILL
+    FILL_SECONDARY: Fill Primary
+    FILL_PRIMARY: Fill Secondary
+    PRIMARY: Primary
+    SECONDARY: Secondary
+    AUTOFILL: Autofill
 
   teams:
     all: All

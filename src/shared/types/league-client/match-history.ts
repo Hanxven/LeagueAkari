@@ -200,7 +200,7 @@ export interface Stats {
 
 // 如果当前的战绩数据是从 SGP 转换得到的, 那么会有这些字段
 interface SgpFields {
-  individualPosition: string
+  individualPosition: string // "Invalid" or "TOP" or "JUNGLE" or "MIDDLE" or "BOTTOM" or "UTILITY"
   lane: string
   teamPosition: string
   pushPings: number
