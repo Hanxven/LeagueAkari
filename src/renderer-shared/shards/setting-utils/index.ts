@@ -1,5 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { effectScope, toRaw, watch } from 'vue'
+import { toRaw, watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 

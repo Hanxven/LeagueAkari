@@ -115,6 +115,13 @@
         <NCheckbox size="small" class="check-box" v-model:checked="rds.printAll">{{
           t('DebugSettings.lcuEvent.printAll')
         }}</NCheckbox>
+        <NCheckbox
+          size="small"
+          class="check-box"
+          :checked="rds.logAllLcuEvents"
+          @update:checked="(val) => rd.setLogAllLcuEvents(val)"
+          >{{ t('DebugSettings.lcuEvent.logAll') }}</NCheckbox
+        >
         <NButton
           size="tiny"
           @click="handleShowAddModal"
@@ -231,6 +238,7 @@ import { useRendererDebugStore } from '@renderer-shared/shards/renderer-debug/st
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
+import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumn,
   NAutoComplete,
@@ -247,10 +255,8 @@ import {
   NTable
 } from 'naive-ui'
 import { computed, h, nextTick, ref, useTemplateRef, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import { LCU_ENDPOINTS } from './lcu-endpoints'
-
 
 const { t } = useTranslation()
 

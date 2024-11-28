@@ -1,4 +1,9 @@
-import { PerkInventory, PerkPage } from '@shared/types/league-client/perks'
+import {
+  PerkInventory,
+  PerkPage,
+  RecommendPage,
+  RecommendPositions
+} from '@shared/types/league-client/perks'
 import { AxiosInstance } from 'axios'
 
 export interface PostPerkDto {
@@ -50,7 +55,7 @@ export class PerksHttpApi {
   }
 
   getRecommendedChampionPositions() {
-    return this._http.get('/lol-perks/v1/recommended-champion-positions')
+    return this._http.get<RecommendPositions>('/lol-perks/v1/recommended-champion-positions')
   }
 
   getRecommendedPagesPosition(championId: number) {
@@ -64,17 +69,23 @@ export class PerksHttpApi {
   }
 
   getRecommendedPages(championId: number, position: string, mapId: number) {
-    return this._http.get(
+    return this._http.get<RecommendPage[]>(
       `/lol-perks/v1/recommended-pages/champion/${championId}/position/${position}/map/${mapId}`
     )
   }
 
-  getRuneRecommenderAutoSelect(championId: number, position: string, mapId: number) {
-    return this._http.get(
-      `/lol-perks/v1/rune-recommender-auto-select/champion/${championId}/position/${position}/map/${mapId}`
-    )
+  /**
+   * 是否系统级别自动选择
+   * @returns
+   */
+  getRuneRecommenderAutoSelect() {
+    return this._http.get<boolean>(`/lol-perks/v1/rune-recommender-auto-select`)
   }
 
+  /**
+   * 开启系统级别自动选择
+   * @returns
+   */
   postRuneRecommenderAutoSelect(data: object) {
     return this._http.post(`/lol-perks/v1/rune-recommender-auto-select`, data)
   }

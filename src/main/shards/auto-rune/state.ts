@@ -12,6 +12,10 @@ export class AutoRuneSettings {
    */
   source: 'opgg' | 'lcu'
 
+  setSource(source: 'opgg' | 'lcu') {
+    this.source = source
+  }
+
   constructor() {
     makeAutoObservable(this)
   }

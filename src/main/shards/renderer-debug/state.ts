@@ -6,8 +6,14 @@ export class RendererDebugState {
    */
   sendAllNativeLcuEvents = false
 
+  logAllLcuEvents = false
+
   setSendAllNativeLcuEvents(enabled: boolean) {
     this.sendAllNativeLcuEvents = enabled
+  }
+
+  setLogAllLcuEvents(enabled: boolean) {
+    this.logAllLcuEvents = enabled
   }
 
   constructor() {

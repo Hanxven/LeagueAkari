@@ -638,7 +638,10 @@ const isSelfTab = computed(() => {
 })
 
 const analysis = computed(() => {
-  const matchHistory = analyzeMatchHistory(tab.matchHistoryPage?.games || [], tab.puuid)
+  const matchHistory = analyzeMatchHistory(
+    tab.matchHistoryPage?.games.map((g) => g.game) || [],
+    tab.puuid
+  )
   const players = analyzeMatchHistoryPlayers(tab.matchHistoryPage?.games || [], tab.puuid)
 
   return {

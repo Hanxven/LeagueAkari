@@ -145,4 +145,8 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
   setSendAllNativeLcuEvents(value: boolean) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setSendAllNativeLcuEvents', value)
   }
+
+  setLogAllLcuEvents(value: boolean) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setLogAllLcuEvents', value)
+  }
 }
