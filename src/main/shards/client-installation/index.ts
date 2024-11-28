@@ -19,8 +19,8 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   static TENCENT_INSTALL_PATH = 'HKCU\\Software\\Tencent\\LOL'
   static TENCENT_INSTALL_VALUE = 'InstallPath'
 
-  // 感觉更加靠谱的 key
-  static WEGAME_OPENCMD_PATH = 'HKCU\\wegame\\shell\\open\\command'
+  static WEGAME_OPENCMD_PATH = 'HKCU\\wegame\\shell\\open\\command' // unused for now
+  static WEGAME_DEFAULTICON_PATH = 'HKCU\\wegame\\DefaultIcon'
 
   public readonly state = new ClientInstallationState()
 
@@ -57,11 +57,11 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   private async _updateTencentPaths() {
     const result = await regedit.promisified.list([
       ClientInstallationMain.TENCENT_INSTALL_PATH,
-      ClientInstallationMain.WEGAME_OPENCMD_PATH
+      ClientInstallationMain.WEGAME_DEFAULTICON_PATH
     ])
 
     const item1 = result[ClientInstallationMain.TENCENT_INSTALL_PATH]
-    const item2 = result[ClientInstallationMain.WEGAME_OPENCMD_PATH]
+    const item2 = result[ClientInstallationMain.WEGAME_DEFAULTICON_PATH]
 
     if (item1 && item1.exists) {
       const p = item1.values[ClientInstallationMain.TENCENT_INSTALL_VALUE]

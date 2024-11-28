@@ -80,14 +80,14 @@ export const PREMADE_TEAMS = [
 ]
 
 export const PREMADE_TEAM_COLORS = {
-  A: { foregroundColor: '#48e5db', color: '#000', borderColor: '#48e5db80' },
-  B: { foregroundColor: '#628aff', color: '#000', borderColor: '#628aff80' },
-  C: { foregroundColor: '#d4de17', color: '#000', borderColor: '#d4de1780' },
-  D: { foregroundColor: '#17d628', color: '#000', borderColor: '#17d62880' },
-  E: { foregroundColor: '#17c1d6', color: '#000', borderColor: '#17c1d680' },
-  F: { foregroundColor: '#d63a17', color: '#fff', borderColor: '#d63a1780' },
-  G: { foregroundColor: '#b517b5', color: '#fff', borderColor: '#b517b580' },
-  H: { foregroundColor: '#fa4e80', color: '#fff', borderColor: '#fa4e8080' }
+  A: { foregroundColor: '#48e5db', color: '#000', borderColor: '#48e5dba0' },
+  B: { foregroundColor: '#628aff', color: '#000', borderColor: '#628affa0' },
+  C: { foregroundColor: '#d4de17', color: '#000', borderColor: '#d4de17a0' },
+  D: { foregroundColor: '#17d628', color: '#000', borderColor: '#17d628a0' },
+  E: { foregroundColor: '#17c1d6', color: '#000', borderColor: '#17c1d6a0' },
+  F: { foregroundColor: '#d63a17', color: '#fff', borderColor: '#d63a17a0' },
+  G: { foregroundColor: '#b517b5', color: '#fff', borderColor: '#b517b5a0' },
+  H: { foregroundColor: '#fa4e80', color: '#fff', borderColor: '#fa4e80a0' }
 }
 
 export const FIXED_CARD_WIDTH_PX_LITERAL = '240px'

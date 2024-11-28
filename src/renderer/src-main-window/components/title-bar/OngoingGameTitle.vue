@@ -60,6 +60,10 @@ const orderOptions = computed(() => {
       value: 'position'
     },
     {
+      label: t('OngoingGameTitle.orderOptions.premade-team'),
+      value: 'premade-team'
+    },
+    {
       label: t('OngoingGameTitle.orderOptions.win-rate'),
       value: 'win-rate'
     },
@@ -126,13 +130,8 @@ const sgpTagOptions = computed(() => {
   gap: 8px;
 }
 
-.sort-player-by-select {
-  width: 120px;
-  -webkit-app-region: no-drag;
-}
-
 .order-select {
-  width: 120px;
+  width: 160px;
   -webkit-app-region: no-drag;
 }
 

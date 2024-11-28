@@ -39,6 +39,7 @@ OngoingGameTitle:
   orderOptions:
     default: Default
     position: Position
+    premade-team: Premade Team
     win-rate: W/R Desc
     kda: KDA Desc
     akari-score: Score Desc
@@ -985,6 +986,7 @@ MatchHistoryCard:
   dtr: DMG Taken {{rate}}%
   gr: Gold {{rate}}%
   misc: Misc
+  perfect: Perfect
   expand: Expand
   collapse: Collapse
   loading: Loading...
@@ -1168,17 +1170,19 @@ PlayerInfoCard:
     selection: 'Selection:'
 
   cherryWinRatePopover: In the recent {{countV}} games, this player's win rate is {{winRate}}%. Among {{cherryCount}} games in Arena Mode, their first place rate is {{top1Rate}}%.
-  winRatePopover: In the recent {{countV}} games, this player's win rate is {{winRate}}%.
-  kdaPopover: In the recent {{countV}} games, this player's average KDA is {{kda}}.
+  winRatePopover: In the recent {{countV}} games, this player's win rate is {{winRate}}%, {{wins}} wins and {{losses}} losses.
+  kdaPopover: In the recent {{countV}} games, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: These players have been on the same team in multiple games, suggesting they may be a premade group. They are labeled as Team {{team}}.
   highWinRatePopover: This player's win rate is exceptionally high. In the recent {{countV}} games, they have won {{winCount}} games.
   metPopover:
     title: Previously encountered this player in {{date}}, a total of {{countV}} times.
     gameId: Game ID
-    date: Match Date
+    date: Game Date
   privatePopover: This player has set their career profile to private, preventing others from viewing their profile, match history, and achievements. Additionally, they cannot be spectated.
   winningStreakPopover: Currently on a winning streak of {{countV}} games. Great job!
   losingStreakPopover: Currently on a losing streak of {{countV}} games.
+  suspiciousFlashPosition: SusFlash
+  suspiciousFlashPositionPopover: Flash position preference is suspiciously inconsistent. In recent games, Flash on D has been used {{dCount}} times and Flash on F has been used {{fCount}} times.
   akariLoved:
     good: Good
     great: Excellent

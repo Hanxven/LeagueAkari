@@ -878,47 +878,56 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       return null
     }
 
-    const playerAnalyses: Record<string, MatchHistoryGamesAnalysisAll> = {}
+    try {
+      const playerAnalyses: Record<string, MatchHistoryGamesAnalysisAll> = {}
 
-    for (const [puuid, matchHistory] of Object.entries(this.state.matchHistory)) {
-      if (!matchHistory) {
-        continue
+      for (const [puuid, matchHistory] of Object.entries(this.state.matchHistory)) {
+        if (!matchHistory) {
+          continue
+        }
+
+        const mappedGameTimeline = Object.entries(this.state.gameTimeline).reduce(
+          (obj, [gameIdStr, data]) => {
+            obj[gameIdStr] = data
+            return obj
+          },
+          {} as Record<number, GameTimeline>
+        )
+
+        const analysis = analyzeMatchHistory(
+          matchHistory.data.map((g) => ({ game: g, isDetailed: true })),
+          puuid,
+          undefined,
+          mappedGameTimeline
+        )
+        if (analysis) {
+          playerAnalyses[puuid] = analysis
+        }
       }
 
-      const mappedGameTimeline = Object.entries(this.state.gameTimeline).reduce(
-        (obj, [gameIdStr, data]) => {
-          obj[gameIdStr] = data
-          return obj
-        },
-        {} as Record<number, GameTimeline>
-      )
+      const teamAnalyses: Record<string, MatchHistoryGamesAnalysisTeamSide> = {}
 
-      const analysis = analyzeMatchHistory(matchHistory.data, puuid, undefined, mappedGameTimeline)
-      if (analysis) {
-        playerAnalyses[puuid] = analysis
+      for (const [sideId, puuids] of Object.entries(this.state.teams)) {
+        const teamPlayerAnalyses = puuids.map((p) => playerAnalyses[p]).filter(Boolean)
+        const teamAnalysis = analyzeTeamMatchHistory(teamPlayerAnalyses)
+        if (teamAnalysis) {
+          teamAnalyses[sideId] = teamAnalysis
+        }
       }
-    }
-
-    const teamAnalyses: Record<string, MatchHistoryGamesAnalysisTeamSide> = {}
-
-    for (const [sideId, puuids] of Object.entries(this.state.teams)) {
-      const teamPlayerAnalyses = puuids.map((p) => playerAnalyses[p]).filter(Boolean)
-      const teamAnalysis = analyzeTeamMatchHistory(teamPlayerAnalyses)
-      if (teamAnalysis) {
-        teamAnalyses[sideId] = teamAnalysis
+      return {
+        players: playerAnalyses,
+        teams: teamAnalyses
       }
-    }
-
-    return {
-      players: playerAnalyses,
-      teams: teamAnalyses
+    } catch (error) {
+      this._log.warn('计算战绩信息时出现错误', error)
+      return null
     }
   }
 
   private _handleCalculation() {
     // 重新计算战绩信息
     this._mobx.reaction(
-      () => [...Object.keys(this.state.matchHistory), ...Object.keys(this.state.gameTimeline)],
+      () => [...Object.values(this.state.matchHistory), ...Object.values(this.state.gameTimeline)],
       (_changedV) => {
         this.state.setPlayerStats(this._calcAnalysis())
       },

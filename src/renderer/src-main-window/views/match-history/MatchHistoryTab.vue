@@ -639,7 +639,7 @@ const isSelfTab = computed(() => {
 
 const analysis = computed(() => {
   const matchHistory = analyzeMatchHistory(
-    tab.matchHistoryPage?.games.map((g) => g.game) || [],
+    tab.matchHistoryPage?.games || [],
     tab.puuid
   )
   const players = analyzeMatchHistoryPlayers(tab.matchHistoryPage?.games || [], tab.puuid)
@@ -779,7 +779,6 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
           (page - 1) * pageSize,
           page * pageSize - 1
         )
-        console.log('lcu', data)
 
         tab.matchHistoryPage = {
           page,

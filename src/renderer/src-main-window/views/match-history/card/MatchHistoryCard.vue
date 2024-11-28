@@ -132,12 +132,17 @@
                   self.participant.stats.kills !== 0
               }"
             >
-              {{
-                (
-                  (self.participant.stats.kills + self.participant.stats.assists) /
-                  (self.participant.stats.deaths || 1)
-                ).toFixed(2)
-              }}
+              <template v-if="self.participant.stats.deaths === 0">{{
+                t('MatchHistoryCard.perfect')
+              }}</template>
+              <template v-else>
+                {{
+                  (
+                    (self.participant.stats.kills + self.participant.stats.assists) /
+                    (self.participant.stats.deaths || 1)
+                  ).toFixed(2)
+                }}
+              </template>
               KDA
             </div>
           </div>

@@ -8,7 +8,7 @@
         currentHighlightingPremadeTeamId && currentHighlightingPremadeTeamId === premadeTeamId
     }"
     :style="{
-      width: `${FIXED_CARD_WIDTH_PX_LITERAL}px`
+      borderColor: premadeTeamId ? PREMADE_TEAM_COLORS[premadeTeamId]?.borderColor : '#ffffff20'
     }"
   >
     <div class="player-info">
@@ -147,7 +147,9 @@
                 'lte-47': analysis.summary.winRate <= 0.47
               }"
             >
-              {{ (analysis.summary.winRate * 100).toFixed() }}%
+              {{ (analysis.summary.winRate * 100).toFixed() }}%<span class="game-count"
+                >({{ analysis.summary.count }})</span
+              >
             </div>
             <div class="win-rate" v-else>—%</div>
           </template>
@@ -155,7 +157,9 @@
             {{
               t('PlayerInfoCard.winRatePopover', {
                 countV: analysis.summary.count,
-                winRate: (analysis.summary.winRate * 100).toFixed()
+                winRate: (analysis.summary.winRate * 100).toFixed(),
+                wins: analysis.summary.win,
+                losses: analysis.summary.lose
               })
             }}
           </div>
@@ -169,7 +173,10 @@
           {{
             t('PlayerInfoCard.kdaPopover', {
               countV: analysis.summary.count,
-              kda: analysis.summary.averageKda.toFixed(2)
+              kda: analysis.summary.averageKda.toFixed(2),
+              kills: analysis.summary.totalKills,
+              deaths: analysis.summary.totalDeaths,
+              assists: analysis.summary.totalAssists
             })
           }}
         </div>
@@ -386,6 +393,25 @@
         </div>
         <div class="popover-text" v-else-if="analysis.akariScore.good">
           {{ t('PlayerInfoCard.akariLoved.goodPopover') }}
+        </div>
+      </NPopover>
+      <NPopover
+        :keep-alive-on-hover="false"
+        v-if="isSuspiciousFlashPosition && isSuspiciousFlashPosition.isSuspicious"
+        :delay="50"
+      >
+        <template #trigger>
+          <div class="tag sus-flash">
+            {{ t('PlayerInfoCard.suspiciousFlashPosition') }}
+          </div>
+        </template>
+        <div class="popover-text">
+          {{
+            t('PlayerInfoCard.suspiciousFlashPositionPopover', {
+              dCount: isSuspiciousFlashPosition.flashOnD,
+              fCount: isSuspiciousFlashPosition.flashOnF
+            })
+          }}
         </div>
       </NPopover>
       <NPopover
@@ -729,6 +755,18 @@ const positionAssignmentReason = computed(() => {
   }
 })
 
+const isSuspiciousFlashPosition = computed(() => {
+  if (!analysis) {
+    return null
+  }
+
+  return {
+    isSuspicious: analysis.summary.flashOnD && analysis.summary.flashOnF,
+    flashOnD: analysis.summary.flashOnD,
+    flashOnF: analysis.summary.flashOnF
+  }
+})
+
 const toSortedMilestoneGrades = (arr: string[]) => {
   const deduplicated = Array.from(new Set(arr))
 
@@ -807,6 +845,7 @@ const matches = computed(() => {
 
 <style lang="less" scoped>
 .player-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -817,6 +856,7 @@ const matches = computed(() => {
   border: 1px solid #ffffff20;
   background-color: #11111180;
   width: v-bind(FIXED_CARD_WIDTH_PX_LITERAL);
+  overflow: hidden;
 
   transition: filter 0.2s;
 
@@ -967,6 +1007,13 @@ const matches = computed(() => {
     font-weight: bold;
     text-align: center;
     flex: 1;
+
+    .game-count {
+      margin-left: 2px;
+      color: #fffa;
+      font-weight: normal;
+      font-size: 9px;
+    }
   }
 
   .win-rate-cherry {
@@ -1048,6 +1095,11 @@ const matches = computed(() => {
     &.akari-loved {
       color: #ffffff;
       background-color: #b81b86;
+    }
+
+    &.sus-flash {
+      color: #ffffff;
+      background-color: #3a1bb8;
     }
 
     &.self {
@@ -1313,5 +1365,14 @@ const matches = computed(() => {
   font-size: 12px;
   white-space: pre-wrap;
   max-width: 260px;
+}
+
+.premade-team-deco {
+  position: absolute;
+  right: 0;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: -1;
 }
 </style>

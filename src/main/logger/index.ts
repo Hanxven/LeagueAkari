@@ -3,6 +3,7 @@ import { app } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
 import { createLogger, format, transports } from 'winston'
+import DailyRotateFile from 'winston-daily-rotate-file'
 
 const STYLES = {
   reset: '\x1b[0m',
@@ -80,9 +81,12 @@ export function initAppLogger() {
 
   return createLogger({
     transports: [
-      new transports.File({
-        filename: `LeagueAkari_${dayjs().format('YYYYMMDD_HHmmssSSS')}.log`,
+      new DailyRotateFile({
+        filename: 'LAkari_%DATE%.log',
         dirname: logsDir,
+        datePattern: 'YYYY-MM-DD',
+        frequency: '24h',
+        maxSize: '20m',
         level: 'info',
         format: format.combine(
           format.timestamp(),

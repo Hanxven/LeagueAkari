@@ -41,6 +41,7 @@ OngoingGameTitle:
   orderOptions:
     default: 楼层顺序
     position: 分路顺序
+    premade-team: 预组队
     win-rate: 胜率降序
     kda: KDA 降序
     akari-score: 评分降序
@@ -990,6 +991,7 @@ MatchHistoryCard:
   dtr: 队伍承伤比 {{rate}}%
   gr: 队伍经济 {{rate}}%
   misc: 杂项
+  perfect: Perfect
   expand: 展开
   collapse: 收起
   loading: 加载中...
@@ -1174,8 +1176,8 @@ PlayerInfoCard:
     selection: 位置选择：
 
   cherryWinRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%。其中，斗魂竞技场的 {{cherryCount}} 场对局中，该玩家的首位率是 {{top1Rate}}%
-  winRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%
-  kdaPopover: 在近期 {{countV}} 场对局中，该玩家的平均 KDA 是 {{kda}}
+  winRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%，{{wins}} 胜 {{losses}} 负
+  kdaPopover: 在近期 {{countV}} 场对局中，该玩家的平均 KDA 是 {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: 这些玩家在数场对局中都位于同一个阵营，推测他们可能是一支固定的小队。为了区分，将其命名为小队 {{team}}
   highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {{countV}} 场的对局中，赢了 {{winCount}} 场
   metPopover:
@@ -1185,6 +1187,8 @@ PlayerInfoCard:
   privatePopover: 该玩家设置了生涯为隐藏。这意味着他人无法查看该玩家的个人主页，包括战绩、成就点数等。另外，也不能观战该玩家
   winningStreakPopover: 截止到现在，该玩家 {{countV}} 连胜，很棒
   losingStreakPopover: 截止到现在，该玩家 {{countV}} 连败
+  suspiciousFlashPosition: 闪现错位
+  suspiciousFlashPositionPopover: 该玩家放置闪现的位置不一致。在最近的对局中，D 位置 {{dCount}} 次，F 位置 {{fCount}} 次
   akariLoved:
     good: 优异
     great: 极好

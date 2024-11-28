@@ -7,6 +7,7 @@ import {
 } from '@shared/types/league-client/match-history'
 
 const WIN_RATE_TEAM_THRESHOLD = 0.9418
+const SUMMONER_SPELL_FLASH_ID = 4
 
 export interface MatchHistoryGameWithState {
   game: Game
@@ -316,6 +317,8 @@ export interface MatchHistoryGamesAnalysis {
   // timeline
   soloKills: number | null
   soloDeaths: number | null
+
+  flashSlot: 'D' | 'F' | null
 }
 
 export interface MatchHistoryGamesAnalysisSummary {
@@ -380,6 +383,9 @@ export interface MatchHistoryGamesAnalysisSummary {
     winRate: number
     top1Rate: number
   }
+
+  flashOnD: number
+  flashOnF: number
 }
 
 export interface MatchHistoryChampionAnalysis {
@@ -427,18 +433,20 @@ export interface MatchHistoryGamesAnalysisAll {
  * @param selfPuuid 玩家 PUUID
  */
 export function analyzeMatchHistory(
-  games: Game[],
+  games: MatchHistoryGameWithState[],
   selfPuuid: string,
-  queueType: number[] = [],
+  queueType: number[] | null = null,
   gameTimeline: Record<number, GameTimeline> = {}
 ): MatchHistoryGamesAnalysisAll | null {
-  games = games
-    .filter((g) => !queueType || queueType.includes(g.queueId))
-    .filter((g) => !g.participants.some((p) => p.stats.gameEndedInEarlySurrender))
-    .filter((g) => g.endOfGameResult !== 'Abort_AntiCheatExit')
-    .filter((g) => g.gameType === 'MATCHED_GAME' && !isPveQueue(g.queueId))
+  const detailedGames = games
+    .filter((g) => g.isDetailed)
+    .filter((g) => !queueType || queueType.includes(g.game.queueId))
+    .filter((g) => !g.game.participants.some((p) => p.stats.gameEndedInEarlySurrender))
+    .filter((g) => g.game.endOfGameResult !== 'Abort_AntiCheatExit')
+    .filter((g) => g.game.gameType === 'MATCHED_GAME' && !isPveQueue(g.game.queueId))
+    .map((g) => g.game)
 
-  if (games.length === 0) {
+  if (detailedGames.length === 0) {
     return null
   }
 
@@ -456,8 +464,8 @@ export function analyzeMatchHistory(
   const champions: Record<number, MatchHistoryChampionAnalysis> = {}
 
   const gameAnalyses: [number, MatchHistoryGamesAnalysis][] = []
-  for (let i = 0; i < games.length; i++) {
-    const game = games[i]
+  for (let i = 0; i < detailedGames.length; i++) {
+    const game = detailedGames[i]
 
     // 确定玩家在这场游戏中的参与者 ID
     const selfIdentity = game.participantIdentities.find((p) => p.player.puuid === selfPuuid)
@@ -499,6 +507,13 @@ export function analyzeMatchHistory(
       } else {
         cherryLost++
       }
+    }
+
+    let flashSlot: 'D' | 'F' | null = null
+    if (watashi.spell1Id === 4) {
+      flashSlot = 'F'
+    } else if (watashi.spell2Id === 4) {
+      flashSlot = 'D'
     }
 
     const gameAnalysis: MatchHistoryGamesAnalysis = {
@@ -569,7 +584,10 @@ export function analyzeMatchHistory(
 
       // timeline
       soloKills: null,
-      soloDeaths: null
+      soloDeaths: null,
+
+      // 杂项
+      flashSlot
     }
 
     let maxDamageDealt = 0
@@ -795,7 +813,7 @@ export function analyzeMatchHistory(
     // timeline 分析
     const thisGameTimeline = gameTimeline[game.gameId]
 
-    if (thisGameTimeline) {
+    if (thisGameTimeline && thisGameTimeline.frames) {
       const timelineAnalysis = {
         soloKills: 0,
         soloDeaths: 0
@@ -885,7 +903,10 @@ export function analyzeMatchHistory(
       first: cherryFirst,
       winRate: cherryWin / cherryCount,
       top1Rate: cherryFirst / cherryCount
-    }
+    },
+
+    flashOnD: 0,
+    flashOnF: 0
   }
 
   let totalDamageShareToTop = 0
@@ -974,6 +995,12 @@ export function analyzeMatchHistory(
     if (analysis.position) {
       positionCount++
       positions[analysis.position] = (positions[analysis.position] || 0) + 1
+    }
+
+    if (analysis.flashSlot === 'D') {
+      summary.flashOnD++
+    } else if (analysis.flashSlot === 'F') {
+      summary.flashOnF++
     }
   }
 

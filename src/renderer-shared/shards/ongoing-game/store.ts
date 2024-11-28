@@ -109,7 +109,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     gameTimelineLoadCount: 0,
 
     // renderer only
-    orderPlayerBy: 'default' as 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position'
+    orderPlayerBy: 'default' as 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
   })
 
   const gameInfo = shallowRef<OngoingGameInfo | null>(null)

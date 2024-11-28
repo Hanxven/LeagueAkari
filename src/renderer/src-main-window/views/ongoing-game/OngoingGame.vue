@@ -154,6 +154,35 @@ const sortedTeams = computed(() => {
         return POSITION_ORDER[pa] - POSITION_ORDER[pb]
       }
 
+      if (ogs.settings.orderPlayerBy === 'premade-team') {
+        const teamA = premadeTeamInfo.value.players[a]
+        const teamB = premadeTeamInfo.value.players[b]
+
+        if (teamA && teamB) {
+          if (teamA !== teamB) {
+            const sizeA = premadeTeamInfo.value.groups[teamA].length
+            const sizeB = premadeTeamInfo.value.groups[teamB].length
+            if (sizeA !== sizeB) {
+              return sizeB - sizeA
+            } else {
+              return teamA.localeCompare(teamB)
+            }
+          } else {
+            return 0
+          }
+        }
+
+        if (teamA) {
+          return -1
+        }
+
+        if (teamB) {
+          return 1
+        }
+
+        return 0
+      }
+
       const statsA = ogs.playerStats?.players[a]
       const statsB = ogs.playerStats?.players[b]
 
@@ -196,6 +225,8 @@ const premadeTeamInfo = computed(() => {
       })
     })
   })
+
+  console.log(playerMap)
 
   return playerMap
 })
