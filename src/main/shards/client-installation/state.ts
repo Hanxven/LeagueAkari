@@ -7,10 +7,13 @@ export class ClientInstallationState {
   leagueClientExecutablePaths: string[] = []
 
   /**
-   * 检测 Tencent 的安装情况
+   * 检测英雄联盟的安装位置, 腾讯服务器
    */
   tencentInstallationPath: string | null = null
 
+  /**
+   * 如果有英雄联盟的安装位置, 同时检测两者是否存在
+   */
   hasTcls: boolean = false
   hasWeGameLauncher: boolean = false
 

@@ -1490,6 +1490,7 @@ EasyToLaunch:
 InGameSend:
   sendStats:
     title: 对局玩家信息发送
+    titleRequireAdmin: 对局玩家信息发送 (需要管理员权限)
     enabled:
       label: 启用
       description: 在英雄选择或对局中，发送队友或敌方的数据统计分析
@@ -1522,6 +1523,7 @@ InGameSend:
 
   customSend:
     title: 自定义发送
+    titleRequireAdmin: 自定义发送 (需要管理员权限)
     newItem: 新项
     unnamed: (未命名)
     enabled: 启用

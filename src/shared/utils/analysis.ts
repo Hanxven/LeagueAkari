@@ -318,6 +318,7 @@ export interface MatchHistoryGamesAnalysis {
   soloKills: number | null
   soloDeaths: number | null
 
+  // 杂项
   flashSlot: 'D' | 'F' | null
 }
 
@@ -384,8 +385,11 @@ export interface MatchHistoryGamesAnalysisSummary {
     top1Rate: number
   }
 
+  // 杂项
   flashOnD: number
   flashOnF: number
+
+  sinceLast: number
 }
 
 export interface MatchHistoryChampionAnalysis {
@@ -510,9 +514,9 @@ export function analyzeMatchHistory(
     }
 
     let flashSlot: 'D' | 'F' | null = null
-    if (watashi.spell1Id === 4) {
+    if (watashi.spell1Id === SUMMONER_SPELL_FLASH_ID) {
       flashSlot = 'F'
-    } else if (watashi.spell2Id === 4) {
+    } else if (watashi.spell2Id === SUMMONER_SPELL_FLASH_ID) {
       flashSlot = 'D'
     }
 
@@ -906,7 +910,8 @@ export function analyzeMatchHistory(
     },
 
     flashOnD: 0,
-    flashOnF: 0
+    flashOnF: 0,
+    sinceLast: Date.now() - detailedGames[0].gameCreation
   }
 
   let totalDamageShareToTop = 0
