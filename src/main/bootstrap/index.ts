@@ -6,7 +6,6 @@ import { AkariProtocolMain } from '@main/shards/akari-protocol'
 import { AppCommonMain } from '@main/shards/app-common'
 import { AutoGameflowMain } from '@main/shards/auto-gameflow'
 import { AutoReplyMain } from '@main/shards/auto-reply'
-import { AutoRuneMain } from '@main/shards/auto-rune'
 import { AutoSelectMain } from '@main/shards/auto-select'
 import { ClientInstallationMain } from '@main/shards/client-installation'
 import { ExtraAssetsMain } from '@main/shards/extra-assets'
@@ -218,7 +217,6 @@ export function bootstrap() {
       // functional shards
       AutoGameflowMain,
       AutoReplyMain,
-      AutoRuneMain,
       AutoSelectMain,
       InGameSendMain,
       OngoingGameMain,

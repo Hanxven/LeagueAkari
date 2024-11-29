@@ -1,37 +1,48 @@
 <template>
   <div class="ongoing-game-title">
     <template v-if="ogs.queryStage.phase !== 'unavailable'">
-      <NSelect
-        class="order-select"
-        size="tiny"
-        :consistent-menu-width="false"
-        :options="orderOptions"
-        v-model:value="ogs.settings.orderPlayerBy"
-      />
-      <NSelect
-        class="queue-tag-select"
-        v-if="ogs.settings.matchHistoryUseSgpApi"
-        size="tiny"
-        :value="ogs.matchHistoryTag"
-        :consistent-menu-width="false"
-        @update:value="(val) => og.setMatchHistoryTag(val)"
-        :options="sgpTagOptions"
-      />
-      <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
-        <template #trigger>
-          <NButton class="refresh-button" secondary circle size="tiny" @click="() => og.reload()">
-            <template #icon>
-              <NIcon><RefreshIcon /></NIcon>
-            </template>
-          </NButton>
-        </template>
-        {{ t('OngoingGameTitle.refresh') }}
-      </NTooltip>
+      <LcuImage v-if="intelligence.mapIconUri" :src="intelligence.mapIconUri" class="map-icon" />
+      <span class="ongoing-title-map-name" v-if="intelligence.mapName">{{
+        intelligence.mapName
+      }}</span>
+      <span class="dot-separator" v-if="intelligence.mapName && intelligence.teamName">·</span>
+      <span class="ongoing-title-side" v-if="intelligence.teamName">
+        {{ intelligence.teamName }}</span
+      >
+      <div class="action-controls">
+        <NSelect
+          class="order-select"
+          size="tiny"
+          :consistent-menu-width="false"
+          :options="orderOptions"
+          v-model:value="ogs.settings.orderPlayerBy"
+        />
+        <NSelect
+          class="queue-tag-select"
+          v-if="ogs.settings.matchHistoryUseSgpApi"
+          size="tiny"
+          :value="ogs.matchHistoryTag"
+          :consistent-menu-width="false"
+          @update:value="(val) => og.setMatchHistoryTag(val)"
+          :options="sgpTagOptions"
+        />
+        <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
+          <template #trigger>
+            <NButton class="refresh-button" secondary circle size="tiny" @click="() => og.reload()">
+              <template #icon>
+                <NIcon><RefreshIcon /></NIcon>
+              </template>
+            </NButton>
+          </template>
+          {{ t('OngoingGameTitle.refresh') }}
+        </NTooltip>
+      </div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
@@ -119,6 +130,31 @@ const sgpTagOptions = computed(() => {
     }
   ]
 })
+
+const TEAM_NAME = {
+  100: t('teams.100'),
+  200: t('teams.200'),
+  'our-1': t('teams.100'),
+  'our-2': t('teams.200'),
+  'their-1': t('teams.100'),
+  'their-2': t('teams.200')
+}
+
+const intelligence = computed(() => {
+  const mapName = lcs.gameflow.session?.map.name
+
+  const selfPuuid = lcs.summoner.me?.puuid
+  const team = Object.entries(ogs.teams).find(([_teamId, puuids]) =>
+    puuids.some((puuid) => puuid === selfPuuid)
+  )
+  const teamName = team ? TEAM_NAME[team[0]] : undefined
+
+  return {
+    mapName,
+    teamName,
+    mapIconUri: lcs.gameflow.session?.map?.assets?.['game-select-icon-hover']
+  }
+})
 </script>
 
 <style lang="less" scoped>
@@ -126,8 +162,8 @@ const sgpTagOptions = computed(() => {
   height: 100%;
   align-items: center;
   display: flex;
-  justify-content: flex-end;
   gap: 8px;
+  color: #fffd;
 }
 
 .order-select {
@@ -142,5 +178,29 @@ const sgpTagOptions = computed(() => {
 
 .refresh-button {
   -webkit-app-region: no-drag;
+}
+
+.map-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.ongoing-title-map-name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.ongoing-title-side {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.action-controls {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+  align-items: center;
+  box-sizing: border-box;
+  margin-left: auto;
 }
 </style>

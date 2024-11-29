@@ -10,7 +10,7 @@
         :positive-text="t('ChampSelectOperations.dodge.positiveText')"
       >
         <template #trigger>
-          <NButton size="tiny" type="warning" secondary style="font-size: 10px">{{
+          <NButton size="tiny" type="warning" secondary>{{
             t('ChampSelectOperations.dodge.button')
           }}</NButton>
         </template>
@@ -76,10 +76,9 @@ import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NFlex, NInputNumber, NPopconfirm, NSwitch, useMessage } from 'naive-ui'
 import { computed, watchEffect } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 
@@ -143,7 +142,7 @@ watchEffect(() => {
 
 <style scoped lang="less">
 .label {
-  font-size: 10px;
+  font-size: 12px;
   color: rgb(178, 178, 178);
 }
 

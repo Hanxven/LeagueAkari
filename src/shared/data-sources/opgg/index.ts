@@ -26,30 +26,6 @@ export class OpggDataApi {
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
   static BASE_URL = 'https://lol-api-champion.op.gg'
 
-  private _name = 'OP.GG'
-
-  private _version = 'v0.0.1'
-
-  private _id = 'opgg'
-
-  private _updateAt = new Date(1990, 0, 1)
-
-  get updateAt() {
-    return this._updateAt
-  }
-
-  get version() {
-    return this._version
-  }
-
-  get name() {
-    return this._name
-  }
-
-  get id() {
-    return this._id
-  }
-
   private _http = axios.create({
     baseURL: OpggDataApi.BASE_URL
     // headers: {

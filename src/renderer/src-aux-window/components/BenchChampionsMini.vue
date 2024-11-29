@@ -40,7 +40,6 @@
                 countV: rerollsRemaining
               })
             "
-            circle
             secondary
             type="primary"
           >
@@ -57,7 +56,6 @@
               })
             "
             secondary
-            circle
             size="tiny"
           >
             <template #icon>
@@ -362,8 +360,8 @@ const handleReroll = async (grabBack = false) => {
 }
 
 .champion-image {
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   border-radius: 2px;
   cursor: pointer;
   box-sizing: border-box;
@@ -394,8 +392,8 @@ const handleReroll = async (grabBack = false) => {
 }
 
 .champion-image-placeholder {
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   box-sizing: border-box;
   border: 1px solid rgb(72, 72, 72);
   border-radius: 2px;
@@ -413,7 +411,7 @@ const handleReroll = async (grabBack = false) => {
 }
 
 .balance-item {
-  font-size: 10px;
+  font-size: 11px;
   color: rgb(204, 204, 204);
 
   .balance-item-value {

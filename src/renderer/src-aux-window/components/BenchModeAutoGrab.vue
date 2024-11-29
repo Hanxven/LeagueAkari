@@ -60,7 +60,7 @@ watch(
 
 <style scoped lang="less">
 .label {
-  font-size: 10px;
+  font-size: 12px;
   color: rgb(146, 146, 146);
 }
 

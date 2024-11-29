@@ -43,7 +43,7 @@ export class RendererDebugMain {
       }
 
       if (this.state.logAllLcuEvents) {
-        this._log.info(data.eventType, data)
+        this._log.info(data.uri, data.eventType, data)
       }
     })
 

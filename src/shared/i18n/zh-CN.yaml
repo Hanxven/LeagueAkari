@@ -44,7 +44,7 @@ OngoingGameTitle:
     premade-team: 预组队
     win-rate: 胜率降序
     kda: KDA 降序
-    akari-score: 评分降序
+    akari-score: 综合降序
 
 AppSettings:
   title: 应用

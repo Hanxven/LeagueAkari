@@ -39,7 +39,6 @@
     "typeorm": "^0.3.20",
     "vm2": "^3.9.19",
     "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {

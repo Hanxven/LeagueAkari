@@ -235,18 +235,17 @@ const formatTeamText = (team: string): TeamMeta => {
   if (ogs.gameInfo?.queueType === 'CHERRY') {
     if (lc.gameflow.phase === 'ChampSelect') {
       return {
-        name: team.startsWith('our') ? t(`common.teams.our`) : t(`common.teams.their`),
-        side: -1
+        name: team.startsWith('our') ? t(`common.teams.our`) : t(`common.teams.their`)
       }
     } else {
       if (team === 'all') {
-        return { name: t(`common.teams.all`), side: -1 }
+        return { name: t(`common.teams.all`) }
       }
 
-      return { name: t(`common.teams.unknown`), side: -1 }
+      return { name: t(`common.teams.unknown`) }
     }
   } else {
-    return { name: t(`common.teams.${team}`, team), side: -1 }
+    return { name: t(`common.teams.${team}`, team) }
   }
 }
 

@@ -45,7 +45,6 @@ export function useIdleState() {
 
 export interface TeamMeta {
   name: string
-  side: number // 100 和 200 代表红色方和蓝色方, -1 代表未知
 }
 
 export const CHINESE_NUMBERS = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十']

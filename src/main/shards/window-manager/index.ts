@@ -33,8 +33,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   static MAIN_WINDOW_PARTITION = 'persist:main-window'
 
   static AUX_WINDOW_INITIAL_SHOW = false
-  static AUX_WINDOW_BASE_WIDTH = 300
-  static AUX_WINDOW_BASE_HEIGHT = 350
+  static AUX_WINDOW_BASE_WIDTH = 340
+  static AUX_WINDOW_BASE_HEIGHT = 420
 
   static AUX_WINDOW_OPGG_BASE_WIDTH = 480
   static AUX_WINDOW_OPGG_BASE_HEIGHT = 720

@@ -449,13 +449,23 @@
     <div class="frequent-used-champions" v-if="frequentlyUsedChampions.length">
       <NPopover :keep-alive-on-hover="false" v-for="c of frequentlyUsedChampions" :delay="50">
         <template #trigger>
-          <ChampionIcon
-            :ring-color="c.winRate >= 0.5 ? '#2368ca' : '#c94f4f'"
-            :champion-id="c.id"
-            ring
-            :ring-width="1"
-            class="frequent-used-champion"
-          />
+          <div class="frequent-used-champion">
+            <ChampionIcon
+              :ring-color="c.winRate >= 0.5 ? '#2368ca' : '#c94f4f'"
+              :champion-id="c.id"
+              ring
+              :ring-width="1"
+              class="image"
+            />
+            <StarRoundIcon
+              v-if="
+                championMastery &&
+                championMastery[c.id] &&
+                championMastery[c.id].championLevel >= STARED_CHAMPION_LEVEL
+              "
+              class="star-icon"
+            />
+          </div>
         </template>
         <div class="champion-stats">
           <div class="champion-line">
@@ -550,11 +560,12 @@ import {
   withSelfParticipantMatchHistory
 } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
+import { StarRound as StarRoundIcon } from '@vicons/material'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NPopover, NVirtualList } from 'naive-ui'
-import { computed, onDeactivated, useTemplateRef, watch, watchEffect } from 'vue'
+import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
 import RankedTable from '@main-window/components/RankedTable.vue'
 import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
@@ -597,6 +608,8 @@ const emits = defineEmits<{
 }>()
 
 const { t } = useTranslation()
+
+const STARED_CHAMPION_LEVEL = 32
 
 const premadeTagElHovering = useElementHover(useTemplateRef('pre-made-tag-el'))
 watch(premadeTagElHovering, (h) => {
@@ -1117,9 +1130,24 @@ const matches = computed(() => {
   margin-bottom: 4px;
 
   .frequent-used-champion {
+    position: relative;
     height: 20px;
     width: 20px;
-    border-radius: 1px;
+
+    .image {
+      width: 100%;
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    .star-icon {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 12px;
+      height: 12px;
+      color: #fff838;
+    }
   }
 }
 
