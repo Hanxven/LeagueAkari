@@ -416,6 +416,54 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
+        v-if="soloKills && soloKills.avgSoloDeathsInEarlyGame >= SOLO_DEATHS_THRESHOLD"
+        :delay="50"
+      >
+        <template #trigger>
+          <div class="tag too-many-solo-deaths">
+            {{
+              t('PlayerInfoCard.soloKills.tooManySoloDeathsInEarlyGame', {
+                times: soloKills.avgSoloDeathsInEarlyGame.toFixed(0)
+              })
+            }}
+          </div>
+        </template>
+        <div class="popover-text">
+          {{
+            t('PlayerInfoCard.soloKills.tooManySoloDeathsInEarlyGamePopover', {
+              times: soloKills.avgSoloDeathsInEarlyGame.toFixed(2),
+              countV: soloKills.count,
+              minutes: EARLY_GAME_THRESHOLD_MINUTES
+            })
+          }}
+        </div>
+      </NPopover>
+      <NPopover
+        :keep-alive-on-hover="false"
+        v-if="soloKills && soloKills.avgSoloKillsInEarlyGame >= SOLO_KILLS_THRESHOLD"
+        :delay="50"
+      >
+        <template #trigger>
+          <div class="tag too-many-solo-kills">
+            {{
+              t('PlayerInfoCard.soloKills.tooManySoloKillsInEarlyGame', {
+                times: soloKills.avgSoloKillsInEarlyGame.toFixed(0)
+              })
+            }}
+          </div>
+        </template>
+        <div class="popover-text">
+          {{
+            t('PlayerInfoCard.soloKills.tooManySoloKillsInEarlyGamePopover', {
+              times: soloKills.avgSoloKillsInEarlyGame.toFixed(2),
+              countV: soloKills.count,
+              minutes: EARLY_GAME_THRESHOLD_MINUTES
+            })
+          }}
+        </div>
+      </NPopover>
+      <NPopover
+        :keep-alive-on-hover="false"
         v-if="as.settings.isInKyokoMode && analysis"
         :delay="50"
       >
@@ -609,7 +657,10 @@ const emits = defineEmits<{
 
 const { t } = useTranslation()
 
-const STARED_CHAMPION_LEVEL = 32
+const STARED_CHAMPION_LEVEL = 60
+const SOLO_DEATHS_THRESHOLD = 3
+const SOLO_KILLS_THRESHOLD = 3
+const EARLY_GAME_THRESHOLD_MINUTES = 14
 
 const premadeTagElHovering = useElementHover(useTemplateRef('pre-made-tag-el'))
 watch(premadeTagElHovering, (h) => {
@@ -777,6 +828,55 @@ const isSuspiciousFlashPosition = computed(() => {
     isSuspicious: analysis.summary.flashOnD && analysis.summary.flashOnF,
     flashOnD: analysis.summary.flashOnD,
     flashOnF: analysis.summary.flashOnF
+  }
+})
+
+const soloKills = computed(() => {
+  if (!analysis || !matchHistory) {
+    return null
+  }
+
+  const sl = matchHistory
+    .map(({ game }) => {
+      const gameId = game.gameId
+      const a = analysis.games[gameId]
+
+      if (a && a.soloKills !== null && a.soloDeaths !== null) {
+        return {
+          gameId,
+          soloKills: a.soloKills,
+          soloDeaths: a.soloDeaths,
+          soloKillsBefore: a.soloKills.filter(
+            (k) => k.time < EARLY_GAME_THRESHOLD_MINUTES * 60 * 1000
+          ),
+          soloDeathsBefore: a.soloDeaths.filter(
+            (d) => d.time < EARLY_GAME_THRESHOLD_MINUTES * 60 * 1000
+          )
+        }
+      }
+
+      return null
+    })
+    .filter((a) => a !== null)
+
+  if (sl.length === 0) {
+    return null
+  }
+
+  const avgSoloKills = sl.reduce((acc, cur) => acc + cur.soloKills.length, 0) / sl.length
+  const avgSoloDeaths = sl.reduce((acc, cur) => acc + cur.soloDeaths.length, 0) / sl.length
+  const avgSoloKillsInEarlyGame =
+    sl.reduce((acc, cur) => acc + cur.soloKillsBefore.length, 0) / sl.length
+  const avgSoloDeathsInEarlyGame =
+    sl.reduce((acc, cur) => acc + cur.soloDeathsBefore.length, 0) / sl.length
+
+  return {
+    avgSoloKills,
+    avgSoloDeaths,
+    avgSoloKillsInEarlyGame,
+    avgSoloDeathsInEarlyGame,
+    count: sl.length,
+    details: sl
   }
 })
 
@@ -1113,6 +1213,16 @@ const matches = computed(() => {
     &.sus-flash {
       color: #ffffff;
       background-color: #3a1bb8;
+    }
+
+    &.too-many-solo-deaths {
+      color: #ffffff;
+      background-color: #a81919;
+    }
+
+    &.too-many-solo-kills {
+      color: #ffffff;
+      background-color: #9019a8;
     }
 
     &.self {

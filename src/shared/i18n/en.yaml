@@ -1183,6 +1183,11 @@ PlayerInfoCard:
   losingStreakPopover: Currently on a losing streak of {{countV}} games.
   suspiciousFlashPosition: SusFlash
   suspiciousFlashPositionPopover: Flash position preference is suspiciously inconsistent. In recent games, Flash on D has been used {{dCount}} times and Flash on F has been used {{fCount}} times.
+  soloKills:
+    tooManySoloDeathsInEarlyGame:  '{{times}} Solo Deaths'
+    tooManySoloDeathsInEarlyGamePopover: In the recent {{countV}} games, in the first {{minutes}} minutes, this player was solo killed {{times}} times on average
+    tooManySoloKillsInEarlyGame:  '{{times}} Solo Kills'
+    tooManySoloKillsInEarlyGamePopover: In the recent {{countV}} games, in the first {{minutes}} minutes, this player get solo kills {{times}} times on average
   akariLoved:
     good: Good
     great: Excellent

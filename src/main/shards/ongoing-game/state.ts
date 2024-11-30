@@ -20,7 +20,7 @@ export class OngoingGameSettings {
   /**
    * 会拉取战绩中前 n 局的时间线数量
    */
-  gameTimelineLoadCount: number = 6
+  gameTimelineLoadCount: number = 8
   concurrency: number = 4
 
   /**

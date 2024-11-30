@@ -248,6 +248,14 @@ export function findOutstandingPlayers(
   return outstandingPlayers
 }
 
+interface SoloKillInfo {
+  time: number
+  position: {
+    x: number
+    y: number
+  }
+}
+
 export interface MatchHistoryGamesAnalysis {
   // 总伤害（包括对其他非英雄单位的伤害）
   damageShareToTop: number
@@ -317,8 +325,8 @@ export interface MatchHistoryGamesAnalysis {
   position: string | null
 
   // timeline
-  soloKills: number | null
-  soloDeaths: number | null
+  soloKills: SoloKillInfo[] | null
+  soloDeaths: SoloKillInfo[] | null
 
   // 杂项
   flashSlot: 'D' | 'F' | null
@@ -822,27 +830,32 @@ export function analyzeMatchHistory(
     const thisGameTimeline = gameTimeline[game.gameId]
 
     if (thisGameTimeline && thisGameTimeline.frames) {
-      const timelineAnalysis = {
-        soloKills: 0,
-        soloDeaths: 0
-      }
+      const soloKills: SoloKillInfo[] = []
+      const soloDeaths: SoloKillInfo[] = []
 
       for (const frame of thisGameTimeline.frames) {
         frame.events.forEach((event) => {
           // 单杀
           if (event.type === 'CHAMPION_KILL' && !event.assistingParticipantIds.length) {
             if (watashi.participantId === event.killerId) {
-              timelineAnalysis.soloKills++
+              soloKills.push({
+                time: frame.timestamp,
+                position: event.position
+              })
             }
 
             if (watashi.participantId === event.victimId) {
-              timelineAnalysis.soloDeaths++
+              soloDeaths.push({
+                time: frame.timestamp,
+                position: event.position
+              })
             }
           }
         })
       }
 
-      Object.assign(gameAnalysis, timelineAnalysis)
+      gameAnalysis.soloKills = soloKills
+      gameAnalysis.soloDeaths = soloDeaths
     }
 
     gameAnalyses.push([game.gameId, gameAnalysis])

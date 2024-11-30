@@ -1189,6 +1189,11 @@ PlayerInfoCard:
   losingStreakPopover: 截止到现在，该玩家 {{countV}} 连败
   suspiciousFlashPosition: 闪现错位
   suspiciousFlashPositionPopover: 该玩家放置闪现的位置不一致。在最近的对局中，D 位置 {{dCount}} 次，F 位置 {{fCount}} 次
+  soloKills:
+    tooManySoloDeathsInEarlyGame: 均被单杀 {{times}} 次
+    tooManySoloDeathsInEarlyGamePopover: 在近期 {{countV}} 场游戏中，对局 {{minutes}} 分钟前该玩家被单杀平均 {{times}} 次
+    tooManySoloKillsInEarlyGame:  '场均 {{times}} 单杀'
+    tooManySoloKillsInEarlyGamePopover: 在近期 {{countV}} 场游戏中，对局 {{minutes}} 分钟前该玩家获得单杀平均 {{times}} 次
   akariLoved:
     good: 优异
     great: 极好

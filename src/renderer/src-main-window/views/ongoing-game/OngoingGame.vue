@@ -226,8 +226,6 @@ const premadeTeamInfo = computed(() => {
     })
   })
 
-  console.log(playerMap)
-
   return playerMap
 })
 

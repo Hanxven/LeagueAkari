@@ -888,11 +888,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
         const mappedGameTimeline = Object.entries(this.state.gameTimeline).reduce(
           (obj, [gameIdStr, data]) => {
-            obj[gameIdStr] = data
+            obj[gameIdStr] = data.data
             return obj
           },
           {} as Record<number, GameTimeline>
         )
+
+        // console.log('mappedGameTimeline', mappedGameTimeline)
 
         const analysis = analyzeMatchHistory(
           matchHistory.data.map((g) => ({ game: g, isDetailed: true })),

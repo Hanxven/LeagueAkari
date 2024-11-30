@@ -132,12 +132,12 @@ const sgpTagOptions = computed(() => {
 })
 
 const TEAM_NAME = {
-  100: t('teams.100'),
-  200: t('teams.200'),
-  'our-1': t('teams.100'),
-  'our-2': t('teams.200'),
-  'their-1': t('teams.100'),
-  'their-2': t('teams.200')
+  100: t('common.teams.100'),
+  200: t('common.teams.200'),
+  'our-1': t('common.teams.100'),
+  'our-2': t('common.teams.200'),
+  'their-1': t('common.teams.100'),
+  'their-2': t('common.teams.200')
 }
 
 const intelligence = computed(() => {

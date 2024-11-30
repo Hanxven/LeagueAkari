@@ -21,7 +21,7 @@ export function createManager() {
       app.config.globalProperties.$akariManager = akariManager
       app.config.errorHandler = (err, instance, info) => {
         const logger = akariManager.getInstance<LoggerRenderer>('logger-renderer')
-        logger?.error('Vue', err, instance, info)
+        logger?.error('Vue', err, info)
       }
     },
     setup: () => akariManager.setup(),
