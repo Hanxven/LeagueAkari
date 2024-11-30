@@ -1,8 +1,7 @@
-import { ChampSelectSummoner } from '@shared/types/league-client/champ-select'
+import { ChampSelectSummoner, OngoingTrade } from '@shared/types/league-client/champ-select'
 import { Conversation } from '@shared/types/league-client/chat'
 import { LcuEvent } from '@shared/types/league-client/event'
 import { Ballot } from '@shared/types/league-client/honorV2'
-import { formatError } from '@shared/utils/errors'
 import { isAxiosError } from 'axios'
 import { comparer, computed, runInAction } from 'mobx'
 import PQueue from 'p-queue'
@@ -24,7 +23,7 @@ import { MatchmakingState } from './matchmaking'
 import { SummonerState } from './summoner'
 
 export class LeagueClientSyncedData {
-  static SUMMONER_FETCH_MAX_RETRIES = 114514 + 1919810
+  static SUMMONER_FETCH_MAX_RETRIES = 16
 
   private _ipc: AkariIpcMain
   private _log: AkariLogger
@@ -113,7 +112,7 @@ export class LeagueClientSyncedData {
       )
     } catch (error) {
       this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-champions')
-      this._log.warn(`获取英雄列表失败 ${formatError(error)}`)
+      this._log.warn(`获取英雄列表失败`, error)
     }
   }
 
@@ -128,7 +127,7 @@ export class LeagueClientSyncedData {
       )
     } catch (error) {
       this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-augments')
-      this._log.warn(`获取 augments 失败 ${formatError(error)}`)
+      this._log.warn(`获取 augments 失败`, error)
     }
   }
 
@@ -143,7 +142,7 @@ export class LeagueClientSyncedData {
       )
     } catch (error) {
       this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-perkstyles')
-      this._log.warn(`获取 perkstyles 失败 ${formatError(error)}`)
+      this._log.warn(`获取 perkstyles 失败`, error)
     }
   }
 
@@ -158,7 +157,7 @@ export class LeagueClientSyncedData {
       )
     } catch (error) {
       this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-perks')
-      this._log.warn(`获取 perks 失败 ${formatError(error)}`)
+      this._log.warn(`获取 perks 失败`, error)
     }
   }
 
@@ -181,7 +180,7 @@ export class LeagueClientSyncedData {
       }
     } catch (error) {
       this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-queues')
-      this._log.warn(`获取可用队列失败 ${formatError(error)}`)
+      this._log.warn(`获取可用队列失败`)
     }
   }
 
@@ -196,7 +195,7 @@ export class LeagueClientSyncedData {
       )
     } catch (error) {
       this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-items')
-      this._log.warn(`获取物品列表失败 ${formatError(error)}`)
+      this._log.warn(`获取物品列表失败`)
     }
   }
 
@@ -211,7 +210,7 @@ export class LeagueClientSyncedData {
       )
     } catch (error) {
       this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-summoner-spells')
-      this._log.warn(`获取召唤师技能失败 ${formatError(error)}`)
+      this._log.warn(`获取召唤师技能失败`, error)
     }
   }
 
@@ -231,7 +230,7 @@ export class LeagueClientSyncedData {
             }
 
             this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-honor-ballot')
-            this._log.warn(`获取 honor ballot 失败 ${formatError(error)}`)
+            this._log.warn(`获取 honor ballot 失败`, error)
           }
         } else {
           this.honor.setBallot(null)
@@ -256,7 +255,8 @@ export class LeagueClientSyncedData {
       'currentPickableChampionIds',
       'currentBannableChampionIds',
       'disabledChampionIds',
-      'currentChampion'
+      'currentChampion',
+      'ongoingTrade'
     ])
 
     this._mobx.reaction(
@@ -273,7 +273,7 @@ export class LeagueClientSyncedData {
             }
 
             this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-champ-select-session')
-            this._log.warn(`获取 champ-select 会话失败 ${formatError(error)}`)
+            this._log.warn(`获取 champ-select 会话失败`, error)
           }
         } else {
           this.champSelect.setSession(null)
@@ -321,7 +321,7 @@ export class LeagueClientSyncedData {
             await Promise.all([loadPickables(), loadBannables()])
           } catch (error) {
             this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-pickable-champ-ids')
-            this._log.warn(`获取可选英雄/可禁用英雄失败 ${formatError(error)}`)
+            this._log.warn(`获取可选英雄/可禁用英雄失败`, error)
           }
         } else {
           this.champSelect.setCurrentPickableChampionArray([])
@@ -348,7 +348,7 @@ export class LeagueClientSyncedData {
               }
             } catch (error) {
               this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-self-summoner')
-              this._log.warn(`获取当前英雄选择召唤师状态失败 ${formatError(error)}`)
+              this._log.warn(`获取当前英雄选择召唤师状态失败`, error)
             }
           }
         }
@@ -405,7 +405,8 @@ export class LeagueClientSyncedData {
               return
             }
 
-            throw error
+            this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-current-champion')
+            this._log.warn(`获取当前选择的英雄失败`, error)
           }
         } else {
           this.champSelect.setCurrentChampion(null)
@@ -429,7 +430,8 @@ export class LeagueClientSyncedData {
               return
             }
 
-            throw error
+            this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-disabled-champions')
+            this._log.warn(`获取已被禁用的英雄失败`, error)
           }
         } else {
           this.champSelect.setDisabledChampionIds([])
@@ -483,7 +485,7 @@ export class LeagueClientSyncedData {
     })
 
     this._mobx.reaction(
-      () => this.gameflow.phase,
+      () => this.gameflow.session?.phase,
       async (phase) => {
         if (
           phase === 'ChampSelect' &&
@@ -493,6 +495,28 @@ export class LeagueClientSyncedData {
           if (data.length) {
             this.champSelect.setCurrentBannableChampionArray(data)
           }
+        }
+      }
+    )
+
+    this._mobx.reaction(
+      () => this._i.state.connectionState,
+      async (state) => {
+        if (state === 'connected') {
+          try {
+            const trade = (await this._i.api.champSelect.getOngoingTrade()).data
+            this.champSelect.setOngoingTrade(trade)
+          } catch (error) {
+            if (isAxiosError(error) && error.response?.status === 404) {
+              this.champSelect.setOngoingTrade(null)
+              return
+            }
+
+            this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-ongoing-trade')
+            this._log.warn(`获取进行中的交易失败`, error)
+          }
+        } else {
+          this._i.data.champSelect.setOngoingTrade(null)
         }
       }
     )
@@ -527,6 +551,15 @@ export class LeagueClientSyncedData {
       } else {
         this.champSelect.setDisabledChampionIds(event.data)
       }
+    })
+
+    this._i.events.on<LcuEvent<OngoingTrade>>('/lol-champ-select/v1/ongoing-trade', (event) => {
+      if (event.eventType === 'Delete') {
+        this.champSelect.setOngoingTrade(null)
+        return
+      }
+
+      this.champSelect.setOngoingTrade(event.data)
     })
   }
 
@@ -657,7 +690,7 @@ export class LeagueClientSyncedData {
             this.chat.setMe((await this._i.api.chat.getMe()).data)
           } catch (error) {
             this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-me')
-            this._log.warn(`获取聊天状态失败 ${formatError(error)}`)
+            this._log.warn(`获取聊天状态失败`, error)
           }
         } else {
           this.chat.setMe(null)
@@ -710,7 +743,7 @@ export class LeagueClientSyncedData {
           } catch (error) {
             if ((error as any)?.response?.data?.message !== 'not connected to RC chat yet') {
               this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-conversations')
-              this._log.warn(`无法获取当前的对话 ${formatError(error)}`)
+              this._log.warn(`无法获取当前的对话`, error)
             }
           }
         } else {
@@ -804,7 +837,7 @@ export class LeagueClientSyncedData {
             }
 
             this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-lobby')
-            this._log.warn(`获取房间信息失败 ${formatError(error)}`)
+            this._log.warn(`获取房间信息失败`, error)
           }
         } else {
           this.lobby.setLobby(null)
@@ -827,7 +860,7 @@ export class LeagueClientSyncedData {
             }
 
             this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-received-invitations')
-            this._log.warn(`获取房间邀请失败 ${formatError(error)}`)
+            this._log.warn(`获取房间邀请失败`, error)
           }
         } else {
           this.lobby.setReceivedInvitations([])
@@ -858,7 +891,7 @@ export class LeagueClientSyncedData {
             }
 
             this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-login-queue-state')
-            this._log.warn(`获取登录队列信息失败 ${formatError(error)}`)
+            this._log.warn(`获取登录队列信息失败`, error)
           }
         } else {
           this.login.setLoginQueueState(null)
@@ -952,7 +985,8 @@ export class LeagueClientSyncedData {
             const { data } = await this._i.api.summoner.getCurrentSummonerProfile()
             this.summoner.setProfile(data)
           } catch (error) {
-            // ignore
+            this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-summoner-profile')
+            this._log.warn(`获取召唤师 profile 信息失败`, error)
           }
         }
       }
@@ -984,7 +1018,7 @@ export class LeagueClientSyncedData {
             }
 
             this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-entitlements-token')
-            this._log.warn(`获取 entitlements token 失败 ${formatError(error)}`)
+            this._log.warn(`获取 entitlements token 失败`, error)
           }
         } else {
           this.entitlements.setToken(null)
@@ -1015,7 +1049,7 @@ export class LeagueClientSyncedData {
             }
 
             this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-lol-league-session-token')
-            this._log.warn(`获取 LOL League Session 失败 ${formatError(error)}`)
+            this._log.warn(`获取 LOL League Session 失败`, error)
           }
         } else {
           this.lolLeagueSession.setToken(null)

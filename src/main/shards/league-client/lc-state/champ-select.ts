@@ -1,4 +1,8 @@
-import { ChampSelectSession, ChampSelectSummoner } from '@shared/types/league-client/champ-select'
+import {
+  ChampSelectSession,
+  ChampSelectSummoner,
+  OngoingTrade
+} from '@shared/types/league-client/champ-select'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class ChampSelectState {
@@ -14,13 +18,16 @@ export class ChampSelectState {
 
   selfSummoner: ChampSelectSummoner | null = null
 
+  ongoingTrade: OngoingTrade | null = null
+
   constructor() {
     makeAutoObservable(this, {
       session: observable.struct,
       currentPickableChampionIdArray: observable.struct,
       currentBannableChampionIdArray: observable.struct,
       disabledChampionIdArray: observable.struct,
-      selfSummoner: observable.struct
+      selfSummoner: observable.struct,
+      ongoingTrade: observable.struct
     })
   }
 
@@ -64,5 +71,9 @@ export class ChampSelectState {
 
   setDisabledChampionIds(ids: number[]) {
     this.disabledChampionIdArray = ids
+  }
+
+  setOngoingTrade(trade: OngoingTrade | null) {
+    this.ongoingTrade = trade
   }
 }

@@ -29,7 +29,11 @@ export interface ChampSelectSessionBase {
   rerollsRemaining: number
   theirTeam: ChampSelectTeam[]
   timer: Timer
-  trades: any[]
+  trades: {
+    cellId: number
+    id: number
+    state: 'INVALID' | 'AVAILABLE'
+  }[]
 }
 
 export interface ChampSelectSummoner {
@@ -209,7 +213,7 @@ export interface OngoingTrade {
   requesterChampionSplashPath: string
   responderChampionName: string
   responderIndex: number
-  state: string
+  state: string | 'RECEIVED' | 'SENT' | 'ACCEPTED' | 'DECLINED'
 }
 
 export interface CarouselSkins {
@@ -285,18 +289,18 @@ interface Rental {
 }
 
 export interface MySelection {
-  assignedPosition: string;
-  cellId: number;
-  championId: number;
-  championPickIntent: number;
-  nameVisibilityType: string;
-  obfuscatedPuuid: string;
-  obfuscatedSummonerId: number;
-  puuid: string;
-  selectedSkinId: number;
-  spell1Id: number;
-  spell2Id: number;
-  summonerId: number;
-  team: number;
-  wardSkinId: number;
+  assignedPosition: string
+  cellId: number
+  championId: number
+  championPickIntent: number
+  nameVisibilityType: string
+  obfuscatedPuuid: string
+  obfuscatedSummonerId: number
+  puuid: string
+  selectedSkinId: number
+  spell1Id: number
+  spell2Id: number
+  summonerId: number
+  team: number
+  wardSkinId: number
 }

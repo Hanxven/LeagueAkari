@@ -3,7 +3,8 @@ import {
   ChampSelectSession,
   ChampSelectSummoner,
   GridChamp,
-  MySelection
+  MySelection,
+  OngoingTrade
 } from '@shared/types/league-client/champ-select'
 import { AxiosInstance } from 'axios'
 
@@ -64,6 +65,10 @@ export class ChampSelectHttpApi {
 
   requestSwap(id: number) {
     return this._http.post(`/lol-champ-select/v1/session/swaps/${id}/request`)
+  }
+
+  getOngoingTrade() {
+    return this._http.get<OngoingTrade>('/lol-champ-select/v1/ongoing-trade')
   }
 
   getPickableChampIds() {

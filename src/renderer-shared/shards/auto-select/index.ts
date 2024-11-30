@@ -66,6 +66,10 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'banTeammateIntendedChampion', enabled)
   }
 
+  setBenchHandleTradeEnabled(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'benchHandleTradeEnabled', enabled)
+  }
+
   async onInit() {
     const store = useAutoSelectStore()
 

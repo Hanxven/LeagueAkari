@@ -425,6 +425,14 @@ AutoSelect:
     label: Prioritize First Available Champion
     description: When enabled, the first available champion from the intended list will always be selected.
 
+  benchHandleTradeEnabled:
+    label: Auto Handle Trade Requests
+    description: |
+      <div>When enabled, upcoming champion trade requests will be managed automatically.</div>
+      <div>If "Prioritize First Available Champion" is enabled, trades for a higher-priority preferred champion will be accepted.</div>
+      <div>If "Prioritize First Available Champion" is not enabled and no preferred champions are held, trades for a preferred champion will be accepted.</div>
+      <div>In other cases, trade requests will be declined.</div>
+
   benchExpectedChampions:
     label: Intended Champions
 
@@ -1184,9 +1192,9 @@ PlayerInfoCard:
   suspiciousFlashPosition: SusFlash
   suspiciousFlashPositionPopover: Flash position preference is suspiciously inconsistent. In recent games, Flash on D has been used {{dCount}} times and Flash on F has been used {{fCount}} times.
   soloKills:
-    tooManySoloDeathsInEarlyGame:  '{{times}} Solo Deaths'
+    tooManySoloDeathsInEarlyGame: '{{times}} Solo Deaths'
     tooManySoloDeathsInEarlyGamePopover: In the recent {{countV}} games, in the first {{minutes}} minutes, this player was solo killed {{times}} times on average
-    tooManySoloKillsInEarlyGame:  '{{times}} Solo Kills'
+    tooManySoloKillsInEarlyGame: '{{times}} Solo Kills'
     tooManySoloKillsInEarlyGamePopover: In the recent {{countV}} games, in the first {{minutes}} minutes, this player get solo kills {{times}} times on average
   akariLoved:
     good: Good
@@ -1607,6 +1615,7 @@ common:
     PRIMARY: Primary
     SECONDARY: Secondary
     AUTOFILL: Autofill
+    AUTOFILL_SHORT: Fill
 
   teams:
     all: All

@@ -131,14 +131,14 @@ const sgpTagOptions = computed(() => {
   ]
 })
 
-const TEAM_NAME = {
+const teamNameMap = computed(() => ({
   100: t('common.teams.100'),
   200: t('common.teams.200'),
   'our-1': t('common.teams.100'),
   'our-2': t('common.teams.200'),
   'their-1': t('common.teams.100'),
   'their-2': t('common.teams.200')
-}
+}))
 
 const intelligence = computed(() => {
   const mapName = lcs.gameflow.session?.map.name
@@ -147,7 +147,7 @@ const intelligence = computed(() => {
   const team = Object.entries(ogs.teams).find(([_teamId, puuids]) =>
     puuids.some((puuid) => puuid === selfPuuid)
   )
-  const teamName = team ? TEAM_NAME[team[0]] : undefined
+  const teamName = team ? teamNameMap.value[team[0]] : undefined
 
   return {
     mapName,

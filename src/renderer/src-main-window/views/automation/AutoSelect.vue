@@ -71,7 +71,7 @@
                   <td class="td-label">
                     <span
                       class="label"
-                      :class="{ current: store.memberMe?.assignedPosition === '' }"
+                      :class="{ current: store.memberMe?.assignedPosition === role.key }"
                       >{{ role.label }}</span
                     >
                   </td>
@@ -148,6 +148,20 @@
           </ControlItem>
           <ControlItem
             class="control-item-margin"
+            :label="t('AutoSelect.benchHandleTradeEnabled.label')"
+            :label-width="260"
+          >
+            <template #labelDescription>
+              <div v-html="t('AutoSelect.benchHandleTradeEnabled.description')"></div>
+            </template>
+            <NSwitch
+              @update:value="(v) => as.setBenchHandleTradeEnabled(v)"
+              :value="store.settings.benchHandleTradeEnabled"
+              size="small"
+            ></NSwitch>
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
             :label="t('AutoSelect.benchExpectedChampions.label')"
             :label-width="260"
           >
@@ -200,7 +214,7 @@
                   <td class="td-label">
                     <span
                       class="label"
-                      :class="{ current: store.memberMe?.assignedPosition === '' }"
+                      :class="{ current: store.memberMe?.assignedPosition === role.key }"
                       >{{ role.label }}</span
                     >
                   </td>
@@ -233,12 +247,11 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
+import { useTranslation } from 'i18next-vue'
 import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
-
 
 const { t } = useTranslation()
 

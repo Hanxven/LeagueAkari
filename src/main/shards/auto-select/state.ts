@@ -18,6 +18,7 @@ export class AutoSelectSettings {
   completed: boolean = false
   benchModeEnabled: boolean = false
   benchSelectFirstAvailableChampion: boolean = false
+  benchHandleTradeEnabled: boolean = false
   benchExpectedChampions: number[] = []
   grabDelaySeconds: number = 1
   banEnabled: boolean = false
@@ -77,6 +78,10 @@ export class AutoSelectSettings {
 
   setBanTeammateIntendedChampion(value: boolean) {
     this.banTeammateIntendedChampion = value
+  }
+
+  setBenchHandleTradeEnabled(value: boolean) {
+    this.benchHandleTradeEnabled = value
   }
 
   constructor() {

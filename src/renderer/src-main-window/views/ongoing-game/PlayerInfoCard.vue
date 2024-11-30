@@ -183,7 +183,23 @@
       </NPopover>
       <NPopover v-if="positionInfo">
         <template #trigger>
-          <div class="position-info">
+          <div
+            class="position-info"
+            :class="{
+              autofill: positionInfo.role && positionInfo.role.assignmentReason === 'AUTOFILL'
+            }"
+          >
+            <!-- AUTOFILL highlighter -->
+            <div
+              class="assignment-reason"
+              v-if="positionInfo.role && positionInfo.role.assignmentReason === 'AUTOFILL'"
+              :style="{
+                'background-color': positionAssignmentReason.AUTOFILL_SHORT?.color,
+                color: positionAssignmentReason.AUTOFILL_SHORT?.foregroundColor
+              }"
+            >
+              {{ positionAssignmentReason.AUTOFILL_SHORT?.name }}
+            </div>
             <!-- Left Current Position -->
             <PositionIcon
               v-if="positionInfo.current && positionInfo.current !== 'NONE'"
@@ -815,6 +831,11 @@ const positionAssignmentReason = computed(() => {
       name: t('common.positionAssignmentReason.AUTOFILL'),
       color: '#944646',
       foregroundColor: '#ffffff'
+    },
+    AUTOFILL_SHORT: {
+      name: t('common.positionAssignmentReason.AUTOFILL_SHORT'),
+      color: '#944646',
+      foregroundColor: '#ffffff'
     }
   }
 })
@@ -1105,7 +1126,10 @@ const matches = computed(() => {
     align-items: center;
     flex: 1;
     justify-content: center;
-    margin-left: 16px;
+
+    &:not(.autofill) {
+      margin-left: 16px;
+    }
 
     .divider {
       margin: 0 2px;
@@ -1429,6 +1453,15 @@ const matches = computed(() => {
   }
 }
 
+.assignment-reason {
+  white-space: nowrap;
+  font-size: 11px;
+  line-height: 11px;
+  color: #ffffff;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
 .position-info-popover {
   .name-line {
     display: flex;
@@ -1438,15 +1471,6 @@ const matches = computed(() => {
     .position-name {
       font-size: 14px;
       font-weight: bold;
-    }
-
-    .assignment-reason {
-      margin-left: 8px;
-      font-size: 11px;
-      line-height: 11px;
-      color: #ffffff;
-      padding: 2px 4px;
-      border-radius: 2px;
     }
 
     margin-bottom: 8px;

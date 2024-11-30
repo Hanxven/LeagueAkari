@@ -2,6 +2,7 @@ import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { formatError, formatErrorMessage } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
+import { handleType } from 'pinyin-pro/types/core/polyphonic'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -58,7 +59,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         },
         grabDelaySeconds: { default: this.settings.grabDelaySeconds },
         banEnabled: { default: this.settings.banEnabled },
-        banTeammateIntendedChampion: { default: this.settings.banTeammateIntendedChampion }
+        banTeammateIntendedChampion: { default: this.settings.banTeammateIntendedChampion },
+        benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled }
       },
       this.settings
     )
@@ -79,7 +81,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'banTeammateIntendedChampion',
       'benchExpectedChampions',
       'expectedChampions',
-      'bannedChampions'
+      'bannedChampions',
+      'benchHandleTradeEnabled'
     ])
 
     this._mobx.propSync(AutoSelectMain.id, 'state', this.state, [
@@ -484,6 +487,78 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     )
 
     this._mobx.reaction(
+      () =>
+        [
+          this._lc.data.champSelect.ongoingTrade,
+          this.settings.benchHandleTradeEnabled,
+          this.settings.benchSelectFirstAvailableChampion
+        ] as const,
+      ([trade, enabled, onlyFirst]) => {
+        if (!trade || !enabled) {
+          return
+        }
+
+        // 只处理接受到的邀请
+        if (trade.state !== 'RECEIVED') {
+          return
+        }
+
+        const session = this._lc.data.champSelect.session
+        if (!session) {
+          return
+        }
+
+        const { id } = trade
+        const t = session.trades.find((t) => t.id === id)
+
+        if (!t) {
+          return
+        }
+
+        const from = session.myTeam.find((v) => v.cellId === t.cellId)
+        const self = session.myTeam.find((v) => v.cellId === session.localPlayerCellId)
+        if (!from || !self) {
+          return
+        }
+
+        this._log.info(`收到交换请求: ${from.championId} -> ${self.championId}`)
+
+        const requesterChampionId = from.championId
+        // 1. 如果对方想要交换的英雄是自己想要的，同时自己手上没有想要的英雄，那么就接受
+        // 2. 如果没有设置 onlyFirst，并且手上已经有想要的英雄，则不接受
+        // 3. 如果设置了 onlyFirst， 那么只有当手上的英雄不是第一个想要的英雄时，才接受
+        const hasExpected = this.settings.benchExpectedChampions.includes(self.championId)
+
+        if (hasExpected) {
+          // 如果手上有期望的英雄了，根据不同的设置策略
+          // 如果按照了优先级设置，则交换更希望的英雄
+          // 否则拒绝
+          if (onlyFirst) {
+            const indexInHand = this.settings.benchExpectedChampions.indexOf(self.championId) // 永远不可能为 -1
+            const indexHim = this.settings.benchExpectedChampions.indexOf(requesterChampionId)
+
+            if (indexHim === -1 || indexInHand < indexHim) {
+              this._acceptOrDeclineTrade(id, false)
+            } else {
+              this._acceptOrDeclineTrade(id, true)
+            }
+          } else {
+            this._acceptOrDeclineTrade(id, false)
+          }
+        } else {
+          // 手上没有想要的英雄, 但是对方交换了
+          // 如果对方的英雄是自己想要的, 那么接受
+          // 如果对方的英雄不是自己想要的, 那么拒绝
+          if (this.settings.benchExpectedChampions.includes(requesterChampionId)) {
+            this._acceptOrDeclineTrade(id, true)
+          } else {
+            this._acceptOrDeclineTrade(id, false)
+          }
+        }
+      }
+    )
+
+    this._mobx.reaction(
       () => this._lc.data.gameflow.phase,
       (phase) => {
         if (phase !== 'ChampSelect' && this.state.upcomingGrab) {
@@ -492,6 +567,24 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         }
       }
     )
+  }
+
+  private async _acceptOrDeclineTrade(tradeId: number, accept: boolean) {
+    if (accept) {
+      try {
+        await this._lc.api.champSelect.acceptTrade(tradeId)
+      } catch (error) {
+        this._ipc.sendEvent(AutoSelectMain.id, 'error-accept-trade', tradeId)
+        this._log.warn(`接受交换请求时发生错误`, error)
+      }
+    } else {
+      try {
+        await this._lc.api.champSelect.declineTrade(tradeId)
+      } catch (error) {
+        this._ipc.sendEvent(AutoSelectMain.id, 'error-decline-trade', tradeId)
+        this._log.warn(`拒绝交换请求时发生错误`, error)
+      }
+    }
   }
 
   private async _notifyInChat(type: 'cancel' | 'select', championId: number, time = 0) {

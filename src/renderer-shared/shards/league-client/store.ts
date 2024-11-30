@@ -1,4 +1,4 @@
-import { ChampSelectSession } from '@shared/types/league-client/champ-select'
+import { ChampSelectSession, OngoingTrade } from '@shared/types/league-client/champ-select'
 import { ChatPerson, Conversation } from '@shared/types/league-client/chat'
 import {
   Augment,
@@ -62,7 +62,8 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     currentChampion: shallowRef<number | null>(null),
     currentPickableChampionIds: shallowRef<Set<number>>(new Set()),
     currentBannableChampionIds: shallowRef<Set<number>>(new Set()),
-    disabledChampionIds: shallowRef<Set<number>>(new Set())
+    disabledChampionIds: shallowRef<Set<number>>(new Set()),
+    ongoingTrade: shallowRef<OngoingTrade | null>(null)
   } as const
 
   const chat = {

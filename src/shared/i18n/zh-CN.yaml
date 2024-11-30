@@ -428,6 +428,14 @@ AutoSelect:
     label: 优先选择首位
     description: 开启此项后，将始终选用期望列表中第一个可用的英雄
 
+  benchHandleTradeEnabled:
+    label: 自动处理交换请求
+    description: |
+      <div>启用后，将接管即将到来的英雄交换请求</div>
+      <div>若已经启用“优先选择首位”，则接受优先级位更高的期望英雄</div>
+      <div>未启用“优先选择首位”同时未持有期望英雄时，若目标英雄为期望英雄，则接受</div>
+      <div>其他情况将拒绝交换请求</div>
+
   benchExpectedChampions:
     label: 期望英雄
 
@@ -1612,6 +1620,7 @@ common:
     PRIMARY: 主选
     SECONDARY: 副选
     AUTOFILL: 系统补位
+    AUTOFILL_SHORT: 补
 
   teams:
     all: 所有
