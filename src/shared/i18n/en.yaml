@@ -1568,6 +1568,10 @@ auto-select-main:
   error-ban: 'Failed to auto ban champion, target champion {{champion}}: {{reason}}'
   error-bench-swap: 'Failed to auto swap champion, target champion {{champion}}: {{reason}}'
 
+self-update:
+  start-update: Starting update League Akari
+  updateOnNextStartup: Updated downloaded. Restart the application to apply the update
+
 common:
   appName: League Akari
   default: Default

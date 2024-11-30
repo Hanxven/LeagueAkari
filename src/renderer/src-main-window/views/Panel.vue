@@ -23,10 +23,8 @@
 </template>
 
 <script setup lang="ts">
-import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   AiStatus as AiStatusIcon,
   AppSwitcher as AppSwitcherIcon,
@@ -41,7 +39,6 @@ import { useRoute, useRouter } from 'vue-router'
 
 import SidebarFixed from '@main-window/components/sidebar/SidebarFixed.vue'
 import SidebarMenu from '@main-window/components/sidebar/SidebarMenu.vue'
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))

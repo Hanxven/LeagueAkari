@@ -1192,7 +1192,7 @@ PlayerInfoCard:
   soloKills:
     tooManySoloDeathsInEarlyGame: 均被单杀 {{times}} 次
     tooManySoloDeathsInEarlyGamePopover: 在近期 {{countV}} 场游戏中，对局 {{minutes}} 分钟前该玩家被单杀平均 {{times}} 次
-    tooManySoloKillsInEarlyGame:  '场均 {{times}} 单杀'
+    tooManySoloKillsInEarlyGame: '场均 {{times}} 单杀'
     tooManySoloKillsInEarlyGamePopover: 在近期 {{countV}} 场游戏中，对局 {{minutes}} 分钟前该玩家获得单杀平均 {{times}} 次
   akariLoved:
     good: 优异
@@ -1572,6 +1572,10 @@ auto-select-main:
   error-pre-pick: 尝试自动预选英雄失败，目标英雄 {{champion}}：{{reason}}
   error-ban: 尝试自动禁用英雄时失败，目标英雄 {{champion}}：{{reason}}
   error-bench-swap: 尝试自动交换英雄时失败，目标英雄 {{champion}}：{{reason}}
+
+self-update:
+  start-update: League Akari 更新已开始
+  updateOnNextStartup: 更新已下载完成，关闭应用后执行更新流程
 
 common:
   appName: League Akari

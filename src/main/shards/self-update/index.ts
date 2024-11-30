@@ -1,3 +1,4 @@
+import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import {
   LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL,
@@ -7,7 +8,7 @@ import {
 import { FileInfo, GithubApiLatestRelease } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosResponse } from 'axios'
-import { app, shell } from 'electron'
+import { Notification, app, shell } from 'electron'
 import { comparer } from 'mobx'
 import { extractFull } from 'node-7z'
 import cp from 'node:child_process'
@@ -17,6 +18,7 @@ import { Readable, pipeline } from 'node:stream'
 import { lt } from 'semver'
 
 import sevenBinPath from '../../../../resources/7za.exe?asset'
+import icon from '../../../../resources/LA_ICON.ico?asset'
 import updateScriptPath from '../../../../resources/update.bat?asset'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -508,6 +510,11 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       `添加退出任务: 更新脚本 ${copiedScriptPath}: ${newUpdateDir} ${appDir} ${SelfUpdateMain.EXECUTABLE_NAME}`
     )
 
+    this._createNotification(
+      i18next.t('common.appName'),
+      i18next.t('self-update.updateOnNextStartup')
+    )
+
     const _updateOnQuitFn = () => {
       const c = cp.spawn(copiedScriptPath, [newUpdateDir, appDir, SelfUpdateMain.EXECUTABLE_NAME], {
         detached: true,
@@ -563,6 +570,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     ) {
       return
     }
+
+    this._ipc.sendEvent(SelfUpdateMain.id, 'start-update')
 
     let downloadPath: string
     try {
@@ -646,5 +655,15 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     this._checkUpdateTimerId && clearInterval(this._checkUpdateTimerId)
     this._checkAnnouncementTimerId && clearInterval(this._checkAnnouncementTimerId)
+  }
+
+  private _createNotification(title = 'League Akari', text: string) {
+    const notification = new Notification({
+      title,
+      body: text,
+      icon: icon
+    })
+
+    notification.show()
   }
 }

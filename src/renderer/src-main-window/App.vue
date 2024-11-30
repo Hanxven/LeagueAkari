@@ -32,6 +32,7 @@ import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
+import { useTranslation } from 'i18next-vue'
 import { useMessage, useNotification } from 'naive-ui'
 import { provide, ref, watchEffect } from 'vue'
 
@@ -52,6 +53,8 @@ const as = useAppCommonStore()
 const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
 
 const app = useInstance<AppCommonRenderer>('app-common-renderer')
+
+const { t } = useTranslation()
 
 greeting(as.version)
 
@@ -93,6 +96,14 @@ watchEffect(() => {
     console.log(sus.currentAnnouncement)
     isShowingAnnouncementModal.value = true
   }
+})
+
+su.onStartUpdate(() => {
+  notification.info({
+    title: 'League Akari',
+    content: t('self-update.start-update'),
+    duration: 4000
+  })
 })
 
 watchEffect(() => {

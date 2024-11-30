@@ -62,6 +62,10 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'downloadSource', source)
   }
 
+  onStartUpdate(cb: () => void) {
+    this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'start-update', cb)
+  }
+
   async onInit() {
     const store = useSelfUpdateStore()
 

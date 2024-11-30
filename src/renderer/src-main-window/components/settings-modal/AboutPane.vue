@@ -169,7 +169,7 @@ import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NFlex, NScrollbar, NStep, NSteps, useMessage } from 'naive-ui'
-import { computed, h, inject, watchEffect } from 'vue'
+import { computed, h, inject } from 'vue'
 
 const UPDATE_SOURCE_MAP = {
   github: 'GitHub',
@@ -181,10 +181,6 @@ const { t } = useTranslation()
 const as = useAppCommonStore()
 const sus = useSelfUpdateStore()
 const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
-
-watchEffect(() => {
-  console.log(sus.updateProgressInfo, sus.newUpdates)
-})
 
 const message = useMessage()
 
