@@ -30,8 +30,8 @@ if not exist "%SOURCE_A%" goto :EOF
 echo Source directory %SOURCE_A% exists.
 
 :: Copy directory A to B
-echo Copying directory %SOURCE_A% to %DEST_B%\A...
-xcopy /E /I /Y "%SOURCE_A%" "%DEST_B%\A" >nul
+echo Copying directory %SOURCE_A% to %DEST_B%\NEW_AKARI_UPDATE...
+xcopy /E /I /Y "%SOURCE_A%" "%DEST_B%\NEW_AKARI_UPDATE" >nul
 
 echo Copy completed.
 
@@ -43,8 +43,8 @@ if exist "%TARGET_C%" (
 )
 
 :: Rename directory A in B to C
-echo Renaming %DEST_B%\A to %~nx2...
-rename "%DEST_B%\A" "%~nx2"
+echo Renaming %DEST_B%\NEW_AKARI_UPDATE to %~nx2...
+rename "%DEST_B%\NEW_AKARI_UPDATE" "%~nx2"
 echo Rename completed.
 
 :: Delete original directory A

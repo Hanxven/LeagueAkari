@@ -34,7 +34,7 @@ import { greeting } from '@renderer-shared/utils/greeting'
 import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
 import { useTranslation } from 'i18next-vue'
 import { useMessage, useNotification } from 'naive-ui'
-import { provide, ref, watchEffect } from 'vue'
+import { onMounted, provide, ref, watchEffect } from 'vue'
 
 import AnnouncementModal from './components/AnnouncementModal.vue'
 import DeclarationModal from './components/DeclarationModal.vue'
@@ -167,7 +167,8 @@ useKeyboardCombo('AKARI', {
   maxInterval: 250
 })
 
-useKeyboardCombo('intintint', {
+// TODO REMOVE
+useKeyboardCombo('TRIGGERUPDATE', {
   onFinish: () => {
     message.info('启用测试性更新', {
       duration: 10000
@@ -176,7 +177,7 @@ useKeyboardCombo('intintint', {
   },
   requireSameEl: true,
   caseSensitive: false,
-  maxInterval: 250
+  maxInterval: 500
 })
 </script>
 

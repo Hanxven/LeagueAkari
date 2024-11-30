@@ -23,7 +23,6 @@
 <script setup lang="ts">
 // @ts-ignore
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { useTranslation } from 'i18next-vue'
 import {
   GlobalThemeOverrides,
   NConfigProvider,

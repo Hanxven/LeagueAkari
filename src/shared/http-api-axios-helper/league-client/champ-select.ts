@@ -34,8 +34,36 @@ export class ChampSelectHttpApi {
     return this._http.post<void>(`/lol-champ-select/v1/session/bench/swap/${champId}`)
   }
 
-  declineTrade(tradeId: string | number) {
+  declineTrade(tradeId: number) {
     return this._http.post(`/lol-champ-select/v1/session/trades/${tradeId}/decline`)
+  }
+
+  acceptTrade(tradeId: number) {
+    return this._http.post(`/lol-champ-select/v1/session/trades/${tradeId}/accept`)
+  }
+
+  cancelTrade(tradeId: number) {
+    return this._http.post(`/lol-champ-select/v1/session/trades/${tradeId}/cancel`)
+  }
+
+  requestTrade(tradeId: number) {
+    return this._http.post(`/lol-champ-select/v1/session/trades/${tradeId}/request`)
+  }
+
+  acceptSwap(id: number) {
+    return this._http.post(` /lol-champ-select/v1/session/swaps/${id}/accept`)
+  }
+
+  declineSwap(id: number) {
+    return this._http.post(`/lol-champ-select/v1/session/swaps/${id}/decline`)
+  }
+
+  cancelSwap(id: number) {
+    return this._http.post(`/lol-champ-select/v1/session/swaps/${id}/cancel`)
+  }
+
+  requestSwap(id: number) {
+    return this._http.post(`/lol-champ-select/v1/session/swaps/${id}/request`)
   }
 
   getPickableChampIds() {
