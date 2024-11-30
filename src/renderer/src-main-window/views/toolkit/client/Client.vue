@@ -78,6 +78,30 @@
               :disabled="!as.isAdministrator"
             />
           </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            :label="t('Client.gameClient.settingsFileMode.label')"
+            :label-description="t('Client.gameClient.settingsFileMode.description')"
+            :label-width="320"
+          >
+            <div style="display: flex; gap: 4px; align-items: center">
+              <NButton
+                :disabled="lcs.connectionState !== 'connected'"
+                size="small"
+                @click="() => handleSetSettingsFileMode('readonly')"
+                >{{ t('Client.gameClient.settingsFileMode.setReadonlyButton') }}</NButton
+              >
+              <NButton
+                :disabled="lcs.connectionState !== 'connected'"
+                size="small"
+                @click="() => handleSetSettingsFileMode('writable')"
+                >{{ t('Client.gameClient.settingsFileMode.setWritableButton') }}</NButton
+              >
+              <div class="settings-file-mode-indicator" v-if="settingFileMode !== 'unavailable'">
+                {{ t(`Client.gameClient.settingsFileMode.${settingFileMode}`) }}
+              </div>
+            </div>
+          </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
           <template #header
@@ -188,12 +212,20 @@ import { GameClientRenderer } from '@renderer-shared/shards/game-client'
 import { useGameClientStore } from '@renderer-shared/shards/game-client/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { NButton, NCard, NInputNumber, NScrollbar, NSwitch, useDialog } from 'naive-ui'
-import { reactive, toRaw, useTemplateRef } from 'vue'
 import { useTranslation } from 'i18next-vue'
+import {
+  NButton,
+  NCard,
+  NFlex,
+  NInputNumber,
+  NScrollbar,
+  NSwitch,
+  useDialog,
+  useMessage
+} from 'naive-ui'
+import { reactive, ref, toRaw, useTemplateRef, watch } from 'vue'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
-
 
 const { t } = useTranslation()
 
@@ -296,6 +328,44 @@ const handleFixWindowMethodA = async () => {
     }
   })
 }
+
+const message = useMessage()
+
+const settingFileMode = ref<'readonly' | 'writable' | 'unavailable'>('unavailable')
+
+watch(
+  () => lcs.isConnected,
+  async (isConnected) => {
+    if (isConnected) {
+      settingFileMode.value = await gc
+        .getSettingsFileReadonlyOrWritable()
+        .catch(() => 'unavailable')
+    } else {
+      settingFileMode.value = 'unavailable'
+    }
+  },
+  { immediate: true }
+)
+
+const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
+  try {
+    await gc.setSettingsFileReadonlyOrWritable(mode)
+    settingFileMode.value = await gc.getSettingsFileReadonlyOrWritable()
+    console.log(settingFileMode.value)
+    if (mode === 'readonly') {
+      message.success(t('Client.gameClient.settingsFileMode.setToReadonly'))
+    } else {
+      message.success(t('Client.gameClient.settingsFileMode.setToWritable'))
+    }
+  } catch (error: any) {
+    message.warning(
+      t('Client.gameClient.settingsFileMode.failedToSet', {
+        reason: error.message
+      })
+    )
+    settingFileMode.value = 'unavailable'
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -328,5 +398,12 @@ const handleFixWindowMethodA = async () => {
 
 .single-root {
   height: 100%;
+}
+
+.settings-file-mode-indicator {
+  font-size: 12px;
+  font-weight: bold;
+  color: #46ff90d0;
+  margin-left: 8px;
 }
 </style>

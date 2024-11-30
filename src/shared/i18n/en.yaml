@@ -614,10 +614,23 @@ Client:
       labelAdminRequired: Terminate Game Client with shortcut (Admin Required)
       label: Terminate Game Client with shortcut
       description: When the game client is running and in the foreground, using the shortcut can forcibly terminate the game client process. Please note that this action forcefully ends the process and is not a normal game exit procedure, potentially leading to unexpected side effects.
+
     terminateShortcut:
       label: Shortcut
       labelAdminRequired: Shortcut (Admin Required)
       description: Set a custom shortcut to forcibly terminate the game client process.
+
+    settingsFileMode:
+      label: Lock Settings
+      description: Adjust the writability of the settings for the current logged-in client. Setting to read-only prevents the game client from modifying the settings, while setting to writable allows the game client to modify the settings.
+      setReadonlyButton: Set to Read-Only
+      setWritableButton: Set to Writable
+      setToReadonly: Set to Read-Only
+      setToWritable: Set to Writable
+      failedToSet: 'Failed to set the settings file mode: {{reason}}'
+      readonly: 'Current: Read-Only'
+      writable: 'Current: Writable'
+
 
   leagueClientUx:
     title: League Client UX

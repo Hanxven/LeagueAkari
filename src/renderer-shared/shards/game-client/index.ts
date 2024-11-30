@@ -55,4 +55,12 @@ export class GameClientRenderer implements IAkariShardInitDispose {
   setTerminateShortcut(shortcut: string | null) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'terminateShortcut', shortcut)
   }
+
+  setSettingsFileReadonlyOrWritable(mode: 'readonly' | 'writable') {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setSettingsFileReadonlyOrWritable', mode)
+  }
+
+  getSettingsFileReadonlyOrWritable() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getSettingsFileReadonlyOrWritable')
+  }
 }

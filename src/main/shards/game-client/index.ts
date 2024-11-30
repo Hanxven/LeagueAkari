@@ -4,6 +4,7 @@ import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game
 import axios from 'axios'
 import cp from 'child_process'
 import https from 'https'
+import ofs from 'node:original-fs'
 import path from 'node:path'
 
 import { ClientInstallationMain } from '../client-installation'
@@ -160,6 +161,18 @@ export class GameClientMain implements IAkariShardInitDispose {
     this._ipc.onCall(GameClientMain.id, 'launchSpectator', (config: LaunchSpectatorConfig) => {
       return this.launchSpectator(config)
     })
+
+    this._ipc.onCall(
+      GameClientMain.id,
+      'setSettingsFileReadonlyOrWritable',
+      async (mode: 'readonly' | 'writable') => {
+        await this._setSettingsFileReadonlyOrWritable(mode)
+      }
+    )
+
+    this._ipc.onCall(GameClientMain.id, 'getSettingsFileReadonlyOrWritable', async () => {
+      return this._getSettingsFileReadonlyOrWritable()
+    })
   }
 
   private _terminateGameClient() {
@@ -294,5 +307,36 @@ export class GameClientMain implements IAkariShardInitDispose {
     return toolkit
       .getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
       .some((pid) => toolkit.isProcessForeground(pid))
+  }
+
+  private async _setSettingsFileReadonlyOrWritable(mode: 'readonly' | 'writable' = 'readonly') {
+    const settingsPath = path.join(await this._getConfigPathByLcuApi(), 'PersistedSettings.json')
+    this._log.info(`设置文件 ${settingsPath} 为 ${mode}`)
+
+    if (mode === 'readonly') {
+      await ofs.promises.chmod(settingsPath, 0o444)
+    } else {
+      await ofs.promises.chmod(settingsPath, 0o644)
+    }
+  }
+
+  private async _getSettingsFileReadonlyOrWritable() {
+    const settingsPath = path.join(await this._getConfigPathByLcuApi(), 'PersistedSettings.json')
+    const stats = await ofs.promises.stat(settingsPath)
+    return stats.mode & 0o222 ? 'writable' : 'readonly'
+  }
+
+  private async _getConfigPathByLcuApi() {
+    if (!this._lc.state.auth) {
+      throw new Error('LC Not connected')
+    }
+
+    const { data: gameInstallRoot } = await this._lc.http.get<string>('/data-store/v1/install-dir')
+
+    if (this._lc.state.auth.region === 'TENCENT') {
+      return path.resolve(gameInstallRoot, '..', 'Game', 'Config')
+    } else {
+      return path.resolve(gameInstallRoot, 'Config')
+    }
   }
 }

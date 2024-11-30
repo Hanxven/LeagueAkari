@@ -52,7 +52,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   ]
 
   static INTERNAL_TIMEOUT = 12500
-  static CONNECT_TO_LC_RETRY_INTERVAL = 750
+  static CONNECT_TO_LC_RETRY_INTERVAL = 2000
   static HTTP_PING_URL = '/riotclient/auth-token'
   static REQUEST_TIMEOUT_MS = 12500
   static FIXED_ITEM_SET_PREFIX = 'akari1'
