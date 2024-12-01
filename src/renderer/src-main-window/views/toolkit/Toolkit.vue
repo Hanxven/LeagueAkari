@@ -2,7 +2,7 @@
   <div class="automation-page">
     <div class="sections">
       <div class="section-icon-container">
-        <NIcon class="section-icon"><AppSwitcherIcon /></NIcon>
+        <NIcon class="section-icon"><ToolkitIcon /></NIcon>
         <span class="session-label">{{ t('Toolkit.title') }}</span>
       </div>
       <NTabs
@@ -42,17 +42,16 @@
 </template>
 
 <script setup lang="ts">
-import { AppSwitcher as AppSwitcherIcon } from '@vicons/carbon'
+import { ToolKit as ToolkitIcon } from '@vicons/carbon'
+import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
 import { ref } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import Client from './client/Client.vue'
 import InGameSend from './in-game-send/InGameSend.vue'
 import InProcess from './in-process/InProcess.vue'
 import Lobby from './lobby/Lobby.vue'
 import Misc from './misc/Misc.vue'
-
 
 const { t } = useTranslation()
 

@@ -34,12 +34,13 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._shared = deps[SHARED_GLOBAL_ID]
     this._ipc = deps['akari-ipc-main']
     this._mobx = deps['mobx-utils-main']
+
     this._setting = (deps['setting-factory-main'] as SettingFactoryMain).create(
       AppCommonMain.id,
       {
         isInKyokoMode: { default: this.settings.isInKyokoMode },
         showFreeSoftwareDeclaration: { default: this.settings.showFreeSoftwareDeclaration },
-        locale: { default: this.settings.locale }
+        locale: { default: this._getSystemLocale() }
       },
       this.settings
     )
@@ -52,6 +53,16 @@ export class AppCommonMain implements IAkariShardInitDispose {
     })
 
     this.state.setBaseConfig(this._shared.global.baseConfig.value)
+  }
+
+  private _getSystemLocale() {
+    const systemLocale = Intl.DateTimeFormat().resolvedOptions().locale
+
+    if (systemLocale.startsWith('zh')) {
+      return 'zh-CN'
+    }
+
+    return 'en'
   }
 
   private _setDisableHardwareAccelerationAndRelaunch(s: boolean) {

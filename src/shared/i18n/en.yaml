@@ -36,6 +36,7 @@ TrafficButtons:
 
 OngoingGameTitle:
   refresh: Refresh
+  spectating: Spectating
   orderOptions:
     default: Default
     position: Position
@@ -396,7 +397,7 @@ AutoSelect:
     label: Ignore Teammates' Intent
     description: When enabled, teammates' intended champions will be ignored. Otherwise, it will avoid conflicts with their selections.
 
-  completed:
+  completePick:
     label: Lock-In Strategy
     description: Instantly lock in or just show the champion.
     options:
@@ -616,8 +617,8 @@ Client:
       description: When the game client is running and in the foreground, using the shortcut can forcibly terminate the game client process. Please note that this action forcefully ends the process and is not a normal game exit procedure, potentially leading to unexpected side effects.
 
     terminateShortcut:
-      label: Shortcut
-      labelAdminRequired: Shortcut (Admin Required)
+      label: Terminate Shortcut
+      labelAdminRequired: Terminate Shortcut (Admin Required)
       description: Set a custom shortcut to forcibly terminate the game client process.
 
     settingsFileMode:
@@ -630,7 +631,6 @@ Client:
       failedToSet: 'Failed to set the settings file mode: {{reason}}'
       readonly: 'Current: Read-Only'
       writable: 'Current: Writable'
-
 
   leagueClientUx:
     title: League Client UX
@@ -1183,6 +1183,7 @@ ItemDisplay:
 PlayerInfoCard:
   empty: No Content
   loadingMatchHistory: Loading...
+  errorLoadingMatchHistory: Unable to load
   top4Rate: Top 4 Rate
   1stRate: First Place Rate
   1st: First {{rate}}%

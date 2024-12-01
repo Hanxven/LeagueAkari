@@ -26,7 +26,9 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
     },
     selectTeammateIntendedChampion: false,
     showIntent: false,
-    completed: false,
+    completePick: false,
+    lastSecondCompletePickEnabled: false,
+    completePickPreEndThreshold: 1,
     benchModeEnabled: false,
     benchSelectFirstAvailableChampion: false,
     benchHandleTradeEnabled: false,
@@ -48,6 +50,7 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
   const upcomingBan = shallowRef<UpcomingBanPick | null>(null)
   const upcomingGrab = shallowRef<{ championId: number; willGrabAt: number } | null>(null)
   const memberMe = shallowRef<ChampSelectTeam | null>(null)
+  const willCompletePickAt = shallowRef<number>(-1)
 
   return {
     settings,
@@ -55,6 +58,7 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
     upcomingPick,
     upcomingBan,
     upcomingGrab,
-    memberMe
+    memberMe,
+    willCompletePickAt
   }
 })

@@ -600,7 +600,13 @@
         </template>
       </NVirtualList>
       <div class="placeholder" v-else-if="matchHistoryLoading === 'loading'">
-        {{ t('PlayerInfoCard.loadingMatchHistory') }}
+        <div class="loading">
+          <NSpin :size="16" />
+          <span>{{ t('PlayerInfoCard.loadingMatchHistory') }}</span>
+        </div>
+      </div>
+      <div class="placeholder" v-else-if="matchHistoryLoading === 'error'">
+        {{ t('PlayerInfoCard.errorLoadingMatchHistory') }}
       </div>
       <div class="placeholder" v-else>{{ t('PlayerInfoCard.empty') }}</div>
     </div>
@@ -628,7 +634,7 @@ import { StarRound as StarRoundIcon } from '@vicons/material'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
-import { NPopover, NVirtualList } from 'naive-ui'
+import { NPopover, NSpin, NVirtualList } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
 import RankedTable from '@main-window/components/RankedTable.vue'
@@ -1380,7 +1386,13 @@ const matches = computed(() => {
     width: 100%;
     height: 100%;
     font-size: 12px;
-    color: #999;
+    color: #ffffffa0;
+
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
   }
 }
 

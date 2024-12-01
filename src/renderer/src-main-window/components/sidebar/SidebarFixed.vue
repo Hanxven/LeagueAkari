@@ -20,7 +20,8 @@
       <div>
         {{ t('SideBarFixed.respawnTimer.timeLeft', { seconds: rts.info.timeLeft.toFixed(0) }) }} ({{
           rts.info.totalTime.toFixed(0)
-        }} s)
+        }}
+        s)
       </div>
     </NPopover>
     <NPopover placement="right">
@@ -137,12 +138,11 @@ import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-n
 import { BareMetalServer as BareMetalServerIcon, Settings as SettingsIcon } from '@vicons/carbon'
 import { PlugDisconnected24Filled as PlugDisconnected24FilledIcon } from '@vicons/fluent'
 import { Hourglass as HourglassIcon } from '@vicons/ionicons5'
+import { useTranslation } from 'i18next-vue'
 import { NBadge, NIcon, NPopover, NProgress, NScrollbar, NSpin, NTooltip } from 'naive-ui'
 import { computed, inject } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
-
 
 const { t } = useTranslation()
 

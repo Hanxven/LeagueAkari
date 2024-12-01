@@ -34,8 +34,16 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'showIntent', enabled)
   }
 
-  setCompleted(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'completed', enabled)
+  setCompletePick(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'completePick', enabled)
+  }
+
+  setLastSecondCompletePickEnabled(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'lastSecondCompletePickEnabled', enabled)
+  }
+
+  setCompletePickPreEndThreshold(threshold: number) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'completePickPreEndThreshold', threshold)
   }
 
   setBenchModeEnabled(enabled: boolean) {

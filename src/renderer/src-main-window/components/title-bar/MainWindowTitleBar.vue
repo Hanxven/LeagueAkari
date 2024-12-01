@@ -42,6 +42,7 @@ import TrafficButtons from './TrafficButtons.vue'
 }
 
 .app-name {
+  padding: 0 4px;
   font-weight: bold;
   color: rgba(255, 255, 255, 0.8);
   margin-left: 8px;

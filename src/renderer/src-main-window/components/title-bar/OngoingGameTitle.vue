@@ -1,6 +1,6 @@
 <template>
   <div class="ongoing-game-title">
-    <template v-if="ogs.queryStage.phase !== 'unavailable'">
+    <template v-if="ogs.queryStage.phase !== 'unavailable' && !isSpectating">
       <LcuImage v-if="intelligence.mapIconUri" :src="intelligence.mapIconUri" class="map-icon" />
       <span class="ongoing-title-map-name" v-if="intelligence.mapName">{{
         intelligence.mapName
@@ -59,6 +59,10 @@ const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 const ogs = useOngoingGameStore()
 const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
 const lcs = useLeagueClientStore()
+
+const isSpectating = computed(() => {
+  return lcs.champSelect.session && lcs.champSelect.session.isSpectating
+})
 
 const orderOptions = computed(() => {
   return [
@@ -137,7 +141,8 @@ const teamNameMap = computed(() => ({
   'our-1': t('common.teams.100'),
   'our-2': t('common.teams.200'),
   'their-1': t('common.teams.100'),
-  'their-2': t('common.teams.200')
+  'their-2': t('common.teams.200'),
+  'spectating': t('OngoingGameTitle.spectating')
 }))
 
 const intelligence = computed(() => {
@@ -147,7 +152,7 @@ const intelligence = computed(() => {
   const team = Object.entries(ogs.teams).find(([_teamId, puuids]) =>
     puuids.some((puuid) => puuid === selfPuuid)
   )
-  const teamName = team ? teamNameMap.value[team[0]] : undefined
+  const teamName = team ? teamNameMap.value[team[0]] : teamNameMap.value['spectating']
 
   return {
     mapName,

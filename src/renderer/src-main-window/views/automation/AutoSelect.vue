@@ -45,17 +45,44 @@
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            :label="t('AutoSelect.completed.label')"
-            :label-description="t('AutoSelect.completed.description')"
+            :label="t('AutoSelect.completePick.label')"
+            :label-description="t('AutoSelect.completePick.description')"
             :label-width="260"
           >
             <NRadioGroup
-              :value="store.settings.completed"
-              @update:value="(v) => as.setCompleted(v)"
+              :value="store.settings.completePick"
+              @update:value="(v) => as.setCompletePick(v)"
             >
-              <NRadio :value="true">{{ t('AutoSelect.completed.options.true') }}</NRadio>
-              <NRadio :value="false">{{ t('AutoSelect.completed.options.false') }}</NRadio>
+              <NRadio :value="true">{{ t('AutoSelect.completePick.options.true') }}</NRadio>
+              <NRadio :value="false">{{ t('AutoSelect.completePick.options.false') }}</NRadio>
             </NRadioGroup>
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            :label="`在最后一刻锁定`"
+            :label-description="`在最后一刻锁定`"
+            :label-width="260"
+          >
+            <NSwitch
+              @update:value="(v) => as.setLastSecondCompletePickEnabled(v)"
+              :value="store.settings.lastSecondCompletePickEnabled"
+              size="small"
+            />
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            :label="`锁定距离结束延迟`"
+            :label-width="260"
+            :label-description="`在选择英雄后，等待多少秒后再结束选择`"
+          >
+            <NInputNumber
+              style="width: 100px"
+              placeholder="秒"
+              :min="0"
+              size="small"
+              :value="store.settings.completePickPreEndThreshold"
+              @update:value="(v) => as.setCompletePickPreEndThreshold(v || 0)"
+            />
           </ControlItem>
           <ControlItem
             class="control-item-margin"
@@ -127,7 +154,6 @@
             </template>
             <NInputNumber
               style="width: 100px"
-              placeholder="秒"
               :min="0"
               size="small"
               :value="store.settings.grabDelaySeconds"

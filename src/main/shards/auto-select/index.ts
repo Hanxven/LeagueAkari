@@ -52,7 +52,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         normalModeEnabled: { default: this.settings.normalModeEnabled },
         selectTeammateIntendedChampion: { default: this.settings.selectTeammateIntendedChampion },
         showIntent: { default: this.settings.showIntent },
-        completed: { default: this.settings.completed },
+        completePick: { default: this.settings.completePick },
+        lastSecondCompletePickEnabled: { default: this.settings.lastSecondCompletePickEnabled },
+        completePickPreEndThreshold: { default: this.settings.completePickPreEndThreshold },
         benchModeEnabled: { default: this.settings.benchModeEnabled },
         benchSelectFirstAvailableChampion: {
           default: this.settings.benchSelectFirstAvailableChampion
@@ -73,7 +75,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'normalModeEnabled',
       'selectTeammateIntendedChampion',
       'showIntent',
-      'completed',
+      'completePick',
+      'lastSecondCompletePickEnabled',
+      'completePickPreEndThreshold',
       'benchModeEnabled',
       'benchSelectFirstAvailableChampion',
       'grabDelaySeconds',
@@ -89,7 +93,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'upcomingBan',
       'upcomingPick',
       'upcomingGrab',
-      'memberMe'
+      'memberMe',
+      'willCompletePickAt'
     ])
   }
 
@@ -109,7 +114,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
         if (pick.isActingNow && pick.action.isInProgress) {
           if (
-            !this.settings.completed &&
+            !this.settings.completePick &&
             this.state.champSelectActionInfo?.memberMe.championId === pick.championId
           ) {
             return
@@ -117,12 +122,12 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
           try {
             this._log.info(
-              `现在选择：${pick.championId}, ${this.settings.completed}, actionId=${pick.action.id}`
+              `现在选择：${pick.championId}, ${this.settings.completePick}, actionId=${pick.action.id}`
             )
 
             await this._lc.api.champSelect.pickOrBan(
               pick.championId,
-              this.settings.completed,
+              this.settings.completePick,
               'pick',
               pick.action.id
             )
@@ -131,7 +136,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             this._lc.api.playerNotifications
               .createTitleDetailsNotification(
                 i18next.t('common.appName'),
-                i18next.t('error-pick', {
+                i18next.t('auto-select-main.error-pick', {
                   champion:
                     this._lc.data.gameData.champions[pick.championId]?.name || pick.championId,
                   reason: formatErrorMessage(error)
@@ -173,7 +178,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             this._lc.api.playerNotifications
               .createTitleDetailsNotification(
                 i18next.t('common.appName'),
-                i18next.t('error-pre-pick', {
+                i18next.t('auto-select-main.error-pre-pick', {
                   champion:
                     this._lc.data.gameData.champions[pick.championId]?.name || pick.championId,
                   reason: formatErrorMessage(error)
@@ -202,7 +207,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             this._lc.api.playerNotifications
               .createTitleDetailsNotification(
                 i18next.t('common.appName'),
-                i18next.t('error-ban', {
+                i18next.t('auto-select-main.error-ban', {
                   champion:
                     this._lc.data.gameData.champions[ban.championId]?.name || ban.championId,
                   reason: formatErrorMessage(error)
@@ -524,34 +529,37 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         this._log.info(`收到交换请求: ${from.championId} -> ${self.championId}`)
 
         const requesterChampionId = from.championId
-        // 1. 如果对方想要交换的英雄是自己想要的，同时自己手上没有想要的英雄，那么就接受
-        // 2. 如果没有设置 onlyFirst，并且手上已经有想要的英雄，则不接受
-        // 3. 如果设置了 onlyFirst， 那么只有当手上的英雄不是第一个想要的英雄时，才接受
         const hasExpected = this.settings.benchExpectedChampions.includes(self.championId)
 
         if (hasExpected) {
-          // 如果手上有期望的英雄了，根据不同的设置策略
-          // 如果按照了优先级设置，则交换更希望的英雄
-          // 否则拒绝
           if (onlyFirst) {
             const indexInHand = this.settings.benchExpectedChampions.indexOf(self.championId) // 永远不可能为 -1
             const indexHim = this.settings.benchExpectedChampions.indexOf(requesterChampionId)
 
             if (indexHim === -1 || indexInHand < indexHim) {
+              this._log.info(
+                `拒绝交换请求: ${from.championId} -> ${self.championId}, 因为目标低于当前所选优先级`
+              )
               this._acceptOrDeclineTrade(id, false)
             } else {
+              this._log.info(
+                `接受交换请求: ${from.championId} -> ${self.championId}, 目标具有更高优先级`
+              )
               this._acceptOrDeclineTrade(id, true)
             }
           } else {
             this._acceptOrDeclineTrade(id, false)
           }
         } else {
-          // 手上没有想要的英雄, 但是对方交换了
-          // 如果对方的英雄是自己想要的, 那么接受
-          // 如果对方的英雄不是自己想要的, 那么拒绝
           if (this.settings.benchExpectedChampions.includes(requesterChampionId)) {
+            this._log.info(
+              `接受交换请求: ${from.championId} -> ${self.championId}, 对方英雄为期望英雄`
+            )
             this._acceptOrDeclineTrade(id, true)
           } else {
+            this._log.info(
+              `拒绝交换请求: ${from.championId} -> ${self.championId}, 已持有一个期望英雄`
+            )
             this._acceptOrDeclineTrade(id, false)
           }
         }
@@ -619,7 +627,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       this._lc.api.playerNotifications
         .createTitleDetailsNotification(
           i18next.t('common.appName'),
-          i18next.t('error-bench-swap', {
+          i18next.t('auto-select-main.error-bench-swap', {
             champion:
               this._lc.data.gameData.champions[this.state.upcomingGrab.championId]?.name ||
               this.state.upcomingGrab.championId,

@@ -27,14 +27,14 @@ import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
   AiStatus as AiStatusIcon,
-  AppSwitcher as AppSwitcherIcon,
   Layers as LayersIcon,
-  Template as TemplateIcon
+  ToolKit as ToolkitIcon
 } from '@vicons/carbon'
+import { Games24Filled as Games24FilledIcon } from '@vicons/fluent'
 import { TicketSharp as TicketSharpIcon } from '@vicons/ionicons5'
+import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
 import { Component as ComponentC, computed, h, ref, watchEffect } from 'vue'
-import { useTranslation } from 'i18next-vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import SidebarFixed from '@main-window/components/sidebar/SidebarFixed.vue'
@@ -43,7 +43,6 @@ import SidebarMenu from '@main-window/components/sidebar/SidebarMenu.vue'
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
 }
-
 
 const { t } = useTranslation()
 
@@ -57,7 +56,7 @@ const menu = computed(() => {
     },
     {
       key: 'ongoing-game',
-      icon: renderIcon(TemplateIcon),
+      icon: renderIcon(Games24FilledIcon),
       name: t('SideBarMenu.ongoing-game')
     },
     {
@@ -67,7 +66,7 @@ const menu = computed(() => {
     },
     {
       key: 'toolkit',
-      icon: renderIcon(AppSwitcherIcon),
+      icon: renderIcon(ToolkitIcon),
       name: t('SideBarMenu.toolkit')
     },
     {

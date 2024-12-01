@@ -23,12 +23,9 @@
             <span :title="t('OngoingGame.avgTeamKda')">{{
               ogs.playerStats?.teams[team].averageKda.toFixed(2)
             }}</span>
-            <span
-              title="Avg Akari Score"
-              style="color: #ff65ce"
-              v-if="app.settings.isInKyokoMode"
-              >{{ ogs.playerStats.teams[team].averageAkariScore.toFixed(2) }}</span
-            >
+            <span title="Avg Akari Score" style="color: #ff65ce" v-if="as.settings.isInKyokoMode">{{
+              ogs.playerStats.teams[team].averageAkariScore.toFixed(2)
+            }}</span>
           </div>
         </div>
         <div class="team">
@@ -36,7 +33,7 @@
             v-for="player of players"
             :puuid="player"
             :key="player"
-            :is-self="player === lc.summoner.me?.puuid"
+            :is-self="player === lcs.summoner.me?.puuid"
             :champion-id="ogs.championSelections?.[player]"
             :match-history="
               ogs.matchHistory[player]?.data.map((g) => ({ isDetailed: true, game: g }))
@@ -73,11 +70,11 @@
       <div class="centered">
         <LeagueAkariSpan bold class="akari-text" />
         <template v-if="ogs.settings.enabled">
-          <template v-if="lc.connectionState !== 'connected'">
+          <template v-if="lcs.connectionState !== 'connected'">
             <span class="no-ongoing-game-text">{{ t('OngoingGame.disconnected') }}</span>
             <EasyToLaunch />
           </template>
-          <template v-else-if="lc.champSelect.session && lc.champSelect.session.isSpectating">
+          <template v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating">
             <span class="no-ongoing-game-text"> {{ t('OngoingGame.waitingForSpectate') }}</span>
           </template>
           <template v-else>
@@ -114,8 +111,8 @@ import {
   useIdleState
 } from './ongoing-game-utils'
 
-const lc = useLeagueClientStore()
-const app = useAppCommonStore()
+const lcs = useLeagueClientStore()
+const as = useAppCommonStore()
 
 const { t } = useTranslation()
 
@@ -231,7 +228,7 @@ const premadeTeamInfo = computed(() => {
 
 const formatTeamText = (team: string): TeamMeta => {
   if (ogs.gameInfo?.queueType === 'CHERRY') {
-    if (lc.gameflow.phase === 'ChampSelect') {
+    if (lcs.gameflow.phase === 'ChampSelect') {
       return {
         name: team.startsWith('our') ? t(`common.teams.our`) : t(`common.teams.their`)
       }

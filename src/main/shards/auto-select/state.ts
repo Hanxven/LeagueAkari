@@ -15,7 +15,9 @@ export class AutoSelectSettings {
   }
   selectTeammateIntendedChampion: boolean = false
   showIntent: boolean = false
-  completed: boolean = false
+  completePick: boolean = false
+  lastSecondCompletePickEnabled: boolean = false
+  completePickPreEndThreshold: number = 1
   benchModeEnabled: boolean = false
   benchSelectFirstAvailableChampion: boolean = false
   benchHandleTradeEnabled: boolean = false
@@ -48,8 +50,16 @@ export class AutoSelectSettings {
     this.showIntent = value
   }
 
-  setCompleted(value: boolean) {
-    this.completed = value
+  setCompletePick(value: boolean) {
+    this.completePick = value
+  }
+
+  setlastSecondCompletePickEnabled(value: boolean) {
+    this.lastSecondCompletePickEnabled = value
+  }
+
+  setCompletePickPreEndThreshold(value: number) {
+    this.completePickPreEndThreshold = value
   }
 
   setBenchModeEnabled(value: boolean) {
@@ -336,6 +346,15 @@ export class AutoSelectState {
       championId: arg1,
       willGrabAt: arg2!
     }
+  }
+
+  /**
+   * 即将选定英雄的时间
+   */
+  willCompletePickAt: number = -1
+
+  setWillCompletePickAt(at: number) {
+    this.willCompletePickAt = at
   }
 
   constructor(
