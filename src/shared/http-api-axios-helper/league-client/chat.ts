@@ -1,7 +1,14 @@
 import { ChatMessage, ChatPerson, Conversation, Friend } from '@shared/types/league-client/chat'
 import { AxiosInstance } from 'axios'
 
-export type AvailabilityType = 'chat' | 'mobile' | 'dnd' | 'away' | 'offline'
+export type AvailabilityType =
+  | 'chat'
+  | 'mobile'
+  | 'dnd'
+  | 'away'
+  | 'offline'
+  | 'online'
+  | 'spectating'
 
 export class ChatHttpApi {
   constructor(private _http: AxiosInstance) {}
@@ -24,11 +31,7 @@ export class ChatHttpApi {
 
   changeAvailability(availability: AvailabilityType) {
     return this._http.put('/lol-chat/v1/me', {
-      availability,
-      ...((availability === 'offline' || availability === 'away') && {
-        lol: { gameStatus: 'outOfGame' }
-      }),
-      ...(availability === 'dnd' && { lol: { gameStatus: 'inGame' } })
+      availability
     })
   }
 

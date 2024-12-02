@@ -3,6 +3,8 @@ import { computed, makeAutoObservable, observable } from 'mobx'
 
 import { LeagueClientSyncedData } from '../league-client/lc-state'
 
+export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in'
+
 export class AutoSelectSettings {
   normalModeEnabled: boolean = false
   expectedChampions: Record<string, number[]> = {
@@ -15,15 +17,15 @@ export class AutoSelectSettings {
   }
   selectTeammateIntendedChampion: boolean = false
   showIntent: boolean = false
-  completePick: boolean = false
-  lastSecondCompletePickEnabled: boolean = false
-  completePickPreEndThreshold: number = 1
+  pickStrategy: AutoPickStrategy = 'lock-in'
+  lockInDelaySeconds: number = 0
   benchModeEnabled: boolean = false
   benchSelectFirstAvailableChampion: boolean = false
   benchHandleTradeEnabled: boolean = false
   benchExpectedChampions: number[] = []
   grabDelaySeconds: number = 1
   banEnabled: boolean = false
+  banDelaySeconds: number = 0
   bannedChampions: Record<string, number[]> = {
     top: [],
     jungle: [],
@@ -50,16 +52,8 @@ export class AutoSelectSettings {
     this.showIntent = value
   }
 
-  setCompletePick(value: boolean) {
-    this.completePick = value
-  }
-
-  setlastSecondCompletePickEnabled(value: boolean) {
-    this.lastSecondCompletePickEnabled = value
-  }
-
-  setCompletePickPreEndThreshold(value: number) {
-    this.completePickPreEndThreshold = value
+  setLockInDelaySeconds(value: number) {
+    this.lockInDelaySeconds = value
   }
 
   setBenchModeEnabled(value: boolean) {
@@ -82,6 +76,10 @@ export class AutoSelectSettings {
     this.banEnabled = value
   }
 
+  setBanDelaySeconds(value: number) {
+    this.banDelaySeconds = value
+  }
+
   setBannedChampions(value: Record<string, number[]>) {
     this.bannedChampions = value
   }
@@ -92,6 +90,10 @@ export class AutoSelectSettings {
 
   setBenchHandleTradeEnabled(value: boolean) {
     this.benchHandleTradeEnabled = value
+  }
+
+  setPickStrategy(value: AutoPickStrategy) {
+    this.pickStrategy = value
   }
 
   constructor() {
@@ -161,7 +163,7 @@ export class AutoSelectState {
     return this.champSelectActionInfo.memberMe
   }
 
-  get upcomingPick() {
+  get targetPick() {
     if (!this._settings.normalModeEnabled) {
       return null
     }
@@ -258,7 +260,7 @@ export class AutoSelectState {
     }
   }
 
-  get upcomingBan() {
+  get targetBan() {
     if (!this._settings.banEnabled) {
       return null
     }
@@ -348,13 +350,58 @@ export class AutoSelectState {
     }
   }
 
-  /**
-   * 即将选定英雄的时间
-   */
-  willCompletePickAt: number = -1
+  upcomingPick: {
+    championId: number
+    willPickAt: number
+  } | null = null
 
-  setWillCompletePickAt(at: number) {
-    this.willCompletePickAt = at
+  setUpcomingPick(championId: number, at: number): void
+  setUpcomingPick(clear: null): void
+  setUpcomingPick(arg1: number | null, arg2?: number): void {
+    if (arg1 === null) {
+      this.upcomingPick = null
+      return
+    }
+
+    this.upcomingPick = {
+      championId: arg1,
+      willPickAt: arg2!
+    }
+  }
+
+  upcomingBan: {
+    championId: number
+    willBanAt: number
+  } | null = null
+
+  setUpcomingBan(championId: number, at: number): void
+  setUpcomingBan(clear: null): void
+  setUpcomingBan(arg1: number | null, arg2?: number): void {
+    if (arg1 === null) {
+      this.upcomingBan = null
+      return
+    }
+
+    this.upcomingBan = {
+      championId: arg1,
+      willBanAt: arg2!
+    }
+  }
+
+  get currentPhaseTimerInfo() {
+    const timer = this._lcData.champSelect.session?.timer
+
+    if (!timer) {
+      return null
+    }
+
+    return {
+      ...timer,
+      adjustedTimeElapsedInPhase: Math.max(
+        0,
+        timer.totalTimeInPhase - timer.adjustedTimeLeftInPhase
+      )
+    }
   }
 
   constructor(
@@ -363,9 +410,13 @@ export class AutoSelectState {
   ) {
     makeAutoObservable(this, {
       champSelectActionInfo: computed.struct,
-      upcomingBan: computed.struct,
-      upcomingPick: computed.struct,
-      upcomingGrab: observable.struct
+      targetBan: computed.struct,
+      targetPick: computed.struct,
+      memberMe: computed.struct,
+      currentPhaseTimerInfo: computed.struct,
+      upcomingGrab: observable.struct,
+      upcomingPick: observable.struct,
+      upcomingBan: observable.struct
     })
   }
 }

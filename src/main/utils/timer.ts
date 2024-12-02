@@ -1,51 +1,81 @@
 export class TimeoutTask {
-  private _timerId: NodeJS.Timeout
+  private _timerId: NodeJS.Timeout | null = null
   private _started = false
-  private _fn: Function
+  private _fn?: Function
+  private _delay: number = 0
 
-  constructor(fn: Function) {
+  constructor(fn?: Function, timeout?: number) {
     this._fn = fn
+    if (timeout) {
+      this._delay = timeout
+    }
   }
 
   get isStarted() {
     return this._started
   }
 
-  /**
-   * 取消即将进行的任务
-   * @returns {boolean} 是否取消了
-   */
   cancel(): boolean {
-    if (this._started) {
+    if (this._started && this._timerId !== null) {
       clearTimeout(this._timerId)
+      this._timerId = null
+      this._started = false
       return true
     }
-
-    return (this._started = false)
+    return false
   }
 
-  /**
-   * 进行预设的任务。如果已经有一个任务，则取消旧任务
-   * @param timeout 时限
-   * @returns
-   */
-  start(timeout: number) {
-    if (this._started) {
+  start(timeout: number): void {
+    if (this._started && this._timerId !== null) {
       clearTimeout(this._timerId)
     }
 
+    if (!this._fn) {
+      return
+    }
+
+    this._delay = timeout
     this._started = true
     this._timerId = setTimeout(() => {
-      this._fn()
+      this._fn && this._fn()
       this._started = false
-    }, timeout) as unknown as NodeJS.Timeout
+      this._timerId = null
+    }, this._delay) as unknown as NodeJS.Timeout
   }
 
-  setTask(fn: Function) {
-    if (this._started) {
+  setTask(fn: Function, autoStart: boolean = false, timeout?: number): void {
+    this._fn = fn
+
+    if (this._started && this._timerId !== null) {
       clearTimeout(this._timerId)
+      this._started = false
+      this._timerId = null
     }
 
-    this._fn = fn
+    if (autoStart) {
+      const delay = timeout !== undefined ? timeout : this._delay
+      this.start(delay)
+    }
+  }
+
+  updateTime(newDelay: number): void {
+    if (this._started && this._fn) {
+      if (this._timerId !== null) {
+        clearTimeout(this._timerId)
+      }
+      this._delay = newDelay
+      this._timerId = setTimeout(() => {
+        this._fn && this._fn()
+        this._started = false
+        this._timerId = null
+      }, this._delay) as unknown as NodeJS.Timeout
+    }
+  }
+
+  triggerCompletion(): void {
+    if (this._started && this._fn) {
+      this._fn()
+      this.cancel()
+    }
   }
 }

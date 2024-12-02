@@ -49,6 +49,12 @@ interface UpdateProgressInfo {
   unpackingProgress: number
 }
 
+interface LastUpdateResult {
+  success: boolean
+  reason: string
+  newVersionPageUrl: string
+}
+
 export class SelfUpdateSettings {
   /**
    * 是否自动检查更新，检查到更新才会下载更新
@@ -107,10 +113,13 @@ export class SelfUpdateState {
 
   currentAnnouncement: CurrentAnnouncement | null
 
+  lastUpdateResult: LastUpdateResult | null = null
+
   constructor() {
     makeAutoObservable(this, {
       updateProgressInfo: observable.ref,
-      currentAnnouncement: observable.ref
+      currentAnnouncement: observable.ref,
+      lastUpdateResult: observable.ref
     })
   }
 
@@ -141,5 +150,9 @@ export class SelfUpdateState {
 
   setLastCheckAt(date: Date) {
     this.lastCheckAt = date
+  }
+
+  setLastUpdateResult(result: LastUpdateResult) {
+    this.lastUpdateResult = result
   }
 }

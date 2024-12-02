@@ -45,43 +45,34 @@
           </ControlItem>
           <ControlItem
             class="control-item-margin"
-            :label="t('AutoSelect.completePick.label')"
-            :label-description="t('AutoSelect.completePick.description')"
+            :label="t('AutoSelect.pickStrategy.label')"
+            :label-description="t('AutoSelect.pickStrategy.description')"
             :label-width="260"
           >
             <NRadioGroup
-              :value="store.settings.completePick"
-              @update:value="(v) => as.setCompletePick(v)"
+              :value="store.settings.pickStrategy"
+              @update:value="(v) => as.setPickStrategy(v)"
             >
-              <NRadio :value="true">{{ t('AutoSelect.completePick.options.true') }}</NRadio>
-              <NRadio :value="false">{{ t('AutoSelect.completePick.options.false') }}</NRadio>
+              <NRadio value="show">{{ t('AutoSelect.pickStrategy.options.show') }}</NRadio>
+              <NRadio value="lock-in">{{ t('AutoSelect.pickStrategy.options.lock-in') }}</NRadio>
+              <NRadio value="show-and-delay-lock-in">{{
+                t('AutoSelect.pickStrategy.options.show-and-delay-lock-in')
+              }}</NRadio>
             </NRadioGroup>
           </ControlItem>
           <ControlItem
+            v-if="store.settings.pickStrategy === 'show-and-delay-lock-in'"
             class="control-item-margin"
-            :label="`在最后一刻锁定`"
-            :label-description="`在最后一刻锁定`"
+            :label="t('AutoSelect.lockInDelaySeconds.label')"
             :label-width="260"
-          >
-            <NSwitch
-              @update:value="(v) => as.setLastSecondCompletePickEnabled(v)"
-              :value="store.settings.lastSecondCompletePickEnabled"
-              size="small"
-            />
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
-            :label="`锁定距离结束延迟`"
-            :label-width="260"
-            :label-description="`在选择英雄后，等待多少秒后再结束选择`"
+            :label-description="t('AutoSelect.lockInDelaySeconds.description')"
           >
             <NInputNumber
               style="width: 100px"
-              placeholder="秒"
               :min="0"
               size="small"
-              :value="store.settings.completePickPreEndThreshold"
-              @update:value="(v) => as.setCompletePickPreEndThreshold(v || 0)"
+              :value="store.settings.lockInDelaySeconds"
+              @update:value="(v) => as.setLockInDelaySeconds(v || 0)"
             />
           </ControlItem>
           <ControlItem
@@ -213,6 +204,20 @@
               :value="store.settings.banEnabled"
               size="small"
             ></NSwitch>
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            :label="t('AutoSelect.banDelaySeconds.label')"
+            :label-width="260"
+            :label-description="t('AutoSelect.banDelaySeconds.description')"
+          >
+            <NInputNumber
+              style="width: 100px"
+              :min="0"
+              size="small"
+              :value="store.settings.banDelaySeconds"
+              @update:value="(v) => as.setBanDelaySeconds(v || 0)"
+            />
           </ControlItem>
           <ControlItem
             class="control-item-margin"

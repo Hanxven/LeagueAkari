@@ -397,12 +397,17 @@ AutoSelect:
     label: Ignore Teammates' Intent
     description: When enabled, teammates' intended champions will be ignored. Otherwise, it will avoid conflicts with their selections.
 
-  completePick:
+  pickStrategy:
     label: Lock-In Strategy
     description: Instantly lock in or just show the champion.
     options:
-      true: Instantly Lock In
-      false: Just Show
+      lock-in: Instantly Lock In
+      show: Just Show
+      show-and-delay-lock-in: Show and Delay Lock In
+
+  lockInDelaySeconds:
+    label: Auto Lock-In Delay (s)
+    description: The delay time (in seconds) to perform the lock-in action after revealing the champion. It will not exceed the maximum duration of the phase.
 
   expectedChampions:
     label: Intended Champions
@@ -430,9 +435,9 @@ AutoSelect:
     label: Auto Handle Trade Requests
     description: |
       <div>When enabled, upcoming champion trade requests will be managed automatically.</div>
-      <div>If "Prioritize First Available Champion" is enabled, trades for a higher-priority preferred champion will be accepted.</div>
-      <div>If "Prioritize First Available Champion" is not enabled and no preferred champions are held, trades for a preferred champion will be accepted.</div>
-      <div>In other cases, trade requests will be declined.</div>
+      <div>If "Prioritize First Available Champion" is enabled, trade for a higher-priority preferred champion will be accepted.</div>
+      <div>If "Prioritize First Available Champion" is not enabled and no expected champions are held, trade for a preferred champion will be accepted.</div>
+      <div>If "Prioritize First Available Champion" is enabled and expected champions are held, trade will be ignored.</div>
 
   benchExpectedChampions:
     label: Intended Champions
@@ -440,6 +445,10 @@ AutoSelect:
   banEnabled:
     label: Enable
     description: Automatically execute champion bans.
+
+  banDelaySeconds:
+    label: Auto Ban Delay (s)
+    description: The delay time (in seconds) to perform the ban action. It will not exceed the maximum duration of the phase.
 
   banTeammateIntendedChampion:
     label: Ignore Teammates' Intent
@@ -814,6 +823,8 @@ ChatAvailability:
       away: Away
       dnd: DND
       offline: Offline
+      spectating: Spectating
+      online: Online
     failedNotification:
       title: Set Chat Status
       description: 'Failed to set chat status: {{reason}}'
@@ -1366,6 +1377,7 @@ Lounge:
 Placeholder:
   inProgress: In Progress
   idle: No active activities
+  spectating: Spectating
 
 Opgg:
   toOpgg: Go to OP.GG
@@ -1589,10 +1601,23 @@ auto-select-main:
   error-pre-pick: 'Failed to auto pre-select champion, target champion {{champion}}: {{reason}}'
   error-ban: 'Failed to auto ban champion, target champion {{champion}}: {{reason}}'
   error-bench-swap: 'Failed to auto swap champion, target champion {{champion}}: {{reason}}'
+  cancel-grab: Selection of {{champion}} has been canceled
+  grab-soon: Will swap {{champion}} in {{seconds}} seconds
+  ignore-trade: The target champion is a preferred one, trade request not auto-processed ({{from}} -> {{to}})
+  auto-pick-normal-mode: Auto-select in Normal Mode
+  auto-grab-bench-mode: Auto-select in Bench Mode
+  auto-ban: Auto Ban
+  enabled: Enabled
+  delayed-lock-in: Will lock in champion {{champion}} in {{seconds}} seconds
+  delayed-ban: Will ban champion {{champion}} in {{seconds}} seconds
+  cancel-delayed-lock-in: Lock-in of champion {{champion}} has been canceled
+  cancel-delayed-ban: Ban of champion {{champion}} has been canceled
 
-self-update:
+self-update-main:
+  title: Self Update
   start-update: Starting update League Akari
   updateOnNextStartup: Updated downloaded. Restart the application to apply the update
+  lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
 
 common:
   appName: League Akari

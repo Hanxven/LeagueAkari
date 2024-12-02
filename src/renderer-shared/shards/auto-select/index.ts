@@ -34,16 +34,12 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'showIntent', enabled)
   }
 
-  setCompletePick(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'completePick', enabled)
+  setPickStrategy(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'pickStrategy', enabled)
   }
 
-  setLastSecondCompletePickEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'lastSecondCompletePickEnabled', enabled)
-  }
-
-  setCompletePickPreEndThreshold(threshold: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'completePickPreEndThreshold', threshold)
+  setLockInDelaySeconds(threshold: number) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'lockInDelaySeconds', threshold)
   }
 
   setBenchModeEnabled(enabled: boolean) {
@@ -64,6 +60,10 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
 
   setBanEnabled(enabled: boolean) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'banEnabled', enabled)
+  }
+
+  setBanDelaySeconds(seconds: number) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'banDelaySeconds', seconds)
   }
 
   setBannedChampions(bannedChampions: Record<string, number[]>) {

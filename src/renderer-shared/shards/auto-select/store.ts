@@ -26,15 +26,15 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
     },
     selectTeammateIntendedChampion: false,
     showIntent: false,
-    completePick: false,
-    lastSecondCompletePickEnabled: false,
-    completePickPreEndThreshold: 1,
+    pickStrategy: 'lock-in',
+    lockInDelaySeconds: 0,
     benchModeEnabled: false,
     benchSelectFirstAvailableChampion: false,
     benchHandleTradeEnabled: false,
     benchExpectedChampions: [],
     grabDelaySeconds: 1,
     banEnabled: false,
+    banDelaySeconds: 0,
     bannedChampions: {
       top: [],
       jungle: [],
@@ -46,19 +46,21 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
     banTeammateIntendedChampion: false
   })
 
-  const upcomingPick = shallowRef<UpcomingBanPick | null>(null)
-  const upcomingBan = shallowRef<UpcomingBanPick | null>(null)
-  const upcomingGrab = shallowRef<{ championId: number; willGrabAt: number } | null>(null)
+  const targetPick = shallowRef<UpcomingBanPick | null>(null)
+  const targetBan = shallowRef<UpcomingBanPick | null>(null)
   const memberMe = shallowRef<ChampSelectTeam | null>(null)
-  const willCompletePickAt = shallowRef<number>(-1)
+  const upcomingGrab = shallowRef<{ championId: number; willGrabAt: number } | null>(null)
+  const upcomingPick = shallowRef<{ championId: number; willPickAt: number } | null>(null)
+  const upcomingBan = shallowRef<{ championId: number; willBanAt: number } | null>(null)
 
   return {
     settings,
 
-    upcomingPick,
-    upcomingBan,
+    targetPick,
+    targetBan,
     upcomingGrab,
     memberMe,
-    willCompletePickAt
+    upcomingPick,
+    upcomingBan
   }
 })

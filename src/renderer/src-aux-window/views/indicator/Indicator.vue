@@ -33,6 +33,10 @@ const currentPage = computed(() => {
       return 'lounge'
 
     case 'ChampSelect':
+      if (lcs.champSelect.session && lcs.champSelect.session.isSpectating) {
+        return 'placeholder'
+      }
+
       return 'champ-select'
   }
 

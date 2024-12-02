@@ -3,7 +3,9 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import {
   LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL,
   LEAGUE_AKARI_GITEE_CHECK_UPDATES_URL,
-  LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL
+  LEAGUE_AKARI_GITEE_LATEST_PAGE,
+  LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL,
+  LEAGUE_AKARI_GITHUB_LATEST_PAGE
 } from '@shared/constants/common'
 import { FileInfo, GithubApiLatestRelease } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
@@ -15,7 +17,7 @@ import cp from 'node:child_process'
 import ofs from 'node:original-fs'
 import path from 'node:path'
 import { Readable, pipeline } from 'node:stream'
-import { lt } from 'semver'
+import { lt, valid } from 'semver'
 
 import sevenBinPath from '../../../../resources/7za.exe?asset'
 import icon from '../../../../resources/LA_ICON.ico?asset'
@@ -44,6 +46,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   static ANNOUNCEMENT_CHECK_INTERVAL = 7.2e6 // 2 hours
   static DOWNLOAD_DIR_NAME = 'NewUpdates'
   static UPDATE_SCRIPT_NAME = 'LeagueAkariUpdate.bat'
+  static NEW_VERSION_FLAG = 'NEW_VERSION_FLAG'
   static EXECUTABLE_NAME = 'LeagueAkari.exe'
   static UPDATE_PROGRESS_UPDATE_INTERVAL = 200
   static USER_AGENT = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 LeagueAkari/${app.getVersion()} `
@@ -99,7 +102,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       'newUpdates',
       'updateProgressInfo',
       'lastCheckAt',
-      'currentAnnouncement'
+      'currentAnnouncement',
+      'lastUpdateResult'
     ])
 
     this._mobx.propSync(SelfUpdateMain.id, 'settings', this.settings, [
@@ -524,6 +528,11 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       })
 
       c.unref()
+
+      ofs.writeFileSync(
+        path.join(app.getPath('userData'), SelfUpdateMain.NEW_VERSION_FLAG),
+        JSON.stringify(this.state.newUpdates?.releaseVersion || '')
+      )
     }
 
     this._updateOnQuitFn = _updateOnQuitFn
@@ -642,6 +651,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
   async onInit() {
     await this._handleState()
+    await this._checkLastFailedUpdate()
     this._handlePeriodicCheck()
     this._handleIpcCall()
   }
@@ -665,5 +675,46 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     })
 
     notification.show()
+  }
+
+  private async _checkLastFailedUpdate() {
+    const newVersionFlagPath = path.join(app.getPath('userData'), SelfUpdateMain.NEW_VERSION_FLAG)
+
+    this._log.info(`检查自动更新结果`, newVersionFlagPath)
+
+    try {
+      const targetVersion = await ofs.promises.readFile(newVersionFlagPath, {
+        encoding: 'utf-8'
+      })
+
+      if (valid(targetVersion)) {
+        const pageUrl =
+          this.settings.downloadSource == 'github'
+            ? LEAGUE_AKARI_GITHUB_LATEST_PAGE
+            : LEAGUE_AKARI_GITEE_LATEST_PAGE
+
+        if (lt(app.getVersion(), targetVersion)) {
+          this._log.info(`上次的自动更新似乎失败了`, targetVersion, newVersionFlagPath)
+          this.state.setLastUpdateResult({
+            success: false,
+            reason: 'Something wrong...',
+            newVersionPageUrl: pageUrl
+          })
+        } else {
+          this._log.info(`看来已经成功更新`, targetVersion, newVersionFlagPath)
+          this.state.setLastUpdateResult({
+            success: true,
+            reason: 'Successfully updated',
+            newVersionPageUrl: pageUrl
+          })
+        }
+      } else {
+        this._log.warn('更新标志非正常版本号', targetVersion)
+      }
+
+      await ofs.promises.unlink(newVersionFlagPath)
+    } catch (error) {
+      this._log.warn('检查更新标志时出现错误', error)
+    }
   }
 }

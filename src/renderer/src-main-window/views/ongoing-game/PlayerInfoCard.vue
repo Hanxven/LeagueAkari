@@ -14,7 +14,7 @@
     <div class="player-info">
       <div class="profile-icon">
         <ChampionIcon
-          :champion-id="championId"
+          :champion-id="championId || -1"
           round
           ring
           ring-color="#ffffff50"

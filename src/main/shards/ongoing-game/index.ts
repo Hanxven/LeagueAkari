@@ -8,6 +8,7 @@ import {
   analyzeTeamMatchHistory
 } from '@shared/utils/analysis'
 import { calculateTogetherTimes, removeOverlappingSubsets } from '@shared/utils/team-up-calc'
+import { isAxiosError } from 'axios'
 import _ from 'lodash'
 import { comparer, computed, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
@@ -465,6 +466,12 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           })
         }
       } catch (error) {
+        // 忽略 415 错误
+        if (isAxiosError(error) && error.response?.status === 415) {
+          this._log.warn('LC 客户端无法转换, 忽略', gameId)
+          return
+        }
+
         this._log.warn('加载游戏时间线失败', gameId, error)
       }
     }

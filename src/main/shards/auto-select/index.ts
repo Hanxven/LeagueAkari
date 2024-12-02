@@ -1,4 +1,5 @@
 import { i18next } from '@main/i18n'
+import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { formatError, formatErrorMessage } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
@@ -35,6 +36,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
   private _grabTimerId: NodeJS.Timeout | null = null
 
+  private _pickTask = new TimeoutTask()
+  private _banTask = new TimeoutTask()
+
   constructor(deps: any) {
     this._loggerFactory = deps['logger-factory-main']
     this._log = this._loggerFactory.create(AutoSelectMain.id)
@@ -50,16 +54,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         expectedChampions: { default: this.settings.expectedChampions },
         bannedChampions: { default: this.settings.bannedChampions },
         normalModeEnabled: { default: this.settings.normalModeEnabled },
+        pickStrategy: { default: this.settings.pickStrategy },
         selectTeammateIntendedChampion: { default: this.settings.selectTeammateIntendedChampion },
         showIntent: { default: this.settings.showIntent },
-        completePick: { default: this.settings.completePick },
-        lastSecondCompletePickEnabled: { default: this.settings.lastSecondCompletePickEnabled },
-        completePickPreEndThreshold: { default: this.settings.completePickPreEndThreshold },
+        lockInDelaySeconds: { default: this.settings.lockInDelaySeconds },
         benchModeEnabled: { default: this.settings.benchModeEnabled },
         benchSelectFirstAvailableChampion: {
           default: this.settings.benchSelectFirstAvailableChampion
         },
         grabDelaySeconds: { default: this.settings.grabDelaySeconds },
+        banDelaySeconds: { default: this.settings.banDelaySeconds },
         banEnabled: { default: this.settings.banEnabled },
         banTeammateIntendedChampion: { default: this.settings.banTeammateIntendedChampion },
         benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled }
@@ -75,13 +79,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'normalModeEnabled',
       'selectTeammateIntendedChampion',
       'showIntent',
-      'completePick',
-      'lastSecondCompletePickEnabled',
-      'completePickPreEndThreshold',
+      'pickStrategy',
+      'lockInDelaySeconds',
       'benchModeEnabled',
       'benchSelectFirstAvailableChampion',
       'grabDelaySeconds',
       'banEnabled',
+      'banDelaySeconds',
       'banTeammateIntendedChampion',
       'benchExpectedChampions',
       'expectedChampions',
@@ -90,12 +94,67 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     ])
 
     this._mobx.propSync(AutoSelectMain.id, 'state', this.state, [
-      'upcomingBan',
-      'upcomingPick',
-      'upcomingGrab',
+      'targetBan',
+      'targetPick',
       'memberMe',
-      'willCompletePickAt'
+      'upcomingGrab',
+      'upcomingPick',
+      'upcomingBan'
     ])
+  }
+
+  private async _pick(championId: number, actionId: number, completed = true) {
+    try {
+      this._log.info(
+        `现在选择：${championId}, ${this.settings.pickStrategy}, actionId=${actionId}, 锁定=${completed}`
+      )
+
+      await this._lc.api.champSelect.pickOrBan(championId, completed, 'pick', actionId)
+    } catch (error) {
+      this._ipc.sendEvent(AutoSelectMain.id, 'error-pick', championId)
+      this._sendInChat(
+        `[League Akari] ${i18next.t('auto-select-main.error-pick', {
+          champion: this._lc.data.gameData.champions[championId]?.name || championId,
+          reason: formatErrorMessage(error)
+        })}`
+      )
+
+      this._log.warn(`尝试执行 pick 时失败, 目标英雄: ${championId}`, error)
+    }
+  }
+
+  private async _ban(championId: number, actionId: number, completed = true) {
+    try {
+      await this._lc.api.champSelect.pickOrBan(championId, completed, 'ban', actionId)
+    } catch (error) {
+      this._ipc.sendEvent(AutoSelectMain.id, 'error-ban', championId)
+      this._sendInChat(
+        `[League Akari] ${i18next.t('auto-select-main.error-ban', {
+          champion: this._lc.data.gameData.champions[championId]?.name || championId,
+          reason: formatErrorMessage(error)
+        })}`
+      )
+
+      this._log.warn(`尝试执行 ban 时失败, 目标英雄: ${championId}`, error)
+    }
+  }
+
+  private async _prePick(championId: number, actionId: number) {
+    try {
+      this._log.info(`现在预选：${championId}, actionId=${actionId}`)
+
+      await this._lc.api.champSelect.action(actionId, { championId })
+    } catch (error) {
+      this._ipc.sendEvent(AutoSelectMain.id, 'error-pre-pick', championId)
+      this._sendInChat(
+        `[League Akari] ${i18next.t('auto-select-main.error-pre-pick', {
+          champion: this._lc.data.gameData.champions[championId]?.name || championId,
+          reason: formatErrorMessage(error)
+        })}`
+      )
+
+      this._log.warn(`尝试执行预选时失败, 目标英雄: ${championId}`, error)
+    }
   }
 
   async onInit() {
@@ -104,46 +163,87 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     this._handleBenchMode()
   }
 
+  /**
+   * 确保用户设置时间的合理性
+   */
+  private _calculateAppropriateDelayMs(delayMs: number, margin: number = 1200) {
+    const info = this.state.currentPhaseTimerInfo
+    if (!info || info.isInfinite) {
+      return delayMs
+    }
+
+    const maxAllowedDelayMs = info.totalTimeInPhase - margin
+    const desiredDelayMs = Math.min(delayMs, maxAllowedDelayMs)
+    const adjustedDelayMs = desiredDelayMs - info.adjustedTimeElapsedInPhase
+
+    return Math.max(0, adjustedDelayMs)
+  }
+
   private _handleAutoPickBan() {
     this._mobx.reaction(
-      () => this.state.upcomingPick,
-      async (pick) => {
+      () =>
+        [
+          this.state.targetPick,
+          this.settings.pickStrategy,
+          this.settings.lockInDelaySeconds
+        ] as const,
+      async ([pick, strategy, delay]) => {
+        if (this.state.upcomingPick) {
+          this._log.info(
+            `取消即将进行的选择自动选择: ${this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name || this.state.upcomingPick.championId}`
+          )
+          this.state.setUpcomingPick(null)
+          this._sendInChat(
+            `[${i18next.t('common.appName')}] ${i18next.t(
+              'auto-select-main.cancel-delayed-lock-in',
+              {
+                champion:
+                  this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name ||
+                  this.state.upcomingPick.championId
+              }
+            )}`
+          )
+        }
+
         if (!pick) {
           return
         }
 
         if (pick.isActingNow && pick.action.isInProgress) {
-          if (
-            !this.settings.completePick &&
-            this.state.champSelectActionInfo?.memberMe.championId === pick.championId
-          ) {
-            return
-          }
+          if (strategy === 'show') {
+            if (this.state.champSelectActionInfo?.memberMe.championId !== pick.championId) {
+              await this._pick(pick.championId, pick.action.id, false)
+            }
+          } else if (strategy === 'lock-in') {
+            await this._pick(pick.championId, pick.action.id)
+          } else if (strategy === 'show-and-delay-lock-in') {
+            if (this.state.champSelectActionInfo?.memberMe.championId !== pick.championId) {
+              await this._pick(pick.championId, pick.action.id, false)
+            }
 
-          try {
+            const delayMs = this._calculateAppropriateDelayMs(delay * 1e3)
+
             this._log.info(
-              `现在选择：${pick.championId}, ${this.settings.completePick}, actionId=${pick.action.id}`
+              `添加延迟选定任务：${delay * 1e3} (修正后：${delayMs}), 目标英雄：${this._lc.data.gameData.champions[pick.championId]?.name || pick.championId}`
             )
 
-            await this._lc.api.champSelect.pickOrBan(
-              pick.championId,
-              this.settings.completePick,
-              'pick',
-              pick.action.id
+            this._sendInChat(
+              `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.delayed-lock-in', {
+                champion:
+                  this._lc.data.gameData.champions[pick.championId]?.name || pick.championId,
+                seconds: (delayMs / 1e3).toFixed(1)
+              })}`
             )
-          } catch (error) {
-            this._ipc.sendEvent(AutoSelectMain.id, 'error-pick', pick.championId)
-            this._lc.api.playerNotifications
-              .createTitleDetailsNotification(
-                i18next.t('common.appName'),
-                i18next.t('auto-select-main.error-pick', {
-                  champion:
-                    this._lc.data.gameData.champions[pick.championId]?.name || pick.championId,
-                  reason: formatErrorMessage(error)
-                })
-              )
-              .catch(() => {})
-            this._log.warn(`尝试自动执行 pick 时失败, 目标英雄: ${pick.championId}`, error)
+
+            this.state.setUpcomingPick(pick.championId, Date.now() + delayMs)
+            this._pickTask.setTask(
+              () =>
+                this._pick(pick.championId, pick.action.id).finally(() =>
+                  this.state.setUpcomingPick(null)
+                ),
+              true,
+              delayMs
+            )
           }
 
           return
@@ -154,11 +254,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             return
           }
 
-          if (this.state.champSelectActionInfo?.session.isCustomGame) {
-            return
-          }
-
-          if (this.state.champSelectActionInfo?.memberMe.championId) {
+          // 非自定义且未选择英雄
+          if (
+            this.state.champSelectActionInfo?.session.isCustomGame ||
+            this.state.champSelectActionInfo?.memberMe.championId
+          ) {
             return
           }
 
@@ -169,68 +269,93 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             return
           }
 
-          try {
-            this._log.info(`现在预选：${pick.championId}, actionId=${pick.action.id}`)
-
-            await this._lc.api.champSelect.action(pick.action.id, { championId: pick.championId })
-          } catch (error) {
-            this._ipc.sendEvent(AutoSelectMain.id, 'error-pre-pick', pick.championId)
-            this._lc.api.playerNotifications
-              .createTitleDetailsNotification(
-                i18next.t('common.appName'),
-                i18next.t('auto-select-main.error-pre-pick', {
-                  champion:
-                    this._lc.data.gameData.champions[pick.championId]?.name || pick.championId,
-                  reason: formatErrorMessage(error)
-                })
-              )
-              .catch(() => {})
-            this._log.warn(`尝试自动执行预选时失败, 目标英雄: ${pick.championId}`, error)
-          }
+          await this._prePick(pick.championId, pick.action.id)
           return
         }
-      }
+      },
+      { equals: comparer.shallow }
     )
 
     this._mobx.reaction(
-      () => this.state.upcomingBan,
-      async (ban) => {
+      () => [this.state.targetBan, this.settings.banDelaySeconds] as const,
+      async ([ban, delay]) => {
+        if (this.state.upcomingBan) {
+          this._log.info(
+            `取消即将进行的选择自动禁用: ${this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name || this.state.upcomingBan.championId}`
+          )
+          this.state.setUpcomingPick(null)
+          this._sendInChat(
+            `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.cancel-delayed-ban', {
+              champion:
+                this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name ||
+                this.state.upcomingBan.championId
+            })}`
+          )
+        }
+
         if (!ban) {
           return
         }
 
         if (ban.action.isInProgress && ban.isActingNow) {
-          try {
-            await this._lc.api.champSelect.pickOrBan(ban.championId, true, 'ban', ban.action.id)
-          } catch (error) {
-            this._ipc.sendEvent(AutoSelectMain.id, 'error-ban', ban.championId)
-            this._lc.api.playerNotifications
-              .createTitleDetailsNotification(
-                i18next.t('common.appName'),
-                i18next.t('auto-select-main.error-ban', {
-                  champion:
-                    this._lc.data.gameData.champions[ban.championId]?.name || ban.championId,
-                  reason: formatErrorMessage(error)
-                })
-              )
-              .catch(() => {})
-            this._log.warn(`尝试自动执行 pick 时失败, 目标英雄: ${ban.championId}`, error)
-          }
+          const delayMs = this._calculateAppropriateDelayMs(delay * 1e3)
+          this._log.info(
+            `添加延迟禁用任务：${delay * 1e3} (修正后：${delayMs}), 目标英雄：${this._lc.data.gameData.champions[ban.championId]?.name || ban.championId}`
+          )
+          this._sendInChat(
+            `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.delayed-ban', {
+              champion: this._lc.data.gameData.champions[ban.championId]?.name || ban.championId,
+              seconds: (delayMs / 1e3).toFixed(1)
+            })}`
+          )
+
+          this.state.setUpcomingBan(ban.championId, Date.now() + delayMs)
+          this._banTask.setTask(
+            () =>
+              this._ban(ban.championId, ban.action.id).finally(() =>
+                this.state.setUpcomingBan(null)
+              ),
+            true,
+            delayMs
+          )
+        }
+      },
+      { equals: comparer.shallow }
+    )
+
+    // 用于校正时间
+    this._mobx.reaction(
+      () => this.state.currentPhaseTimerInfo,
+      (_timer) => {
+        if (this.state.upcomingPick) {
+          const adjustedDelayMs = this._calculateAppropriateDelayMs(
+            this.settings.lockInDelaySeconds * 1e3
+          )
+
+          this._pickTask.updateTime(adjustedDelayMs)
+        }
+
+        if (this.state.upcomingBan) {
+          const adjustedDelayMs = this._calculateAppropriateDelayMs(
+            this.settings.banDelaySeconds * 1e3
+          )
+
+          this._banTask.updateTime(adjustedDelayMs)
         }
       }
     )
 
     this._mobx.reaction(
-      () => this.state.upcomingPick,
+      () => this.state.targetPick,
       (pick) => {
-        this._log.info(`Upcoming Pick - 即将进行的选择: ${JSON.stringify(pick)}`)
+        this._log.info(`targetPick - 即将进行的选择: ${JSON.stringify(pick)}`)
       }
     )
 
     this._mobx.reaction(
-      () => this.state.upcomingBan,
+      () => this.state.targetBan,
       (ban) => {
-        this._log.info(`Upcoming Ban - 即将进行的禁用: ${JSON.stringify(ban)}`)
+        this._log.info(`targetBan - 即将进行的禁用: ${JSON.stringify(ban)}`)
       }
     )
 
@@ -287,11 +412,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
           const texts: string[] = []
           if (!this._lc.data.champSelect.session.benchEnabled && this.settings.normalModeEnabled) {
-            texts.push('普通模式自动选择已开启')
+            texts.push(i18next.t('auto-select-main.auto-pick-normal-mode'))
           }
 
           if (this._lc.data.champSelect.session.benchEnabled && this.settings.benchModeEnabled) {
-            texts.push('随机模式自动选择已开启')
+            texts.push(i18next.t('auto-select-main.auto-grab-bench-mode'))
           }
 
           if (!this._lc.data.champSelect.session.benchEnabled && this.settings.banEnabled) {
@@ -303,14 +428,14 @@ export class AutoSelectMain implements IAkariShardInitDispose {
               }
             }
             if (hasBanAction) {
-              texts.push('自动禁用已开启')
+              texts.push(i18next.t('auto-select-main.auto-ban'))
             }
           }
 
           if (texts.length) {
-            this._lc.api.chat
-              .chatSend(id, `[League Akari] ${texts.join(', ')}`, 'celebration')
-              .catch(() => {})
+            this._sendInChat(
+              `[League Akari] ${i18next.t('auto-select-main.enabled')} ${texts.join(' | ')}`
+            )
           }
         }
       }
@@ -476,6 +601,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           }
         }
 
+        // 或许有用
+        clearTimeout(this._grabTimerId!)
+
         const newTarget = pickableChampionsOnBench[0]
         const waitTime = Math.max(
           this.settings.grabDelaySeconds * 1e3 -
@@ -557,10 +685,12 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             )
             this._acceptOrDeclineTrade(id, true)
           } else {
-            this._log.info(
-              `拒绝交换请求: ${from.championId} -> ${self.championId}, 已持有一个期望英雄`
+            this._sendInChat(
+              `[League Akari] ${i18next.t('auto-select-main.ignore-trade', {
+                from: this._lc.data.gameData.champions[from.championId]?.name || from.championId,
+                to: this._lc.data.gameData.champions[self.championId]?.name || self.championId
+              })}`
             )
-            this._acceptOrDeclineTrade(id, false)
           }
         }
       }
@@ -604,8 +734,13 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       await this._lc.api.chat.chatSend(
         this._lc.data.chat.conversations.championSelect.id,
         type === 'select'
-          ? `[League Akari] - [自动选择]: 即将在 ${(time / 1000).toFixed(1)} 秒后选择 ${this._lc.data.gameData.champions[championId]?.name || championId}`
-          : `[League Akari] - [自动选择]: 已取消选择 ${this._lc.data.gameData.champions[championId]?.name || championId}`,
+          ? `[League Akari] - ${i18next.t('grab-soon', {
+              seconds: (time / 1000).toFixed(1),
+              champion: this._lc.data.gameData.champions[championId]?.name || championId
+            })}`
+          : `[League Akari] - ${i18next.t('auto-select-main.cancel-grab', {
+              champion: this._lc.data.gameData.champions[championId]?.name || championId
+            })}`,
         'celebration'
       )
     } catch (error) {
@@ -624,21 +759,29 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       this._log.info(`已交换英雄: ${this.state.upcomingGrab.championId}`)
     } catch (error) {
       this._ipc.sendEvent(AutoSelectMain.id, 'error-bench-swap', this.state.upcomingGrab.championId)
-      this._lc.api.playerNotifications
-        .createTitleDetailsNotification(
-          i18next.t('common.appName'),
-          i18next.t('auto-select-main.error-bench-swap', {
-            champion:
-              this._lc.data.gameData.champions[this.state.upcomingGrab.championId]?.name ||
-              this.state.upcomingGrab.championId,
-            reason: formatErrorMessage(error)
-          })
-        )
-        .catch(() => {})
+      this._sendInChat(
+        `[League Akari] ${i18next.t('auto-select-main.error-bench-swap', {
+          champion:
+            this._lc.data.gameData.champions[this.state.upcomingGrab.championId]?.name ||
+            this.state.upcomingGrab.championId,
+          reason: formatErrorMessage(error)
+        })}`
+      )
       this._log.warn(`在尝试交换英雄时发生错误`, error)
     } finally {
+      // TODO 使用新代码
       this._grabTimerId = null
       this.state.setUpcomingGrab(null)
     }
+  }
+
+  private _sendInChat(message: string) {
+    if (!this._lc.data.chat.conversations.championSelect) {
+      return
+    }
+
+    this._lc.api.chat
+      .chatSend(this._lc.data.chat.conversations.championSelect.id, message, 'celebration')
+      .catch(() => {})
   }
 }

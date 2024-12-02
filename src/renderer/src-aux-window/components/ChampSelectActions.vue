@@ -24,12 +24,12 @@
           </div>
         </template>
         <template v-else>
-          <div class="solution" v-if="as2.upcomingPick && as2.upcomingPick.action.id === a[0].id">
-            <LcuImage class="image" :src="championIconUri(as2.upcomingPick.championId)" />
+          <div class="solution" v-if="as2.targetPick && as2.targetPick.action.id === a[0].id">
+            <LcuImage class="image" :src="championIconUri(as2.targetPick.championId)" />
             <span class="label">{{ t('ChampSelectActions.autoPick') }}</span>
           </div>
-          <div class="solution" v-if="as2.upcomingBan && as2.upcomingBan.action.id === a[0].id">
-            <LcuImage class="image" :src="championIconUri(as2.upcomingBan.championId)" />
+          <div class="solution" v-if="as2.targetBan && as2.targetBan.action.id === a[0].id">
+            <LcuImage class="image" :src="championIconUri(as2.targetBan.championId)" />
             <span class="label">{{ t('ChampSelectActions.autoBan') }}</span>
           </div>
         </template>

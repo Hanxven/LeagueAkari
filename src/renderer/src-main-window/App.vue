@@ -31,10 +31,11 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { greeting } from '@renderer-shared/utils/greeting'
-import { KYOKO_MODE_KEY_SEQUENCE } from '@shared/constants/common'
+import { KYOKO_MODE_KEY_SEQUENCE, LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { useTranslation } from 'i18next-vue'
 import { useMessage, useNotification } from 'naive-ui'
-import { onMounted, provide, ref, watchEffect } from 'vue'
+import { provide, ref, watchEffect } from 'vue'
+import { h } from 'vue'
 
 import AnnouncementModal from './components/AnnouncementModal.vue'
 import DeclarationModal from './components/DeclarationModal.vue'
@@ -78,6 +79,8 @@ provide('app', {
   }
 })
 
+const notification = useNotification()
+
 const isShowingSettingModal = ref(false)
 const settingModelTab = ref('basic')
 const isShowingNewUpdateModal = ref(false)
@@ -101,7 +104,7 @@ watchEffect(() => {
 su.onStartUpdate(() => {
   notification.info({
     title: 'League Akari',
-    content: t('self-update.start-update'),
+    content: t('self-update-main.start-update'),
     duration: 4000
   })
 })
@@ -116,12 +119,26 @@ watchEffect(() => {
   }
 })
 
+watchEffect(() => {
+  if (sus.lastUpdateResult && !sus.lastUpdateResult.success) {
+    notification.warning({
+      title: () => t('self-update-main.title'),
+      content: () =>
+        h('div', {
+          innerHTML: t('self-update-main.lastUpdateFailed', {
+            url: sus.lastUpdateResult?.newVersionPageUrl || LEAGUE_AKARI_GITHUB
+          })
+        }),
+      duration: 1e10,
+      closable: true
+    })
+  }
+})
+
 const handleConfirmation = (notShowAgain: boolean) => {
   app.setShowFreeSoftwareDeclaration(notShowAgain)
   isShowingFreeSoftwareDeclaration.value = false
 }
-
-const notification = useNotification()
 
 app.onSecondInstance(() => {
   notification.info({

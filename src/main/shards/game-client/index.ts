@@ -190,9 +190,8 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   /**
-   * 已连接的情况下, 可通过 API 当场获取观战凭据
-   * 未连接的情况下, 需要传入观战凭据
-   * 已连接且请求失败的情况下, 会尝试一次未连接的应对方式
+   * 连接情况下, 通过 LCU API 获取安装位置
+   * 未连接的情况下, 默认使用腾讯服务端的安装位置
    * @param config
    * @returns
    */
@@ -207,33 +206,61 @@ export class GameClientMain implements IAkariShardInitDispose {
       observerServerPort
     } = config
 
-    if (this._lc.state.auth?.region === 'TENCENT' && this._ci.state.tencentInstallationPath) {
-      const gameExecutablePath = path.resolve(
-        this._ci.state.tencentInstallationPath,
-        'Game',
-        GameClientMain.GAME_CLIENT_PROCESS_NAME
-      )
+    if (this._lc.state.connectionState === 'connected') {
+      try {
+        const { data: location } = await this._lc.http.get<{
+          gameExecutablePath: string
+          gameInstallRoot: string
+        }>('/lol-patch/v1/products/league_of_legends/install-location')
 
-      const gameInstallRoot = path.resolve(this._ci.state.tencentInstallationPath, 'Game')
-
-      return {
-        sgpServerId,
-        gameId,
-        gameMode,
-        locale,
-        observerEncryptionKey,
-        observerServerIp,
-        observerServerPort,
-        gameInstallRoot,
-        gameExecutablePath
+        return {
+          sgpServerId,
+          gameId,
+          gameMode,
+          locale,
+          observerEncryptionKey,
+          observerServerIp,
+          observerServerPort,
+          gameInstallRoot: location.gameInstallRoot,
+          gameExecutablePath: location.gameExecutablePath
+        }
+      } catch (error) {
+        const err = new Error('Cannot get game installation path')
+        err.name = 'CannotGetGameInstallationPath'
+        throw err
       }
     } else {
-      if (this._lc.state.connectionState === 'connected') {
+      if (this._ci.state.tencentInstallationPath) {
+        const gameExecutablePath = path.resolve(
+          this._ci.state.tencentInstallationPath,
+          'Game',
+          GameClientMain.GAME_CLIENT_PROCESS_NAME
+        )
+
+        const gameInstallRoot = path.resolve(this._ci.state.tencentInstallationPath, 'Game')
+
+        return {
+          sgpServerId,
+          gameId,
+          gameMode,
+          locale,
+          observerEncryptionKey,
+          observerServerIp,
+          observerServerPort,
+          gameInstallRoot,
+          gameExecutablePath
+        }
+      } else if (this._ci.state.leagueClientExecutablePaths.length) {
+        const gameExecutablePath = path.resolve(
+          this._ci.state.leagueClientExecutablePaths[0],
+          '..',
+          'Game',
+          GameClientMain.GAME_CLIENT_PROCESS_NAME
+        )
+
         try {
-          const { data: location } = await this._lc.http.get<{
-            gameExecutablePath: string
-            gameInstallRoot: string
-          }>('/lol-patch/v1/products/league_of_legends/install-location')
+          await ofs.promises.access(gameExecutablePath)
+          const gameInstallRoot = path.resolve(gameExecutablePath, '..')
 
           return {
             sgpServerId,
@@ -243,17 +270,17 @@ export class GameClientMain implements IAkariShardInitDispose {
             observerEncryptionKey,
             observerServerIp,
             observerServerPort,
-            gameInstallRoot: location.gameInstallRoot,
-            gameExecutablePath: location.gameExecutablePath
+            gameInstallRoot,
+            gameExecutablePath
           }
-        } catch (error) {
+        } catch {
           const err = new Error('Cannot get game installation path')
           err.name = 'CannotGetGameInstallationPath'
           throw err
         }
       } else {
-        const err = new Error('No Tencent Installation Path')
-        err.name = 'NoTencentInstallationPath'
+        const err = new Error('Cannot get game installation path')
+        err.name = 'CannotGetGameInstallationPath'
         throw err
       }
     }

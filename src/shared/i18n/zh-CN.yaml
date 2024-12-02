@@ -400,12 +400,17 @@ AutoSelect:
     label: 无视队友预选
     description: 开启后将不会考虑队友的预选英雄，反之会避免与队友的选择冲突
 
-  completePick:
+  pickStrategy:
     label: 锁定策略
     description: 立即锁定或只是亮出
     options:
-      true: 立即锁定
-      false: 亮出而不锁定
+      lock-in: 立即锁定
+      show: 仅亮出
+      show-and-delay-lock-in: 亮出后延迟锁定
+
+  lockInDelaySeconds:
+    label: 自动锁定延迟 (s)
+    description: 在亮出英雄后，执行锁定操作的延迟时间 (秒)。不会超过该阶段的最长时间
 
   expectedChampions:
     label: 意向英雄
@@ -433,9 +438,9 @@ AutoSelect:
     label: 自动处理交换请求
     description: |
       <div>启用后，将接管即将到来的英雄交换请求</div>
-      <div>若已经启用“优先选择首位”，则接受优先级位更高的期望英雄</div>
+      <div>若已经启用“优先选择首位”，则接受优先级位更高的期望英雄，拒绝其他英雄</div>
       <div>未启用“优先选择首位”同时未持有期望英雄时，若目标英雄为期望英雄，则接受</div>
-      <div>其他情况将拒绝交换请求</div>
+      <div>未启用“优先选择首位”同时持有期望英雄时，若目标英雄为期望英雄，则忽略</div>
 
   benchExpectedChampions:
     label: 期望英雄
@@ -443,6 +448,10 @@ AutoSelect:
   banEnabled:
     label: 开启
     description: 自动执行英雄的禁用操作
+
+  banDelaySeconds:
+    label: 自动禁用延时 (s)
+    description: 执行禁用操作的延迟时间 (秒)。不会超过该阶段的最长时间
 
   banTeammateIntendedChampion:
     label: 无视队友预选
@@ -816,6 +825,8 @@ ChatAvailability:
       away: 离开
       dnd: 游戏中
       offline: 离线
+      spectating: 观战中
+      online: 在线
     failedNotification:
       title: 设置聊天状态
       description: 设置聊天状态失败 {{reason}}
@@ -1371,6 +1382,7 @@ Lounge:
 Placeholder:
   inProgress: 游戏进行中
   idle: 当前没有进行中的活动
+  spectating: 等待观战中
 
 Opgg:
   toOpgg: 转到 OP.GG
@@ -1594,10 +1606,23 @@ auto-select-main:
   error-pre-pick: 尝试自动预选英雄失败，目标英雄 {{champion}}：{{reason}}
   error-ban: 尝试自动禁用英雄时失败，目标英雄 {{champion}}：{{reason}}
   error-bench-swap: 尝试自动交换英雄时失败，目标英雄 {{champion}}：{{reason}}
+  cancel-grab: 已取消选择 {{champion}}
+  grab-soon: 即将在 {{seconds}} 秒后选择 {{champion}}
+  ignore-trade: 目标英雄为期望英雄，不自动处理交换请求 ({{from}} -> {{to}})
+  auto-pick-normal-mode: 普通模式自动选择
+  auto-grab-bench-mode: 随机模式自动选择
+  auto-ban: 自动英雄禁用
+  enabled: 已启用
+  delayed-lock-in: 将在 {{seconds}} 秒后锁定英雄 {{champion}}
+  delayed-ban: 将在 {{seconds}} 秒后禁用英雄 {{champion}}
+  cancel-delayed-lock-in: 已取消锁定英雄 {{champion}}
+  cancel-delayed-ban: 已取消禁用英雄 {{champion}}
 
-self-update:
+self-update-main:
+  title: 自动更新
   start-update: League Akari 更新已开始
   updateOnNextStartup: 更新已下载完成，关闭应用后执行更新流程
+  lastUpdateFailed: 上一次自动更新没有成功，请<a href="{{url}}" target="_blank">手动更新新版本</a>
 
 common:
   appName: League Akari

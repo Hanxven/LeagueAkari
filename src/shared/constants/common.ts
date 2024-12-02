@@ -24,3 +24,7 @@ export const 联盟阿卡林 = 'League Akari'
 export const AKARI_USER_MODEL_ID = 'sugar.cocoa.league-akari'
 
 export const KYOKO_MODE_KEY_SEQUENCE = 'FUNAMIYUI'
+
+export const LEAGUE_AKARI_GITHUB_LATEST_PAGE = 'https://github.com/Hanxven/LeagueAkari/releases/latest'
+
+export const LEAGUE_AKARI_GITEE_LATEST_PAGE = 'https://gitee.com/Hanxven/LeagueAkari/releases'

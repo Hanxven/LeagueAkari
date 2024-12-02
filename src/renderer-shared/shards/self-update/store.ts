@@ -35,6 +35,13 @@ interface NewUpdates {
   releaseNotes: string
 }
 
+// copied from main shard
+interface LastUpdateResult {
+  success: boolean
+  reason: string
+  newVersionPageUrl: string
+}
+
 export const useSelfUpdateStore = defineStore('shard:self-update-renderer', () => {
   const settings = shallowReactive({
     autoCheckUpdates: true,
@@ -47,6 +54,7 @@ export const useSelfUpdateStore = defineStore('shard:self-update-renderer', () =
   const updateProgressInfo = shallowRef<UpdateProgressInfo | null>(null)
   const currentAnnouncement = shallowRef<CurrentAnnouncement | null>(null)
   const newUpdates = shallowRef<NewUpdates | null>(null)
+  const lastUpdateResult = shallowRef<LastUpdateResult | null>(null)
 
   return {
     settings,
@@ -55,6 +63,7 @@ export const useSelfUpdateStore = defineStore('shard:self-update-renderer', () =
     lastCheckAt,
     updateProgressInfo,
     currentAnnouncement,
-    newUpdates
+    newUpdates,
+    lastUpdateResult
   }
 })
