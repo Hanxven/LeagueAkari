@@ -28,12 +28,12 @@ export class SettingMigrateMain implements IAkariShardInitDispose {
     'window-manager-main'
   ]
 
-  static MIGRATION_125 = 'akari-magic-125'
+  static MIGRATION_FROM_126 = 'akari-migration-from-1.2.6'
 
-  private readonly _storage: StorageMain
+  private readonly _st: StorageMain
   private readonly _log: AkariLogger
 
-  // no need to keep the reference
+  // no need to keep the references
   // private readonly _leagueClient: LeagueClientMain
   // private readonly _riotClient: RiotClientMain
   // private readonly _gameClient: GameClientMain
@@ -47,7 +47,7 @@ export class SettingMigrateMain implements IAkariShardInitDispose {
   // private readonly _autoGameflow: AutoGameflowMain
 
   constructor(deps: any) {
-    this._storage = deps['storage-main']
+    this._st = deps['storage-main']
     this._log = deps['logger-factory-main'].create(SettingMigrateMain.id)
 
     this._printDeps(deps)
@@ -59,7 +59,7 @@ export class SettingMigrateMain implements IAkariShardInitDispose {
   }
 
   private async _do(from: string, to: string) {
-    const s = await this._storage.dataSource.manager.findOneBy(Setting, { key: Equal(from) })
+    const s = await this._st.dataSource.manager.findOneBy(Setting, { key: Equal(from) })
 
     if (!s) {
       return
@@ -67,29 +67,25 @@ export class SettingMigrateMain implements IAkariShardInitDispose {
 
     this._log.info(`迁移设置项: ${from} -> ${to}`)
 
-    await this._storage.dataSource.manager.save(Setting.create(to, s.value))
-    await this._storage.dataSource.manager.remove(s)
+    await this._st.dataSource.manager.save(Setting.create(to, s.value))
+    await this._st.dataSource.manager.remove(s)
   }
 
   // NOTE: drop support before League Akari 1.1.x
   private async _migrate() {
-    const isMigratedSymbol = await this._storage.dataSource.manager.findOneBy(Setting, {
-      key: Equal(SettingMigrateMain.MIGRATION_125)
-    })
-
-    if (isMigratedSymbol) {
-      return
-    }
-
+    // const isMigratedSymbol = await this._st.dataSource.manager.findOneBy(Setting, {
+    //   key: Equal(SettingMigrateMain.MIGRATION_130)
+    // })
+    // if (isMigratedSymbol) {
+    //   return
+    // }
     // 原 app finish
-    await this._do('app/useWmic', 'league-client-ux-main/useWmic')
-    await this._do('app/closeStrategy', 'window-manager-main/mainWindowCloseAction')
-    await this._do('app/showFreeSoftwareDeclaration', 'app-common-main/showFreeSoftwareDeclaration')
-    await this._do('app/isInKyokoMode', 'app-common-main/isInKyokoMode')
-
+    // await this._do('app/useWmic', 'league-client-ux-main/useWmic')
+    // await this._do('app/closeStrategy', 'window-manager-main/mainWindowCloseAction')
+    // await this._do('app/showFreeSoftwareDeclaration', 'app-common-main/showFreeSoftwareDeclaration')
+    // await this._do('app/isInKyokoMode', 'app-common-main/isInKyokoMode')
     // 原 lcu-connection
     // await this._do('lcu-connection/autoConnect', 'league-client-main/autoConnect')
-
     // await this._storage.dataSource.manager.save(
     //   Setting.create(SettingMigrateMain.MIGRATION_125, true)
     // )

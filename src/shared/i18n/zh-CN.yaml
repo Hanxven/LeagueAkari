@@ -1013,6 +1013,28 @@ MatchHistoryTab:
     win: 胜
     lose: 负
 
+  summoner404: 未找到召唤师
+  failedToLoadTitle: 加载失败
+  failedToLoadSummoner: 无法加载召唤师信息：{{reason}}
+  failedToLoadSummonerProfile: 无法加载召唤师信息：{{reason}}
+  failedToLoadRankedStats: 无法加载排位信息：{{reason}}
+  failedToLoadMatchHistory: 无法加载战绩：{{reason}}
+  failedToLoadMatchHistoryHN1: |
+    无法加载战绩：{{reason}}
+    注意：当前页面的大区为艾欧尼亚。该大区在某些时间段（尤其是晚间）可能无法正常返回战绩数据。
+  failedToLoadMatchHistoryGame: 无法加载对局：{{reason}}
+  failedToLoadTags: 无法加载玩家标记：{{reason}}
+  failedToUpdateTag: 无法更新玩家标记：{{reason}}
+  failedToDeleteTag: 无法更新玩家标记：{{reason}}
+  operationSuccessTitle: 操作成功
+  operationFailedTitle: 操作失败
+  spectatorCalledUp: 已拉起观战
+  spectatorCalledUpByCmd: 已调起进程。注意，调起观战可能会出现黑屏情况，若长时间黑屏，届时请手动结束进程
+  failedToCallUpSpectator: 观战调起失败：{{reason}}
+  failedToTakeScreenshotNoData: 尝试截图失败，未获取到图片信息
+  failedToTakeScreenshot: 尝试截图失败：{{reason}}
+  copiedToClipboard: 已复制到剪贴板
+
 MatchHistoryCard:
   kprTitle: 在队伍中参与了击杀的程度 {{rate}}%
   ddrTitle: 在队伍中对英雄造成的伤害占比 {{rate}}%

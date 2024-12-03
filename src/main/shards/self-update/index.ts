@@ -17,7 +17,7 @@ import cp from 'node:child_process'
 import ofs from 'node:original-fs'
 import path from 'node:path'
 import { Readable, pipeline } from 'node:stream'
-import { lt, valid } from 'semver'
+import { gte, lt, valid } from 'semver'
 
 import sevenBinPath from '../../../../resources/7za.exe?asset'
 import icon from '../../../../resources/LA_ICON.ico?asset'
@@ -699,18 +699,18 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
             ? LEAGUE_AKARI_GITHUB_LATEST_PAGE
             : LEAGUE_AKARI_GITEE_LATEST_PAGE
 
-        if (lt(app.getVersion(), targetVersion)) {
-          this._log.info(`上次的自动更新似乎失败了`, targetVersion, newVersionFlagPath)
-          this.state.setLastUpdateResult({
-            success: false,
-            reason: 'Something wrong...',
-            newVersionPageUrl: pageUrl
-          })
-        } else {
+        if (gte(app.getVersion(), targetVersion)) {
           this._log.info(`看来已经成功更新`, targetVersion, newVersionFlagPath)
           this.state.setLastUpdateResult({
             success: true,
             reason: 'Successfully updated',
+            newVersionPageUrl: pageUrl
+          })
+        } else {
+          this._log.info(`上次的自动更新似乎失败了`, targetVersion, newVersionFlagPath)
+          this.state.setLastUpdateResult({
+            success: false,
+            reason: 'Something wrong...',
             newVersionPageUrl: pageUrl
           })
         }

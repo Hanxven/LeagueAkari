@@ -120,7 +120,7 @@ watchEffect(() => {
 })
 
 watchEffect(() => {
-  if (sus.lastUpdateResult && !sus.lastUpdateResult.success) {
+  if (sus.lastUpdateResult) {
     if (sus.lastUpdateResult.success) {
       notification.warning({
         title: () => t('self-update-main.title'),
@@ -194,19 +194,6 @@ useKeyboardCombo('AKARI', {
   requireSameEl: true,
   caseSensitive: false,
   maxInterval: 250
-})
-
-// TODO REMOVE
-useKeyboardCombo('TRIGGERUPDATE', {
-  onFinish: () => {
-    message.info('启用测试性更新', {
-      duration: 10000
-    })
-    su.checkUpdatesDebug()
-  },
-  requireSameEl: true,
-  caseSensitive: false,
-  maxInterval: 500
 })
 </script>
 

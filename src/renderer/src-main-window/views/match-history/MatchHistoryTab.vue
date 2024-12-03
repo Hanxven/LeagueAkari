@@ -543,7 +543,6 @@
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -587,6 +586,7 @@ import {
   useNotification
 } from 'naive-ui'
 import { computed, markRaw, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { h } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import RankedTable from '@main-window/components/RankedTable.vue'
@@ -621,6 +621,8 @@ const lcs = useLeagueClientStore()
 const mhs = useMatchHistoryTabsStore()
 const sgps = useSgpStore()
 
+const notification = useNotification()
+
 const VIEW_NAMESPACE = 'view:MatchHistoryTab'
 
 const currentSgpServerSupported = computed(() => {
@@ -638,10 +640,7 @@ const isSelfTab = computed(() => {
 })
 
 const analysis = computed(() => {
-  const matchHistory = analyzeMatchHistory(
-    tab.matchHistoryPage?.games || [],
-    tab.puuid
-  )
+  const matchHistory = analyzeMatchHistory(tab.matchHistoryPage?.games || [], tab.puuid)
   const players = analyzeMatchHistoryPlayers(tab.matchHistoryPage?.games || [], tab.puuid)
 
   return {
@@ -672,7 +671,7 @@ const loadSummoner = async () => {
         const { data: ns } = await rc.api.playerAccount.getPlayerAccountNameset([tab.puuid])
 
         if (ns.namesets.length === 0) {
-          throw new Error('召唤师不存在')
+          throw new Error(t('MatchHistoryTab.summoner404'))
         }
 
         data.gameName = ns.namesets[0].gnt.gameName
@@ -683,8 +682,15 @@ const loadSummoner = async () => {
       const { data } = await lc.api.summoner.getSummonerByPuuid(tab.puuid)
       tab.summoner = markRaw(data)
     }
-  } catch (error) {
-    laNotification.warn('加载失败', '拉取召唤师信息失败', error)
+  } catch (error: any) {
+    notification.warning({
+      title: () => t('MatchHistoryTab.failedToLoadTitle'),
+      content: () =>
+        t('MatchHistoryTab.failedToLoadSummoner', {
+          reason: error.message
+        }),
+      duration: 4000
+    })
     log.warn(VIEW_NAMESPACE, '拉取召唤师信息失败', error)
   } finally {
     tab.isLoadingSummoner = false
@@ -707,8 +713,15 @@ const loadRankedStats = async () => {
     tab.isLoadingRankedStats = true
     const { data } = await lc.api.ranked.getRankedStats(tab.puuid)
     tab.rankedStats = markRaw(data)
-  } catch (error) {
-    laNotification.warn('加载失败', '拉取排位信息失败', error)
+  } catch (error: any) {
+    notification.warning({
+      title: () => t('MatchHistoryTab.failedToLoadTitle'),
+      content: () =>
+        t('MatchHistoryTab.failedToLoadRankedStats', {
+          reason: error.message
+        }),
+      duration: 4000
+    })
     log.warn(VIEW_NAMESPACE, '拉取排位信息失败', error)
   } finally {
     tab.isLoadingRankedStats = false
@@ -729,8 +742,15 @@ const loadSummonerProfile = async () => {
     tab.isLoadingSummonerProfile = true
     const { data } = await lc.api.summoner.getSummonerProfile(tab.puuid)
     tab.summonerProfile = markRaw(data)
-  } catch (error) {
-    laNotification.warn('加载失败', '拉取召唤师信息失败', error)
+  } catch (error: any) {
+    notification.warning({
+      title: () => t('MatchHistoryTab.failedToLoadTitle'),
+      content: () =>
+        t('MatchHistoryTab.failedToLoadSummonerProfile', {
+          reason: error.message
+        }),
+      duration: 4000
+    })
     log.warn(VIEW_NAMESPACE, '拉取召唤师信息失败', error)
   } finally {
     tab.isLoadingSummonerProfile = false
@@ -819,8 +839,22 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
         await Promise.all(tasks)
       }
     }
-  } catch (error) {
-    laNotification.warn('加载失败', '拉取战绩信息失败', error)
+  } catch (error: any) {
+    notification.warning({
+      title: () => t('MatchHistoryTab.failedToLoadTitle'),
+      content: () => {
+        if (tab.sgpServerId === 'TENCENT_HN1') {
+          return t('MatchHistoryTab.failedToLoadMatchHistoryHN1', {
+            reason: error.message
+          })
+        } else {
+          return t('MatchHistoryTab.failedToLoadMatchHistory', {
+            reason: error.message
+          })
+        }
+      },
+      duration: 6000
+    })
     log.warn(VIEW_NAMESPACE, '拉取战绩信息失败', error)
   } finally {
     tab.isLoadingMatchHistory = false
@@ -853,8 +887,15 @@ const loadDetailedGame = async (dataState: GameDataState) => {
         dataState.isDetailed = true
       }
     }
-  } catch (error) {
-    laNotification.warn('加载失败', '拉取详细战绩信息失败', error)
+  } catch (error: any) {
+    notification.warning({
+      title: () => t('MatchHistoryTab.failedToLoadTitle'),
+      content: () =>
+        t('MatchHistoryTab.failedToLoadMatchHistoryGame', {
+          reason: error.message
+        }),
+      duration: 4000
+    })
   } finally {
     dataState.isLoading = false
   }
@@ -877,8 +918,15 @@ const loadTags = async () => {
       selfPuuid: lcs.summoner.me.puuid
     })
     tab.tags = markRaw(data)
-  } catch (error) {
-    laNotification.warn('加载失败', '拉取标记信息失败', error)
+  } catch (error: any) {
+    notification.warning({
+      title: () => t('MatchHistoryTab.failedToLoadTitle'),
+      content: () =>
+        t('MatchHistoryTab.failedToLoadTags', {
+          reason: error.message
+        }),
+      duration: 4000
+    })
   } finally {
     tab.isLoadingTags = false
   }
@@ -1060,10 +1108,17 @@ const handleTagEdited = async (tag: string | null) => {
     })
     isShowingTagEditModal.value = false
 
-    message.success(`已更新标记`)
+    message.success(() => t('MatchHistoryTab.operationSuccessTitle'))
     await loadTags()
-  } catch (error) {
-    laNotification.warn('操作失败', '更新玩家标记失败', error)
+  } catch (error: any) {
+    notification.warning({
+      title: () => t('MatchHistoryTab.failedToLoadTitle'),
+      content: () =>
+        t('MatchHistoryTab.failedToUpdateTag', {
+          reason: error.message
+        }),
+      duration: 4000
+    })
     log.warn(VIEW_NAMESPACE, '标记玩家失败', error)
   }
 }
@@ -1077,10 +1132,17 @@ const handleRemoveTag = async (puuid: string, selfPuuid: string) => {
     })
     isShowingTagEditModal.value = false
 
-    message.success(`已删除标记`)
+    message.success(() => t('MatchHistoryTab.operationSuccessTitle'))
     await loadTags()
-  } catch (error) {
-    laNotification.warn('操作失败', '删除玩家标记失败', error)
+  } catch (error: any) {
+    notification.warning({
+      title: () => t('MatchHistoryTab.failedToLoadTitle'),
+      content: () =>
+        t('MatchHistoryTab.failedToDeleteTag', {
+          reason: error.message
+        }),
+      duration: 4000
+    })
     log.warn(VIEW_NAMESPACE, '标记玩家失败', error)
   }
 }
@@ -1217,15 +1279,13 @@ watch(
   { immediate: true }
 )
 
-const notification = useNotification()
-
 const handleLaunchSpectator = async (_: string, useLcuApi: boolean) => {
   try {
     if (useLcuApi) {
       await lc.api.spectator.launchSpectator(tab.puuid)
       notification.success({
-        title: '观战',
-        content: '已调起观战流程',
+        title: () => t('MatchHistoryTab.operationSuccessTitle'),
+        content: () => t('MatchHistoryTab.spectatorCalledUp'),
         duration: 4000
       })
     } else {
@@ -1240,16 +1300,16 @@ const handleLaunchSpectator = async (_: string, useLcuApi: boolean) => {
           sgpServerId: tab.sgpServerId
         })
         notification.success({
-          title: '观战',
-          content: '已调起进程。注意，调起观战可能会出现黑屏情况，若长时间黑屏，届时请手动结束进程',
+          title: () => t('MatchHistoryTab.operationSuccessTitle'),
+          content: () => t('MatchHistoryTab.spectatorCalledUpByCmd'),
           duration: 4000
         })
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     notification.warning({
-      title: '观战',
-      content: `无法调起客户端进程: ${(error as Error).message}`,
+      title: () => t('MatchHistoryTab.operationFailedTitle'),
+      content: () => t('MatchHistoryTab.failedToCallUpSpectator', { reason: error.message }),
       duration: 4000
     })
 
@@ -1292,17 +1352,25 @@ const handleScreenshot = async () => {
     })
 
     if (!blob) {
-      message.warning('尝试截图失败，未获取到图片信息')
+      message.warning(() => t('MatchHistoryTab.failedToTakeScreenshotNoData'))
       return
     }
 
     await app.writeClipboardImage(await blob.arrayBuffer())
-    message.success('已复制截图到剪贴板')
-  } catch (error) {
+    message.success(() => t('MatchHistoryTab.copiedToClipboard'))
+  } catch (error: any) {
     if (error instanceof Error) {
-      message.error(`尝试截图失败: ${error.message}`)
+      message.error(() =>
+        t('MatchHistoryTab.failedToTakeScreenshot', {
+          reason: error.message
+        })
+      )
     } else {
-      message.error('尝试截图失败')
+      message.error(() =>
+        t('MatchHistoryTab.failedToTakeScreenshot', {
+          reason: ''
+        })
+      )
     }
   } finally {
     tab.isTakingScreenshot = false

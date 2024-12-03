@@ -1008,6 +1008,28 @@ MatchHistoryTab:
     win: Win
     lose: Loss
 
+  summoner404: Summoner not found
+  failedToLoadTitle: Failed to Load
+  failedToLoadSummoner: 'Unable to load summoner information: {{reason}}'
+  failedToLoadSummonerProfile: 'Unable to load summoner profile: {{reason}}'
+  failedToLoadRankedStats: 'Unable to load ranked stats: {{reason}}'
+  failedToLoadMatchHistory: 'Unable to load match history: {{reason}}'
+  failedToLoadMatchHistoryHN1: |
+    Unable to load match history: {{reason}}
+    The current region on this page is Ionia. Please note that during certain times (especially in the evening), match history data may not be returned properly.
+  failedToLoadMatchHistoryGame: 'Unable to load match: {{reason}}'
+  failedToLoadTags: 'Unable to load player tags: {{reason}}'
+  failedToUpdateTag: 'Unable to update player tag: {{reason}}'
+  failedToDeleteTag: 'Unable to delete player tag: {{reason}}'
+  operationSuccessTitle: Operation Successful
+  operationFailedTitle: Operation Failed
+  spectatorCalledUp: Spectator mode initiated
+  spectatorCalledUpByCmd: 'Process initiated. Note: Starting spectator mode may result in a black screen. If it persists, please manually terminate the process.'
+  failedToCallUpSpectator: 'Failed to initiate spectator mode: {{reason}}'
+  failedToTakeScreenshotNoData: Screenshot attempt failed, no image data obtained
+  failedToTakeScreenshot: 'Screenshot attempt failed: {{reason}}'
+  copiedToClipboard: Copied to clipboard
+
 MatchHistoryCard:
   kprTitle: 'Kill participation in team: {{rate}}%'
   ddrTitle: 'Damage dealt to champions: {{rate}}%'
