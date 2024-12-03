@@ -409,8 +409,6 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       ofs.rmSync(extractedTo, { recursive: true, force: true })
     }
 
-    this._log.info(`很奇怪，这里不存在`)
-
     const asyncTask = new Promise<string>((resolve, reject) => {
       this._log.info(`开始解压更新包 ${filepath} 到 ${extractedTo}, 使用 ${sevenBinPath}`)
 
@@ -499,7 +497,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     const copiedScriptPath = path.join(app.getPath('temp'), SelfUpdateMain.UPDATE_SCRIPT_NAME)
 
-    ofs.copyFileSync(updateScriptPath, copiedScriptPath)
+    ofs.copyFileSync(updateScriptPath.replace('app.asar', 'app.asar.unpacked'), copiedScriptPath)
 
     this._log.info(`写入更新脚本 ${copiedScriptPath}`)
 
@@ -516,7 +514,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     this._createNotification(
       i18next.t('common.appName'),
-      i18next.t('self-update.updateOnNextStartup')
+      i18next.t('self-update-main.updateOnNextStartup')
     )
 
     const _updateOnQuitFn = () => {
@@ -683,9 +681,17 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     this._log.info(`检查自动更新结果`, newVersionFlagPath)
 
     try {
-      const targetVersion = await ofs.promises.readFile(newVersionFlagPath, {
-        encoding: 'utf-8'
-      })
+      await ofs.promises.access(newVersionFlagPath)
+    } catch (error) {
+      return
+    }
+
+    try {
+      const targetVersion = JSON.parse(
+        await ofs.promises.readFile(newVersionFlagPath, {
+          encoding: 'utf-8'
+        })
+      )
 
       if (valid(targetVersion)) {
         const pageUrl =

@@ -106,7 +106,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
   private async _pick(championId: number, actionId: number, completed = true) {
     try {
       this._log.info(
-        `现在选择：${championId}, ${this.settings.pickStrategy}, actionId=${actionId}, 锁定=${completed}`
+        `现在选择：${this._lc.data.gameData.champions[championId]?.name || championId}, ${this.settings.pickStrategy}, actionId=${actionId}, 锁定=${completed}`
       )
 
       await this._lc.api.champSelect.pickOrBan(championId, completed, 'pick', actionId)
@@ -179,6 +179,39 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     return Math.max(0, adjustedDelayMs)
   }
 
+  private _cancelPrevScheduledPickIfExists() {
+    if (this.state.upcomingPick) {
+      this._log.info(
+        `取消即将进行的选择自动选择: ${this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name || this.state.upcomingPick.championId}`
+      )
+      this._sendInChat(
+        `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.cancel-delayed-lock-in', {
+          champion:
+            this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name ||
+            this.state.upcomingPick.championId
+        })}`
+      )
+      this.state.setUpcomingPick(null)
+      this._pickTask.cancel()
+    }
+  }
+
+  private _cancelPrevScheduledBanIfExists() {
+    if (this.state.upcomingBan) {
+      this._log.info(
+        `取消即将进行的自动禁用: ${this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name || this.state.upcomingBan.championId}`
+      )
+      this.state.setUpcomingPick(null)
+      this._sendInChat(
+        `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.cancel-delayed-ban', {
+          champion:
+            this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name ||
+            this.state.upcomingBan.championId
+        })}`
+      )
+    }
+  }
+
   private _handleAutoPickBan() {
     this._mobx.reaction(
       () =>
@@ -188,38 +221,26 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           this.settings.lockInDelaySeconds
         ] as const,
       async ([pick, strategy, delay]) => {
-        if (this.state.upcomingPick) {
-          this._log.info(
-            `取消即将进行的选择自动选择: ${this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name || this.state.upcomingPick.championId}`
-          )
-          this.state.setUpcomingPick(null)
-          this._sendInChat(
-            `[${i18next.t('common.appName')}] ${i18next.t(
-              'auto-select-main.cancel-delayed-lock-in',
-              {
-                champion:
-                  this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name ||
-                  this.state.upcomingPick.championId
-              }
-            )}`
-          )
-        }
-
         if (!pick) {
+          this._cancelPrevScheduledPickIfExists()
           return
         }
 
         if (pick.isActingNow && pick.action.isInProgress) {
           if (strategy === 'show') {
             if (this.state.champSelectActionInfo?.memberMe.championId !== pick.championId) {
+              this._cancelPrevScheduledPickIfExists()
               await this._pick(pick.championId, pick.action.id, false)
             }
           } else if (strategy === 'lock-in') {
+            this._cancelPrevScheduledPickIfExists()
             await this._pick(pick.championId, pick.action.id)
           } else if (strategy === 'show-and-delay-lock-in') {
             if (this.state.champSelectActionInfo?.memberMe.championId !== pick.championId) {
               await this._pick(pick.championId, pick.action.id, false)
             }
+
+            this._cancelPrevScheduledPickIfExists()
 
             const delayMs = this._calculateAppropriateDelayMs(delay * 1e3)
 
@@ -279,25 +300,14 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => [this.state.targetBan, this.settings.banDelaySeconds] as const,
       async ([ban, delay]) => {
-        if (this.state.upcomingBan) {
-          this._log.info(
-            `取消即将进行的选择自动禁用: ${this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name || this.state.upcomingBan.championId}`
-          )
-          this.state.setUpcomingPick(null)
-          this._sendInChat(
-            `[${i18next.t('common.appName')}] ${i18next.t('auto-select-main.cancel-delayed-ban', {
-              champion:
-                this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name ||
-                this.state.upcomingBan.championId
-            })}`
-          )
-        }
-
         if (!ban) {
+          this._cancelPrevScheduledBanIfExists()
           return
         }
 
         if (ban.action.isInProgress && ban.isActingNow) {
+          this._cancelPrevScheduledBanIfExists()
+
           const delayMs = this._calculateAppropriateDelayMs(delay * 1e3)
           this._log.info(
             `添加延迟禁用任务：${delay * 1e3} (修正后：${delayMs}), 目标英雄：${this._lc.data.gameData.champions[ban.championId]?.name || ban.championId}`
@@ -346,23 +356,9 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     )
 
     this._mobx.reaction(
-      () => this.state.targetPick,
-      (pick) => {
-        this._log.info(`targetPick - 即将进行的选择: ${JSON.stringify(pick)}`)
-      }
-    )
-
-    this._mobx.reaction(
-      () => this.state.targetBan,
-      (ban) => {
-        this._log.info(`targetBan - 即将进行的禁用: ${JSON.stringify(ban)}`)
-      }
-    )
-
-    this._mobx.reaction(
       () => this.state.upcomingGrab,
       (grab) => {
-        this._log.info(`Upcoming Grab - 即将进行的交换: ${JSON.stringify(grab)}`)
+        this._log.info(`Upcoming Grab - 即将进行的交换`, grab)
       }
     )
 

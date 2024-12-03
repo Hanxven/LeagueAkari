@@ -17,4 +17,8 @@ export class ChampionMasteryHttpApi {
   getPlayerChampionMastery(puuid: string) {
     return this._http.get<Mastery[]>(`/lol-champion-mastery/v1/${puuid}/champion-mastery`)
   }
+
+  ackNotifications() {
+    return this._http.post<void>('/lol-champion-mastery/v1/notifications/ack')
+  }
 }

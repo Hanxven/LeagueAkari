@@ -22,6 +22,7 @@ import { PlayerNotificationsHttpApi } from './player-notifications'
 import { ProcessControlHttpApi } from './process-control'
 import { RankedHttpApi } from './ranked'
 import { RegaliaHttpApi } from './regalia'
+import { RemedyHttpApi } from './remedy'
 import { RiotClientHttpApi } from './riotclient'
 import { SpectatorHttpApi } from './spectator'
 import { SummonerHttpApi } from './summoner'
@@ -55,6 +56,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly perks: PerksHttpApi
   public readonly missions: MissionsHttpApi
   public readonly endOfGame: EndOfGameHttpApi
+  public readonly remedy: RemedyHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -82,5 +84,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.perks = new PerksHttpApi(this._http)
     this.missions = new MissionsHttpApi(this._http)
     this.endOfGame = new EndOfGameHttpApi(this._http)
+    this.remedy = new RemedyHttpApi(this._http)
   }
 }

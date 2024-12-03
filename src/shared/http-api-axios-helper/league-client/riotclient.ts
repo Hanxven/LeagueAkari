@@ -14,4 +14,8 @@ export class RiotClientHttpApi {
   restartUx() {
     return this._http.post('riotclient/kill-and-restart-ux')
   }
+
+  splash() {
+    return this._http.put('/riotclient/splash')
+  }
 }

@@ -26,4 +26,8 @@ export class GameflowHttpApi {
   reconnect() {
     return this._http.post('/lol-gameflow/v1/reconnect')
   }
+
+  ackFailedToLaunch() {
+    return this._http.post('/lol-gameflow/v1/ack-failed-to-launch')
+  }
 }

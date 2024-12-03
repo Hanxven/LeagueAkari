@@ -174,10 +174,6 @@ export class AutoSelectState {
       return null
     }
 
-    if (a.memberMe.championId) {
-      return null
-    }
-
     // 第一个能用的 action
     const first = a.pick.find((e) => !e.completed)
 
@@ -187,16 +183,19 @@ export class AutoSelectState {
 
     const unpickables = new Set<number>()
 
-    // 不能选择队友 (包括自己) 已经选择或亮出的英雄
+    // 不能选择队友亮出的英雄, 以及自己已选定的英雄
     ;[...a.session.myTeam, ...a.session.theirTeam].forEach((t) => {
-      if (t.championId && t.puuid !== a.memberMe.puuid) {
+      if (!t.championId) {
+        return
+      }
+
+      if (t.puuid === a.memberMe.puuid) {
+        if (first.championId === t.championId && first.completed) {
+          unpickables.add(t.championId)
+        }
+      } else {
         unpickables.add(t.championId)
       }
-    })
-
-    // 队友已经选择的英雄不可用
-    a.session.myTeam.forEach((m) => {
-      unpickables.add(m.championId)
     })
 
     // 不允许重复选择时，场上已经选择的英雄不能选择

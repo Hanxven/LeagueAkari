@@ -5,12 +5,15 @@ import path from 'node:path'
 import util from 'node:util'
 import regedit from 'regedit'
 
+import RES_POSITIONER from '../../../../resources/AKARI?asset&asarUnpack'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { ClientInstallationState } from './state'
 
 const execAsync = util.promisify(cp.exec)
+
+regedit.setExternalVBSLocation(path.resolve(RES_POSITIONER, '..', 'regedit-vbs'))
 
 /**
  * 以各种方式搜索不同目标的安装位置, 这是必要的情报收集操作
@@ -63,72 +66,76 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
    * @returns
    */
   private async _updateTencentPathsByReg() {
-    const list: string[] = []
+    try {
+      const list: string[] = []
 
-    if (!this.state.tencentInstallationPath) {
-      list.push(ClientInstallationMain.TENCENT_REG_INSTALL_PATH)
-    }
-
-    if (!this.state.weGameExecutablePath) {
-      list.push(ClientInstallationMain.WEGAME_DEFAULTICON_PATH)
-    }
-
-    const result = await regedit.promisified.list(list)
-
-    const item1 = result[ClientInstallationMain.TENCENT_REG_INSTALL_PATH]
-    const item2 = result[ClientInstallationMain.WEGAME_DEFAULTICON_PATH]
-
-    if (item1 && item1.exists) {
-      const p = item1.values[ClientInstallationMain.TENCENT_REG_INSTALL_VALUE]
-
-      if (!p) {
-        return
+      if (!this.state.tencentInstallationPath) {
+        list.push(ClientInstallationMain.TENCENT_REG_INSTALL_PATH)
       }
 
-      try {
-        await fs.promises.access(p.value as string)
-      } catch {
-        this._log.info('注册表检测到腾讯服英雄联盟安装位置但无法访问, 可能并不存在', p.value)
-        return
+      if (!this.state.weGameExecutablePath) {
+        list.push(ClientInstallationMain.WEGAME_DEFAULTICON_PATH)
       }
 
-      this._log.info('腾讯服英雄联盟安装位置', p.value)
-      this.state.setTencentInstallationPath(p.value as string)
+      const result = await regedit.promisified.list(list)
 
-      try {
-        const tclsPath = path.resolve(p.value as string, 'TCLS', 'client.exe')
-        await fs.promises.access(tclsPath)
-        this.state.setHasTcls(true)
-      } catch {
-        this._log.info('TCLS 无法访问, 可能并不存在', p.value)
-        return
-      }
+      const item1 = result[ClientInstallationMain.TENCENT_REG_INSTALL_PATH]
+      const item2 = result[ClientInstallationMain.WEGAME_DEFAULTICON_PATH]
 
-      try {
-        const weGamePath = path.resolve(p.value as string, 'WeGameLauncher', 'launcher.exe')
-        await fs.promises.access(weGamePath)
-        this.state.setHasWeGameLauncher(true)
-      } catch {
-        this._log.info('WeGame 启动器无法访问, 可能并不存在', p.value)
-        return
-      }
-    }
+      if (item1 && item1.exists) {
+        const p = item1.values[ClientInstallationMain.TENCENT_REG_INSTALL_VALUE]
 
-    if (item2 && item2.exists) {
-      const p = item2.values[''].value as string
-      const match = p.match(/"([^"]+)"/)
-
-      if (match) {
-        try {
-          await fs.promises.access(match[1])
-        } catch {
-          this._log.info('检测到 WeGame 但无法访问, 可能并不存在', match[1])
+        if (!p) {
           return
         }
 
-        this._log.info('检测到 WeGame 安装位置', match[1])
-        this.state.setWeGameExecutablePath(match[1])
+        try {
+          await fs.promises.access(p.value as string)
+        } catch {
+          this._log.info('注册表检测到腾讯服英雄联盟安装位置但无法访问, 可能并不存在', p.value)
+          return
+        }
+
+        this._log.info('注册表检测到腾讯服英雄联盟安装位置', p.value)
+        this.state.setTencentInstallationPath(p.value as string)
+
+        try {
+          const tclsPath = path.resolve(p.value as string, 'TCLS', 'client.exe')
+          await fs.promises.access(tclsPath)
+          this.state.setHasTcls(true)
+        } catch {
+          this._log.info('TCLS 无法访问, 可能并不存在', p.value)
+          return
+        }
+
+        try {
+          const weGamePath = path.resolve(p.value as string, 'WeGameLauncher', 'launcher.exe')
+          await fs.promises.access(weGamePath)
+          this.state.setHasWeGameLauncher(true)
+        } catch {
+          this._log.info('WeGame 启动器无法访问, 可能并不存在', p.value)
+          return
+        }
       }
+
+      if (item2 && item2.exists) {
+        const p = item2.values[''].value as string
+        const match = p.match(/"([^"]+)"/)
+
+        if (match) {
+          try {
+            await fs.promises.access(match[1])
+          } catch {
+            this._log.info('检测到 WeGame 但无法访问, 可能并不存在', match[1])
+            return
+          }
+
+          this._log.info('注册表检测到 WeGame 安装位置', match[1])
+          this.state.setWeGameExecutablePath(match[1])
+        }
+      }
+    } catch (error) {
+      this._log.warn(`使用注册表信息读取安装目录时发生错误`, error)
     }
   }
 

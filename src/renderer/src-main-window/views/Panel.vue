@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import {
   AiStatus as AiStatusIcon,
   Layers as LayersIcon,
@@ -34,7 +35,7 @@ import { Games24Filled as Games24FilledIcon } from '@vicons/fluent'
 import { TicketSharp as TicketSharpIcon } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
-import { Component as ComponentC, computed, h, ref, watchEffect } from 'vue'
+import { Component as ComponentC, computed, h, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import SidebarFixed from '@main-window/components/sidebar/SidebarFixed.vue'
@@ -45,6 +46,26 @@ const renderIcon = (icon: ComponentC) => {
 }
 
 const { t } = useTranslation()
+
+const ogs = useOngoingGameStore()
+const router = useRouter()
+const route = useRoute()
+
+const shouldShowOngoingGameBadge = ref(false)
+const isInOngoingStage = computed(() => {
+  return ogs.queryStage.phase !== 'unavailable'
+})
+
+watch(
+  () => isInOngoingStage.value,
+  (yes) => {
+    if (yes && currentMenu.value !== 'ongoing-game') {
+      shouldShowOngoingGameBadge.value = true
+    } else {
+      shouldShowOngoingGameBadge.value = false
+    }
+  }
+)
 
 const currentMenu = ref('match-history')
 const menu = computed(() => {
@@ -57,7 +78,8 @@ const menu = computed(() => {
     {
       key: 'ongoing-game',
       icon: renderIcon(Games24FilledIcon),
-      name: t('SideBarMenu.ongoing-game')
+      name: t('SideBarMenu.ongoing-game'),
+      inProgress: shouldShowOngoingGameBadge.value
     },
     {
       key: 'automation',
@@ -78,11 +100,12 @@ const menu = computed(() => {
   ]
 })
 
-const router = useRouter()
-const route = useRoute()
-
 watchEffect(() => {
   currentMenu.value = route.name as string
+
+  if (route.name === 'ongoing-game') {
+    shouldShowOngoingGameBadge.value = false
+  }
 })
 
 const handleMenuChange = async (val: string) => {

@@ -8,7 +8,9 @@
           :class="{ active: currentActiveItem === item.key }"
         >
           <div class="menu-item-inner">
-            <component :is="item.icon" class="menu-item-icon" />
+            <NBadge :show="!!item.inProgress" dot>
+              <component :is="item.icon" class="menu-item-icon" />
+            </NBadge>
           </div>
           <Transition name="menu-item-move-right-fade">
             <div class="menu-item-indicator" v-if="currentActiveItem === item.key"></div>
@@ -21,12 +23,12 @@
 </template>
 
 <script setup lang="ts">
-import { NTooltip } from 'naive-ui'
+import { NBadge, NTooltip } from 'naive-ui'
 import { Component as ComponentC, computed, watchEffect } from 'vue'
 
 const { defaultValue, items = [] } = defineProps<{
   defaultValue?: string
-  items?: { key: string; icon: ComponentC; name: string; show?: boolean }[]
+  items?: { key: string; icon: ComponentC; name: string; show?: boolean; inProgress?: boolean }[]
 }>()
 
 const showItems = computed(() => items.filter((item) => item.show !== false))
@@ -71,8 +73,6 @@ const handleMenuChange = (key: string) => {
     height: 100%;
     width: 100%;
     border-radius: 2px;
-    left: 0;
-    transition: left 0.2s;
   }
 
   .menu-item-icon {
@@ -99,10 +99,6 @@ const handleMenuChange = (key: string) => {
     .menu-item-indicator {
       background-color: #60f44db9;
       box-shadow: 0 0 8px 0px #60f44db9;
-    }
-
-    .menu-item-inner {
-      left: 2px;
     }
   }
 }

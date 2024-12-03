@@ -32,4 +32,24 @@ export class HonorHttpApi {
   getV2Ballot() {
     return this._http.get<Ballot>('/lol-honor-v2/v1/ballot/')
   }
+
+  ackHonorNotification(mailId: string) {
+    return this._http.post(`/lol-honor-v2/v1/ack-honor-notification/${mailId}`)
+  }
+
+  ackLateRecognition() {
+    return this._http.post(`/lol-honor-v2/v1/late-recognition/ack`)
+  }
+
+  ackLevelChange() {
+    return this._http.post(`/lol-honor-v2/v1/level-change/ack`)
+  }
+
+  ackMutualHonor() {
+    return this._http.post(`/lol-honor-v2/v1/mutual-honor/ack`)
+  }
+
+  ackRewardGranted() {
+    return this._http.post(`/lol-honor-v2/v1/reward-granted/ack`)
+  }
 }

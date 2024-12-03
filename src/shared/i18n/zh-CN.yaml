@@ -410,7 +410,7 @@ AutoSelect:
 
   lockInDelaySeconds:
     label: 自动锁定延迟 (s)
-    description: 在亮出英雄后，执行锁定操作的延迟时间 (秒)。不会超过该阶段的最长时间
+    description: 在亮出英雄后，执行锁定操作的延迟时间 (秒)，不会超过该阶段的最长时间。延时为从本阶段开始起经过的时间
 
   expectedChampions:
     label: 意向英雄
@@ -451,7 +451,7 @@ AutoSelect:
 
   banDelaySeconds:
     label: 自动禁用延时 (s)
-    description: 执行禁用操作的延迟时间 (秒)。不会超过该阶段的最长时间
+    description: 执行禁用操作的延迟时间 (秒)，不会超过该阶段的最长时间。延时为从本阶段开始起经过的时间
 
   banTeammateIntendedChampion:
     label: 无视队友预选
@@ -1623,6 +1623,7 @@ self-update-main:
   start-update: League Akari 更新已开始
   updateOnNextStartup: 更新已下载完成，关闭应用后执行更新流程
   lastUpdateFailed: 上一次自动更新没有成功，请<a href="{{url}}" target="_blank">手动更新新版本</a>
+  lastUpdateSuccess: 已成功更新到 {{version}}
 
 common:
   appName: League Akari

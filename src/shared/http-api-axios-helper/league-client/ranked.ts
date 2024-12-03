@@ -11,4 +11,12 @@ export class RankedHttpApi {
   getRankedStats(puuid: string) {
     return this._http.get<RankedStats>(`/lol-ranked/v1/ranked-stats/${puuid}`)
   }
+
+  acknowledgeEosNotification(id: string) {
+    return this._http.post(`/lol-ranked/v1/eos-notifications/${id}/acknowledge`)
+  }
+
+  acknowledgeNotification(id: string) {
+    return this._http.post(`/lol-ranked/v1/notifications/${id}/acknowledge`)
+  }
 }

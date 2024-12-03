@@ -1618,6 +1618,7 @@ self-update-main:
   start-update: Starting update League Akari
   updateOnNextStartup: Updated downloaded. Restart the application to apply the update
   lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
+  lastUpdateSuccess: Updated to {{version}}
 
 common:
   appName: League Akari

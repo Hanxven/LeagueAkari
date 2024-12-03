@@ -121,17 +121,29 @@ watchEffect(() => {
 
 watchEffect(() => {
   if (sus.lastUpdateResult && !sus.lastUpdateResult.success) {
-    notification.warning({
-      title: () => t('self-update-main.title'),
-      content: () =>
-        h('div', {
-          innerHTML: t('self-update-main.lastUpdateFailed', {
-            url: sus.lastUpdateResult?.newVersionPageUrl || LEAGUE_AKARI_GITHUB
-          })
-        }),
-      duration: 1e10,
-      closable: true
-    })
+    if (sus.lastUpdateResult.success) {
+      notification.warning({
+        title: () => t('self-update-main.title'),
+        content: () =>
+          t('self-update-main.lastUpdateSuccess', {
+            version: as.version
+          }),
+        duration: 4000,
+        closable: true
+      })
+    } else {
+      notification.warning({
+        title: () => t('self-update-main.title'),
+        content: () =>
+          h('div', {
+            innerHTML: t('self-update-main.lastUpdateFailed', {
+              url: sus.lastUpdateResult?.newVersionPageUrl || LEAGUE_AKARI_GITHUB
+            })
+          }),
+        duration: 1e10,
+        closable: true
+      })
+    }
   }
 })
 

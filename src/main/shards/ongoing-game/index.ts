@@ -468,7 +468,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       } catch (error) {
         // 忽略 415 错误
         if (isAxiosError(error) && error.response?.status === 415) {
-          this._log.warn('LC 客户端无法转换, 忽略', gameId)
+          this._log.warn('LC 客户端无法转换对局时间线信息, 忽略', gameId)
           return
         }
 
