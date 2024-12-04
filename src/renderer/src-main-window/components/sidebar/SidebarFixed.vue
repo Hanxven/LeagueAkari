@@ -24,7 +24,7 @@
         s)
       </div>
     </NPopover>
-    <NPopover placement="right">
+    <NPopover placement="right" ref="popover-connection">
       <template #trigger>
         <div class="menu-item">
           <div class="menu-item-inner">
@@ -49,7 +49,7 @@
           </div>
         </div>
       </template>
-      <span class="menu-item-popover">
+      <div class="menu-item-popover" ref="popover-connection-body">
         <div class="summoner-name" v-if="lcs.summoner.me">
           <span class="game-name-line">{{ lcs.summoner.me.gameName }}</span>
           <span class="tag-line">#{{ lcs.summoner.me.tagLine }}</span>
@@ -74,7 +74,7 @@
           </div>
         </template>
         <template v-if="clients.others.length !== 0">
-          <div class="separator"></div>
+          <div class="separator" v-if="clients.current"></div>
           <div class="launched-clients">
             <div class="title-label">
               <NIcon class="icon"><BareMetalServerIcon /></NIcon>
@@ -108,7 +108,7 @@
           </div>
           <div class="no-client">{{ t('SideBarFixed.noClient') }}</div>
         </template>
-      </span>
+      </div>
     </NPopover>
     <NTooltip placement="right">
       <template #trigger>
@@ -138,9 +138,10 @@ import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-n
 import { BareMetalServer as BareMetalServerIcon, Settings as SettingsIcon } from '@vicons/carbon'
 import { PlugDisconnected24Filled as PlugDisconnected24FilledIcon } from '@vicons/fluent'
 import { Hourglass as HourglassIcon } from '@vicons/ionicons5'
+import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NBadge, NIcon, NPopover, NProgress, NScrollbar, NSpin, NTooltip } from 'naive-ui'
-import { computed, inject } from 'vue'
+import { computed, inject, useTemplateRef, watch } from 'vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
@@ -197,6 +198,17 @@ const handleConnectToLeagueClient = (auth: UxCommandLine) => {
 
   lc.connect(auth)
 }
+
+const popoverEl = useTemplateRef('popover-connection')
+const popoverBodyEl = useTemplateRef('popover-connection-body')
+
+const { height } = useElementSize(popoverBodyEl)
+watch(
+  () => height.value,
+  () => {
+    popoverEl.value?.syncPosition()
+  }
+)
 </script>
 
 <style lang="less" scoped>

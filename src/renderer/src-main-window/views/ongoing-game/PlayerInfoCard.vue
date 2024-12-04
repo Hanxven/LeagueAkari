@@ -201,17 +201,18 @@
               {{ positionAssignmentReason.AUTOFILL_SHORT?.name }}
             </div>
             <!-- Left Current Position -->
-            <PositionIcon
-              v-if="positionInfo.current && positionInfo.current !== 'NONE'"
-              :position="positionInfo.current"
-            />
+            <template v-if="positionInfo.current && positionInfo.current !== 'NONE'">
+              <PositionIcon :position="positionInfo.current" />
+              <div
+                class="divider"
+                v-if="(positionInfo.recent && positionInfo.recent.length) || positionInfo.role"
+              ></div>
+            </template>
             <!-- Right Side Auxiliary Information -->
             <template v-if="positionInfo.recent && positionInfo.recent.length">
-              <div class="divider"></div>
               <PositionIcon v-for="p of positionInfo.recent.slice(0, 2)" :position="p.position" />
             </template>
             <template v-else-if="positionInfo.role">
-              <div class="divider"></div>
               <PositionIcon :position="positionInfo.role.primary" />
               <PositionIcon
                 v-if="positionInfo.role.secondary !== 'UNSELECTED'"
