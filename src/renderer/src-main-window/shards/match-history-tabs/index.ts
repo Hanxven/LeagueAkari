@@ -30,7 +30,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   static id = 'match-history-tabs-renderer'
   static dependencies = ['setting-utils-renderer', 'sgp-renderer']
 
-  static SEARCH_HISTORY_KEY = 'x:searchHistory'
+  static SEARCH_HISTORY_KEY = 'searchHistory'
   static SEARCH_HISTORY_MAX_LENGTH = 20
 
   private readonly _setting: SettingUtilsRenderer

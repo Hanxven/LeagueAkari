@@ -69,7 +69,7 @@ Supports both Tencent and non-Tencent game clients.
 
 A fun place for casual chats, party setups, bug reports, and suggestions.
 
-QQ Group: 301157623
+QQ Group: 301157623 (Password: akari, full)
 
 ## 1.4 Beta Versions
 

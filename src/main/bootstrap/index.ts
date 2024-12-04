@@ -24,6 +24,7 @@ import { RiotClientMain } from '@main/shards/riot-client'
 import { SavedPlayerMain } from '@main/shards/saved-player'
 import { SelfUpdateMain } from '@main/shards/self-update'
 import { SettingFactoryMain } from '@main/shards/setting-factory'
+import { SettingMigrateMain } from '@main/shards/setting-migrate'
 import { SgpMain } from '@main/shards/sgp'
 import { StorageMain } from '@main/shards/storage'
 import { TrayMain } from '@main/shards/tray'
@@ -196,7 +197,7 @@ export function bootstrap() {
       LoggerFactoryMain,
       MobxUtilsMain,
 
-      // SettingMigrateMain, // TODO
+      SettingMigrateMain,
       SettingFactoryMain,
       StorageMain,
 

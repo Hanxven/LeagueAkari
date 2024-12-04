@@ -158,7 +158,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         headers: { 'Cache-Control': 'no-cache' }
       })
 
-      const lastReadSha = await this._setting._getFromStorage('x:lastReadAnnouncementSha', '')
+      const lastReadSha = await this._setting._getFromStorage('lastReadAnnouncementSha', '')
 
       this.state.setCurrentAnnouncement({
         content: announcement,
@@ -631,7 +631,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     this._ipc.onCall(SelfUpdateMain.id, 'setAnnouncementRead', async (sha: string) => {
       if (this.state.currentAnnouncement) {
         this.state.setAnnouncementRead(true)
-        await this._setting._saveToStorage('x:lastReadAnnouncementSha', sha)
+        await this._setting._saveToStorage('lastReadAnnouncementSha', sha)
       }
 
       return

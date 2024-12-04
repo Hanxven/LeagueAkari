@@ -71,6 +71,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._setting = deps['setting-factory-main'].create(
       WindowManagerMain.id,
       {
+        auxWindowEnabled: { default: this.settings.auxWindowEnabled },
         mainWindowCloseAction: { default: this.settings.mainWindowCloseAction },
         auxWindowAutoShow: { default: this.settings.auxWindowAutoShow },
         auxWindowOpacity: { default: this.settings.auxWindowOpacity },
@@ -120,7 +121,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       this.state.setAuxWindowFunctionalityBounds(auxFBounds)
     }
 
-    const auxFunctionality = await this._setting._getFromStorage('auxWindowFauxFunctionality')
+    const auxFunctionality = await this._setting._getFromStorage('auxWindowFunctionality')
     if (auxFunctionality) {
       this.state.setAuxWindowFunctionality(auxFunctionality)
     }
