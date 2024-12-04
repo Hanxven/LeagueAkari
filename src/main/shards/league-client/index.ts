@@ -9,6 +9,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import { AxiosRetry } from 'axios-retry'
 import { comparer } from 'mobx'
 import fs from 'node:fs'
+import { ClientRequestArgs } from 'node:http'
 import https from 'node:https'
 import path from 'node:path'
 import PQueue from 'p-queue'
@@ -356,7 +357,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       } catch (error) {
         if ((error as any).code !== 'ECONNREFUSED') {
           this._ipc.sendEvent(LeagueClientMain.id, 'error-connecting', (error as any)?.message)
-          this._log.error(`尝试连接到 LC 时发生错误`, error)
+          this._log.warn(`尝试连接到 LC 时发生错误`, error)
           break
         }
       }
@@ -365,104 +366,91 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     }
   }
 
-  private async _connectToLcu(auth: UxCommandLine) {
-    try {
-      if (
-        this.state.connectionState === 'connecting' ||
-        this.state.connectionState === 'connected'
-      ) {
-        return
-      }
+  private _wsPromisified(
+    url: string,
+    options: WebSocket.ClientOptions | ClientRequestArgs = {},
+    timeout = 12500
+  ): Promise<WebSocket> {
+    return new Promise<WebSocket>((resolve, reject) => {
+      const ws = new WebSocket(url, options)
 
-      const { certificate, ...rest } = auth
-      this._log.info(`尝试连接`, rest)
-      this.state.setConnecting()
+      const timer = setTimeout(() => {
+        ws.close()
+        reject(new Error(`WebSocket connection timed out after ${timeout}ms`))
+      }, timeout)
 
-      await this._initWebSocket(auth)
-
-      let timeoutTimer: NodeJS.Timeout | null
-      await new Promise<void>((resolve, reject) => {
-        timeoutTimer = setTimeout(() => {
-          this._ws!.close()
-          const error = new Error(
-            `timeout trying to connect to LC Websocket: ${LeagueClientMain.INTERNAL_TIMEOUT}ms`
-          )
-          error.name = 'LC:TIMEOUT'
-          reject(error)
-        }, LeagueClientMain.INTERNAL_TIMEOUT)
-
-        this._ws!.on('open', async () => {
-          try {
-            await this._initHttpInstance(auth)
-            clearTimeout(timeoutTimer!)
-          } catch (error) {
-            this._ws?.close()
-            reject(error)
-          }
-
-          const _sendTask = (code: number, eventName: string) =>
-            new Promise<void>((resolve, reject) => {
-              this._ws!.send(JSON.stringify([code, eventName]), (error) => {
-                if (error instanceof Error) {
-                  reject(error)
-                } else {
-                  resolve()
-                }
-              })
-            })
-
-          const subTasks = SUBSCRIBED_LCU_ENDPOINTS.map((eventName) => _sendTask(5, eventName))
-
-          Promise.all(subTasks)
-            .then(() => {
-              this.state.setConnected(auth)
-              resolve()
-            })
-            .catch((error) => {
-              this.state.setDisconnected()
-              this._ws!.close()
-              reject(error)
-            })
-        })
-
-        this._ws!.on('error', (error) => {
-          this.state.setDisconnected()
-          clearTimeout(timeoutTimer!)
-          reject(error)
-        })
+      ws.on('open', () => {
+        clearTimeout(timer)
+        resolve(ws)
       })
 
-      this._ws!.on('close', () => {
-        this.state.setDisconnected()
-        clearTimeout(timeoutTimer!)
-        timeoutTimer = null
+      ws.on('error', (err) => {
+        clearTimeout(timer)
+        reject(err)
       })
 
-      this._ws!.on('message', (msg) => {
-        try {
-          const data = JSON.parse(msg.toString())
-          this._eventBus.emit(data[2].uri, data[2])
-        } catch {
-          /* TODO NOTHING */
-        }
-      })
-    } catch (error) {
-      this._ws = null
-      this._http = null
-      this._api = null
-      this.state.setDisconnected()
-      throw error
-    }
+      ws.on('close', () => clearTimeout(timer))
+    })
   }
 
-  private async _initWebSocket(auth: UxCommandLine) {
-    this._ws = new WebSocket(`wss://riot:${auth.authToken}@127.0.0.1:${auth.port}`, {
-      headers: {
-        Authorization: `Basic ${Buffer.from(`riot:${auth.authToken}`).toString('base64')}`
-      },
-      protocol: 'wamp',
-      rejectUnauthorized: false
-    })
+  private _cleanup() {
+    if (this._ws && this._ws.readyState !== WebSocket.CLOSED) {
+      this._ws.close()
+      this._ws = null
+    }
+    this._http = null
+    this._api = null
+  }
+
+  private async _connectToLcu(cmd: UxCommandLine) {
+    if (this.state.connectionState === 'connecting' || this.state.connectionState === 'connected') {
+      return
+    }
+
+    const { certificate, ...rest } = cmd
+
+    this._log.info('目标客户端', rest)
+
+    this.state.setConnecting()
+
+    const initWs = async () => {
+      try {
+        this._ws = await this._wsPromisified(`wss://riot:${cmd.authToken}@127.0.0.1:${cmd.port}`, {
+          headers: {
+            Authorization: `Basic ${Buffer.from(`riot:${cmd.authToken}`).toString('base64')}`
+          },
+          rejectUnauthorized: false
+        })
+
+        for (const endpoint of SUBSCRIBED_LCU_ENDPOINTS) {
+          this._ws.send(JSON.stringify([5, endpoint]))
+        }
+
+        this._ws.on('message', (msg) => {
+          try {
+            const data = JSON.parse(msg.toString())
+            this._eventBus.emit(data[2].uri, data[2])
+          } catch {}
+        })
+
+        this._ws.on('close', () => {
+          this.state.setDisconnected()
+          this._cleanup()
+        })
+      } catch (error) {
+        throw error
+      }
+    }
+
+    try {
+      await initWs()
+      await this._initHttpInstance(cmd)
+      this.state.setConnected(cmd)
+    } catch (error) {
+      this.state.setDisconnected()
+      this._cleanup()
+      throw error
+    }
   }
 
   private async _initHttpInstance(auth: UxCommandLine) {
@@ -502,7 +490,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     } catch (error) {
       if (isAxiosError(error) && (!error.response || (error.status && error.status >= 500))) {
         this._log.warn(`无法执行 PING 操作`, error)
-        throw new Error('http initialization PING failed')
+        throw error
       }
     }
   }

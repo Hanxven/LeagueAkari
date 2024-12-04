@@ -1021,7 +1021,7 @@ MatchHistoryTab:
   failedToLoadMatchHistory: 无法加载战绩：{{reason}}
   failedToLoadMatchHistoryHN1: |
     无法加载战绩：{{reason}}
-    注意：当前页面的大区为艾欧尼亚。该大区在某些时间段（尤其是晚间）可能无法正常返回战绩数据。
+    注意：当前页面的大区为艾欧尼亚。该大区在某些时间段（尤其是晚间）可能无法正常返回战绩数据
   failedToLoadMatchHistoryGame: 无法加载对局：{{reason}}
   failedToLoadTags: 无法加载玩家标记：{{reason}}
   failedToUpdateTag: 无法更新玩家标记：{{reason}}
