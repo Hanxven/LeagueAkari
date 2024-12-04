@@ -466,6 +466,7 @@ AutoSelect:
 
 AutoMisc:
   autoReply:
+    updated: 已更新
     title: 自动回复
 
     enabled:

@@ -1,22 +1,4 @@
-# vx.x.x DRAFT
-
-## ROADMAP
-
-- [TODO] 现在可以导出和导入部分内容。
-
-- [TODO] 对局页面在主页面关闭后的打开问题，现在允许关闭自己的页面，但也要想办法提供一个打开的入口。
-
-- [TODO] 对局页面的加载问题，目前仍有很多 BUG。
-
-- [TODO] 似乎更多的特定事件可以被发送，如加载召唤师失败等。仅用于渲染进程。
-
-- [TODO] 迁移设置项
-
-- [TODO] Pages 开源协议更新
-
-- [TODO] AFK 确认自动
-
-# v1.3.0 Sakurako DRAFT
+# v1.3.0 2024-12-? Sakurako DRAFT
 
 ## 协议变更
 
@@ -28,17 +10,21 @@ v1.3.0 版本对底层代码进行了重构，同时，自本版本起，League 
 
 - English is now supported. You can switch the language in the settings.
 
-- 游戏内的发送将支持更多种类，自定义发送可设置多个预设，同时战绩类发送可自定义模板。
-
 - 在客户端未启动时，提供快捷启动入口。[#128](https://github.com/Hanxven/LeagueAkari/issues/128)
 
-- 现在同大区内的玩家标记将不再隔离。
+- 现在同大区内的玩家标记将不再隔离。[#94](https://github.com/Hanxven/LeagueAkari/issues/94)
 
 - 战绩页面的右键菜单中添加截图选项。
 
-## 调整
+- 现在支持设置多个发送文案，同时支持对局中自定义的发送模板。[#69](https://github.com/Hanxven/LeagueAkari/issues/69) [#121](https://github.com/Hanxven/LeagueAkari/issues/121)
 
-- 对局卡片展示召唤师等级。
+- 添加了一个工具，可以锁定设置项配置文件。 [#58](https://github.com/Hanxven/LeagueAkari/issues/58)
+
+- 现在自动选择和自动禁用添加了实验性的延时设置，它的时间并不一定准确。[#93](https://github.com/Hanxven/LeagueAkari/issues/93) [#142](https://github.com/Hanxven/LeagueAkari/issues/142)
+
+# 调整
+
+- 包含文本输入的组件，现在仅当失去焦点时才会保存文本。[#107](https://github.com/Hanxven/LeagueAkari/issues/107)
 
 ## 修复
 
@@ -48,7 +34,7 @@ v1.3.0 版本对底层代码进行了重构，同时，自本版本起，League 
 
 - 工具页中，根据对局 ID 查看游戏的功能无法使用。
 
-- 在新的点赞系统启用后，原有自动点赞逻辑失效。([#114](https://github.com/Hanxven/LeagueAkari/issues/114))
+- 在新的点赞系统启用后，原有自动点赞逻辑失效。[#114](https://github.com/Hanxven/LeagueAkari/issues/114)
 
 - 部分直营服无法查看对局中状态。
 

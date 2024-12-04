@@ -38,8 +38,13 @@
             <NInput
               :status="ar.settings.text.length === 0 && ar.settings.enabled ? 'warning' : 'success'"
               style="max-width: 360px; width: 360px"
-              :value="ar.settings.text"
-              @update:value="(text) => arm.setText(text)"
+              v-model:value="tempText"
+              @blur="handleSaveText"
+              :autosize="{
+                minRows: 2,
+                maxRows: 4
+              }"
+              type="textarea"
               size="small"
             ></NInput>
           </ControlItem>
@@ -54,14 +59,26 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoReplyRenderer } from '@renderer-shared/shards/auto-reply'
 import { useAutoReplyStore } from '@renderer-shared/shards/auto-reply/store'
-import { NCard, NInput, NScrollbar, NSwitch } from 'naive-ui'
 import { useTranslation } from 'i18next-vue'
-
+import { NCard, NInput, NScrollbar, NSwitch, useMessage } from 'naive-ui'
+import { ref, watchEffect } from 'vue'
 
 const { t } = useTranslation()
 
 const ar = useAutoReplyStore()
 const arm = useInstance<AutoReplyRenderer>('auto-reply-renderer')
+
+const message = useMessage()
+const tempText = ref('')
+
+const handleSaveText = async () => {
+  await arm.setText(tempText.value)
+  message.success(() => t('AutoMisc.autoReply.updated'))
+}
+
+watchEffect(() => {
+  tempText.value = ar.settings.text
+})
 </script>
 
 <style lang="less" scoped>

@@ -27,8 +27,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     'league-client-main'
   ]
 
-  static MAIN_WINDOW_DEFAULT_SIZE = [1310, 862] as [number, number]
-  static MAIN_WINDOW_MIN_SIZE = [800, 600] as [number, number]
+  static MAIN_WINDOW_DEFAULT_SIZE = [1380, 900] as [number, number]
+  static MAIN_WINDOW_MIN_SIZE = [840, 600] as [number, number]
   static MAIN_WINDOW_INITIAL_SHOW = false
   static MAIN_WINDOW_PARTITION = 'persist:main-window'
 
