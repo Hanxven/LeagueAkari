@@ -76,10 +76,6 @@ export class SettingMigrateMain implements IAkariShardInitDispose {
     await this._do('auto-reply/text', 'auto-reply-main/text')
     await this._do('auto-reply/enabled', 'auto-reply-main/enabled')
     await this._do('auto-reply/enableOnAway', 'auto-reply-main/enableOnAway')
-    await this._do(
-      'auxiliary-window/functionality-bounds',
-      'window-manager-main/auxWindowFunctionalityBounds'
-    )
     await this._do('auxiliary-window/functionality', 'window-manager-main/auxWindowFunctionality')
     await this._do('auto-gameflow/autoHonorEnabled', 'auto-gameflow-main/autoHonorEnabled')
     await this._do('auto-gameflow/playAgainEnabled', 'auto-gameflow-main/playAgainEnabled')

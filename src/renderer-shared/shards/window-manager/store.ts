@@ -11,8 +11,7 @@ export const useWindowManagerStore = defineStore('shard:window-manager-renderer'
     auxWindowAutoShow: true,
     auxWindowOpacity: 0.9,
     auxWindowPinned: true,
-    auxWindowShowSkinSelector: false,
-    auxWindowZoomFactor: 1.0
+    auxWindowShowSkinSelector: false
   })
 
   const mainWindowStatus = ref('normal')
@@ -34,6 +33,8 @@ export const useWindowManagerStore = defineStore('shard:window-manager-renderer'
     auxWindowStatus,
     auxWindowFocus,
     auxWindowShow,
-    auxWindowFunctionality
+    auxWindowFunctionality,
+
+    supportsMica
   }
 })

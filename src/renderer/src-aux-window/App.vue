@@ -19,21 +19,27 @@ import { watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AuxWindowTitleBar from './components/AuxWindowTitleBar.vue'
+import { useInstance } from '@renderer-shared/shards'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
 
 const mws = useWindowManagerStore()
 
 const router = useRouter()
+const log = useInstance<LoggerRenderer>('logger-renderer')
 
 watch(
   () => mws.auxWindowFunctionality,
   (fun) => {
     switch (fun) {
       case 'indicator':
-        console.log('route to indicator')
         router.replace({ name: 'indicator' })
         break
       case 'opgg':
         router.replace({ name: 'opgg' })
+        break
+
+      default:
+        log.error('view:App', `Unknown aux window functionality: ${fun}`)
         break
     }
   },

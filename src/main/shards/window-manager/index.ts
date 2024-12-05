@@ -289,10 +289,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
         this._adjustAuxWindowForFunctionality(f)
       }
     )
-
-    this._ipc.onCall(WindowManagerMain.id, 'aux-window/getFunctionality', () => {
-      return this.state.auxWindowFunctionality
-    })
   }
 
   showOrRestoreAuxWindow(inactive = false) {

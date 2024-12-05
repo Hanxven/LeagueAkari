@@ -87,6 +87,8 @@ export class TrayMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
+    this._buildTray()
+
     this._mobx.reaction(
       () => this._wm.settings.auxWindowEnabled,
       (e) => {
@@ -97,7 +99,8 @@ export class TrayMain implements IAkariShardInitDispose {
           this._auxWindowTrayDevItem.enabled = false
           this._auxWindowTrayItem.enabled = false
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     this._mobx.reaction(
@@ -110,8 +113,6 @@ export class TrayMain implements IAkariShardInitDispose {
         this._buildTray()
       }
     )
-
-    this._buildTray()
   }
 
   async onDispose() {
