@@ -1573,6 +1573,7 @@ InGameSend:
       cancelButton: Cancel Changes
       description: The entries sent will use a custom template following EJS-style (ETA) format syntax. The final output should be text divided by lines, and blank lines will be ignored
       descriptionDanger: The content of this template will be executed by the application and has high privileges. Please always confirm its safety
+      descriptionReferTo: Refer to the <a href="{{url}}" target="_blank">Templates</a>
     dryRun:
       label: Dry Run
       description: Preview the output at the current point in time

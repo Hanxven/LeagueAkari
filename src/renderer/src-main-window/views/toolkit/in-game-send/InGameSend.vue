@@ -110,6 +110,14 @@
               <div style="font-weight: bold">
                 {{ t('InGameSend.sendStats.sendStatsTemplate.descriptionDanger') }}
               </div>
+              <div
+                style="margin-top: 8px"
+                v-html="
+                  t('InGameSend.sendStats.sendStatsTemplate.descriptionReferTo', {
+                    url: 'https://hanxven.github.io/LeagueAkari/in-game-send-templates.html'
+                  })
+                "
+              ></div>
             </template>
             <div>
               <NInput

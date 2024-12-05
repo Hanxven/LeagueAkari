@@ -681,8 +681,8 @@ const emits = defineEmits<{
 const { t } = useTranslation()
 
 const STARED_CHAMPION_LEVEL = 60
-const SOLO_DEATHS_THRESHOLD = 3
-const SOLO_KILLS_THRESHOLD = 3
+const SOLO_DEATHS_THRESHOLD = 2
+const SOLO_KILLS_THRESHOLD = 2
 const EARLY_GAME_THRESHOLD_MINUTES = 14
 
 const premadeTagElHovering = useElementHover(useTemplateRef('pre-made-tag-el'))

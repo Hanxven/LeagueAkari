@@ -1,4 +1,4 @@
-# v1.3.0 2024-12-? Sakurako DRAFT
+# v1.3.0 Sakurako (2024-12-05)
 
 ## 协议变更
 
@@ -7,6 +7,8 @@
 v1.3.0 版本对底层代码进行了重构，同时，自本版本起，League Akari 的开源协议变更为 **GPL-3.0**。
 
 ## 新增
+
+- UI 重写。
 
 - English is now supported. You can switch the language in the settings.
 
@@ -27,6 +29,8 @@ v1.3.0 版本对底层代码进行了重构，同时，自本版本起，League 
 - 包含文本输入的组件，现在仅当失去焦点时才会保存文本。[#107](https://github.com/Hanxven/LeagueAkari/issues/107)
 
 ## 修复
+
+- 使用命令行的观战方式失效。
 
 - 在对局页面，无法跳转到对应玩家的战绩页面。
 
