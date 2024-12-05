@@ -86,6 +86,8 @@ export class WindowManagerState {
 
   supportsMica: boolean = false
 
+  isShardsReady: boolean = false
+
   setMainWindowStatus(status: 'normal' | 'maximized' | 'minimized') {
     this.mainWindowStatus = status
   }
@@ -136,6 +138,10 @@ export class WindowManagerState {
 
   setSupportsMica(supports: boolean) {
     this.supportsMica = supports
+  }
+
+  setShardsReady(ready: boolean) {
+    this.isShardsReady = ready
   }
 
   constructor() {

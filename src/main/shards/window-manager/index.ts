@@ -840,8 +840,12 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     )
 
     this._mobx.reaction(
-      () => [this.settings.auxWindowEnabled] as const,
-      ([enabled]) => {
+      () => [this.settings.auxWindowEnabled, this.state.isShardsReady] as const,
+      ([enabled, ready]) => {
+        if (!ready) {
+          return
+        }
+
         if (enabled) {
           this.createAuxWindow()
         } else {
@@ -944,6 +948,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._shared.global.events.on('second-instance', () => {
       this.showOrRestoreMainWindow()
     })
+    this.state.setShardsReady(true)
     this.createMainWindow()
   }
 }

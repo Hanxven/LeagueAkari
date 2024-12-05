@@ -6,7 +6,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'root',
-      component: () => import('@aux-window/views/indicator/Placeholder.vue')
+      redirect: { name: 'indicator' }
     },
     {
       path: '/indicator',
