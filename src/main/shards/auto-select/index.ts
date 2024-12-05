@@ -20,7 +20,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     'setting-factory-main',
     'league-client-main',
     'akari-ipc-main',
-    'mobx-utils-main'
+    'mobx-utils-main',
+    'config-migrate-main'
   ]
 
   private readonly _loggerFactory: LoggerFactoryMain

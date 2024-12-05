@@ -8,35 +8,19 @@ import { Setting } from '../storage/entities/Settings'
 /**
  * 将旧的设置项重新设置, 并设置数据
  */
-export class SettingMigrateMain implements IAkariShardInitDispose {
-  static id = 'setting-migrate-main'
+export class ConfigMigrateMain implements IAkariShardInitDispose {
+  static id = 'config-migrate-main'
 
-  // 引入涉及到的模块的对应依赖, 以保证其在加载其他模块之前完成迁移操作
-  static dependencies = [
-    'storage-main',
-    'logger-factory-main',
-    'league-client-main',
-    'riot-client-main',
-    'game-client-main',
-    'self-update-main',
-    'ongoing-game-main',
-    'league-client-ux-main',
-    'respawn-timer-main',
-    'auto-reply-main',
-    'auto-select-main',
-    'auto-gameflow-main',
-    'window-manager-main',
-    'app-common-main'
-  ]
+  static dependencies = ['storage-main', 'logger-factory-main']
 
-  static MIGRATION_FROM_126 = 'akari-migration-from-1.2.6_patch1'
+  static MIGRATION_FROM_126 = 'akari-migration-from-1.2.6_patch2'
 
   private readonly _st: StorageMain
   private readonly _log: AkariLogger
 
   constructor(deps: any) {
     this._st = deps['storage-main']
-    this._log = deps['logger-factory-main'].create(SettingMigrateMain.id)
+    this._log = deps['logger-factory-main'].create(ConfigMigrateMain.id)
 
     this._printDeps(deps)
   }
@@ -60,7 +44,7 @@ export class SettingMigrateMain implements IAkariShardInitDispose {
   // NOTE: drop support before League Akari 1.1.x
   private async _migrate() {
     const isMigratedSymbol = await this._st.dataSource.manager.findOneBy(Setting, {
-      key: Equal(SettingMigrateMain.MIGRATION_FROM_126)
+      key: Equal(ConfigMigrateMain.MIGRATION_FROM_126)
     })
 
     if (isMigratedSymbol) {
@@ -68,7 +52,7 @@ export class SettingMigrateMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('开始迁移设置项', SettingMigrateMain.MIGRATION_FROM_126)
+    this._log.info('开始迁移设置项', ConfigMigrateMain.MIGRATION_FROM_126)
 
     await this._do('auxiliary-window/opacity', 'window-manager-main/auxWindowOpacity')
     await this._do('auxiliary-window/enabled', 'window-manager-main/auxWindowEnabled')
@@ -172,10 +156,10 @@ export class SettingMigrateMain implements IAkariShardInitDispose {
     await this._do('auto-gameflow/autoReconnectEnabled', 'auto-gameflow-main/autoReconnectEnabled')
 
     await this._st.dataSource.manager.save(
-      Setting.create(SettingMigrateMain.MIGRATION_FROM_126, SettingMigrateMain.MIGRATION_FROM_126)
+      Setting.create(ConfigMigrateMain.MIGRATION_FROM_126, ConfigMigrateMain.MIGRATION_FROM_126)
     )
 
-    this._log.info(`迁移完成, 到 ${SettingMigrateMain.MIGRATION_FROM_126}`)
+    this._log.info(`迁移完成, 到 ${ConfigMigrateMain.MIGRATION_FROM_126}`)
   }
 
   async onInit() {

@@ -39,7 +39,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     'akari-ipc-main',
     'mobx-utils-main',
     'logger-factory-main',
-    'setting-factory-main'
+    'setting-factory-main',
+    'config-migrate-main'
   ]
 
   static UPDATES_CHECK_INTERVAL = 7.2e6 // 2 hours
