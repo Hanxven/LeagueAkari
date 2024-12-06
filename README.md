@@ -73,7 +73,7 @@ Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/H
 
 一个适合吹水开黑聊天的好地方，甚至还能反馈 BUG 和提出建议。
 
-企鹅群组：301157623 (密码为 akari，已满)
+企鹅群组：301157623 (已满，随缘加入)
 
 ## 1.4 测试版本
 

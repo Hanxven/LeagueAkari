@@ -14,7 +14,9 @@ QQ 群聊：[301157623](https://qm.qq.com/q/F1Xv85etlm)
 
 [v1.3.0](https://hanxven.github.io/LeagueAkari/updates/v1.3.0.html) 已经发布，修复了若干已知 BUG，增加了一些新功能。
 
-## v1.3.0 已知问题 (2024-12-05 22:17)
+## v1.3.1 (2024-12-06)
+
+### 修复
 
 - 托盘区菜单辅助窗口部分状态更新不及时。
 
@@ -22,4 +24,4 @@ QQ 群聊：[301157623](https://qm.qq.com/q/F1Xv85etlm)
 
 - 设置项无法正确迁移。
 
-将在近期修复。
+其他同 [v1.3.0](https://hanxven.github.io/LeagueAkari/updates/v1.3.0.html)。
