@@ -74,7 +74,7 @@ export class WindowManagerState {
   mainWindowFocus: 'focused' | 'blurred' = 'focused'
   mainWindowReady: boolean = false
   mainWindowShow: boolean = true
-  mainWindowSize: [number, number] = [1256, 780]
+  mainWindowSize: [number, number] = [1380, 860]
 
   auxWindowStatus: 'normal' | 'maximized' | 'minimized' = 'normal'
   auxWindowFocus: 'focused' | 'blurred' = 'focused'

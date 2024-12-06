@@ -122,7 +122,7 @@ watchEffect(() => {
 watchEffect(() => {
   if (sus.lastUpdateResult) {
     if (sus.lastUpdateResult.success) {
-      notification.warning({
+      notification.success({
         title: () => t('self-update-main.title'),
         content: () =>
           t('self-update-main.lastUpdateSuccess', {

@@ -24,6 +24,9 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     this._ipc = deps['akari-ipc-renderer']
     this._pm = deps['pinia-mobx-utils-renderer']
     this._setting = deps['setting-utils-renderer']
+
+    // @ts-ignore
+    window.selfUpdateShard = this
   }
 
   checkUpdates() {

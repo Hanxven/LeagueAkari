@@ -9,10 +9,9 @@ set "SOURCE_A=%~1"
 set "TARGET_C=%~2"
 set "EXECUTABLE_NAME=%~3"
 
-timeout /t 5 >nul
+echo League Akari Update Script
 
-echo League Akari Update Script...
-echo Process %EXECUTABLE_NAME% has ended.
+timeout /t 5 >nul
 
 :: Get directory B (the parent directory of C)
 echo Getting the parent directory of target %TARGET_C%...

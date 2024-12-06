@@ -51,7 +51,7 @@ export class TrayMain implements IAkariShardInitDispose {
     this._mainWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleMainWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.showOrRestoreMainWindow()
+      click: () => this._wm.toggleDevtoolsMainWindow()
     })
 
     this._quitTrayItem = new MenuItem({
