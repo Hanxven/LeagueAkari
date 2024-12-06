@@ -354,8 +354,6 @@ export class InGameSendMain implements IAkariShardInitDispose {
       if (data.shortcut === null) {
         if (this._kbd.unregisterByTargetId(targetId)) {
           this._log.info(`已删除快捷键 ${targetId}`)
-        } else {
-          this._log.warn(`删除快捷键 ${targetId} 失败, 未找到对应快捷键`)
         }
       } else {
         this._kbd.register(targetId, data.shortcut, 'last-active', () => {
@@ -389,8 +387,6 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
     if (this._kbd.unregisterByTargetId(targetId)) {
       this._log.info(`已删除快捷键 ${targetId}`)
-    } else {
-      this._log.warn(`删除快捷键 ${targetId} 失败, 未找到对应快捷键`)
     }
 
     this._setting.set(

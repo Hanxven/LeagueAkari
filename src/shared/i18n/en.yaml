@@ -1588,6 +1588,8 @@ InGameSend:
     name: Name
     shortcut: Set Shortcut
     message: Set Text to Send
+    emptyPlaceholder: No custom sending items
+    buttonAdd: Add
     delete:
       label: Delete
       button: Delete

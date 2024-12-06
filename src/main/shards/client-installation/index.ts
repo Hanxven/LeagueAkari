@@ -302,7 +302,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
     const location = path.resolve(this.state.tencentInstallationPath, 'TCLS', 'client.exe')
-    return this._spawnDetached(location)
+    return execAsync(location)
   }
 
   private _launchWeGameLeagueOfLegends() {
@@ -314,7 +314,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       'WeGameLauncher',
       'launcher.exe'
     )
-    return this._spawnDetached(location)
+    return execAsync(location)
   }
 
   private _launchWeGame() {
@@ -322,7 +322,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    return this._spawnDetached(this.state.weGameExecutablePath)
+    return execAsync(this.state.weGameExecutablePath)
   }
 
   private _launchDefaultRiotClient() {
@@ -330,7 +330,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    return this._spawnDetached(
+    return execAsync(
       `"${this.state.officialRiotClientExecutablePath}" --launch-product=league_of_legends --launch-patchline=live`
     )
   }

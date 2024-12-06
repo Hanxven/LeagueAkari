@@ -169,16 +169,16 @@
             }}</span>
           </template>
           <NTabs
+            v-if="igs.settings.customSend.length"
             size="small"
             v-model:value="currentCustomSendTab"
-            :addable="as.isAdministrator && igs.settings.customSend.length < 50"
+            :addable="igs.settings.customSend.length < 50"
             type="card"
             @add="handleAddCustomSend"
             placement="left"
             style="max-height: 1000px"
           >
             <NTabPane
-              :disabled="!as.isAdministrator"
               display-directive="show"
               v-for="s of igs.settings.customSend"
               :key="s.id"
@@ -262,12 +262,11 @@
                   :label-description="``"
                 >
                   <NPopconfirm
-                    :disabled="!as.isAdministrator"
                     :positive-button-props="{ type: 'error' }"
                     @positive-click="() => ig.deleteCustomSend(s.id)"
                   >
                     <template #trigger>
-                      <NButton :disabled="!as.isAdministrator" type="error" size="tiny">{{
+                      <NButton type="error" size="tiny">{{
                         t('InGameSend.customSend.delete.button')
                       }}</NButton>
                     </template>
@@ -277,6 +276,12 @@
               </div>
             </NTabPane>
           </NTabs>
+          <div v-else class="empty-placeholder">
+            <span>{{ t('InGameSend.customSend.emptyPlaceholder') }}</span>
+            <NButton type="primary" size="small" @click="handleAddCustomSend">{{
+              t('InGameSend.customSend.buttonAdd')
+            }}</NButton>
+          </div>
         </NCard>
       </div>
     </NScrollbar>
@@ -461,5 +466,18 @@ ig.onSendError((message) => {
   .empty {
     filter: opacity(0.8);
   }
+}
+
+.empty-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  color: #fff8;
+  font-size: 14px;
+  background-color: #ffffff05;
+  padding: 16px;
+  border-radius: 4px;
 }
 </style>

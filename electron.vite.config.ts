@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig, externalizeDepsPlugin, swcPlugin } from 'electron-vite'
 import { resolve } from 'path'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
 const minify = process.env.NODE_ENV === 'production'
 
@@ -84,7 +85,8 @@ export default defineConfig({
       }),
       vueJsx({
         isCustomElement: (tag) => LC_CUSTOM_TAGS.has(tag)
-      })
+      }),
+      vueDevTools()
     ],
     build: {
       minify,

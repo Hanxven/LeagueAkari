@@ -1593,6 +1593,8 @@ InGameSend:
     name: 名称
     shortcut: 设置快捷键
     message: 设置发送文本行
+    emptyPlaceholder: 当前无自定义发送项目
+    buttonAdd: 添加
     delete:
       label: 删除
       button: 删除
