@@ -1,6 +1,6 @@
 <template>
   <div class="ongoing-game-title">
-    <template v-if="ogs.queryStage.phase !== 'unavailable' && !isSpectating">
+    <template v-if="ogs.queryStage.phase !== 'unavailable' && !isCsSpectateWait">
       <LcuImage v-if="intelligence.mapIconUri" :src="intelligence.mapIconUri" class="map-icon" />
       <span class="ongoing-title-map-name" v-if="intelligence.mapName">{{
         intelligence.mapName
@@ -60,7 +60,7 @@ const ogs = useOngoingGameStore()
 const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
 const lcs = useLeagueClientStore()
 
-const isSpectating = computed(() => {
+const isCsSpectateWait = computed(() => {
   return lcs.champSelect.session && lcs.champSelect.session.isSpectating
 })
 
@@ -142,7 +142,7 @@ const teamNameMap = computed(() => ({
   'our-2': t('common.teams.200'),
   'their-1': t('common.teams.100'),
   'their-2': t('common.teams.200'),
-  'spectating': t('OngoingGameTitle.spectating')
+  spectating: t('OngoingGameTitle.spectating')
 }))
 
 const intelligence = computed(() => {
