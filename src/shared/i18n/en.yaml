@@ -1595,6 +1595,12 @@ InGameSend:
       button: Delete
       popconfirm: Confirm deletion of this custom sending item?
 
+  settings:
+    title: Settings
+    sendInterval:
+      label: Send Interval (ms)
+      description: Set the interval between each simulated sending action
+
   compiled: Compiled
   saved: Saved
   invalidTemplate: The provided template is invalid. Please check the syntax

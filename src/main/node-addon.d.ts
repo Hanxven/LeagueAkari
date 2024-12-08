@@ -2,16 +2,29 @@ declare module '@main/native/la-input-win64.node' {
   interface LeagueAkariInputAddon {
     /**
      * 模拟按键输入
+     * @deprecated 请使用 `sendKeyAsync`
      * @param code 按键码
      * @param press 是否按下
      */
     sendKey(code: number, press: boolean): void
 
     /**
-     * 发送 Unicode 字符串
+     * 异步版本的 `sendKey`
+     */
+    sendKeyAsync(code: number, press: boolean): Promise<void>
+
+    /**
+     * 发送 Unicode 字符串, 发送后会不管
+     * @deprecated 请使用 `sendKeysAsync`
      * @param str 字符串
      */
     sendKeys(str: string): void
+
+    /**
+     * 异步版本的 `sendKeys`
+     * @param str
+     */
+    sendKeysAsync(str: string): Promise<void>
 
     /**
      * 设置 **一个** 监听器，新设置会替换之前的

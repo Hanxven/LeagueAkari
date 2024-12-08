@@ -1,6 +1,7 @@
 <template>
   <div id="app-title-bar">
-    <span class="app-name">League Akari</span>
+    <span class="app-name" v-if="as.isAdministrator">Admin Akari</span>
+    <span class="app-name" v-else>League Akari</span>
     <div class="divider" />
     <div class="shard-area">
       <Transition name="fade">
@@ -18,10 +19,13 @@
 </template>
 
 <script setup lang="ts">
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store';
 import CommonButtons from './CommonButtons.vue'
 import MatchHistoryTabsTitle from './MatchHistoryTabsTitle.vue'
 import OngoingGameTitle from './OngoingGameTitle.vue'
 import TrafficButtons from './TrafficButtons.vue'
+
+const as = useAppCommonStore()
 </script>
 
 <style lang="less" scoped>

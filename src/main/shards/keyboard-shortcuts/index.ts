@@ -81,14 +81,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     this._ipc = deps['akari-ipc-main']
   }
 
-  sendKey(code: number, press: boolean) {
-    input.sendKey(code, press)
-  }
-
-  sendKeys(str: string) {
-    input.sendKeys(str)
-  }
-
   async onInit() {
     if (this._common.state.isAdministrator) {
       input.startHook()

@@ -11,9 +11,7 @@
         <thead class="team-header">
           <tr>
             <th class="header-info">
-              {{
-                formatI18nOrdinal(participants[0].stats.subteamPlacement, as.settings.locale)
-              }}
+              {{ formatI18nOrdinal(participants[0].stats.subteamPlacement, as.settings.locale) }}
               ({{
                 participants[0].stats.subteamPlacement <= match.maxPlacement / 2
                   ? t('DetailedGame.win')
@@ -57,13 +55,12 @@
                     @mousedown="handleMouseDown"
                     @mouseup.prevent="(event) => handleMouseUp(event, p.identity.player.puuid)"
                   >
-                    {{
+                    {{ p.identity.player.puuid === EMPTY_PUUID ? `(${t('DetailedGame.bot')}) ` : ''
+                    }}{{
                       summonerName(
                         p.identity.player.gameName || p.identity.player.summonerName,
                         p.identity.player.tagLine
                       )
-                    }}{{
-                      p.identity.player.puuid === EMPTY_PUUID ? ` (${t('DetailedGame.bot')})` : ''
                     }}
                   </div>
                 </div>

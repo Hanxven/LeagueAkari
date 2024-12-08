@@ -283,6 +283,30 @@
             }}</NButton>
           </div>
         </NCard>
+        <NCard size="small" style="margin-top: 8px">
+          <template #header>
+            <span class="card-header-title">{{ t('InGameSend.settings.title') }}</span>
+          </template>
+          <ControlItem
+            :label-width="260"
+            class="control-item-margin"
+            :label="t('InGameSend.settings.sendInterval.label')"
+            :label-description="t('InGameSend.settings.sendInterval.description')"
+          >
+            <NInputNumber
+              @update:value="(val) => ig.setSendInterval(val || 65)"
+              :value="igs.settings.sendInterval"
+              size="small"
+              :disabled="!as.isAdministrator"
+              :min="10"
+              :max="3500"
+              :step="15"
+              style="width: 120px"
+              secondary
+              type="warning"
+            ></NInputNumber>
+          </ControlItem>
+        </NCard>
       </div>
     </NScrollbar>
   </div>
@@ -301,6 +325,7 @@ import {
   NCard,
   NEllipsis,
   NInput,
+  NInputNumber,
   NPopconfirm,
   NScrollbar,
   NSwitch,
@@ -390,7 +415,6 @@ const handleSaveTemplate = async (template: string) => {
 const handleDryRun = async () => {
   const { data, error, reason, extra } = await ig.dryRunStatsSend()
   if (error) {
-    console.log(data, error, reason)
     switch (reason) {
       case 'not-compiled':
         message.error(t('InGameSend.not-compiled'))

@@ -83,6 +83,10 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateSendStatsTemplate', template)
   }
 
+  setSendInterval(interval: number) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'sendInterval', interval)
+  }
+
   dryRunStatsSend(): Promise<
     {
       data: string[]

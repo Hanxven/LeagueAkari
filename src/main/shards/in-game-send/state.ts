@@ -22,6 +22,8 @@ export class InGameSendSettings {
   sendAllAlliesShortcut: string | null = null
   sendAllEnemiesShortcut: string | null = null
 
+  sendInterval: number = 65
+
   setSendStatsEnabled(enabled: boolean) {
     this.sendStatsEnabled = enabled
   }
@@ -55,6 +57,10 @@ export class InGameSendSettings {
 
   setCustomSend(customSend: CustomSend[]) {
     this.customSend = customSend
+  }
+
+  setSendInterval(interval: number) {
+    this.sendInterval = interval
   }
 
   constructor() {

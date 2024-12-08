@@ -46,7 +46,6 @@ export class InGameSendMain implements IAkariShardInitDispose {
    * 还是需要限制一下
    */
   static MAX_CUSTOM_SEND = 20
-  static SEND_INTERVAL_MS = 65
   static ENTER_KEY_CODE = 13
 
   public readonly settings = new InGameSendSettings()
@@ -92,7 +91,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
         sendAllEnemiesShortcut: { default: this.settings.sendAllEnemiesShortcut },
         sendStatsEnabled: { default: this.settings.sendStatsEnabled },
         sendStatsTemplate: { default: this.settings.sendStatsTemplate.template },
-        sendStatsUseDefaultTemplate: { default: this.settings.sendStatsUseDefaultTemplate }
+        sendStatsUseDefaultTemplate: { default: this.settings.sendStatsUseDefaultTemplate },
+        sendInterval: { default: this.settings.sendInterval }
       },
       this.settings
     )
@@ -109,8 +109,17 @@ export class InGameSendMain implements IAkariShardInitDispose {
       'sendAllEnemiesShortcut',
       'sendStatsEnabled',
       'sendStatsTemplate',
-      'sendStatsUseDefaultTemplate'
+      'sendStatsUseDefaultTemplate',
+      'sendInterval'
     ])
+
+    this._setting.onChange('sendInterval', (v, { setter }) => {
+      if (v < 0) {
+        return setter(0)
+      }
+
+      return setter(v)
+    })
   }
 
   /**
@@ -136,6 +145,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
     const tasks: (() => Promise<void>)[] = []
 
+    const interval = this.settings.sendInterval
+
     if (type === 'champ-select-chat') {
       const csRoomId = this._lc.data.chat.conversations.championSelect?.id
 
@@ -146,24 +157,24 @@ export class InGameSendMain implements IAkariShardInitDispose {
           })
 
           if (i !== messages.length - 1) {
-            tasks.push(() => sleep(InGameSendMain.SEND_INTERVAL_MS))
+            tasks.push(() => sleep(interval))
           }
         }
       }
     } else {
       for (let i = 0; i < messages.length; i++) {
         tasks.push(async () => {
-          input.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
-          input.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
-          await sleep(InGameSendMain.SEND_INTERVAL_MS)
-          input.sendKeys(messages[i])
-          await sleep(InGameSendMain.SEND_INTERVAL_MS)
-          input.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
-          input.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
+          await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, true)
+          await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, false)
+          await sleep(interval)
+          await input.sendKeysAsync(messages[i])
+          await sleep(interval)
+          await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, true)
+          await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, false)
         })
 
         if (i !== messages.length - 1) {
-          tasks.push(() => sleep(InGameSendMain.SEND_INTERVAL_MS))
+          tasks.push(() => sleep(interval))
         }
       }
     }
@@ -180,6 +191,11 @@ export class InGameSendMain implements IAkariShardInitDispose {
   }
 
   private async _performCustomSend(id: string) {
+    if (!GameClientMain.isGameClientForeground()) {
+      this._log.warn('游戏当前未在前台')
+      return
+    }
+
     const s = this.settings.customSend.find((item) => item.id === id)
 
     if (!s || !s.enabled) {

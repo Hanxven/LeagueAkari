@@ -42,9 +42,9 @@ import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Game } from '@shared/types/league-client/match-history'
 import { AxiosError } from 'axios'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NModal } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
@@ -56,7 +56,6 @@ const props = defineProps<{
   gameId?: number
   selfPuuid?: string
 }>()
-
 
 const { t } = useTranslation()
 
@@ -131,21 +130,23 @@ const handleReload = async () => {
 }
 
 watch(
-  [() => props.game, () => props.gameId, () => props.selfPuuid, () => isAbleToUseSgpApi.value],
-  ([game, gameId, _selfId, useSgpApi]) => {
+  [
+    () => props.game,
+    () => props.gameId,
+    () => props.selfPuuid,
+    () => isAbleToUseSgpApi.value,
+    () => show.value
+  ],
+  ([game, gameId, _selfId, useSgpApi, show]) => {
     if (game) {
       return
     }
 
     uncontrolledData.value = null
 
-    if (gameId && lcs.isConnected) {
+    if (gameId && lcs.isConnected && show) {
       fetchGame(gameId, useSgpApi)
       isExpanded.value = true
-    } else {
-      if (show.value) {
-        show.value = false
-      }
     }
   },
   { immediate: true }

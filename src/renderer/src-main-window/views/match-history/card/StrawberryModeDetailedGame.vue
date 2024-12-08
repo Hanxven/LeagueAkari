@@ -46,13 +46,12 @@
                     @mouseup.prevent="(event) => handleMouseUp(event, p.identity.player.puuid)"
                     @mousedown="handleMouseDown"
                   >
-                    {{
+                    {{ p.identity.player.puuid === EMPTY_PUUID ? `(${t('DetailedGame.bot')}) ` : ''
+                    }}{{
                       summonerName(
                         p.identity.player.gameName || p.identity.player.summonerName,
                         p.identity.player.tagLine
                       )
-                    }}{{
-                      p.identity.player.puuid === EMPTY_PUUID ? ` (${t('DetailedGame.bot')})` : ''
                     }}
                   </div>
                 </div>
@@ -122,11 +121,10 @@ import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game, Participant, ParticipantIdentity } from '@shared/types/league-client/match-history'
 import { summonerName } from '@shared/utils/name'
 import { createReusableTemplate } from '@vueuse/core'
-import { computed } from 'vue'
 import { useTranslation } from 'i18next-vue'
+import { computed } from 'vue'
 
 import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
-
 
 const { t } = useTranslation()
 

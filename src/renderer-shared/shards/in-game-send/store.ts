@@ -23,7 +23,9 @@ export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () 
     sendAllyShortcut: null as string | null,
     sendEnemyShortcut: null as string | null,
     sendAllAlliesShortcut: null as string | null,
-    sendAllEnemiesShortcut: null as string | null
+    sendAllEnemiesShortcut: null as string | null,
+
+    sendInterval: 65
   })
 
   return {

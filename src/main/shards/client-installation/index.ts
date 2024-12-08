@@ -304,7 +304,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     }
 
     const location = path.resolve(this.state.tencentInstallationPath, 'TCLS', 'client.exe')
-    return execAsync(location, { shell: 'cmd' })
+    return execAsync(`"${location}"`, { shell: 'cmd' })
   }
 
   private _launchWeGameLeagueOfLegends() {
@@ -316,7 +316,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       'WeGameLauncher',
       'launcher.exe'
     )
-    return execAsync(location, { shell: 'cmd' })
+    return execAsync(`"${location}"`, { shell: 'cmd' })
   }
 
   private _launchWeGame() {
@@ -324,7 +324,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    return execAsync(this.state.weGameExecutablePath, { shell: 'cmd' })
+    return execAsync(`"${this.state.weGameExecutablePath}"`, { shell: 'cmd' })
   }
 
   private _launchDefaultRiotClient() {

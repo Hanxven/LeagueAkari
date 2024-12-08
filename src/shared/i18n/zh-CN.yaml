@@ -579,6 +579,7 @@ PlayerTagEditModal:
   loading: 加载中...
   save: 保存
   cancel: 取消
+  placeholder: 输入对 {{name}} 的标记
 
 ShortcutSelector:
   title: 快捷键设定
@@ -1599,6 +1600,12 @@ InGameSend:
       label: 删除
       button: 删除
       popconfirm: 确认删除该自定义发送项目？
+
+  settings:
+    title: 发送设置
+    sendInterval:
+      label: 发送间隔 (ms)
+      description: 模拟发送时的间隔时间
 
   compiled: 已编译
   saved: 已保存

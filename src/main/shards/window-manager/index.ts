@@ -656,9 +656,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       this.state.setAuxWindowShow(false)
     })
 
-    this._aw.on('always-on-top-changed', (_, b) => {
-      this._setting.set('auxWindowPinned', b)
-    })
+    // this._aw.on('always-on-top-changed', (_, b) => {
+    //   this._setting.set('auxWindowPinned', b)
+    // })
 
     this._aw.on('closed', () => {
       this.state.setAuxWindowReady(false)

@@ -51,6 +51,9 @@
                   <div class="name">
                     <span
                       class="name-span"
+                      :class="{
+                        'is-bot': p.identity.player.puuid === EMPTY_PUUID
+                      }"
                       @click="() => emits('toSummoner', p.identity.player.puuid)"
                       @mouseup.prevent="(event) => handleMouseUp(event, p.identity.player.puuid)"
                       @mousedown="handleMouseDown"
@@ -61,12 +64,14 @@
                         )
                       "
                       >{{
+                        p.identity.player.puuid === EMPTY_PUUID
+                          ? `(${t('DetailedGame.bot')}) `
+                          : ''
+                      }}{{
                         summonerName(
                           p.identity.player.gameName || p.identity.player.summonerName,
                           p.identity.player.tagLine
                         )
-                      }}{{
-                        p.identity.player.puuid === EMPTY_PUUID ? ` (${t('DetailedGame.bot')})` : ''
                       }}</span
                     >
                   </div>
@@ -420,7 +425,8 @@ table {
     .name-span {
       cursor: pointer;
       transition: color 0.3s ease;
-      &:hover {
+
+      &:not(.is-bot):hover {
         color: #63e2b7;
       }
     }
