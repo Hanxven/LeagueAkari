@@ -21,7 +21,7 @@ import { gte, lt, valid } from 'semver'
 
 import sevenBinPath from '../../../../resources/7za.exe?asset'
 import icon from '../../../../resources/LA_ICON.ico?asset'
-import updateScriptPath from '../../../../resources/update.bat?asset'
+import updateExecutablePath from '../../../../resources/akari-updater.exe?asset'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -46,7 +46,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   static UPDATES_CHECK_INTERVAL = 7.2e6 // 2 hours
   static ANNOUNCEMENT_CHECK_INTERVAL = 7.2e6 // 2 hours
   static DOWNLOAD_DIR_NAME = 'NewUpdates'
-  static UPDATE_SCRIPT_NAME = 'LeagueAkariUpdate.bat'
+  static UPDATE_EXECUTABLE_NAME = 'akari-updater.exe'
   static NEW_VERSION_FLAG = 'NEW_VERSION_FLAG'
   static EXECUTABLE_NAME = 'LeagueAkari.exe'
   static UPDATE_PROGRESS_UPDATE_INTERVAL = 200
@@ -489,18 +489,24 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     return asyncTask
   }
 
-  private _applyUpdatesOnNextStartup(newUpdateDir: string, _shouldStartNewApp: boolean = false) {
+  private _applyUpdatesOnNextStartup(newUpdateDir: string, _shouldStartNewApp: boolean = true) {
     if (!ofs.existsSync(newUpdateDir)) {
       this.state.setUpdateProgressInfo(null)
       this._log.error(`更新目录不存在 ${newUpdateDir}`)
       throw new Error(`No such directory ${newUpdateDir}`)
     }
 
-    const copiedScriptPath = path.join(app.getPath('temp'), SelfUpdateMain.UPDATE_SCRIPT_NAME)
+    const copiedExecutablePath = path.join(
+      app.getPath('temp'),
+      SelfUpdateMain.UPDATE_EXECUTABLE_NAME
+    )
 
-    ofs.copyFileSync(updateScriptPath.replace('app.asar', 'app.asar.unpacked'), copiedScriptPath)
+    ofs.copyFileSync(
+      updateExecutablePath.replace('app.asar', 'app.asar.unpacked'),
+      copiedExecutablePath
+    )
 
-    this._log.info(`写入更新脚本 ${copiedScriptPath}`)
+    this._log.info(`写入更新可执行文件 ${copiedExecutablePath}`)
 
     const appExePath = app.getPath('exe')
     const appDir = path.dirname(appExePath)
@@ -510,7 +516,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     }
 
     this._log.info(
-      `添加退出任务: 更新脚本 ${copiedScriptPath}: ${newUpdateDir} ${appDir} ${SelfUpdateMain.EXECUTABLE_NAME}`
+      `添加退出任务: 更新流程 ${copiedExecutablePath}: ${newUpdateDir} ${appDir} ${SelfUpdateMain.EXECUTABLE_NAME}`
     )
 
     this._createNotification(
@@ -519,12 +525,16 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     )
 
     const _updateOnQuitFn = () => {
-      const c = cp.spawn(copiedScriptPath, [newUpdateDir, appDir, SelfUpdateMain.EXECUTABLE_NAME], {
-        detached: true,
-        stdio: 'ignore',
-        shell: true,
-        cwd: app.getPath('temp')
-      })
+      const c = cp.spawn(
+        copiedExecutablePath,
+        [`"${newUpdateDir}"`, `"${appDir}"`, `"${SelfUpdateMain.EXECUTABLE_NAME}"`],
+        {
+          detached: true,
+          stdio: 'ignore',
+          shell: true,
+          cwd: app.getPath('temp')
+        }
+      )
 
       c.unref()
 
@@ -546,8 +556,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     })
 
     this._currentUpdateTaskCanceler = () => {
-      if (ofs.existsSync(copiedScriptPath)) {
-        ofs.rmSync(copiedScriptPath, {
+      if (ofs.existsSync(copiedExecutablePath)) {
+        ofs.rmSync(copiedExecutablePath, {
           force: true,
           recursive: true
         })
@@ -563,7 +573,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
       this._log.info(
         `取消退出更新任务`,
-        `删除更新脚本 ${copiedScriptPath}`,
+        `删除更新脚本 ${copiedExecutablePath}`,
         `删除更新目录 ${newUpdateDir}`
       )
     }
