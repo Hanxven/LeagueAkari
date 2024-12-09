@@ -59,6 +59,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
   private _mw: BrowserWindow | null = null
   private _aw: BrowserWindow | null = null
+  private _ow: BrowserWindow | null = null
 
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
@@ -289,6 +290,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
         this._adjustAuxWindowForFunctionality(f)
       }
     )
+
+    this._ipc.onCall(WindowManagerMain.id, 'overlay-window/clickThrough', (value: boolean = false) => {
+      this.changeOverlayWindowClickThrough(value)
+    })
   }
 
   showOrRestoreAuxWindow(inactive = false) {
@@ -699,6 +704,55 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._log.info('创建辅助窗口')
   }
 
+  private _createOverlayWindow() {
+    this._ow = new BrowserWindow({
+      fullscreen: false,
+      resizable: false,
+      frame: true,
+      title: 'Akari Overlay',
+      autoHideMenuBar: true,
+      maximizable: true,
+      minimizable: true,
+      icon,
+      skipTaskbar: false,
+      webPreferences: {
+        preload: join(__dirname, '../preload/index.js'),
+        sandbox: false,
+        spellcheck: false,
+        backgroundThrottling: false,
+        partition: WindowManagerMain.AUX_WINDOW_PARTITION
+      }
+    })
+
+    // this._ow.setIgnoreMouseEvents(true, { forward: true });
+    // this._ow.setSkipTaskbar(true);
+    this._ow.removeMenu();
+    this._ow.restore();
+    this._ow.show();
+    this._ow?.webContents.toggleDevTools()
+
+    // this._ow.webContents.on('before-input-event', (event, input) => {
+    //   event.preventDefault()
+    // })
+
+    if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+      this._ow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/overlay-window.html`)
+    } else {
+      this._ow.loadFile(join(__dirname, '../renderer/overlay-window.html'))
+    }
+
+    this._log.info('创建Overlay窗口')
+  }
+
+  closeOverlayWindow() {
+    if (this._ow) {
+      this._ow.close()
+      this._ow = null
+
+      this._log.info('Overlay窗口关闭')
+    }
+  }
+
   closeAuxWindow() {
     if (this._aw) {
       this._aw.close()
@@ -883,6 +937,12 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     )
   }
 
+  createOverlayWindow() {
+    if (!this._ow || this._ow.isDestroyed()) {
+      this._createOverlayWindow()
+    }
+  }
+
   createAuxWindow() {
     if (!this._aw || this._aw.isDestroyed()) {
       this._createAuxWindow()
@@ -939,6 +999,14 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     }
   }
 
+  changeOverlayWindowClickThrough(value: boolean) {
+    if (value) {
+      this._ow?.setIgnoreMouseEvents(true, { forward: true });
+    } else {
+      this._ow?.setIgnoreMouseEvents(false);
+    }
+  }
+
   forceMainWindowQuit() {
     this._willQuit = true
     this._mw?.close()
@@ -950,5 +1018,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     })
     this.state.setShardsReady(true)
     this.createMainWindow()
+    this.createOverlayWindow()
   }
 }

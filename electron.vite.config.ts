@@ -73,6 +73,7 @@ export default defineConfig({
       alias: {
         '@main-window': resolve('src/renderer/src-main-window'),
         '@aux-window': resolve('src/renderer/src-aux-window'),
+        '@overlay-window': resolve('src/renderer/src-overlay-window'),
         '@shared': resolve('src/shared'),
         '@renderer-shared': resolve('src/renderer-shared')
       }

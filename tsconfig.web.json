@@ -6,6 +6,8 @@
     "src/renderer/src-main-window/**/*.vue",
     "src/renderer/src-aux-window/**/*",
     "src/renderer/src-aux-window/**/*.vue",
+    "src/renderer/src-overlay-window/**/*",
+    "src/renderer/src-overlay-window/**/*.vue",
     "src/preload/*.d.ts",
     "src/shared/**/*",
     "src/renderer-shared/**/*"
@@ -19,6 +21,7 @@
     "paths": {
       "@main-window/*": ["src/renderer/src-main-window/*"],
       "@aux-window/*": ["src/renderer/src-aux-window/*"],
+      "@overlay-window/*": ["src/renderer/src-overlay-window"],
       "@shared/*": ["src/shared/*"],
       "@renderer-shared/*": ["src/renderer-shared/*"]
     },
