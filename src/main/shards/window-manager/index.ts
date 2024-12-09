@@ -15,6 +15,7 @@ import { AkariLogger } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { WindowManagerSettings, WindowManagerState } from './state'
+import { OverlayWindowMain } from './overlay'
 
 export class WindowManagerMain implements IAkariShardInitDispose {
   static id = 'window-manager-main'
@@ -59,7 +60,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
   private _mw: BrowserWindow | null = null
   private _aw: BrowserWindow | null = null
-  private _ow: BrowserWindow | null = null
+  private _ow: OverlayWindowMain | null = null
 
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
@@ -385,6 +386,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   private _handleCloseMainWindow(event: Event) {
     if (this._willQuit) {
       this._aw?.close()
+      this.closeOverlayWindow()
       return
     }
 
@@ -705,42 +707,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   }
 
   private _createOverlayWindow() {
-    this._ow = new BrowserWindow({
-      fullscreen: false,
-      resizable: false,
-      frame: true,
-      title: 'Akari Overlay',
-      autoHideMenuBar: true,
-      maximizable: true,
-      minimizable: true,
-      icon,
-      skipTaskbar: false,
-      webPreferences: {
-        preload: join(__dirname, '../preload/index.js'),
-        sandbox: false,
-        spellcheck: false,
-        backgroundThrottling: false,
-        partition: WindowManagerMain.AUX_WINDOW_PARTITION
-      }
-    })
-
-    // this._ow.setIgnoreMouseEvents(true, { forward: true });
-    // this._ow.setSkipTaskbar(true);
-    this._ow.removeMenu();
-    this._ow.restore();
-    this._ow.show();
-    this._ow?.webContents.toggleDevTools()
-
-    // this._ow.webContents.on('before-input-event', (event, input) => {
-    //   event.preventDefault()
-    // })
-
-    if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-      this._ow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/overlay-window.html`)
-    } else {
-      this._ow.loadFile(join(__dirname, '../renderer/overlay-window.html'))
-    }
-
+    this._ow = new OverlayWindowMain;
+    this._ow.create();
     this._log.info('创建Overlay窗口')
   }
 
@@ -938,7 +906,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   }
 
   createOverlayWindow() {
-    if (!this._ow || this._ow.isDestroyed()) {
+    if (!this._ow) {
       this._createOverlayWindow()
     }
   }
@@ -1000,11 +968,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   }
 
   changeOverlayWindowClickThrough(value: boolean) {
-    if (value) {
-      this._ow?.setIgnoreMouseEvents(true, { forward: true });
-    } else {
-      this._ow?.setIgnoreMouseEvents(false);
-    }
+    this._ow?.setClickThrough(value);
   }
 
   forceMainWindowQuit() {
