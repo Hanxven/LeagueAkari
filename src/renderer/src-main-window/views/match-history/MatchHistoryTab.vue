@@ -660,6 +660,10 @@ const loadSummoner = async () => {
 
     // 在非当前登录服务器的情况下, 需要借用 RC 和 SGP API 来补全召唤师信息 (仅限腾讯服之间)
     if (sgps.availability.sgpServerId !== tab.sgpServerId) {
+      if (!sgps.isTokenReady) {
+        return
+      }
+
       // 需要 SGP API 支持
       if (currentSgpServerSupported.value.common) {
         const data = await sgp.getSummonerLcuFormat(tab.puuid, tab.sgpServerId)
@@ -771,6 +775,10 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
 
     // 在优先使用 SGP API 查询战绩时, 且当前的 SGP Server 记录在案, 则使用之
     if (mhs.settings.matchHistoryUseSgpApi && currentSgpServerSupported.value.matchHistory) {
+      if (!sgps.isTokenReady) {
+        return
+      }
+
       const data = await sgp.getMatchHistoryLcuFormat(
         tab.puuid,
         (page - 1) * pageSize,
@@ -1147,9 +1155,40 @@ const handleRemoveTag = async (puuid: string, selfPuuid: string) => {
   }
 }
 
-onMounted(() => {
-  handleRefresh()
-})
+// 对于使用到 SGP API 的接口, 在 token 准备好后, 再次加载数据
+// 仅作为 workaround
+watch(
+  () => sgps.isTokenReady,
+  async (current, prev) => {
+    if (current && !prev) {
+      const fn1 = async () => {
+        if (sgps.availability.sgpServerId !== tab.sgpServerId && tab.summoner === null) {
+          await loadSummoner()
+        }
+      }
+
+      const fn2 = async () => {
+        if (
+          mhs.settings.matchHistoryUseSgpApi &&
+          currentSgpServerSupported.value.matchHistory &&
+          tab.matchHistoryPage === null
+        ) {
+          await loadMatchHistory()
+        }
+      }
+
+      const fn3 = async () => {
+        if (sgps.availability.serversSupported.common && tab.spectatorData === null) {
+          await updateSpectatorData()
+        }
+      }
+
+      await Promise.all([fn1(), fn2(), fn3()])
+    }
+  }
+)
+
+handleRefresh()
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 const RECENTLY_PLAYED_PLAYER_THRESHOLD = 2
@@ -1236,6 +1275,10 @@ const UPDATE_SPECTATOR_DATA_INTERVAL = 60 * 1000 // 1 分钟
 const updateSpectatorData = async () => {
   // 仅仅在当前大区支持 SGP API 时才更新
   if (!sgps.availability.serversSupported.common) {
+    return
+  }
+
+  if (!sgps.isTokenReady) {
     return
   }
 

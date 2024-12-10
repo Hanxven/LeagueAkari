@@ -8,7 +8,6 @@ import {
   analyzeTeamMatchHistory
 } from '@shared/utils/analysis'
 import { calculateTogetherTimes, removeOverlappingSubsets } from '@shared/utils/team-up-calc'
-import { isAxiosError } from 'axios'
 import _ from 'lodash'
 import { comparer, computed, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
@@ -576,7 +575,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
       this._loadGameTimeline(
         data.games.games.map((g) => g.gameId).slice(0, this.settings.gameTimelineLoadCount),
-        { signal }
+        { signal, force, useSgpApi }
       )
 
       const toBeLoaded = {
@@ -626,7 +625,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
       this._loadGameTimeline(
         res.data.games.games.map((g) => g.gameId).slice(0, this.settings.gameTimelineLoadCount),
-        { signal }
+        { signal, force, useSgpApi }
       )
 
       await Promise.allSettled(res.data.games.games.map((g) => loadGame(g.gameId)))
