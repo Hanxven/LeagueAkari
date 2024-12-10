@@ -139,7 +139,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._handleMainWindowObservations()
     this._handleMainWindowIpcCall()
     this._handleAuxWindowIpcCall()
-    this._handleOverlayIpcCall()
   }
 
   private _handleMainWindowIpcCall() {
@@ -295,12 +294,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       }
     )
 
-  }
-  
-  private _handleOverlayIpcCall() {
-    this._ipc.onCall(WindowManagerMain.id, 'overlay/show', () => {
-      this.showOverlay()
-    })
   }
     
   showOrRestoreAuxWindow(inactive = false) {

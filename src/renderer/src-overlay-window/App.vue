@@ -9,7 +9,8 @@
     <img src="./assets/test.gif" />
     <p>Drag Me!</p>
   </div>
-  <p>Overlay Window</p>
+  <p>LEAGUE AKRAI Overlay Window</p>
+  <p>CTRL + X to show or hide</p>
   <p>Click Count {{ count }}</p>
   <p>Click Through {{ clickThroughStatus }}</p>
   <button @mouseenter="enter" @mouseleave="leave" @click="clickThroughCount">
@@ -19,10 +20,10 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
-import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
+import { OverlayRenderer } from '@renderer-shared/shards/overlay';
 import { ref } from 'vue'
 
-const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const mng = useInstance<OverlayRenderer>('overlay-renderer')
 
 const count = ref(0);
 const clickThroughStatus = ref(true);
@@ -32,15 +33,15 @@ const clickThroughCount = () => {
 };
 
 const enter = () => {
-  // console.log("enter");
-  // clickThroughStatus.value = false;
-  // wm.setOverlayWindowClickThrough(false);
+  console.log("enter");
+  clickThroughStatus.value = false;
+  mng.toggleClickThrough(false);
 };
 
 const leave = () => {
-  // console.log("leave");
-  // clickThroughStatus.value = true;
-  // wm.setOverlayWindowClickThrough(true);
+  console.log("leave");
+  clickThroughStatus.value = true;
+  mng.toggleClickThrough(true);
 };
 
 const box = ref();

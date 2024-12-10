@@ -55,12 +55,14 @@ import { LogoGithub } from '@vicons/ionicons5'
 import { NIcon, NTooltip } from 'naive-ui'
 import { inject } from 'vue'
 import { useTranslation } from 'i18next-vue'
+import { OverlayRenderer } from '@renderer-shared/shards/overlay'
 
 
 const { t } = useTranslation()
 
 const wms = useWindowManagerStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const overlay = useInstance<OverlayRenderer>('overlay-renderer')
 
 const { openAnnouncementModal } = inject('app') as any
 
@@ -71,7 +73,7 @@ const handleShowAuxWindow = () => {
 }
 
 const handleShowOverlay = () => {
-  wm.showOverlay()
+  overlay.show()
 }
 
 const handleToGithub = () => {

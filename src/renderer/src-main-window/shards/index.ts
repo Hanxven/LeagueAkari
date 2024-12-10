@@ -25,6 +25,7 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
 import { MainWindowUiRenderer } from './main-window-ui'
 import { MatchHistoryTabsRenderer } from './match-history-tabs'
+import { OverlayRenderer } from '@renderer-shared/shards/overlay'
 
 const manager = createManager()
 
@@ -53,7 +54,8 @@ manager.use(
   SettingUtilsRenderer,
   SgpRenderer,
   WindowManagerRenderer,
-  MainWindowUiRenderer
+  MainWindowUiRenderer,
+  OverlayRenderer
 )
 
 export { manager }

@@ -142,11 +142,6 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'aux-window/setBackgroundMaterial', value)
   }
 
-  showOverlay() {
-    this._log.info(WindowManagerRenderer.id, '显示Overlay')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'overlay/show')
-  }
-
   mainWindowOpenDialog(
     properties = ['openFile'],
     filters: {

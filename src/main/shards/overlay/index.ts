@@ -46,14 +46,17 @@ export class OverlayMain implements IAkariShardInitDispose {
   }
 
   private _handleIpcCall() {
-    this._ipc.onCall(OverlayMain.id, 'overlay/clickThrough', (value: boolean = false) => {
-      this._setClickThrough(value);
+    this._ipc.onCall(OverlayMain.id, 'overlay/show', () => {
+      this.show();
+    })
+    this._ipc.onCall(OverlayMain.id, 'overlay/clickThrough', (value: boolean) => {
+      this._toggleClickThrough(value);
     })
   }
 
   private _create() {
     this._window = new BrowserWindow({
-      fullscreen: false,
+      fullscreen: true,
       resizable: false,
       frame: false,
       title: 'Akari Overlay',
@@ -63,6 +66,8 @@ export class OverlayMain implements IAkariShardInitDispose {
       show: false,
       icon,
       skipTaskbar: false,
+      transparent: true,
+      backgroundColor: '#00000000',
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         sandbox: false,
@@ -82,8 +87,11 @@ export class OverlayMain implements IAkariShardInitDispose {
     } else {
       this._window.loadFile(join(__dirname, '../renderer/overlay-window.html'))
     }
-
-    this._inst.enable(this._window.getNativeWindowHandle())
+    try {
+      this._inst.enable(this._window.getNativeWindowHandle())
+    } catch(err) {
+      this._log.error(err)
+    }
   }
   
   private _initShortCuts() {
@@ -92,12 +100,11 @@ export class OverlayMain implements IAkariShardInitDispose {
     this._kbd.register(`${OverlayMain.id}/visible`, 'LeftControl+X', 'normal', () => {
       if (this._window) {
         this.visible ? this.hide() : this.show()
-        this.visible = !this.visible
       }
     })
   }
 
-  private _setClickThrough(value: boolean) {
+  private _toggleClickThrough(value: boolean) {
     if (value) {
       this._window?.setIgnoreMouseEvents(true, { forward: true });
     } else {
@@ -116,14 +123,14 @@ export class OverlayMain implements IAkariShardInitDispose {
   }
 
   show() {
-    if (this._window) {
-      this._window.show()
+    if (this._window && !this.visible) {
+      this._window?.show()
       this.visible = true
     }
   }
 
   hide() {
-    if (this._window) {
+    if (this._window  && this.visible) {
       this._window?.hide()
       this.visible = false
     }
