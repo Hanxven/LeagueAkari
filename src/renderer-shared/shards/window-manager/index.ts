@@ -142,9 +142,9 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'aux-window/setBackgroundMaterial', value)
   }
 
-  setOverlayWindowClickThrough(value: boolean) {
-    this._log.info(WindowManagerRenderer.id, `change overlay window click through: ${value}`)
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'overlay-window/clickThrough', value)
+  showOverlay() {
+    this._log.info(WindowManagerRenderer.id, '显示Overlay')
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'overlay/show')
   }
 
   mainWindowOpenDialog(

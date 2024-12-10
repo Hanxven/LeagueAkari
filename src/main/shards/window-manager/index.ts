@@ -15,7 +15,7 @@ import { AkariLogger } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { WindowManagerSettings, WindowManagerState } from './state'
-import { OverlayWindowMain } from './overlay'
+import { OverlayMain } from '../overlay'
 
 export class WindowManagerMain implements IAkariShardInitDispose {
   static id = 'window-manager-main'
@@ -26,7 +26,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     'logger-factory-main',
     'setting-factory-main',
     'league-client-main',
-    'config-migrate-main'
+    'config-migrate-main',
+    'overlay-main'
   ]
 
   static MAIN_WINDOW_MIN_SIZE = [840, 600] as [number, number]
@@ -50,6 +51,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   private readonly _setting: SetterSettingService
   private readonly _lc: LeagueClientMain
   private readonly _shared: AkariSharedGlobalShard
+  private readonly _overlay: OverlayMain
 
   /**
    * 标记位, 用于判断是否是即将退出应用程序 (需要全部窗口关闭)
@@ -60,7 +62,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
   private _mw: BrowserWindow | null = null
   private _aw: BrowserWindow | null = null
-  private _ow: OverlayWindowMain | null = null
 
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
@@ -83,6 +84,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       this.settings
     )
     this._lc = deps['league-client-main']
+    this._overlay = deps['overlay-main']
   }
 
   async onInit() {
@@ -137,6 +139,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._handleMainWindowObservations()
     this._handleMainWindowIpcCall()
     this._handleAuxWindowIpcCall()
+    this._handleOverlayIpcCall()
   }
 
   private _handleMainWindowIpcCall() {
@@ -292,11 +295,14 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       }
     )
 
-    this._ipc.onCall(WindowManagerMain.id, 'overlay-window/clickThrough', (value: boolean = false) => {
-      this.changeOverlayWindowClickThrough(value)
+  }
+  
+  private _handleOverlayIpcCall() {
+    this._ipc.onCall(WindowManagerMain.id, 'overlay/show', () => {
+      this.showOverlay()
     })
   }
-
+    
   showOrRestoreAuxWindow(inactive = false) {
     if (this._aw && this.state.auxWindowReady) {
       if (!this.state.auxWindowShow) {
@@ -706,19 +712,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._log.info('创建辅助窗口')
   }
 
-  private _createOverlayWindow() {
-    this._ow = new OverlayWindowMain;
-    this._ow.create();
-    this._log.info('创建Overlay窗口')
-  }
-
   closeOverlayWindow() {
-    if (this._ow) {
-      this._ow.close()
-      this._ow = null
-
-      this._log.info('Overlay窗口关闭')
-    }
+    this._overlay.close()
+    this._log.info('Overlay窗口关闭')
   }
 
   closeAuxWindow() {
@@ -906,9 +902,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   }
 
   createOverlayWindow() {
-    if (!this._ow) {
-      this._createOverlayWindow()
-    }
+    this._overlay.create()
+    this._log.info('Overlay窗口创建')
   }
 
   createAuxWindow() {
@@ -967,8 +962,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     }
   }
 
-  changeOverlayWindowClickThrough(value: boolean) {
-    this._ow?.setClickThrough(value);
+  showOverlay() {
+    this._overlay.show()
   }
 
   forceMainWindowQuit() {
@@ -982,6 +977,5 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     })
     this.state.setShardsReady(true)
     this.createMainWindow()
-    this.createOverlayWindow()
   }
 }

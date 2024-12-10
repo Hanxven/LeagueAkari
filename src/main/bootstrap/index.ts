@@ -42,6 +42,7 @@ import os from 'node:os'
 import { Logger } from 'winston'
 
 import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
+import { OverlayMain } from '@main/shards/overlay'
 
 interface AkariAppEventMap {
   'second-instance': [commandLine: string[], workingDirectory: string]
@@ -214,6 +215,7 @@ export function bootstrap() {
       TrayMain,
       KeyboardShortcutsMain,
       SelfUpdateMain,
+      OverlayMain,
 
       // functional shards
       AutoGameflowMain,
@@ -247,6 +249,7 @@ export function bootstrap() {
       try {
         await manager.setup()
       } catch (error) {
+        console.log(error)
         logger.error({
           message: `[10002] 功能初始化时出现错误 ${formatError(error)}`,
           namespace: 'akari-shard-manager'

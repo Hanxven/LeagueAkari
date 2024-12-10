@@ -18,6 +18,7 @@ CommonButtons:
   announcement: Announcement
   github: Project GitHub
   auxWindow: Auxiliary Window
+  overlay: Overlay
 
 TrafficButtons:
   minimize: Minimize

@@ -20,6 +20,7 @@ CommonButtons:
   announcement: 公告
   github: 项目主页
   auxWindow: 小窗口
+  overlay: 悬浮窗
 
 TrafficButtons:
   minimize: 最小化

@@ -32,15 +32,15 @@ const clickThroughCount = () => {
 };
 
 const enter = () => {
-  console.log("enter");
-  clickThroughStatus.value = false;
-  wm.setOverlayWindowClickThrough(false);
+  // console.log("enter");
+  // clickThroughStatus.value = false;
+  // wm.setOverlayWindowClickThrough(false);
 };
 
 const leave = () => {
-  console.log("leave");
-  clickThroughStatus.value = true;
-  wm.setOverlayWindowClickThrough(true);
+  // console.log("leave");
+  // clickThroughStatus.value = true;
+  // wm.setOverlayWindowClickThrough(true);
 };
 
 const box = ref();
