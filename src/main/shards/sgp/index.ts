@@ -1,12 +1,16 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AvailableServersMap, SgpApi } from '@shared/data-sources/sgp'
-import { SgpGameSummaryLol, SgpMatchHistoryLol, SgpSummoner } from '@shared/data-sources/sgp/types'
-import { Game, MatchHistory } from '@shared/types/league-client/match-history'
+import {
+  SgpGameDetailsLol,
+  SgpGameSummaryLol,
+  SgpMatchHistoryLol,
+  SgpSummoner
+} from '@shared/data-sources/sgp/types'
+import { Game, GameTimeline, MatchHistory } from '@shared/types/league-client/match-history'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { formatError } from '@shared/utils/errors'
 import Ajv from 'ajv'
 import { isAxiosError } from 'axios'
-import { comparer, when } from 'mobx'
 import fs from 'node:fs'
 
 import builtinSgpServersJson from '../../../../resources/builtin-config/sgp/mh-sgp-servers.json?commonjs-external&asset'
@@ -254,6 +258,16 @@ export class SgpMain implements IAkariShardInitDispose {
     return data
   }
 
+  async getGameDetails(gameId: number, sgpServerId?: string) {
+    if (!sgpServerId) {
+      sgpServerId = this.state.availability.sgpServerId
+    }
+
+    const { data } = await this._sgp.getGameDetails(sgpServerId, gameId)
+
+    return data
+  }
+
   async getMatchHistoryLcuFormat(
     playerPuuid: string,
     start: number,
@@ -292,6 +306,17 @@ export class SgpMain implements IAkariShardInitDispose {
       return this.parseSgpSummonerToLcu0Format(result)
     } catch (error) {
       this._log.warn(`转换召唤师数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${playerPuuid}`)
+      throw error
+    }
+  }
+
+  async getTimelineLcuFormat(gameId: number, sgpServerId?: string) {
+    const result = await this.getGameDetails(gameId, sgpServerId)
+
+    try {
+      return this.parseSgpGameDetailsToLcu0Format(result)
+    } catch (error) {
+      this._log.warn(`转换时间线数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${gameId}`)
       throw error
     }
   }
@@ -504,6 +529,49 @@ export class SgpMain implements IAkariShardInitDispose {
       unnamed: sgpSummoner.unnamed,
       xpSinceLastLevel: sgpSummoner.expPoints,
       xpUntilNextLevel: sgpSummoner.expToNextLevel - sgpSummoner.expPoints
+    }
+  }
+
+  parseSgpGameDetailsToLcu0Format(bData: SgpGameDetailsLol): GameTimeline {
+    return {
+      frames: bData.json.frames.map((frame) => ({
+        timestamp: frame.timestamp,
+        events: frame.events.map((event) => ({
+          // A 的 Event 字段：
+          assistingParticipantIds: event.assistingParticipantIds ?? [],
+          buildingType: event.buildingType ?? '',
+          itemId: event.itemId ?? 0,
+          killerId: event.killerId ?? 0,
+          laneType: event.laneType ?? '',
+          monsterSubType: event.monsterSubType ?? '',
+          monsterType: event.monsterType ?? '',
+          participantId: event.participantId ?? 0,
+          position: event.position ?? { x: 0, y: 0 },
+          skillSlot: event.skillSlot ?? 0,
+          teamId: event.teamId ?? 0,
+          timestamp: event.timestamp,
+          towerType: event.towerType ?? '',
+          type: event.type ?? '',
+          victimId: event.victimId ?? 0
+        })),
+        participantFrames: Object.fromEntries(
+          Object.values(frame.participantFrames).map((pf) => [
+            pf.participantId,
+            {
+              currentGold: pf.currentGold ?? 0,
+              dominionScore: 0, // B 中无对应数据，设为默认值
+              jungleMinionsKilled: pf.jungleMinionsKilled ?? 0,
+              level: pf.level ?? 0,
+              minionsKilled: pf.minionsKilled ?? 0,
+              participantId: pf.participantId,
+              position: pf.position ?? { x: 0, y: 0 },
+              teamScore: 0, // B 中无对应数据，设为默认值
+              totalGold: pf.totalGold ?? 0,
+              xp: pf.xp ?? 0
+            }
+          ])
+        )
+      }))
     }
   }
 

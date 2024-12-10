@@ -100,7 +100,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
         this.state.setTencentInstallationPath(p.value as string)
 
         try {
-          const tclsPath = path.resolve(p.value as string, 'TCLS', 'client.exe')
+          const tclsPath = path.resolve(p.value as string, 'Launcher', 'Client.exe')
           await fs.promises.access(tclsPath)
           this.state.setHasTcls(true)
         } catch {
@@ -178,7 +178,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
 
         this.state.setTencentInstallationPath(installation)
 
-        const tcls = path.resolve(installation, 'TCLS', 'client.exe')
+        const tcls = path.resolve(installation, 'Launcher', 'Client.exe')
         const weGameLauncher = path.resolve(installation, 'WeGameLauncher', 'launcher.exe')
 
         try {
@@ -303,7 +303,7 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       return
     }
 
-    const location = path.resolve(this.state.tencentInstallationPath, 'TCLS', 'client.exe')
+    const location = path.resolve(this.state.tencentInstallationPath, 'Launcher', 'Client.exe')
     return execAsync(`"${location}"`, { shell: 'cmd' })
   }
 
