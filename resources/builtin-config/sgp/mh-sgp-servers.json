@@ -69,6 +69,11 @@
       "name": "PBE",
       "matchHistory": "https://usw2-red.pp.sgp.pvp.net",
       "common": "https://pbe-red.lol.sgp.pvp.net"
+    },
+    "EUW": {
+      "name": "EUW",
+      "matchHistory": "https://euc1-red.pp.sgp.pvp.net",
+      "common": "https://euw-red.lol.sgp.pvp.net"
     }
   },
   "tencentServerMatchHistoryInteroperability": [

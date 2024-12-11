@@ -89,7 +89,7 @@ export class SgpMain implements IAkariShardInitDispose {
     'akari-ipc-main'
   ]
 
-  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v7.json'
+  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v8.json'
 
   public readonly state: SgpState
 

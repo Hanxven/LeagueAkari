@@ -210,7 +210,7 @@
             </template>
             <!-- Right Side Auxiliary Information -->
             <template v-if="positionInfo.recent && positionInfo.recent.length">
-              <PositionIcon v-for="p of positionInfo.recent.slice(0, 2)" :position="p.position" />
+              <PositionIcon v-for="p of positionInfo.recent.slice(0, 3)" :position="p.position" />
             </template>
             <template v-else-if="positionInfo.role">
               <PositionIcon :position="positionInfo.role.primary" />
@@ -398,18 +398,18 @@
         :delay="50"
       >
         <template #trigger>
-          <div class="tag akari-loved" v-if="analysis.akariScore.great">
-            {{ t('PlayerInfoCard.akariLoved.great') }}
+          <div class="tag akari-loved" v-if="analysis.akariScore.good">
+            {{ t('PlayerInfoCard.akariLoved.good') }}
           </div>
-          <div class="tag akari-loved" v-else-if="analysis.akariScore.good">
+          <div class="tag akari-loved" v-else-if="analysis.akariScore.great">
             {{ t('PlayerInfoCard.akariLoved.great') }}
           </div>
         </template>
-        <div class="popover-text" v-if="analysis.akariScore.great">
-          {{ t('PlayerInfoCard.akariLoved.greatPopover') }}
-        </div>
-        <div class="popover-text" v-else-if="analysis.akariScore.good">
+        <div class="popover-text" v-if="analysis.akariScore.good">
           {{ t('PlayerInfoCard.akariLoved.goodPopover') }}
+        </div>
+        <div class="popover-text" v-else-if="analysis.akariScore.great">
+          {{ t('PlayerInfoCard.akariLoved.greatPopover') }}
         </div>
       </NPopover>
       <NPopover

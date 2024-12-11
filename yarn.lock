@@ -1336,13 +1336,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kurkle/color@npm:^0.3.0":
-  version: 0.3.2
-  resolution: "@kurkle/color@npm:0.3.2"
-  checksum: 10c0/a9e8e3e35dcd59dec4dd4f0105919c05e24823a96347bcf152965c29e48d6290b66d5fb96c071875db752e10930724c48ce6d338fefbd65e0ce5082d5c78970e
-  languageName: node
-  linkType: hard
-
 "@malept/cross-spawn-promise@npm:^2.0.0":
   version: 2.0.0
   resolution: "@malept/cross-spawn-promise@npm:2.0.0"
@@ -3141,15 +3134,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chart.js@npm:^4.4.7":
-  version: 4.4.7
-  resolution: "chart.js@npm:4.4.7"
-  dependencies:
-    "@kurkle/color": "npm:^0.3.0"
-  checksum: 10c0/9db499993c561f11184112003956ba96cf00513e025f58846be36e75ebddc6cbab2f93626c3734c305bc801e9362a9ef193b9591e679c59903b2ecb48cfcb317
-  languageName: node
-  linkType: hard
-
 "chownr@npm:^2.0.0":
   version: 2.0.0
   resolution: "chownr@npm:2.0.0"
@@ -3800,16 +3784,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^33.2.0":
-  version: 33.2.0
-  resolution: "electron@npm:33.2.0"
+"electron@npm:33.2.1":
+  version: 33.2.1
+  resolution: "electron@npm:33.2.1"
   dependencies:
     "@electron/get": "npm:^2.0.0"
     "@types/node": "npm:^20.9.0"
     extract-zip: "npm:^2.0.1"
   bin:
     electron: cli.js
-  checksum: 10c0/ad013bcc4fe65f6e0f40b77387452966347d4fb54acc8d8d7b0310244f73511a7ac87e03e1097970f83b94bcafc44e0b98a4c603daa9c95e11931d7c020ff155
+  checksum: 10c0/25111ab9b48bf95a24b916292c8d4f4d05309b12823d5e942636f377a8033c9c47d466f686895bfe4619b80d222470a439d9b0227516740c8e19fa14991b880b
   languageName: node
   linkType: hard
 
@@ -5273,10 +5257,9 @@ __metadata:
     ajv: "npm:^8.17.1"
     axios: "npm:^1.7.9"
     axios-retry: "npm:^4.5.0"
-    chart.js: "npm:^4.4.7"
     dayjs: "npm:^1.11.13"
     deep-eql: "npm:^5.0.2"
-    electron: "npm:^33.2.0"
+    electron: "npm:33.2.1"
     electron-builder: "npm:25.1.8"
     electron-vite: "npm:^2.3.0"
     eta: "npm:^3.5.0"
@@ -5307,7 +5290,6 @@ __metadata:
     vite-plugin-vue-devtools: "npm:^7.6.7"
     vm2: "npm:^3.9.19"
     vue: "npm:^3.5.13"
-    vue-chartjs: "npm:^5.3.2"
     vue-router: "npm:^4.5.0"
     vue-tsc: "npm:^2.1.10"
     winston: "npm:^3.17.0"
@@ -7997,16 +7979,6 @@ __metadata:
   version: 3.0.8
   resolution: "vscode-uri@npm:3.0.8"
   checksum: 10c0/f7f217f526bf109589969fe6e66b71e70b937de1385a1d7bb577ca3ee7c5e820d3856a86e9ff2fa9b7a0bc56a3dd8c3a9a557d3fedd7df414bc618d5e6b567f9
-  languageName: node
-  linkType: hard
-
-"vue-chartjs@npm:^5.3.2":
-  version: 5.3.2
-  resolution: "vue-chartjs@npm:5.3.2"
-  peerDependencies:
-    chart.js: ^4.1.1
-    vue: ^3.0.0-0 || ^2.7.0
-  checksum: 10c0/e07d6766d058ecb11798ce3764105db2878c77bb6c887bf634644b5bf763e881e749b0d1a2981281126c889206b7fbe3b8db43ede275f951a84ec6087a83ff4e
   languageName: node
   linkType: hard
 

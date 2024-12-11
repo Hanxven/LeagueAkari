@@ -370,30 +370,50 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
               ...eogStatus.leftPlayers,
               ...eogStatus.readyPlayers
             ]
+
             const candidates: string[] = []
 
+            // 1. 优先从房间中的己方成员选择
             const lobbyAllies = h.allies.filter((p) => lobbyMembers.includes(p))
-
-            if (lobbyAllies.length > 0) {
-              const actualLobbyVotes = Math.min(h.votes, lobbyAllies.length)
+            const firstBatchVotes = Math.min(h.votes, lobbyAllies.length)
+            if (firstBatchVotes > 0) {
               const weights = Array(lobbyAllies.length).fill(1)
               const maker = new ChoiceMaker(weights, lobbyAllies)
-              const lobbyCandidates = maker.choose(actualLobbyVotes)
-              candidates.push(...lobbyCandidates)
+              const chosenLobbyAllies = maker.choose(firstBatchVotes)
+              candidates.push(...chosenLobbyAllies)
             }
 
-            const leftPlayers = [...h.allies, ...h.opponents].filter(
-              (p) => !lobbyMembers.includes(p)
-            )
-            const actualLeftVotes = Math.min(h.votes - candidates.length, leftPlayers.length)
-
-            if (actualLeftVotes > 0) {
-              const leftWeights = Array(leftPlayers.length).fill(1)
-              const leftMaker = new ChoiceMaker(leftWeights, leftPlayers)
-              const leftCandidates = leftMaker.choose(actualLeftVotes)
-              candidates.push(...leftCandidates)
+            // 2. 如果还有剩余点赞数，从非房间内的己方成员中选择
+            const remainingVotesAfterFirst = h.votes - candidates.length
+            if (remainingVotesAfterFirst > 0) {
+              const nonLobbyAllies = h.allies.filter(
+                (p) => !lobbyMembers.includes(p) && !candidates.includes(p)
+              )
+              const secondBatchVotes = Math.min(remainingVotesAfterFirst, nonLobbyAllies.length)
+              if (secondBatchVotes > 0) {
+                const weights = Array(nonLobbyAllies.length).fill(1)
+                const maker = new ChoiceMaker(weights, nonLobbyAllies)
+                const chosenNonLobbyAllies = maker.choose(secondBatchVotes)
+                candidates.push(...chosenNonLobbyAllies)
+              }
             }
 
+            // 3. 如果还有剩余点赞数，从非房间内的敌方成员中选择
+            const remainingVotesAfterSecond = h.votes - candidates.length
+            if (remainingVotesAfterSecond > 0) {
+              const nonLobbyOpponents = h.opponents.filter(
+                (p) => !lobbyMembers.includes(p) && !candidates.includes(p)
+              )
+              const thirdBatchVotes = Math.min(remainingVotesAfterSecond, nonLobbyOpponents.length)
+              if (thirdBatchVotes > 0) {
+                const weights = Array(nonLobbyOpponents.length).fill(1)
+                const maker = new ChoiceMaker(weights, nonLobbyOpponents)
+                const chosenNonLobbyOpponents = maker.choose(thirdBatchVotes)
+                candidates.push(...chosenNonLobbyOpponents)
+              }
+            }
+
+            // 对选择出的candidates进行点赞
             for (const puuid of candidates) {
               await this._lc.api.honor.honor(
                 AutoGameflowMain.HONOR_CATEGORY[
