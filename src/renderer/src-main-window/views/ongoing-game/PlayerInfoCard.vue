@@ -8,7 +8,7 @@
         currentHighlightingPremadeTeamId && currentHighlightingPremadeTeamId === premadeTeamId
     }"
     :style="{
-      borderColor: premadeTeamId ? PREMADE_TEAM_COLORS[premadeTeamId]?.borderColor : '#ffffff20'
+      borderColor: premadeTeamId ? PREMADE_TEAM_COLORS[premadeTeamId]?.borderColor : '#ffffff40'
     }"
   >
     <div class="player-info">
@@ -998,6 +998,7 @@ const matches = computed(() => {
   background-color: #11111180;
   width: v-bind(FIXED_CARD_WIDTH_PX_LITERAL);
   overflow: hidden;
+  backdrop-filter: blur(4px);
 
   transition: filter 0.2s;
 

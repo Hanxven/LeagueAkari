@@ -549,6 +549,11 @@ SpectateStatus:
 MatchHistoryTabsTitle:
   loading: 加载中...
   search: 搜索玩家
+  refresh: 刷新
+  close: 关闭
+  closeOthers: 关闭其他页面
+  closeToTheRight: 关闭右侧页面
+  screenshot: 截图当前页面
 
 SearchSummonerModal:
   title: 召唤师搜索
@@ -1641,7 +1646,7 @@ auto-select-main:
   error-bench-swap: 尝试自动交换英雄时失败，目标英雄 {{champion}}：{{reason}}
   cancel-grab: 已取消选择 {{champion}}
   grab-soon: 即将在 {{seconds}} 秒后选择 {{champion}}
-  ignore-trade: 目标英雄为期望英雄，不自动处理交换请求 ({{from}} -> {{to}})
+  ignore-trade: 不自动处理交换请求 ({{from}} -> {{to}})
   auto-pick-normal-mode: 普通模式自动选择
   auto-grab-bench-mode: 随机模式自动选择
   auto-ban: 自动英雄禁用

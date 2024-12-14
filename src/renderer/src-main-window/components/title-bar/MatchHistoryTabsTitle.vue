@@ -258,7 +258,7 @@ const contextMenuState = reactive({
 
 const contextMenuOptions: DropdownMixedOption[] = reactive([
   {
-    label: '刷新',
+    label: computed(() => t('MatchHistoryTabsTitle.refresh')),
     key: 'refresh',
     disabled: computed(() => {
       const tab = mhs.tabs.find((t) => t.id === contextMenuState.id)
@@ -275,17 +275,17 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
     key: 'divider-1'
   },
   {
-    label: '关闭',
+    label: computed(() => t('MatchHistoryTabsTitle.close')),
     key: 'close',
     icon: () => h(NIcon, null, { default: () => h(CloseRoundIcon) })
   },
   {
-    label: '关闭其他页面',
+    label: computed(() => t('MatchHistoryTabsTitle.closeOthers')),
     key: 'close-others',
     disabled: computed(() => !mhs.canCloseOtherTabs(contextMenuState.id))
   },
   {
-    label: '关闭右侧页面',
+    label: computed(() => t('MatchHistoryTabsTitle.closeToTheRight')),
     key: 'close-to-the-right',
     disabled: computed(() => !mhs.canCloseTabsToTheRight(contextMenuState.id))
   },
@@ -294,7 +294,7 @@ const contextMenuOptions: DropdownMixedOption[] = reactive([
     key: 'divider-2'
   },
   {
-    label: '截图当前页面',
+    label: computed(() => t('MatchHistoryTabsTitle.screenshot')),
     key: 'screenshot',
     disabled: computed(() => {
       const tab = mhs.tabs.find((t) => t.id === contextMenuState.id)

@@ -322,12 +322,26 @@ export class GameClientMain implements IAkariShardInitDispose {
       cmds.push(`-PlatformId=${rsoPlatformId}`)
     }
 
-    const p = cp.spawn(gameExecutablePath, cmds, {
-      cwd: gameInstallRoot,
-      detached: true
-    })
+    return new Promise<void>((resolve, reject) => {
+      const p = cp.spawn(gameExecutablePath, cmds, {
+        cwd: gameInstallRoot,
+        detached: true
+      })
 
-    p.unref()
+      let hasError = false
+      p.on('error', (err) => {
+        reject(err)
+      })
+
+      setImmediate(() => {
+        if (hasError) {
+          return
+        }
+
+        p.unref()
+        resolve()
+      })
+    })
   }
 
   static isGameClientForeground() {

@@ -53,7 +53,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   /**
    * 标记位, 用于判断是否是即将退出应用程序 (需要全部窗口关闭)
    */
-  private _willQuit = false
+
+  private _forceMainWindowClose = false
+  private _forceAuxWindowClose = false
 
   private _nextCloseAction: string | null = null
 
@@ -378,8 +380,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
    * @returns
    */
   private _handleCloseMainWindow(event: Event) {
-    if (this._willQuit) {
-      this._aw?.close()
+    if (this._forceMainWindowClose) {
+      this.closeAuxWindow(true)
       return
     }
 
@@ -398,8 +400,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       this._ipc.sendEvent(WindowManagerMain.id, 'main-window-close-asking')
       this.showOrRestoreMainWindow()
     } else {
-      this._willQuit = true
-      this._mw?.close()
+      this.forceMainWindowQuit()
       this._log.info('主窗口将关闭')
     }
 
@@ -466,6 +467,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._mw.on('closed', () => {
       this.state.setMainWindowReady(false)
       this._mw = null
+      this._log.info('主窗口关闭')
     })
 
     if (this._mw.isMaximized()) {
@@ -663,6 +665,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._aw.on('closed', () => {
       this.state.setAuxWindowReady(false)
       this._aw = null
+      this._log.info('辅助窗口关闭')
     })
 
     this._aw.on('move', () => {
@@ -682,7 +685,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._aw.on('page-title-updated', (e) => e.preventDefault())
 
     this._aw.on('close', (e) => {
-      if (this._willQuit) {
+      if (this._forceAuxWindowClose) {
         return
       }
 
@@ -699,12 +702,11 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._log.info('创建辅助窗口')
   }
 
-  closeAuxWindow() {
+  closeAuxWindow(force = false) {
     if (this._aw) {
+      this._forceAuxWindowClose = force
       this._aw.close()
-      this._aw = null
-
-      this._log.info('辅助窗口关闭')
+      this._forceAuxWindowClose = false
     }
   }
 
@@ -849,7 +851,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
         if (enabled) {
           this.createAuxWindow()
         } else {
-          this.closeAuxWindow()
+          this.closeAuxWindow(true)
         }
       },
       { fireImmediately: true, delay: 500, equals: comparer.shallow }
@@ -940,8 +942,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   }
 
   forceMainWindowQuit() {
-    this._willQuit = true
-    this._mw?.close()
+    if (this._mw) {
+      this._forceMainWindowClose = true
+      this._mw.close()
+    }
   }
 
   async onFinish() {

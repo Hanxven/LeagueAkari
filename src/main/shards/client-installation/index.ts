@@ -282,22 +282,6 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     })
   }
 
-  // unused
-  private _spawnDetached(location: string, args: string[] = []) {
-    return new Promise<void>((resolve, reject) => {
-      const p = cp.spawn(location, args, { detached: true, shell: true })
-
-      p.on('error', (error) => {
-        reject(error)
-      })
-
-      setImmediate(() => {
-        p.unref()
-        resolve()
-      })
-    })
-  }
-
   private _launchTencentTcls() {
     if (!this.state.tencentInstallationPath) {
       return

@@ -751,16 +751,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       return
     }
 
+    const { championId = -1 } = this.state.upcomingGrab
+
     try {
-      await this._lc.api.champSelect.benchSwap(this.state.upcomingGrab.championId)
-      this._log.info(`已交换英雄: ${this.state.upcomingGrab.championId}`)
+      await this._lc.api.champSelect.benchSwap(championId)
+      this._log.info(`已交换英雄: ${championId}`)
     } catch (error) {
-      this._ipc.sendEvent(AutoSelectMain.id, 'error-bench-swap', this.state.upcomingGrab.championId)
+      this._ipc.sendEvent(AutoSelectMain.id, 'error-bench-swap', championId)
       this._sendInChat(
         `[League Akari] ${i18next.t('auto-select-main.error-bench-swap', {
-          champion:
-            this._lc.data.gameData.champions[this.state.upcomingGrab.championId]?.name ||
-            this.state.upcomingGrab.championId,
+          champion: this._lc.data.gameData.champions[championId]?.name || championId,
           reason: formatErrorMessage(error)
         })}`
       )

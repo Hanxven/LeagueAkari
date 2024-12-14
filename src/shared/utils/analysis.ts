@@ -302,6 +302,7 @@ export interface MatchHistoryGamesAnalysis {
   // KDA 系列
   killParticipationRate: number
   kda: number
+  kd: number
 
   kills: number
   deaths: number
@@ -365,6 +366,7 @@ export interface MatchHistoryGamesAnalysisSummary {
 
   averageKillParticipationRate: number
   averageKda: number
+  averageKd: number
 
   averageCsShareToTop: number
   averageCsShareOfTeam: number
@@ -575,6 +577,7 @@ export function analyzeMatchHistory(
       killParticipationRate: 0,
 
       kda: (watashi.stats.kills + watashi.stats.assists) / (watashi.stats.deaths || 1),
+      kd: watashi.stats.kills / (watashi.stats.deaths || 1),
       kills: watashi.stats.kills,
       deaths: watashi.stats.deaths,
       assists: watashi.stats.assists,
@@ -896,6 +899,7 @@ export function analyzeMatchHistory(
 
     averageKillParticipationRate: 0,
     averageKda: 0,
+    averageKd: 0,
 
     averageCsShareToTop: 0,
     averageCsShareOfTeam: 0,
@@ -1077,6 +1081,7 @@ export function analyzeMatchHistory(
   summary.averageKillParticipationRate = totalKillParticipationRate / (gameAnalyses.length || 1)
 
   summary.averageKda = (summary.totalKills + summary.totalAssists) / (summary.totalDeaths || 1)
+  summary.averageKd = summary.totalKills / (summary.totalDeaths || 1)
 
   summary.averageCsShareToTop = totalCsShareToTop / (gameAnalyses.length || 1)
   summary.averageCsShareOfTeam = totalCsShareOfTeam / (gameAnalyses.length || 1)

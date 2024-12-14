@@ -132,10 +132,12 @@ export class InGameSendMain implements IAkariShardInitDispose {
     type: 'champ-select-chat' | 'keyboard' = 'keyboard' // 选人界面发送 or 键盘模拟游戏中发送
   ) {
     if (this._currentSending === taskId) {
+      this._log.warn('当前有发送任务正在进行, 将取消当前任务', taskId)
       this._currentSending = null
       return
     } else {
       if (messages.length === 0) {
+        this._log.warn('没有消息可以发送')
         this._currentSending = null
         return
       }
@@ -283,6 +285,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
     target: 'ally' | 'enemy' | 'all'
   }) {
     if (!this.settings.sendStatsEnabled || this._og.state.queryStage.phase === 'unavailable') {
+      this._log.warn('当前不在可发送阶段', this._og.state.queryStage.phase, this.settings.sendStatsEnabled)
       return
     }
 
