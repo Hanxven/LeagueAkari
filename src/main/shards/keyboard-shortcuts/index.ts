@@ -59,6 +59,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     shortcut: [details: ShortcutDetails]
 
     /**
+     * last-active: 在所有按键松开后再触发
      * 在所有按键结束后, 且最后一次激活的快捷键组合被触发时触发
      * 这个事件用于规避 SendInput 在模拟过程中, 和现有正在进行的按键冲突的问题
      */

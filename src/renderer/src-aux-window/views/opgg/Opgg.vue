@@ -586,7 +586,6 @@ watchDebounced(
   { immediate: true, debounce: 500 }
 )
 
-const autoApplySpellsAndRunesAndItems = useLocalStorage('opgg-auto-apply', false)
 const flashPosition = useLocalStorage('opgg-flash-position', 'auto')
 
 const SUMMONER_SPELL_FLASH_ID = 4

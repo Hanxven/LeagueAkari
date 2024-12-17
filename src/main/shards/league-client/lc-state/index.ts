@@ -134,12 +134,13 @@ export class LeagueClientSyncedData {
   private async _loadPerkstyles() {
     try {
       const perkstyles = (await this._i.api.gameData.getPerkstyles()).data
-      this.gameData.setPerkStyles(
-        perkstyles.styles.reduce((prev, cur) => {
+      this.gameData.setPerkStyles({
+        schemaVersion: perkstyles.schemaVersion,
+        styles: perkstyles.styles.reduce((prev, cur) => {
           prev[cur.id] = cur
           return prev
         }, {})
-      )
+      })
     } catch (error) {
       this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-perkstyles')
       this._log.warn(`获取 perkstyles 失败`, error)

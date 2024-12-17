@@ -7,6 +7,7 @@ import {
   Perk,
   Perkstyles,
   Queue,
+  Style,
   SummonerSpell
 } from '@shared/types/league-client/game-data'
 import { GameflowPhase, GameflowSession } from '@shared/types/league-client/gameflow'
@@ -51,7 +52,13 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     champions: shallowRef<Record<number, ChampionSimple>>({}),
     augments: shallowRef<Record<number, Augment>>({}),
     perks: shallowRef<Record<number, Perk>>({}),
-    perkstyles: shallowRef<Record<number, Perkstyles['styles'][number]>>({}),
+    perkstyles: shallowRef<{
+      schemaVersion: number
+      styles: Record<number, Style>
+    }>({
+      schemaVersion: 0,
+      styles: {}
+    }),
     queues: shallowRef<Record<number, Queue>>({}),
     items: shallowRef<Record<number, Item>>({}),
     summonerSpells: shallowRef<Record<number, SummonerSpell>>({})
@@ -96,7 +103,7 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
 
   const summoner = {
     me: shallowRef<SummonerInfo | null>(null),
-    profile: shallowRef<SummonerProfile | null>(null),
+    profile: shallowRef<SummonerProfile | null>(null)
   } as const
 
   const login = {

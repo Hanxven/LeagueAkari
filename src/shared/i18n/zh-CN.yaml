@@ -1123,32 +1123,32 @@ MiscellaneousPanel:
     objectivePlayerScore: 目标玩家得分
     participantId: 参与者 ID
     pentaKills: 五杀
-    perk0: 天赋0
-    perk0Var1: 天赋0变量1
-    perk0Var2: 天赋0变量2
-    perk0Var3: 天赋0变量3
-    perk1: 天赋1
-    perk1Var1: 天赋1变量1
-    perk1Var2: 天赋1变量2
-    perk1Var3: 天赋1变量3
-    perk2: 天赋2
-    perk2Var1: 天赋2变量1
-    perk2Var2: 天赋2变量2
-    perk2Var3: 天赋2变量3
-    perk3: 天赋3
-    perk3Var1: 天赋3变量1
-    perk3Var2: 天赋3变量2
-    perk3Var3: 天赋3变量3
-    perk4: 天赋4
-    perk4Var1: 天赋4变量1
-    perk4Var2: 天赋4变量2
-    perk4Var3: 天赋4变量3
-    perk5: 天赋5
-    perk5Var1: 天赋5变量1
-    perk5Var2: 天赋5变量2
-    perk5Var3: 天赋5变量3
-    perkPrimaryStyle: 主要天赋风格
-    perkSubStyle: 次要天赋风格
+    perk0: 符文0
+    perk0Var1: 符文0变量1
+    perk0Var2: 符文0变量2
+    perk0Var3: 符文0变量3
+    perk1: 符文1
+    perk1Var1: 符文1变量1
+    perk1Var2: 符文1变量2
+    perk1Var3: 符文1变量3
+    perk2: 符文2
+    perk2Var1: 符文2变量1
+    perk2Var2: 符文2变量2
+    perk2Var3: 符文2变量3
+    perk3: 符文3
+    perk3Var1: 符文3变量1
+    perk3Var2: 符文3变量2
+    perk3Var3: 符文3变量3
+    perk4: 符文4
+    perk4Var1: 符文4变量1
+    perk4Var2: 符文4变量2
+    perk4Var3: 符文4变量3
+    perk5: 符文5
+    perk5Var1: 符文5变量1
+    perk5Var2: 符文5变量2
+    perk5Var3: 符文5变量3
+    perkPrimaryStyle: 主要符文风格
+    perkSubStyle: 次要符文风格
     physicalDamageDealt: 造成的物理伤害
     physicalDamageDealtToChampions: 对英雄造成的物理伤害
     physicalDamageTaken: 承受的物理伤害

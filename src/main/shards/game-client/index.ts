@@ -113,12 +113,9 @@ export class GameClientMain implements IAkariShardInitDispose {
         this._kbd.register(
           `${GameClientMain.id}/terminate-game-client`,
           this.settings.terminateShortcut,
-          'last-active',
+          'normal',
           () => {
-            console.log('打算1')
             if (this.settings.terminateGameClientWithShortcut) {
-              console.log('打算2')
-
               this._terminateGameClient()
             }
           }
@@ -133,16 +130,11 @@ export class GameClientMain implements IAkariShardInitDispose {
         this._kbd.unregisterByTargetId(`${GameClientMain.id}/terminate-game-client`)
       } else {
         try {
-          this._kbd.register(
-            `${GameClientMain.id}/terminate-game-client`,
-            value,
-            'last-active',
-            () => {
-              if (this.settings.terminateGameClientWithShortcut) {
-                this._terminateGameClient()
-              }
+          this._kbd.register(`${GameClientMain.id}/terminate-game-client`, value, 'normal', () => {
+            if (this.settings.terminateGameClientWithShortcut) {
+              this._terminateGameClient()
             }
-          )
+          })
         } catch (error) {
           this._log.warn('注册快捷键失败', value)
           await setter(null)

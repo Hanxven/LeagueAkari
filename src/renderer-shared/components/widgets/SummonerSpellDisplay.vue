@@ -1,5 +1,9 @@
 <template>
-  <NPopover v-if="spellId && lcs.gameData.summonerSpells[spellId]" :delay="50">
+  <NPopover
+    v-if="spellId && lcs.gameData.summonerSpells[spellId]"
+    :delay="50"
+    :disabled="disablePopover"
+  >
     <template #trigger>
       <LcuImage
         :src="lcs.gameData.summonerSpells[spellId].iconPath"
@@ -37,16 +41,16 @@
 
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { NPopover } from 'naive-ui'
 import { useTranslation } from 'i18next-vue'
+import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
 
 const { size = 20 } = defineProps<{
+  disablePopover?: boolean
   spellId?: number
   size?: number
 }>()
-
 
 const { t } = useTranslation()
 

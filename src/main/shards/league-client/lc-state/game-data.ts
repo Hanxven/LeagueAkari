@@ -10,13 +10,19 @@ import {
 import { makeAutoObservable, observable } from 'mobx'
 
 export class GameDataState {
-  summonerSpells: Record<number | string, SummonerSpell> = {}
-  items: Record<number | string, Item> = {}
-  queues: Record<number | string, Queue> = {}
-  perks: Record<number | string, Perk> = {}
-  perkstyles: Record<number | string, Perkstyles['styles'][number]> = {}
-  augments: Record<number | string, Augment> = {}
-  champions: Record<number | string, ChampionSimple> = {}
+  summonerSpells: Record<number, SummonerSpell> = {}
+  items: Record<number, Item> = {}
+  queues: Record<number, Queue> = {}
+  perks: Record<number, Perk> = {}
+  perkstyles: {
+    schemaVersion: number
+    styles: Record<number, Perkstyles['styles'][number]>
+  } = {
+    schemaVersion: 0,
+    styles: {}
+  }
+  augments: Record<number, Augment> = {}
+  champions: Record<number, ChampionSimple> = {}
 
   constructor() {
     makeAutoObservable(this, {
@@ -30,31 +36,34 @@ export class GameDataState {
     })
   }
 
-  setSummonerSpells(value: Record<number | string, SummonerSpell>) {
+  setSummonerSpells(value: Record<number, SummonerSpell>) {
     this.summonerSpells = value
   }
 
-  setItems(value: Record<number | string, Item>) {
+  setItems(value: Record<number, Item>) {
     this.items = value
   }
 
-  setQueues(value: Record<number | string, Queue>) {
+  setQueues(value: Record<number, Queue>) {
     this.queues = value
   }
 
-  setPerks(value: Record<number | string, Perk>) {
+  setPerks(value: Record<number, Perk>) {
     this.perks = value
   }
 
-  setPerkStyles(value: Record<number | string, Perkstyles['styles'][number]>) {
+  setPerkStyles(value: {
+    schemaVersion: number
+    styles: Record<number, Perkstyles['styles'][number]>
+  }) {
     this.perkstyles = value
   }
 
-  setAugments(value: Record<number | string, Augment>) {
+  setAugments(value: Record<number, Augment>) {
     this.augments = value
   }
 
-  setChampions(value: Record<number | string, ChampionSimple>) {
+  setChampions(value: Record<number, ChampionSimple>) {
     this.champions = value
   }
 }

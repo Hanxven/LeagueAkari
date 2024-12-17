@@ -17,7 +17,7 @@
         <span style="font-size: 12px">{{ t('ChampSelectOperations.dodge.popconfirm') }}</span>
       </NPopconfirm>
     </NFlex>
-    <NFlex align="center" class="control-item" v-if="!isCustomGame">
+    <!-- <NFlex align="center" class="control-item" v-if="!isCustomGame">
       <span class="label" style="flex: 1">{{ dodgeAtLastSecondLabelText }}</span>
       <NSwitch
         size="small"
@@ -38,7 +38,7 @@
         :value="agfs.settings.dodgeAtLastSecondThreshold"
         @update:value="(val) => agf.setDodgeAtLastSecondThreshold(val || 2)"
       />
-    </NFlex>
+    </NFlex> -->
     <NFlex align="center" v-if="!isBenchMode" class="control-item">
       <span class="label" style="flex: 1">{{ t('ChampSelectOperations.autos.autoPick') }}</span>
       <NSwitch

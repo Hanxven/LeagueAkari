@@ -1222,8 +1222,8 @@ const recentlyPlayers = computed(() => {
       })
       .filter((a) => a.games.length >= RECENTLY_PLAYED_PLAYER_THRESHOLD)
       .map((a) => {
-        const win = a.games.filter((g) => g.win).length
-        const lose = a.games.filter((g) => !g.win).length
+        const win = a.games.filter((g) => (isOpponent ? !g.win : g.win)).length
+        const lose = a.games.filter((g) => (isOpponent ? g.win : !g.win)).length
         return { ...a, win, lose }
       })
       .sort((a, b) => {

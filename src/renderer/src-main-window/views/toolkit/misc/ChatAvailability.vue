@@ -25,7 +25,7 @@
           <NRadio value="offline">{{ t('ChatAvailability.availability.radio.offline') }}</NRadio>
           <NRadio value="dnd">{{ t('ChatAvailability.availability.radio.dnd') }}</NRadio>
           <NRadio value="spectating">{{ t('ChatAvailability.availability.radio.spectating') }}</NRadio>
-          <NRadio value="online">{{ t('ChatAvailability.availability.radio.spectating') }}</NRadio>
+          <NRadio value="online">{{ t('ChatAvailability.availability.radio.online') }}</NRadio>
         </NFlex>
       </NRadioGroup>
     </ControlItem>
