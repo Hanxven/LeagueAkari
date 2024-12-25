@@ -24,8 +24,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     'setting-factory-main',
     'league-client-main',
     'akari-ipc-main',
-    'mobx-utils-main',
-    'config-migrate-main'
+    'mobx-utils-main'
   ]
 
   public readonly settings = new AutoGameflowSettings()

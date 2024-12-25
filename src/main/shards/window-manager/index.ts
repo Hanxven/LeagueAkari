@@ -24,8 +24,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     'mobx-utils-main',
     'logger-factory-main',
     'setting-factory-main',
-    'league-client-main',
-    'config-migrate-main'
+    'league-client-main'
   ]
 
   static MAIN_WINDOW_MIN_SIZE = [840, 600] as [number, number]

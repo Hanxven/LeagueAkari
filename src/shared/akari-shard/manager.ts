@@ -9,6 +9,11 @@ export interface AkariShardConstructor<T = any> {
   id: string
 
   /**
+   * 在保持依赖顺序时, 越高的值加载越优先
+   */
+  priority?: number
+
+  /**
    * 依赖的模块 ID 列表
    */
   dependencies?: string[]
@@ -68,6 +73,7 @@ export class AkariManager {
       AkariManager.INTERNAL_RUNNER_ID,
       class __$RootShard {
         static id = AkariManager.INTERNAL_RUNNER_ID
+        static priority = -Infinity
         static dependencies = [...allDeps].filter((dep) => dep !== AkariManager.INTERNAL_RUNNER_ID)
       }
     )
@@ -127,6 +133,13 @@ export class AkariManager {
     return this._instances.get(id) as T | undefined
   }
 
+  /**
+   * For debug purpose
+   */
+  _getInitializationStack() {
+    return this._initializationStack
+  }
+
   private _resolve(id: string, visited: Set<string>, stack: string[]) {
     const cls = this._registry.get(id)
     if (!cls) {
@@ -137,7 +150,13 @@ export class AkariManager {
     const instances: AkariDeps = {}
 
     if (dependencies) {
-      for (const dep of dependencies) {
+      const sortedDependencies = dependencies.toSorted((a, b) => {
+        const aPriority = this._registry.get(a)?.priority ?? 0
+        const bPriority = this._registry.get(b)?.priority ?? 0
+        return bPriority - aPriority
+      })
+
+      for (const dep of sortedDependencies) {
         if (visited.has(dep)) {
           throw new Error(`Circular dependency detected: ${[...visited, dep].join(' -> ')}`)
         }

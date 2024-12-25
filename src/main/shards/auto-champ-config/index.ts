@@ -16,8 +16,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     'logger-factory-main',
     'setting-factory-main',
     'league-client-main',
-    'mobx-utils-main',
-    'config-migrate-main'
+    'mobx-utils-main'
   ]
 
   private readonly _loggerFactory: LoggerFactoryMain

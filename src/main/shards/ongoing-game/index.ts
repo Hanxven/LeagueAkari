@@ -35,8 +35,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     'akari-ipc-main',
     'mobx-utils-main',
     'sgp-main',
-    'saved-player-main',
-    'config-migrate-main'
+    'saved-player-main'
   ]
 
   static LOADING_PRIORITY = {

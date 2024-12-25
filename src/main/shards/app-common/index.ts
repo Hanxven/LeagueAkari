@@ -19,8 +19,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
     SHARED_GLOBAL_ID,
     'akari-ipc-main',
     'mobx-utils-main',
-    'setting-factory-main',
-    'config-migrate-main'
+    'setting-factory-main'
   ]
 
   public readonly state = new AppCommonState()

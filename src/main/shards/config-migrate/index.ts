@@ -11,6 +11,11 @@ import { Setting } from '../storage/entities/Settings'
 export class ConfigMigrateMain implements IAkariShardInitDispose {
   static id = 'config-migrate-main'
 
+  /**
+   * 设置较高优先级, 以优先加载
+   */
+  static priority = 2992
+
   static dependencies = ['storage-main', 'logger-factory-main']
 
   static MIGRATION_FROM_126 = 'akari-migration-from-1.2.6_patch2'

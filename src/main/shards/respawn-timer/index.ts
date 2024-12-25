@@ -17,8 +17,7 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
     'logger-factory-main',
     'league-client-main',
     'setting-factory-main',
-    'mobx-utils-main',
-    'config-migrate-main'
+    'mobx-utils-main'
   ]
 
   static POLL_INTERVAL = 1000
