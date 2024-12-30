@@ -6,7 +6,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { AutoChampConfigSettings } from './state'
+import { AutoChampConfigSettings, ChampionRunesConfig, SummonerSpellsConfig } from './state'
 
 export class AutoChampionConfigMain implements IAkariShardInitDispose {
   static id = 'auto-champ-config-main'
@@ -40,8 +40,8 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
       AutoChampionConfigMain.id,
       {
         enabled: { default: this.settings.enabled },
-        runeV2Presets: { default: this.settings.runeV2Presets },
-        summonerSpellPresets: { default: this.settings.summonerSpellPresets }
+        runesV2: { default: this.settings.runesV2 },
+        summonerSpells: { default: this.settings.summonerSpells }
       },
       this.settings
     )
@@ -50,32 +50,19 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
   private _handleIpcCall() {
     this._ipc.onCall(
       AutoChampionConfigMain.id,
-      'updateChampionPreset',
-      (
-        championId: number,
-        position: string,
-        runes: {
-          primaryStyleId: number
-          subStyleId: number
-          selectedPerkIds: number[]
-        } | null
-      ) => {
-        this.settings.updateRulePresetChampion(championId, position, runes)
+      'updateRunes',
+      async (championId: number, key: string, runes: ChampionRunesConfig | null) => {
+        this.settings.updateRunes(championId, key, runes)
+        await this._setting.set('runesV2', this.settings.runesV2)
       }
     )
 
     this._ipc.onCall(
       AutoChampionConfigMain.id,
-      'updateSummonerSpellPreset',
-      (
-        championId: number,
-        position: string,
-        spells: {
-          spell1Id: number
-          spell2Id: number
-        } | null
-      ) => {
-        this.settings.updateSummonerSpellPreset(championId, position, spells)
+      'updateSummonerSpells',
+      async (championId: number, key: string, spells: SummonerSpellsConfig | null) => {
+        this.settings.updateSummonerSpells(championId, key, spells)
+        await this._setting.set('summonerSpells', this.settings.summonerSpells)
       }
     )
   }
@@ -85,8 +72,8 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
 
     this._mobx.propSync(AutoChampionConfigMain.id, 'settings', this.settings, [
       'enabled',
-      'runeV2Presets',
-      'summonerSpellPresets'
+      'runesV2',
+      'summonerSpells'
     ])
 
     this._handleIpcCall()

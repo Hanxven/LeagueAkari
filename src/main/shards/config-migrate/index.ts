@@ -26,13 +26,6 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
   constructor(deps: any) {
     this._st = deps['storage-main']
     this._log = deps['logger-factory-main'].create(ConfigMigrateMain.id)
-
-    this._printDeps(deps)
-  }
-
-  private _printDeps(deps: any) {
-    const shards = Object.entries(deps).map(([key, _value]) => key)
-    return `预先加载: [${shards.join(', ')}]`
   }
 
   private async _do(from: string, to: string) {

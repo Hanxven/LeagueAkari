@@ -9,7 +9,6 @@ import { WindowManagerMain } from '../window-manager'
  * 实现 `akari://` 协议, 用户特殊资源的代理
  * akari://league-client/* 代理到 LeagueClient 的 HTTP 服务
  * akari://riot-client/* 代理到 RiotClient 的 HTTP 服务
- * akari://file/ 代理到本地文件系统 (实验性特性, 危险)
  */
 export class AkariProtocolMain implements IAkariShardInitDispose {
   static id = 'akari-protocol-main'

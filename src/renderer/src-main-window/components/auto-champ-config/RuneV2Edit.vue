@@ -7,35 +7,41 @@
           :size="28"
           :key="style.id"
           :perkstyle-id="style.id"
-          :selected="style.id === primaryStyleId"
-          @item-click="(id) => (primaryStyleId = id)"
+          :selected="style.id === page.primaryStyleId"
+          @item-click="(id) => handleSelectPrimaryStyle(id)"
         />
       </div>
-      <template v-if="primaryStyle">
-        <div class="slots key" v-for="slot of primaryStyle.keyStone">
+      <template v-if="pStyle">
+        <div class="slots key" v-for="slot of pKeyStone">
           <PerkIcon
             v-for="perk of slot.perks"
             :size="36"
             :perk-id="perk"
             :key="perk"
-            :selected="primarySelections[slot.slotId] === perk"
+            :selected="selections !== null && selections.primarySelections[slot.slotId] === perk"
             :darken="
-              primarySelections[slot.slotId] !== undefined &&
-              primarySelections[slot.slotId] !== perk
+              selections !== null &&
+              slot.perks.includes(selections.primarySelections[slot.slotId]) &&
+              selections.primarySelections[slot.slotId] !== 0 &&
+              selections.primarySelections[slot.slotId] !== undefined &&
+              selections.primarySelections[slot.slotId] !== perk
             "
             @item-click="(perk) => handleSelectPrimaryPerk(slot.slotId, perk)"
           />
         </div>
-        <div class="slots" v-for="slot of primaryStyle.regular">
+        <div class="slots" v-for="slot of pRegular">
           <PerkIcon
             v-for="perk of slot.perks"
             :size="32"
             :perk-id="perk"
             :key="perk"
-            :selected="primarySelections[slot.slotId] === perk"
+            :selected="selections !== null && selections.primarySelections[slot.slotId] === perk"
             :darken="
-              primarySelections[slot.slotId] !== undefined &&
-              primarySelections[slot.slotId] !== perk
+              selections !== null &&
+              slot.perks.includes(selections.primarySelections[slot.slotId]) &&
+              selections.primarySelections[slot.slotId] !== 0 &&
+              selections.primarySelections[slot.slotId] !== undefined &&
+              selections.primarySelections[slot.slotId] !== perk
             "
             @item-click="(perk) => handleSelectPrimaryPerk(slot.slotId, perk)"
           />
@@ -44,28 +50,30 @@
     </div>
     <div class="divider"></div>
     <div class="right-side-column">
-      <div class="header-styles" v-if="primaryStyle">
+      <div class="header-styles" v-if="pStyle">
         <PerkstyleSvgIcon
-          v-for="styleId of primaryStyle.style.allowedSubStyles"
+          v-for="styleId of pStyle.allowedSubStyles"
           :size="28"
           :key="styleId"
           :perkstyle-id="styleId"
-          :selected="styleId === subStyleId"
-          @item-click="(id) => (subStyleId = id)"
+          :selected="styleId === page.subStyleId"
+          @item-click="(id) => handleSelectSubStyle(id)"
         />
       </div>
       <div class="sub">
-        <template v-if="subStyle">
-          <div class="slots" v-for="slot of subStyle.regular">
+        <template v-if="sStyle">
+          <div class="slots" v-for="slot of sRegular">
             <PerkIcon
               v-for="perk of slot.perks"
               :size="32"
               :perk-id="perk"
               :key="perk"
-              :selected="subSelections[slot.slotId] === perk"
+              :selected="selections !== null && selections.subSelections[slot.slotId] === perk"
               :darken="
-                (subSelections[slot.slotId] !== undefined && subSelections[slot.slotId] !== perk) ||
-                (!subSelections[slot.slotId] && Object.keys(subSelections).length >= SUB_COUNT)
+                selections !== null &&
+                selections.subSelections[slot.slotId] !== 0 &&
+                (selections.subSelections[slot.slotId] !== undefined || subPerksSelectedTwo) &&
+                selections.subSelections[slot.slotId] !== perk
               "
               @item-click="(perk) => handleSelectSubPerk(slot.slotId, perk)"
             />
@@ -73,17 +81,19 @@
         </template>
       </div>
       <div class="stat-mod">
-        <template v-if="primaryStyle">
-          <div class="slots sparse" v-for="slot of primaryStyle.statMod">
+        <template v-if="pStyle">
+          <div class="slots sparse" v-for="slot of pStatMod">
             <PerkIcon
               v-for="perk of slot.perks"
               :size="22"
               :perk-id="perk"
               :key="perk"
-              :selected="primarySelections[slot.slotId] === perk"
+              :selected="selections !== null && selections.primarySelections[slot.slotId] === perk"
               :darken="
-                primarySelections[slot.slotId] !== undefined &&
-                primarySelections[slot.slotId] !== perk
+                selections !== null &&
+                selections.primarySelections[slot.slotId] !== 0 &&
+                selections.primarySelections[slot.slotId] !== undefined &&
+                selections.primarySelections[slot.slotId] !== perk
               "
               @item-click="(perk) => handleSelectPrimaryPerk(slot.slotId, perk)"
             />
@@ -100,16 +110,12 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NModal } from 'naive-ui'
-import { computed, onDeactivated, ref, watch } from 'vue'
+import _ from 'lodash'
+import { computed, ref, watch } from 'vue'
 
 import PerkIcon from './PerkIcon.vue'
 import PerkstyleSvgIcon from './PerkstyleSvgIcon.vue'
-
-defineProps<{
-  disabled?: boolean
-  targetId?: string
-}>()
+import { usePerkstyleInfo, useRunesToSelections } from './utils'
 
 const { t } = useTranslation()
 
@@ -120,331 +126,224 @@ const isApplicableSchemaVersion = computed(() => {
   return lcs.gameData.perkstyles.schemaVersion === 2
 })
 
-const modelData = defineModel<
-  | {
-      primaryStyleId: number
-      selectedPerkIds: number[]
-      subStyleId: number
-    }
-  | null
-  | undefined
->('page', {
-  default: null
+const page = defineModel<{
+  primaryStyleId: number
+  selectedPerkIds: number[]
+  subStyleId: number
+}>('page', {
+  default: () => ({
+    primaryStyleId: 0,
+    subStyleId: 0,
+    selectedPerkIds: []
+  })
 })
 
-const show = defineModel<boolean>('show', { default: false })
+const selections = useRunesToSelections(() => page.value)
 
-const primaryStyleId = ref(0)
-const subStyleId = ref(0)
+const {
+  style: pStyle,
+  keyStone: pKeyStone,
+  regular: pRegular,
+  statMod: pStatMod
+} = usePerkstyleInfo(() => page.value.primaryStyleId)
 
-const SUB_COUNT = 2
+const { style: sStyle, regular: sRegular } = usePerkstyleInfo(() => page.value.subStyleId)
 
-const extractStyle = (styleId: number) => {
-  const style = lcs.gameData.perkstyles.styles[styleId]
+const handleSelectPrimaryStyle = (styleId: number) => {
+  const pStyle = lcs.gameData.perkstyles.styles[styleId]
 
-  if (!style) {
-    return null
+  if (!pStyle) {
+    return
   }
 
-  const keyStone = style.slots
-    .filter((s) => s.type === 'kKeyStone')
-    .map((s, i) => ({ ...s, slotId: `${style.id}-${s.type}-${i}` }))
-  const regular = style.slots
-    .filter((s) => s.type === 'kMixedRegularSplashable')
-    .map((s, i) => ({ ...s, slotId: `${style.id}-${s.type}-${i}` }))
-  const statMod = style.slots
-    .filter((s) => s.type === 'kStatMod')
-    .map((s, i) => ({ ...s, slotId: `${style.id}-${s.type}-${i}` }))
+  const availableSubStyles = pStyle.allowedSubStyles
 
-  return {
-    style,
-    keyStone,
-    regular,
-    statMod,
-    slots: style.slots
+  const perkIds =
+    page.value.selectedPerkIds.length !== 9 ? Array(9).fill(0) : [...page.value.selectedPerkIds]
+
+  if (availableSubStyles.includes(page.value.subStyleId)) {
+    page.value = {
+      ...page.value,
+      primaryStyleId: styleId,
+      selectedPerkIds: perkIds
+    }
+  } else {
+    page.value = {
+      primaryStyleId: styleId,
+      subStyleId: availableSubStyles[0],
+      selectedPerkIds: perkIds
+    }
   }
 }
 
-// slotId, perkId
-const primarySelections = ref<Record<string, number>>({})
+const handleSelectSubStyle = (styleId: number) => {
+  const perkIds =
+    page.value.selectedPerkIds.length !== 9 ? Array(9).fill(0) : [...page.value.selectedPerkIds]
 
-const subSelections = ref<Record<string, number>>({})
-const subSelectionQueue = ref<string[]>([])
+  page.value = {
+    ...page.value,
+    subStyleId: styleId,
+    selectedPerkIds: perkIds
+  }
+}
 
-const primaryStyle = computed(() => {
-  return extractStyle(primaryStyleId.value)
-})
-
-const subStyle = computed(() => {
-  return extractStyle(subStyleId.value)
-})
-
+// 多余的纠正步骤: 如果当前的选择不在范围内, 则尝试一次自动纠正
 watch(
-  [() => primaryStyleId.value, () => Object.keys(lcs.gameData.perkstyles.styles).length],
-  ([styleId, perkstylesReady]) => {
-    if (!perkstylesReady) {
-      return
-    }
+  () => page.value,
+  (page) => {
+    const pStyle = lcs.gameData.perkstyles.styles[page.primaryStyleId]
 
-    if (styleId) {
-      const style = lcs.gameData.perkstyles.styles[styleId]
-      if (
-        style &&
-        style.allowedSubStyles.length &&
-        !style.allowedSubStyles.includes(subStyleId.value)
-      ) {
-        subStyleId.value = style.allowedSubStyles[0]
-        return
-      }
-    } else {
+    if (!pStyle) {
       const all = Object.values(lcs.gameData.perkstyles.styles)
 
       if (all.length) {
-        primaryStyleId.value = all[0].id
+        handleSelectPrimaryStyle(all[0].id)
       }
     }
   },
   { immediate: true }
 )
 
-watch(
-  () => primaryStyle.value,
-  (_style) => {
-    primarySelections.value = {}
-  }
-)
-
-watch(
-  () => subStyle.value,
-  (_style) => {
-    subSelections.value = {}
-    subSelectionQueue.value = []
-  }
-)
-
-const testApply = async () => {
-  const pages = (await lc.api.perks.getPerkPages()).data
-  if (!pages.length) {
-    return
-  }
-
-  const page1 = pages[0]
-  await lc.api.perks.putPage({
-    id: page1.id,
-    isRecommendationOverride: false,
-    isTemporary: false,
-    name: `测试内容`,
-    primaryStyleId: primaryStyleId.value,
-    selectedPerkIds: selectedPerks.value,
-    subStyleId: subStyleId.value
-  })
-  await lc.api.perks.putCurrentPage(page1.id)
-}
-
-// 细心活
-const parsePageDataToSelection = (
-  primaryStyleId: number,
-  subStyleId: number,
-  perkIds: number[]
-) => {
-  if (perkIds.length !== 9) {
-    return null
-  }
-
-  const pStyle = extractStyle(primaryStyleId)
-  const sStyle = extractStyle(subStyleId)
-
-  if (!pStyle || !sStyle) {
-    return null
-  }
-
-  const primaryKeyStone = perkIds.slice(0, 1)
-  const primaryRegular = perkIds.slice(1, 4)
-  const subRegular = perkIds.slice(4, 6)
-  const primaryStatMod = perkIds.slice(6, 9)
-
-  const primarySelections: Record<string, number> = {}
-  const subSelections: Record<string, number> = {}
-
-  pStyle.keyStone.forEach((slot, i) => {
-    primarySelections[slot.slotId] = primaryKeyStone[i]
-  })
-
-  pStyle.regular.forEach((slot, i) => {
-    primarySelections[slot.slotId] = primaryRegular[i]
-  })
-
-  const subPerkPosition: Record<number, string> = {}
-  sStyle.regular.forEach((slot) => {
-    slot.perks.forEach((perk) => {
-      subPerkPosition[perk] = slot.slotId
-    })
-  })
-
-  sStyle.regular.forEach((_, i) => {
-    const perkId = subRegular[i]
-    if (perkId) {
-      subSelections[subPerkPosition[perkId]] = perkId
-    }
-  })
-
-  pStyle.statMod.forEach((slot, i) => {
-    primarySelections[slot.slotId] = primaryStatMod[i]
-  })
-
-  return {
-    primarySelections,
-    subSelections
-  }
-}
-
 const handleSelectPrimaryPerk = (slotId: string, perkId: number) => {
-  primarySelections.value[slotId] = perkId
-}
+  const allSlots = [...pKeyStone.value, ...pRegular.value, ...pStatMod.value]
 
-const handleSelectSubPerk = (slotId: string, perkId: number) => {
-  subSelections.value[slotId] = perkId
-
-  if (!subSelectionQueue.value.includes(slotId)) {
-    subSelectionQueue.value.push(slotId)
-  }
-
-  if (subSelectionQueue.value.length > SUB_COUNT) {
-    const countNeedToDelete = subSelectionQueue.value.length - SUB_COUNT
-    const deleted = subSelectionQueue.value.splice(0, countNeedToDelete)
-    for (const slotId of deleted) {
-      delete subSelections.value[slotId]
-    }
-  }
-}
-
-// 经过测试, 顺序必须是: 主系 key 1, 主系 regular 3, 副系 regular 2, 主系 statMod 3
-const selectedPerks = computed(() => {
-  if (!primaryStyle.value || !subStyle.value) {
-    return []
-  }
-
-  const primaryKeyStone = primaryStyle.value.keyStone.map(
-    (s) => primarySelections.value[s.slotId] || 0
-  )
-
-  const primaryRegular = primaryStyle.value.regular.map(
-    (s) => primarySelections.value[s.slotId] || 0
-  )
-
-  const subRegular = subStyle.value.regular
-    .filter((s) => subSelections.value[s.slotId])
-    .map((s) => subSelections.value[s.slotId])
-
-  while (subRegular.length < SUB_COUNT) {
-    subRegular.push(0)
-  }
-
-  const primaryStatMod = primaryStyle.value.statMod.map(
-    (s) => primarySelections.value[s.slotId] || 0
-  )
-
-  return [...primaryKeyStone, ...primaryRegular, ...subRegular, ...primaryStatMod]
-})
-
-const isValidPerks = computed(() => {
-  if (!primaryStyle.value || !subStyle.value) {
-    return false
-  }
-
-  // 和当前符文页相符
-  const availablePerks = primaryStyle.value.slots
-    .concat(subStyle.value.slots)
-    .reduce((acc, slot) => acc.concat(slot.perks), [] as number[])
-
-  // 主系选满
-  if (primaryStyle.value) {
-    const toCheck = primaryStyle.value.keyStone
-      .concat(primaryStyle.value.regular)
-      .concat(primaryStyle.value.statMod)
-
-    for (const slot of toCheck) {
-      if (
-        primarySelections.value[slot.slotId] === undefined ||
-        !availablePerks.includes(slot.perks[0])
-      ) {
-        return false
-      }
-    }
-  }
-
-  // 副系三选二
-  if (subStyle.value) {
-    const toCheck = subStyle.value.regular
-
-    let slotSelected = 0
-    for (const slot of toCheck) {
-      if (subSelections.value[slot.slotId] && availablePerks.includes(slot.perks[0])) {
-        slotSelected++
-      }
-    }
-
-    if (slotSelected !== SUB_COUNT) {
-      return false
-    }
-  }
-
-  return true
-})
-
-const handleSubmit = async () => {
-  if (!isValidPerks.value) {
+  if (!allSlots.some((slot) => slot.slotId === slotId && slot.perks.includes(perkId))) {
     return
   }
 
-  modelData.value = {
-    primaryStyleId: primaryStyleId.value,
-    subStyleId: subStyleId.value,
-    selectedPerkIds: selectedPerks.value
-  }
-}
+  const map: Record<string, number> = {}
+  pKeyStone.value.forEach((slot, i) => {
+    map[slot.slotId] = i
+  })
 
-watch(
-  () => modelData.value,
-  (page) => {
-    if (!page) {
+  pRegular.value.forEach((slot, i) => {
+    map[slot.slotId] = i + 1
+  })
+
+  pStatMod.value.forEach((slot, i) => {
+    map[slot.slotId] = i + 6
+  })
+
+  const slotIndex = map[slotId]
+  if (slotIndex !== undefined) {
+    if (page.value.selectedPerkIds[slotIndex] === perkId) {
       return
     }
 
-    const parsed = parsePageDataToSelection(
-      page.primaryStyleId,
-      page.subStyleId,
-      page.selectedPerkIds
-    )
+    const perkIds =
+      page.value.selectedPerkIds.length !== 9 ? Array(9).fill(0) : [...page.value.selectedPerkIds]
 
-    if (parsed) {
-      primarySelections.value = parsed.primarySelections
-      subSelections.value = parsed.subSelections
+    perkIds[slotIndex] = perkId
+
+    page.value = {
+      ...page.value,
+      selectedPerkIds: perkIds
     }
-  }
-)
-
-const reset = () => {
-  if (modelData.value) {
-    const { primaryStyleId, subStyleId, selectedPerkIds } = modelData.value
-    const parsed = parsePageDataToSelection(primaryStyleId, subStyleId, selectedPerkIds)
-
-    if (parsed) {
-      primarySelections.value = parsed.primarySelections
-      subSelections.value = parsed.subSelections
-    }
-  } else {
-    primarySelections.value = {}
-    subSelections.value = {}
   }
 }
 
-defineExpose({
-  reset
-})
+// 记录了加载顺序的队列历史记录
+const subPerkSlotHistory: Record<string, number> = {}
+const handleSelectSubPerk = (slotId: string, perkId: number) => {
+  if (!sRegular.value.some((slot) => slot.slotId === slotId && slot.perks.includes(perkId))) {
+    return
+  }
 
-onDeactivated(() => {
-  show.value = false
+  const perkIds =
+    page.value.selectedPerkIds.length !== 9 ? Array(9).fill(0) : [...page.value.selectedPerkIds]
+
+  const sRegularPerkIds = perkIds.slice(4, 6)
+
+  const perkRelativePosition: Record<number, number> = {}
+  sRegular.value.forEach((slot, i) => {
+    slot.perks.forEach((perk) => {
+      perkRelativePosition[perk] = i
+    })
+  })
+
+  const perkSlot: Record<number, string> = {}
+  sRegular.value.forEach((slot) => {
+    slot.perks.forEach((perk) => {
+      perkSlot[perk] = slot.slotId
+    })
+  })
+
+  const slotSelections: Record<string, number> = {}
+  ;[...sRegularPerkIds, perkId].forEach((perkId) => {
+    if (perkSlot[perkId]) {
+      slotSelections[perkSlot[perkId]] = perkId
+    }
+  })
+
+  // 如果 selection 数量超过 2，则移除最早的一个
+  if (Object.keys(slotSelections).length > 2) {
+    const sorted = Object.entries(subPerkSlotHistory).toSorted((a, b) => a[1] - b[1])
+
+    const keyToDelete = sorted[0]?.[0] || Object.keys(slotSelections)[0]
+
+    delete slotSelections[keyToDelete]
+    delete subPerkSlotHistory[keyToDelete]
+  }
+
+  const toSortedPerkIds = Object.values(slotSelections).toSorted((a, b) => {
+    return perkRelativePosition[a] - perkRelativePosition[b]
+  })
+
+  toSortedPerkIds.push(...Array(Math.max(0, 2 - toSortedPerkIds.length)).fill(0))
+
+  if (_.isEqual(sRegularPerkIds, toSortedPerkIds)) {
+    return
+  }
+
+  perkIds.splice(4, 2, ...toSortedPerkIds)
+
+  subPerkSlotHistory[slotId] = Date.now()
+
+  page.value = {
+    ...page.value,
+    selectedPerkIds: perkIds
+  }
+}
+
+watch(
+  () => sStyle.value,
+  (style) => {
+    if (style) {
+      Object.keys(subPerkSlotHistory).forEach((key) => {
+        delete subPerkSlotHistory[key]
+      })
+
+      const perkSlot: Record<number, string> = {}
+      sRegular.value.forEach((slot) => {
+        slot.perks.forEach((perk) => {
+          perkSlot[perk] = slot.slotId
+        })
+      })
+
+      const perkIds = page.value.selectedPerkIds.slice(4, 6)
+
+      perkIds.forEach((perkId) => {
+        if (perkSlot[perkId]) {
+          subPerkSlotHistory[perkSlot[perkId]] = Date.now()
+        }
+      })
+    }
+  },
+  {
+    immediate: true
+  }
+)
+
+const subPerksSelectedTwo = computed(() => {
+  const perkIds = page.value.selectedPerkIds.slice(4, 6)
+  let count = 0
+  sRegular.value.forEach((slot) => {
+    if (slot.perks.some((perk) => perkIds.includes(perk))) {
+      count++
+    }
+  })
+
+  return count >= 2
 })
 </script>
 

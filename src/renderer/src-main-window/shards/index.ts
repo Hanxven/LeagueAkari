@@ -25,12 +25,14 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
 import { MainWindowUiRenderer } from './main-window-ui'
 import { MatchHistoryTabsRenderer } from './match-history-tabs'
+import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 
 const manager = createManager()
 
 manager.use(
   AkariIpcRenderer,
   AppCommonRenderer,
+  AutoChampConfigRenderer,
   AutoGameflowRenderer,
   AutoSelectRenderer,
   AutoReplyRenderer,

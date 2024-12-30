@@ -4,6 +4,7 @@ import { initAppLogger } from '@main/logger'
 import tools from '@main/native/la-tools-win64.node'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
 import { AppCommonMain } from '@main/shards/app-common'
+import { AutoChampionConfigMain } from '@main/shards/auto-champ-config'
 import { AutoGameflowMain } from '@main/shards/auto-gameflow'
 import { AutoReplyMain } from '@main/shards/auto-reply'
 import { AutoSelectMain } from '@main/shards/auto-select'
@@ -216,6 +217,7 @@ export function bootstrap() {
       SelfUpdateMain,
 
       // functional shards
+      AutoChampionConfigMain,
       AutoGameflowMain,
       AutoReplyMain,
       AutoSelectMain,

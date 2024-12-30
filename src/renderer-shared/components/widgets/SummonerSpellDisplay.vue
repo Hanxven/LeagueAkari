@@ -3,6 +3,7 @@
     v-if="spellId && lcs.gameData.summonerSpells[spellId]"
     :delay="50"
     :disabled="disablePopover"
+    :keep-alive-on-hover="keepAliveOnHover"
   >
     <template #trigger>
       <LcuImage
@@ -50,6 +51,7 @@ const { size = 20 } = defineProps<{
   disablePopover?: boolean
   spellId?: number
   size?: number
+  keepAliveOnHover?: boolean
 }>()
 
 const { t } = useTranslation()

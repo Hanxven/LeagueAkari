@@ -8,7 +8,7 @@
 
 欢迎使用 League Akari。
 
-QQ 群聊：[301157623](https://qm.qq.com/q/F1Xv85etlm) (已满，随缘加入)
+QQ 群聊：[301157623](https://qm.qq.com/q/F1Xv85etlm) (密码：akari)
 
 本软件是开源软件，遵循 GPL-3.0 协议。
 

@@ -292,6 +292,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     )
   }
 
+  /**
+   * @deprecated 已无法使用
+   */
   private _adjustDodgeTimer(msLeft: number, threshold: number) {
     const dodgeIn = Math.max(msLeft - threshold * 1e3, 0)
     this._log.info(`时间校正：将在 ${dodgeIn} ms 后秒退`)
