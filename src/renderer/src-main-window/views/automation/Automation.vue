@@ -17,6 +17,9 @@
         <NTab name="auto-select" class="tab-name">
           <span class="tab-name">{{ t('Automation.autoSelect') }}</span>
         </NTab>
+        <NTab name="auto-champ-config" class="tab-name">
+          <span class="tab-name">{{ `自动英雄配置` }}</span>
+        </NTab>
         <NTab name="misc" class="tab-name">
           <span class="tab-name">{{ t('Automation.autoMisc') }}</span>
         </NTab>
@@ -27,6 +30,7 @@
         <KeepAlive>
           <AutoGameflow v-if="currentTab === 'auto-gameflow'" />
           <AutoSelect v-else-if="currentTab === 'auto-select'" />
+          <AutoChampConfig v-else-if="currentTab === 'auto-champ-config'" />
           <AutoMisc v-else-if="currentTab === 'misc'" />
         </KeepAlive>
       </Transition>
@@ -40,6 +44,7 @@ import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
 import { ref } from 'vue'
 
+import AutoChampConfig from './AutoChampConfig.vue'
 import AutoGameflow from './AutoGameflow.vue'
 import AutoMisc from './AutoMisc.vue'
 import AutoSelect from './AutoSelect.vue'

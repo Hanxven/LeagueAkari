@@ -1673,8 +1673,8 @@ common:
   na: N/A
 
   lanes:
-    all: None
-    ALL: None
+    all: 无
+    ALL: 无
     top: 上单
     jungle: 打野
     mid: 中单

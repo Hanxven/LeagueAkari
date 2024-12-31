@@ -72,5 +72,9 @@ export class AutoChampConfigRenderer implements IAkariShardInitDispose {
     )
   }
 
+  setEnabled(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'enabled', enabled)
+  }
+
   async onDispose() {}
 }

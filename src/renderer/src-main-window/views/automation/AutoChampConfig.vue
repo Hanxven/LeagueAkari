@@ -1,0 +1,77 @@
+<template>
+  <div class="single-root">
+    <NScrollbar class="outer-wrapper">
+      <div class="inner-wrapper">
+        <NCard size="small">
+          <template #header
+            ><span class="card-header-title">{{ `自动英雄配置` }}</span></template
+          >
+          <ControlItem
+            :label="`启用`"
+            :label-description="`在英雄选择阶段锁定英雄后，按照预设配置符文或召唤师技能`"
+            class="control-item-margin"
+            :label-width="260"
+          >
+            <NSwitch
+              @update:value="(v) => ac.setEnabled(v)"
+              :value="acs.settings.enabled"
+              size="small"
+            ></NSwitch>
+          </ControlItem>
+          <ControlItem :label="`配置`" class="control-item-margin" :label-width="260">
+            <ChampionConfig />
+          </ControlItem>
+        </NCard>
+      </div>
+    </NScrollbar>
+  </div>
+</template>
+
+<script setup lang="ts">
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { useInstance } from '@renderer-shared/shards'
+import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
+import { useAutoChampConfigStore } from '@renderer-shared/shards/auto-champ-config/store'
+import { useTranslation } from 'i18next-vue'
+import { NCard, NScrollbar, NSwitch } from 'naive-ui'
+
+import ChampionConfig from '@main-window/components/auto-champ-config/ChampionConfig.vue'
+
+const { t } = useTranslation()
+
+const acs = useAutoChampConfigStore()
+const ac = useInstance<AutoChampConfigRenderer>('auto-champ-config-renderer')
+</script>
+
+<style lang="less" scoped>
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
+.card-header-title {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.outer-wrapper {
+  position: relative;
+  height: 100%;
+  max-width: 100%;
+}
+
+.inner-wrapper {
+  padding: 16px;
+  margin: 0 auto;
+  max-width: 800px;
+
+  :deep(.n-card) {
+    background-color: transparent;
+  }
+}
+
+.single-root {
+  height: 100%;
+}
+</style>

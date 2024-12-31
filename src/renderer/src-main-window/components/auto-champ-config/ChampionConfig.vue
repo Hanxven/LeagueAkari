@@ -1,216 +1,94 @@
 <template>
-  <NCard size="small" class="champion-config-wrapper">
-    <template #header>
-      <div class="header">
-        <template v-if="selectedId">
-          <LcuImage class="header-icon" :src="championIconUri(selectedId)" />
-          <span>配置：{{ currentSelected?.label }}</span>
-        </template>
-        <template v-else>英雄配置</template>
-      </div>
-    </template>
-    <div class="content">
-      <div class="filter-area">
-        <NInput clearable size="small" placeholder="搜索英雄" v-model:value="filterInput">
-          <template #prefix>
-            <NIcon :component="SearchIcon" />
+  <div>
+    <NModal
+      preset="card"
+      size="small"
+      :class="$style['champion-config-wrapper']"
+      transform-origin="center"
+      v-model:show="show"
+    >
+      <template #header>
+        <div class="header">
+          <template v-if="selectedId">
+            <LcuImage class="header-icon" :src="championIconUri(selectedId)" />
+            <span>{{ currentSelected?.label }}</span>
           </template>
-        </NInput>
-        <NVirtualList
-          class="champion-list"
-          :padding-top="2"
-          :item-size="30"
-          key-field="value"
-          :items="championOptions"
-        >
-          <template #default="{ item }">
-            <div
-              class="champion-item"
-              :class="{
-                selected: item.value === selectedId
-              }"
-              @click="handleChangeChampion(item.value)"
-            >
-              <LcuImage class="icon" :src="championIconUri(item.value)" />
-              <div class="champion-name">{{ item.label }}</div>
-              <NPopover :keep-alive-on-hover="false" v-if="item.hasRunes || item.hasSpells">
-                <template #trigger>
-                  <template v-if="item.hasRunes">
-                    <NIcon class="configure-status configured">
-                      <CheckmarkCircle16RegularIcon />
-                    </NIcon>
-                  </template>
-                  <template v-else>
-                    <NIcon class="configure-status not-configured">
-                      <SubtractCircle16RegularIcon />
-                    </NIcon>
-                  </template>
-                </template>
-                <template v-if="item.hasRunes">存在符文配置</template>
-                <template v-else>尚未配置符文</template>
-              </NPopover>
-              <NPopover :keep-alive-on-hover="false" v-if="item.hasRunes || item.hasSpells">
-                <template #trigger>
-                  <template v-if="item.hasSpells">
-                    <NIcon class="configure-status configured">
-                      <CheckmarkCircle16RegularIcon />
-                    </NIcon>
-                  </template>
-                  <template v-else>
-                    <NIcon class="configure-status not-configured">
-                      <SubtractCircle16RegularIcon />
-                    </NIcon>
-                  </template>
-                </template>
-                <template v-if="item.hasSpells">存在召唤师技能配置</template>
-                <template v-else>尚未配置召唤师技能</template>
-              </NPopover>
-            </div>
-          </template>
-        </NVirtualList>
-      </div>
-      <div class="divider"></div>
-      <div class="config-area" v-if="selectedId">
-        <div class="tabs-section">
-          <div class="tab-title">目标模式</div>
-          <NRadioGroup v-model:value="currentType" size="small">
-            <NRadioButton value="ranked">
-              <div class="radio-button-inner">
-                <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
-                <span>排位</span>
-                <NIcon
-                  v-if="
-                    configExistence.runes.some((r) => r.startsWith('ranked')) ||
-                    configExistence.spells.some((r) => r.startsWith('ranked'))
-                  "
-                  class="check-icon"
-                >
-                  <CheckmarkCircle16RegularIcon />
-                </NIcon>
-              </div>
-            </NRadioButton>
-            <NRadioButton value="normal">
-              <div class="radio-button-inner">
-                <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
-                <span>普通</span>
-                <NIcon
-                  v-if="
-                    configExistence.runes.includes('normal') ||
-                    configExistence.spells.includes('normal')
-                  "
-                  class="check-icon"
-                >
-                  <CheckmarkCircle16RegularIcon />
-                </NIcon>
-              </div>
-            </NRadioButton>
-            <NRadioButton value="aram">
-              <div class="radio-button-inner">
-                <LcuImage class="mode-icon" :src="gameModeIconUri['ARAM']" />
-                <span>大乱斗</span>
-                <NIcon
-                  v-if="
-                    configExistence.runes.includes('aram') ||
-                    configExistence.spells.includes('aram')
-                  "
-                  class="check-icon"
-                >
-                  <CheckmarkCircle16RegularIcon />
-                </NIcon>
-              </div>
-            </NRadioButton>
-            <NRadioButton value="urf">
-              <div class="radio-button-inner">
-                <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
-                <span>无限火力</span>
-                <NIcon
-                  v-if="
-                    configExistence.runes.includes('urf') || configExistence.spells.includes('urf')
-                  "
-                  class="check-icon"
-                >
-                  <CheckmarkCircle16RegularIcon />
-                </NIcon>
-              </div>
-            </NRadioButton>
-            <NRadioButton value="nexusblitz">
-              <div class="radio-button-inner">
-                <LcuImage class="mode-icon" :src="gameModeIconUri['NEXUSBLITZ']" />
-                <span>极限闪击</span>
-                <NIcon
-                  v-if="
-                    configExistence.runes.includes('nexusblitz') ||
-                    configExistence.spells.includes('nexusblitz')
-                  "
-                  class="check-icon"
-                >
-                  <CheckmarkCircle16RegularIcon />
-                </NIcon>
-              </div>
-            </NRadioButton>
-            <NRadioButton value="ultbook">
-              <div class="radio-button-inner">
-                <LcuImage class="mode-icon" :src="gameModeIconUri['ULTBOOK']" />
-                <span>终极魔典</span>
-                <NIcon
-                  v-if="
-                    configExistence.runes.includes('ultbook') ||
-                    configExistence.spells.includes('ultbook')
-                  "
-                  class="check-icon"
-                >
-                  <CheckmarkCircle16RegularIcon />
-                </NIcon>
-              </div>
-            </NRadioButton>
-          </NRadioGroup>
+          <template v-else>英雄配置</template>
         </div>
-        <div class="tabs-sections">
+      </template>
+      <div class="content">
+        <div class="filter-area">
+          <NInput clearable size="small" placeholder="搜索英雄" v-model:value="filterInput">
+            <template #prefix>
+              <NIcon :component="SearchIcon" />
+            </template>
+          </NInput>
+          <NVirtualList
+            class="champion-list"
+            :padding-top="2"
+            :item-size="30"
+            key-field="value"
+            :items="championOptions"
+          >
+            <template #default="{ item }">
+              <div
+                class="champion-item"
+                :class="{
+                  selected: item.value === selectedId
+                }"
+                @click="handleChangeChampion(item.value)"
+              >
+                <LcuImage class="icon" :src="championIconUri(item.value)" />
+                <div class="champion-name">{{ item.label }}</div>
+                <NPopover :keep-alive-on-hover="false" v-if="item.hasRunes || item.hasSpells">
+                  <template #trigger>
+                    <template v-if="item.hasRunes">
+                      <NIcon class="configure-status configured">
+                        <CheckmarkCircle16RegularIcon />
+                      </NIcon>
+                    </template>
+                    <template v-else>
+                      <NIcon class="configure-status not-configured">
+                        <SubtractCircle16RegularIcon />
+                      </NIcon>
+                    </template>
+                  </template>
+                  <template v-if="item.hasRunes">存在符文配置</template>
+                  <template v-else>尚未配置符文</template>
+                </NPopover>
+                <NPopover :keep-alive-on-hover="false" v-if="item.hasRunes || item.hasSpells">
+                  <template #trigger>
+                    <template v-if="item.hasSpells">
+                      <NIcon class="configure-status configured">
+                        <CheckmarkCircle16RegularIcon />
+                      </NIcon>
+                    </template>
+                    <template v-else>
+                      <NIcon class="configure-status not-configured">
+                        <SubtractCircle16RegularIcon />
+                      </NIcon>
+                    </template>
+                  </template>
+                  <template v-if="item.hasSpells">存在召唤师技能配置</template>
+                  <template v-else>尚未配置召唤师技能</template>
+                </NPopover>
+              </div>
+            </template>
+          </NVirtualList>
+        </div>
+        <div class="divider"></div>
+        <div class="config-area" v-if="selectedId">
           <div class="tabs-section">
-            <div class="tab-title">配置</div>
-            <NRadioGroup v-model:value="currentConfig" size="small">
-              <NRadioButton value="runes">
+            <div class="tab-title">目标模式</div>
+            <NRadioGroup v-model:value="currentType" size="small">
+              <NRadioButton value="ranked">
                 <div class="radio-button-inner">
-                  <span>符文</span>
-                  <NIcon
-                    v-if="configExistence.runes.some((r) => r.startsWith(currentType))"
-                    class="check-icon"
-                  >
-                    <CheckmarkCircle16RegularIcon />
-                  </NIcon>
-                </div>
-              </NRadioButton>
-              <NRadioButton value="spells">
-                <div class="radio-button-inner">
-                  <span>技能</span>
-                  <NIcon
-                    v-if="configExistence.spells.some((r) => r.startsWith(currentType))"
-                    class="check-icon"
-                  >
-                    <CheckmarkCircle16RegularIcon />
-                  </NIcon>
-                </div>
-              </NRadioButton>
-            </NRadioGroup>
-          </div>
-          <div class="tabs-section" v-if="currentType === 'ranked'">
-            <div class="tab-title">位置</div>
-            <NRadioGroup
-              v-model:value="currentPosition"
-              size="small"
-              :theme-overrides="{
-                labelPadding: '0 8px'
-              }"
-            >
-              <NRadioButton value="default">
-                <div class="radio-button-inner">
-                  <PositionIcon position="all" />
-                  <span>默认</span>
+                  <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
+                  <span>排位</span>
                   <NIcon
                     v-if="
-                      currentConfig === 'runes'
-                        ? configExistence.runes.includes(`${currentType}-default`)
-                        : configExistence.spells.includes(`${currentType}-default`)
+                      configExistence.runes.some((r) => r.startsWith('ranked')) ||
+                      configExistence.spells.some((r) => r.startsWith('ranked'))
                     "
                     class="check-icon"
                   >
@@ -218,15 +96,14 @@
                   </NIcon>
                 </div>
               </NRadioButton>
-              <NRadioButton value="top">
+              <NRadioButton value="normal">
                 <div class="radio-button-inner">
-                  <PositionIcon position="top" />
-                  <span>上路</span>
+                  <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
+                  <span>普通</span>
                   <NIcon
                     v-if="
-                      currentConfig === 'runes'
-                        ? configExistence.runes.includes(`${currentType}-top`)
-                        : configExistence.spells.includes(`${currentType}-top`)
+                      configExistence.runes.includes('normal') ||
+                      configExistence.spells.includes('normal')
                     "
                     class="check-icon"
                   >
@@ -234,15 +111,14 @@
                   </NIcon>
                 </div>
               </NRadioButton>
-              <NRadioButton value="middle">
+              <NRadioButton value="aram">
                 <div class="radio-button-inner">
-                  <PositionIcon position="middle" />
-                  <span>中路</span>
+                  <LcuImage class="mode-icon" :src="gameModeIconUri['ARAM']" />
+                  <span>大乱斗</span>
                   <NIcon
                     v-if="
-                      currentConfig === 'runes'
-                        ? configExistence.runes.includes(`${currentType}-middle`)
-                        : configExistence.spells.includes(`${currentType}-middle`)
+                      configExistence.runes.includes('aram') ||
+                      configExistence.spells.includes('aram')
                     "
                     class="check-icon"
                   >
@@ -250,15 +126,14 @@
                   </NIcon>
                 </div>
               </NRadioButton>
-              <NRadioButton value="jungle">
+              <NRadioButton value="urf">
                 <div class="radio-button-inner">
-                  <PositionIcon position="jungle" />
-                  <span>打野</span>
+                  <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
+                  <span>无限火力</span>
                   <NIcon
                     v-if="
-                      currentConfig === 'runes'
-                        ? configExistence.runes.includes(`${currentType}-jungle`)
-                        : configExistence.spells.includes(`${currentType}-jungle`)
+                      configExistence.runes.includes('urf') ||
+                      configExistence.spells.includes('urf')
                     "
                     class="check-icon"
                   >
@@ -266,15 +141,14 @@
                   </NIcon>
                 </div>
               </NRadioButton>
-              <NRadioButton value="bottom">
+              <NRadioButton value="nexusblitz">
                 <div class="radio-button-inner">
-                  <PositionIcon position="bottom" />
-                  <span>下路</span>
+                  <LcuImage class="mode-icon" :src="gameModeIconUri['NEXUSBLITZ']" />
+                  <span>极限闪击</span>
                   <NIcon
                     v-if="
-                      currentConfig === 'runes'
-                        ? configExistence.runes.includes(`${currentType}-bottom`)
-                        : configExistence.spells.includes(`${currentType}-bottom`)
+                      configExistence.runes.includes('nexusblitz') ||
+                      configExistence.spells.includes('nexusblitz')
                     "
                     class="check-icon"
                   >
@@ -282,15 +156,14 @@
                   </NIcon>
                 </div>
               </NRadioButton>
-              <NRadioButton value="utility">
+              <NRadioButton value="ultbook">
                 <div class="radio-button-inner">
-                  <PositionIcon position="utility" />
-                  <span>辅助</span>
+                  <LcuImage class="mode-icon" :src="gameModeIconUri['ULTBOOK']" />
+                  <span>终极魔典</span>
                   <NIcon
                     v-if="
-                      currentConfig === 'runes'
-                        ? configExistence.runes.includes(`${currentType}-utility`)
-                        : configExistence.spells.includes(`${currentType}-utility`)
+                      configExistence.runes.includes('ultbook') ||
+                      configExistence.spells.includes('ultbook')
                     "
                     class="check-icon"
                   >
@@ -300,70 +173,206 @@
               </NRadioButton>
             </NRadioGroup>
           </div>
-        </div>
-        <div class="runes" v-if="currentConfig === 'runes'">
-          <RuneV2Edit v-model:page="tempEditingRunes" v-if="tempEditingRunes" />
-          <div class="empty-placeholder" v-else>
-            <span>未设置符文</span>
-            <NButton secondary size="small" type="primary" @click="handleCreateRunesConfig"
-              >设置符文</NButton
-            >
+          <div class="tabs-sections">
+            <div class="tabs-section">
+              <div class="tab-title">配置</div>
+              <NRadioGroup v-model:value="currentConfig" size="small">
+                <NRadioButton value="runes">
+                  <div class="radio-button-inner">
+                    <span>符文</span>
+                    <NIcon
+                      v-if="configExistence.runes.some((r) => r.startsWith(currentType))"
+                      class="check-icon"
+                    >
+                      <CheckmarkCircle16RegularIcon />
+                    </NIcon>
+                  </div>
+                </NRadioButton>
+                <NRadioButton value="spells">
+                  <div class="radio-button-inner">
+                    <span>技能</span>
+                    <NIcon
+                      v-if="configExistence.spells.some((r) => r.startsWith(currentType))"
+                      class="check-icon"
+                    >
+                      <CheckmarkCircle16RegularIcon />
+                    </NIcon>
+                  </div>
+                </NRadioButton>
+              </NRadioGroup>
+            </div>
+            <div class="tabs-section" v-if="currentType === 'ranked'">
+              <div class="tab-title">位置</div>
+              <NRadioGroup
+                v-model:value="currentPosition"
+                size="small"
+                :theme-overrides="{
+                  labelPadding: '0 8px'
+                }"
+              >
+                <NRadioButton value="default">
+                  <div class="radio-button-inner">
+                    <PositionIcon position="all" />
+                    <span>默认</span>
+                    <NIcon
+                      v-if="
+                        currentConfig === 'runes'
+                          ? configExistence.runes.includes(`${currentType}-default`)
+                          : configExistence.spells.includes(`${currentType}-default`)
+                      "
+                      class="check-icon"
+                    >
+                      <CheckmarkCircle16RegularIcon />
+                    </NIcon>
+                  </div>
+                </NRadioButton>
+                <NRadioButton value="top">
+                  <div class="radio-button-inner">
+                    <PositionIcon position="top" />
+                    <span>上路</span>
+                    <NIcon
+                      v-if="
+                        currentConfig === 'runes'
+                          ? configExistence.runes.includes(`${currentType}-top`)
+                          : configExistence.spells.includes(`${currentType}-top`)
+                      "
+                      class="check-icon"
+                    >
+                      <CheckmarkCircle16RegularIcon />
+                    </NIcon>
+                  </div>
+                </NRadioButton>
+                <NRadioButton value="middle">
+                  <div class="radio-button-inner">
+                    <PositionIcon position="middle" />
+                    <span>中路</span>
+                    <NIcon
+                      v-if="
+                        currentConfig === 'runes'
+                          ? configExistence.runes.includes(`${currentType}-middle`)
+                          : configExistence.spells.includes(`${currentType}-middle`)
+                      "
+                      class="check-icon"
+                    >
+                      <CheckmarkCircle16RegularIcon />
+                    </NIcon>
+                  </div>
+                </NRadioButton>
+                <NRadioButton value="jungle">
+                  <div class="radio-button-inner">
+                    <PositionIcon position="jungle" />
+                    <span>打野</span>
+                    <NIcon
+                      v-if="
+                        currentConfig === 'runes'
+                          ? configExistence.runes.includes(`${currentType}-jungle`)
+                          : configExistence.spells.includes(`${currentType}-jungle`)
+                      "
+                      class="check-icon"
+                    >
+                      <CheckmarkCircle16RegularIcon />
+                    </NIcon>
+                  </div>
+                </NRadioButton>
+                <NRadioButton value="bottom">
+                  <div class="radio-button-inner">
+                    <PositionIcon position="bottom" />
+                    <span>下路</span>
+                    <NIcon
+                      v-if="
+                        currentConfig === 'runes'
+                          ? configExistence.runes.includes(`${currentType}-bottom`)
+                          : configExistence.spells.includes(`${currentType}-bottom`)
+                      "
+                      class="check-icon"
+                    >
+                      <CheckmarkCircle16RegularIcon />
+                    </NIcon>
+                  </div>
+                </NRadioButton>
+                <NRadioButton value="utility">
+                  <div class="radio-button-inner">
+                    <PositionIcon position="utility" />
+                    <span>辅助</span>
+                    <NIcon
+                      v-if="
+                        currentConfig === 'runes'
+                          ? configExistence.runes.includes(`${currentType}-utility`)
+                          : configExistence.spells.includes(`${currentType}-utility`)
+                      "
+                      class="check-icon"
+                    >
+                      <CheckmarkCircle16RegularIcon />
+                    </NIcon>
+                  </div>
+                </NRadioButton>
+              </NRadioGroup>
+            </div>
           </div>
-        </div>
-        <div class="spells" v-else-if="currentConfig === 'spells'">
-          <SummonerSpellEdit
-            v-if="tempEditingSpells"
-            :game-mode="typeToGameMode(currentType)"
-            v-model:spell-ids="tempEditingSpells"
-          />
-          <div class="empty-placeholder" v-else>
-            <span>未设置召唤师技能</span>
-            <NButton size="small" secondary type="primary" @click="handleCreateSpellsConfig"
-              >设置召唤师技能</NButton
-            >
+          <div class="runes" v-if="currentConfig === 'runes'">
+            <RuneV2Edit v-model:page="tempEditingRunes" v-if="tempEditingRunes" />
+            <div class="empty-placeholder" v-else>
+              <span>未设置符文</span>
+              <NButton secondary size="small" type="primary" @click="handleCreateRunesConfig"
+                >设置符文</NButton
+              >
+            </div>
           </div>
-        </div>
-        <div class="actions">
-          <template v-if="currentConfig === 'runes'">
-            <NButton size="small" @click="handleClearRunes" :disabled="!tempEditingRunes"
-              >清空</NButton
-            >
+          <div class="spells" v-else-if="currentConfig === 'spells'">
+            <SummonerSpellEdit
+              v-if="tempEditingSpells"
+              :game-mode="typeToGameMode(currentType)"
+              v-model:spell-ids="tempEditingSpells"
+            />
+            <div class="empty-placeholder" v-else>
+              <span>未设置召唤师技能</span>
+              <NButton size="small" secondary type="primary" @click="handleCreateSpellsConfig"
+                >设置召唤师技能</NButton
+              >
+            </div>
+          </div>
+          <div class="actions">
+            <template v-if="currentConfig === 'runes'">
+              <NButton size="small" @click="handleClearRunes" :disabled="!tempEditingRunes"
+                >清空</NButton
+              >
 
-            <NButton size="small" :disabled="isRunesUnchanged" @click="handleRestoreRunes"
-              >还原</NButton
-            >
-            <NButton
-              size="small"
-              type="primary"
-              :disabled="isRunesUnchanged || !isRunesValid"
-              @click="handleSaveRunes"
-              >保存</NButton
-            >
-          </template>
-          <template v-else-if="currentConfig === 'spells'">
-            <NButton size="small" @click="handleClearSpells" :disabled="!tempEditingSpells"
-              >清空</NButton
-            >
-            <NButton size="small" @click="handleRestoreSpells" :disabled="isSpellsUnchanged"
-              >还原</NButton
-            >
-            <NButton
-              size="small"
-              type="primary"
-              @click="handleSaveSpells"
-              :disabled="isSpellsUnchanged"
-              >保存</NButton
-            >
-          </template>
+              <NButton size="small" :disabled="isRunesUnchanged" @click="handleRestoreRunes"
+                >还原</NButton
+              >
+              <NButton
+                size="small"
+                type="primary"
+                :disabled="isRunesUnchanged || !isRunesValid"
+                @click="handleSaveRunes"
+                >保存</NButton
+              >
+            </template>
+            <template v-else-if="currentConfig === 'spells'">
+              <NButton size="small" @click="handleClearSpells" :disabled="!tempEditingSpells"
+                >清空</NButton
+              >
+              <NButton size="small" @click="handleRestoreSpells" :disabled="isSpellsUnchanged"
+                >还原</NButton
+              >
+              <NButton
+                size="small"
+                type="primary"
+                @click="handleSaveSpells"
+                :disabled="isSpellsUnchanged"
+                >保存</NButton
+              >
+            </template>
+          </div>
         </div>
+        <div v-else class="config-area-empty-placeholder">选择英雄以查看配置</div>
       </div>
-      <div v-else class="config-area-empty-placeholder">选择英雄以查看配置</div>
-    </div>
-  </NCard>
+    </NModal>
+    <NButton size="tiny" type="primary" @click="show = true">{{ `配置英雄` }}</NButton>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import FadeExpand from '@renderer-shared/components/FadeExpand.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
@@ -386,6 +395,7 @@ import {
   NCard,
   NIcon,
   NInput,
+  NModal,
   NPopover,
   NRadioButton,
   NRadioGroup,
@@ -407,6 +417,8 @@ const acs = useAutoChampConfigStore()
 const ac = useInstance<AutoChampConfigRenderer>('auto-champ-config-renderer')
 
 const { match: isNameMatch } = useChampionNameMatch()
+
+const show = defineModel<boolean>('show', { default: false })
 
 const filterInput = ref('')
 
@@ -853,11 +865,6 @@ const configExistence = computed(() => {
 </script>
 
 <style lang="less" scoped>
-.champion-config-wrapper {
-  height: 580px;
-  width: fit-content;
-}
-
 .header {
   display: flex;
   align-items: center;
@@ -1036,5 +1043,13 @@ const configExistence = computed(() => {
   display: flex;
   justify-content: flex-end;
   gap: 4px;
+}
+</style>
+
+<style lang="less" module>
+.champion-config-wrapper {
+  height: 580px;
+  width: fit-content;
+  min-width: 940px;
 }
 </style>
