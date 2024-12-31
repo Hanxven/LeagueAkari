@@ -45,8 +45,8 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'cancelUpdate')
   }
 
-  setAnnouncementRead(sha: string) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setAnnouncementRead', sha)
+  setAnnouncementRead(md5: string) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'setAnnouncementRead', md5)
   }
 
   openNewUpdatesDir() {

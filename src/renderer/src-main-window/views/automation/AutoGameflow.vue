@@ -46,38 +46,6 @@
               size="small"
             />
           </ControlItem>
-          <ControlItem
-            v-if="false"
-            class="control-item-margin"
-            :label="t('AutoGameflow.autoHonorStrategy.label')"
-            :label-description="t('AutoGameflow.autoHonorStrategy.description')"
-            :label-width="260"
-          >
-            <NRadioGroup
-              size="small"
-              name="radio-group"
-              :value="store.settings.autoHonorStrategy"
-              @update:value="(val) => shard.setAutoHonorStrategy(val)"
-            >
-              <NFlex :size="4">
-                <NRadio value="prefer-lobby-member">{{
-                  t('AutoGameflow.autoHonorStrategy.options.prefer-lobby-member')
-                }}</NRadio>
-                <NRadio value="only-lobby-member">{{
-                  t('AutoGameflow.autoHonorStrategy.options.only-lobby-member')
-                }}</NRadio>
-                <NRadio value="all-member">{{
-                  t('AutoGameflow.autoHonorStrategy.options.all-member')
-                }}</NRadio>
-                <NRadio value="all-member-including-opponent"
-                  >{{ t('AutoGameflow.autoHonorStrategy.options.all-member-including-opponent') }}
-                </NRadio>
-                <NRadio value="opt-out">{{
-                  t('AutoGameflow.autoHonorStrategy.options.opt-out')
-                }}</NRadio>
-              </NFlex>
-            </NRadioGroup>
-          </ControlItem>
           <div class="divider"></div>
           <ControlItem
             class="control-item-margin"
@@ -228,6 +196,18 @@
             <NSwitch
               :value="store.settings.autoHandleInvitationsEnabled"
               @update:value="(val) => shard.setAutoHandleInvitationsEnabled(val)"
+              size="small"
+            />
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            :label="t('AutoGameflow.rejectInvitationWhenAway.label')"
+            :label-description="t('AutoGameflow.rejectInvitationWhenAway.description')"
+            :label-width="260"
+          >
+            <NSwitch
+              :value="store.settings.rejectInvitationWhenAway"
+              @update:value="(val) => shard.setRejectInvitationWhenAway(val)"
               size="small"
             />
           </ControlItem>

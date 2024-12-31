@@ -93,6 +93,10 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoHandleInvitationsEnabled', enabled)
   }
 
+  setRejectInvitationWhenAway(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'rejectInvitationWhenAway', enabled)
+  }
+
   setDodgeAtLastSecondThreshold(threshold: number) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'dodgeAtLastSecondThreshold', threshold)
   }

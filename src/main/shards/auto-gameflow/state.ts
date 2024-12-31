@@ -1,4 +1,5 @@
 import { makeAutoObservable, observable } from 'mobx'
+
 import { LeagueClientSyncedData } from '../league-client/lc-state'
 
 export type AutoHonorStrategy =
@@ -30,6 +31,8 @@ export class AutoGameflowSettings {
   autoMatchmakingWaitForInvitees: boolean = true // 等待邀请中的用户
 
   autoHandleInvitationsEnabled: boolean = false
+  rejectInvitationWhenAway: boolean = false
+
   invitationHandlingStrategies: Record<string, string> = {}
 
   dodgeAtLastSecondThreshold: number = 2
@@ -84,6 +87,10 @@ export class AutoGameflowSettings {
 
   setAutoHandleInvitationsEnabled(enabled: boolean) {
     this.autoHandleInvitationsEnabled = enabled
+  }
+
+  setRejectInvitationWhenAway(yes: boolean) {
+    this.rejectInvitationWhenAway = yes
   }
 
   setDodgeAtLastSecondThreshold(threshold: number) {

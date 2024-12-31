@@ -82,7 +82,8 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         autoMatchmakingWaitForInvitees: { default: this.settings.autoMatchmakingWaitForInvitees },
         autoHandleInvitationsEnabled: { default: this.settings.autoHandleInvitationsEnabled },
         dodgeAtLastSecondThreshold: { default: this.settings.dodgeAtLastSecondThreshold },
-        invitationHandlingStrategies: { default: this.settings.invitationHandlingStrategies }
+        invitationHandlingStrategies: { default: this.settings.invitationHandlingStrategies },
+        rejectInvitationWhenAway: { default: this.settings.rejectInvitationWhenAway }
       },
       this.settings
     )
@@ -219,10 +220,17 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         [
           this._lc.data.lobby.receivedInvitations,
           this.settings.autoHandleInvitationsEnabled,
-          this.settings.invitationHandlingStrategies
+          this.settings.invitationHandlingStrategies,
+          this.settings.rejectInvitationWhenAway,
+          this._lc.data.chat.me?.availability
         ] as const,
-      async ([invitations, enabled, strategies]) => {
+      async ([invitations, enabled, strategies, rejectWhenAway, availability]) => {
         if (!enabled || invitations.length === 0) {
+          return
+        }
+
+        if (rejectWhenAway && availability === 'away') {
+          this._log.info('拒绝邀请：当前状态为离开')
           return
         }
 
@@ -659,7 +667,8 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       'autoHandleInvitationsEnabled',
       'autoReconnectEnabled',
       'autoMatchmakingMaximumMatchDuration',
-      'invitationHandlingStrategies'
+      'invitationHandlingStrategies',
+      'rejectInvitationWhenAway'
     ])
 
     this._mobx.propSync(AutoGameflowMain.id, 'state', this.state, [

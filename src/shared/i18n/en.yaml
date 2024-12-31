@@ -380,6 +380,9 @@ AutoGameflow:
     button: Configure
     queueTypes:
       default: Default
+  rejectInvitationWhenAway:
+    label: Reject When Away
+    description: Automatically rejects room invitations when the game status is set to Away.
 
 AutoSelect:
   normalModeTitle: Auto Pick · Normal Mode

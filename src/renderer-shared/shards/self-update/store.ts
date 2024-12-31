@@ -21,7 +21,7 @@ interface CurrentAnnouncement {
   content: string
   updateAt: Date
   isRead: boolean
-  sha: string
+  md5: string
 }
 
 // copied from main shard

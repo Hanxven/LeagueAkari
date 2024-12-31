@@ -29,7 +29,8 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
     autoMatchmakingWaitForInvitees: true,
     autoHandleInvitationsEnabled: false,
     invitationHandlingStrategies: {} as Record<string, string>,
-    dodgeAtLastSecondThreshold: 2
+    dodgeAtLastSecondThreshold: 2,
+    rejectInvitationWhenAway: false
   })
 
   const willAccept = ref(false)

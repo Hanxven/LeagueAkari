@@ -383,6 +383,9 @@ AutoGameflow:
     button: 配置
     queueTypes:
       default: 默认
+  rejectInvitationWhenAway:
+    label: 离开时拒绝邀请
+    description: 当游戏状态为离开时，将拒绝所有房间邀请
 
 AutoSelect:
   normalModeTitle: 自动英雄选择 · 普通模式

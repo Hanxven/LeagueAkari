@@ -14,7 +14,7 @@ interface CurrentAnnouncement {
   content: string
   updateAt: Date
   isRead: boolean
-  sha: string
+  md5: string
 }
 
 interface UpdateProgressInfo {

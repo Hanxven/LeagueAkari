@@ -14,6 +14,7 @@ import { Notification, app, shell } from 'electron'
 import { comparer } from 'mobx'
 import { extractFull } from 'node-7z'
 import cp from 'node:child_process'
+import crypto from 'node:crypto'
 import ofs from 'node:original-fs'
 import path from 'node:path'
 import { Readable, pipeline } from 'node:stream'
@@ -158,13 +159,15 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         headers: { 'Cache-Control': 'no-cache' }
       })
 
-      const lastReadSha = await this._setting._getFromStorage('lastReadAnnouncementSha', '')
+      const md5 = crypto.createHash('md5').update(announcement).digest('hex')
+
+      const lastReadSha = await this._setting._getFromStorage('lastReadAnnouncementMd5', '')
 
       this.state.setCurrentAnnouncement({
         content: announcement,
         updateAt: new Date(),
-        isRead: data.sha === lastReadSha,
-        sha: data.sha
+        isRead: md5 === lastReadSha,
+        md5
       })
     } catch (error) {
       this._log.warn(`尝试拉取公告失败`, error)
@@ -638,10 +641,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       }
     })
 
-    this._ipc.onCall(SelfUpdateMain.id, 'setAnnouncementRead', async (sha: string) => {
+    this._ipc.onCall(SelfUpdateMain.id, 'setAnnouncementRead', async (md5: string) => {
       if (this.state.currentAnnouncement) {
         this.state.setAnnouncementRead(true)
-        await this._setting._saveToStorage('lastReadAnnouncementSha', sha)
+        await this._setting._saveToStorage('lastReadAnnouncementMd5', md5)
       }
 
       return

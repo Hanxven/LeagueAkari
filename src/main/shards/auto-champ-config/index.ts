@@ -350,7 +350,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
           id: added.id,
           isRecommendationOverride: false,
           isTemporary: false,
-          name: `[Akari] ${pageName}`,
+          name: pageName,
           primaryStyleId: config.primaryStyleId,
           selectedPerkIds: config.selectedPerkIds,
           subStyleId: config.subStyleId
@@ -367,7 +367,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
           id: page1.id,
           isRecommendationOverride: false,
           isTemporary: false,
-          name: `[Akari] ${pageName}`,
+          name: pageName,
           primaryStyleId: config.primaryStyleId,
           selectedPerkIds: config.selectedPerkIds,
           subStyleId: config.subStyleId

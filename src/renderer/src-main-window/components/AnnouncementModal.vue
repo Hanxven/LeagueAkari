@@ -66,7 +66,7 @@ const show = defineModel<boolean>('show', { default: false })
 
 const handleRead = () => {
   if (sus.currentAnnouncement) {
-    aum.setAnnouncementRead(sus.currentAnnouncement.sha)
+    aum.setAnnouncementRead(sus.currentAnnouncement.md5)
   }
   show.value = false
 }
