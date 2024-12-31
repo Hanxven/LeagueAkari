@@ -314,6 +314,7 @@ Automation:
   autoGameflow: 自动游戏流程
   autoSelect: 自动选择 / 禁用
   autoMisc: 其他
+  autoChampConfig: 自动英雄配置
 
 AutoGameflow:
   title: 游戏流
@@ -1623,6 +1624,46 @@ InGameSend:
   error: 未知错误
   confirm: 确认
 
+ChampionConfig:
+  targetMode: 目标模式
+  ranked: 排位
+  normal: 普通
+  aram: 大乱斗
+  urf: 无限火力
+  nexusblitz: 极限闪击
+  ultbook: 终极魔典
+  runes: 符文
+  configure: 配置
+  spells: 技能
+  position: 位置
+  default: 默认
+  runesConfigured: 存在符文配置
+  spellsConfigured: 存在召唤师技能配置
+  runesUnconfigured: 尚未配置符文
+  spellsUnconfigured: 未设置召唤师技能
+  configureRunes: 配置符文
+  configureSpells: 设置召唤师技能
+  clear: 清空
+  restore: 还原
+  save: 保存
+  noChampionPlaceholder: 选择英雄以查看配置
+  runesSaved: 符文配置已保存
+  runesRestored: 符文配置已还原
+  spellsSaved: 召唤师技能配置已保存
+  spellsRestored: 召唤师技能配置已还原
+  searchPlaceholder: 查找英雄
+
+RuneEditV2:
+  unsupported: 当前符文构型未支持
+
+AutoChampConfig:
+  title: 自动英雄配置
+  enabled:
+    label: 启用
+    description: 在英雄选择阶段锁定英雄后，按照预设配置符文或召唤师技能
+  configure:
+    label: 配置
+
 tray:
   quit: 退出
   auxWindow: 辅助窗口
@@ -1662,6 +1703,24 @@ self-update-main:
   updateOnNextStartup: 更新已下载完成，关闭应用后执行更新流程
   lastUpdateFailed: 上一次自动更新没有成功，请<a href="{{url}}" target="_blank">手动更新新版本</a>
   lastUpdateSuccess: 已成功更新到 {{version}}
+
+auto-champ-config-main:
+  summonerSpells:
+    applied: '{{name}} 的召唤师技能已更新为 [{{spell1}}] [{{spell2}}]'
+    appliedWithPosition: '{{name}} - {{position}} 的召唤师技能已更新为 [{{spell1}}] [{{spell2}}]'
+    errorApplied: '{{name}} 的召唤师技能更新失败'
+    errorAppliedWithPosition: '{{name}} - {{position}} 的召唤师技能更新失败'
+
+  runes:
+    pageName: '{{name}}'
+    pageNameWithPosition: '{{name}} - {{position}}'
+    applied: '{{name}} 的符文配法已更新为 {{primary}} / {{sub}} ({{all}})'
+    appliedWithPosition: '{{name}} - {{position}} 的符文配法已更新为 {{primary}} / {{sub}} ({{all}})'
+    errorApplied: '{{name}} 的符文配法更新失败'
+    errorAppliedWithPosition: '{{name}} - {{position}} 的符文配法更新失败'
+
+  auto-config-enabled-no-champion: 已启用自动配置，但无已配置的英雄
+  auto-config-enabled: 已启用自动配置，已配置的英雄：{{names}}
 
 common:
   appName: League Akari

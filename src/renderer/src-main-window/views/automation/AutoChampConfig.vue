@@ -4,11 +4,11 @@
       <div class="inner-wrapper">
         <NCard size="small">
           <template #header
-            ><span class="card-header-title">{{ `自动英雄配置` }}</span></template
+            ><span class="card-header-title">{{ t('AutoChampConfig.title') }}</span></template
           >
           <ControlItem
-            :label="`启用`"
-            :label-description="`在英雄选择阶段锁定英雄后，按照预设配置符文或召唤师技能`"
+            :label="t('AutoChampConfig.enabled.label')"
+            :label-description="t('AutoChampConfig.enabled.description')"
             class="control-item-margin"
             :label-width="260"
           >
@@ -18,7 +18,11 @@
               size="small"
             ></NSwitch>
           </ControlItem>
-          <ControlItem :label="`配置`" class="control-item-margin" :label-width="260">
+          <ControlItem
+            :label="t('AutoChampConfig.configure.label')"
+            class="control-item-margin"
+            :label-width="260"
+          >
             <ChampionConfig />
           </ControlItem>
         </NCard>

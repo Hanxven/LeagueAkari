@@ -1,6 +1,7 @@
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { formatError } from '@shared/utils/errors'
+import { comparer } from 'mobx'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -143,16 +144,88 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     )
 
     this._mobx.reaction(
-      () => this._lc.data.chat.conversations.championSelect?.id,
-      (id) => {
-        if (id && this._lc.data.gameflow.phase === 'ChampSelect') {
-          if (!this._lc.data.champSelect.session) {
+      () =>
+        [
+          this._lc.data.chat.conversations.championSelect?.id,
+          Boolean(this._lc.data.gameflow.session),
+          Boolean(this._lc.data.champSelect.session)
+        ] as const,
+      ([id, g, c]) => {
+        if (id && this._lc.data.gameflow.phase === 'ChampSelect' && g && c) {
+          const gSession = this._lc.data.gameflow.session!
+          const cSession = this._lc.data.champSelect.session!
+
+          const localPlayerCellId = cSession.localPlayerCellId
+          const self = cSession.myTeam.find((player) => player.cellId === localPlayerCellId)
+
+          if (!self) {
             return
           }
 
-          this._sendInChat(`[League Akari] 已启用 自动英雄配置`)
+          const gameMode = gSession.gameData.queue.gameMode
+          const queueType = gSession.gameData.queue.type
+          const selfPosition = self.assignedPosition
+
+          const isRankedMode = queueType.startsWith('RANKED_')
+
+          let configKey: string
+          if (gameMode === 'CLASSIC') {
+            if (isRankedMode) {
+              configKey = `ranked-${selfPosition}`
+            } else {
+              configKey = 'normal'
+            }
+          } else {
+            configKey = AutoChampionConfigMain.GAME_MODE_TYPE_MAP[gameMode] || null
+          }
+
+          if (!configKey) {
+            return
+          }
+
+          // 寻找已配置的所有英雄
+          const runesChampionIds: number[] = []
+          const spellsChampionIds: number[] = []
+
+          Object.entries(this.settings.runesV2).forEach(([championId, runesConfig]) => {
+            if (runesConfig[configKey]) {
+              runesChampionIds.push(Number(championId))
+            } else {
+              if (isRankedMode && runesConfig['ranked-default']) {
+                runesChampionIds.push(Number(championId))
+              }
+            }
+          })
+
+          Object.entries(this.settings.summonerSpells).forEach(([championId, spellsConfig]) => {
+            if (spellsConfig[configKey]) {
+              spellsChampionIds.push(Number(championId))
+            } else {
+              if (isRankedMode && spellsConfig['ranked-default']) {
+                spellsChampionIds.push(Number(championId))
+              }
+            }
+          })
+
+          const unionChampionIds = Array.from(new Set([...runesChampionIds, ...spellsChampionIds]))
+          const names = unionChampionIds.map(
+            (id) => this._lc.data.gameData.champions[id]?.name || id
+          )
+
+          if (names.length) {
+            this._sendInChat(
+              `[League Akari] ${i18next.t('auto-champ-config-main.auto-config-enabled', {
+                names: names.join(', ')
+              })}`
+            )
+          } else {
+            this._sendInChat(
+              `[League Akari] ${i18next.t('auto-champ-config-main.auto-config-enabled-no-champion')}`
+            )
+          }
         }
-      }
+      },
+      { equals: comparer.shallow }
     )
   }
 
@@ -178,15 +251,36 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
 
     if (positionName) {
       return {
-        pageName: `${championName} - ${positionName}`,
-        message: `${championName} - ${positionName} 的符文页已更新为 [${primaryStyleName}] [${subStyleName}] + [${perkNames.join(', ')}]`,
-        errorMessage: `${championName} - ${positionName} 的符文页更新失败`
+        pageName: `[Akari] ${i18next.t('auto-champ-config-main.runes.pageNameWithPosition', {
+          name: championName,
+          position: positionName
+        })}`,
+        message: i18next.t('auto-champ-config-main.runes.appliedWithPosition', {
+          name: championName,
+          primary: primaryStyleName,
+          sub: subStyleName,
+          all: perkNames.join(', '),
+          position: positionName
+        }),
+        errorMessage: i18next.t('auto-champ-config-main.runes.errorAppliedWithPosition', {
+          name: championName,
+          position: positionName
+        })
       }
     } else {
       return {
-        pageName: `${championName}`,
-        message: `${championName} 的符文页已更新为 [${primaryStyleName}] [${subStyleName}] [${perkNames.join(', ')}]`,
-        errorMessage: `${championName} 的符文页更新失败`
+        pageName: `[Akari] ${i18next.t('auto-champ-config-main.runes.pageName', {
+          name: championName
+        })}`,
+        message: i18next.t('auto-champ-config-main.runes.applied', {
+          name: championName,
+          primary: primaryStyleName,
+          sub: subStyleName,
+          all: perkNames.join(', ')
+        }),
+        errorMessage: i18next.t('auto-champ-config-main.runes.errorApplied', {
+          name: championName
+        })
       }
     }
   }
@@ -210,13 +304,27 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
 
     if (positionName) {
       return {
-        message: `${championName} - ${positionName} 的召唤师技能已更新为 [${spell1Name}] [${spell2Name}]`,
-        errorMessage: `${championName} - ${positionName} 的召唤师技能更新失败`
+        message: i18next.t('auto-champ-config-main.summonerSpells.appliedWithPosition', {
+          name: championName,
+          spell1: spell1Name,
+          spell2: spell2Name,
+          position: positionName
+        }),
+        errorMessage: i18next.t('auto-champ-config-main.summonerSpells.errorAppliedWithPosition', {
+          name: championName,
+          position: positionName
+        })
       }
     } else {
       return {
-        message: `${championName} 的召唤师技能已更新为 [${spell1Name}] [${spell2Name}]`,
-        errorMessage: `${championName} 的召唤师技能更新失败`
+        message: i18next.t('auto-champ-config-main.summonerSpells.applied', {
+          name: championName,
+          spell1: spell1Name,
+          spell2: spell2Name
+        }),
+        errorMessage: i18next.t('auto-champ-config-main.summonerSpells.errorApplied', {
+          name: championName
+        })
       }
     }
   }

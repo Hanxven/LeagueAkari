@@ -13,12 +13,17 @@
             <LcuImage class="header-icon" :src="championIconUri(selectedId)" />
             <span>{{ currentSelected?.label }}</span>
           </template>
-          <template v-else>英雄配置</template>
+          <template v-else>{{ t('ChampionConfig.configure') }}</template>
         </div>
       </template>
       <div class="content">
         <div class="filter-area">
-          <NInput clearable size="small" placeholder="搜索英雄" v-model:value="filterInput">
+          <NInput
+            clearable
+            size="small"
+            :placeholder="t('ChampionConfig.searchPlaceholder')"
+            v-model:value="filterInput"
+          >
             <template #prefix>
               <NIcon :component="SearchIcon" />
             </template>
@@ -53,8 +58,10 @@
                       </NIcon>
                     </template>
                   </template>
-                  <template v-if="item.hasRunes">存在符文配置</template>
-                  <template v-else>尚未配置符文</template>
+                  <template v-if="item.hasRunes">{{
+                    t('ChampionConfig.runesConfigured')
+                  }}</template>
+                  <template v-else>{{ t('ChampionConfig.runesUnconfigured') }}</template>
                 </NPopover>
                 <NPopover :keep-alive-on-hover="false" v-if="item.hasRunes || item.hasSpells">
                   <template #trigger>
@@ -69,8 +76,10 @@
                       </NIcon>
                     </template>
                   </template>
-                  <template v-if="item.hasSpells">存在召唤师技能配置</template>
-                  <template v-else>尚未配置召唤师技能</template>
+                  <template v-if="item.hasSpells">{{
+                    t('ChampionConfig.spellsConfigured')
+                  }}</template>
+                  <template v-else>{{ t('ChampionConfig.spellsUnconfigured') }}</template>
                 </NPopover>
               </div>
             </template>
@@ -79,12 +88,12 @@
         <div class="divider"></div>
         <div class="config-area" v-if="selectedId">
           <div class="tabs-section">
-            <div class="tab-title">目标模式</div>
+            <div class="tab-title">{{ t('ChampionConfig.targetMode') }}</div>
             <NRadioGroup v-model:value="currentType" size="small">
               <NRadioButton value="ranked">
                 <div class="radio-button-inner">
                   <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
-                  <span>排位</span>
+                  <span>{{ t('ChampionConfig.ranked') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.some((r) => r.startsWith('ranked')) ||
@@ -99,7 +108,7 @@
               <NRadioButton value="normal">
                 <div class="radio-button-inner">
                   <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
-                  <span>普通</span>
+                  <span>{{ t('ChampionConfig.normal') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('normal') ||
@@ -114,7 +123,7 @@
               <NRadioButton value="aram">
                 <div class="radio-button-inner">
                   <LcuImage class="mode-icon" :src="gameModeIconUri['ARAM']" />
-                  <span>大乱斗</span>
+                  <span>{{ t('ChampionConfig.aram') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('aram') ||
@@ -129,7 +138,7 @@
               <NRadioButton value="urf">
                 <div class="radio-button-inner">
                   <LcuImage class="mode-icon" :src="gameModeIconUri['CLASSIC']" />
-                  <span>无限火力</span>
+                  <span>{{ t('ChampionConfig.urf') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('urf') ||
@@ -144,7 +153,7 @@
               <NRadioButton value="nexusblitz">
                 <div class="radio-button-inner">
                   <LcuImage class="mode-icon" :src="gameModeIconUri['NEXUSBLITZ']" />
-                  <span>极限闪击</span>
+                  <span>{{ t('ChampionConfig.nexusblitz') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('nexusblitz') ||
@@ -159,7 +168,7 @@
               <NRadioButton value="ultbook">
                 <div class="radio-button-inner">
                   <LcuImage class="mode-icon" :src="gameModeIconUri['ULTBOOK']" />
-                  <span>终极魔典</span>
+                  <span>{{ t('ChampionConfig.ultbook') }}</span>
                   <NIcon
                     v-if="
                       configExistence.runes.includes('ultbook') ||
@@ -175,11 +184,11 @@
           </div>
           <div class="tabs-sections">
             <div class="tabs-section">
-              <div class="tab-title">配置</div>
+              <div class="tab-title">{{ t('ChampionConfig.configure') }}</div>
               <NRadioGroup v-model:value="currentConfig" size="small">
                 <NRadioButton value="runes">
                   <div class="radio-button-inner">
-                    <span>符文</span>
+                    <span>{{ t('ChampionConfig.runes') }}</span>
                     <NIcon
                       v-if="configExistence.runes.some((r) => r.startsWith(currentType))"
                       class="check-icon"
@@ -190,7 +199,7 @@
                 </NRadioButton>
                 <NRadioButton value="spells">
                   <div class="radio-button-inner">
-                    <span>技能</span>
+                    <span>{{ t('ChampionConfig.spells') }}</span>
                     <NIcon
                       v-if="configExistence.spells.some((r) => r.startsWith(currentType))"
                       class="check-icon"
@@ -202,7 +211,7 @@
               </NRadioGroup>
             </div>
             <div class="tabs-section" v-if="currentType === 'ranked'">
-              <div class="tab-title">位置</div>
+              <div class="tab-title">{{ t('ChampionConfig.position') }}</div>
               <NRadioGroup
                 v-model:value="currentPosition"
                 size="small"
@@ -213,7 +222,7 @@
                 <NRadioButton value="default">
                   <div class="radio-button-inner">
                     <PositionIcon position="all" />
-                    <span>默认</span>
+                    <span>{{ t('ChampionConfig.default') }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -229,7 +238,7 @@
                 <NRadioButton value="top">
                   <div class="radio-button-inner">
                     <PositionIcon position="top" />
-                    <span>上路</span>
+                    <span>{{ t('common.lanes.top') }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -245,7 +254,7 @@
                 <NRadioButton value="middle">
                   <div class="radio-button-inner">
                     <PositionIcon position="middle" />
-                    <span>中路</span>
+                    <span>{{ t('common.lanes.middle') }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -261,7 +270,7 @@
                 <NRadioButton value="jungle">
                   <div class="radio-button-inner">
                     <PositionIcon position="jungle" />
-                    <span>打野</span>
+                    <span>{{ t('common.lanes.jungle') }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -277,7 +286,7 @@
                 <NRadioButton value="bottom">
                   <div class="radio-button-inner">
                     <PositionIcon position="bottom" />
-                    <span>下路</span>
+                    <span>{{ t('common.lanes.bottom') }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -293,7 +302,7 @@
                 <NRadioButton value="utility">
                   <div class="radio-button-inner">
                     <PositionIcon position="utility" />
-                    <span>辅助</span>
+                    <span>{{ t('common.lanes.utility') }}</span>
                     <NIcon
                       v-if="
                         currentConfig === 'runes'
@@ -312,10 +321,10 @@
           <div class="runes" v-if="currentConfig === 'runes'">
             <RuneV2Edit v-model:page="tempEditingRunes" v-if="tempEditingRunes" />
             <div class="empty-placeholder" v-else>
-              <span>未设置符文</span>
-              <NButton secondary size="small" type="primary" @click="handleCreateRunesConfig"
-                >设置符文</NButton
-              >
+              <span>{{ t('ChampionConfig.runesUnconfigured') }}</span>
+              <NButton secondary size="small" type="primary" @click="handleCreateRunesConfig">{{
+                t('ChampionConfig.configureRunes')
+              }}</NButton>
             </div>
           </div>
           <div class="spells" v-else-if="currentConfig === 'spells'">
@@ -325,50 +334,54 @@
               v-model:spell-ids="tempEditingSpells"
             />
             <div class="empty-placeholder" v-else>
-              <span>未设置召唤师技能</span>
-              <NButton size="small" secondary type="primary" @click="handleCreateSpellsConfig"
-                >设置召唤师技能</NButton
-              >
+              <span>{{ t('ChampionConfig.spellsUnconfigured') }}</span>
+              <NButton size="small" secondary type="primary" @click="handleCreateSpellsConfig">{{
+                t('ChampionConfig.configureSpells')
+              }}</NButton>
             </div>
           </div>
           <div class="actions">
             <template v-if="currentConfig === 'runes'">
-              <NButton size="small" @click="handleClearRunes" :disabled="!tempEditingRunes"
-                >清空</NButton
-              >
+              <NButton size="small" @click="handleClearRunes" :disabled="!tempEditingRunes">{{
+                t('ChampionConfig.clear')
+              }}</NButton>
 
-              <NButton size="small" :disabled="isRunesUnchanged" @click="handleRestoreRunes"
-                >还原</NButton
-              >
+              <NButton size="small" :disabled="isRunesUnchanged" @click="handleRestoreRunes">{{
+                t('ChampionConfig.restore')
+              }}</NButton>
               <NButton
                 size="small"
                 type="primary"
                 :disabled="isRunesUnchanged || !isRunesValid"
                 @click="handleSaveRunes"
-                >保存</NButton
+                >{{ t('ChampionConfig.save') }}</NButton
               >
             </template>
             <template v-else-if="currentConfig === 'spells'">
-              <NButton size="small" @click="handleClearSpells" :disabled="!tempEditingSpells"
-                >清空</NButton
-              >
-              <NButton size="small" @click="handleRestoreSpells" :disabled="isSpellsUnchanged"
-                >还原</NButton
-              >
+              <NButton size="small" @click="handleClearSpells" :disabled="!tempEditingSpells">{{
+                t('ChampionConfig.clear')
+              }}</NButton>
+              <NButton size="small" @click="handleRestoreSpells" :disabled="isSpellsUnchanged">{{
+                t('ChampionConfig.restore')
+              }}</NButton>
               <NButton
                 size="small"
                 type="primary"
                 @click="handleSaveSpells"
                 :disabled="isSpellsUnchanged"
-                >保存</NButton
+                >{{ t('ChampionConfig.save') }}</NButton
               >
             </template>
           </div>
         </div>
-        <div v-else class="config-area-empty-placeholder">选择英雄以查看配置</div>
+        <div v-else class="config-area-empty-placeholder">
+          {{ t('ChampionConfig.noChampionPlaceholder') }}
+        </div>
       </div>
     </NModal>
-    <NButton size="tiny" type="primary" @click="show = true">{{ `配置英雄` }}</NButton>
+    <NButton size="tiny" type="primary" @click="show = true">{{
+      t('ChampionConfig.configure')
+    }}</NButton>
   </div>
 </template>
 
@@ -389,6 +402,7 @@ import {
   CheckmarkCircle16Regular as CheckmarkCircle16RegularIcon,
   SubtractCircle16Regular as SubtractCircle16RegularIcon
 } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
 import _ from 'lodash'
 import {
   NButton,
@@ -411,6 +425,8 @@ import PositionIcon from '../icons/position-icons/PositionIcon.vue'
 import RuneV2Edit from './RuneV2Edit.vue'
 import SummonerSpellEdit from './SummonerSpellEdit.vue'
 import { useValidatedRunes } from './utils'
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const acs = useAutoChampConfigStore()
@@ -592,7 +608,7 @@ const handleSaveRunes = async () => {
     await ac.updateRunes(selectedId.value, currentType.value, toRaw(tempEditingRunes.value))
   }
 
-  message.success('Already saved. Runes changed.')
+  message.success(() => t('ChampionConfig.runesSaved'))
 }
 
 const handleClearRunes = () => {
@@ -634,7 +650,7 @@ const handleSaveSpells = async () => {
     )
   }
 
-  message.success('Saved')
+  message.success(() => t('ChampionConfig.spellsSaved'))
 }
 
 const handleClearSpells = () => {
@@ -652,15 +668,17 @@ const handleRestoreSpells = () => {
 
   if (currentType.value === 'ranked') {
     tempEditingSpells.value = structuredClone(
-      acs.settings.summonerSpells[selectedId.value][`${currentType.value}-${currentPosition.value}`]
+      acs.settings.summonerSpells[selectedId.value]?.[
+        `${currentType.value}-${currentPosition.value}`
+      ] || null
     )
   } else {
     tempEditingSpells.value = structuredClone(
-      acs.settings.summonerSpells[selectedId.value][currentType.value]
+      acs.settings.summonerSpells[selectedId.value]?.[currentType.value] || null
     )
   }
 
-  message.success('Restored')
+  message.success(() => t('ChampionConfig.spellsRestored'))
 }
 
 const handleRestoreRunes = () => {
@@ -670,15 +688,16 @@ const handleRestoreRunes = () => {
 
   if (currentType.value === 'ranked') {
     tempEditingRunes.value = structuredClone(
-      acs.settings.runesV2[selectedId.value][`${currentType.value}-${currentPosition.value}`]
+      acs.settings.runesV2[selectedId.value]?.[`${currentType.value}-${currentPosition.value}`] ||
+        null
     )
   } else {
     tempEditingRunes.value = structuredClone(
-      acs.settings.runesV2[selectedId.value][currentType.value]
+      acs.settings.runesV2[selectedId.value]?.[currentType.value] || null
     )
   }
 
-  message.success('Restored')
+  message.success(() => t('ChampionConfig.runesRestored'))
 }
 
 const currentSelected = computed(() => {

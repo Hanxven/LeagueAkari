@@ -34,6 +34,7 @@ Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/H
   - [x] 返回房间
   - [x] 英雄选择（普通模式、大乱斗模式等）
   - [x] 英雄禁用
+  - [x] 符文配置和召唤师技能配置
   - [x] 重新匹配对局
   - [x] 自动回复
 - **对局分析**

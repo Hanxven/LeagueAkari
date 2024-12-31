@@ -67,6 +67,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
   private _customCompiledFn: TemplateFunction | null = null
   private _defaultCompliedFn: TemplateFunction | null = null
 
+  private _data: Record<string, any> = {}
+
   /** 用以记录发送状态, 正在进行中将会被取消 */
   private _currentSending: string | null = null
 
@@ -275,7 +277,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
       positionAssignments: toJS(this._og.state.positionAssignments),
       playerStats: toJS(this._og.state.playerStats),
       gameTimeline: toJS(this._og.state.gameTimeline),
-      premadeTeams: toJS(this._og.state.premadeTeams)
+      premadeTeams: toJS(this._og.state.premadeTeams),
+      data: this._data
     }
   }
 
@@ -285,7 +288,11 @@ export class InGameSendMain implements IAkariShardInitDispose {
     target: 'ally' | 'enemy' | 'all'
   }) {
     if (!this.settings.sendStatsEnabled || this._og.state.queryStage.phase === 'unavailable') {
-      this._log.warn('当前不在可发送阶段', this._og.state.queryStage.phase, this.settings.sendStatsEnabled)
+      this._log.warn(
+        '当前不在可发送阶段',
+        this._og.state.queryStage.phase,
+        this.settings.sendStatsEnabled
+      )
       return
     }
 
@@ -304,8 +311,9 @@ export class InGameSendMain implements IAkariShardInitDispose {
       }
 
       try {
-        const messages = this._defaultCompliedFn
-          .call(this._eta, this._createTemplateEnv(options))
+        const messages = (
+          await this._eta.renderAsync(this._defaultCompliedFn, this._createTemplateEnv(options))
+        )
           .split('\n')
           .filter((m) => m.trim().length > 0)
           .map((m) => (options.prefix && sendType === 'keyboard' ? `${options.prefix} ${m}` : m))
@@ -321,8 +329,9 @@ export class InGameSendMain implements IAkariShardInitDispose {
       }
 
       try {
-        const messages = this._customCompiledFn
-          .call(this._eta, this._createTemplateEnv(options))
+        const messages = (
+          await this._eta.renderAsync(this._customCompiledFn, this._createTemplateEnv(options))
+        )
           .split('\n')
           .filter((m) => m.trim().length > 0)
           .map((m) => (options.prefix ? `${options.prefix} ${m}` : m))

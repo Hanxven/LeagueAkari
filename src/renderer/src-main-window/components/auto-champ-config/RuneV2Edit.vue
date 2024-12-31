@@ -102,24 +102,20 @@
       </div>
     </div>
   </div>
-  <div class="main-body" v-else>当前符文构型未支持</div>
+  <div class="main-body" v-else>{{ t('RuneEditV2.unsupported') }}</div>
 </template>
 
 <script setup lang="ts">
-import { useInstance } from '@renderer-shared/shards'
-import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
 import _ from 'lodash'
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 
 import PerkIcon from './PerkIcon.vue'
 import PerkstyleSvgIcon from './PerkstyleSvgIcon.vue'
 import { usePerkstyleInfo, useRunesToSelections } from './utils'
 
 const { t } = useTranslation()
-
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
 const lcs = useLeagueClientStore()
 const isApplicableSchemaVersion = computed(() => {

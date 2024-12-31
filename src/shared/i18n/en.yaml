@@ -311,6 +311,7 @@ Automation:
   autoGameflow: Automated Gameflow
   autoSelect: Auto Pick / Ban
   autoMisc: Misc
+  autoChampConfig: Auto Configuration
 
 AutoGameflow:
   title: Gameflow
@@ -1617,6 +1618,46 @@ InGameSend:
   error: Unknown error
   confirm: Confirm
 
+ChampionConfig:
+  targetMode: Target Mode
+  ranked: Ranked
+  normal: Normal
+  aram: ARAM
+  urf: URF
+  nexusblitz: Nexus Blitz
+  ultbook: Ultimate Spellbook
+  runes: Runes
+  configure: Configure
+  spells: Spells
+  position: Position
+  default: Default
+  runesConfigured: Runes Configured
+  spellsConfigured: Spells Configured
+  runesUnconfigured: Runes Unconfigured
+  spellsUnconfigured: Spells Unconfigured
+  configureRunes: Configure Runes
+  configureSpells: Configure Spells
+  clear: Clear
+  restore: Restore
+  save: Save
+  noChampionPlaceholder: Select a champion to view configurations
+  runesSaved: Rune configurations saved
+  runesRestored: Rune configurations restored
+  spellsSaved: Spell configurations saved
+  spellsRestored: Spell configurations restored
+  searchPlaceholder: Search champions
+
+RuneEditV2:
+  unsupported: Current rune setup is not supported
+
+AutoChampConfig:
+  title: Auto Champion Configuration
+  enabled:
+    label: Enable
+    description: Automatically configure runes or summoner spells based on presets after locking in a champion during champion select
+  configure:
+    label: Configure
+
 tray:
   quit: Quit
   auxWindow: Aux Window
@@ -1656,6 +1697,25 @@ self-update-main:
   updateOnNextStartup: Updated downloaded. Restart the application to apply the update
   lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
   lastUpdateSuccess: Updated to {{version}}
+
+auto-champ-config-main:
+  summonerSpells:
+    applied: '{{name}} summoner spells have been updated to [{{spell1}}] [{{spell2}}]'
+    appliedWithPosition: '{{name}} - {{position}} summoner spells have been updated to [{{spell1}}] [{{spell2}}]'
+    errorApplied: 'Failed to update summoner spells for {{name}}'
+    errorAppliedWithPosition: 'Failed to update summoner spells for {{name}} - {{position}}'
+
+  runes:
+    pageName: '{{name}}'
+    pageNameWithPosition: '{{name}} - {{position}}'
+    applied: '{{name}} rune setup has been updated to {{primary}} / {{sub}} ({{all}})'
+    appliedWithPosition: '{{name}} - {{position}} rune setup has been updated to {{primary}} / {{sub}} ({{all}})'
+    errorApplied: 'Failed to update rune setup for {{name}}'
+    errorAppliedWithPosition: 'Failed to update rune setup for {{name}} - {{position}}'
+
+  auto-config-enabled-no-champion: Auto configuration enabled, but no champion has been configured
+  auto-config-enabled: 'Auto configuration enabled, configured champions: {{names}}'
+
 
 common:
   appName: League Akari

@@ -23,7 +23,7 @@ import { MatchmakingState } from './matchmaking'
 import { SummonerState } from './summoner'
 
 export class LeagueClientSyncedData {
-  static SUMMONER_FETCH_MAX_RETRIES = 16
+  static SUMMONER_FETCH_MAX_RETRIES = 50000
 
   private _ipc: AkariIpcMain
   private _log: AkariLogger

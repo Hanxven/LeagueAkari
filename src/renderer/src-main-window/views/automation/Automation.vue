@@ -18,7 +18,7 @@
           <span class="tab-name">{{ t('Automation.autoSelect') }}</span>
         </NTab>
         <NTab name="auto-champ-config" class="tab-name">
-          <span class="tab-name">{{ `自动英雄配置` }}</span>
+          <span class="tab-name">{{ t('Automation.autoChampConfig') }}</span>
         </NTab>
         <NTab name="misc" class="tab-name">
           <span class="tab-name">{{ t('Automation.autoMisc') }}</span>

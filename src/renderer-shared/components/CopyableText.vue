@@ -45,7 +45,7 @@ const handleCopy = async () => {
     if (propText) {
       text = propText.toString()
     } else {
-      const nodes = slots.default()
+      const nodes = slots.default({})
       if (nodes[0] && typeof nodes[0].children === 'string') {
         text = nodes[0].children
       }

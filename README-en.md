@@ -32,6 +32,7 @@
   - [x] Return to the room
   - [x] Champion selection (Normal, ARAM, etc.)
   - [x] Champion banning
+  - [x] Runes and summoner spells configuration
   - [x] Rematch
   - [x] Auto reply
 - **Match Analysis**
@@ -50,7 +51,7 @@
   - [x] Resize client window
 - **External Data Sources**
   - [x] Champion balance information (Fandom)
-  - [x] OP.GG
+  - [x] OP.GG Integration
 - **Miscellaneous**
   - [x] Explore more on your own!
 
