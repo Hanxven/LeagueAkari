@@ -11,13 +11,23 @@
       v-model:show="isModalShow"
     >
       <div style="display: flex; gap: 4px; margin-bottom: 8px; width: 340px">
-        <NSelect
-          filterable
-          :options="championOptions"
-          v-model:value="currentChampionId"
-          size="small"
-          :filter="(a, b) => isNameMatch(a, b.label as string, b.value as number)"
-        ></NSelect>
+      <NScrollbar style="height: 200px">
+        <NButtonGroup>
+          <NGrid :x-gap="20" :y-gap="10" :cols="4" >
+              <template v-for="(a, b) in championOptions" :key="b">
+                <NGi>
+                  <NButton quaternary circle @click="currentChampionId = a.value">
+                    <LcuImage
+                      class="champion-icon-stretched"
+                      style="width: 50px; height: 50px"
+                      :src="a.value ? `/lol-game-data/assets/v1/champion-icons/${a.value}.png` : undefined"
+                    />
+                  </NButton>
+                </NGi>
+              </template>
+          </NGrid>
+        </NButtonGroup>
+      </NScrollbar>
         <NButton
           type="primary"
           size="small"
@@ -118,7 +128,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { ChampSkin } from '@shared/types/league-client/game-data'
-import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
+import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage, NScrollbar, NGrid, NGi, NButtonGroup } from 'naive-ui'
 import { VNode, computed, h, ref, watch } from 'vue'
 import { useTranslation } from 'i18next-vue'
 
