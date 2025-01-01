@@ -78,6 +78,10 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'benchHandleTradeEnabled', enabled)
   }
 
+  setBenchHandleTradeIgnoreChampionOwner(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'benchHandleTradeIgnoreChampionOwner', enabled)
+  }
+
   async onInit() {
     const store = useAutoSelectStore()
 

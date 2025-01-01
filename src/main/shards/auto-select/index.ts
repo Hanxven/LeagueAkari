@@ -11,6 +11,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { AramOwnerTracker } from './aram-owner-tracker'
 import { AutoSelectSettings, AutoSelectState } from './state'
 
 export class AutoSelectMain implements IAkariShardInitDispose {
@@ -66,7 +67,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
         banDelaySeconds: { default: this.settings.banDelaySeconds },
         banEnabled: { default: this.settings.banEnabled },
         banTeammateIntendedChampion: { default: this.settings.banTeammateIntendedChampion },
-        benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled }
+        benchHandleTradeEnabled: { default: this.settings.benchHandleTradeEnabled },
+        benchHandleTradeIgnoreChampionOwner: {
+          default: this.settings.benchHandleTradeIgnoreChampionOwner
+        }
       },
       this.settings
     )
@@ -90,7 +94,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'benchExpectedChampions',
       'expectedChampions',
       'bannedChampions',
-      'benchHandleTradeEnabled'
+      'benchHandleTradeEnabled',
+      'benchHandleTradeIgnoreChampionOwner'
     ])
 
     this._mobx.propSync(AutoSelectMain.id, 'state', this.state, [
@@ -474,6 +479,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       return { benchEnabled, localPlayerCellId, benchChampions, myTeam }
     })
 
+    const ownerTracker = new AramOwnerTracker()
+
     this._mobx.reaction(
       () =>
         [
@@ -488,12 +495,15 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           if (prevSession) {
             benchChampions.clear()
           }
+          ownerTracker.reset()
           return
         }
 
         if (!session.benchEnabled) {
           return
         }
+
+        ownerTracker.update(session)
 
         // Diff
         const now = Date.now()
@@ -637,7 +647,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return
         }
 
-        const { id } = trade
+        const { id, otherSummonerIndex } = trade
         const t = session.trades.find((t) => t.id === id)
 
         if (!t) {
@@ -661,10 +671,31 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             const indexHim = this.settings.benchExpectedChampions.indexOf(requesterChampionId)
 
             if (indexHim === -1 || indexInHand < indexHim) {
-              this._log.info(
-                `拒绝交换请求: ${from.championId} -> ${self.championId}, 因为目标低于当前所选优先级`
-              )
-              this._acceptOrDeclineTrade(id, false)
+              if (this.settings.benchHandleTradeIgnoreChampionOwner) {
+                const origin = ownerTracker.getOrigin(self.championId)
+                if (origin && origin.cellId === otherSummonerIndex) {
+                  this._sendInChat(
+                    `[League Akari] ${i18next.t('auto-select-main.ignore-trade-owner', {
+                      from:
+                        this._lc.data.gameData.champions[from.championId]?.name || from.championId,
+                      to: this._lc.data.gameData.champions[self.championId]?.name || self.championId
+                    })}`
+                  )
+                  this._log.info(
+                    `忽略交换请求: ${from.championId} -> ${self.championId}, 对方为物主`
+                  )
+                } else {
+                  this._log.info(
+                    `拒绝交换请求: ${from.championId} -> ${self.championId}, 因为目标低于当前所选优先级`
+                  )
+                  this._acceptOrDeclineTrade(id, false)
+                }
+              } else {
+                this._log.info(
+                  `拒绝交换请求: ${from.championId} -> ${self.championId}, 因为目标低于当前所选优先级`
+                )
+                this._acceptOrDeclineTrade(id, false)
+              }
             } else {
               this._log.info(
                 `接受交换请求: ${from.championId} -> ${self.championId}, 目标具有更高优先级`
@@ -672,7 +703,23 @@ export class AutoSelectMain implements IAkariShardInitDispose {
               this._acceptOrDeclineTrade(id, true)
             }
           } else {
-            this._acceptOrDeclineTrade(id, false)
+            if (this.settings.benchHandleTradeIgnoreChampionOwner) {
+              const origin = ownerTracker.getOrigin(self.championId)
+              if (origin && origin.cellId === otherSummonerIndex) {
+                this._sendInChat(
+                  `[League Akari] ${i18next.t('auto-select-main.ignore-trade-owner', {
+                    from:
+                      this._lc.data.gameData.champions[from.championId]?.name || from.championId,
+                    to: this._lc.data.gameData.champions[self.championId]?.name || self.championId
+                  })}`
+                )
+                this._log.info(`忽略交换请求: ${from.championId} -> ${self.championId}, 对方为物主`)
+              } else {
+                this._acceptOrDeclineTrade(id, false)
+              }
+            } else {
+              this._acceptOrDeclineTrade(id, false)
+            }
           }
         } else {
           if (this.settings.benchExpectedChampions.includes(requesterChampionId)) {

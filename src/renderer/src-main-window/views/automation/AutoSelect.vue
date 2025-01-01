@@ -179,6 +179,20 @@
           </ControlItem>
           <ControlItem
             class="control-item-margin"
+            :label="t('AutoSelect.benchHandleTradeIgnoreChampionOwner.label')"
+            :label-width="260"
+          >
+            <template #labelDescription>
+              <div v-html="t('AutoSelect.benchHandleTradeIgnoreChampionOwner.description')"></div>
+            </template>
+            <NSwitch
+              @update:value="(v) => as.setBenchHandleTradeIgnoreChampionOwner(v)"
+              :value="store.settings.benchHandleTradeIgnoreChampionOwner"
+              size="small"
+            ></NSwitch>
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
             :label="t('AutoSelect.benchExpectedChampions.label')"
             :label-width="260"
           >

@@ -443,6 +443,13 @@ AutoSelect:
       <div>If "Prioritize First Available Champion" is not enabled and no expected champions are held, trade for a preferred champion will be accepted.</div>
       <div>If "Prioritize First Available Champion" is enabled and expected champions are held, trade will be ignored.</div>
 
+  benchHandleTradeIgnoreChampionOwner:
+    label: Ignore Champion Owner
+    description: |
+      <div>When handling champion trade requests, the champion's owner will be considered</div>
+      <div>If the other party is the owner of the champion, the trade request will not be taken over</div>
+      <div style="font-weight:bold">Note: Cannot handle scenarios where champion select is joined midway</div>
+
   benchExpectedChampions:
     label: Intended Champions
 
@@ -1685,6 +1692,7 @@ auto-select-main:
   cancel-grab: Selection of {{champion}} has been canceled
   grab-soon: Will swap {{champion}} in {{seconds}} seconds
   ignore-trade: Trade request not auto-processed ({{from}} -> {{to}})
+  ignore-trade-owner: Trade request not auto-processed since the trader is the champion owner ({{from}} -> {{to}})
   auto-pick-normal-mode: Auto-select in Normal Mode
   auto-grab-bench-mode: Auto-select in Bench Mode
   auto-ban: Auto Ban
@@ -1718,7 +1726,6 @@ auto-champ-config-main:
 
   auto-config-enabled-no-champion: Auto configuration enabled, but no champion has been configured
   auto-config-enabled: 'Auto configuration enabled, configured champions: {{names}}'
-
 
 common:
   appName: League Akari

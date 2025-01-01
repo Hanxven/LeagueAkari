@@ -446,6 +446,13 @@ AutoSelect:
       <div>未启用“优先选择首位”同时未持有期望英雄时，若目标英雄为期望英雄，则接受</div>
       <div>未启用“优先选择首位”同时持有期望英雄时，若目标英雄为期望英雄，则忽略</div>
 
+  benchHandleTradeIgnoreChampionOwner:
+    label: 忽略英雄物主
+    description: |
+      <div>处理英雄交换请求时，将考虑英雄所有者</div>
+      <div>若对方为该英雄的所有者，则不接管交换请求</div>
+      <div style="font-weight:bold">注意：无法处理追踪中途加入的英雄选择阶段</div>
+
   benchExpectedChampions:
     label: 期望英雄
 
@@ -1691,6 +1698,7 @@ auto-select-main:
   cancel-grab: 已取消选择 {{champion}}
   grab-soon: 即将在 {{seconds}} 秒后选择 {{champion}}
   ignore-trade: 不自动处理交换请求 ({{from}} -> {{to}})
+  ignore-trade-owner: 不自动处理交换请求，对方为物主 ({{from}} -> {{to}})
   auto-pick-normal-mode: 普通模式自动选择
   auto-grab-bench-mode: 随机模式自动选择
   auto-ban: 自动英雄禁用

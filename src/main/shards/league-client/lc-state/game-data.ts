@@ -24,6 +24,10 @@ export class GameDataState {
   augments: Record<number, Augment> = {}
   champions: Record<number, ChampionSimple> = {}
 
+  championName(id: number) {
+    return this.champions[id]?.name || id.toString()
+  }
+
   constructor() {
     makeAutoObservable(this, {
       summonerSpells: observable.ref,

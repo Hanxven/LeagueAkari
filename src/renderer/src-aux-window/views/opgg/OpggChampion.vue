@@ -1056,7 +1056,7 @@ const handleAddToItemSet = async () => {
           type: g.title,
           items: g.items.map((i) => ({
             id: i.toString(),
-            countV: 1
+            count: 1
           }))
         })),
         associatedChampions: [],

@@ -31,6 +31,7 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
     benchModeEnabled: false,
     benchSelectFirstAvailableChampion: false,
     benchHandleTradeEnabled: false,
+    benchHandleTradeIgnoreChampionOwner: false,
     benchExpectedChampions: [],
     grabDelaySeconds: 1,
     banEnabled: false,

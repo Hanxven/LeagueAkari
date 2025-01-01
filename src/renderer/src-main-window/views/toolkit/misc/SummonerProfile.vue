@@ -15,6 +15,7 @@
           filterable
           :options="championOptions"
           v-model:value="currentChampionId"
+          :render-label="renderLabel"
           size="small"
           :filter="(a, b) => isNameMatch(a, b.label as string, b.value as number)"
         ></NSelect>
@@ -117,13 +118,22 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { ChampSkin } from '@shared/types/league-client/game-data'
-import { NButton, NCard, NModal, NSelect, NTooltip, SelectOption, useMessage } from 'naive-ui'
-import { VNode, computed, h, ref, watch } from 'vue'
 import { useTranslation } from 'i18next-vue'
+import {
+  NButton,
+  NCard,
+  NFlex,
+  NModal,
+  NSelect,
+  NTooltip,
+  SelectOption,
+  useMessage
+} from 'naive-ui'
+import { VNode, VNodeChild, computed, h, ref, watch } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
-
 
 const { t } = useTranslation()
 
@@ -229,6 +239,26 @@ const currentAugmentOptions = computed(() => {
 
   return s?.augments || []
 })
+
+const renderLabel = (option: SelectOption) => {
+  if (option.type === 'group') {
+    return h('span', option.label as string)
+  }
+
+  return h(
+    'div',
+    {
+      style: { display: 'flex', alignItems: 'center', gap: '8px' }
+    },
+    [
+      h(LcuImage, {
+        src: championIconUri(option.value as number),
+        style: { width: '20px', height: '20px' }
+      }),
+      h('span', option.label as string)
+    ]
+  )
+}
 
 const renderOption = ({ option, node }: { node: VNode; option: SelectOption }) => {
   return h(
