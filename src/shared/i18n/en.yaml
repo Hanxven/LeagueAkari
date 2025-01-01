@@ -125,6 +125,8 @@ MatchHistoryTabsSettings:
 
 OngoingGameSettings:
   title: Ongoing Game
+  titleCommon: Ongoing Game
+  titlePlayerCard: Player Card
 
   enabled:
     label: Enable
@@ -157,6 +159,46 @@ OngoingGameSettings:
   gameTimelineLoadCount:
     label: Game Timeline Load Count
     description: Will additionally load the timeline information for the first {{countV}} matches for game analysis.
+
+  showRecentlyUsedChampions:
+    label: Show Recently Used Champions
+    description: Display the recently used champions in the player card.
+
+  playerCardTags:
+    label: Player Card Tags
+    description: These tags will be displayed on the player cards
+
+    tags:
+      showPremadeTeamTag:
+        label: Premade Team Text
+      showWinningStreakTag:
+        label: Winning Streak
+      showLosingStreakTag:
+        label: Losing Streak
+      showSoloKillsTag:
+        label: Average Solo Kills Per Game (Last {{countV}} games)
+      showSoloDeathsTag:
+        label: Average Solo Deaths Per Game (Last {{countV}} games)
+      showAverageTeamDamageTag:
+        label: Average Team Damage
+      showAverageTeamDamageTakenTag:
+        label: Average Team Damage Taken
+      showSuspiciousFlashPositionTag:
+        label: Flash Position Anomaly Detection
+      showAverageTeamGoldTag:
+        label: Average Team Gold
+      showGreatPerformanceTag:
+        label: Outstanding Performance Tag
+      showMetTag:
+        label: Previously Encountered Players
+      showTaggedTag:
+        label: Tagged Players
+      showSelfTag:
+        label: Self Tag
+      showWinRateTeamTag:
+        label: High Win Rate Tag
+      showPrivacyTag:
+        label: Career Hidden Tag
 
 AuxWindowSettings:
   title: Auxiliary Window
@@ -1246,6 +1288,12 @@ PlayerInfoCard:
   kdaPopover: In the recent {{countV}} games, this player's average KDA is {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: These players have been on the same team in multiple games, suggesting they may be a premade group. They are labeled as Team {{team}}.
   highWinRatePopover: This player's win rate is exceptionally high. In the recent {{countV}} games, they have won {{winCount}} games.
+  teamDamageShare: Dmg {{rate}}%
+  teamDamageSharePopover: In the recent {{countV}} games, this player's average team damage share is {{rate}}%
+  teamDamageTakenShare: Dmg Taken {{rate}}%
+  teamDamageTakenSharePopover: In the recent {{countV}} games, this player's average team damage taken share is {{rate}}%
+  teamGoldShare: Gold {{rate}}%
+  teamGoldSharePopover: In the recent {{countV}} games, this player's average team gold share is {{rate}}%
   metPopover:
     title: Previously encountered this player in {{date}}, a total of {{countV}} times.
     gameId: Game ID

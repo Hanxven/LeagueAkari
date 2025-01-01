@@ -265,8 +265,16 @@
       </NPopover>
     </div>
     <div class="tags">
-      <div class="tag self" v-if="isSelf">{{ t('PlayerInfoCard.self') }}</div>
-      <NPopover v-if="savedInfo && !isSelf && savedInfo.tag" :delay="50" style="max-height: 240px">
+      <div class="tag self" v-if="isSelf && ogs.frontendSettings.playerCardTags.showSelfTag">
+        {{ t('PlayerInfoCard.self') }}
+      </div>
+      <NPopover
+        v-if="
+          ogs.frontendSettings.playerCardTags.showTaggedTag && savedInfo && !isSelf && savedInfo.tag
+        "
+        :delay="50"
+        style="max-height: 240px"
+      >
         <template #trigger>
           <div class="tag tagged">{{ t('PlayerInfoCard.tagged') }}</div>
         </template>
@@ -275,9 +283,40 @@
         </div>
       </NPopover>
       <NPopover
+        v-if="ogs.frontendSettings.playerCardTags.showPremadeTeamTag && premadeTeamId"
+        :delay="50"
+        style="max-height: 240px"
+      >
+        <template #trigger>
+          <div
+            class="tag"
+            :style="{
+              backgroundColor: premadeTeamId
+                ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
+                : '#ffffff40',
+              color: PREMADE_TEAM_COLORS[premadeTeamId]?.color || '#fff'
+            }"
+          >
+            {{
+              t('PlayerInfoCard.premade', {
+                team: premadeTeamId
+              })
+            }}
+          </div>
+        </template>
+        <div class="popover-text">
+          {{ t('PlayerInfoCard.premadePopover', { team: premadeTeamId }) }}
+        </div>
+      </NPopover>
+      <NPopover
         :keep-alive-on-hover="false"
         :delay="50"
-        v-if="analysis && analysis.summary.count >= 16 && analysis.summary.winRate >= 0.85"
+        v-if="
+          ogs.frontendSettings.playerCardTags.showWinRateTeamTag &&
+          analysis &&
+          analysis.summary.count >= 16 &&
+          analysis.summary.winRate >= 0.85
+        "
       >
         <template #trigger>
           <div class="tag win-rate-team">{{ t('PlayerInfoCard.highWinRate') }}</div>
@@ -292,7 +331,12 @@
         </div>
       </NPopover>
       <NPopover
-        v-if="savedInfo && savedInfo.lastMetAt && !isSelf"
+        v-if="
+          ogs.frontendSettings.playerCardTags.showMetTag &&
+          savedInfo &&
+          savedInfo.lastMetAt &&
+          !isSelf
+        "
         :delay="50"
         scrollable
         style="max-height: 240px"
@@ -338,7 +382,11 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
-        v-if="summoner?.privacy === 'PRIVATE' && !isSelf"
+        v-if="
+          ogs.frontendSettings.playerCardTags.showPrivacyTag &&
+          summoner?.privacy === 'PRIVATE' &&
+          !isSelf
+        "
         :delay="50"
       >
         <template #trigger>
@@ -350,7 +398,11 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
-        v-if="analysis && analysis.summary.winningStreak >= 3"
+        v-if="
+          ogs.frontendSettings.playerCardTags.showWinningStreakTag &&
+          analysis &&
+          analysis.summary.winningStreak >= 3
+        "
         :delay="50"
       >
         <template #trigger>
@@ -372,7 +424,11 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
-        v-if="analysis && analysis.summary.losingStreak >= 3"
+        v-if="
+          ogs.frontendSettings.playerCardTags.showLosingStreakTag &&
+          analysis &&
+          analysis.summary.losingStreak >= 3
+        "
         :delay="50"
       >
         <template #trigger>
@@ -394,7 +450,11 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
-        v-if="analysis && (analysis.akariScore.good || analysis.akariScore.great)"
+        v-if="
+          ogs.frontendSettings.playerCardTags.showGreatPerformanceTag &&
+          analysis &&
+          (analysis.akariScore.good || analysis.akariScore.great)
+        "
         :delay="50"
       >
         <template #trigger>
@@ -414,7 +474,11 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
-        v-if="isSuspiciousFlashPosition && isSuspiciousFlashPosition.isSuspicious"
+        v-if="
+          ogs.frontendSettings.playerCardTags.showSuspiciousFlashPositionTag &&
+          isSuspiciousFlashPosition &&
+          isSuspiciousFlashPosition.isSuspicious
+        "
         :delay="50"
       >
         <template #trigger>
@@ -433,7 +497,12 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
-        v-if="soloKills && soloKills.avgSoloDeathsInEarlyGame >= SOLO_DEATHS_THRESHOLD"
+        v-if="
+          ogs.frontendSettings.playerCardTags.showSoloDeathsTag &&
+          soloKills &&
+          soloKills.count >= Math.min(ogs.settings.gameTimelineLoadCount, 3) &&
+          soloKills.avgSoloDeathsInEarlyGame >= SOLO_DEATHS_THRESHOLD
+        "
         :delay="50"
       >
         <template #trigger>
@@ -457,7 +526,12 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
-        v-if="soloKills && soloKills.avgSoloKillsInEarlyGame >= SOLO_KILLS_THRESHOLD"
+        v-if="
+          ogs.frontendSettings.playerCardTags.showSoloKillsTag &&
+          soloKills &&
+          soloKills.count >= Math.min(ogs.settings.gameTimelineLoadCount, 3) &&
+          soloKills.avgSoloKillsInEarlyGame >= SOLO_KILLS_THRESHOLD
+        "
         :delay="50"
       >
         <template #trigger>
@@ -475,6 +549,75 @@
               times: soloKills.avgSoloKillsInEarlyGame.toFixed(2),
               countV: soloKills.count,
               minutes: EARLY_GAME_THRESHOLD_MINUTES
+            })
+          }}
+        </div>
+      </NPopover>
+      <NPopover
+        :keep-alive-on-hover="false"
+        v-if="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag && analysis"
+        :delay="50"
+      >
+        <template #trigger>
+          <div class="tag team-damage-share">
+            {{
+              t('PlayerInfoCard.teamDamageShare', {
+                rate: (analysis.summary.averageDamageDealtToChampionShareOfTeam * 100).toFixed(0)
+              })
+            }}
+          </div>
+        </template>
+        <div class="popover-text">
+          {{
+            t('PlayerInfoCard.teamDamageSharePopover', {
+              rate: (analysis.summary.averageDamageDealtToChampionShareOfTeam * 100).toFixed(2),
+              countV: analysis.summary.count
+            })
+          }}
+        </div>
+      </NPopover>
+      <NPopover
+        :keep-alive-on-hover="false"
+        v-if="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag && analysis"
+        :delay="50"
+      >
+        <template #trigger>
+          <div class="tag team-damage-taken-share">
+            {{
+              t('PlayerInfoCard.teamDamageTakenShare', {
+                rate: (analysis.summary.averageDamageTakenShareOfTeam * 100).toFixed(0)
+              })
+            }}
+          </div>
+        </template>
+        <div class="popover-text">
+          {{
+            t('PlayerInfoCard.teamDamageTakenSharePopover', {
+              rate: (analysis.summary.averageDamageTakenShareOfTeam * 100).toFixed(2),
+              countV: analysis.summary.count
+            })
+          }}
+        </div>
+      </NPopover>
+      <NPopover
+        :keep-alive-on-hover="false"
+        v-if="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag && analysis"
+        :delay="50"
+      >
+        <template #trigger>
+          <div class="tag team-gold-share">
+            {{
+              t('PlayerInfoCard.teamGoldShare', {
+                rate: (analysis.summary.averageGoldShareOfTeam * 100).toFixed(0)
+              })
+            }}
+          </div>
+        </template>
+        <div class="popover-text">
+          {{
+            t('PlayerInfoCard.teamGoldSharePopover', {
+              rate: (analysis.summary.averageGoldShareOfTeam * 100).toFixed(2),
+              countV: analysis.summary.count
             })
           }}
         </div>
@@ -511,7 +654,10 @@
         </div>
       </NPopover>
     </div>
-    <div class="frequent-used-champions" v-if="frequentlyUsedChampions.length">
+    <div
+      class="frequent-used-champions"
+      v-if="ogs.frontendSettings.showRecentlyUsedChampions && frequentlyUsedChampions.length"
+    >
       <NPopover :keep-alive-on-hover="false" v-for="c of frequentlyUsedChampions" :delay="50">
         <template #trigger>
           <div class="frequent-used-champion">
@@ -618,7 +764,11 @@
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { QueryStage, SavedInfo } from '@renderer-shared/shards/ongoing-game/store'
+import {
+  QueryStage,
+  SavedInfo,
+  useOngoingGameStore
+} from '@renderer-shared/shards/ongoing-game/store'
 import { formatI18nOrdinal } from '@shared/i18n'
 import { Mastery } from '@shared/types/league-client/champion-mastery'
 import { Game } from '@shared/types/league-client/match-history'
@@ -685,6 +835,8 @@ const SOLO_DEATHS_THRESHOLD = 2
 const SOLO_KILLS_THRESHOLD = 2
 const EARLY_GAME_THRESHOLD_MINUTES = 14
 
+const ogs = useOngoingGameStore()
+
 const premadeTagElHovering = useElementHover(useTemplateRef('pre-made-tag-el'))
 watch(premadeTagElHovering, (h) => {
   if (premadeTeamId) {
@@ -732,6 +884,10 @@ const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 
 const frequentlyUsedChampions = computed(() => {
   if (!analysis) {
+    return []
+  }
+
+  if (!ogs.frontendSettings.showRecentlyUsedChampions) {
     return []
   }
 
@@ -861,6 +1017,13 @@ const isSuspiciousFlashPosition = computed(() => {
 
 const soloKills = computed(() => {
   if (!analysis || !matchHistory) {
+    return null
+  }
+
+  if (
+    !ogs.frontendSettings.playerCardTags.showSoloKillsTag &&
+    !ogs.frontendSettings.playerCardTags.showSoloDeathsTag
+  ) {
     return null
   }
 
@@ -1259,6 +1422,18 @@ const matches = computed(() => {
 
     &.self {
       background-color: #37246c;
+    }
+
+    &.team-damage-share {
+      background-color: #692723;
+    }
+
+    &.team-damage-taken-share {
+      background-color: #135225;
+    }
+
+    &.team-gold-share {
+      background-color: #a73d2a;
     }
   }
 }

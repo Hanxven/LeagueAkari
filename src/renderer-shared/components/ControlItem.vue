@@ -1,5 +1,5 @@
 <template>
-  <div class="control-item">
+  <div class="control-item" :class="{ [`align-${align}`]: align }">
     <div class="label-area" :style="{ width: labelWidth ? `${labelWidth}px` : 'unset' }">
       <div v-if="$slots.label" class="label">
         <slot name="label" :disabled="disabled"></slot>
@@ -17,8 +17,9 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const { align = 'center' } = defineProps<{
   labelWidth?: number
+  align?: 'center' | 'start'
   label?: string
   labelDescription?: string
   disabled?: boolean
@@ -28,9 +29,16 @@ defineProps<{
 <style lang="less" scoped>
 .control-item {
   display: flex;
-  align-items: center;
   width: fit-content;
   width: 100%;
+
+  &.align-center {
+    align-items: center;
+  }
+
+  &.align-start {
+    align-items: start;
+  }
 
   .label-area {
     margin-right: 24px;

@@ -1,9 +1,9 @@
 <template>
   <NScrollbar style="max-height: 65vh">
-    <NCard size="small" style="margin-top: 8px">
-      <template #header
-        ><span class="card-header-title">{{ t('OngoingGameSettings.title') }}</span></template
-      >
+    <NCard size="small">
+      <template #header>
+        <span class="card-header-title">{{ t('OngoingGameSettings.titleCommon') }}</span>
+      </template>
       <ControlItem
         class="control-item-margin"
         :label="t('OngoingGameSettings.enabled.label')"
@@ -125,6 +125,86 @@
         </NRadioGroup>
       </ControlItem>
     </NCard>
+    <NCard size="small" style="margin-top: 8px">
+      <template #header>
+        <span class="card-header-title">{{ t('OngoingGameSettings.titlePlayerCard') }}</span>
+      </template>
+      <ControlItem
+        class="control-item-margin"
+        :label-width="320"
+        :label="t('OngoingGameSettings.showRecentlyUsedChampions.label')"
+        :label-description="t('OngoingGameSettings.showRecentlyUsedChampions.description')"
+      >
+        <NSwitch size="small" v-model:value="ogs.frontendSettings.showRecentlyUsedChampions" />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label-width="320"
+        :label="t('OngoingGameSettings.playerCardTags.label')"
+        align="start"
+        :label-description="t('OngoingGameSettings.playerCardTags.description')"
+      >
+        <NFlex vertical align="start">
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showPremadeTeamTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showPremadeTeamTag.label') }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showWinningStreakTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showWinningStreakTag.label') }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showLosingStreakTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showLosingStreakTag.label') }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showSoloKillsTag">
+            {{
+              t('OngoingGameSettings.playerCardTags.tags.showSoloKillsTag.label', {
+                countV: ogs.settings.gameTimelineLoadCount
+              })
+            }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showSoloDeathsTag">
+            {{
+              t('OngoingGameSettings.playerCardTags.tags.showSoloDeathsTag.label', {
+                countV: ogs.settings.gameTimelineLoadCount
+              })
+            }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamDamageTag.label') }}
+          </NCheckbox>
+          <NCheckbox
+            v-model:checked="ogs.frontendSettings.playerCardTags.showAverageTeamDamageTakenTag"
+          >
+            {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamDamageTakenTag.label') }}
+          </NCheckbox>
+          <NCheckbox
+            v-model:checked="ogs.frontendSettings.playerCardTags.showSuspiciousFlashPositionTag"
+          >
+            {{ t('OngoingGameSettings.playerCardTags.tags.showSuspiciousFlashPositionTag.label') }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showAverageTeamGoldTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamGoldTag.label') }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showGreatPerformanceTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showGreatPerformanceTag.label') }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showMetTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showMetTag.label') }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showTaggedTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showTaggedTag.label') }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showSelfTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showSelfTag.label') }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showWinRateTeamTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showWinRateTeamTag.label') }}
+          </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showPrivacyTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showPrivacyTag.label') }}
+          </NCheckbox>
+        </NFlex>
+      </ControlItem>
+    </NCard>
   </NScrollbar>
 </template>
 
@@ -135,7 +215,16 @@ import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch } from 'naive-ui'
+import {
+  NCard,
+  NCheckbox,
+  NFlex,
+  NInputNumber,
+  NRadio,
+  NRadioGroup,
+  NScrollbar,
+  NSwitch
+} from 'naive-ui'
 
 const { t } = useTranslation()
 

@@ -8,7 +8,7 @@ import {
 } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
-import { shallowReactive, shallowRef } from 'vue'
+import { reactive, shallowReactive, shallowRef } from 'vue'
 
 // copied from main shard
 interface OngoingGameInfo {
@@ -109,7 +109,34 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     gameTimelineLoadCount: 0,
 
     // renderer only
-    orderPlayerBy: 'default' as 'win-rate' | 'kda' | 'default' | 'akari-score' | 'position' | 'premade-team'
+    orderPlayerBy: 'default' as
+      | 'win-rate'
+      | 'kda'
+      | 'default'
+      | 'akari-score'
+      | 'position'
+      | 'premade-team'
+  })
+
+  const frontendSettings = reactive({
+    showRecentlyUsedChampions: true,
+    playerCardTags: {
+      showPremadeTeamTag: true,
+      showSuspiciousFlashPositionTag: true,
+      showWinningStreakTag: true,
+      showLosingStreakTag: true,
+      showSoloKillsTag: true,
+      showSoloDeathsTag: true,
+      showGreatPerformanceTag: true,
+      showAverageTeamDamageTag: true,
+      showAverageTeamDamageTakenTag: true,
+      showAverageTeamGoldTag: true,
+      showSelfTag: true,
+      showMetTag: true,
+      showTaggedTag: true,
+      showWinRateTeamTag: true,
+      showPrivacyTag: true
+    }
   })
 
   const gameInfo = shallowRef<OngoingGameInfo | null>(null)
@@ -151,6 +178,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
 
   return {
     settings,
+    frontendSettings,
 
     gameInfo,
     championSelections,

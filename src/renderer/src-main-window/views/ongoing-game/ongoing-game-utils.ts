@@ -86,7 +86,7 @@ export const PREMADE_TEAM_COLORS = {
   E: { foregroundColor: '#17c1d6', color: '#000', borderColor: '#17c1d6d0' },
   F: { foregroundColor: '#d63a17', color: '#fff', borderColor: '#d63a17d0' },
   G: { foregroundColor: '#b517b5', color: '#fff', borderColor: '#b517b5d0' },
-  H: { foregroundColor: '#fa4e80', color: '#fff', borderColor: '#fa4e80d0' }
+  H: { foregroundColor: '#fa4e80', color: '#000', borderColor: '#fa4e80d0' }
 }
 
 export const FIXED_CARD_WIDTH_PX_LITERAL = '240px'

@@ -128,6 +128,8 @@ MatchHistoryTabsSettings:
 
 OngoingGameSettings:
   title: 对局分析
+  titleCommon: 对局分析
+  titlePlayerCard: 玩家卡片
 
   enabled:
     label: 启用
@@ -160,6 +162,46 @@ OngoingGameSettings:
   gameTimelineLoadCount:
     label: 时间线信息加载数量
     description: 会额外加载前 {{countV}} 场对局的时间线信息，用于对局分析
+
+  showRecentlyUsedChampions:
+    label: 显示最近使用的英雄
+    description: 在玩家卡片上展示最近使用的英雄
+
+  playerCardTags:
+    label: 玩家卡片标签
+    description: 这些标签将被展示在玩家卡片上
+
+    tags:
+      showPremadeTeamTag:
+        label: 预组队文本
+      showWinningStreakTag:
+        label: 连胜场次
+      showLosingStreakTag:
+        label: 连败场次
+      showSoloKillsTag:
+        label: 场均单杀次数 (近 {{countV}} 场)
+      showSoloDeathsTag:
+        label: 场均被单杀次数 (近 {{countV}} 场)
+      showAverageTeamDamageTag:
+        label: 场均队伍伤害
+      showAverageTeamDamageTakenTag:
+        label: 场均队伍承伤
+      showSuspiciousFlashPositionTag:
+        label: 闪现异常位置检测
+      showAverageTeamGoldTag:
+        label: 场均队伍经济
+      showGreatPerformanceTag:
+        label: 优异标记
+      showMetTag:
+        label: 遇到过的玩家
+      showTaggedTag:
+        label: 已标记的玩家
+      showSelfTag:
+        label: 自己标记
+      showWinRateTeamTag:
+        label: 超高胜率标记
+      showPrivacyTag:
+        label: 生涯隐藏标记
 
 AuxWindowSettings:
   title: 小窗口
@@ -1253,6 +1295,12 @@ PlayerInfoCard:
   kdaPopover: 在近期 {{countV}} 场对局中，该玩家的平均 KDA 是 {{kda}} ({{kills}} / {{deaths}} / {{assists}})
   premadePopover: 这些玩家在数场对局中都位于同一个阵营，推测他们可能是一支固定的小队。为了区分，将其命名为小队 {{team}}
   highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {{countV}} 场的对局中，赢了 {{winCount}} 场
+  teamDamageShare: 伤害 {{rate}}%
+  teamDamageSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍伤害占比为 {{rate}}%
+  teamDamageTakenShare: 承伤 {{rate}}%
+  teamDamageTakenSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍承伤占比为 {{rate}}%
+  teamGoldShare: 经济 {{rate}}%
+  teamGoldSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍经济占比为 {{rate}}%
   metPopover:
     title: 曾在 {{date}} 场对局中遇到过该玩家，共遇到过 {{countV}} 次
     gameId: 对局 ID
@@ -1286,7 +1334,7 @@ PlayerInfoCard:
 
   self: 自己
   tagged: 已标记
-  premade: 预组队 {{team}}
+  premade: 小队 {{team}}
   highWinRate: 极高胜率
   met: 遇到过
   private: 生涯隐藏

@@ -1,5 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { effectScope, watch } from 'vue'
+import { effectScope, toRaw, watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -120,12 +120,39 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       store.settings.orderPlayerBy
     )
 
+    store.frontendSettings.showRecentlyUsedChampions = await this._setting.get(
+      OngoingGameRenderer.id,
+      'frontend/showRecentlyUsedChampions',
+      store.frontendSettings.showRecentlyUsedChampions
+    )
+
+    store.frontendSettings.playerCardTags = await this._setting.get(
+      OngoingGameRenderer.id,
+      'frontend/playerCard',
+      store.frontendSettings.playerCardTags
+    )
+
     this._scope.run(() => {
       watch(
         () => store.settings.orderPlayerBy,
         (newValue) => {
           this._setting.set(OngoingGameRenderer.id, 'orderPlayerBy', newValue)
         }
+      )
+
+      watch(
+        () => store.frontendSettings.showRecentlyUsedChampions,
+        (newValue) => {
+          this._setting.set(OngoingGameRenderer.id, 'frontend/showRecentlyUsedChampions', newValue)
+        }
+      )
+
+      watch(
+        () => store.frontendSettings.playerCardTags,
+        (newValue) => {
+          this._setting.set(OngoingGameRenderer.id, 'frontend/playerCard', toRaw(newValue))
+        },
+        { deep: true }
       )
     })
   }
