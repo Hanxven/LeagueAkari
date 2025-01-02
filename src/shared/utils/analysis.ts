@@ -317,6 +317,9 @@ export interface MatchHistoryGamesAnalysis {
   goldShareToTop: number
   goldShareOfTeam: number
 
+  // 经济转换率
+  damageGoldEfficiency: number
+
   win: boolean
 
   // -
@@ -367,6 +370,7 @@ export interface MatchHistoryGamesAnalysisSummary {
   averageKillParticipationRate: number
   averageKda: number
   averageKd: number
+  kdaCv: number
 
   averageCsShareToTop: number
   averageCsShareOfTeam: number
@@ -374,6 +378,8 @@ export interface MatchHistoryGamesAnalysisSummary {
 
   averageGoldShareToTop: number
   averageGoldShareOfTeam: number
+
+  averageDamageGoldEfficiency: number
 
   totalKills: number
   totalDeaths: number
@@ -592,6 +598,12 @@ export function analyzeMatchHistory(
       // 经济占比
       goldShareToTop: 0,
       goldShareOfTeam: 0,
+
+      // 经济转换率
+      damageGoldEfficiency: Math.min(
+        watashi.stats.totalDamageDealtToChampions / watashi.stats.goldEarned,
+        99999
+      ),
 
       win: watashi.stats.win,
 
@@ -900,6 +912,7 @@ export function analyzeMatchHistory(
     averageKillParticipationRate: 0,
     averageKda: 0,
     averageKd: 0,
+    kdaCv: 0,
 
     averageCsShareToTop: 0,
     averageCsShareOfTeam: 0,
@@ -907,6 +920,8 @@ export function analyzeMatchHistory(
 
     averageGoldShareToTop: 0,
     averageGoldShareOfTeam: 0,
+
+    averageDamageGoldEfficiency: 0,
 
     totalKills: 0,
     totalDeaths: 0,
@@ -971,6 +986,8 @@ export function analyzeMatchHistory(
   let totalGoldShareToTop = 0
   let totalGoldShareOfTeam = 0
 
+  let totalDamageGoldEfficiency = 0
+
   let positionCount = 0
   const positions: Record<string, number> = {}
 
@@ -1018,6 +1035,8 @@ export function analyzeMatchHistory(
     totalGoldShareToTop += analysis.goldShareToTop
     totalGoldShareOfTeam += analysis.goldShareOfTeam
 
+    totalDamageGoldEfficiency += analysis.damageGoldEfficiency
+
     if (analysis.position) {
       positionCount++
       positions[analysis.position] = (positions[analysis.position] || 0) + 1
@@ -1031,6 +1050,10 @@ export function analyzeMatchHistory(
   }
 
   // for summary calculation
+
+  summary.kdaCv = calculateCoefficientOfVariation(
+    gameAnalyses.map(([_gameId, analysis]) => analysis.kda)
+  )
 
   summary.averageDamageShareToTop = totalDamageShareToTop / (gameAnalyses.length || 1)
   summary.averagePhysicalDamageShareToTop =
@@ -1089,6 +1112,8 @@ export function analyzeMatchHistory(
 
   summary.averageGoldShareToTop = totalGoldShareToTop / (gameAnalyses.length || 1)
   summary.averageGoldShareOfTeam = totalGoldShareOfTeam / (gameAnalyses.length || 1)
+
+  summary.averageDamageGoldEfficiency = totalDamageGoldEfficiency / (gameAnalyses.length || 1)
 
   return {
     games: gamesAnalysisMap,
@@ -1392,4 +1417,20 @@ export function analyzeMatchHistoryPlayers(games: MatchHistoryGameWithState[], s
   }
 
   return relationship
+}
+
+function calculateCoefficientOfVariation(numbers: number[]): number {
+  if (!numbers || numbers.length === 0) {
+    return -1
+  }
+
+  const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length
+  if (mean === 0) {
+    return -1
+  }
+
+  const variance = numbers.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / numbers.length
+  const standardDeviation = Math.sqrt(variance)
+
+  return standardDeviation / mean
 }

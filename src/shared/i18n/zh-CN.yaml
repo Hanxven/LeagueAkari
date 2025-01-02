@@ -200,6 +200,8 @@ OngoingGameSettings:
         label: 自己标记
       showWinRateTeamTag:
         label: 超高胜率标记
+      showAverageDamageGoldEfficiencyTag:
+        label: 伤害经济效率
       showPrivacyTag:
         label: 生涯隐藏标记
 
@@ -1301,6 +1303,8 @@ PlayerInfoCard:
   teamDamageTakenSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍承伤占比为 {{rate}}%
   teamGoldShare: 经济 {{rate}}%
   teamGoldSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍经济占比为 {{rate}}%
+  damageGoldEfficiency: 伤转率 {{rate}}%
+  damageGoldEfficiencyPopover: 在最近的 {{countV}} 场对局中，该玩家的平均伤害转化率为 {{rate}}%
   metPopover:
     title: 曾在 {{date}} 场对局中遇到过该玩家，共遇到过 {{countV}} 次
     gameId: 对局 ID

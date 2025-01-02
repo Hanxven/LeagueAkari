@@ -184,6 +184,9 @@
           <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showAverageTeamGoldTag">
             {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamGoldTag.label') }}
           </NCheckbox>
+          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showAverageDamageGoldEfficiencyTag">
+            {{ t('OngoingGameSettings.playerCardTags.tags.showAverageDamageGoldEfficiencyTag.label') }}
+          </NCheckbox>
           <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showGreatPerformanceTag">
             {{ t('OngoingGameSettings.playerCardTags.tags.showGreatPerformanceTag.label') }}
           </NCheckbox>

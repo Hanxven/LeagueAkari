@@ -23,7 +23,7 @@
         <div class="level" v-if="summoner">{{ summoner.summonerLevel }}</div>
       </div>
       <div class="name-group">
-        <div class="name-tag" @click="() => emits('toSummoner', puuid)" ref="pre-made-tag-el">
+        <div class="name-tag" @click="() => emits('toSummoner', puuid)" ref="premade-title-el">
           <NPopover
             :keep-alive-on-hover="false"
             :delay="50"
@@ -174,11 +174,11 @@
             t('PlayerInfoCard.kdaPopover', {
               countV: analysis.summary.count,
               kda: analysis.summary.averageKda.toFixed(2),
-              kills: analysis.summary.totalKills,
-              deaths: analysis.summary.totalDeaths,
-              assists: analysis.summary.totalAssists
+              kills: (analysis.summary.totalKills / analysis.summary.count || 1).toFixed(2),
+              deaths: (analysis.summary.totalDeaths / analysis.summary.count || 1).toFixed(2),
+              assists: (analysis.summary.totalAssists / analysis.summary.count || 1).toFixed(2)
             })
-          }}
+          }} | {{ analysis.summary.kdaCv.toFixed(2) }}
         </div>
       </NPopover>
       <NPopover v-if="positionInfo">
@@ -296,6 +296,7 @@
                 : '#ffffff40',
               color: PREMADE_TEAM_COLORS[premadeTeamId]?.color || '#fff'
             }"
+            ref="premade-tag-el"
           >
             {{
               t('PlayerInfoCard.premade', {
@@ -624,6 +625,29 @@
       </NPopover>
       <NPopover
         :keep-alive-on-hover="false"
+        v-if="ogs.frontendSettings.playerCardTags.showAverageDamageGoldEfficiencyTag && analysis"
+        :delay="50"
+      >
+        <template #trigger>
+          <div class="tag damage-gold-efficiency">
+            {{
+              t('PlayerInfoCard.damageGoldEfficiency', {
+                rate: (analysis.summary.averageDamageGoldEfficiency * 100).toFixed(0)
+              })
+            }}
+          </div>
+        </template>
+        <div class="popover-text">
+          {{
+            t('PlayerInfoCard.damageGoldEfficiencyPopover', {
+              rate: (analysis.summary.averageDamageGoldEfficiency * 100).toFixed(2),
+              countV: analysis.summary.count
+            })
+          }}
+        </div>
+      </NPopover>
+      <NPopover
+        :keep-alive-on-hover="false"
         v-if="as.settings.isInKyokoMode && analysis"
         :delay="50"
       >
@@ -837,12 +861,16 @@ const EARLY_GAME_THRESHOLD_MINUTES = 14
 
 const ogs = useOngoingGameStore()
 
-const premadeTagElHovering = useElementHover(useTemplateRef('pre-made-tag-el'))
-watch(premadeTagElHovering, (h) => {
-  if (premadeTeamId) {
-    emits('highlight', premadeTeamId, h)
+const premadeTitleElHovering = useElementHover(useTemplateRef('premade-title-el'))
+const premadeTagElHovering = useElementHover(useTemplateRef('premade-tag-el'))
+watch(
+  () => [premadeTitleElHovering.value, premadeTagElHovering.value],
+  ([h1, h2]) => {
+    if (premadeTeamId) {
+      emits('highlight', premadeTeamId, h1 || h2)
+    }
   }
-})
+)
 
 // 以防路由时高亮状态未清除
 onDeactivated(() => {
@@ -1434,6 +1462,10 @@ const matches = computed(() => {
 
     &.team-gold-share {
       background-color: #a73d2a;
+    }
+
+    &.damage-gold-efficiency {
+      background-color: #8f411e;
     }
   }
 }

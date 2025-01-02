@@ -197,6 +197,8 @@ OngoingGameSettings:
         label: Self Tag
       showWinRateTeamTag:
         label: High Win Rate Tag
+      showAverageDamageGoldEfficiencyTag:
+        label: Damage-Gold Efficiency Tag
       showPrivacyTag:
         label: Career Hidden Tag
 
@@ -1294,6 +1296,8 @@ PlayerInfoCard:
   teamDamageTakenSharePopover: In the recent {{countV}} games, this player's average team damage taken share is {{rate}}%
   teamGoldShare: Gold {{rate}}%
   teamGoldSharePopover: In the recent {{countV}} games, this player's average team gold share is {{rate}}%
+  damageGoldEfficiency: Dmg-Gold {{rate}}%
+  damageGoldEfficiencyPopover: In the recent {{countV}} games, this player's average damage to gold efficiency is {{rate}}%
   metPopover:
     title: Previously encountered this player in {{date}}, a total of {{countV}} times.
     gameId: Game ID
