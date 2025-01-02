@@ -178,7 +178,8 @@
               deaths: (analysis.summary.totalDeaths / analysis.summary.count || 1).toFixed(2),
               assists: (analysis.summary.totalAssists / analysis.summary.count || 1).toFixed(2)
             })
-          }} | {{ analysis.summary.kdaCv.toFixed(2) }}
+          }}
+          | {{ analysis.summary.kdaCv.toFixed(2) }}
         </div>
       </NPopover>
       <NPopover v-if="positionInfo">
@@ -740,8 +741,14 @@
       </NPopover>
     </div>
     <div class="match-history">
-      <NVirtualList style="height: 100%" :item-size="32" :items="matches" v-if="matches.length">
-        <template #default="{ item }">
+      <NVirtualList
+        key-field="gameId"
+        style="height: 100%"
+        :item-size="32"
+        :items="matches"
+        v-if="matches.length"
+      >
+        <template #default="{ item, index }">
           <div
             class="match-item"
             :class="getWinLoseClassName(item)"
@@ -753,6 +760,7 @@
                   : emits('showGameById', item.game.gameId, puuid)
             "
           >
+            <div class="ordinal">#{{ index + 1 }}</div>
             <ChampionIcon :champion-id="item.selfParticipant.championId" class="champion-icon" />
             <div class="queue-name-date">
               <div class="queue-name">
@@ -1125,19 +1133,34 @@ const toSortedMilestoneGrades = (arr: string[]) => {
 }
 
 const getWinLoseClassName = (match: SelfParticipantGame) => {
+  const classes: string[] = []
+
+  if (ogs.frontendSettings.showMatchHistoryItemBorder) {
+    classes.push('bordered')
+  }
+
   if (match.game.gameMode === 'PRACTICETOOL') {
-    return 'na'
+    classes.push('na')
+    return classes
   }
 
   if (match.game.endOfGameResult === 'Abort_AntiCheatExit') {
-    return 'na'
+    classes.push('na')
+    return classes
   }
 
   if (match.selfParticipant.stats.gameEndedInEarlySurrender) {
-    return 'na'
+    classes.push('na')
+    return classes
   }
 
-  return match.selfParticipant.stats.win ? 'win' : 'lose'
+  if (match.selfParticipant.stats.win) {
+    classes.push('win')
+  } else {
+    classes.push('lose')
+  }
+
+  return classes
 }
 
 const getWinResultText = (match: SelfParticipantGame) => {
@@ -1171,7 +1194,10 @@ const matches = computed(() => {
     return []
   }
 
-  return withSelfParticipantMatchHistory(matchHistory, puuid)
+  return withSelfParticipantMatchHistory(matchHistory, puuid).map((game) => ({
+    ...game,
+    gameId: game.game.gameId
+  }))
 })
 </script>
 
@@ -1509,6 +1535,7 @@ const matches = computed(() => {
   margin-top: 4px; // 再补一点间距, 合计 8px
 
   .match-item {
+    position: relative;
     display: flex;
     align-items: center;
     height: 30px;
@@ -1520,13 +1547,38 @@ const matches = computed(() => {
     transition: filter 0.3s;
     cursor: pointer;
     margin-bottom: 2px;
+    box-sizing: border-box;
+
+    .ordinal {
+      opacity: 0;
+      position: absolute;
+      font-size: 10px;
+      color: #ffffff40;
+      bottom: 0;
+      right: 0;
+      transition:  opacity 0.3s;
+    }
+
+    &:hover {
+      .ordinal {
+        opacity: 1;
+      }
+    }
 
     &:hover {
       filter: brightness(1.2);
     }
 
+    &.bordered.win {
+      border: #2369cab0 1px solid;
+    }
+
+    &.bordered.lose {
+      border: #c94f4fb0 1px solid;
+    }
+
     &.win {
-      background-color: #2369ca20;
+      background-color: #2369ca30;
 
       .win-lose {
         color: #4cc69d;
@@ -1534,7 +1586,7 @@ const matches = computed(() => {
     }
 
     &.lose {
-      background-color: #c94f4f20;
+      background-color: #c94f4f30;
 
       .win-lose {
         color: #ff6161;
@@ -1542,7 +1594,7 @@ const matches = computed(() => {
     }
 
     &.na {
-      border-left-color: #c0c0c020;
+      border-left-color: #c0c0c030;
 
       .win-lose {
         color: #c0c0c0;

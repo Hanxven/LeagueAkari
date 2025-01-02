@@ -164,6 +164,10 @@ OngoingGameSettings:
     label: Show Recently Used Champions
     description: Display the recently used champions in the player card.
 
+  showMatchHistoryItemBorder:
+    label: Show Match History Item Border
+    description: Display a border around the match history item.
+
   playerCardTags:
     label: Player Card Tags
     description: These tags will be displayed on the player cards

@@ -167,6 +167,10 @@ OngoingGameSettings:
     label: 显示最近使用的英雄
     description: 在玩家卡片上展示最近使用的英雄
 
+  showMatchHistoryItemBorder:
+    label: 战绩项显示边框
+    description: 玩家卡片的战绩条目是否显示边框
+
   playerCardTags:
     label: 玩家卡片标签
     description: 这些标签将被展示在玩家卡片上

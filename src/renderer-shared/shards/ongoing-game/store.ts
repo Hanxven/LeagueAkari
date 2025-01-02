@@ -120,6 +120,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
 
   const frontendSettings = reactive({
     showRecentlyUsedChampions: true,
+    showMatchHistoryItemBorder: false,
     playerCardTags: {
       showPremadeTeamTag: true,
       showSuspiciousFlashPositionTag: true,

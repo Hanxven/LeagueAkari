@@ -140,6 +140,14 @@
       <ControlItem
         class="control-item-margin"
         :label-width="320"
+        :label="t('OngoingGameSettings.showMatchHistoryItemBorder.label')"
+        :label-description="t('OngoingGameSettings.showMatchHistoryItemBorder.description')"
+      >
+        <NSwitch size="small" v-model:value="ogs.frontendSettings.showMatchHistoryItemBorder" />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label-width="320"
         :label="t('OngoingGameSettings.playerCardTags.label')"
         align="start"
         :label-description="t('OngoingGameSettings.playerCardTags.description')"
@@ -184,8 +192,12 @@
           <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showAverageTeamGoldTag">
             {{ t('OngoingGameSettings.playerCardTags.tags.showAverageTeamGoldTag.label') }}
           </NCheckbox>
-          <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showAverageDamageGoldEfficiencyTag">
-            {{ t('OngoingGameSettings.playerCardTags.tags.showAverageDamageGoldEfficiencyTag.label') }}
+          <NCheckbox
+            v-model:checked="ogs.frontendSettings.playerCardTags.showAverageDamageGoldEfficiencyTag"
+          >
+            {{
+              t('OngoingGameSettings.playerCardTags.tags.showAverageDamageGoldEfficiencyTag.label')
+            }}
           </NCheckbox>
           <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showGreatPerformanceTag">
             {{ t('OngoingGameSettings.playerCardTags.tags.showGreatPerformanceTag.label') }}
