@@ -61,7 +61,11 @@ const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
 const lcs = useLeagueClientStore()
 
 const isCsSpectateWait = computed(() => {
-  return lcs.champSelect.session && lcs.champSelect.session.isSpectating
+  return (
+    lcs.champSelect.session &&
+    lcs.champSelect.session.isSpectating &&
+    Object.values(ogs.teams).flat().length === 0
+  )
 })
 
 const orderOptions = computed(() => {

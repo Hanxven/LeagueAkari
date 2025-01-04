@@ -1,5 +1,5 @@
-import deepEqual from 'deep-eql'
 import { customRef } from 'vue'
+import _ from 'lodash'
 
 export function useStableRef<T = any>(initialValue: T) {
   return customRef<T>((track, trigger) => {
@@ -11,7 +11,7 @@ export function useStableRef<T = any>(initialValue: T) {
         return value
       },
       set(newValue) {
-        if (!deepEqual(newValue, value)) {
+        if (!_.isEqual(newValue, value)) {
           value = newValue
           trigger()
         }

@@ -1,4 +1,4 @@
-import deepEqual from 'deep-eql'
+import _ from 'lodash'
 import { ComputedRef, shallowRef, watchEffect } from 'vue'
 import { computed } from 'vue'
 
@@ -11,7 +11,7 @@ export function useStableComputed<T = any>(getter: () => T): ComputedRef<T> {
 
   watchEffect(() => {
     const currentValue = getter()
-    if (!deepEqual(currentValue, previousValue.value)) {
+    if (!_.isEqual(currentValue, previousValue.value)) {
       previousValue.value = currentValue
     }
   })

@@ -1874,13 +1874,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/deep-eql@npm:^4.0.2":
-  version: 4.0.2
-  resolution: "@types/deep-eql@npm:4.0.2"
-  checksum: 10c0/bf3f811843117900d7084b9d0c852da9a044d12eb40e6de73b552598a6843c21291a8a381b0532644574beecd5e3491c5ff3a0365ab86b15d59862c025384844
-  languageName: node
-  linkType: hard
-
 "@types/estree@npm:1.0.6, @types/estree@npm:^1.0.0":
   version: 1.0.6
   resolution: "@types/estree@npm:1.0.6"
@@ -3539,13 +3532,6 @@ __metadata:
   dependencies:
     mimic-response: "npm:^3.1.0"
   checksum: 10c0/bd89d23141b96d80577e70c54fb226b2f40e74a6817652b80a116d7befb8758261ad073a8895648a29cc0a5947021ab66705cb542fa9c143c82022b27c5b175e
-  languageName: node
-  linkType: hard
-
-"deep-eql@npm:^5.0.2":
-  version: 5.0.2
-  resolution: "deep-eql@npm:5.0.2"
-  checksum: 10c0/7102cf3b7bb719c6b9c0db2e19bf0aa9318d141581befe8c7ce8ccd39af9eaa4346e5e05adef7f9bd7015da0f13a3a25dcfe306ef79dc8668aedbecb658dd247
   languageName: node
   linkType: hard
 
@@ -5248,7 +5234,6 @@ __metadata:
     "@rushstack/eslint-patch": "npm:^1.10.4"
     "@swc/core": "npm:^1.10.4"
     "@trivago/prettier-plugin-sort-imports": "npm:^5.2.0"
-    "@types/deep-eql": "npm:^4.0.2"
     "@types/lodash": "npm:^4.17.13"
     "@types/luaparse": "npm:^0.2.12"
     "@types/markdown-it": "npm:^14.1.2"
@@ -5268,7 +5253,6 @@ __metadata:
     axios: "npm:^1.7.9"
     axios-retry: "npm:^4.5.0"
     dayjs: "npm:^1.11.13"
-    deep-eql: "npm:^5.0.2"
     electron: "npm:33.3.0"
     electron-builder: "npm:25.1.8"
     electron-vite: "npm:^2.3.0"
