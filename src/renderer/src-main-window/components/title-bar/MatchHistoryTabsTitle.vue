@@ -48,8 +48,8 @@
                 @dragend="handleTagDragEnd($event, tab.id)"
               >
                 <NBadge
-                  :show="tab.spectatorData !== null"
                   dot
+                  :show="tab.spectatorData !== null"
                   :size="4"
                   color="#00ff00"
                   processing
@@ -114,16 +114,15 @@ import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
 import { Screenshot20Regular as Screenshot20RegularIcon } from '@vicons/fluent'
 import { CloseRound as CloseRoundIcon, RefreshRound as RefreshRoundIcon } from '@vicons/material'
+import { useTranslation } from 'i18next-vue'
 import { NBadge, NDropdown, NIcon, NPopover, NScrollbar, NSpin } from 'naive-ui'
 import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { computed, h, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import { TabState, useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 import SearchSummonerModal from '../search-summoner-modal/SearchSummonerModal.vue'
-
 
 const { t } = useTranslation()
 

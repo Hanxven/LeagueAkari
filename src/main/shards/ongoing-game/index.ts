@@ -184,7 +184,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     })
 
     this._setting.onChange('premadeTeamThreshold', async (value, { setter }) => {
-      if (value >= 3) {
+      if (value >= 2) {
         await setter(value)
       }
     })

@@ -1827,9 +1827,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trivago/prettier-plugin-sort-imports@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "@trivago/prettier-plugin-sort-imports@npm:5.2.0"
+"@trivago/prettier-plugin-sort-imports@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "@trivago/prettier-plugin-sort-imports@npm:5.2.1"
   dependencies:
     "@babel/generator": "npm:^7.26.2"
     "@babel/parser": "npm:^7.26.2"
@@ -1841,7 +1841,7 @@ __metadata:
     "@vue/compiler-sfc": 3.x
     prettier: 2.x - 3.x
     prettier-plugin-svelte: 3.x
-    svelte: 4.x
+    svelte: 4.x || 5.x
   peerDependenciesMeta:
     "@vue/compiler-sfc":
       optional: true
@@ -1849,7 +1849,7 @@ __metadata:
       optional: true
     svelte:
       optional: true
-  checksum: 10c0/73ebdea1f5cef609e1bf7ed7a276916770de210d29e512dfcdac68fafd05cc155f5aec5962bcce65952d24e43aeee81bc58caf37c8d298e7d7f23d4851534405
+  checksum: 10c0/fd782f84d44c61159dce099775a86ebb5082b5e5eea205ec71d6fede3cf079aafb8f9a9979d5742ff0126598a37098cf679d5bad268320907513f2984df3d501
   languageName: node
   linkType: hard
 
@@ -1946,10 +1946,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:^4.17.13":
-  version: 4.17.13
-  resolution: "@types/lodash@npm:4.17.13"
-  checksum: 10c0/c3d0b7efe7933ac0369b99f2f7bff9240d960680fdb74b41ed4bd1b3ca60cca1e31fe4046d9abbde778f941a41bc2a75eb629abf8659fa6c27b66efbbb0802a9
+"@types/lodash@npm:^4.17.14":
+  version: 4.17.14
+  resolution: "@types/lodash@npm:4.17.14"
+  checksum: 10c0/343c6f722e0b39969036a885ad5aad6578479ead83987128c9b994e6b7f2fb9808244d802d4d332396bb09096f720a6c7060de16a492f5460e06a44560360322
   languageName: node
   linkType: hard
 
@@ -2018,12 +2018,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.10.2":
-  version: 22.10.2
-  resolution: "@types/node@npm:22.10.2"
+"@types/node@npm:^22.10.5":
+  version: 22.10.5
+  resolution: "@types/node@npm:22.10.5"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10c0/2c7b71a040f1ef5320938eca8ebc946e6905caa9bbf3d5665d9b3774a8d15ea9fab1582b849a6d28c7fc80756a62c5666bc66b69f42f4d5dafd1ccb193cdb4ac
+  checksum: 10c0/6a0e7d1fe6a86ef6ee19c3c6af4c15542e61aea2f4cee655b6252efb356795f1f228bc8299921e82924e80ff8eca29b74d9dd0dd5cc1a90983f892f740b480df
   languageName: node
   linkType: hard
 
@@ -2458,42 +2458,42 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vueuse/components@npm:^12.2.0":
-  version: 12.2.0
-  resolution: "@vueuse/components@npm:12.2.0"
+"@vueuse/components@npm:^12.3.0":
+  version: 12.3.0
+  resolution: "@vueuse/components@npm:12.3.0"
   dependencies:
-    "@vueuse/core": "npm:12.2.0"
-    "@vueuse/shared": "npm:12.2.0"
+    "@vueuse/core": "npm:12.3.0"
+    "@vueuse/shared": "npm:12.3.0"
     vue: "npm:^3.5.13"
-  checksum: 10c0/ca77b76eccf560ec0a54377a09aeb433b8e418eb3740a4a2153847f8709c2bb51caab434cb572a4afa763c1792834f8145ceebb1653e0720d5dc2f04a35abaf1
+  checksum: 10c0/27abdd1768681c32a6196fa1c220db67a63c1453f67a32c8a89a3ce239b3cb44e06d54e8d3f0b77885bde224b5da99922e7dcb1c6bbd99c4cc78b0c4d53678b7
   languageName: node
   linkType: hard
 
-"@vueuse/core@npm:12.2.0, @vueuse/core@npm:^12.2.0":
-  version: 12.2.0
-  resolution: "@vueuse/core@npm:12.2.0"
+"@vueuse/core@npm:12.3.0, @vueuse/core@npm:^12.3.0":
+  version: 12.3.0
+  resolution: "@vueuse/core@npm:12.3.0"
   dependencies:
     "@types/web-bluetooth": "npm:^0.0.20"
-    "@vueuse/metadata": "npm:12.2.0"
-    "@vueuse/shared": "npm:12.2.0"
+    "@vueuse/metadata": "npm:12.3.0"
+    "@vueuse/shared": "npm:12.3.0"
     vue: "npm:^3.5.13"
-  checksum: 10c0/fd07f0cae0272e75ec50c14fc7a3ae95720119eee180ab03d04f1e1bd95006b506cd2d0e61d6bd957b3eb3804da78c5d402ef00bd6b4b61c9e40641dac5cf630
+  checksum: 10c0/ed21137e00fcb2d585a9956f410293a43a1cbbfde1cffe97bc4fa845c97c8ddbeffe51744369ed2b385a3302f739620a43f65abd5b1a4ded29ab393b07e085a1
   languageName: node
   linkType: hard
 
-"@vueuse/metadata@npm:12.2.0":
-  version: 12.2.0
-  resolution: "@vueuse/metadata@npm:12.2.0"
-  checksum: 10c0/251dae24d718b9da1b69313b6e5eeae9b0ce69d0399727750359ff2cdeb6668f623b04838af360c496a5d5bb5a181a9ed27a9628dc716d436ad06496f5009000
+"@vueuse/metadata@npm:12.3.0":
+  version: 12.3.0
+  resolution: "@vueuse/metadata@npm:12.3.0"
+  checksum: 10c0/3227a64f7c9389dd35ede627e5a1b3d945c10e16065975b3b00e6ca7e7727a3edf2493b442e59c2473a9365c4d49d9cfa29159f92609e826551ceea214013b96
   languageName: node
   linkType: hard
 
-"@vueuse/shared@npm:12.2.0":
-  version: 12.2.0
-  resolution: "@vueuse/shared@npm:12.2.0"
+"@vueuse/shared@npm:12.3.0":
+  version: 12.3.0
+  resolution: "@vueuse/shared@npm:12.3.0"
   dependencies:
     vue: "npm:^3.5.13"
-  checksum: 10c0/98660dbed32415004c7acf50e9a98828322f6f4bf400923a1ed53c68c11232af9e28beb46f676f5b1f8ce2a4c42d4c6dcbfb2bdd47a889231372e01849298470
+  checksum: 10c0/af9b324fcebca776f53ab02a304beeba5592744577fb487bd10b6572d7835bb7dade2d671f9da0aae4315b1b0537d661eac602f6114202aaa953dbc2320e6661
   languageName: node
   linkType: hard
 
@@ -2515,22 +2515,6 @@ __metadata:
   version: 2.0.0
   resolution: "abbrev@npm:2.0.0"
   checksum: 10c0/f742a5a107473946f426c691c08daba61a1d15942616f300b5d32fd735be88fef5cba24201757b6c407fd564555fb48c751cfa33519b2605c8a7aadd22baf372
-  languageName: node
-  linkType: hard
-
-"acorn-walk@npm:^8.2.0":
-  version: 8.3.2
-  resolution: "acorn-walk@npm:8.3.2"
-  checksum: 10c0/7e2a8dad5480df7f872569b9dccff2f3da7e65f5353686b1d6032ab9f4ddf6e3a2cb83a9b52cf50b1497fd522154dda92f0abf7153290cc79cd14721ff121e52
-  languageName: node
-  linkType: hard
-
-"acorn@npm:^8.7.0":
-  version: 8.11.3
-  resolution: "acorn@npm:8.11.3"
-  bin:
-    acorn: bin/acorn
-  checksum: 10c0/3ff155f8812e4a746fee8ecff1f227d527c4c45655bb1fad6347c3cb58e46190598217551b1500f18542d2bbe5c87120cb6927f5a074a59166fbdd9468f0a299
   languageName: node
   linkType: hard
 
@@ -5233,11 +5217,11 @@ __metadata:
     "@modyfi/vite-plugin-yaml": "npm:^1.1.0"
     "@rushstack/eslint-patch": "npm:^1.10.4"
     "@swc/core": "npm:^1.10.4"
-    "@trivago/prettier-plugin-sort-imports": "npm:^5.2.0"
-    "@types/lodash": "npm:^4.17.13"
+    "@trivago/prettier-plugin-sort-imports": "npm:^5.2.1"
+    "@types/lodash": "npm:^4.17.14"
     "@types/luaparse": "npm:^0.2.12"
     "@types/markdown-it": "npm:^14.1.2"
-    "@types/node": "npm:^22.10.2"
+    "@types/node": "npm:^22.10.5"
     "@types/node-7z": "npm:^2.1.10"
     "@types/semver": "npm:^7.5.8"
     "@types/ws": "npm:^8.5.13"
@@ -5247,8 +5231,8 @@ __metadata:
     "@vicons/material": "npm:^0.13.0"
     "@vitejs/plugin-vue": "npm:^5.2.1"
     "@vitejs/plugin-vue-jsx": "npm:^4.1.1"
-    "@vueuse/components": "npm:^12.2.0"
-    "@vueuse/core": "npm:^12.2.0"
+    "@vueuse/components": "npm:^12.3.0"
+    "@vueuse/core": "npm:^12.3.0"
     ajv: "npm:^8.17.1"
     axios: "npm:^1.7.9"
     axios-retry: "npm:^4.5.0"
@@ -5266,7 +5250,7 @@ __metadata:
     luaparse: "npm:^0.3.1"
     markdown-it: "npm:^14.1.0"
     mobx: "npm:^6.13.5"
-    naive-ui: "npm:^2.40.4"
+    naive-ui: "npm:^2.41.0"
     node-7z: "npm:^3.0.0"
     p-queue: "npm:^8.0.1"
     pinia: "npm:^2.3.0"
@@ -5280,9 +5264,8 @@ __metadata:
     typeorm: "npm:^0.3.20"
     typescript: "npm:~5.6.3"
     vfonts: "npm:^0.0.3"
-    vite: "npm:^6.0.6"
+    vite: "npm:^6.0.7"
     vite-plugin-vue-devtools: "npm:^7.6.8"
-    vm2: "npm:^3.9.19"
     vue: "npm:^3.5.13"
     vue-router: "npm:^4.5.0"
     vue-tsc: "npm:^2.2.0"
@@ -5965,9 +5948,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"naive-ui@npm:^2.40.4":
-  version: 2.40.4
-  resolution: "naive-ui@npm:2.40.4"
+"naive-ui@npm:^2.41.0":
+  version: 2.41.0
+  resolution: "naive-ui@npm:2.41.0"
   dependencies:
     "@css-render/plugin-bem": "npm:^0.15.14"
     "@css-render/vue3-ssr": "npm:^0.15.14"
@@ -5990,7 +5973,7 @@ __metadata:
     vueuc: "npm:^0.4.63"
   peerDependencies:
     vue: ^3.0.0
-  checksum: 10c0/38103d84989e72a67b5a1e4101231997d2ea13cf9681bd48ade8d36f5c1175bd4c5fab4c393d427720167b9d3d0a559448e2c220742ada75d90cf48f6b745a43
+  checksum: 10c0/0db33c5f925002b277bfe252498bf8d53d094e4936b839b207c9c5b43b5d0eea6351724820b22c7944dea16596cfd891e85601da65be00c303f5ec6e9e80e2d0
   languageName: node
   linkType: hard
 
@@ -7894,9 +7877,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^6.0.6":
-  version: 6.0.6
-  resolution: "vite@npm:6.0.6"
+"vite@npm:^6.0.7":
+  version: 6.0.7
+  resolution: "vite@npm:6.0.7"
   dependencies:
     esbuild: "npm:^0.24.2"
     fsevents: "npm:~2.3.3"
@@ -7942,19 +7925,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10c0/144c3f80a7920a4b2fa14f00f99b58ece246455ca9313561a67a227b45dadac3343e406d3c1dbfafa79992ac88f54cb2b040b229997e432daf47594fe8cacec2
-  languageName: node
-  linkType: hard
-
-"vm2@npm:^3.9.19":
-  version: 3.9.19
-  resolution: "vm2@npm:3.9.19"
-  dependencies:
-    acorn: "npm:^8.7.0"
-    acorn-walk: "npm:^8.2.0"
-  bin:
-    vm2: bin/vm2
-  checksum: 10c0/16e8e6bb389ae88b8ffbc439e8d7c09db3b98f7f738440af5b78080d6cb35db66b41b0ad055cc59bcc45cb8e270ed850667207348e90760b430403741f72337a
+  checksum: 10c0/ae81047b4290a7206b9394a39a782d509e9610462e7946422ba22d5bc615b5a322c07e33d7bf9dd0b3312ec3f5c63353b725913d1519324bfdf539b4f1e03f52
   languageName: node
   linkType: hard
 

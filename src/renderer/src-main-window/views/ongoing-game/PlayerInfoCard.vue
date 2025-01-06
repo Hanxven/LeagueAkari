@@ -8,9 +8,17 @@
         currentHighlightingPremadeTeamId && currentHighlightingPremadeTeamId === premadeTeamId
     }"
     :style="{
-      borderColor: premadeTeamId ? PREMADE_TEAM_COLORS[premadeTeamId]?.borderColor : '#ffffff40'
+      borderColor: premadeTeamId ? PREMADE_TEAM_COLORS[premadeTeamId]?.borderColor : '#ffffff60'
     }"
   >
+    <div
+      class="premade-deco"
+      :style="{
+        backgroundColor: premadeTeamId
+          ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
+          : undefined
+      }"
+    ></div>
     <div class="player-info">
       <div class="profile-icon">
         <ChampionIcon
@@ -524,6 +532,7 @@
               minutes: EARLY_GAME_THRESHOLD_MINUTES
             })
           }}
+          ({{ soloKills.details.map((d) => d.soloDeathsBefore.length).join(', ') }})
         </div>
       </NPopover>
       <NPopover
@@ -553,6 +562,7 @@
               minutes: EARLY_GAME_THRESHOLD_MINUTES
             })
           }}
+          ({{ soloKills.details.map((d) => d.soloKillsBefore.length).join(', ') }})
         </div>
       </NPopover>
       <NPopover
@@ -960,7 +970,8 @@ const rankedSoloFlex = computed(() => {
     result.solo = {
       text: soloText,
       tier: solo.tier,
-      division: solo.division
+      division: solo.division,
+      lp: solo.leaguePoints
     }
   }
 
@@ -973,7 +984,8 @@ const rankedSoloFlex = computed(() => {
     result.flex = {
       text: flexText,
       tier: flex.tier,
-      division: flex.division
+      division: flex.division,
+      lp: flex.leaguePoints
     }
   }
 
@@ -1211,7 +1223,7 @@ const matches = computed(() => {
   height: 360px;
   border-radius: 4px;
   box-sizing: border-box;
-  border: 1px solid #ffffff20;
+  border: 1px solid #ffffff60;
   background-color: #11111180;
   width: v-bind(FIXED_CARD_WIDTH_PX_LITERAL);
   overflow: hidden;
@@ -1225,6 +1237,16 @@ const matches = computed(() => {
 
   &.highlighting {
     filter: brightness(1.1);
+  }
+
+  .premade-deco {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    transform: translate(50%, -50%) rotate(45deg);
+    z-index: 0;
   }
 }
 
@@ -1318,12 +1340,18 @@ const matches = computed(() => {
         margin-right: 4px;
       }
 
-      .text {
+      .text,
+      .lp {
         font-size: 11px;
         color: #dfdfdf;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+
+      .lp {
+        font-size: 10px;
+        margin-left: 4px;
       }
 
       &.unranked {
@@ -1556,7 +1584,6 @@ const matches = computed(() => {
       color: #ffffff40;
       bottom: 0;
       right: 0;
-      transition:  opacity 0.3s;
     }
 
     &:hover {
