@@ -255,7 +255,8 @@
       </div>
       <div class="card-area" v-if="data && data.data.synergies && data.data.synergies.length">
         <div class="card-title">
-          {{t('OpggChampion.synergies')}}<NCheckbox size="small" v-model:checked="isSynergiesExpanded">{{
+          {{ t('OpggChampion.synergies')
+          }}<NCheckbox size="small" v-model:checked="isSynergiesExpanded">{{
             t('OpggChampion.showAll')
           }}</NCheckbox>
         </div>
@@ -313,7 +314,6 @@
             <template #tab>
               <span class="augments-tab-title">{{ t('OpggChampion.augmentGold') }}</span>
             </template>
-
             <div
               class="augments-group"
               v-for="(a, i) of augments[1].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
@@ -744,6 +744,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
+import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NCheckbox,
@@ -756,7 +757,6 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, ref, watchEffect } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 const props = defineProps<{
   region?: string
@@ -782,7 +782,6 @@ const emits = defineEmits<{
     }
   ]
 }>()
-
 
 const { t } = useTranslation()
 

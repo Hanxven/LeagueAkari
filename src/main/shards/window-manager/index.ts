@@ -64,6 +64,14 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
 
+  get mainWindow() {
+    return this._mw
+  }
+
+  get auxWindow() {
+    return this._aw
+  }
+
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
     this._mobx = deps['mobx-utils-main']
