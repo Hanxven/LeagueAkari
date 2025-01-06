@@ -1,5 +1,7 @@
 # 发送模板
 
+用于指导自定义发送时的模板。
+
 ## 牛马发送模板
 
 部分实现自：[hh-lol-prophet](https://github.com/real-web-world/hh-lol-prophet)

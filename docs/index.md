@@ -14,10 +14,10 @@ hero:
       link: /faq
 
 features:
-  - title: 易用
-    details: 无需繁琐安装，解压后即可直接使用。
-  - title: 开源
-    details: 拥抱开源，遵循 GPL-3.0 协议。
-  - title: 功能全面
-    details: 多功能集成，一站式解决各类需求。
+  - title: 容易使用
+    details: 不用安装，不用配置，只要学会解压就能用。
+  - title: 开源免费
+    details: 遵循 GPL-3.0 协议，白嫖最棒了。
+  - title: 功能挺多
+    details: 战绩、对局、自动化，各种花式小功能，大部分合法的功能这里都有。
 ---
