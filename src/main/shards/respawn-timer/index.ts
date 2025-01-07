@@ -1,6 +1,6 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { riotId, summonerName } from '@shared/utils/name'
-import { comparer, computed, runInAction } from 'mobx'
+import { comparer, runInAction } from 'mobx'
 
 import { GameClientMain } from '../game-client'
 import { LeagueClientMain } from '../league-client'

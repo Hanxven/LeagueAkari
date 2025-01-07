@@ -15,6 +15,7 @@
         <SummonerSpellDisplay
           :keep-alive-on-hover="false"
           :size="32"
+          :delay="1000"
           v-for="s of availableSpells"
           :spell-id="s.id"
           @click="handle1Click(s.id)"
@@ -36,6 +37,7 @@
         <SummonerSpellDisplay
           :keep-alive-on-hover="false"
           :size="32"
+          :delay="1000"
           v-for="s of availableSpells"
           :spell-id="s.id"
           @click="handle2Click(s.id)"

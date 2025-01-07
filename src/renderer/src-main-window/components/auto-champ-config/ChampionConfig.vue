@@ -379,7 +379,7 @@
         </div>
       </div>
     </NModal>
-    <NButton size="tiny" type="primary" @click="show = true">{{
+    <NButton size="tiny" type="primary" @click="show = true" :disabled="!lcs.isConnected">{{
       t('ChampionConfig.configure')
     }}</NButton>
   </div>
@@ -416,7 +416,7 @@ import {
   NVirtualList,
   useMessage
 } from 'naive-ui'
-import { computed, ref, toRaw, watch, watchEffect } from 'vue'
+import { computed, ref, toRaw, watch } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
 import { useMapAssets } from '@main-window/compositions/useMapAssets'

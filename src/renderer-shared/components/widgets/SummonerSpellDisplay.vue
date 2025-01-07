@@ -1,7 +1,7 @@
 <template>
   <NPopover
     v-if="spellId && lcs.gameData.summonerSpells[spellId]"
-    :delay="50"
+    :delay="delay"
     :disabled="disablePopover"
     :keep-alive-on-hover="keepAliveOnHover"
   >
@@ -47,11 +47,12 @@ import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
 
-const { size = 20 } = defineProps<{
+const { size = 20, delay = 50 } = defineProps<{
   disablePopover?: boolean
   spellId?: number
   size?: number
   keepAliveOnHover?: boolean
+  delay?: number
 }>()
 
 const { t } = useTranslation()

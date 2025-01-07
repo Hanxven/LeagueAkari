@@ -34,8 +34,8 @@ const handleError = () => {
 }
 
 .lcu-image-placeholder {
-  color: rgb(103, 103, 103);
-  background-color: rgb(56, 56, 56);
+  border: 1px solid #fff2;
+  background-color: #0006;
   border-radius: 4px;
 }
 </style>
