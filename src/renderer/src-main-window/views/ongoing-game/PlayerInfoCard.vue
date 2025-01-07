@@ -232,13 +232,17 @@
         </template>
         <div class="position-info-popover">
           <div class="name-line">
-            <PositionIcon class="position-icon" :position="positionInfo.current || 'ALL'" />
+            <PositionIcon
+              v-if="positionInfo.current && positionInfo.current !== 'NONE'"
+              class="position-icon"
+              :position="positionInfo.current || 'ALL'"
+            />
             <span class="position-name">{{
               t(`common.lanes.${positionInfo.current || 'ALL'}`)
             }}</span>
             <div
               class="assignment-reason"
-              v-if="positionInfo.role"
+              v-if="positionInfo.role && positionInfo.role.assignmentReason !== 'NONE'"
               :style="{
                 'background-color':
                   positionAssignmentReason[positionInfo.role.assignmentReason]?.color || '#5b4694',
@@ -907,7 +911,7 @@ const positionInfo = computed(() => {
     recent: [] as { position: string; count: number }[]
   }
 
-  if (!position || position.position === 'NONE') {
+  if (!position?.position || position.position === 'NONE') {
     return null
   }
 
@@ -917,7 +921,7 @@ const positionInfo = computed(() => {
   if (analysis?.positions) {
     const recentPositions = Object.entries(analysis.positions.positions)
       .map(([position, count]) => ({ position, count }))
-      .filter((p) => p.count > 0)
+      .filter((p) => p.position !== 'NONE' && p.count > 0)
       .toSorted((a, b) => b.count - a.count)
 
     info.recent = recentPositions
