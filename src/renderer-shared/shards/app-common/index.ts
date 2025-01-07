@@ -70,6 +70,10 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'locale', s)
   }
 
+  setTheme(s: 'default' | 'dark' | 'light') {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'theme', s)
+  }
+
   readClipboardText() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'readClipboardText') as Promise<string>
   }

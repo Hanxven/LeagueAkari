@@ -172,7 +172,6 @@ const intelligence = computed(() => {
   align-items: center;
   display: flex;
   gap: 8px;
-  color: #fffd;
 }
 
 .order-select {
@@ -211,5 +210,17 @@ const intelligence = computed(() => {
   align-items: center;
   box-sizing: border-box;
   margin-left: auto;
+}
+
+[data-theme='dark'] {
+  .ongoing-game-title {
+    color: #fffd;
+  }
+}
+
+[data-theme='light'] {
+  .ongoing-game-title {
+    color: #000d;
+  }
 }
 </style>

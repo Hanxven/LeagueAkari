@@ -1,5 +1,5 @@
 <template>
-  <div class="automation-page">
+  <div class="toolkit-page">
     <div class="sections">
       <div class="section-icon-container">
         <NIcon class="section-icon"><ToolkitIcon /></NIcon>
@@ -59,7 +59,7 @@ const currentTab = ref('client')
 </script>
 
 <style lang="less" scoped>
-.automation-page {
+.toolkit-page {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -69,7 +69,6 @@ const currentTab = ref('client')
     height: 52px;
     padding: 0 24px;
     align-items: flex-end;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .contents {
@@ -89,7 +88,6 @@ const currentTab = ref('client')
   margin-right: 24px;
   margin-bottom: 4px;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.8);
 
   .section-icon {
     font-size: 24px;
@@ -98,6 +96,30 @@ const currentTab = ref('client')
   .session-label {
     font-size: 16px;
     font-weight: bold;
+  }
+}
+
+[data-theme='dark'] {
+  .toolkit-page {
+    .sections {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .section-icon-container {
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+[data-theme='light'] {
+  .toolkit-page {
+    .sections {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .section-icon-container {
+    color: rgba(0, 0, 0, 0.8);
   }
 }
 </style>

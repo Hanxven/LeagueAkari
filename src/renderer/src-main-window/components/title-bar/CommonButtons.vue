@@ -41,10 +41,9 @@ import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { Notification as NotificationIcon } from '@vicons/carbon'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
+import { useTranslation } from 'i18next-vue'
 import { NIcon, NTooltip } from 'naive-ui'
 import { inject } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 
@@ -85,26 +84,50 @@ const handleToGithub = () => {
     -webkit-app-region: no-drag;
   }
 
-  .common-button-outer:hover .common-button-inner {
-    background-color: rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 1);
-  }
-
-  .common-button-outer:active .common-button-inner {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
   .common-button-inner {
     padding: 4px;
     border-radius: 2px;
     transition:
       background-color 0.3s,
       color 0.3s;
-    color: rgba(255, 255, 255, 0.86);
     font-size: 16px;
 
     i {
       display: block;
+    }
+  }
+}
+
+[data-theme='dark'] {
+  .common-buttons {
+    .common-button-outer:hover .common-button-inner {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 1);
+    }
+
+    .common-button-outer:active .common-button-inner {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .common-button-inner {
+      color: rgba(255, 255, 255, 0.86);
+    }
+  }
+}
+
+[data-theme='light'] {
+  .common-buttons {
+    .common-button-outer:hover .common-button-inner {
+      background-color: rgba(0, 0, 0, 0.15);
+      color: rgba(0, 0, 0, 1);
+    }
+
+    .common-button-outer:active .common-button-inner {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .common-button-inner {
+      color: rgba(0, 0, 0, 0.86);
     }
   }
 }

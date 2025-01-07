@@ -1,7 +1,7 @@
 <template>
   <NConfigProvider
     :theme-overrides="themeOverrides"
-    :theme="darkTheme"
+    :theme="naiveUiTheme"
     :locale="naiveUiLocale.locale"
     :date-locale="naiveUiLocale.dateLocale"
     abstract
@@ -22,6 +22,7 @@
 
 <script setup lang="ts">
 // @ts-ignore
+import { useColorThemeAttr } from '@renderer-shared/compositions/useColorThemeAttr'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   GlobalThemeOverrides,
@@ -33,6 +34,7 @@ import {
   dateEnUS,
   dateZhCN,
   enUS,
+  lightTheme,
   zhCN
 } from 'naive-ui'
 import { computed } from 'vue'
@@ -41,25 +43,31 @@ import App from './App.vue'
 
 const as = useAppCommonStore()
 
-const themeOverrides: GlobalThemeOverrides = {
-  Notification: { padding: '12px', color: '#313131fa' },
-  Popover: {
-    color: '#1f1f1ffa',
-    fontSize: '12px'
-  },
-  Card: {
-    colorModal: '#232329'
-  },
-  Message: {
-    colorInfo: 'rgba(45, 45, 55, 1)',
-    colorSuccess: 'rgba(45, 45, 55, 1)',
-    colorWarning: 'rgba(45, 45, 55, 1)',
-    colorError: 'rgba(45, 45, 55, 1)'
-  },
-  Menu: {
-    padding: '1px'
+const themeOverrides = computed(() => {
+  if (as.colorTheme === 'dark') {
+    return {
+      Notification: { padding: '12px', color: '#313131fa' },
+      Popover: {
+        color: '#1f1f1ffa',
+        fontSize: '12px'
+      },
+      Card: {
+        colorModal: '#232329'
+      },
+      Message: {
+        colorInfo: 'rgba(45, 45, 55, 1)',
+        colorSuccess: 'rgba(45, 45, 55, 1)',
+        colorWarning: 'rgba(45, 45, 55, 1)',
+        colorError: 'rgba(45, 45, 55, 1)'
+      },
+      Menu: {
+        padding: '1px'
+      }
+    } as GlobalThemeOverrides
+  } else {
+    return {} as GlobalThemeOverrides
   }
-}
+})
 
 const NAIVE_UI_LOCALE = {
   'zh-CN': {
@@ -75,4 +83,10 @@ const NAIVE_UI_LOCALE = {
 const naiveUiLocale = computed(() => {
   return NAIVE_UI_LOCALE[as.settings.locale] || NAIVE_UI_LOCALE['en']
 })
+
+const naiveUiTheme = computed(() => {
+  return as.colorTheme === 'dark' ? darkTheme : lightTheme
+})
+
+useColorThemeAttr(() => as.colorTheme)
 </script>

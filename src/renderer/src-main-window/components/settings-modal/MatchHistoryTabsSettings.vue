@@ -24,7 +24,8 @@
           >
             <div
               v-if="sgps.availability.sgpServerId"
-              style="color: #63e2b7; font-weight: bold; user-select: text"
+              class="sgp-server-hint-ok"
+              style="font-weight: bold; user-select: text"
             >
               {{
                 t('MatchHistoryTabsSettings.matchHistoryUseSgpApi.current', {
@@ -32,7 +33,7 @@
                 })
               }}
             </div>
-            <div v-else style="color: rgb(209, 170, 124); font-weight: bold">
+            <div class="sgp-server-hint-not-ok" v-else style="font-weight: bold">
               {{
                 t('MatchHistoryTabsSettings.matchHistoryUseSgpApi.unsupported', {
                   server: sgps.availability.sgpServerId
@@ -51,11 +52,10 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
-import { NCard, NScrollbar, NSwitch } from 'naive-ui'
 import { useTranslation } from 'i18next-vue'
+import { NCard, NScrollbar, NSwitch } from 'naive-ui'
 
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
-
 
 const { t } = useTranslation()
 
@@ -76,7 +76,23 @@ const lcs = useLeagueClientStore()
   font-size: 18px;
 }
 
-.card-header-title.disabled {
-  color: rgba(255, 255, 255, 0.35);
+[data-theme='dark'] {
+  .sgp-server-hint-ok {
+    color: #63e2b7;
+  }
+
+  .sgp-server-hint-not-ok {
+    color: rgb(209, 170, 124);
+  }
+}
+
+[data-theme='light'] {
+  .sgp-server-hint-ok {
+    color: rgb(24, 129, 94);
+  }
+
+  .sgp-server-hint-not-ok {
+    color: rgb(166, 116, 58);
+  }
 }
 </style>

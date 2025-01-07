@@ -77,10 +77,9 @@ import {
   Maximize20Regular as Maximize20RegularIcon
 } from '@vicons/fluent'
 import { CloseOutlined as CloseOutlinedIcon } from '@vicons/material'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
 import { ref, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 
@@ -158,25 +157,54 @@ watch(
       filter: brightness(0.85);
     }
   }
+}
 
-  .traffic-button.minimize {
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.162);
-      color: #fff;
+[data-theme='dark'] {
+  .traffic-buttons {
+    .traffic-button.minimize {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.162);
+        color: #fff;
+      }
+    }
+
+    .traffic-button.maximize {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.162);
+        color: #fff;
+      }
+    }
+
+    .traffic-button.close {
+      &:hover {
+        background-color: rgb(194, 0, 0);
+        color: #fff;
+      }
     }
   }
+}
 
-  .traffic-button.maximize {
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.162);
-      color: #fff;
+[data-theme='light'] {
+  .traffic-buttons {
+    .traffic-button.minimize {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.162);
+        color: #000;
+      }
     }
-  }
 
-  .traffic-button.close {
-    &:hover {
-      background-color: rgb(194, 0, 0);
-      color: #fff;
+    .traffic-button.maximize {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.162);
+        color: #000;
+      }
+    }
+
+    .traffic-button.close {
+      &:hover {
+        background-color: rgb(194, 0, 0);
+        color: #fff;
+      }
     }
   }
 }

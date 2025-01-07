@@ -65,7 +65,6 @@ const { t } = useTranslation()
     height: 52px;
     padding: 0 24px;
     align-items: flex-end;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .contents {
@@ -85,7 +84,6 @@ const { t } = useTranslation()
   margin-right: 24px;
   margin-bottom: 4px;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.8);
 
   .section-icon {
     font-size: 24px;
@@ -94,6 +92,30 @@ const { t } = useTranslation()
   .session-label {
     font-size: 16px;
     font-weight: bold;
+  }
+}
+
+[data-theme='dark'] {
+  .automation-page {
+    .sections {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .section-icon-container {
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+[data-theme='light'] {
+  .automation-page {
+    .sections {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .section-icon-container {
+    color: rgba(0, 0, 0, 0.8);
   }
 }
 

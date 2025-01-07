@@ -44,6 +44,11 @@ export class AppCommonSettings {
    */
   locale: string = 'zh-CN'
 
+  /**
+   * 主题色
+   */
+  theme: 'default' | 'dark' | 'light' = 'default'
+
   setShowFreeSoftwareDeclaration(s: boolean) {
     this.showFreeSoftwareDeclaration = s
   }
@@ -54,6 +59,10 @@ export class AppCommonSettings {
 
   setLocale(s: string) {
     this.locale = s
+  }
+
+  setTheme(s: 'default' | 'dark' | 'light') {
+    this.theme = s
   }
 
   constructor() {

@@ -32,6 +32,21 @@
           :options="locales"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        label="主题色"
+        label-description="设置应用界面的主题颜色"
+        :label-width="320"
+        v-if="as.settings.isInKyokoMode"
+      >
+        <NSelect
+          style="width: 160px"
+          size="small"
+          :value="as.settings.theme"
+          @update:value="(val) => app.setTheme(val)"
+          :options="themes"
+        />
+      </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header
@@ -208,6 +223,12 @@ const updateDownloadSource = [
 const locales = [
   { label: '中文', value: 'zh-CN' },
   { label: 'English', value: 'en' }
+]
+
+const themes = [
+  { label: '跟随系统', value: 'default' },
+  { label: '亮色', value: 'light' },
+  { label: '暗色', value: 'dark' }
 ]
 
 const dialog = useDialog()

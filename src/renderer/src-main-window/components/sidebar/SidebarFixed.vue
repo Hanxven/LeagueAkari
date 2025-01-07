@@ -228,12 +228,6 @@ watch(
   box-sizing: border-box;
   cursor: pointer;
 
-  &:hover {
-    .menu-item-icon {
-      color: #fff;
-    }
-  }
-
   .menu-item-inner {
     position: relative;
     display: flex;
@@ -252,7 +246,6 @@ watch(
 
   .menu-item-icon {
     font-size: 24px;
-    color: rgba(255, 255, 255, 0.8);
     transition: color 0.2s;
   }
 
@@ -292,7 +285,6 @@ watch(
   .tag-line {
     margin-left: 4px;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
   }
 }
 
@@ -302,13 +294,11 @@ watch(
 
   .region-name {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.8);
   }
 
   .rso-name {
     margin-left: 4px;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.8);
   }
 }
 
@@ -316,7 +306,6 @@ watch(
   margin: 8px 0;
   width: 100%;
   height: 1px;
-  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .title-label {
@@ -325,12 +314,10 @@ watch(
   gap: 4px;
   font-size: 13px;
   font-weight: bold;
-  color: rgba(255, 255, 255, 1);
   margin-bottom: 12px;
 
   .icon {
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.8);
   }
 }
 
@@ -342,24 +329,14 @@ watch(
   gap: 8px;
   transition: 0.2s all ease;
   border-radius: 2px;
-  background-color: rgba(255, 255, 255, 0.03);
   padding: 4px 16px;
 
   &.connectable {
     cursor: pointer;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    &:active {
-      background-color: rgba(255, 255, 255, 0.08);
-    }
   }
 
   .region-name {
     font-size: 12px;
-    color: #fff;
     font-weight: bold;
   }
 
@@ -369,7 +346,6 @@ watch(
 
   .pid {
     font-size: 10px;
-    color: #6a6a6ae3;
   }
 
   &:not(:last-child) {
@@ -385,22 +361,171 @@ watch(
 
 .no-client {
   font-size: 12px;
-  color: rgba(255, 255, 255, 1);
 }
 
 .respawn-timer-countdown {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.8);
 }
 
 .respawn-timer-hourglass {
-  color: rgba(255, 255, 255, 0.4);
   position: absolute;
   bottom: 0;
   right: 0;
   font-size: 16px;
   transform: translate(25%, 25%);
   animation: hourglass-rotate 6s ease infinite;
+}
+
+[data-theme='dark'] {
+  .menu-item {
+    &:hover {
+      .menu-item-icon {
+        color: #fff;
+      }
+    }
+
+    .menu-item-icon {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .summoner-name {
+    .tag-line {
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  .region {
+    .region-name {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .rso-name {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .separator {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .title-label {
+    color: rgba(255, 255, 255, 1);
+
+    .icon {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .client {
+    background-color: rgba(255, 255, 255, 0.03);
+
+    &.connectable {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      &:active {
+        background-color: rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    .region-name {
+      color: #fff;
+    }
+
+    .pid {
+      color: #6a6a6ae3;
+    }
+  }
+
+  .respawn-timer-hourglass {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .no-client {
+    color: rgba(255, 255, 255, 1);
+  }
+
+  .respawn-timer-countdown {
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+[data-theme='light'] {
+  .menu-item {
+    &:hover {
+      .menu-item-icon {
+        color: #000;
+      }
+    }
+
+    .menu-item-icon {
+      color: rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  .summoner-name {
+    .tag-line {
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  .region {
+    .region-name {
+      color: rgba(0, 0, 0, 0.8);
+    }
+
+    .rso-name {
+      color: rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  .separator {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .title-label {
+    color: rgba(0, 0, 0, 1);
+
+    .icon {
+      color: rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  .client {
+    background-color: rgba(0, 0, 0, 0.03);
+
+    &.connectable {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      &:active {
+        background-color: rgba(0, 0, 0, 0.08);
+      }
+    }
+
+    .region-name {
+      color: #000;
+    }
+
+    .pid {
+      color: #3e3e3ee3;
+    }
+  }
+
+  .respawn-timer-hourglass {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  .no-client {
+    color: rgba(0, 0, 0, 1);
+  }
+
+  .respawn-timer-countdown {
+    color: rgba(0, 0, 0, 0.8);
+  }
 }
 
 @keyframes hourglass-rotate {

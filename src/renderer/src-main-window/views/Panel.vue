@@ -156,6 +156,30 @@ watchEffect(() => {
   }
 }
 
+[data-theme='dark'] {
+  .panel {
+    .fixed-buttons {
+      background-color: rgba(167, 37, 37, 0.518);
+    }
+
+    .left-side-content {
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+[data-theme='light'] {
+  .panel {
+    .fixed-buttons {
+      background-color: rgba(167, 37, 37, 0.518);
+    }
+
+    .left-side-content {
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
 .client {
   position: relative;
   display: flex;

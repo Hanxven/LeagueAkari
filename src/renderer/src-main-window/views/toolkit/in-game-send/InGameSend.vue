@@ -498,10 +498,22 @@ ig.onSendError((message) => {
   align-items: center;
   flex-direction: column;
   gap: 8px;
-  color: #fff8;
   font-size: 14px;
-  background-color: #ffffff05;
   padding: 16px;
   border-radius: 4px;
+}
+
+[data-theme='dark'] {
+  .empty-placeholder {
+    color: #fff8;
+    background-color: #ffffff05;
+  }
+}
+
+[data-theme='light'] {
+  .empty-placeholder {
+    color: #0008;
+    background-color: #00000005;
+  }
 }
 </style>

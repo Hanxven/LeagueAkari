@@ -379,14 +379,6 @@ const columnsNeed = computed(() => {
   .win-rate {
     font-weight: bold;
   }
-
-  .win-rate.gte-50 {
-    color: #4cc69d;
-  }
-
-  .win-rate.lt-50 {
-    color: #ff6161;
-  }
 }
 
 .team-wrapper {
@@ -414,7 +406,6 @@ const columnsNeed = computed(() => {
   .no-ongoing-game-text {
     font-size: 14px;
     font-weight: normal;
-    color: rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -427,5 +418,41 @@ const columnsNeed = computed(() => {
   left: 50%;
   transform: translate(-50%, -50%);
   gap: 16px;
+}
+
+[data-theme='dark'] {
+  .team-header {
+    .win-rate.gte-50 {
+      color: #4cc69d;
+    }
+
+    .win-rate.lt-50 {
+      color: #ff6161;
+    }
+  }
+
+  .no-ongoing-game {
+    .no-ongoing-game-text {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}
+
+[data-theme='light'] {
+  .team-header {
+    .win-rate.gte-50 {
+      color: rgb(44, 140, 108);
+    }
+
+    .win-rate.lt-50 {
+      color: rgb(204, 0, 0);
+    }
+  }
+
+  .no-ongoing-game {
+    .no-ongoing-game-text {
+      color: rgba(0, 0, 0, 0.4);
+    }
+  }
 }
 </style>

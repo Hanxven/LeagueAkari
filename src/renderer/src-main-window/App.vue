@@ -229,12 +229,6 @@ useKeyboardCombo('AKARI', {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.8) 0%,
-      rgba(0, 0, 0, 0.85) 75%,
-      rgba(0, 0, 0, 0.85) 100%
-    );
   }
 
   &.no-image {
@@ -244,6 +238,24 @@ useKeyboardCombo('AKARI', {
       background: none;
     }
   }
+}
+
+[data-theme='light'] .background-wallpaper::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.95) 75%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+}
+
+[data-theme='dark'] .background-wallpaper::before {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.85) 75%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
 }
 
 .bg-fade-enter-active,

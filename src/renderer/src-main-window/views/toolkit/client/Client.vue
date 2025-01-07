@@ -403,7 +403,18 @@ const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
 .settings-file-mode-indicator {
   font-size: 12px;
   font-weight: bold;
-  color: #46ff90d0;
   margin-left: 8px;
+}
+
+[data-theme='dark'] {
+  .settings-file-mode-indicator {
+    color: #46ff90d0;
+  }
+}
+
+[data-theme='light'] {
+  .settings-file-mode-indicator {
+    color: rgba(0, 122, 49, 0.816);
+  }
 }
 </style>

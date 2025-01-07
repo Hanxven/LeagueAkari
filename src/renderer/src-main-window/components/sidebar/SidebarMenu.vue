@@ -59,12 +59,6 @@ const handleMenuChange = (key: string) => {
   box-sizing: border-box;
   cursor: pointer;
 
-  &:hover {
-    .menu-item-icon {
-      color: #fff;
-    }
-  }
-
   .menu-item-inner {
     position: relative;
     display: flex;
@@ -77,7 +71,6 @@ const handleMenuChange = (key: string) => {
 
   .menu-item-icon {
     font-size: 24px;
-    color: rgba(255, 255, 255, 0.45);
     transition: color 0.2s;
   }
 
@@ -95,10 +88,55 @@ const handleMenuChange = (key: string) => {
     .menu-item-icon {
       color: #fff;
     }
+  }
+}
 
-    .menu-item-indicator {
-      background-color: #60f44db9;
-      box-shadow: 0 0 8px 0px #60f44db9;
+[data-theme='dark'] {
+  .menu-item {
+    &:hover {
+      .menu-item-icon {
+        color: #fff;
+      }
+    }
+
+    .menu-item-icon {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    &.active {
+      .menu-item-icon {
+        color: #fff;
+      }
+
+      .menu-item-indicator {
+        background-color: #60f44db9;
+        box-shadow: 0 0 8px 0px #60f44db9;
+      }
+    }
+  }
+}
+
+[data-theme='light'] {
+  .menu-item {
+    &:hover {
+      .menu-item-icon {
+        color: #000;
+      }
+    }
+
+    .menu-item-icon {
+      color: rgba(0, 0, 0, 0.45);
+    }
+
+    &.active {
+      .menu-item-icon {
+        color: #000;
+      }
+
+      .menu-item-indicator {
+        background-color: #1e6a14e0;
+        box-shadow: 0 0 8px 0px #1e6a14e0;
+      }
     }
   }
 }

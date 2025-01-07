@@ -40,7 +40,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
       {
         isInKyokoMode: { default: this.settings.isInKyokoMode },
         showFreeSoftwareDeclaration: { default: this.settings.showFreeSoftwareDeclaration },
-        locale: { default: this._getSystemLocale() }
+        locale: { default: this._getSystemLocale() },
+        theme: { default: 'default' as 'default' | 'dark' | 'light' }
       },
       this.settings
     )
@@ -96,7 +97,8 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._mobx.propSync(AppCommonMain.id, 'settings', this.settings, [
       'isInKyokoMode',
       'showFreeSoftwareDeclaration',
-      'locale'
+      'locale',
+      'theme'
     ])
     this._mobx.propSync(AppCommonMain.id, 'state', this.state, [
       'isAdministrator',

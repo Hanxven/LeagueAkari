@@ -6,14 +6,16 @@
 }
 
 :root {
-  color-scheme: dark;
-  --background-color-primary: #1a1a1d;
   --app-min-height: 520px;
   --app-min-width: 670px;
   --title-bar-height: 36px;
   --scroll-bar-height: 6px;
   --scroll-bar-width: 8px;
   --n-option-padding: 0 4px;
+}
+
+[data-theme='dark'] {
+  --background-color-primary: #1a1a1d;
 }
 
 ::-webkit-scrollbar {
@@ -48,16 +50,31 @@ body {
 
 body {
   user-select: none;
-  background-color: var(--background-color-primary);
   line-height: normal;
 }
 
-a {
-  color: rgb(144, 198, 166);
+[data-theme='dark'] body {
+  background-color: var(--background-color-primary);
 }
 
-a:visited {
-  color: rgb(144, 198, 166);
+[data-theme='dark'] {
+  a {
+    color: rgb(144, 198, 166);
+  }
+
+  a:visited {
+    color: rgb(144, 198, 166);
+  }
+}
+
+[data-theme='light'] {
+  a {
+    color: rgb(88, 124, 102);
+  }
+
+  a:visited {
+    color: rgb(88, 124, 102);
+  }
 }
 
 .n-radio {
@@ -95,7 +112,7 @@ a:visited {
   max-height: calc(100vh - var(--title-bar-height)) !important;
 }
 
-.n-base-select-menu {
+[data-theme='dark'] .n-base-select-menu {
   background-color: #383838f8;
 }
 

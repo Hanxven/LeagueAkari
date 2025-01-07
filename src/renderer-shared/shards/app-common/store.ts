@@ -1,5 +1,6 @@
+import { usePreferredColorScheme } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { ref, shallowReactive, shallowRef } from 'vue'
+import { computed, ref, shallowReactive, shallowRef } from 'vue'
 
 interface BaseConfig {
   disableHardwareAcceleration?: boolean
@@ -9,7 +10,8 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   const settings = shallowReactive({
     showFreeSoftwareDeclaration: false,
     isInKyokoMode: false,
-    locale: 'zh-CN'
+    locale: 'zh-CN',
+    theme: 'default' as 'default' | 'dark' | 'light'
   })
 
   const version = ref('0.0.0')
@@ -23,12 +25,24 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     shown: false
   })
 
+  const preferredColorScheme = usePreferredColorScheme()
+
+  const colorTheme = computed(() => {
+    if (settings.theme === 'default') {
+      return preferredColorScheme.value === 'dark' ? 'dark' : 'light'
+    }
+
+    return settings.theme
+  })
+
   return {
     settings,
     isAdministrator,
     disableHardwareAcceleration,
     version,
     baseConfig,
+
+    colorTheme,
 
     tempAkariSubscriptionInfo
   }

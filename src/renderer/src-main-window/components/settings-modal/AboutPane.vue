@@ -306,6 +306,18 @@ const processStatus = computed(() => {
   margin: 12px 0px;
 }
 
+[data-theme='dark'] {
+  .divider {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+[data-theme='light'] {
+  .divider {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
 .control-item-margin {
   &:not(:last-child) {
     margin-bottom: 12px;

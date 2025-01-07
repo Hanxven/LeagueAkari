@@ -48,27 +48,53 @@ const { align = 'center' } = defineProps<{
   .label {
     font-size: 14px;
     font-weight: bold;
-    color: #fff;
     transition: color 0.3s ease;
   }
 
-  .label.disabled {
-    color: rgb(97, 97, 97);
-  }
-
   .label-description {
-    color: rgb(198, 198, 198);
     transition: color 0.3s ease;
     font-size: 13px;
     margin-top: 2px;
   }
 
-  .label-description.disabled {
-    color: rgb(97, 97, 97);
-  }
-
   .control {
     flex: 1;
+  }
+}
+
+[data-theme='dark'] {
+  .label {
+    color: #fff;
+  }
+
+  .label.disabled {
+    color: #fff8;
+  }
+
+  .label-description {
+    color: #fffc;
+  }
+
+  .label-description.disabled {
+    color: #fff8;
+  }
+}
+
+[data-theme='light'] {
+  .label {
+    color: #000;
+  }
+
+  .label.disabled {
+    color: #0008;
+  }
+
+  .label-description {
+    color: #000c;
+  }
+
+  .label-description.disabled {
+    color: #0008;
   }
 }
 </style>

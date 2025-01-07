@@ -416,7 +416,6 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
   flex-shrink: 0;
   padding: 0 4px 0 8px;
   box-sizing: border-box;
-  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
   cursor: pointer;
   user-select: none;
@@ -425,9 +424,10 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
     filter 0.2s;
   line-height: 1;
   filter: brightness(0.55);
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0);
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
     filter: brightness(0.8);
   }
 
@@ -441,27 +441,20 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
   }
 
   .tab-icon-placeholder {
-    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
   }
 
   .close-icon {
     margin-left: 4px;
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.8);
     cursor: pointer;
     border-radius: 2px;
     transition: background-color 0.2s;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
   }
 
   .sgp-server {
     font-size: 11px;
     font-weight: bold;
-    color: rgba(174, 245, 219, 0.8);
     margin-right: 4px;
   }
 
@@ -472,29 +465,24 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
 
   .empty-placeholder-text {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.8);
   }
 
   .game-name-line {
     font-size: 12px;
     font-weight: bold;
-    color: rgba(255, 255, 255, 1);
     margin-right: 4px;
   }
 
   .tag-line {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.8);
   }
 
   &.active {
     filter: brightness(1);
-    background-color: rgba(255, 255, 255, 0.12);
   }
 
   &.drag-hover {
     filter: brightness(0.8);
-    background-color: rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -509,27 +497,15 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
   flex-shrink: 0;
   -webkit-app-region: no-drag;
   padding: 0px 12px 0px 10px;
-  border: 1px solid rgba(255, 255, 255, 0);
   border-radius: 2px;
   height: 24px; // same as tab height
   box-sizing: border-box;
   cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
   line-height: 1;
   transition:
     border-color 0.2s,
     background-color 0.2s,
     color 0.2s;
-
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.4);
-    color: rgba(255, 255, 255, 1);
-  }
-
-  &:active {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
 
   .search-icon {
     font-size: 12px;
@@ -548,7 +524,141 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
   height: 40%;
   box-sizing: border-box;
   margin: 0 8px;
-  background-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='dark'] {
+  .tab {
+    background-color: rgba(255, 255, 255, 0.1);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .tab-icon-placeholder {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .close-icon {
+      color: rgba(255, 255, 255, 0.8);
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    .sgp-server {
+      color: rgba(174, 245, 219, 0.8);
+    }
+
+    .empty-placeholder-text {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .game-name-line {
+      color: rgba(255, 255, 255, 1);
+    }
+
+    .tag-line {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    &.active {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    &.drag-hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  .search-area {
+    padding: 0px 12px 0px 10px;
+    border: 1px solid rgba(255, 255, 255, 0);
+
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 1);
+    }
+
+    &:active {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .divider {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+[data-theme='light'] {
+  .tab {
+    background-color: rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-icon-placeholder {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .close-icon {
+      color: rgba(0, 0, 0, 0.8);
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    .sgp-server {
+      color: rgba(111, 151, 136, 0.9);
+    }
+
+    .empty-placeholder-text {
+      color: rgba(0, 0, 0, 0.8);
+    }
+
+    .game-name-line {
+      color: rgba(0, 0, 0, 1);
+    }
+
+    .tag-line {
+      color: rgba(0, 0, 0, 0.8);
+    }
+
+    &.active {
+      background-color: rgba(0, 0, 0, 0);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    &.drag-hover {
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  .search-area {
+    padding: 0px 12px 0px 10px;
+    border: 1px solid rgba(0, 0, 0, 0);
+
+    background-color: rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0.8);
+
+    &:hover {
+      border-color: rgba(0, 0, 0, 0.4);
+      color: rgba(0, 0, 0, 1);
+    }
+
+    &:active {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  .divider {
+    background-color: rgba(0, 0, 0, 0.15);
+  }
 }
 </style>
 

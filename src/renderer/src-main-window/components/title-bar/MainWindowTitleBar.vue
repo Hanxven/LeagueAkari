@@ -19,7 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store';
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+
 import CommonButtons from './CommonButtons.vue'
 import MatchHistoryTabsTitle from './MatchHistoryTabsTitle.vue'
 import OngoingGameTitle from './OngoingGameTitle.vue'
@@ -36,7 +37,18 @@ const as = useAppCommonStore()
   align-items: center;
   -webkit-app-region: drag;
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] {
+  #app-title-bar {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+[data-theme='light'] {
+  #app-title-bar {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
 }
 
 .shard-area {
@@ -48,8 +60,19 @@ const as = useAppCommonStore()
 .app-name {
   padding: 0 4px;
   font-weight: bold;
-  color: rgba(255, 255, 255, 0.8);
   margin-left: 8px;
+}
+
+[data-theme='dark'] {
+  .app-name {
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+[data-theme='light'] {
+  .app-name {
+    color: rgba(0, 0, 0, 0.8);
+  }
 }
 
 .divider {
@@ -58,5 +81,17 @@ const as = useAppCommonStore()
   box-sizing: border-box;
   margin: 0 8px;
   background-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='dark'] {
+  .divider {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+[data-theme='light'] {
+  .divider {
+    background-color: rgba(0, 0, 0, 0.15);
+  }
 }
 </style>
