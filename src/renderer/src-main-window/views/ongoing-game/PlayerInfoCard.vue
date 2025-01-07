@@ -678,13 +678,13 @@
               margin-top: 4px;
             "
           >
-            <div>伤害: {{ analysis.akariScore.dmgScore.toFixed(2) }}</div>
-            <div>承伤: {{ analysis.akariScore.dmgTakenScore.toFixed(2) }}</div>
-            <div>经济: {{ analysis.akariScore.goldScore.toFixed(2) }}</div>
-            <div>补兵: {{ analysis.akariScore.csScore.toFixed(2) }}</div>
-            <div>参团: {{ analysis.akariScore.participationScore.toFixed(2) }}</div>
+            <div>Dmg: {{ analysis.akariScore.dmgScore.toFixed(2) }}</div>
+            <div>Taken: {{ analysis.akariScore.dmgTakenScore.toFixed(2) }}</div>
+            <div>Gold: {{ analysis.akariScore.goldScore.toFixed(2) }}</div>
+            <div>CS: {{ analysis.akariScore.csScore.toFixed(2) }}</div>
+            <div>K/P: {{ analysis.akariScore.participationScore.toFixed(2) }}</div>
             <div>KDA: {{ analysis.akariScore.kdaScore.toFixed(2) }}</div>
-            <div>胜率: {{ analysis.akariScore.winRateScore.toFixed(2) }}</div>
+            <div>W/R: {{ analysis.akariScore.winRateScore.toFixed(2) }}</div>
           </div>
         </div>
       </NPopover>
@@ -1243,8 +1243,8 @@ const matches = computed(() => {
     position: absolute;
     right: 0;
     top: 0;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     transform: translate(50%, -50%) rotate(45deg);
     z-index: 0;
   }
@@ -1602,6 +1602,10 @@ const matches = computed(() => {
 
     &.bordered.lose {
       border: #c94f4fb0 1px solid;
+    }
+
+    &.bordered.na {
+      border: #c0c0c0b0 1px solid;
     }
 
     &.win {

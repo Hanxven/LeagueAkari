@@ -1,6 +1,6 @@
 <template>
   <div id="app-title-bar">
-    <span class="app-name" v-if="as.isAdministrator">Admin Akari</span>
+    <span class="app-name" v-if="as.isAdministrator">League Akari X</span>
     <span class="app-name" v-else>League Akari</span>
     <div class="divider" />
     <div class="shard-area">

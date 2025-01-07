@@ -7,7 +7,7 @@
         :current="currentMenu"
         @update:current="(key) => handleMenuChange(key)"
       />
-      <div class="dragging-zone"></div>
+      <div class="padding-zone"></div>
       <SidebarFixed />
     </div>
     <div class="right-side-content">
@@ -135,9 +135,8 @@ watchEffect(() => {
   width: 100%;
   height: 100%;
 
-  .dragging-zone {
+  .padding-zone {
     flex: 1;
-    -webkit-app-region: drag;
   }
 
   .fixed-buttons {

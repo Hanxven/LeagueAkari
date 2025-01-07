@@ -330,7 +330,7 @@ AboutPane:
   title: About
   line1: ' (联盟阿卡林, Version {{version}}) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
   line2: Project Reference
-  copyright: © 2024 Hanxven. This software is open-source and follows the GPL-3.0 license.
+  copyright: © 2025 Hanxven. This software is open-source and follows the GPL-3.0 license.
 
   checkFrom: Check updates from download source ({{source}})
   checkUpdates: Check Updates

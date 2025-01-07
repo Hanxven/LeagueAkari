@@ -20,32 +20,17 @@ asarUnpack:
   - resources/**
 afterSign: build/notarize.js
 win:
-  target: 7z
+  target:
+    - 7z
   executableName: LeagueAkari
   icon: resources/LA_ICON.ico
 nsis:
+  oneClick: false
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
-mac:
-  entitlementsInherit: build/entitlements.mac.plist
-  extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
-dmg:
-  artifactName: ${name}-${version}.${ext}
-linux:
-  target:
-    - AppImage
-    - snap
-    - deb
-  maintainer: nobody
-  category: Utility
-appImage:
-  artifactName: ${name}-${version}.${ext}
+
 npmRebuild: false
 publish:
 #   provider: generic
