@@ -1,7 +1,7 @@
 <template>
   <NConfigProvider
     :theme-overrides="themeOverrides"
-    :theme="darkTheme"
+    :theme="naiveUiTheme"
     :locale="naiveUiLocale"
     abstract
     inline-theme-disabled
@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+import { useColorThemeAttr } from '@renderer-shared/compositions/useColorThemeAttr'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import {
   GlobalThemeOverrides,
@@ -29,6 +30,7 @@ import {
   dateEnUS,
   dateZhCN,
   enUS,
+  lightTheme,
   zhCN
 } from 'naive-ui'
 import { computed } from 'vue'
@@ -68,6 +70,12 @@ const NAIVE_UI_LOCALE = {
 const naiveUiLocale = computed(() => {
   return NAIVE_UI_LOCALE[as.settings.locale] || NAIVE_UI_LOCALE['en']
 })
+
+const naiveUiTheme = computed(() => {
+  return as.colorTheme === 'dark' ? darkTheme : lightTheme
+})
+
+useColorThemeAttr(() => as.colorTheme)
 </script>
 
 <style></style>
