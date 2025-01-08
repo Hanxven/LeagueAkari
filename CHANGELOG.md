@@ -2,7 +2,7 @@
 
 ## TODO
 
-- 提供按照成就点数排序的英雄偏好。[#184](https://github.com/Hanxven/LeagueAkari/issues/184)
+- 遇到过标签中，提供更多信息。
 
 ## 新增
 
@@ -12,7 +12,9 @@
 
 - (Test Required) 自动交换可以忽略物主
 
-- 对局页面的玩家卡片，部分内容可自定义是否展示。
+- 对局页面的玩家卡片，部分内容可自定义是否展示。[#184](https://github.com/Hanxven/LeagueAkari/issues/184)
+
+- 主窗口背景材质支持 Mica。需 Windows 版本大于 22H2。
 
 ## 修复
 

@@ -171,6 +171,14 @@ OngoingGameSettings:
     label: Show Recently Used Champions
     description: Display the recently used champions in the player card.
 
+  showChampionUsage:
+    label: Show Champion Usage
+    description: Display the champion usage on the player card.
+    options:
+      none: None
+      recent: Recently Used
+      mastery: Mastery Level
+
   showMatchHistoryItemBorder:
     label: Show Match History Item Border
     description: Display a border around the match history item.

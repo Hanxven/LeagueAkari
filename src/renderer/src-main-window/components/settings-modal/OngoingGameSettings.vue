@@ -132,10 +132,20 @@
       <ControlItem
         class="control-item-margin"
         :label-width="320"
-        :label="t('OngoingGameSettings.showRecentlyUsedChampions.label')"
-        :label-description="t('OngoingGameSettings.showRecentlyUsedChampions.description')"
+        :label="t('OngoingGameSettings.showChampionUsage.label')"
+        :label-description="t('OngoingGameSettings.showChampionUsage.description')"
       >
-        <NSwitch size="small" v-model:value="ogs.frontendSettings.showRecentlyUsedChampions" />
+        <NRadioGroup v-model:value="ogs.frontendSettings.showChampionUsage">
+          <NRadio value="none">
+            {{ t('OngoingGameSettings.showChampionUsage.options.none') }}</NRadio
+          >
+          <NRadio value="recent">{{
+            t('OngoingGameSettings.showChampionUsage.options.recent')
+          }}</NRadio>
+          <NRadio value="mastery">{{
+            t('OngoingGameSettings.showChampionUsage.options.mastery')
+          }}</NRadio>
+        </NRadioGroup>
       </ControlItem>
       <ControlItem
         class="control-item-margin"

@@ -159,7 +159,7 @@
                 >({{ analysis.summary.count }})</span
               >
             </div>
-            <div class="win-rate" v-else>—%</div>
+            <div class="win-rate" v-else>— %</div>
           </template>
           <div class="popover-text" v-if="analysis">
             {{
@@ -693,26 +693,21 @@
         </div>
       </NPopover>
     </div>
-    <div
-      class="frequent-used-champions"
-      v-if="ogs.frontendSettings.showRecentlyUsedChampions && frequentlyUsedChampions.length"
-    >
-      <NPopover :keep-alive-on-hover="false" v-for="c of frequentlyUsedChampions" :delay="50">
+    <div class="frequent-used-champions" v-if="championUsage.length">
+      <NPopover :keep-alive-on-hover="false" v-for="c of championUsage" :delay="50">
         <template #trigger>
           <div class="frequent-used-champion">
             <ChampionIcon
-              :ring-color="c.winRate >= 0.5 ? '#2368ca' : '#c94f4f'"
+              :ring-color="
+                c.analysis ? (c.analysis.winRate >= 0.5 ? '#2368ca' : '#c94f4f') : undefined
+              "
               :champion-id="c.id"
               ring
               :ring-width="1"
               class="image"
             />
             <StarRoundIcon
-              v-if="
-                championMastery &&
-                championMastery[c.id] &&
-                championMastery[c.id].championLevel >= STARED_CHAMPION_LEVEL
-              "
+              v-if="c.mastery && c.mastery.championLevel >= STARED_CHAMPION_LEVEL"
               class="star-icon"
             />
           </div>
@@ -722,31 +717,31 @@
             <ChampionIcon ring :ring-width="1" round class="champion-icon" :champion-id="c.id" />
             <div class="champion-name">{{ lcs.gameData.champions[c.id]?.name || c.id }}</div>
           </div>
-          <div class="recent-plays">
+          <div class="recent-plays" v-if="c.analysis">
             {{
               t('PlayerInfoCard.champion.winRate', {
-                countV: c.count,
-                winRate: (c.winRate * 100).toFixed()
+                countV: c.analysis.count,
+                winRate: (c.analysis.winRate * 100).toFixed()
               })
             }}
           </div>
-          <template v-if="championMastery && championMastery[c.id]">
+          <template v-if="c.mastery">
             <div class="mastery-points">
               <span class="level">{{
                 t('PlayerInfoCard.champion.level', {
-                  level: championMastery[c.id].championLevel
+                  level: c.mastery.championLevel
                 })
               }}</span>
               <span class="points">{{
                 t('PlayerInfoCard.champion.masteryPoints', {
-                  points: championMastery[c.id].championPoints.toLocaleString()
+                  points: c.mastery.championPoints.toLocaleString()
                 })
               }}</span>
             </div>
             <div class="milestones">
               <span
                 class="milestone"
-                v-for="m of toSortedMilestoneGrades(championMastery[c.id].milestoneGrades)"
+                v-for="m of toSortedMilestoneGrades(c.mastery.milestoneGrades)"
                 >{{ m }}</span
               >
             </div>
@@ -941,22 +936,44 @@ const positionInfo = computed(() => {
 
 const FREQUENT_USED_CHAMPIONS_MAX_COUNT = 9
 
-const frequentlyUsedChampions = computed(() => {
-  if (!analysis) {
-    return []
+const championUsage = computed(() => {
+  if (ogs.frontendSettings.showChampionUsage === 'recent') {
+    if (!analysis) {
+      return []
+    }
+
+    const truncated = Object.values(analysis.champions)
+      .toSorted((a, b) => {
+        return b.count - a.count
+      })
+      .slice(0, FREQUENT_USED_CHAMPIONS_MAX_COUNT)
+      .map((c) => ({
+        id: c.id,
+        analysis: c,
+        mastery: championMastery && championMastery[c.id]
+      }))
+
+    return truncated
+  } else if (ogs.frontendSettings.showChampionUsage === 'mastery') {
+    if (!championMastery) {
+      return []
+    }
+
+    const truncated = Object.values(championMastery)
+      .toSorted((a, b) => {
+        return b.championPoints - a.championPoints
+      })
+      .slice(0, FREQUENT_USED_CHAMPIONS_MAX_COUNT)
+      .map((m) => ({
+        id: m.championId,
+        analysis: analysis?.champions[m.championId],
+        mastery: m
+      }))
+
+    return truncated
   }
 
-  if (!ogs.frontendSettings.showRecentlyUsedChampions) {
-    return []
-  }
-
-  const truncated = Object.values(analysis.champions)
-    .toSorted((a, b) => {
-      return b.count - a.count
-    })
-    .slice(0, FREQUENT_USED_CHAMPIONS_MAX_COUNT)
-
-  return truncated
+  return []
 })
 
 const rankedSoloFlex = computed(() => {

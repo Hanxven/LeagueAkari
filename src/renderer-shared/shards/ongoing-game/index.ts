@@ -120,10 +120,10 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       store.settings.orderPlayerBy
     )
 
-    store.frontendSettings.showRecentlyUsedChampions = await this._setting.get(
+    store.frontendSettings.showChampionUsage = await this._setting.get(
       OngoingGameRenderer.id,
-      'frontend/showRecentlyUsedChampions',
-      store.frontendSettings.showRecentlyUsedChampions
+      'frontend/showChampionUsage',
+      store.frontendSettings.showChampionUsage
     )
 
     store.frontendSettings.showMatchHistoryItemBorder = await this._setting.get(
@@ -147,9 +147,9 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       )
 
       watch(
-        () => store.frontendSettings.showRecentlyUsedChampions,
+        () => store.frontendSettings.showChampionUsage,
         (newValue) => {
-          this._setting.set(OngoingGameRenderer.id, 'frontend/showRecentlyUsedChampions', newValue)
+          this._setting.set(OngoingGameRenderer.id, 'frontend/showChampionUsage', newValue)
         }
       )
 
