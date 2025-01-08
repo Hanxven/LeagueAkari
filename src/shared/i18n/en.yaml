@@ -1682,6 +1682,7 @@ InGameSend:
   stage-unavailable: Not in a match query stage
   execution-error: Error occurred while executing the template. Please check the template logic for correctness
   error: Unknown error
+  errorSendStatsUseCustomTemplateTitle: Custom Template Error
   confirm: Confirm
 
 ChampionConfig:

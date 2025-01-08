@@ -1688,6 +1688,7 @@ InGameSend:
   stage-unavailable: 未处于对局查询阶段中
   execution-error: 执行模板时出错，请检查模板逻辑正确性
   error: 未知错误
+  errorSendStatsUseCustomTemplateTitle: 发送自定义模板时出错
   confirm: 确认
 
 ChampionConfig:

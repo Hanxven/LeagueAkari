@@ -120,12 +120,21 @@
               ></div>
             </template>
             <div>
+              <NAlert
+                style="width: 420px"
+                v-if="lastSendCustomTemplateError"
+                type="error"
+                closable
+                :title="t('InGameSend.errorSendStatsUseCustomTemplateTitle')"
+              >
+                {{ lastSendCustomTemplateError?.reason }}
+              </NAlert>
               <NInput
                 :disabled="!as.isAdministrator"
                 :placeholder="t('InGameSend.sendStats.sendStatsTemplate.inputPlaceholder')"
                 v-model:value="tempTemplateInput"
                 ref="use-template-input"
-                style="width: 420px; font-family: monospace; font-size: 12px"
+                style="margin-top: 4px; width: 420px; font-family: monospace; font-size: 12px"
                 size="small"
                 :status="igs.settings.sendStatsTemplate.isValid ? 'success' : 'warning'"
                 type="textarea"
@@ -227,7 +236,6 @@
                   :disabled="!as.isAdministrator"
                   class="control-item-margin"
                   :label="t('InGameSend.customSend.shortcut')"
-                  :label-description="``"
                 >
                   <ShortcutSelector
                     :disabled="!as.isAdministrator"
@@ -241,7 +249,6 @@
                   :label-width="120"
                   class="control-item-margin"
                   :label="t('InGameSend.customSend.message')"
-                  :label-description="``"
                 >
                   <NInput
                     :placeholder="t('InGameSend.customSend.message')"
@@ -259,7 +266,6 @@
                   :label-width="120"
                   class="control-item-margin"
                   :label="t('InGameSend.customSend.delete.label')"
-                  :label-description="``"
                 >
                   <NPopconfirm
                     :positive-button-props="{ type: 'error' }"
@@ -321,6 +327,7 @@ import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import { useTranslation } from 'i18next-vue'
 import {
+  NAlert,
   NButton,
   NCard,
   NEllipsis,
@@ -443,9 +450,28 @@ const handleDryRun = async () => {
   }
 }
 
-ig.onSendError((message) => {
-  laNotification.warn(t('InGameSend.error'), message)
+const lastSendCustomTemplateError = ref<{
+  reason: string
+} | null>()
+
+ig.onSendCustomTemplateError((message) => {
+  lastSendCustomTemplateError.value = {
+    reason: message
+  }
 })
+
+ig.onSendCustomTemplateSuccess(() => {
+  lastSendCustomTemplateError.value = null
+})
+
+watch(
+  () => igs.settings.sendStatsUseDefaultTemplate,
+  () => {
+    if (igs.settings.sendStatsUseDefaultTemplate) {
+      lastSendCustomTemplateError.value = null
+    }
+  }
+)
 </script>
 
 <style lang="less" scoped>

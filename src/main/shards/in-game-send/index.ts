@@ -339,8 +339,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
         this._log.info('将模拟发送如下信息', messages)
 
         await this._sendSeparatedStringLines(messages, 'send-stats', sendType)
+        this._ipc.sendEvent(InGameSendMain.id, 'success-send-stats-use-custom-template')
       } catch (error) {
-        this._ipc.sendEvent(InGameSendMain.id, 'send-stats-error', (error as Error).message)
+        this._ipc.sendEvent(
+          InGameSendMain.id,
+          'error-send-stats-use-custom-template',
+          (error as Error).message
+        )
         this._log.warn('发送时模板发生错误', error)
       }
     }
