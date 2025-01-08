@@ -7,11 +7,9 @@
       v-model:show="isCloseConfirmationModelShow"
       :z-index="10000000"
     >
-      <template #header
-        ><span class="close-confirmation-header">{{
-          t('TrafficButtons.modal.title')
-        }}</span></template
-      >
+      <template #header>
+        <span class="close-confirmation-header">{{ t('TrafficButtons.modal.title') }}</span>
+      </template>
       <NRadioGroup v-model:value="closeStrategy" size="small">
         <NFlex vertical>
           <NRadio value="minimize-to-tray">{{

@@ -9,9 +9,9 @@
     :mask-closable="false"
     :class="$style['declaration-modal']"
   >
-    <template #header
-      ><span class="card-header-title">{{ t('DeclarationModal.title') }}</span></template
-    >
+    <template #header>
+      <span class="card-header-title">{{ t('DeclarationModal.title') }}</span>
+    </template>
     <template #footer>
       <NFlex justify="flex-end" align="center">
         <NButton @click="() => emits('confirm', showAgainChecked)" size="small" type="primary">{{
@@ -32,10 +32,9 @@
 
 <script setup lang="ts">
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NFlex, NModal } from 'naive-ui'
 import { ref } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

@@ -3,9 +3,9 @@
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
         <NCard size="small">
-          <template #header
-            ><span class="card-header-title">{{ t('AutoChampConfig.title') }}</span></template
-          >
+          <template #header>
+            <span class="card-header-title">{{ t('AutoChampConfig.title') }}</span>
+          </template>
           <ControlItem
             :label="t('AutoChampConfig.enabled.label')"
             :label-description="t('AutoChampConfig.enabled.description')"

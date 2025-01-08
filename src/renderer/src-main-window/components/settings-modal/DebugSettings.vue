@@ -26,9 +26,9 @@
       />
     </NModal>
     <NCard size="small">
-      <template #header
-        ><span class="card-header-title">{{ t('DebugSettings.electron.title') }}</span></template
-      >
+      <template #header>
+        <span class="card-header-title">{{ t('DebugSettings.electron.title') }}</span>
+      </template>
       <ControlItem
         class="control-item-margin"
         :label="t('DebugSettings.electron.devTools.label')"
@@ -51,9 +51,9 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header
-        ><span class="card-header-title">{{ t('DebugSettings.files.title') }}</span></template
-      >
+      <template #header>
+        <span class="card-header-title">{{ t('DebugSettings.files.title') }}</span>
+      </template>
       <ControlItem
         class="control-item-margin"
         :label="t('DebugSettings.files.logs.label')"
@@ -108,9 +108,9 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header
-        ><span class="card-header-title">{{ t('DebugSettings.lcuEvent.label') }}</span></template
-      >
+      <template #header>
+        <span class="card-header-title">{{ t('DebugSettings.lcuEvent.label') }}</span>
+      </template>
       <div class="operations">
         <NCheckbox size="small" class="check-box" v-model:checked="rds.printAll">{{
           t('DebugSettings.lcuEvent.printAll')
@@ -144,13 +144,13 @@
       </NCollapseTransition>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header
-        ><span class="card-header-title">{{
+      <template #header>
+        <span class="card-header-title">{{
           lc.connectionState === 'connected'
             ? t('DebugSettings.lcuConnection.titleConnected')
             : t('DebugSettings.lcuConnection.titleDisconnected')
-        }}</span></template
-      >
+        }}</span>
+      </template>
       <NTable size="small" bordered>
         <colgroup>
           <col style="width: 120px" />
@@ -193,9 +193,9 @@
       </NTable>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header
-        ><span class="card-header-title">{{ t('DebugSettings.gameflow.title') }}</span></template
-      >
+      <template #header>
+        <span class="card-header-title">{{ t('DebugSettings.gameflow.title') }}</span>
+      </template>
       <span class="text" v-if="lc.connectionState === 'connected'"
         >{{ gameflowText[lc.gameflow.phase || 'None'] }} ({{ lc.gameflow.phase }})</span
       >

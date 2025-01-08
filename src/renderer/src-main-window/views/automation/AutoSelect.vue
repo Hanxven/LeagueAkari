@@ -3,9 +3,9 @@
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
         <NCard size="small">
-          <template #header
-            ><span class="card-header-title">{{ t('AutoSelect.normalModeTitle') }}</span></template
-          >
+          <template #header>
+            <span class="card-header-title">{{ t('AutoSelect.normalModeTitle') }}</span>
+          </template>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoSelect.normalModeEnabled.label')"
@@ -112,9 +112,9 @@
           </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
-          <template #header
-            ><span class="card-header-title">{{ t('AutoSelect.benchModeTitle') }}</span></template
-          >
+          <template #header>
+            <span class="card-header-title">{{ t('AutoSelect.benchModeTitle') }}</span>
+          </template>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoSelect.benchModeEnabled.label')"
@@ -135,9 +135,9 @@
             <template #labelDescription>
               {{ t('AutoSelect.grabDelaySeconds.description.part1') }}
               <NTooltip>
-                <template #trigger
-                  ><span style="text-decoration: underline; font-weight: bold">(?)</span></template
-                >
+                <template #trigger>
+                  <span style="text-decoration: underline; font-weight: bold">(?)</span>
+                </template>
                 <div style="font-size: 12px; max-width: 300px">
                   {{ t('AutoSelect.grabDelaySeconds.description.part2') }}
                 </div>
@@ -204,9 +204,9 @@
           </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
-          <template #header
-            ><span class="card-header-title">{{ t('AutoSelect.banTitle') }}</span></template
-          >
+          <template #header>
+            <span class="card-header-title">{{ t('AutoSelect.banTitle') }}</span>
+          </template>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoSelect.banEnabled.label')"

@@ -1,10 +1,10 @@
 <template>
   <NCard size="small">
-    <template #header
-      ><span class="card-header-title">
+    <template #header>
+      <span class="card-header-title">
         {{ t('ChatAvailability.title') }}
-      </span></template
-    >
+      </span>
+    </template>
     <ControlItem
       class="control-item-margin"
       :label="t('ChatAvailability.availability.label')"
@@ -24,7 +24,9 @@
           <NRadio value="away">{{ t('ChatAvailability.availability.radio.away') }}</NRadio>
           <NRadio value="offline">{{ t('ChatAvailability.availability.radio.offline') }}</NRadio>
           <NRadio value="dnd">{{ t('ChatAvailability.availability.radio.dnd') }}</NRadio>
-          <NRadio value="spectating">{{ t('ChatAvailability.availability.radio.spectating') }}</NRadio>
+          <NRadio value="spectating">{{
+            t('ChatAvailability.availability.radio.spectating')
+          }}</NRadio>
           <NRadio value="online">{{ t('ChatAvailability.availability.radio.online') }}</NRadio>
         </NFlex>
       </NRadioGroup>
@@ -39,9 +41,8 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { AvailabilityType } from '@shared/http-api-axios-helper/league-client/chat'
-import { NCard, NFlex, NRadio, NRadioGroup } from 'naive-ui'
 import { useTranslation } from 'i18next-vue'
-
+import { NCard, NFlex, NRadio, NRadioGroup } from 'naive-ui'
 
 const { t } = useTranslation()
 

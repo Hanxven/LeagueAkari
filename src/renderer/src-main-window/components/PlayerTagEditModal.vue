@@ -1,8 +1,8 @@
 <template>
   <NModal v-model:show="show" preset="card" style="max-width: 60vw">
-    <template #header
-      ><span class="card-header-title">{{ t('PlayerTagEditModal.title') }}</span></template
-    >
+    <template #header>
+      <span class="card-header-title">{{ t('PlayerTagEditModal.title') }}</span>
+    </template>
     <template v-if="summoner">
       <div class="summoner-info">
         <LcuImage class="image" :src="profileIconUri(summoner.profileIconId)" />
@@ -11,9 +11,9 @@
         }}</span>
       </div>
     </template>
-    <template v-else
-      ><span style="font-size: 12px">{{ t('PlayerTagEditModal.loading') }}</span></template
-    >
+    <template v-else>
+      <span style="font-size: 12px">{{ t('PlayerTagEditModal.loading') }}</span>
+    </template>
     <div style="margin-top: 12px">
       <NInput
         v-model:value="text"
@@ -46,10 +46,9 @@ import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { PlayerTagDto } from '@renderer-shared/shards/saved-player'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { summonerName } from '@shared/utils/name'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NInput, NModal } from 'naive-ui'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

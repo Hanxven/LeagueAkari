@@ -1,8 +1,8 @@
 <template>
   <NCard size="small">
-    <template #header
-      ><span class="card-header-title">{{ t('SummonerProfile.title') }}</span></template
-    >
+    <template #header>
+      <span class="card-header-title">{{ t('SummonerProfile.title') }}</span>
+    </template>
     <NModal
       style="width: fit-content"
       preset="card"

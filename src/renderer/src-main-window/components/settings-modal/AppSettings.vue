@@ -1,9 +1,9 @@
 <template>
   <NScrollbar style="max-height: 65vh">
     <NCard size="small">
-      <template #header
-        ><span class="card-header-title">{{ t('AppSettings.basic.title') }}</span></template
-      >
+      <template #header>
+        <span class="card-header-title">{{ t('AppSettings.basic.title') }}</span>
+      </template>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.basic.mainWindowCloseAction.label')"
@@ -49,9 +49,9 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header
-        ><span class="card-header-title">{{ t('AppSettings.selfUpdate.title') }}</span></template
-      >
+      <template #header>
+        <span class="card-header-title">{{ t('AppSettings.selfUpdate.title') }}</span>
+      </template>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.selfUpdate.autoCheckUpdates.label')"
@@ -109,9 +109,9 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header
-        ><span class="card-header-title">{{ t('AppSettings.mainWindowUi.title') }}</span></template
-      >
+      <template #header>
+        <span class="card-header-title">{{ t('AppSettings.mainWindowUi.title') }}</span>
+      </template>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.label')"
@@ -122,9 +122,9 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header
-        ><span class="card-header-title">{{ t('AppSettings.lcConnection.title') }}</span></template
-      >
+      <template #header>
+        <span class="card-header-title">{{ t('AppSettings.lcConnection.title') }}</span>
+      </template>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.lcConnection.autoConnect.label')"
@@ -151,9 +151,9 @@
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header
-        ><span class="card-header-title">{{ t('AppSettings.misc.title') }}</span></template
-      >
+      <template #header>
+        <span class="card-header-title">{{ t('AppSettings.misc.title') }}</span>
+      </template>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.misc.disableHardwareAcceleration.label')"

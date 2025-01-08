@@ -1,8 +1,8 @@
 <template>
   <NCard size="small">
-    <template #header
-      ><span class="card-header-title">{{ t('FakeRanked.title') }}</span></template
-    >
+    <template #header>
+      <span class="card-header-title">{{ t('FakeRanked.title') }}</span>
+    </template>
     <ControlItem
       class="control-item-margin"
       :label="t('FakeRanked.set.label')"
@@ -53,10 +53,9 @@ import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
 import { computed, reactive } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

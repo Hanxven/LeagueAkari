@@ -81,11 +81,9 @@
             :status="processStatus.status"
           >
             <NStep>
-              <template #title
-                ><span class="step-title">{{
-                  t('AboutPane.updateProgress.downloading')
-                }}</span></template
-              >
+              <template #title>
+                <span class="step-title">{{ t('AboutPane.updateProgress.downloading') }}</span>
+              </template>
               <div class="step-description">
                 {{
                   t('AboutPane.updateProgress.finished', {
@@ -108,11 +106,9 @@
               </div>
             </NStep>
             <NStep>
-              <template #title
-                ><span class="step-title">{{
-                  t('AboutPane.updateProgress.unpacking')
-                }}</span></template
-              >
+              <template #title>
+                <span class="step-title">{{ t('AboutPane.updateProgress.unpacking') }}</span>
+              </template>
               <div class="step-description">
                 {{
                   t('AboutPane.updateProgress.finished', {
@@ -125,11 +121,11 @@
               </div>
             </NStep>
             <NStep>
-              <template #title
-                ><span class="step-title">{{
+              <template #title>
+                <span class="step-title">{{
                   t('AboutPane.updateProgress.waitingForRestart')
-                }}</span></template
-              >
+                }}</span>
+              </template>
               <div class="step-description">
                 {{ t('AboutPane.updateProgress.waitingForRestartDescription') }}
               </div>

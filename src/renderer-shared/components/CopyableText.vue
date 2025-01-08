@@ -12,9 +12,9 @@
 
 <script setup lang="ts">
 import { Copy as CopyIcon } from '@vicons/carbon'
+import { useTranslation } from 'i18next-vue'
 import { NIcon, useMessage } from 'naive-ui'
 import { useSlots } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 const {
   showMessage = true,
@@ -27,7 +27,6 @@ const {
   prefix?: string
   suffix?: string
 }>()
-
 
 const { t } = useTranslation()
 
@@ -51,7 +50,7 @@ const handleCopy = async () => {
       }
     }
   } else {
-    text = text?.toString() || ''
+    text = propText?.toString() || ''
   }
 
   try {

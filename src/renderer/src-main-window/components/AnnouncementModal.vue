@@ -6,8 +6,8 @@
     v-model:show="show"
     :class="$style['ann-modal']"
   >
-    <template #header
-      ><span class="card-header-title"
+    <template #header>
+      <span class="card-header-title"
         >{{ t('AnnouncementModal.title')
         }}<span style="font-size: 12px" v-if="sus.currentAnnouncement">
           ({{
@@ -16,8 +16,8 @@
               .fromNow()
           }})</span
         ></span
-      ></template
-    >
+      >
+    </template>
     <div>
       <NScrollbar
         style="max-height: 50vh"

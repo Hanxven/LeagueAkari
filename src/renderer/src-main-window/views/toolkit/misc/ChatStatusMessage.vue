@@ -1,8 +1,8 @@
 <template>
   <NCard size="small">
-    <template #header
-      ><span class="card-header-title">{{ t('ChatStatusMessage.title') }}</span></template
-    >
+    <template #header>
+      <span class="card-header-title">{{ t('ChatStatusMessage.title') }}</span>
+    </template>
     <ControlItem
       :label="t('ChatStatusMessage.message.label')"
       class="control-item-margin"
@@ -40,10 +40,9 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NInput, useMessage } from 'naive-ui'
 import { ref } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

@@ -3,9 +3,9 @@
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
         <NCard size="small">
-          <template #header
-            ><span class="card-header-title">{{ t('Client.leagueClient.title') }}</span></template
-          >
+          <template #header>
+            <span class="card-header-title">{{ t('Client.leagueClient.title') }}</span>
+          </template>
           <ControlItem
             class="control-item-margin"
             :label="t('Client.leagueClient.disconnect.label')"
@@ -38,9 +38,9 @@
           </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
-          <template #header
-            ><span class="card-header-title">{{ t('Client.gameClient.title') }}</span></template
-          >
+          <template #header>
+            <span class="card-header-title">{{ t('Client.gameClient.title') }}</span>
+          </template>
           <ControlItem
             class="control-item-margin"
             :label-description="t('Client.gameClient.terminateGameClientWithShortcut.description')"
@@ -104,9 +104,9 @@
           </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
-          <template #header
-            ><span class="card-header-title">{{ t('Client.leagueClientUx.title') }}</span></template
-          >
+          <template #header>
+            <span class="card-header-title">{{ t('Client.leagueClientUx.title') }}</span>
+          </template>
           <ControlItem
             class="control-item-margin"
             :disabled="!as.isAdministrator"

@@ -1,8 +1,8 @@
 <template>
   <NCard size="small">
-    <template #header
-      ><span class="card-header-title">{{ t('StrawberryTool.title') }}</span></template
-    >
+    <template #header>
+      <span class="card-header-title">{{ t('StrawberryTool.title') }}</span>
+    </template>
     <div v-if="lcs.lobby.lobby?.gameConfig.gameMode !== 'STRAWBERRY'" style="font-size: 13px">
       {{ t('StrawberryTool.unavailable') }}
     </div>
@@ -100,11 +100,10 @@ import {
   maybePveChampion
 } from '@shared/types/league-client/game-data'
 import { isChampionNameMatch } from '@shared/utils/string-match'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NSelect, SelectRenderLabel, useMessage } from 'naive-ui'
 import { h, shallowRef, watchEffect } from 'vue'
 import { computed, ref } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

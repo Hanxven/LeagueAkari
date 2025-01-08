@@ -1,10 +1,10 @@
 <template>
   <NCard size="small">
-    <template #header
-      ><span class="card-header-title">
+    <template #header>
+      <span class="card-header-title">
         {{ t('GameflowInProgress.title') }}
-      </span></template
-    >
+      </span>
+    </template>
     <!-- <ControlItem
       class="control-item-margin"
       :label="t('GameflowInProgress.dodge.label')"
@@ -51,10 +51,9 @@ import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

@@ -3,9 +3,9 @@
     <NScrollbar class="outer-wrapper" ref="el">
       <div class="inner-wrapper">
         <NCard size="small">
-          <template #header
-            ><span class="card-header-title">{{ t('AutoGameflow.title') }}</span></template
-          >
+          <template #header>
+            <span class="card-header-title">{{ t('AutoGameflow.title') }}</span>
+          </template>
           <ControlItem
             class="control-item-margin"
             :label="t('AutoGameflow.autoAcceptEnabled.label')"
@@ -276,6 +276,7 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/store'
+import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NCard,
@@ -288,7 +289,6 @@ import {
   NSwitch
 } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 const store = useAutoGameflowStore()
 const shard = useInstance<AutoGameflowRenderer>('auto-gameflow-renderer')
@@ -310,7 +310,6 @@ const handleChangeInvitationStrategies = (value: string[]) => {
 
   shard.setInvitationHandlingStrategies(newStrategies)
 }
-
 
 const { t } = useTranslation()
 

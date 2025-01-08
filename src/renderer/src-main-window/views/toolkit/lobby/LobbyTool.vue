@@ -1,8 +1,8 @@
 <template>
   <NCard size="small">
-    <template #header
-      ><span class="card-header-title">{{ t('LobbyTool.title') }}</span></template
-    >
+    <template #header>
+      <span class="card-header-title">{{ t('LobbyTool.title') }}</span>
+    </template>
     <ControlItem
       class="control-item-margin"
       :label="t('LobbyTool.addBot.label')"
@@ -99,10 +99,9 @@ import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { AvailableBot, QueueEligibility } from '@shared/types/league-client/lobby'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NFlex, NInput, NSelect, useMessage } from 'naive-ui'
 import { computed, reactive, ref, shallowRef } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

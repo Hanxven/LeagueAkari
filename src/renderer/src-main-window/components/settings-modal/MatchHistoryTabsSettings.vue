@@ -1,9 +1,9 @@
 <template>
   <NScrollbar style="max-height: 65vh">
     <NCard size="small">
-      <template #header
-        ><span class="card-header-title">{{ t('MatchHistoryTabsSettings.title') }}</span></template
-      >
+      <template #header>
+        <span class="card-header-title">{{ t('MatchHistoryTabsSettings.title') }}</span>
+      </template>
       <ControlItem
         class="control-item-margin"
         :label="t('MatchHistoryTabsSettings.refreshTabsAfterGameEnds.label')"

@@ -6,11 +6,11 @@
     v-model:show="show"
     :class="$style['settings-modal']"
   >
-    <template #header
-      ><span class="card-header-title">{{
+    <template #header>
+      <span class="card-header-title">{{
         showingNewUpdate ? t('UpdateModal.newVersion') : t('UpdateModal.versionFeatures')
-      }}</span></template
-    >
+      }}</span>
+    </template>
     <div v-if="sus.newUpdates">
       <div v-if="showingNewUpdate" class="para">
         {{
@@ -52,14 +52,13 @@
 <script setup lang="ts">
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { markdownIt } from '@renderer-shared/utils/markdown'
+import { useTranslation } from 'i18next-vue'
 import { NModal, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 defineProps<{
   showingNewUpdate?: boolean
 }>()
-
 
 const { t } = useTranslation()
 

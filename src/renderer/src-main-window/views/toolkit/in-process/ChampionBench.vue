@@ -1,8 +1,8 @@
 <template>
   <NCard size="small">
-    <template #header
-      ><span class="card-header-title">{{ t('ChampionBench.title') }}</span></template
-    >
+    <template #header>
+      <span class="card-header-title">{{ t('ChampionBench.title') }}</span>
+    </template>
     <div class="outer" v-if="benchChampions !== null">
       <div class="operations">
         <NButton
@@ -61,10 +61,9 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NDivider } from 'naive-ui'
 import { computed, ref } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

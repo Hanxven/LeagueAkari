@@ -3,9 +3,9 @@
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
         <NCard size="small">
-          <template #header
-            ><span class="card-header-title">{{ t('AutoMisc.autoReply.title') }}</span></template
-          >
+          <template #header>
+            <span class="card-header-title">{{ t('AutoMisc.autoReply.title') }}</span>
+          </template>
           <ControlItem
             :label="t('AutoMisc.autoReply.enabled.label')"
             class="control-item-margin"

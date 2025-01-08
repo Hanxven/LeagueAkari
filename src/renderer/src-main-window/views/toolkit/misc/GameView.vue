@@ -1,8 +1,8 @@
 <template>
   <NCard size="small">
-    <template #header
-      ><span class="card-header-title">{{ t('GameView.title') }}</span></template
-    >
+    <template #header>
+      <span class="card-header-title">{{ t('GameView.title') }}</span>
+    </template>
     <StandaloneMatchHistoryCardModal v-model:show="show" :game-id="viewingGameId" />
     <ControlItem
       class="control-item-margin"
@@ -22,12 +22,11 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import StandaloneMatchHistoryCardModal from '../../match-history/card/StandaloneMatchHistoryCardModal.vue'
-
 
 const { t } = useTranslation()
 

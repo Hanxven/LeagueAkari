@@ -1,15 +1,15 @@
 <template>
   <NCard size="small">
-    <template #header
-      ><span class="card-header-title"
+    <template #header>
+      <span class="card-header-title"
         >{{ t('Spectate.title')
         }}<span v-if="lcs.gameflow.phase === 'Lobby'" style="color: yellow; font-size: 14px">
           {{ t('Spectate.needToLeaveLobby') }}
           <NButton size="tiny" secondary @click="() => lc.api.lobby.deleteLobby()">{{
             t('Spectate.leaveButton')
           }}</NButton></span
-        ></span
-      ></template
+        >
+      </span></template
     >
     <ControlItem
       class="control-item-margin"
@@ -82,10 +82,9 @@ import { Friend } from '@shared/types/league-client/chat'
 import { summonerName } from '@shared/utils/name'
 import { useIntervalFn } from '@vueuse/core'
 import { AxiosError } from 'axios'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
 import { computed, onActivated, onDeactivated, reactive, ref } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

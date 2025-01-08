@@ -6,9 +6,9 @@
     v-model:show="show"
     :class="styles['settings-modal']"
   >
-    <template #header
-      ><span class="card-header-title">{{ t('SettingModal.title') }}</span></template
-    >
+    <template #header>
+      <span class="card-header-title">{{ t('SettingModal.title') }}</span>
+    </template>
     <NTabs ref="tabs" type="line" animated size="small" v-model:value="tabName">
       <NTabPane name="basic" :tab="t('AppSettings.title')">
         <AppSettings />
