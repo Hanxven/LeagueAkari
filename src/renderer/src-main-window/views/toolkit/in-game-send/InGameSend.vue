@@ -164,9 +164,29 @@
             :label="t('InGameSend.sendStats.dryRun.label')"
             :label-description="t('InGameSend.sendStats.dryRun.description')"
           >
-            <NButton :disabled="!as.isAdministrator" size="tiny" @click="handleDryRun" secondary>{{
-              t('InGameSend.sendStats.dryRun.button')
-            }}</NButton>
+            <div style="display: flex; gap: 4px">
+              <NButton
+                :disabled="!as.isAdministrator"
+                size="tiny"
+                @click="handleDryRun('all')"
+                secondary
+                >{{ t('InGameSend.sendStats.dryRun.button') }}</NButton
+              >
+              <NButton
+                :disabled="!as.isAdministrator"
+                size="tiny"
+                @click="handleDryRun('ally')"
+                secondary
+                >{{ t('InGameSend.sendStats.dryRun.buttonAllies') }}</NButton
+              >
+              <NButton
+                :disabled="!as.isAdministrator"
+                size="tiny"
+                @click="handleDryRun('enemy')"
+                secondary
+                >{{ t('InGameSend.sendStats.dryRun.buttonEnemies') }}</NButton
+              >
+            </div>
           </ControlItem>
         </NCard>
         <NCard size="small" style="margin-top: 8px">
@@ -419,8 +439,8 @@ const handleSaveTemplate = async (template: string) => {
   inputEl.value?.blur()
 }
 
-const handleDryRun = async () => {
-  const { data, error, reason, extra } = await ig.dryRunStatsSend()
+const handleDryRun = async (target: string) => {
+  const { data, error, reason, extra } = await ig.dryRunStatsSend(target)
   if (error) {
     switch (reason) {
       case 'not-compiled':

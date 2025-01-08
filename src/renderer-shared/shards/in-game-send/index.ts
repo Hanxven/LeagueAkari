@@ -87,7 +87,7 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'sendInterval', interval)
   }
 
-  dryRunStatsSend(): Promise<
+  dryRunStatsSend(target = 'all'): Promise<
     {
       data: string[]
     } & (
@@ -95,7 +95,7 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
       | { error: false; reason: null; extra: string }
     )
   > {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'dryRunStatsSend')
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'dryRunStatsSend', target)
   }
 
   onSendCustomTemplateError(cb: (message: string) => void) {

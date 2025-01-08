@@ -1650,6 +1650,8 @@ InGameSend:
       label: Dry Run
       description: Preview the output at the current point in time
       button: Dry Run
+      buttonAllies: Dry Run (Allies)
+      buttonEnemies: Dry Run (Enemies)
 
   customSend:
     title: Custom Sending

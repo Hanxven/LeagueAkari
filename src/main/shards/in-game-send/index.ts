@@ -465,8 +465,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
       return this._updateSendStatsTemplate(template)
     })
 
-    this._ipc.onCall(InGameSendMain.id, 'dryRunStatsSend', () => {
-      return this._dryRunStatsSend()
+    this._ipc.onCall(InGameSendMain.id, 'dryRunStatsSend', (target) => {
+      return this._dryRunStatsSend(target)
     })
   }
 
@@ -677,7 +677,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
   /**
    * 仅用于测试发送内容, 返回字符串
    */
-  private async _dryRunStatsSend() {
+  private async _dryRunStatsSend(target = 'all') {
     if (this._og.state.queryStage.phase === 'unavailable') {
       this._log.warn('Dry-Run: 当前不在可发送阶段，无数据')
       return { error: true, reason: 'stage-unavailable', data: [] }
@@ -698,7 +698,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
           this._eta,
           this._createTemplateEnv({
             akariVersion: this._shared.global.version,
-            target: 'all'
+            target: target as 'ally' | 'enemy' | 'all'
           })
         )
         .split('\n')

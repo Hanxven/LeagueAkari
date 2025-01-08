@@ -1656,6 +1656,8 @@ InGameSend:
       label: 试运行
       description: 当前时间节点的即将输出内容
       button: 试运行
+      buttonAllies: 试运行 (友方)
+      buttonEnemies: 试运行 (敌方)
 
   customSend:
     title: 自定义发送
