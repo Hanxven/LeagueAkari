@@ -11,14 +11,13 @@
 import { useInstance } from '@renderer-shared/shards'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
+import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import leagueIco from '@main-window/assets/ico/league.ico'
 import riotClient from '@main-window/assets/ico/riotclient.ico'
 import weGameIco from '@main-window/assets/ico/wegame.ico'
-
 
 const { t } = useTranslation()
 
@@ -54,8 +53,7 @@ const launchItem = computed(() => {
     arr.push({
       name: t('EasyToLaunch.weGame'),
       imgUrl: weGameIco,
-      launch: () =>
-        launchIt(ci.launchWeGameLeagueOfLegends.bind(ci), t('EasyToLaunch.weGame'))
+      launch: () => launchIt(ci.launchWeGameLeagueOfLegends.bind(ci), t('EasyToLaunch.weGame'))
     })
   }
 
@@ -93,14 +91,9 @@ const launchItem = computed(() => {
   display: flex;
   align-items: center;
   border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.05);
   padding: 8px 16px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
 
   .logo {
     width: 28px;
@@ -112,7 +105,34 @@ const launchItem = computed(() => {
     font-weight: bold;
     font-size: 14px;
     width: 96px;
-    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+[data-theme='dark'] {
+  .launch-item {
+    background-color: rgba(255, 255, 255, 0.05);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .label {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+}
+
+[data-theme='light'] {
+  .launch-item {
+    background-color: rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .label {
+      color: rgba(0, 0, 0, 0.8);
+    }
   }
 }
 </style>

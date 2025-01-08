@@ -18,6 +18,10 @@
   --background-color-primary: #1a1a1d;
 }
 
+[data-theme='light'] {
+  --background-color-primary: #f9f9f9;
+}
+
 ::-webkit-scrollbar {
   width: var(--scroll-bar-width);
   height: var(--scroll-bar-height);
@@ -46,15 +50,12 @@ body,
 body {
   // 防止一些使用绝对布局的元素溢出，产生多余的滚动条
   overflow: hidden;
+  background-color: var(--background-color-primary);
 }
 
 body {
   user-select: none;
   line-height: normal;
-}
-
-[data-theme='dark'] body {
-  background-color: var(--background-color-primary);
 }
 
 [data-theme='dark'] {

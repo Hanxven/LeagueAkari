@@ -401,8 +401,9 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
 
 .mh-tabs {
   display: flex;
+  padding-top: 4px;
+  box-sizing: border-box;
   flex: 1;
-  width: 0;
   height: 100%;
   align-items: center;
   width: max-content;
@@ -410,13 +411,14 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
 }
 
 .tab {
-  height: 24px;
+  height: 100%;
   display: flex;
   align-items: center;
   flex-shrink: 0;
   padding: 0 4px 0 8px;
   box-sizing: border-box;
-  border-radius: 2px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
   cursor: pointer;
   user-select: none;
   transition:
@@ -631,7 +633,9 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
 
     &.active {
       background-color: rgba(0, 0, 0, 0);
-      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-top: 1px solid rgba(0, 0, 0, 0.2);
+      border-left: 1px solid rgba(0, 0, 0, 0.2);
+      border-right: 1px solid rgba(0, 0, 0, 0.2);
     }
 
     &.drag-hover {

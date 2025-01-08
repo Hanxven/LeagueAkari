@@ -42,9 +42,9 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 import { computed, onActivated, onDeactivated, useTemplateRef, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import EasyToLaunch from '@main-window/components/EasyToLaunch.vue'
@@ -53,7 +53,6 @@ import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 
 import MatchHistoryTab from './MatchHistoryTab.vue'
-
 
 const { t } = useTranslation()
 
@@ -263,6 +262,62 @@ mh.events.on('screenshot-tab', (tabId: string) => {
       margin-left: 4px;
       font-size: 14px;
       color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}
+
+[data-theme='dark'] {
+  .tabs-placeholder {
+    .disconnected {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .no-tab {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .shortcut {
+      background-color: rgba(255, 255, 255, 0.06);
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.12);
+      }
+
+      .shortcut-game-name {
+        color: rgba(255, 255, 255, 0.95);
+      }
+
+      .shortcut-tag-line {
+        color: rgba(255, 255, 255, 0.4);
+      }
+    }
+  }
+}
+
+[data-theme='light'] {
+  .tabs-placeholder {
+    .disconnected {
+      color: rgba(0, 0, 0, 0.4);
+    }
+
+    .no-tab {
+      color: rgba(0, 0, 0, 0.4);
+    }
+
+    .shortcut {
+      background-color: rgba(0, 0, 0, 0.06);
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.12);
+      }
+
+      .shortcut-game-name {
+        color: rgba(0, 0, 0, 0.95);
+      }
+
+      .shortcut-tag-line {
+        color: rgba(0, 0, 0, 0.4);
+      }
     }
   }
 }
