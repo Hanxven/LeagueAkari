@@ -61,6 +61,13 @@ AppSettings:
         quit: 退出应用
         ask: 每次询问
 
+    backgroundMaterial:
+      label: 背景材质
+      description: 设置应用界面的背景材质，需特定系统版本支持
+      options:
+        none: 默认
+        mica: Mica
+
   selfUpdate:
     title: 应用更新
     tip:
@@ -85,7 +92,7 @@ AppSettings:
 
     useProfileSkinAsBackground:
       label: 使用生涯皮肤背景
-      description: League Akari 将使用当前玩家的生涯背景皮肤作为背景
+      description: League Akari 将使用当前玩家的生涯背景皮肤作为背景。当背景材质被设置时，该选项将被不会生效
 
   lcConnection:
     title: LCU 连接

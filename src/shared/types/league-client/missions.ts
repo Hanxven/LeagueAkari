@@ -198,3 +198,49 @@ interface Display {
   attributes: string[]
   locations: string[]
 }
+
+export interface MissionData {
+  level: number
+  loyaltyEnabled: boolean
+  playerInventory: PlayerInventory
+  userInfoToken: null
+}
+
+interface PlayerInventory {
+  champions: any[]
+  icons: any[]
+  inventoryJwts: string[]
+  skins: any[]
+  wardSkins: any[]
+}
+
+export interface MissionSeries {
+  createdDate: number
+  description: string
+  displayType: string
+  eligibilityType: string
+  endDate: number
+  id: string
+  internalName: string
+  lastUpdatedTimestamp: number
+  media: Media
+  optInButtonText: string
+  optOutButtonText: string
+  parentInternalName: string
+  startDate: number
+  status: string
+  tags: string[]
+  title: string
+  type: string
+  viewed: boolean
+  warnings: any[]
+}
+
+interface Media {
+  accentColor: string
+  backgroundImageLargeUrl: string
+  backgroundImageSmallUrl: string
+  backgroundUrl: string
+  trackerIcon: string
+  trackerIconUrl: string
+}

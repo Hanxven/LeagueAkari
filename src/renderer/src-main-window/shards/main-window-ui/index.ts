@@ -2,9 +2,11 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
+import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { computed, effectScope, watch } from 'vue'
 
+import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
 import { router } from '@main-window/routes'
 
 import { useMatchHistoryTabsStore } from '../match-history-tabs/store'
@@ -43,10 +45,16 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     const mui = useMainWindowUiStore()
     const mhs = useMatchHistoryTabsStore()
 
+    const preferMica = useMicaAvailability()
+
     watch(
-      [() => lcs.summoner.profile, () => mui.settings.useProfileSkinAsBackground],
-      async ([profile, enabled]) => {
-        if (!enabled) {
+      [
+        () => lcs.summoner.profile,
+        () => mui.settings.useProfileSkinAsBackground,
+        () => preferMica.value
+      ],
+      async ([profile, enabled, preferMica]) => {
+        if (!enabled || preferMica) {
           mui.backgroundSkinUrl = ''
           return
         }

@@ -134,12 +134,8 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'auxWindowShowSkinSelector', value)
   }
 
-  setMainWindowBackgroundMaterial(value: string) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'main-window/setBackgroundMaterial', value)
-  }
-
-  setAuxWindowBackgroundMaterial(value: string) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'aux-window/setBackgroundMaterial', value)
+  setBackgroundMaterial(value: string) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'backgroundMaterial', value)
   }
 
   mainWindowOpenDialog(

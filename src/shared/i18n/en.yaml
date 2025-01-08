@@ -59,6 +59,13 @@ AppSettings:
         quit: Quit
         ask: Ask every time
 
+    backgroundMaterial:
+      label: Background Material
+      description: Set the background material of the application interface, requires specific system version support
+      options:
+        none: Default
+        mica: Mica
+
   selfUpdate:
     title: Application Update
     tip:
@@ -82,7 +89,7 @@ AppSettings:
     title: Main Window UI
     useProfileSkinAsBackground:
       label: Use Profile Skin as Background
-      description: League Akari will use the current player's profile background skin as the background
+      description: League Akari will use the current player's profile background skin as the background. If the background texture is set, this option will not take effect
 
   lcConnection:
     title: LCU Connection

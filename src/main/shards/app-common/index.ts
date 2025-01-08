@@ -1,7 +1,7 @@
 import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
-import { app, dialog, nativeImage, shell } from 'electron'
+import { app, nativeImage, nativeTheme, shell } from 'electron'
 import { clipboard } from 'electron'
 
 import { AkariIpcMain } from '../ipc'
@@ -119,6 +119,18 @@ export class AppCommonMain implements IAkariShardInitDispose {
       () => this.settings.locale,
       (locale) => {
         i18next.changeLanguage(locale)
+      },
+      { fireImmediately: true }
+    )
+
+    this._mobx.reaction(
+      () => this.settings.theme,
+      (theme) => {
+        if (theme === 'default') {
+          nativeTheme.themeSource = 'system'
+        } else {
+          nativeTheme.themeSource = theme
+        }
       },
       { fireImmediately: true }
     )

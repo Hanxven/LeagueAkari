@@ -20,7 +20,7 @@
         <RankedTable v-if="tab.rankedStats" :ranked-stats="tab.rankedStats" />
       </div>
     </NModal>
-    <Transition name="fade">
+    <Transition name="bi-fade">
       <div class="player-header-simplified" v-if="shouldShowTinyHeader">
         <div class="header-simplified-inner">
           <LcuImage
@@ -1868,5 +1868,20 @@ defineExpose({
   .lose {
     color: #c76713;
   }
+}
+
+.bi-fade-enter-from,
+.bi-fade-leave-to {
+  opacity: 0;
+}
+
+.bi-fade-enter-active,
+.bi-fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.bi-fade-enter-to,
+.bi-fade-leave-from {
+  opacity: 1;
 }
 </style>

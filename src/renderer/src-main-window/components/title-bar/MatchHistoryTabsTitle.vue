@@ -425,7 +425,7 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
     background-color 0.2s,
     filter 0.2s;
   line-height: 1;
-  filter: brightness(0.55);
+  filter: brightness(0.7);
   box-sizing: border-box;
   border: 1px solid rgba(0, 0, 0, 0);
 
@@ -480,6 +480,8 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
   }
 
   &.active {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
     filter: brightness(1);
   }
 
@@ -530,7 +532,7 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
 
 [data-theme='dark'] {
   .tab {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
 
     &:hover {
       background-color: rgba(255, 255, 255, 0.1);

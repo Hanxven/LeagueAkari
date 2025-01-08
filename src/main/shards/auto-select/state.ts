@@ -24,7 +24,7 @@ export class AutoSelectSettings {
   benchHandleTradeEnabled: boolean = false
   benchHandleTradeIgnoreChampionOwner: boolean = true
   benchExpectedChampions: number[] = []
-  grabDelaySeconds: number = 1
+  grabDelaySeconds: number = 2.9
   banEnabled: boolean = false
   banDelaySeconds: number = 0
   bannedChampions: Record<string, number[]> = {

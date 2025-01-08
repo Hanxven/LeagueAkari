@@ -843,28 +843,37 @@ import {
   RANKED_MEDAL_MAP
 } from './ongoing-game-utils'
 
-const { puuid, analysis, matchHistory, position, premadeTeamId, summoner, rankedStats, savedInfo } =
-  defineProps<{
-    puuid: string
-    championId?: number
-    isSelf?: boolean
-    premadeTeamId?: string
-    currentHighlightingPremadeTeamId?: string | null
-    team?: string
-    queueType?: string
-    position?: {
-      position: string
-      role: ParsedRole | null
-    }
-    summoner?: SummonerInfo
-    rankedStats?: RankedStats
-    championMastery?: Record<number, Mastery>
-    matchHistory?: MatchHistoryGameWithState[]
-    matchHistoryLoading?: string
-    analysis?: MatchHistoryGamesAnalysisAll
-    savedInfo?: SavedInfo
-    queryStage: QueryStage
-  }>()
+const {
+  puuid,
+  analysis,
+  matchHistory,
+  position,
+  premadeTeamId,
+  summoner,
+  rankedStats,
+  savedInfo,
+  championMastery
+} = defineProps<{
+  puuid: string
+  championId?: number
+  isSelf?: boolean
+  premadeTeamId?: string
+  currentHighlightingPremadeTeamId?: string | null
+  team?: string
+  queueType?: string
+  position?: {
+    position: string
+    role: ParsedRole | null
+  }
+  summoner?: SummonerInfo
+  rankedStats?: RankedStats
+  championMastery?: Record<number, Mastery>
+  matchHistory?: MatchHistoryGameWithState[]
+  matchHistoryLoading?: string
+  analysis?: MatchHistoryGamesAnalysisAll
+  savedInfo?: SavedInfo
+  queryStage: QueryStage
+}>()
 
 const emits = defineEmits<{
   toSummoner: [puuid: string]

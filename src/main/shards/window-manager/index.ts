@@ -85,7 +85,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
         auxWindowAutoShow: { default: this.settings.auxWindowAutoShow },
         auxWindowOpacity: { default: this.settings.auxWindowOpacity },
         auxWindowPinned: { default: this.settings.auxWindowPinned },
-        auxWindowShowSkinSelector: { default: this.settings.auxWindowShowSkinSelector }
+        auxWindowShowSkinSelector: { default: this.settings.auxWindowShowSkinSelector },
+        backgroundMaterial: { default: this.settings.backgroundMaterial }
       },
       this.settings
     )
@@ -106,7 +107,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       'auxWindowFocus',
       'auxWindowReady',
       'auxWindowFunctionality',
-      'auxWindowStatus'
+      'auxWindowStatus',
+      'supportsMica'
     ])
 
     this._mobx.propSync(WindowManagerMain.id, 'settings', this.settings, [
@@ -115,7 +117,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       'auxWindowAutoShow',
       'auxWindowOpacity',
       'auxWindowPinned',
-      'auxWindowShowSkinSelector'
+      'auxWindowShowSkinSelector',
+      'backgroundMaterial'
     ])
 
     this._setting.onChange('auxWindowPinned', (value, { setter }) => {
@@ -204,10 +207,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       }
     )
 
-    this._ipc.onCall(WindowManagerMain.id, 'main-window/setBackgroundMaterial', (material) => {
-      this._mw?.setBackgroundMaterial(material)
-    })
-
     this._ipc.onCall(
       WindowManagerMain.id,
       'main-window/openDialog',
@@ -285,10 +284,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._ipc.onCall(WindowManagerMain.id, 'aux-window/getWindowSize', () => {
       const [width, height] = this._aw?.getSize() || []
       return { width, height }
-    })
-
-    this._ipc.onCall(WindowManagerMain.id, 'aux-window/setBackgroundMaterial', (material) => {
-      this._aw?.setBackgroundMaterial(material)
     })
 
     this._ipc.onCall(
@@ -429,6 +424,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       autoHideMenuBar: false,
       icon,
       fullscreenable: false,
+      backgroundMaterial: this._settingToNativeBackgroundMaterial(this.settings.backgroundMaterial),
       webPreferences: {
         preload: join(__dirname, '../preload/index.js'),
         sandbox: false,
@@ -890,6 +886,19 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       },
       { delay: 500 }
     )
+
+    this._mobx.reaction(
+      () => this.settings.backgroundMaterial,
+      (material) => {
+        if (!this._mw) {
+          return
+        }
+
+        const m = this._settingToNativeBackgroundMaterial(material)
+        this._mw.setBackgroundMaterial(m)
+      },
+      { fireImmediately: true }
+    )
   }
 
   createAuxWindow() {
@@ -961,5 +970,20 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     })
     this.state.setShardsReady(true)
     this.createMainWindow()
+  }
+
+  /**
+   * 设置项的背景材质转换为原生系统级别背景材质
+   */
+  private _settingToNativeBackgroundMaterial(material: string) {
+    if (!this.state.supportsMica) {
+      return 'auto'
+    }
+
+    if (material === 'mica') {
+      return 'mica'
+    }
+
+    return 'auto'
   }
 }

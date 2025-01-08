@@ -1,5 +1,10 @@
 <template>
-  <div id="app-frame">
+  <div
+    id="app-frame"
+    :class="{
+      'use-plain-bg': !preferMica
+    }"
+  >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
     <UpdateModal v-model:show="isShowingNewUpdateModal" :showing-new-update="isShowingNewUpdate" />
     <AnnouncementModal v-model:show="isShowingAnnouncementModal" />
@@ -9,9 +14,12 @@
     />
     <Transition name="bg-fade">
       <div
+        v-if="!preferMica"
         :key="muis.tabBackgroundSkinUrl || muis.backgroundSkinUrl"
         class="background-wallpaper"
-        :class="{ 'no-image': !muis.backgroundSkinUrl && !muis.tabBackgroundSkinUrl }"
+        :class="{
+          'no-image': !muis.backgroundSkinUrl && !muis.tabBackgroundSkinUrl
+        }"
         :style="{
           backgroundImage: `url('${muis.tabBackgroundSkinUrl || muis.backgroundSkinUrl}')`
         }"
@@ -42,6 +50,7 @@ import DeclarationModal from './components/DeclarationModal.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
+import { useMicaAvailability } from './compositions/useMicaAvailability'
 import { useMainWindowUiStore } from './shards/main-window-ui/store'
 
 setupNaiveUiNotificationEvents()
@@ -195,6 +204,8 @@ useKeyboardCombo('AKARI', {
   caseSensitive: false,
   maxInterval: 250
 })
+
+const preferMica = useMicaAvailability()
 </script>
 
 <style lang="less">
@@ -204,6 +215,10 @@ useKeyboardCombo('AKARI', {
   flex-direction: column;
   min-width: var(--app-min-width);
   min-height: var(--app-min-height);
+
+  &.use-plain-bg {
+    background-color: var(--background-color-primary);
+  }
 
   > #app-content {
     height: 0;
@@ -220,7 +235,7 @@ useKeyboardCombo('AKARI', {
   height: 100%;
   background-size: cover;
   background-position: center;
-  z-index: -1;
+  z-index: 0;
 
   &::before {
     content: '';

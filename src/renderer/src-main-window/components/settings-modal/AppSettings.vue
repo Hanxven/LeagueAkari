@@ -47,6 +47,20 @@
           :options="themes"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.basic.backgroundMaterial.label')"
+        :label-description="t('AppSettings.basic.backgroundMaterial.description')"
+        :label-width="320"
+      >
+        <NSelect
+          style="width: 160px"
+          size="small"
+          :value="wms.settings.backgroundMaterial"
+          @update:value="(val) => wm.setBackgroundMaterial(val)"
+          :options="backgroundMaterials"
+        />
+      </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header>
@@ -117,8 +131,13 @@
         :label="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.label')"
         :label-description="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.description')"
         :label-width="320"
+        :disabled="preferMica"
       >
-        <NSwitch size="small" v-model:value="muis.settings.useProfileSkinAsBackground" />
+        <NSwitch
+          :disabled="preferMica"
+          size="small"
+          v-model:value="muis.settings.useProfileSkinAsBackground"
+        />
       </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
@@ -187,6 +206,7 @@ import { useTranslation } from 'i18next-vue'
 import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip, useDialog } from 'naive-ui'
 import { computed } from 'vue'
 
+import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 
 const { t } = useTranslation()
@@ -203,6 +223,8 @@ const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
 const app = useInstance<AppCommonRenderer>('app-common-renderer')
 const lcu = useInstance<LeagueClientUxRenderer>('league-client-ux-renderer')
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+
+const preferMica = useMicaAvailability()
 
 const closeActions = computed(() => {
   return [
@@ -231,6 +253,12 @@ const themes = [
   { label: '暗色', value: 'dark' }
 ]
 
+const backgroundMaterials = computed(() => {
+  return [
+    { label: '默认', value: 'none' },
+    { label: 'Mica', value: 'mica', disabled: !wms.supportsMica }
+  ]
+})
 const dialog = useDialog()
 const handleDisableHardwareAcceleration = (val: boolean) => {
   dialog.warning({

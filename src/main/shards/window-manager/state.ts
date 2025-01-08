@@ -40,6 +40,8 @@ export class WindowManagerSettings {
    */
   auxWindowShowSkinSelector: boolean = false
 
+  backgroundMaterial: 'mica' | 'none' = 'none'
+
   setAuxWindowOpacity(opacity: number) {
     this.auxWindowOpacity = opacity
   }
@@ -62,6 +64,10 @@ export class WindowManagerSettings {
 
   setAuxWindowEnabled(enabled: boolean) {
     this.auxWindowEnabled = enabled
+  }
+
+  setBackgroundMaterial(material: 'mica' | 'none') {
+    this.backgroundMaterial = material
   }
 
   constructor() {
