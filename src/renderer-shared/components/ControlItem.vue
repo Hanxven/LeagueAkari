@@ -12,7 +12,7 @@
         {{ labelDescription }}
       </div>
     </div>
-    <div class="control"><slot name="default"></slot></div>
+    <div class="control"><slot></slot></div>
   </div>
 </template>
 
@@ -24,6 +24,10 @@ const { align = 'center' } = defineProps<{
   labelDescription?: string
   disabled?: boolean
 }>()
+
+defineOptions({
+  __akari_isControlItem: true
+})
 </script>
 
 <style lang="less" scoped>

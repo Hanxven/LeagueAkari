@@ -23,6 +23,7 @@ import { gte, lt, valid } from 'semver'
 import sevenBinPath from '../../../../resources/7za.exe?asset'
 import icon from '../../../../resources/LA_ICON.ico?asset'
 import updateExecutablePath from '../../../../resources/akari-updater.exe?asset'
+import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -37,6 +38,7 @@ import { SelfUpdateSettings, SelfUpdateState } from './state'
 export class SelfUpdateMain implements IAkariShardInitDispose {
   static id = 'self-update-main'
   static dependencies = [
+    'app-common-main',
     'akari-ipc-main',
     'mobx-utils-main',
     'logger-factory-main',
@@ -60,6 +62,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   public readonly settings = new SelfUpdateSettings()
   public readonly state = new SelfUpdateState()
 
+  private readonly _app: AppCommonMain
   private readonly _ipc: AkariIpcMain
   private readonly _mobx: MobxUtilsMain
   private readonly _loggerFactory: LoggerFactoryMain
@@ -78,6 +81,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   private _currentUpdateTaskCanceler: (() => void) | null = null
 
   constructor(deps: any) {
+    this._app = deps['app-common-main']
     this._ipc = deps['akari-ipc-main']
     this._mobx = deps['mobx-utils-main']
     this._loggerFactory = deps['logger-factory-main']
@@ -663,6 +667,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   async onInit() {
     await this._handleState()
     await this._checkLastFailedUpdate()
+    this._handleUpdateHttpProxy()
     this._handlePeriodicCheck()
     this._handleIpcCall()
   }
@@ -735,5 +740,22 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     } catch (error) {
       this._log.warn('检查更新标志时出现错误', error)
     }
+  }
+
+  private _handleUpdateHttpProxy() {
+    this._mobx.reaction(
+      () => this._app.settings.httpProxy,
+      (httpProxy) => {
+        if (httpProxy.enabled) {
+          this._http.defaults.proxy = {
+            host: httpProxy.host,
+            port: httpProxy.port
+          }
+        } else {
+          this._http.defaults.proxy = undefined
+        }
+      },
+      { fireImmediately: true }
+    )
   }
 }

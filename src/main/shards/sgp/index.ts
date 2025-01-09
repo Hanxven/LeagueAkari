@@ -14,6 +14,7 @@ import { isAxiosError } from 'axios'
 import fs from 'node:fs'
 
 import builtinSgpServersJson from '../../../../resources/builtin-config/sgp/mh-sgp-servers.json?commonjs-external&asset'
+import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -82,6 +83,7 @@ const SCHEMA = {
 export class SgpMain implements IAkariShardInitDispose {
   static id = 'sgp-main'
   static dependencies = [
+    'app-common-main',
     'logger-factory-main',
     'setting-factory-main',
     'mobx-utils-main',
@@ -93,17 +95,19 @@ export class SgpMain implements IAkariShardInitDispose {
 
   public readonly state: SgpState
 
-  private _loggerFactory: LoggerFactoryMain
-  private _settingFactory: SettingFactoryMain
-  private _log: AkariLogger
-  private _setting: SetterSettingService
-  private _mobx: MobxUtilsMain
-  private _lc: LeagueClientMain
-  private _ipc: AkariIpcMain
+  private readonly _app: AppCommonMain
+  private readonly _loggerFactory: LoggerFactoryMain
+  private readonly _settingFactory: SettingFactoryMain
+  private readonly _log: AkariLogger
+  private readonly _setting: SetterSettingService
+  private readonly _mobx: MobxUtilsMain
+  private readonly _lc: LeagueClientMain
+  private readonly _ipc: AkariIpcMain
 
   private readonly _sgp = new SgpApi()
 
   constructor(deps: any) {
+    this._app = deps['app-common-main']
     this._loggerFactory = deps['logger-factory-main']
     this._settingFactory = deps['setting-factory-main']
     this._mobx = deps['mobx-utils-main']
@@ -121,6 +125,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._mobx.propSync(SgpMain.id, 'state', this.state, ['availability', 'isTokenReady'])
 
     this._handleIpcCall()
+    this._handleUpdateHttpProxy()
     this._handleUpdateSupportedInfo()
     this._maintainEntitlementsToken()
     this._maintainLolLeagueSessionToken()
@@ -713,6 +718,23 @@ export class SgpMain implements IAkariShardInitDispose {
         this._log.info(`更新 Lol League Session Token: ${copied}`)
 
         this._sgp.setLolLeagueSessionToken(token)
+      },
+      { fireImmediately: true }
+    )
+  }
+
+  private _handleUpdateHttpProxy() {
+    this._mobx.reaction(
+      () => this._app.settings.httpProxy,
+      (httpProxy) => {
+        if (httpProxy.enabled) {
+          this._sgp.http.defaults.proxy = {
+            host: httpProxy.host,
+            port: httpProxy.port
+          }
+        } else {
+          this._sgp.http.defaults.proxy = undefined
+        }
       },
       { fireImmediately: true }
     )

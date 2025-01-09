@@ -1471,9 +1471,9 @@ defineExpose({
   right: 0;
   height: 64px;
   z-index: 1;
-  background-color: rgba(#000, 0.4);
+  background-color: rgba(#000, 0.6);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
 
   .header-simplified-inner {
     display: flex;

@@ -142,13 +142,10 @@ export class RiotClientMain implements IAkariShardInitDispose {
       },
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,
-        keepAlive: true,
-        maxCachedSessions: 2048,
-        maxFreeSockets: 1024
+        keepAlive: true
       }),
       httpAgent: new https.Agent({
-        keepAlive: true,
-        maxFreeSockets: 1024
+        keepAlive: true
       }),
       timeout: RiotClientMain.REQUEST_TIMEOUT_MS,
       proxy: false

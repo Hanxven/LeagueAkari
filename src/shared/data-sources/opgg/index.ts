@@ -33,6 +33,10 @@ export class OpggDataApi {
     // }
   })
 
+  get http() {
+    return this._http
+  }
+
   constructor() {
     _axiosRetry(this._http, {
       retries: 2, // set it to 2 in order to fast fail

@@ -165,6 +165,7 @@ import OpggIcon from '@aux-window/assets/icon/OpggIcon.vue'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useStableComputed } from '@renderer-shared/compositions/useStableComputed'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
@@ -186,6 +187,7 @@ import {
   Settings as SettingsIcon
 } from '@vicons/ionicons5'
 import { useLocalStorage, useMediaQuery, watchDebounced } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NFlex,
@@ -198,12 +200,10 @@ import {
   SelectRenderLabel,
   useMessage
 } from 'naive-ui'
-import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watchEffect } from 'vue'
-import { useTranslation } from 'i18next-vue'
+import { computed, h, onErrorCaptured, onMounted, ref, shallowRef, watch, watchEffect } from 'vue'
 
 import OpggChampion from './OpggChampion.vue'
 import OpggTier from './OpggTier.vue'
-
 
 const { t } = useTranslation()
 
@@ -213,6 +213,8 @@ const lcs = useLeagueClientStore()
 
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const log = useInstance<LoggerRenderer>('logger-renderer')
+
+const as = useAppCommonStore()
 
 const savedPreferences = useLocalStorage('opgg-preferences', {
   mode: 'ranked',
@@ -256,6 +258,21 @@ watchEffect(async () => {
     version.value = versions.value[0]
   }
 })
+
+watch(
+  () => as.settings.httpProxy,
+  (httpProxy) => {
+    if (httpProxy) {
+      opgg.http.defaults.proxy = {
+        host: httpProxy.host,
+        port: httpProxy.port
+      }
+    } else {
+      opgg.http.defaults.proxy = false
+    }
+  },
+  { immediate: true }
+)
 
 const tierData = shallowRef<
   OpggARAMChampionSummary | OpggRankedChampionsSummary | OpggArenaChampionSummary | null

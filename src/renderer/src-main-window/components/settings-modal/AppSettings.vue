@@ -175,6 +175,51 @@
       </template>
       <ControlItem
         class="control-item-margin"
+        :label="t('AppSettings.misc.httpProxy.enabled.label')"
+        :label-description="t('AppSettings.misc.httpProxy.enabled.description')"
+        :label-width="320"
+      >
+        <NSwitch
+          size="small"
+          :value="as.settings.httpProxy.enabled"
+          @update:value="(val) => updateHttpProxySettings({ enabled: val })"
+        />
+      </ControlItem>
+      <ControlItem
+        v-if="as.settings.httpProxy.enabled"
+        class="control-item-margin"
+        :label="t('AppSettings.misc.httpProxy.host.label')"
+        :label-description="t('AppSettings.misc.httpProxy.host.description')"
+        :label-width="320"
+      >
+        <NInput
+          :value="as.settings.httpProxy.host"
+          style="width: 160px"
+          size="small"
+          placeholder="Host"
+          :status="as.settings.httpProxy.host.trim() ? 'success' : 'warning'"
+          @update:value="(val) => updateHttpProxySettings({ host: val })"
+        />
+      </ControlItem>
+      <ControlItem
+        v-if="as.settings.httpProxy.enabled"
+        class="control-item-margin"
+        :label="t('AppSettings.misc.httpProxy.port.label')"
+        :label-description="t('AppSettings.misc.httpProxy.port.description')"
+        :label-width="320"
+      >
+        <NInputNumber
+          :show-button="false"
+          :min="1"
+          :max="65535"
+          :value="as.settings.httpProxy.port"
+          style="width: 160px"
+          size="small"
+          @update:value="(val) => updateHttpProxySettings({ port: val || 1 })"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         :label="t('AppSettings.misc.disableHardwareAcceleration.label')"
         :label-description="t('AppSettings.misc.disableHardwareAcceleration.description')"
         :label-width="320"
@@ -193,7 +238,7 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { HttpProxySetting, useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
@@ -203,7 +248,17 @@ import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NFlex, NScrollbar, NSelect, NSwitch, NTooltip, useDialog } from 'naive-ui'
+import {
+  NCard,
+  NFlex,
+  NInput,
+  NInputNumber,
+  NScrollbar,
+  NSelect,
+  NSwitch,
+  NTooltip,
+  useDialog
+} from 'naive-ui'
 import { computed } from 'vue'
 
 import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
@@ -274,6 +329,10 @@ const handleDisableHardwareAcceleration = (val: boolean) => {
       await app.setDisableHardwareAcceleration(val)
     }
   })
+}
+
+const updateHttpProxySettings = (obj: Partial<HttpProxySetting>) => {
+  app.setHttpProxy({ ...as.settings.httpProxy, ...obj })
 }
 </script>
 

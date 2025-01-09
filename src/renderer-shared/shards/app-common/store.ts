@@ -6,12 +6,23 @@ interface BaseConfig {
   disableHardwareAcceleration?: boolean
 }
 
+export interface HttpProxySetting {
+  enabled: boolean
+  port: number
+  host: string
+}
+
 export const useAppCommonStore = defineStore('shard:app-common-renderer', () => {
   const settings = shallowReactive({
     showFreeSoftwareDeclaration: false,
     isInKyokoMode: false,
     locale: 'zh-CN',
-    theme: 'default' as 'default' | 'dark' | 'light'
+    theme: 'default' as 'default' | 'dark' | 'light',
+    httpProxy: {
+      enabled: false,
+      port: 0,
+      host: ''
+    } as HttpProxySetting
   })
 
   const version = ref('0.0.0')

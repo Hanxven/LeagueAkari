@@ -1,12 +1,11 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import i18next from 'i18next'
-import { useTranslation } from 'i18next-vue'
 import { effectScope, watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { useAppCommonStore } from './store'
+import { HttpProxySetting, useAppCommonStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'app-common-main'
 
@@ -72,6 +71,10 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
 
   setTheme(s: 'default' | 'dark' | 'light') {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'theme', s)
+  }
+
+  setHttpProxy(s: HttpProxySetting | null) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'httpProxy', s)
   }
 
   readClipboardText() {

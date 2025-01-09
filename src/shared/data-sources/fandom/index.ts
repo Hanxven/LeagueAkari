@@ -39,6 +39,10 @@ export class LolFandomWikiApi {
     'tenacity'
   ] as const
 
+  get http() {
+    return this._http
+  }
+
   constructor() {
     axiosRetry(this._http, {
       retries: 3,

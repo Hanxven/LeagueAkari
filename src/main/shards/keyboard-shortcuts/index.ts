@@ -4,6 +4,7 @@ import EventEmitter from 'node:events'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { UNIFIED_KEY_ID, VKEY_MAP, isModifierKey } from './definitions'
 
 interface ShortcutDetails {
@@ -19,10 +20,12 @@ interface ShortcutDetails {
  */
 export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   static id = 'keyboard-shortcuts-main'
-  static dependencies = ['app-common-main', 'akari-ipc-main']
+  static dependencies = ['app-common-main', 'akari-ipc-main', 'logger-factory-main']
 
   private readonly _common: AppCommonMain
   private readonly _ipc: AkariIpcMain
+  private readonly _loggerFactory: LoggerFactoryMain
+  private readonly _log: AkariLogger
 
   /** 除了修饰键之外的其他按键 */
   private readonly _pressedOtherKeys = new Set<number>()
@@ -80,11 +83,15 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   constructor(deps: any) {
     this._common = deps['app-common-main']
     this._ipc = deps['akari-ipc-main']
+    this._loggerFactory = deps['logger-factory-main']
+    this._log = this._loggerFactory.create(KeyboardShortcutsMain.id)
   }
 
   async onInit() {
     if (this._common.state.isAdministrator) {
       input.startHook()
+
+      this._log.info('监听键盘事件')
 
       input.onKeyEvent((key) => {
         const [keyCodeRaw, state] = key.split(',')
@@ -250,6 +257,8 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
     this._registrationMap.set(shortcutId, { type, targetId, cb })
     this._targetIdMap.set(targetId, shortcutId)
+
+    this._log.info(`注册快捷键 ${shortcutId} (${type})`)
   }
 
   unregister(shortcutId: string) {
@@ -257,6 +266,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     if (options) {
       this._registrationMap.delete(shortcutId)
       this._targetIdMap.delete(options.targetId)
+      this._log.info(`注销快捷键 ${shortcutId}`)
       return true
     }
 
@@ -288,6 +298,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   async onDispose() {
     if (this._common.state.isAdministrator) {
+      this._log.info('停止监听键盘事件')
       input.stopHook()
     }
     this.events.removeAllListeners()

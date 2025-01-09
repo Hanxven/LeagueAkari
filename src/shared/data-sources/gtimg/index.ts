@@ -47,6 +47,10 @@ export class GtimgApi {
     baseURL: GtimgApi.BASE_URL
   })
 
+  get http() {
+    return this._http
+  }
+
   constructor() {
     axiosRetry(this._http, {
       retries: 2,

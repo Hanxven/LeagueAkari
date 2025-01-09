@@ -120,6 +120,17 @@ AppSettings:
       positiveText: 重启应用并退出
       negativeText: 取消
 
+    httpProxy:
+      enabled:
+        label: HTTP 代理
+        description: 设置 HTTP 代理，除 LCU HTTP 之外的所有网络请求都将通过该代理
+      host:
+        label: 代理主机
+        description: 代理服务器的主机地址
+      port:
+        label: 代理端口
+        description: 代理服务器的端口
+
 MatchHistoryTabsSettings:
   title: 战绩页面
 

@@ -71,6 +71,10 @@ export class SgpApi {
     }
   })
 
+  get http() {
+    return this._http
+  }
+
   constructor() {
     axiosRetry(this._http, {
       retries: 3,

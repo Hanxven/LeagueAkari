@@ -117,6 +117,17 @@ AppSettings:
       positiveText: Restart and Quit
       negativeText: Cancel
 
+    httpProxy:
+      enabled:
+        label: Enable HTTP Proxy
+        description: Set an HTTP proxy. All network requests except LCU HTTP will be routed through this proxy
+      host:
+        label: Proxy Host
+        description: The host of the proxy server
+      port:
+        label: Proxy Port
+        description: The port of the proxy server
+
 MatchHistoryTabsSettings:
   title: Match History Tabs
 

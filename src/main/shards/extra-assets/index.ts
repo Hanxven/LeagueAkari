@@ -3,6 +3,7 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { LolFandomWikiApi } from '@shared/data-sources/fandom'
 import { GtimgApi } from '@shared/data-sources/gtimg'
 
+import { AppCommonMain } from '../app-common'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { ExtraAssetsStateFandom, ExtraAssetsStateGtimg } from './state'
@@ -12,8 +13,9 @@ import { ExtraAssetsStateFandom, ExtraAssetsStateGtimg } from './state'
  */
 export class ExtraAssetsMain implements IAkariShardInitDispose {
   static id = 'extra-assets-main'
-  static dependencies = ['mobx-utils-main', 'logger-factory-main']
+  static dependencies = ['app-common-main', 'mobx-utils-main', 'logger-factory-main']
 
+  private readonly _app: AppCommonMain
   private readonly _loggerFactory: LoggerFactoryMain
   private readonly _mobx: MobxUtilsMain
   private readonly _log: AkariLogger
@@ -25,6 +27,7 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
   private _fandomApi = new LolFandomWikiApi()
 
   constructor(deps: any) {
+    this._app = deps['app-common-main']
     this._mobx = deps['mobx-utils-main']
     this._loggerFactory = deps['logger-factory-main']
     this._log = this._loggerFactory.create(ExtraAssetsMain.id)
@@ -61,11 +64,34 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
     }
   }
 
+  private _handleUpdateHttpProxy() {
+    this._mobx.reaction(
+      () => this._app.settings.httpProxy,
+      (httpProxy) => {
+        if (httpProxy.enabled) {
+          this._gtimgApi.http.defaults.proxy = {
+            host: httpProxy.host,
+            port: httpProxy.port
+          }
+          this._fandomApi.http.defaults.proxy = {
+            host: httpProxy.host,
+            port: httpProxy.port
+          }
+        } else {
+          this._gtimgApi.http.defaults.proxy = undefined
+          this._fandomApi.http.defaults.proxy = undefined
+        }
+      },
+      { fireImmediately: true }
+    )
+  }
+
   async onInit() {
     this._mobx.propSync(ExtraAssetsMain.id, 'gtimg', this.gtimg, ['heroList'])
     this._mobx.propSync(ExtraAssetsMain.id, 'fandom', this.fandom, ['balance'])
 
     this._updateGtimgHeroList()
     this._updateFandomBalance()
+    this._handleUpdateHttpProxy()
   }
 }

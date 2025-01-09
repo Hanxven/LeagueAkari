@@ -49,6 +49,19 @@ export class AppCommonSettings {
    */
   theme: 'default' | 'dark' | 'light' = 'default'
 
+  /**
+   * HTTP 代理
+   */
+  httpProxy: {
+    enabled: boolean
+    port: number
+    host: string
+  } = {
+    enabled: false,
+    port: 7890,
+    host: '127.0.0.1'
+  }
+
   setShowFreeSoftwareDeclaration(s: boolean) {
     this.showFreeSoftwareDeclaration = s
   }
@@ -65,7 +78,13 @@ export class AppCommonSettings {
     this.theme = s
   }
 
+  setHttpProxy(s: { enabled: boolean; port: number; host: string }) {
+    this.httpProxy = s
+  }
+
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      httpProxy: observable.ref
+    })
   }
 }
