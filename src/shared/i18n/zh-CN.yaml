@@ -1678,6 +1678,7 @@ InGameSend:
       description: 发送条目将使用自定义模板，要求遵循 EJS 式 (ETA) 格式语法。最终的输出内容应该为按行分割的文本，空行将被忽略
       descriptionDanger: 该模板的内容指令会被应用执行，拥有较高的权限。请始终确认其安全性
       descriptionReferTo: 可参考 <a href="{{url}}" target="_blank">模板</a>
+
     dryRun:
       label: 试运行
       description: 当前时间节点的即将输出内容
@@ -1703,6 +1704,9 @@ InGameSend:
 
   settings:
     title: 发送设置
+    cancelShortcut:
+      label: 取消发送
+      description: 设置快捷键，以取消发送当前的任何发送任务
     sendInterval:
       label: 发送间隔 (ms)
       description: 模拟发送时的间隔时间

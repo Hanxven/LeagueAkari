@@ -407,7 +407,7 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
   height: 100%;
   align-items: center;
   width: max-content;
-  gap: 2px;
+  gap: 1px;
 }
 
 .tab {

@@ -315,6 +315,20 @@
           </template>
           <ControlItem
             :label-width="260"
+            :disabled="!as.isAdministrator"
+            class="control-item-margin"
+            :label="t('InGameSend.settings.cancelShortcut.label')"
+            :label-description="t('InGameSend.settings.cancelShortcut.description')"
+          >
+            <ShortcutSelector
+              :disabled="!as.isAdministrator"
+              :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
+              :shortcut-id="igs.settings.cancelShortcut"
+              @update:shortcut-id="(id) => ig.setCancelShortcut(id)"
+            />
+          </ControlItem>
+          <ControlItem
+            :label-width="260"
             class="control-item-margin"
             :label="t('InGameSend.settings.sendInterval.label')"
             :label-description="t('InGameSend.settings.sendInterval.description')"
@@ -340,7 +354,6 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'

@@ -21,6 +21,7 @@ export class InGameSendSettings {
   sendEnemyShortcut: string | null = null
   sendAllAlliesShortcut: string | null = null
   sendAllEnemiesShortcut: string | null = null
+  cancelShortcut: string | null = null
 
   sendInterval: number = 65
 

@@ -70,7 +70,12 @@ export class InGameSendMain implements IAkariShardInitDispose {
   private _data: Record<string, any> = {}
 
   /** 用以记录发送状态, 正在进行中将会被取消 */
-  private _currentSending: string | null = null
+  private _currentSendingInfo: {
+    id: string | null
+    isEnd: () => boolean
+    isCancelled: () => boolean
+    cancel: () => void
+  } | null = null
 
   constructor(deps: any) {
     this._loggerFactory = deps['logger-factory-main']
@@ -94,7 +99,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
         sendStatsEnabled: { default: this.settings.sendStatsEnabled },
         sendStatsTemplate: { default: this.settings.sendStatsTemplate.template },
         sendStatsUseDefaultTemplate: { default: this.settings.sendStatsUseDefaultTemplate },
-        sendInterval: { default: this.settings.sendInterval }
+        sendInterval: { default: this.settings.sendInterval },
+        cancelShortcut: { default: this.settings.cancelShortcut }
       },
       this.settings
     )
@@ -112,7 +118,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
       'sendStatsEnabled',
       'sendStatsTemplate',
       'sendStatsUseDefaultTemplate',
-      'sendInterval'
+      'sendInterval',
+      'cancelShortcut'
     ])
 
     this._setting.onChange('sendInterval', (v, { setter }) => {
@@ -130,25 +137,10 @@ export class InGameSendMain implements IAkariShardInitDispose {
    */
   private async _sendSeparatedStringLines(
     messages: string[],
-    taskId: string,
-    type: 'champ-select-chat' | 'keyboard' = 'keyboard' // 选人界面发送 or 键盘模拟游戏中发送
+    type: 'champ-select-chat' | 'keyboard' = 'keyboard', // 选人界面发送 or 键盘模拟游戏中发送
+    identifier: string | null = null
   ) {
-    if (this._currentSending === taskId) {
-      this._log.warn('当前有发送任务正在进行, 将取消当前任务', taskId)
-      this._currentSending = null
-      return
-    } else {
-      if (messages.length === 0) {
-        this._log.warn('没有消息可以发送')
-        this._currentSending = null
-        return
-      }
-
-      this._currentSending = taskId
-    }
-
     const tasks: (() => Promise<void>)[] = []
-
     const interval = this.settings.sendInterval
 
     if (type === 'champ-select-chat') {
@@ -183,18 +175,33 @@ export class InGameSendMain implements IAkariShardInitDispose {
       }
     }
 
-    for (const task of tasks) {
-      if (this._currentSending !== taskId) {
-        return
-      }
+    let isCancelled = false
+    let isEnd = false
 
+    this._currentSendingInfo = {
+      id: identifier,
+      isEnd: () => isEnd,
+      isCancelled: () => isCancelled,
+      cancel: () => {
+        isCancelled = true
+      }
+    }
+
+    for (const task of tasks) {
+      if (isCancelled) {
+        break
+      }
       await task()
     }
 
-    this._currentSending = null
+    isEnd = true
   }
 
   private async _performCustomSend(id: string) {
+    if (this._currentSendingInfo && !this._currentSendingInfo.isEnd()) {
+      this._currentSendingInfo.cancel()
+    }
+
     if (!GameClientMain.isGameClientForeground()) {
       this._log.warn('游戏当前未在前台')
       return
@@ -208,7 +215,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
     const messages = s.message.split('\n').filter((m) => m.trim().length > 0)
 
-    await this._sendSeparatedStringLines(messages, s.id)
+    if (messages.length === 0) {
+      this._log.warn('没有消息可以发送')
+      return
+    }
+
+    this._log.info('将模拟发送如下信息', messages)
+
+    await this._sendSeparatedStringLines(messages, 'keyboard', s.id)
   }
 
   static mapNonFunctionObject<T extends Record<string, any>>(obj: T) {
@@ -287,6 +301,10 @@ export class InGameSendMain implements IAkariShardInitDispose {
     prefix?: string
     target: 'ally' | 'enemy' | 'all'
   }) {
+    if (this._currentSendingInfo && !this._currentSendingInfo.isEnd()) {
+      this._currentSendingInfo.cancel()
+    }
+
     if (!this.settings.sendStatsEnabled || this._og.state.queryStage.phase === 'unavailable') {
       this._log.warn(
         '当前不在可发送阶段',
@@ -318,7 +336,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
           .filter((m) => m.trim().length > 0)
           .map((m) => (options.prefix && sendType === 'keyboard' ? `${options.prefix} ${m}` : m))
 
-        await this._sendSeparatedStringLines(messages, 'send-stats', sendType)
+        if (messages.length === 0) {
+          this._log.warn('没有消息可以发送')
+          return
+        }
+
+        this._log.info('将模拟发送如下信息', messages)
+
+        await this._sendSeparatedStringLines(messages, sendType)
       } catch (error) {
         this._log.warn('发送时模板发生错误', error)
       }
@@ -336,9 +361,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
           .filter((m) => m.trim().length > 0)
           .map((m) => (options.prefix ? `${options.prefix} ${m}` : m))
 
+        if (messages.length === 0) {
+          this._log.warn('没有消息可以发送')
+          return
+        }
+
         this._log.info('将模拟发送如下信息', messages)
 
-        await this._sendSeparatedStringLines(messages, 'send-stats', sendType)
+        await this._sendSeparatedStringLines(messages, sendType)
         this._ipc.sendEvent(InGameSendMain.id, 'success-send-stats-use-custom-template')
       } catch (error) {
         this._ipc.sendEvent(
@@ -563,6 +593,28 @@ export class InGameSendMain implements IAkariShardInitDispose {
       }
     }
 
+    if (this.settings.cancelShortcut) {
+      const cancelR = this._kbd.getRegistration(this.settings.cancelShortcut)
+      if (cancelR) {
+        this._log.warn(
+          `尝试初始化快捷键 ${this.settings.cancelShortcut} 时, 发现快捷键已被 ${cancelR.targetId} 占用, 将重置快捷键`
+        )
+        await this._setting.set('cancelShortcut', null)
+      } else {
+        this._kbd.register(
+          `${InGameSendMain.id}/cancel`,
+          this.settings.cancelShortcut,
+          'normal',
+          () => {
+            if (this._currentSendingInfo && !this._currentSendingInfo.isEnd()) {
+              this._currentSendingInfo.cancel()
+              this._log.info('已取消发送', this._currentSendingInfo.id)
+            }
+          }
+        )
+      }
+    }
+
     // 很乱, 但暂时先这样写
     this._setting.onChange('sendAllyShortcut', async (v, { setter }) => {
       if (v === null) {
@@ -639,6 +691,26 @@ export class InGameSendMain implements IAkariShardInitDispose {
               prefix: '/all',
               target: 'enemy'
             })
+          })
+        } catch {
+          this._log.warn('注册快捷键失败', v)
+          await setter(null)
+          return
+        }
+      }
+
+      await setter()
+    })
+
+    this._setting.onChange('cancelShortcut', async (v, { setter }) => {
+      if (v === null) {
+        this._kbd.unregisterByTargetId(`${InGameSendMain.id}/cancel`)
+      } else {
+        try {
+          this._kbd.register(`${InGameSendMain.id}/cancel`, v, 'normal', () => {
+            if (this._currentSendingInfo && !this._currentSendingInfo.isEnd()) {
+              this._currentSendingInfo.cancel()
+            }
           })
         } catch {
           this._log.warn('注册快捷键失败', v)

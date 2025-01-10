@@ -181,6 +181,8 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
             ...new Set(this._lastActiveShortcut.map((k) => UNIFIED_KEY_ID[k] || VKEY_MAP[k].keyId))
           ].join('+')
 
+          this._log.info(`最后激活的快捷键 ${combined}`)
+
           this.events.emit('last-active-shortcut', {
             keyCodes: this._lastActiveShortcut,
             keys,

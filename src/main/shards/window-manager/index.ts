@@ -14,6 +14,7 @@ import { LeagueClientMain } from '../league-client'
 import { AkariLogger } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
+import { MainWindowPart } from './main-window'
 import { WindowManagerSettings, WindowManagerState } from './state'
 
 export class WindowManagerMain implements IAkariShardInitDispose {

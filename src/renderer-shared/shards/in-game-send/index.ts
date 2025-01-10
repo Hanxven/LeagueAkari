@@ -19,6 +19,7 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   static SHORTCUT_ID_SEND_ENEMY = `${MAIN_SHARD_NAMESPACE}/send-enemy`
   static SHORTCUT_ID_SEND_ALL_ALLIES = `${MAIN_SHARD_NAMESPACE}/send-all-allies`
   static SHORTCUT_ID_SEND_ALL_ENEMIES = `${MAIN_SHARD_NAMESPACE}/send-all-enemies`
+  static SHORTCUT_ID_CANCEL = `${MAIN_SHARD_NAMESPACE}/cancel`
 
   private readonly _ipc: AkariIpcRenderer
   private readonly _pm: PiniaMobxUtilsRenderer
@@ -58,6 +59,10 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
 
   setSendAllEnemiesShortcut(shortcut: string | null) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'sendAllEnemiesShortcut', shortcut)
+  }
+
+  setCancelShortcut(shortcut: string | null) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'cancelShortcut', shortcut)
   }
 
   createCustomSend(name: string): Promise<CustomSend> {

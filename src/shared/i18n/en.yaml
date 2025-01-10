@@ -1697,6 +1697,9 @@ InGameSend:
 
   settings:
     title: Settings
+    cancelShortcut:
+      label: Cancel Shortcut
+      description: Set a shortcut key to cancel any sending action
     sendInterval:
       label: Send Interval (ms)
       description: Set the interval between each simulated sending action

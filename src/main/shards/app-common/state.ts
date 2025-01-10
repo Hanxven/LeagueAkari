@@ -47,7 +47,7 @@ export class AppCommonSettings {
   /**
    * 主题色
    */
-  theme: 'default' | 'dark' | 'light' = 'default'
+  theme: 'default' | 'dark' | 'light' = 'dark'
 
   /**
    * HTTP 代理
