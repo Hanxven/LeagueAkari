@@ -1138,7 +1138,14 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
           const players = Object.values(this.state.teams || {}).flat()
 
-          for (const player of players) {
+          if (!players.includes(this._lc.data.summoner.me.puuid)) {
+            this._log.info('当前玩家不在此对局中, 跳过记录')
+            return
+          }
+
+          const filteredPlayers = players.filter((p) => p !== this._lc.data.summoner.me?.puuid)
+
+          for (const player of filteredPlayers) {
             await this._saved.saveEncounteredGame({
               gameId: this.state.queryStage.gameInfo.gameId,
               puuid: player,

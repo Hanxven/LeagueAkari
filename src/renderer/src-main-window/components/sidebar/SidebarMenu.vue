@@ -72,22 +72,17 @@ const handleMenuChange = (key: string) => {
   .menu-item-icon {
     font-size: 24px;
     transition: color 0.2s;
+    left: 0px;
   }
 
   .menu-item-indicator {
     position: absolute;
     top: 50%;
-    left: 0;
+    left: -4px;
     transform: translateY(-50%);
-    width: 5px;
+    width: 10px;
     height: 64%;
     border-radius: 4px;
-  }
-
-  &.active {
-    .menu-item-icon {
-      color: #fff;
-    }
   }
 }
 
@@ -156,12 +151,10 @@ const handleMenuChange = (key: string) => {
 .menu-item-move-right-fade-enter-from,
 .menu-item-move-right-fade-leave-to {
   opacity: 0;
-  left: -4px !important;
 }
 
 .menu-item-move-right-fade-enter-to,
 .menu-item-move-right-fade-leave-from {
   opacity: 1;
-  left: 0 !important;
 }
 </style>

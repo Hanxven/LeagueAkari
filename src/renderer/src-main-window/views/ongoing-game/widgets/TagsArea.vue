@@ -99,10 +99,11 @@
             <tr>
               <th>{{ t('PlayerInfoCard.metPopover.gameId') }}</th>
               <th>{{ t('PlayerInfoCard.metPopover.date') }}</th>
+              <th>{{ t('PlayerInfoCard.metPopover.gameStats') }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in savedInfo.encounteredGames" :key="item.gameId">
+            <tr v-for="item in encounteredGames" :key="item.gameId">
               <td
                 class="game-id-td"
                 @click="
@@ -112,12 +113,73 @@
                       : emits('showGameById', item.gameId, puuid)
                 "
               >
-                {{ item.gameId }}
+                <div class="game-id-tag">
+                  {{
+                    t('PlayerInfoCard.metPopover.inspectByGameId', {
+                      gameId: item.gameId
+                    })
+                  }}
+                </div>
               </td>
               <td>
                 {{ dayjs(item.updateAt).format('MM-DD HH:mm:ss') }} ({{
                   dayjs(item.updateAt).locale(as.settings.locale.toLowerCase()).fromNow()
                 }})
+              </td>
+              <td>
+                <template v-if="item.gameStats">
+                  <div class="game-stats">
+                    <span class="win-result" :class="item.gameStats.selfWinResult">{{
+                      t(`PlayerInfoCard.metPopover.winResult.${item.gameStats.selfWinResult}`)
+                    }}</span>
+                    <span
+                      class="team"
+                      :class="{
+                        teammate: item.gameStats.sameTeam,
+                        opponent: !item.gameStats.sameTeam
+                      }"
+                      >{{
+                        item.gameStats.sameTeam
+                          ? t(`PlayerInfoCard.metPopover.team.teammate`)
+                          : t(`PlayerInfoCard.metPopover.team.opponent`)
+                      }}</span
+                    >
+                    <PositionIcon
+                      class="position-icon"
+                      v-if="item.gameStats.selfPosition"
+                      :position="item.gameStats.selfPosition"
+                    />
+                    <LcuImage
+                      class="champion-icon"
+                      :src="championIconUri(item.gameStats.selfChampionId)"
+                    />
+                    <div class="kda">
+                      <span>{{ item.gameStats.selfKda.k }}</span>
+                      <span>/</span>
+                      <span>{{ item.gameStats.selfKda.d }}</span>
+                      <span>/</span>
+                      <span>{{ item.gameStats.selfKda.a }}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <PositionIcon
+                      class="position-icon"
+                      v-if="item.gameStats.opponentPosition"
+                      :position="item.gameStats.opponentPosition"
+                    />
+                    <LcuImage
+                      class="champion-icon"
+                      :src="championIconUri(item.gameStats.opponentChampionId)"
+                    />
+                    <div class="kda">
+                      <span>{{ item.gameStats.opponentKda.k }}</span>
+                      <span>/</span>
+                      <span>{{ item.gameStats.opponentKda.d }}</span>
+                      <span>/</span>
+                      <span>{{ item.gameStats.opponentKda.a }}</span>
+                    </div>
+                  </div>
+                </template>
+                <template v-else>—</template>
               </td>
             </tr>
           </tbody>
@@ -420,7 +482,9 @@
 </template>
 
 <script lang="ts" setup>
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { SavedInfo, useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { Game } from '@shared/types/league-client/match-history'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
@@ -429,7 +493,9 @@ import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
-import { computed, useTemplateRef, watch } from 'vue'
+import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
+
+import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
 
 import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
 
@@ -534,6 +600,93 @@ const isSuspiciousFlashPosition = computed(() => {
     isSuspicious: analysis.summary.flashOnD && analysis.summary.flashOnF,
     flashOnD: analysis.summary.flashOnD,
     flashOnF: analysis.summary.flashOnF
+  }
+})
+
+// 对局 ID（可以跳转）
+// 我使用的英雄
+// 他使用的英雄
+// 胜负
+// 敌方还是我方
+// 时间
+// 模式
+const encounteredGames = computed(() => {
+  if (!savedInfo) {
+    return []
+  }
+
+  const mapped = savedInfo.encounteredGames.map((record) => {
+    const game = ogs.cachedGames[record.gameId]
+
+    if (!game) {
+      return { gameStats: null, ...record }
+    }
+
+    const sI = game.participantIdentities.find((p) => p.player.puuid === record.selfPuuid)
+    const hI = game.participantIdentities.find((p) => p.player.puuid === record.puuid)
+
+    if (!sI || !hI) {
+      return { gameStats: null, ...record }
+    }
+
+    const s = game.participants.find((par) => par.participantId === sI.participantId)
+    const h = game.participants.find((par) => par.participantId === hI.participantId)
+
+    if (!s || !h) {
+      return { gameStats: null, ...record }
+    }
+
+    // for cherry mode, all players are placed in the same team
+    const sameTeam =
+      game.gameMode === 'CHERRY'
+        ? s.stats.playerSubteamId === h.stats.playerSubteamId
+        : s.teamId === h.teamId
+
+    let selfWinResult: string
+    if (game.endOfGameResult === 'Abort_AntiCheatExit') {
+      selfWinResult = 'abort'
+    } else if (s.stats.gameEndedInEarlySurrender) {
+      selfWinResult = 'remake'
+    } else {
+      selfWinResult = s.stats.win ? 'win' : 'lose'
+    }
+
+    const selfChampionId = s.championId
+    const opponentChampionId = h.championId
+
+    const date = game.gameCreation
+
+    const selfKda = { k: s.stats.kills, d: s.stats.deaths, a: s.stats.assists }
+    const opponentKda = { k: h.stats.kills, d: h.stats.deaths, a: h.stats.assists }
+
+    // FOR SGP ONLY
+    const selfPosition = s.stats.teamPosition || null
+    const opponentPosition = h.stats.teamPosition || null
+
+    return {
+      gameStats: {
+        gameId: game.gameId,
+        selfChampionId,
+        opponentChampionId,
+        selfPosition,
+        opponentPosition,
+        selfWinResult,
+        selfKda,
+        opponentKda,
+        sameTeam,
+        date,
+        mode: game.gameMode
+      },
+      ...record
+    }
+  })
+
+  return mapped
+})
+
+onDeactivated(() => {
+  if (premadeTeamId) {
+    emits('highlight', premadeTeamId, false)
   }
 })
 </script>
@@ -650,7 +803,7 @@ const isSuspiciousFlashPosition = computed(() => {
   th,
   td {
     border: 1px solid #ffffff40;
-    padding: 0 8px;
+    padding: 2px 8px;
     text-align: center;
     white-space: nowrap;
   }
@@ -666,6 +819,77 @@ const isSuspiciousFlashPosition = computed(() => {
   .game-id-td {
     transition: color 0.2s;
     cursor: pointer;
+  }
+
+  .game-id-tag {
+    padding: 2px 4px;
+    line-height: 12px;
+    font-size: 12px;
+    background-color: #ffffff20;
+    border-radius: 2px;
+  }
+
+  .game-stats {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+
+    .champion-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .position-icon {
+      font-size: 16px;
+    }
+
+    .team,
+    .win-result {
+      font-size: 12px;
+      line-height: 12px;
+      font-weight: bold;
+    }
+
+    .team {
+      margin-right: 8px;
+
+      &.teammate {
+        color: #4cc69d;
+      }
+
+      &.opponent {
+        color: #ff6161;
+      }
+    }
+
+    .win-result {
+      &.win {
+        color: #4cc69d;
+      }
+
+      &.lose {
+        color: #ff6161;
+      }
+
+      &.abort,
+      &.remake {
+        color: #c0c0c0;
+      }
+    }
+
+    .kda {
+      color: #fffb;
+      font-size: 11px;
+      display: flex;
+      gap: 2px;
+    }
+
+    .divider {
+      margin: 0 4px;
+      width: 1px;
+      height: 12px;
+      background-color: #ffffff40;
+    }
   }
 }
 </style>

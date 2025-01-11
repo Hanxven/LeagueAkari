@@ -1331,7 +1331,17 @@ PlayerInfoCard:
   metPopover:
     title: Previously encountered this player in {{date}}, a total of {{countV}} times.
     gameId: Game ID
+    inspectByGameId: Inspect {{gameId}}
     date: Game Date
+    gameStats: Game Stats
+    winResult:
+      abort: Abort
+      lose: Lose
+      remake: Remake
+      win: Win
+    eam:
+      teammate: Ally
+      opponent: Enemy
   privatePopover: This player has set their career profile to private, preventing others from viewing their profile, match history, and achievements. Additionally, they cannot be spectated.
   winningStreakPopover: Currently on a winning streak of {{countV}} games. Great job!
   losingStreakPopover: Currently on a losing streak of {{countV}} games.

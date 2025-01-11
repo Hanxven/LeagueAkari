@@ -18,6 +18,10 @@
 
 - 外部 API 现在可以设置 HTTP 代理。
 
+- 对局页面的玩家卡片，可以显示当时对局的部分详细内容。[#182](https://github.com/Hanxven/LeagueAkari/issues/182)
+
+- 添加了一个代理设置项，可以设置 HTTP 代理。[#186](https://github.com/Hanxven/LeagueAkari/issues/186)
+
 ## 修复
 
 - 修复潜在的内存泄露问题。曾导致在多次开关辅助窗口时，窗口实例没有被正确清除。
