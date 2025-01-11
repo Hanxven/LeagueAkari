@@ -19,7 +19,7 @@ interface OngoingGameInfo {
 }
 
 // copied from main shard
-interface MatchHistoryPlayer {
+export interface MatchHistoryPlayer {
   source: 'lcu' | 'sgp'
   tag?: string
   targetCount: number
@@ -27,19 +27,19 @@ interface MatchHistoryPlayer {
 }
 
 // copied from main shard
-interface SummonerPlayer {
+export interface SummonerPlayer {
   source: 'lcu' | 'sgp'
   data: SummonerInfo
 }
 
 // copied from main shard
-interface RankedStatsPlayer {
+export interface RankedStatsPlayer {
   source: 'lcu' | 'sgp'
   data: RankedStats
 }
 
 // copied from main shard
-interface ChampionMasteryPlayer {
+export interface ChampionMasteryPlayer {
   source: 'lcu' | 'sgp'
   data: Record<number, Mastery>
 }
@@ -172,7 +172,10 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const championMastery = shallowRef<Record<string, ChampionMasteryPlayer>>({})
   const savedInfo = shallowRef<Record<string, SavedInfo>>({})
 
+  const cachedGames = shallowRef<Record<number, Game>>({})
+
   const matchHistoryLoadingState = shallowRef<Record<string, string>>({})
+
   const summonerLoadingState = shallowRef<Record<string, string>>({}) // 未实装
   const savedInfoLoadingState = shallowRef<Record<string, string>>({}) // 未实装
   const rankedStatsLoadingState = shallowRef<Record<string, string>>({}) // 未实装
@@ -197,6 +200,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     rankedStats,
     championMastery,
     savedInfo,
+
+    cachedGames,
 
     matchHistoryLoadingState,
     summonerLoadingState,

@@ -1,10 +1,17 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { effectScope, toRaw, watch } from 'vue'
+import { Game } from '@shared/types/league-client/match-history'
+import { effectScope, markRaw, toRaw, watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { useOngoingGameStore } from './store'
+import {
+  ChampionMasteryPlayer,
+  MatchHistoryPlayer,
+  RankedStatsPlayer,
+  SummonerPlayer,
+  useOngoingGameStore
+} from './store'
 
 const MAIN_SHARD_NAMESPACE = 'ongoing-game-main'
 export class OngoingGameRenderer implements IAkariShardInitDispose {
@@ -65,10 +72,11 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
 
   getAll() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getAll') as Promise<{
-      matchHistory: any
-      summoner: any
-      rankedStats: any
-      championMastery: any
+      matchHistory: Record<string, MatchHistoryPlayer>
+      summoner: Record<string, SummonerPlayer>
+      rankedStats: Record<string, RankedStatsPlayer>
+      championMastery: Record<string, ChampionMasteryPlayer>
+      additionalGames: Record<number, any>
       savedInfo: any
     }>
   }
@@ -85,10 +93,18 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       store.rankedStats = {}
       store.championMastery = {}
       store.savedInfo = {}
+      store.cachedGames = {}
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'match-history-loaded', (puuid: string, data) => {
       store.matchHistory[puuid] = data
+
+      const games = data.data as Game[]
+      games.forEach((game) => (store.cachedGames[game.gameId] = markRaw(game)))
+    })
+
+    this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'additional-game-loaded', (gameId: number, data) => {
+      store.cachedGames[gameId] = markRaw(data.data)
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'summoner-loaded', (puuid: string, data) => {
@@ -107,12 +123,22 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       store.savedInfo[puuid] = data
     })
 
-    const { championMastery, matchHistory, rankedStats, savedInfo, summoner } = await this.getAll()
+    const { championMastery, matchHistory, rankedStats, savedInfo, summoner, additionalGames } =
+      await this.getAll()
     store.championMastery = championMastery
     store.matchHistory = matchHistory
     store.rankedStats = rankedStats
     store.savedInfo = savedInfo
     store.summoner = summoner
+
+    Object.values(matchHistory).forEach((data) => {
+      const games = data.data as Game[]
+      games.forEach((game) => (store.cachedGames[game.gameId] = markRaw(game)))
+    })
+
+    Object.values(additionalGames).forEach((data) => {
+      store.cachedGames[data.gameId] = markRaw(data.data)
+    })
 
     store.settings.orderPlayerBy = await this._setting.get(
       OngoingGameRenderer.id,

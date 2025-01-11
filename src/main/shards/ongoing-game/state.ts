@@ -455,14 +455,22 @@ export class OngoingGameState {
    */
   savedInfoLoadingState: Record<string, string> = {}
 
-  /**
-   * 游戏时间线, 暂未实装
-   */
   gameTimeline: Record<
     number,
     {
       source: 'lcu' | 'sgp'
       data: GameTimeline
+    }
+  > = {}
+
+  /**
+   * 除了战绩中的对局外, 额外被加载的对局信息
+   */
+  additionalGame: Record<
+    number,
+    {
+      source: 'lcu' | 'sgp'
+      data: Game
     }
   > = {}
 
@@ -483,6 +491,7 @@ export class OngoingGameState {
     this.rankedStatsLoadingState = {}
     this.championMasteryLoadingState = {}
     this.gameTimeline = {}
+    this.additionalGame = {}
   }
 
   constructor(private readonly _lcData: LeagueClientSyncedData) {
@@ -494,6 +503,7 @@ export class OngoingGameState {
       savedInfo: observable.shallow,
       championMastery: observable.shallow,
       gameTimeline: observable.shallow,
+      additionalGame: observable.shallow,
 
       // ref object, override only, no modification
       matchHistoryLoadingState: observable.ref,

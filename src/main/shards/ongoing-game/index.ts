@@ -8,6 +8,7 @@ import {
   analyzeTeamMatchHistory
 } from '@shared/utils/analysis'
 import { calculateTogetherTimes, removeOverlappingSubsets } from '@shared/utils/team-up-calc'
+import { isAxiosError } from 'axios'
 import _ from 'lodash'
 import { comparer, computed, runInAction, toJS } from 'mobx'
 import PQueue from 'p-queue'
@@ -44,6 +45,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     SAVED_INFO: 4,
     RANKED_STATS: 3,
     CHAMPION_MASTERY: 2,
+    ADDITIONAL_GAME: 2,
     GAME_TIMELINE: 1
   }
 
@@ -75,7 +77,13 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   public readonly settings = new OngoingGameSettings()
   public readonly state: OngoingGameState
 
-  private _detailedGameLruMap = new LRUMap<number, Game>({
+  private _gameLruMap = new LRUMap<
+    number,
+    {
+      source: 'lcu' | 'sgp'
+      data: Game
+    }
+  >({
     maxSize: 400
   })
 
@@ -331,7 +339,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       })
       this._loadPlayerSummoner(puuid, { signal, force })
       this._loadPlayerRankedStats(puuid, { signal, force })
-      this._loadPlayerSavedInfo(puuid, { signal, force })
+      this._loadPlayerSavedInfo(puuid, {
+        signal,
+        force,
+        useSgpApi: this.settings.matchHistoryUseSgpApi
+      })
       this._loadPlayerChampionMasteries(puuid, { signal, force })
     })
   }
@@ -355,7 +367,11 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       })
       this._loadPlayerSummoner(puuid, { signal, force })
       this._loadPlayerRankedStats(puuid, { signal, force })
-      this._loadPlayerSavedInfo(puuid, { signal, force })
+      this._loadPlayerSavedInfo(puuid, {
+        signal,
+        force,
+        useSgpApi: this.settings.matchHistoryUseSgpApi
+      })
       this._loadPlayerChampionMasteries(puuid, { signal, force })
     })
   }
@@ -470,7 +486,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             signal,
             priority: OngoingGameMain.LOADING_PRIORITY.GAME_TIMELINE
           })
-          .catch((error) => this._handleError(error, 'game-timeline'))
+          .catch((error) => this._handleError(error, 'game-timeline', gameId))
 
         if (res) {
           this._log.info('游戏时间线加载完成: SGP', gameId)
@@ -494,7 +510,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             signal,
             priority: OngoingGameMain.LOADING_PRIORITY.GAME_TIMELINE
           })
-          .catch((error) => this._handleError(error, 'game-timeline'))
+          .catch((error) => this._handleError(error, 'game-timeline', gameId))
 
         if (res) {
           this._log.info('游戏时间线加载完成: LCU', gameId)
@@ -514,6 +530,91 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     }
 
     await Promise.allSettled(gameIds.map((g) => loadGameTimeline(g)))
+  }
+
+  private async _loadAdditionalGame(
+    gameIds: number[],
+    options: {
+      force?: boolean
+      useSgpApi?: boolean
+      signal?: AbortSignal
+    } = {}
+  ) {
+    const { force, signal, useSgpApi } = options
+
+    const isAbleToUseSgpApi =
+      useSgpApi && this._sgp.state.availability.serversSupported.matchHistory
+
+    const loadGame = async (gameId: number) => {
+      const current = this.state.additionalGame[gameId]
+
+      if (!force && current && current.source === (isAbleToUseSgpApi ? 'sgp' : 'lcu')) {
+        this._log.info('游戏时间线查询条件未变化, 跳过', gameId)
+        return
+      }
+
+      const cached = this._gameLruMap.get(gameId)
+      if (cached && cached.source === (isAbleToUseSgpApi ? 'sgp' : 'lcu')) {
+        this._log.info('额外对局信息命中缓存', gameId)
+        runInAction(() => {
+          this.state.additionalGame[gameId] = cached
+        })
+        this._ipc.sendEvent(OngoingGameMain.id, 'additional-game-loaded', gameId, cached)
+        return
+      }
+
+      if (isAbleToUseSgpApi) {
+        this._log.info('加载额外对局信息: SGP API', gameId)
+
+        const res = await this._queue
+          .add(() => this._sgp.getGameSummaryLcuFormat(gameId), {
+            signal,
+            priority: OngoingGameMain.LOADING_PRIORITY.ADDITIONAL_GAME
+          })
+          .catch((error) => this._handleError(error, 'additional-game', gameId))
+
+        if (res) {
+          this._log.info('额外对局信息加载完成: SGP', gameId)
+
+          const toBeLoaded = {
+            data: res,
+            source: 'sgp' as 'sgp' | 'lcu'
+          }
+
+          this._gameLruMap.set(gameId, toBeLoaded)
+          runInAction(() => {
+            this.state.additionalGame[gameId] = toBeLoaded
+          })
+          this._ipc.sendEvent(OngoingGameMain.id, 'additional-game-loaded', gameId, toBeLoaded)
+        }
+      } else {
+        this._log.info('加载额外对局信息: LCU API', gameId)
+
+        const res = await this._queue
+          .add(() => this._lc.api.matchHistory.getGame(gameId), {
+            signal,
+            priority: OngoingGameMain.LOADING_PRIORITY.ADDITIONAL_GAME
+          })
+          .catch((error) => this._handleError(error, 'additional-game', gameId))
+
+        if (res) {
+          this._log.info('额外对局信息加载完成: LCU', gameId)
+
+          const toBeLoaded = {
+            data: res.data,
+            source: 'lcu' as 'sgp' | 'lcu'
+          }
+
+          this._gameLruMap.set(gameId, toBeLoaded)
+          runInAction(() => {
+            this.state.additionalGame[gameId] = toBeLoaded
+          })
+          this._ipc.sendEvent(OngoingGameMain.id, 'additional-game-loaded', gameId, toBeLoaded)
+        }
+      }
+    }
+
+    await Promise.allSettled(gameIds.map((g) => loadGame(g)))
   }
 
   private async _loadPlayerMatchHistory(
@@ -604,8 +705,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
       const detailedGameMap: Record<number, Game> = {}
       const loadGame = async (gameId: number) => {
-        if (this._detailedGameLruMap.has(gameId)) {
-          detailedGameMap[gameId] = this._detailedGameLruMap.get(gameId)!
+        if (this._gameLruMap.has(gameId)) {
+          detailedGameMap[gameId] = this._gameLruMap.get(gameId)!.data
           return
         }
 
@@ -617,7 +718,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           .catch((error) => this._handleMatchHistoryError(error, puuid))
 
         if (res) {
-          this._detailedGameLruMap.set(gameId, res.data)
+          this._gameLruMap.set(gameId, {
+            source: 'lcu',
+            data: res.data
+          })
           detailedGameMap[gameId] = res.data
         }
       }
@@ -665,7 +769,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         signal,
         priority: OngoingGameMain.LOADING_PRIORITY.SUMMONER
       })
-      .catch((error) => this._handleError(error, 'summoner'))
+      .catch((error) => this._handleError(error, 'summoner', puuid))
 
     if (!res) {
       return
@@ -684,6 +788,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     options: {
       signal?: AbortSignal
       force?: boolean
+      useSgpApi?: boolean
     } = {}
   ) {
     // just used to suppress ts error
@@ -698,7 +803,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       rsoPlatformId: this._lc.state.auth.rsoPlatformId
     }
 
-    const { signal, force } = options
+    const { signal, force, useSgpApi } = options
 
     if (!force && this.state.savedInfo[puuid]) {
       return
@@ -709,11 +814,20 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         signal,
         priority: OngoingGameMain.LOADING_PRIORITY.SAVED_INFO
       })
-      .catch((error) => this._handleError(error, 'saved-info'))
+      .catch((error) => this._handleError(error, 'saved-info', puuid))
 
     if (!res) {
       return
     }
+
+    this._loadAdditionalGame(
+      res.encounteredGames.map((c) => c.gameId),
+      {
+        force,
+        signal,
+        useSgpApi
+      }
+    )
 
     runInAction(() => (this.state.savedInfo[puuid] = res))
     this._ipc.sendEvent(OngoingGameMain.id, 'saved-info-loaded', puuid, res)
@@ -738,7 +852,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         signal,
         priority: OngoingGameMain.LOADING_PRIORITY.RANKED_STATS
       })
-      .catch((error) => this._handleError(error, 'ranked-stats'))
+      .catch((error) => this._handleError(error, 'ranked-stats', puuid))
 
     if (!res) {
       return
@@ -771,7 +885,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         signal,
         priority: OngoingGameMain.LOADING_PRIORITY.CHAMPION_MASTERY
       })
-      .catch((error) => this._handleError(error, 'champion-mastery'))
+      .catch((error) => this._handleError(error, 'champion-mastery', puuid))
 
     if (!res) {
       return
@@ -805,9 +919,18 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       const rankedStats = toJS(this.state.rankedStats)
       const savedInfo = toJS(this.state.savedInfo)
       const championMastery = toJS(this.state.championMastery)
-      const gameTimeline = toJS(this.state.gameTimeline)
+      const gameTimeline = toJS(this.state.additionalGame)
+      const additionalGames = toJS(this.state.additionalGame)
 
-      return { matchHistory, summoner, rankedStats, savedInfo, championMastery, gameTimeline }
+      return {
+        matchHistory,
+        summoner,
+        rankedStats,
+        savedInfo,
+        championMastery,
+        gameTimeline,
+        additionalGames
+      }
     })
 
     this._ipc.onCall(OngoingGameMain.id, 'setMatchHistoryTag', (tag: string) => {
@@ -930,7 +1053,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           continue
         }
 
-        const mappedGameTimeline = Object.entries(this.state.gameTimeline).reduce(
+        const mappedGameTimeline = Object.entries(this.state.additionalGame).reduce(
           (obj, [gameIdStr, data]) => {
             obj[gameIdStr] = data.data
             return obj
@@ -973,7 +1096,10 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private _handleCalculation() {
     // 重新计算战绩信息
     this._mobx.reaction(
-      () => [...Object.values(this.state.matchHistory), ...Object.values(this.state.gameTimeline)],
+      () => [
+        ...Object.values(this.state.matchHistory),
+        ...Object.values(this.state.additionalGame)
+      ],
       (_changedV) => {
         this.state.setPlayerStats(this._calcAnalysis())
       },
@@ -1037,13 +1163,18 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     )
   }
 
-  private _handleError(e: any, mark = '') {
+  private _handleError(e: any, type = '', info?: any) {
     if (e instanceof Error && e.name === 'AbortError') {
-      this._log.info('任务被取消', mark)
+      this._log.info('任务被取消', type)
       return
     }
 
-    this._log.warn('在尝试加载时出现错误', e, mark)
+    if (isAxiosError(e) && e.response?.status === 404) {
+      this._log.info('查询目标不存在', type, info)
+      return
+    }
+
+    this._log.warn('在尝试加载时出现错误', e, type)
     return
   }
 

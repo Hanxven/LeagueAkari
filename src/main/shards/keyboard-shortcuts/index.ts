@@ -22,7 +22,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   static id = 'keyboard-shortcuts-main'
   static dependencies = ['app-common-main', 'akari-ipc-main', 'logger-factory-main']
 
-  private readonly _common: AppCommonMain
+  private readonly _app: AppCommonMain
   private readonly _ipc: AkariIpcMain
   private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger
@@ -81,14 +81,14 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   private _targetIdMap = new Map<string, string>()
 
   constructor(deps: any) {
-    this._common = deps['app-common-main']
+    this._app = deps['app-common-main']
     this._ipc = deps['akari-ipc-main']
     this._loggerFactory = deps['logger-factory-main']
     this._log = this._loggerFactory.create(KeyboardShortcutsMain.id)
   }
 
   async onInit() {
-    if (this._common.state.isAdministrator) {
+    if (this._app.state.isAdministrator) {
       input.startHook()
 
       this._log.info('监听键盘事件')
@@ -181,8 +181,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
             ...new Set(this._lastActiveShortcut.map((k) => UNIFIED_KEY_ID[k] || VKEY_MAP[k].keyId))
           ].join('+')
 
-          this._log.info(`最后激活的快捷键 ${combined}`)
-
           this.events.emit('last-active-shortcut', {
             keyCodes: this._lastActiveShortcut,
             keys,
@@ -245,6 +243,11 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     type: 'last-active' | 'normal',
     cb: (details: ShortcutDetails) => void
   ) {
+    if (!this._app.state.isAdministrator) {
+      this._log.info(`当前位于普通权限, 忽略快捷键注册: ${shortcutId} (${type})`)
+      return
+    }
+
     const originShortcut = this._targetIdMap.get(targetId)
     if (originShortcut) {
       const options = this._registrationMap.get(originShortcut)
@@ -299,7 +302,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   async onDispose() {
-    if (this._common.state.isAdministrator) {
+    if (this._app.state.isAdministrator) {
       this._log.info('停止监听键盘事件')
       input.stopHook()
     }
