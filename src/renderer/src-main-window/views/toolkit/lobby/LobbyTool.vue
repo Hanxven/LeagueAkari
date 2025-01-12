@@ -204,6 +204,7 @@ const queueOptions = computed(() => {
 
   if (availableQueues.length > 0) {
     options.push({
+      key: 'akari',
       label: t('LobbyTool.queueOptions.available'),
       type: 'group',
       children: availableQueues.map((k) => ({
@@ -215,6 +216,7 @@ const queueOptions = computed(() => {
 
   if (unavailableQueues.length > 0) {
     options.push({
+      key: 'kyoko',
       label: t('LobbyTool.queueOptions.unavailable'),
       type: 'group',
       children: unavailableQueues.map((k) => ({

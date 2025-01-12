@@ -588,6 +588,7 @@ const handleToggleShowDetailedGame = () => {
   }
 
   .champion {
+    flex-shrink: 0;
     position: relative;
     height: 50px;
     width: 50px;
