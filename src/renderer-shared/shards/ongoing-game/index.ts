@@ -137,7 +137,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     })
 
     Object.values(additionalGames).forEach((data) => {
-      store.cachedGames[data.gameId] = markRaw(data.data)
+      store.cachedGames[data.data.gameId] = markRaw(data.data)
     })
 
     store.settings.orderPlayerBy = await this._setting.get(

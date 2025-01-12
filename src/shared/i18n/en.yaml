@@ -1344,7 +1344,7 @@ PlayerInfoCard:
       lose: Lose
       remake: Remake
       win: Win
-    eam:
+    team:
       teammate: Ally
       opponent: Enemy
   privatePopover: This player has set their career profile to private, preventing others from viewing their profile, match history, and achievements. Additionally, they cannot be spectated.

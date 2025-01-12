@@ -4,15 +4,22 @@ import { AxiosInstance } from 'axios'
 export class MissionsHttpApi {
   constructor(private _http: AxiosInstance) {}
 
-  putPlayer(missionIds: string[], seriesIds: string[] = []) {
-    return this._http.put<void>('/lol-missions/v1/player', {
-      missionIds,
-      seriesIds: seriesIds.length ? seriesIds : undefined
-    })
+  putPlayer(data?: { seriesIds?: string[]; missionIds?: string[] }) {
+    return this._http.put<void>('/lol-missions/v1/player', data)
   }
 
+  // ?
   putRewardGroups(id: string, rewardGroups: string[]) {
     return this._http.put<void>(`/lol-missions/v1/player/${id}/reward-groups`, { rewardGroups })
+  }
+
+  putPlayerMission(
+    missionId: string,
+    data?: {
+      rewardGroups?: string[]
+    }
+  ) {
+    return this._http.put<void>(`/lol-missions/v1/player/${missionId}`, data)
   }
 
   getMissions() {

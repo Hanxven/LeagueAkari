@@ -221,6 +221,7 @@ const preferMica = useMicaAvailability()
   }
 
   > #app-content {
+    z-index: 5;
     height: 0;
     flex: 1;
     overflow: hidden;

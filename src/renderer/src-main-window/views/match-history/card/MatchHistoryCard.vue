@@ -47,7 +47,7 @@
     </DefineSubTeam>
     <div v-if="self" class="match-history-card" :class="composedResultClass">
       <div class="game">
-        <div class="mode">
+        <div class="mode" :title="formattedModeText">
           {{ formattedModeText }}
         </div>
         <div
@@ -560,6 +560,9 @@ const handleToggleShowDetailedGame = () => {
   gap: 2px;
 
   .mode {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
     font-weight: bold;
   }
 
