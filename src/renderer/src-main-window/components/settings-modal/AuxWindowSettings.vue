@@ -77,7 +77,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NInputNumber, NScrollbar, NSlider, NSwitch } from 'naive-ui'
+import { NButton, NCard, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 const { t } = useTranslation()
 

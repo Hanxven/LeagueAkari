@@ -128,6 +128,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this.settings.theme,
       (theme) => {
+        if (process.env['NODE_ENV'] !== 'development') {
+          theme = 'default'
+        }
+
         if (theme === 'default') {
           nativeTheme.themeSource = 'system'
         } else {

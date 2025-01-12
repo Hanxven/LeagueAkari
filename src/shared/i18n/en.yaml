@@ -375,6 +375,11 @@ AboutPane:
     waitingForRestart: Waiting for restart
     waitingForRestartDescription: The auto-update process will be performed after closing the application
 
+  checkUpdatesResult:
+    no-updates: No new version available
+    new-updates: New version available
+    failed: Failed to check for updates {{reason}}
+
   updateDir:
     label: Update Directory
     description: The current location of the downloaded update. If the complete auto-update process cannot be executed, manual update is required

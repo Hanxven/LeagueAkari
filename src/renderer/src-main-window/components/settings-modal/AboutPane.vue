@@ -188,16 +188,16 @@ const handleClickEasterEgg = () => {
 }
 
 const handleCheckUpdates = async () => {
-  const result = await su.checkUpdates()
+  const { result, reason } = await su.checkUpdates()
   switch (result) {
     case 'no-updates':
-      message.success('当前已是最新版本')
+      message.success(() => t('AboutPane.checkUpdatesResult.no-updates'))
       break
     case 'new-updates':
-      message.success('发现新版本')
+      message.success(() => t('AboutPane.checkUpdatesResult.new-updates'))
       break
     case 'failed':
-      message.warning('检查更新失败')
+      message.warning(() => t('AboutPane.checkUpdatesResult.failed', { reason }))
       break
   }
 }

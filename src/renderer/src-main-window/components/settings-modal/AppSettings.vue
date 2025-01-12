@@ -33,11 +33,11 @@
         />
       </ControlItem>
       <ControlItem
-        class="control-item-margin"
-        label="主题色"
-        label-description="设置应用界面的主题颜色"
-        :label-width="320"
         v-if="as.settings.isInKyokoMode"
+        class="control-item-margin"
+        label="Theme Color"
+        label-description="Theme color for League Akari"
+        :label-width="320"
       >
         <NSelect
           style="width: 160px"
@@ -47,7 +47,9 @@
           :options="themes"
         />
       </ControlItem>
+      <!-- 由于 Electron 的 bug (https://github.com/electron/electron/issues/41824), 禁用该功能 -->
       <ControlItem
+        v-if="as.settings.isInKyokoMode"
         class="control-item-margin"
         :label="t('AppSettings.basic.backgroundMaterial.label')"
         :label-description="t('AppSettings.basic.backgroundMaterial.description')"

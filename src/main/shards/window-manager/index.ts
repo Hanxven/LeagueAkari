@@ -977,14 +977,21 @@ export class WindowManagerMain implements IAkariShardInitDispose {
    * 设置项的背景材质转换为原生系统级别背景材质
    */
   private _settingToNativeBackgroundMaterial(material: string) {
+    if (process.env['NODE_ENV'] !== 'development') {
+      this._log.warn(
+        '由于 Electron 上游 bug (https://github.com/electron/electron/issues/41824), 使用 Mica 材质后窗口会出现不可逆渲染错误, 生产环境下禁用此特性。'
+      )
+      return 'none'
+    }
+
     if (!this.state.supportsMica) {
-      return 'auto'
+      return 'none'
     }
 
     if (material === 'mica') {
       return 'mica'
     }
 
-    return 'auto'
+    return 'none'
   }
 }

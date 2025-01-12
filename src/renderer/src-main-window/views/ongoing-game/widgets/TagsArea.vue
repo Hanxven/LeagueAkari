@@ -603,13 +603,6 @@ const isSuspiciousFlashPosition = computed(() => {
   }
 })
 
-// 对局 ID（可以跳转）
-// 我使用的英雄
-// 他使用的英雄
-// 胜负
-// 敌方还是我方
-// 时间
-// 模式
 const encounteredGames = computed(() => {
   if (!savedInfo) {
     return []

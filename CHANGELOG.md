@@ -14,8 +14,6 @@
 
 - 对局页面的玩家卡片，部分内容可自定义是否展示。[#184](https://github.com/Hanxven/LeagueAkari/issues/184)
 
-- 主窗口背景材质支持 Mica。需 Windows 版本大于 22H2。
-
 - 外部 API 现在可以设置 HTTP 代理。
 
 - 对局页面的玩家卡片，可以显示当时对局的部分详细内容。[#182](https://github.com/Hanxven/LeagueAkari/issues/182)

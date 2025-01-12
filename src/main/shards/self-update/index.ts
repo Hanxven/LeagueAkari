@@ -223,7 +223,9 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
    */
   private async _updateReleaseUpdatesInfo(debug = false) {
     if (this.state.isCheckingUpdates) {
-      return 'is-checking-updates'
+      return {
+        result: 'is-checking-updates'
+      }
     }
 
     this.state.setCheckingUpdates(true)
@@ -236,7 +238,9 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       this.state.setLastCheckAt(new Date())
 
       if (!release) {
-        return 'no-updates'
+        return {
+          result: 'no-updates'
+        }
       }
 
       this.state.setNewUpdates({
@@ -255,14 +259,19 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           this._updateReleaseUpdatesInfo()
         }, SelfUpdateMain.UPDATES_CHECK_INTERVAL)
       }
-    } catch (error) {
+    } catch (error: any) {
       this._log.warn(`尝试检查时更新失败`, error)
-      return 'failed'
+      return {
+        result: 'failed',
+        reason: error.message
+      }
     } finally {
       this.state.setCheckingUpdates(false)
     }
 
-    return 'new-updates'
+    return {
+      result: 'new-updates'
+    }
   }
 
   private async _downloadUpdate(downloadUrl: string, filename: string) {
