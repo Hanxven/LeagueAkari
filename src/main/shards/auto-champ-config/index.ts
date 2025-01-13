@@ -214,14 +214,12 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
 
           if (names.length) {
             this._sendInChat(
-              `[League Akari] ${i18next.t('auto-champ-config-main.auto-config-enabled', {
+              i18next.t('auto-champ-config-main.auto-config-enabled', {
                 names: names.join(', ')
-              })}`
+              })
             )
           } else {
-            this._sendInChat(
-              `[League Akari] ${i18next.t('auto-champ-config-main.auto-config-enabled-no-champion')}`
-            )
+            this._sendInChat(i18next.t('auto-champ-config-main.auto-config-enabled-no-champion'))
           }
         }
       },

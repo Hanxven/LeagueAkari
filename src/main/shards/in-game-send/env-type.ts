@@ -49,6 +49,13 @@ interface RankedStatsEnv {
   }
 }
 
+interface AdditionalGameEnv {
+  [key: string]: {
+    source: 'lcu' | 'sgp'
+    data: Game
+  }
+}
+
 interface SummonerEnv {
   [key: string]: {
     source: 'lcu'
@@ -257,6 +264,11 @@ export type TemplateEnv = {
    * Game timeline environment including game timeline data for a certain count of games.
    */
   gameTimeline: GameTimelineEnv
+
+  /**
+   * Additional game environment including additional game data for each player.
+   */
+  additionalGame: AdditionalGameEnv
 
   /**
    * Settings from shard ongoing-game-main (including only non-function fields)
