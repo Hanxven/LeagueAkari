@@ -1771,6 +1771,18 @@ AutoChampConfig:
   configure:
     label: Configure
 
+BenchChampionTracker:
+  position_ordinal_one: '{{position}}st'
+  position_ordinal_two: '{{position}}nd'
+  position_ordinal_three: '{{position}}rd'
+  position_ordinal_other: '{{position}}th'
+  reroll: Reroll
+  trade: Trade
+  swap: Swap
+  useReroll: '{{player}} used a reroll'
+  tradeWithPlayer: '{{player1}} traded with {{player2}}'
+  swapFromBench: '{{player}} swapped from the bench'
+
 tray:
   quit: Quit
   auxWindow: Aux Window

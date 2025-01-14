@@ -3,7 +3,6 @@ import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { formatError, formatErrorMessage } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
-import { handleType } from 'pinyin-pro/types/core/polyphonic'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -11,7 +10,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { AramOwnerTracker } from './aram-owner-tracker'
+import { AramTracker } from './aram-tracker'
 import { AutoSelectSettings, AutoSelectState } from './state'
 
 export class AutoSelectMain implements IAkariShardInitDispose {
@@ -39,6 +38,8 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
   private _pickTask = new TimeoutTask()
   private _banTask = new TimeoutTask()
+
+  private _aramTracker = new AramTracker()
 
   constructor(deps: any) {
     this._loggerFactory = deps['logger-factory-main']
@@ -105,6 +106,11 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       'upcomingGrab',
       'upcomingPick',
       'upcomingBan'
+    ])
+
+    this._mobx.propSync(AutoSelectMain.id, 'aramTracker', this._aramTracker.state, [
+      'recordedEvents',
+      'isJoinAfterSession'
     ])
   }
 
@@ -479,8 +485,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
       return { benchEnabled, localPlayerCellId, benchChampions, myTeam }
     })
 
-    const ownerTracker = new AramOwnerTracker()
-
     this._mobx.reaction(
       () =>
         [
@@ -495,7 +499,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           if (prevSession) {
             benchChampions.clear()
           }
-          ownerTracker.reset()
+          this._aramTracker.reset()
           return
         }
 
@@ -503,7 +507,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
           return
         }
 
-        ownerTracker.update(session)
+        this._aramTracker.track(session)
 
         // Diff
         const now = Date.now()
@@ -672,7 +676,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
             if (indexHim === -1 || indexInHand < indexHim) {
               if (this.settings.benchHandleTradeIgnoreChampionOwner) {
-                const origin = ownerTracker.getOrigin(self.championId)
+                const origin = this._aramTracker.getOrigin(self.championId)
                 if (origin && origin.cellId === otherSummonerIndex) {
                   this._sendInChat(
                     `[League Akari] ${i18next.t('auto-select-main.ignore-trade-owner', {
@@ -704,7 +708,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
             }
           } else {
             if (this.settings.benchHandleTradeIgnoreChampionOwner) {
-              const origin = ownerTracker.getOrigin(self.championId)
+              const origin = this._aramTracker.getOrigin(self.championId)
               if (origin && origin.cellId === otherSummonerIndex) {
                 this._sendInChat(
                   `[League Akari] ${i18next.t('auto-select-main.ignore-trade-owner', {

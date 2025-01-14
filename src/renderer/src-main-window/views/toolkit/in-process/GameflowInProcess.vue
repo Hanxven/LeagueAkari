@@ -5,7 +5,7 @@
         {{ t('GameflowInProgress.title') }}
       </span>
     </template>
-    <!-- <ControlItem
+    <ControlItem
       class="control-item-margin"
       :label="t('GameflowInProgress.dodge.label')"
       :label-description="t('GameflowInProgress.dodge.description')"
@@ -18,7 +18,7 @@
         size="small"
         >{{ t('GameflowInProgress.dodge.button') }}</NButton
       >
-    </ControlItem> -->
+    </ControlItem>
     <ControlItem
       class="control-item-margin"
       :label="t('GameflowInProgress.playAgain.label')"

@@ -87,5 +87,6 @@ export class AutoSelectRenderer implements IAkariShardInitDispose {
 
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'aramTracker', store.aramTracker)
   }
 }

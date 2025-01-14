@@ -13,6 +13,28 @@ interface UpcomingBanPick {
   }
 }
 
+export type PlaceInfo =
+  | {
+      place: 'bench'
+    }
+  | {
+      place: 'player'
+      puuid: string
+      cellId: number
+    }
+
+export type AdditionalPlaceInfo =
+  | { place: 'unknown' } // 凭空出现
+  | { place: 'reroll' } // reroll
+  | { place: 'initial' } // 初始分配
+
+export interface TrackEvent {
+  championId: number
+  from: PlaceInfo | AdditionalPlaceInfo
+  to: PlaceInfo
+  timestamp: number
+}
+
 export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () => {
   const settings = shallowReactive({
     normalModeEnabled: false,
@@ -54,6 +76,11 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
   const upcomingPick = shallowRef<{ championId: number; willPickAt: number } | null>(null)
   const upcomingBan = shallowRef<{ championId: number; willBanAt: number } | null>(null)
 
+  const aramTracker = shallowReactive({
+    recordedEvents: [] as TrackEvent[],
+    isJoinAfterSession: false
+  })
+
   return {
     settings,
 
@@ -62,6 +89,8 @@ export const useAutoSelectStore = defineStore('shard:auto-select-renderer', () =
     upcomingGrab,
     memberMe,
     upcomingPick,
-    upcomingBan
+    upcomingBan,
+
+    aramTracker
   }
 })

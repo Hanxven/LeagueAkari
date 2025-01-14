@@ -1,6 +1,6 @@
 {
   "name": "league-akari",
-  "version": "1.3.3-rabi.5",
+  "version": "1.3.3-rabi.6",
   "author": {
     "name": "Hanxven",
     "email": "hanxven@gmail.com"
@@ -52,6 +52,7 @@
     "@types/semver": "^7.5.8",
     "@types/ws": "^8.5.13",
     "@vicons/carbon": "^0.13.0",
+    "@vicons/fa": "^0.13.0",
     "@vicons/fluent": "^0.13.0",
     "@vicons/ionicons5": "^0.13.0",
     "@vicons/material": "^0.13.0",

@@ -14,7 +14,6 @@ import { LeagueClientMain } from '../league-client'
 import { AkariLogger } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { MainWindowPart } from './main-window'
 import { WindowManagerSettings, WindowManagerState } from './state'
 
 export class WindowManagerMain implements IAkariShardInitDispose {
@@ -977,7 +976,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
    * 设置项的背景材质转换为原生系统级别背景材质
    */
   private _settingToNativeBackgroundMaterial(material: string) {
-    if (process.env['NODE_ENV'] !== 'development') {
+    if (material === 'mica' && process.env['NODE_ENV'] !== 'development') {
       this._log.warn(
         '由于 Electron 上游 bug (https://github.com/electron/electron/issues/41824), 使用 Mica 材质后窗口会出现不可逆渲染错误, 生产环境下禁用此特性。'
       )

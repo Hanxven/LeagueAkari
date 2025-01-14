@@ -4,11 +4,13 @@
     <BenchModeAutoGrab style="margin-bottom: 4px" />
     <ChampSelectActions style="margin-bottom: 4px" />
     <SkinSelectionMini style="margin-bottom: 4px" />
-    <ChampSelectOperations />
+    <ChampSelectOperations style="margin-bottom: 4px" />
+    <BenchChampionTracker />
   </NScrollbar>
 </template>
 
 <script setup lang="ts">
+import BenchChampionTracker from '@aux-window/components/BenchChampionTracker.vue'
 import BenchChampionsMini from '@aux-window/components/BenchChampionsMini.vue'
 import BenchModeAutoGrab from '@aux-window/components/BenchModeAutoGrab.vue'
 import ChampSelectActions from '@aux-window/components/ChampSelectActions.vue'

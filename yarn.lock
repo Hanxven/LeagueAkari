@@ -2092,6 +2092,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vicons/fa@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "@vicons/fa@npm:0.13.0"
+  checksum: 10c0/060abebf1aeee66cbeba227cae9b87071c180a2d1419eb9cc56762c3b4fdccc35b6c837f2c809ed7305898508a4e151d17c33c26e4cd223758fdf6a0470a6e6a
+  languageName: node
+  linkType: hard
+
 "@vicons/fluent@npm:^0.13.0":
   version: 0.13.0
   resolution: "@vicons/fluent@npm:0.13.0"
@@ -5218,6 +5225,7 @@ __metadata:
     "@types/semver": "npm:^7.5.8"
     "@types/ws": "npm:^8.5.13"
     "@vicons/carbon": "npm:^0.13.0"
+    "@vicons/fa": "npm:^0.13.0"
     "@vicons/fluent": "npm:^0.13.0"
     "@vicons/ionicons5": "npm:^0.13.0"
     "@vicons/material": "npm:^0.13.0"

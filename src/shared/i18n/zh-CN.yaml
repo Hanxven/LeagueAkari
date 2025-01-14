@@ -1778,6 +1778,15 @@ AutoChampConfig:
   configure:
     label: 配置
 
+BenchChampionTracker:
+  position: '{{position}} 楼'
+  reroll: 重随
+  trade: 交换
+  swap: 拿取
+  useReroll: '{{player}} 使用了一个骰子'
+  tradeWithPlayer: '{{player1}} 与 {{player2}} 交换'
+  swapFromBench: '{{player}} 从备选区拿取'
+
 tray:
   quit: 退出
   auxWindow: 辅助窗口
