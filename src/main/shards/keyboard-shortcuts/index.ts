@@ -93,6 +93,21 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
       this._log.info('监听键盘事件')
 
+      const keyStats = await input.getAllKeyStatesAsync()
+
+      keyStats.forEach((key) => {
+        const { vkCode, pressed } = key
+        if (isModifierKey(vkCode)) {
+          if (pressed) {
+            this._pressedModifierKeys.add(vkCode)
+          }
+        } else {
+          if (pressed) {
+            this._pressedOtherKeys.add(vkCode)
+          }
+        }
+      })
+
       input.onKeyEvent((key) => {
         const [keyCodeRaw, state] = key.split(',')
 
@@ -230,6 +245,15 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
       const { cb, ...rest } = r
       return rest
+    })
+
+    this._ipc.onCall(KeyboardShortcutsMain.id, '_getInternalVars', () => {
+      // 调试用
+      return {
+        _pressedOtherKeys: this._pressedOtherKeys,
+        _pressedModifierKeys: this._pressedModifierKeys,
+        _lastActiveShortcut: this._lastActiveShortcut
+      }
     })
   }
 

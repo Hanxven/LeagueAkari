@@ -273,6 +273,63 @@ private:
   Napi::Promise::Deferred deferred;
 };
 
+class GetAllKeyStatesWorker : public Napi::AsyncWorker {
+public:
+  struct KeyStateInfo {
+    int vkCode;
+    bool isPressed;
+    UINT scanCode;
+  };
+
+  GetAllKeyStatesWorker(const Napi::Env& env)
+      : Napi::AsyncWorker(env)
+      , deferred(Napi::Promise::Deferred::New(env)) {}
+
+  ~GetAllKeyStatesWorker() {}
+
+  void Execute() override {
+    for (int vk = 0; vk < 256; ++vk) {
+      SHORT state = GetAsyncKeyState(vk);
+      bool pressed = (state & 0x8000) != 0;
+
+      UINT scanCode = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
+
+      KeyStateInfo info;
+      info.vkCode    = vk;
+      info.isPressed = pressed;
+      info.scanCode  = scanCode;
+
+      results.push_back(info);
+    }
+  }
+
+  void OnOK() override {
+    Napi::Env env = Env();
+
+    Napi::Array arr = Napi::Array::New(env, results.size());
+    for (size_t i = 0; i < results.size(); i++) {
+      Napi::Object entry = Napi::Object::New(env);
+      entry.Set("vkCode",    Napi::Number::New(env, results[i].vkCode));
+      entry.Set("pressed",   Napi::Boolean::New(env, results[i].isPressed));
+      entry.Set("scanCode",  Napi::Number::New(env, results[i].scanCode));
+
+      arr.Set(i, entry);
+    }
+
+    deferred.Resolve(arr);
+  }
+
+  void OnError(const Napi::Error& e) override {
+    deferred.Reject(e.Value());
+  }
+
+  Napi::Promise GetPromise() { return deferred.Promise(); }
+
+private:
+  Napi::Promise::Deferred deferred;
+  std::vector<KeyStateInfo> results;
+};
+
 Napi::Value SendKeysAsync(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
@@ -318,6 +375,14 @@ Napi::Value SendKeyAsync(const Napi::CallbackInfo& info) {
   return promise;
 }
 
+Napi::Value GetAllKeyStatesAsync(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  GetAllKeyStatesWorker* worker = new GetAllKeyStatesWorker(env);
+  Napi::Promise promise = worker->GetPromise();
+  worker->Queue();
+  return promise;
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "startHook"), Napi::Function::New(env, StartHook));
   exports.Set(Napi::String::New(env, "stopHook"), Napi::Function::New(env, StopHook));
@@ -326,6 +391,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "sendKeys"), Napi::Function::New(env, SendKeys));
   exports.Set(Napi::String::New(env, "sendKeysAsync"), Napi::Function::New(env, SendKeysAsync));
   exports.Set(Napi::String::New(env, "sendKeyAsync"), Napi::Function::New(env, SendKeyAsync));
+  exports.Set(Napi::String::New(env, "getAllKeyStatesAsync"), Napi::Function::New(env, GetAllKeyStatesAsync));
   return exports;
 }
 

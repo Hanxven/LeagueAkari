@@ -1,8 +1,20 @@
 <template>
-  <NCard size="small" v-if="translatedEvents.length">
+  <NCard size="small" v-if="translatedEvents.events.length">
+    <div class="dice-usage" v-if="translatedEvents.diceUsage.length">
+      <div class="player-dice-usage" v-for="p of translatedEvents.diceUsage" :key="p.cellId">
+        <span class="label">{{
+          t('BenchChampionTracker.position', {
+            count: cellIdToFloor[p.cellId],
+            ordinal: true
+          })
+        }}</span>
+        <NIcon class="icon"><DiceIcon /></NIcon>
+        <span class="count">{{ p.diceUsage.length }}</span>
+      </div>
+    </div>
     <NScrollbar style="height: 200px" ref="scrollbar">
       <NTimeline>
-        <NTimelineItem v-for="e of translatedEvents" type="info">
+        <NTimelineItem v-for="e of translatedEvents.events" type="info">
           <template #icon>
             <NIcon>
               <component :is="getEventTypeIcon(e)" />
@@ -10,14 +22,16 @@
           </template>
           <template #header>
             <span class="action"
-              >{{ formatEventTypeText(e) }} ({{ dayjs(e.timestamp).format('HH:mm:ss:SSS') }})</span
+              >{{ formatEventTypeText(e) }}
+              <span class="time">({{ dayjs(e.timestamp).format('HH:mm:ss:SSS') }})</span></span
             >
           </template>
           <div class="solution" v-if="e.type === 'reroll'">
             <span class="action">{{
               t('BenchChampionTracker.useReroll', {
                 player: t('BenchChampionTracker.position', {
-                  position: cellIdToFloor[e.playerCellId]
+                  count: cellIdToFloor[e.playerCellId],
+                  ordinal: true
                 })
               })
             }}</span>
@@ -28,10 +42,12 @@
               {{
                 t('BenchChampionTracker.tradeWithPlayer', {
                   player1: t('BenchChampionTracker.position', {
-                    position: cellIdToFloor[e.player1CellId]
+                    count: cellIdToFloor[e.player1CellId],
+                    ordinal: true
                   }),
                   player2: t('BenchChampionTracker.position', {
-                    position: cellIdToFloor[e.player2CellId]
+                    count: cellIdToFloor[e.player2CellId],
+                    ordinal: true
                   })
                 })
               }}
@@ -43,8 +59,9 @@
             <span class="action">
               {{
                 t('BenchChampionTracker.swapFromBench', {
-                  name: t('BenchChampionTracker.position', {
-                    position: cellIdToFloor[e.playerCellId]
+                  player: t('BenchChampionTracker.position', {
+                    count: cellIdToFloor[e.playerCellId],
+                    ordinal: true
                   })
                 })
               }}
@@ -105,6 +122,14 @@ type TranslatedEvent =
       timestamp: number
     }
 
+type TranslatedDiceUsage = {
+  cellId: number
+  diceUsage: {
+    championId: number
+    timestamp: number
+  }[]
+}
+
 const formatEventTypeText = (e: TranslatedEvent) => {
   switch (e.type) {
     case 'reroll':
@@ -162,6 +187,7 @@ const translatedEvents = computed(() => {
   )
 
   const translated = [] as TranslatedEvent[]
+  const diceUsage: Record<number, TranslatedDiceUsage> = {}
 
   for (let i = 0; i < events.length; i++) {
     const item = events[i]
@@ -174,6 +200,19 @@ const translatedEvents = computed(() => {
         playerCellId: item.to.cellId as number,
         // @ts-ignore
         playerPuuid: item.from.puuid as string,
+        timestamp: item.timestamp
+      })
+
+      // @ts-ignore
+      const cellId = item.to.cellId as number
+
+      diceUsage[cellId] = diceUsage[cellId] || {
+        cellId,
+        diceUsage: []
+      }
+
+      diceUsage[cellId].diceUsage.push({
+        championId: item.championId,
         timestamp: item.timestamp
       })
     } else if (item.from.place === 'player' && item.to.place === 'player') {
@@ -200,7 +239,14 @@ const translatedEvents = computed(() => {
     }
   }
 
-  return translated
+  return {
+    events: translated,
+    diceUsage: Object.values(diceUsage).toSorted((a, b) => {
+      const f1 = cellIdToFloor.value[a.cellId] || 0
+      const f2 = cellIdToFloor.value[b.cellId] || 0
+      return f1 - f2
+    })
+  }
 })
 
 const scrollbarEl = useTemplateRef('scrollbar')
@@ -208,7 +254,7 @@ const shouldFollow = ref(true)
 const { arrivedState, y } = useScroll(() => scrollbarEl.value?.scrollbarInstRef?.containerRef)
 
 watch(
-  [() => shouldFollow.value, () => translatedEvents.value.length],
+  [() => shouldFollow.value, () => translatedEvents.value.events.length],
   ([should, _]) => {
     if (should) {
       nextTick(() => {
@@ -235,6 +281,11 @@ watch(
 .action {
   font-size: 12px;
   color: #fffd;
+
+  .time {
+    font-size: 10px;
+    color: #fff8;
+  }
 }
 
 .solution {
@@ -251,6 +302,37 @@ watch(
     width: 16px;
     height: 16px;
     border-radius: 2px;
+  }
+}
+
+.dice-usage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+
+  .player-dice-usage {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    border: solid 1px #fff2;
+    padding: 0 4px;
+    border-radius: 2px;
+
+    .label {
+      font-size: 11px;
+      color: #fff8;
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .count {
+      font-size: 12px;
+      color: #fff;
+    }
   }
 }
 </style>

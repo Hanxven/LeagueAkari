@@ -1772,10 +1772,10 @@ AutoChampConfig:
     label: Configure
 
 BenchChampionTracker:
-  position_ordinal_one: '{{position}}st'
-  position_ordinal_two: '{{position}}nd'
-  position_ordinal_three: '{{position}}rd'
-  position_ordinal_other: '{{position}}th'
+  position_ordinal_one: '{{count}}st'
+  position_ordinal_two: '{{count}}nd'
+  position_ordinal_three: '{{count}}rd'
+  position_ordinal_other: '{{count}}th'
   reroll: Reroll
   trade: Trade
   swap: Swap

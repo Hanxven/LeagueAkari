@@ -42,6 +42,17 @@ declare module '@main/native/la-input-win64.node' {
      * 停止监听
      */
     stopHook(): void
+
+    /**
+     * 获取所有按键的状态
+     */
+    getAllKeyStatesAsync(): Promise<
+      {
+        vkCode: number
+        pressed: boolean
+        scanCode: number
+      }[]
+    >
   }
 
   const inputAddon: LeagueAkariInputAddon

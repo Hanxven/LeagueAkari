@@ -1779,7 +1779,7 @@ AutoChampConfig:
     label: 配置
 
 BenchChampionTracker:
-  position: '{{position}} 楼'
+  position: '{{count}} 楼'
   reroll: 重随
   trade: 交换
   swap: 拿取
