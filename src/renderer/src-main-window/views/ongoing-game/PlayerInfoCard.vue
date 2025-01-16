@@ -104,7 +104,7 @@
             </div>
           </template>
           <RankedTable v-if="rankedStats" :rankedStats="rankedStats" />
-          <div v-else style="font-size: 12px">{{ t('common.PlayerInfoCard.empty') }}</div>
+          <div v-else style="font-size: 12px">{{ t('PlayerInfoCard.empty') }}</div>
         </NPopover>
       </div>
     </div>

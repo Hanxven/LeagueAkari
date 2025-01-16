@@ -1,6 +1,6 @@
 <template>
   <NCard v-if="isCustomGame !== null" size="small">
-    <NFlex align="center" v-if="!isCustomGame" class="control-item">
+    <NFlex align="center" v-if="aps.settings.isInKyokoMode && !isCustomGame" class="control-item">
       <span class="label" style="flex: 1">{{ t('ChampSelectOperations.dodge.label') }}</span>
       <NPopconfirm
         @positive-click="handleDodge"
@@ -17,7 +17,7 @@
         <span style="font-size: 12px">{{ t('ChampSelectOperations.dodge.popconfirm') }}</span>
       </NPopconfirm>
     </NFlex>
-    <NFlex align="center" class="control-item" v-if="!isCustomGame">
+    <NFlex align="center" class="control-item" v-if="aps.settings.isInKyokoMode && !isCustomGame">
       <span class="label" style="flex: 1">{{ dodgeAtLastSecondLabelText }}</span>
       <NSwitch
         size="small"
@@ -25,7 +25,7 @@
         @update:value="(val) => agf.setWillDodgeAtLastSecond(val)"
       />
     </NFlex>
-    <NFlex align="center" class="control-item" v-if="!isCustomGame">
+    <NFlex align="center" class="control-item" v-if="aps.settings.isInKyokoMode && !isCustomGame">
       <span class="label" style="flex: 1">{{
         t('ChampSelectOperations.dodgeAtLastSecond.label')
       }}</span>
@@ -69,6 +69,7 @@
 <script setup lang="ts">
 import { useCountdownSeconds } from '@renderer-shared/compositions/useCountdown'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/store'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
@@ -85,6 +86,7 @@ const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 const as2 = useAutoSelectStore()
 const agfs = useAutoGameflowStore()
+const aps = useAppCommonStore()
 
 const agf = useInstance<AutoGameflowRenderer>('auto-gameflow-renderer')
 const as = useInstance<AutoSelectRenderer>('auto-select-renderer')

@@ -1406,6 +1406,7 @@ BenchChampionsMini:
   charity: 'Reroll and Take back (Remaining: {{countV}})'
   notInBenchMode: Not currently in a bench mode
   notInPhase: Not in the champion selection phase
+  rerollFailed: Failed to reroll {{reason}}
 
   balanceTypes:
     damage-dealt: Damage Dealt

@@ -119,10 +119,9 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { RefreshOutline as RefreshOutlineIcon, Share as ShareIcon } from '@vicons/ionicons5'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NDivider, NIcon, NTooltip, useMessage } from 'naive-ui'
 import { computed, ref } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 
@@ -299,9 +298,13 @@ const handleBenchSwap = async (championId: number) => {
   isSwapping.value = true
   try {
     await lc.api.champSelect.benchSwap(championId)
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
-    message.warning(t('BenchChampionsMini.rerollFailed'))
+    message.warning(
+      t('BenchChampionsMini.rerollFailed', {
+        reason: error.message
+      })
+    )
   } finally {
     isSwapping.value = false
   }
@@ -326,8 +329,12 @@ const handleReroll = async (grabBack = false) => {
         }
       }, 25)
     }
-  } catch (error) {
-    message.warning(t('BenchChampionsMini.rerollFailed'))
+  } catch (error: any) {
+    message.warning(
+      t('BenchChampionsMini.rerollFailed', {
+        reason: error.message
+      })
+    )
   } finally {
     isRerolling.value = false
   }

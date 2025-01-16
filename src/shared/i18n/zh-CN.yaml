@@ -1412,6 +1412,7 @@ BenchChampionsMini:
   charity: '重随并立即取回 (剩余: {{countV}})'
   notInBenchMode: 当前不在随机模式中
   notInPhase: 未处于英雄选择过程中
+  rerollFailed: 重随失败 {{reason}}
 
   balanceTypes:
     damage-dealt: 造成伤害

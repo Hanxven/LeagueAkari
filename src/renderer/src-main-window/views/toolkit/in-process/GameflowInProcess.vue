@@ -6,6 +6,7 @@
       </span>
     </template>
     <ControlItem
+      v-if="as.settings.isInKyokoMode"
       class="control-item-margin"
       :label="t('GameflowInProgress.dodge.label')"
       :label-description="t('GameflowInProgress.dodge.description')"
@@ -49,6 +50,7 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
@@ -57,6 +59,7 @@ import { computed } from 'vue'
 
 const { t } = useTranslation()
 
+const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
