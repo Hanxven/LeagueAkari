@@ -47,6 +47,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
    */
   static MAX_CUSTOM_SEND = 20
   static ENTER_KEY_CODE = 13
+  static ENTER_KEY_INTERNAL_DELAY = 20
 
   public readonly settings = new InGameSendSettings()
   public readonly state = new InGameSendState()
@@ -161,11 +162,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
       for (let i = 0; i < messages.length; i++) {
         tasks.push(async () => {
           await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, true)
+          await sleep(InGameSendMain.ENTER_KEY_INTERNAL_DELAY)
           await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, false)
           await sleep(interval)
           await input.sendKeysAsync(messages[i])
           await sleep(interval)
           await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, true)
+          await sleep(InGameSendMain.ENTER_KEY_INTERNAL_DELAY)
           await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, false)
         })
 

@@ -887,6 +887,21 @@ export const UNIFIED_KEY_ID = {
   110: 'Dot'
 } as const
 
+const COMMON_MODIFIER_KEY = [
+  // Alt
+  18,
+
+  // SHIFT
+  16,
+
+  // CONTROL
+  17
+]
+
 export function isModifierKey(keyCode: number) {
   return MODIFIER_KEYS.has(keyCode)
+}
+
+export function isCommonModifierKey(keyCode: number) {
+  return COMMON_MODIFIER_KEY.includes(keyCode)
 }

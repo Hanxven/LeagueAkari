@@ -23,6 +23,8 @@ export class KeyboardShortcutsRenderer implements IAkariShardInitDispose {
   static id = 'keyboard-shortcuts-renderer'
   static dependencies = ['akari-ipc-renderer']
 
+  static DISABLED_KEYS_TARGET_ID = 'akari-disabled-keys'
+
   private readonly _ipc: AkariIpcRenderer
 
   constructor(deps: any) {
@@ -44,5 +46,10 @@ export class KeyboardShortcutsRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getRegistration', shortcutId)
   }
 
-  async onInit() {}
+  async onInit() {
+    // @ts-ignore
+    window._getInternalVars = async () => {
+      return await this._ipc.call(MAIN_SHARD_NAMESPACE, '_getInternalVars')
+    }
+  }
 }

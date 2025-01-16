@@ -681,6 +681,7 @@ ShortcutSelector:
   hint: 按下按键以记录快捷键
   clear: 清除
   unset: 未设置
+  reservedShortcut: 此快捷键不可用
   beingOccupied: 此快捷键被占用
   unchanged: (未变化)
   tooComplicated: 该快捷键组合具有较高复杂度，请确认

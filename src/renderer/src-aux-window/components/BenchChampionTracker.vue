@@ -308,7 +308,8 @@ watch(
 .dice-usage {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  row-gap: 4px;
+  column-gap: 2px;
   margin-bottom: 4px;
 
   .player-dice-usage {

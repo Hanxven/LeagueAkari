@@ -36,7 +36,14 @@
         <span class="empty" v-if="!editingKeys.length">{{ t('ShortcutSelector.hint') }}</span>
       </div>
       <div v-if="isOccupiedBy && targetId !== isOccupiedBy.targetId" class="warn-text">
-        {{ t('ShortcutSelector.beingOccupied') }}
+        <template
+          v-if="isOccupiedBy.targetId === KeyboardShortcutsRenderer.DISABLED_KEYS_TARGET_ID"
+        >
+          {{ t('ShortcutSelector.reservedShortcut') }}
+        </template>
+        <template v-else>
+          {{ t('ShortcutSelector.beingOccupied') }}
+        </template>
       </div>
       <div v-if="editingKeys.length > 4" class="warn-text">
         {{ t('ShortcutSelector.tooComplicated') }}
@@ -60,15 +67,14 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
+import { useTranslation } from 'i18next-vue'
 import { NButton, NModal } from 'naive-ui'
 import { computed, onDeactivated, onUnmounted, ref, shallowRef, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 defineProps<{
   disabled?: boolean
   targetId?: string
 }>()
-
 
 const { t } = useTranslation()
 
@@ -135,7 +141,6 @@ watch(
   async (shortcut) => {
     if (shortcut) {
       isOccupiedBy.value = await kbd.getRegistration(shortcut)
-      console.log(isOccupiedBy.value)
     } else {
       isOccupiedBy.value = null
     }

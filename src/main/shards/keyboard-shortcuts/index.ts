@@ -1,11 +1,12 @@
 import input from '@main/native/la-input-win64.node'
+import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import EventEmitter from 'node:events'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
-import { UNIFIED_KEY_ID, VKEY_MAP, isModifierKey } from './definitions'
+import { UNIFIED_KEY_ID, VKEY_MAP, isCommonModifierKey, isModifierKey } from './definitions'
 
 interface ShortcutDetails {
   keyCodes: number[]
@@ -52,6 +53,14 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     92: 9
   }
 
+  static readonly VK_CODE_F22 = 133
+
+  static DISABLED_KEYS_TARGET_ID = 'akari-disabled-keys'
+  static DISABLED_KEYS = [
+    133, // F22
+    13 // Enter
+  ]
+
   /**
    * 原生监听到的键盘事件
    */
@@ -80,6 +89,14 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   private _targetIdMap = new Map<string, string>()
 
+  private _correctTask = new TimeoutTask(() => {
+    if (this._pressedModifierKeys.size === 0 && this._pressedOtherKeys.size === 0) {
+      return
+    }
+
+    this._correctTrackingState()
+  }, 2000)
+
   constructor(deps: any) {
     this._app = deps['app-common-main']
     this._ipc = deps['akari-ipc-main']
@@ -93,35 +110,26 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
       this._log.info('监听键盘事件')
 
-      const keyStats = await input.getAllKeyStatesAsync()
-
-      keyStats.forEach((key) => {
-        const { vkCode, pressed } = key
-        if (isModifierKey(vkCode)) {
-          if (pressed) {
-            this._pressedModifierKeys.add(vkCode)
-          }
-        } else {
-          if (pressed) {
-            this._pressedOtherKeys.add(vkCode)
-          }
-        }
-      })
-
       input.onKeyEvent((key) => {
         const [keyCodeRaw, state] = key.split(',')
 
         // ignore VK_PACKET (231)
-        if (keyCodeRaw === '231') {
-          return
-        }
-
-        if (!VKEY_MAP[keyCodeRaw]) {
+        if (keyCodeRaw === '231' || !VKEY_MAP[keyCodeRaw]) {
           return
         }
 
         const keyCode = parseInt(keyCodeRaw, 10)
+
+        if (isCommonModifierKey(keyCode)) {
+          return
+        }
+
         const isDown = state === 'DOWN'
+
+        // 定期尝试修正状态 (无奈之举)
+        if (isDown) {
+          this._correctTask.start()
+        }
 
         if (isModifierKey(keyCode)) {
           // skip if unchanged
@@ -163,7 +171,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
             const registration = this._registrationMap.get(combined)
             if (registration && registration.type === 'normal') {
               registration.cb({
-                keyCodes: this._lastActiveShortcut,
+                keyCodes,
                 keys,
                 id: combined,
                 unifiedId: unified
@@ -223,6 +231,8 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
           this._lastActiveShortcut = []
         }
       })
+
+      await this._correctTrackingState()
     }
 
     this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistration', (shortcutId: string) => {
@@ -253,6 +263,42 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
         _pressedOtherKeys: this._pressedOtherKeys,
         _pressedModifierKeys: this._pressedModifierKeys,
         _lastActiveShortcut: this._lastActiveShortcut
+      }
+    })
+  }
+
+  /**
+   * 修正当前的按键状态, 最大程度上保证状态的一致性
+   */
+  private async _correctTrackingState() {
+    const states = await input.getAllKeyStatesAsync()
+
+    this._pressedModifierKeys.clear()
+    this._pressedOtherKeys.clear()
+
+    states.forEach((key) => {
+      const { vkCode, pressed } = key
+
+      // 你知道吗? 当微信启动的时候, 会伸出一个无形的大手将 F22 (VK_CODE 133) 按下, 然后永远不松开
+      // 使用此逻辑以释放 F22
+      if (vkCode === KeyboardShortcutsMain.VK_CODE_F22 && pressed) {
+        this._log.info('F22 被按下, 试图释放')
+        input.sendKeyAsync(KeyboardShortcutsMain.VK_CODE_F22, false).catch(() => {})
+        return
+      }
+
+      if (isCommonModifierKey(vkCode)) {
+        return
+      }
+
+      if (isModifierKey(vkCode)) {
+        if (pressed) {
+          this._pressedModifierKeys.add(vkCode)
+        }
+      } else {
+        if (pressed) {
+          this._pressedOtherKeys.add(vkCode)
+        }
       }
     })
   }
@@ -314,10 +360,27 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   getRegistration(shortcutId: string) {
+    const reservedKeyIds = KeyboardShortcutsMain.DISABLED_KEYS.map((k) => VKEY_MAP[k].keyId)
+    if (reservedKeyIds.some((k) => shortcutId.includes(k))) {
+      return {
+        type: 'normal',
+        targetId: KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID,
+        cb: () => {}
+      }
+    }
+
     return this._registrationMap.get(shortcutId) || null
   }
 
   getRegistrationByTargetId(targetId: string) {
+    if (targetId === KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID) {
+      return {
+        type: 'normal',
+        targetId: KeyboardShortcutsMain.DISABLED_KEYS_TARGET_ID,
+        cb: () => {}
+      }
+    }
+
     const shortcutId = this._targetIdMap.get(targetId)
     if (shortcutId) {
       return this._registrationMap.get(shortcutId) || null
@@ -333,5 +396,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     this.events.removeAllListeners()
     this._registrationMap.clear()
     this._targetIdMap.clear()
+    this._correctTask.cancel()
   }
 }
