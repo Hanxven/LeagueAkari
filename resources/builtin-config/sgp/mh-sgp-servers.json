@@ -84,7 +84,8 @@
     "TENCENT_CQ100",
     "TENCENT_TJ100",
     "TENCENT_TJ101",
-    "TENCENT_BGP2"
+    "TENCENT_BGP2",
+    "TENCENT_PBE"
   ],
   "tencentServerSpectatorInteroperability": [
     "TENCENT_HN1",
@@ -94,7 +95,8 @@
     "TENCENT_CQ100",
     "TENCENT_TJ100",
     "TENCENT_TJ101",
-    "TENCENT_BGP2"
+    "TENCENT_BGP2",
+    "TENCENT_PBE"
   ],
   "tencentServerSummonerInteroperability": [
     "TENCENT_HN1",
@@ -104,6 +106,7 @@
     "TENCENT_CQ100",
     "TENCENT_TJ100",
     "TENCENT_TJ101",
-    "TENCENT_BGP2"
+    "TENCENT_BGP2",
+    "TENCENT_PBE"
   ]
 }

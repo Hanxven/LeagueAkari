@@ -205,7 +205,7 @@
       <template #header><LeagueAkariSpan class="card-header-title" /></template>
       <span class="text">{{ t('DebugSettings.inAdministrator.description') }}</span>
     </NCard>
-    <NCard v-if="as.settings.isInKyokoMode" size="small" style="margin-top: 8px">
+    <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">Akari~</span></template>
       <ControlItem
         class="control-item-margin"
@@ -215,7 +215,6 @@
       >
         <NSwitch
           size="small"
-          v-if="as.settings.isInKyokoMode"
           :value="as.settings.isInKyokoMode"
           @update:value="(val: boolean) => app.setInKyokoMode(val)"
         />

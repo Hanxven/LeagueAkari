@@ -350,7 +350,7 @@ DebugSettings:
     description: League Akari is running with administrator privileges, required for certain client-specific functionalities.
 
   kyokoMode:
-    description: Some features are for debugging purposes only.
+    description: Some features are for debugging purposes only. Including some deprecated or unfinished features.
 
 AboutPane:
   title: About
