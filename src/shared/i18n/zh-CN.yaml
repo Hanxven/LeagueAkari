@@ -353,7 +353,8 @@ DebugSettings:
     description: League Akari 运行在管理员权限，仅用于实现特定的客户端功能
 
   kyokoMode:
-    description: 部分功能仅用于调试用途，包含被废弃或未完成的功能
+    label: Kyoko 模式
+    description: 启用被废弃或实验性的功能
 
 AboutPane:
   title: 关于
@@ -1160,6 +1161,9 @@ StandaloneMatchHistoryCardModal:
   error: 加载对局失败
   reload: 重新拉取
   loading: 加载中...
+  errorNotification:
+    title: 加载对局失败 {{gameId}}
+    description: 无法加载对局信息 {{reason}}
 
 MiscellaneousPanel:
   gameId: 对局 ID {{gameId}}

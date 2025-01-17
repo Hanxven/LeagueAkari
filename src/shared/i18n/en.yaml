@@ -350,7 +350,8 @@ DebugSettings:
     description: League Akari is running with administrator privileges, required for certain client-specific functionalities.
 
   kyokoMode:
-    description: Some features are for debugging purposes only. Including some deprecated or unfinished features.
+    label: Kyoko Mode
+    description: Enabled features that are deprecated or experimental. Use with caution.
 
 AboutPane:
   title: About
@@ -1154,6 +1155,9 @@ StandaloneMatchHistoryCardModal:
   error: Failed to load game
   reload: Reload
   loading: Loading...
+  errorNotification:
+    title: Error loading {{gameId}}
+    description: 'Cannot fetch game: {{reason}}'
 
 MiscellaneousPanel:
   gameId: Game ID {{gameId}}

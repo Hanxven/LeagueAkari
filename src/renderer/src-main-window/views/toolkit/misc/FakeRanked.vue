@@ -49,18 +49,19 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NSelect, useMessage } from 'naive-ui'
+import { NButton, NCard, NSelect, useMessage, useNotification } from 'naive-ui'
 import { computed, reactive } from 'vue'
 
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+
+const notification = useNotification()
 
 const state = reactive({
   queue: 'RANKED_SOLO_5x5',
@@ -81,13 +82,13 @@ const handleSet = async () => {
     )
     message.success(t('FakeRanked.commonSuccess'), { duration: 1000 })
   } catch (error) {
-    laNotification.warn(
-      t('FakeRanked.set.failedNotification.title'),
-      t('FakeRanked.set.failedNotification.description', {
-        reason: (error as Error).message
-      }),
-      error
-    )
+    notification.warning({
+      title: () => t('FakeRanked.set.failedNotification.title'),
+      content: () =>
+        t('FakeRanked.set.failedNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   }
 }
 

@@ -1665,90 +1665,90 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/core-darwin-arm64@npm:1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core-darwin-arm64@npm:1.10.6"
+"@swc/core-darwin-arm64@npm:1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core-darwin-arm64@npm:1.10.7"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@swc/core-darwin-x64@npm:1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core-darwin-x64@npm:1.10.6"
+"@swc/core-darwin-x64@npm:1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core-darwin-x64@npm:1.10.7"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@swc/core-linux-arm-gnueabihf@npm:1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core-linux-arm-gnueabihf@npm:1.10.6"
+"@swc/core-linux-arm-gnueabihf@npm:1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core-linux-arm-gnueabihf@npm:1.10.7"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@swc/core-linux-arm64-gnu@npm:1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core-linux-arm64-gnu@npm:1.10.6"
+"@swc/core-linux-arm64-gnu@npm:1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core-linux-arm64-gnu@npm:1.10.7"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@swc/core-linux-arm64-musl@npm:1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core-linux-arm64-musl@npm:1.10.6"
+"@swc/core-linux-arm64-musl@npm:1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core-linux-arm64-musl@npm:1.10.7"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@swc/core-linux-x64-gnu@npm:1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core-linux-x64-gnu@npm:1.10.6"
+"@swc/core-linux-x64-gnu@npm:1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core-linux-x64-gnu@npm:1.10.7"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@swc/core-linux-x64-musl@npm:1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core-linux-x64-musl@npm:1.10.6"
+"@swc/core-linux-x64-musl@npm:1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core-linux-x64-musl@npm:1.10.7"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@swc/core-win32-arm64-msvc@npm:1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core-win32-arm64-msvc@npm:1.10.6"
+"@swc/core-win32-arm64-msvc@npm:1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core-win32-arm64-msvc@npm:1.10.7"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@swc/core-win32-ia32-msvc@npm:1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core-win32-ia32-msvc@npm:1.10.6"
+"@swc/core-win32-ia32-msvc@npm:1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core-win32-ia32-msvc@npm:1.10.7"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
 
-"@swc/core-win32-x64-msvc@npm:1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core-win32-x64-msvc@npm:1.10.6"
+"@swc/core-win32-x64-msvc@npm:1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core-win32-x64-msvc@npm:1.10.7"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@swc/core@npm:^1.10.6":
-  version: 1.10.6
-  resolution: "@swc/core@npm:1.10.6"
+"@swc/core@npm:^1.10.7":
+  version: 1.10.7
+  resolution: "@swc/core@npm:1.10.7"
   dependencies:
-    "@swc/core-darwin-arm64": "npm:1.10.6"
-    "@swc/core-darwin-x64": "npm:1.10.6"
-    "@swc/core-linux-arm-gnueabihf": "npm:1.10.6"
-    "@swc/core-linux-arm64-gnu": "npm:1.10.6"
-    "@swc/core-linux-arm64-musl": "npm:1.10.6"
-    "@swc/core-linux-x64-gnu": "npm:1.10.6"
-    "@swc/core-linux-x64-musl": "npm:1.10.6"
-    "@swc/core-win32-arm64-msvc": "npm:1.10.6"
-    "@swc/core-win32-ia32-msvc": "npm:1.10.6"
-    "@swc/core-win32-x64-msvc": "npm:1.10.6"
+    "@swc/core-darwin-arm64": "npm:1.10.7"
+    "@swc/core-darwin-x64": "npm:1.10.7"
+    "@swc/core-linux-arm-gnueabihf": "npm:1.10.7"
+    "@swc/core-linux-arm64-gnu": "npm:1.10.7"
+    "@swc/core-linux-arm64-musl": "npm:1.10.7"
+    "@swc/core-linux-x64-gnu": "npm:1.10.7"
+    "@swc/core-linux-x64-musl": "npm:1.10.7"
+    "@swc/core-win32-arm64-msvc": "npm:1.10.7"
+    "@swc/core-win32-ia32-msvc": "npm:1.10.7"
+    "@swc/core-win32-x64-msvc": "npm:1.10.7"
     "@swc/counter": "npm:^0.1.3"
     "@swc/types": "npm:^0.1.17"
   peerDependencies:
@@ -1777,7 +1777,7 @@ __metadata:
   peerDependenciesMeta:
     "@swc/helpers":
       optional: true
-  checksum: 10c0/40cd7c29b454feecb7f9b8010a28d5650c4435ce15b26c9467fb650fee9cef35f88f16a22c30aafbf294c9e1588ebb55ced07acaaac93b5b52349070c810c930
+  checksum: 10c0/73d3b164620590aff57512125e3cfd6dc1bb3346882fa9ad12abf8029f8be01eb71e6afc3c760c3e2cb479a2d7ff3180bf298f907768b93e3eac15fc72e0d855
   languageName: node
   linkType: hard
 
@@ -2011,12 +2011,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.10.5":
-  version: 22.10.5
-  resolution: "@types/node@npm:22.10.5"
+"@types/node@npm:^22.10.7":
+  version: 22.10.7
+  resolution: "@types/node@npm:22.10.7"
   dependencies:
     undici-types: "npm:~6.20.0"
-  checksum: 10c0/6a0e7d1fe6a86ef6ee19c3c6af4c15542e61aea2f4cee655b6252efb356795f1f228bc8299921e82924e80ff8eca29b74d9dd0dd5cc1a90983f892f740b480df
+  checksum: 10c0/c941b4689dfc4044b64a5f601306cbcb0c7210be853ba378a5dd44137898c45accedd796ee002ad9407024cac7ecaf5049304951cb1d80ce3d7cebbbae56f20e
   languageName: node
   linkType: hard
 
@@ -2458,42 +2458,42 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vueuse/components@npm:^12.3.0":
-  version: 12.3.0
-  resolution: "@vueuse/components@npm:12.3.0"
+"@vueuse/components@npm:^12.4.0":
+  version: 12.4.0
+  resolution: "@vueuse/components@npm:12.4.0"
   dependencies:
-    "@vueuse/core": "npm:12.3.0"
-    "@vueuse/shared": "npm:12.3.0"
+    "@vueuse/core": "npm:12.4.0"
+    "@vueuse/shared": "npm:12.4.0"
     vue: "npm:^3.5.13"
-  checksum: 10c0/27abdd1768681c32a6196fa1c220db67a63c1453f67a32c8a89a3ce239b3cb44e06d54e8d3f0b77885bde224b5da99922e7dcb1c6bbd99c4cc78b0c4d53678b7
+  checksum: 10c0/434a34c57a220eb9f71136451000e93c2879a8250da94e2a57edec71ca0c963e8b0b7eb8e1fc7fe4554f551ae089f04df8bf2803d6161a41d49c55c15eba9061
   languageName: node
   linkType: hard
 
-"@vueuse/core@npm:12.3.0, @vueuse/core@npm:^12.3.0":
-  version: 12.3.0
-  resolution: "@vueuse/core@npm:12.3.0"
+"@vueuse/core@npm:12.4.0, @vueuse/core@npm:^12.4.0":
+  version: 12.4.0
+  resolution: "@vueuse/core@npm:12.4.0"
   dependencies:
     "@types/web-bluetooth": "npm:^0.0.20"
-    "@vueuse/metadata": "npm:12.3.0"
-    "@vueuse/shared": "npm:12.3.0"
+    "@vueuse/metadata": "npm:12.4.0"
+    "@vueuse/shared": "npm:12.4.0"
     vue: "npm:^3.5.13"
-  checksum: 10c0/ed21137e00fcb2d585a9956f410293a43a1cbbfde1cffe97bc4fa845c97c8ddbeffe51744369ed2b385a3302f739620a43f65abd5b1a4ded29ab393b07e085a1
+  checksum: 10c0/21d37cc7ca9e358d356ee6f2dc5bd5f1c9431e6c930ab56f27bcd751daf0567b4d85c449f7c8e1ee13a087fbdcb949ad3b35862e3d888729f1e2003f519587ad
   languageName: node
   linkType: hard
 
-"@vueuse/metadata@npm:12.3.0":
-  version: 12.3.0
-  resolution: "@vueuse/metadata@npm:12.3.0"
-  checksum: 10c0/3227a64f7c9389dd35ede627e5a1b3d945c10e16065975b3b00e6ca7e7727a3edf2493b442e59c2473a9365c4d49d9cfa29159f92609e826551ceea214013b96
+"@vueuse/metadata@npm:12.4.0":
+  version: 12.4.0
+  resolution: "@vueuse/metadata@npm:12.4.0"
+  checksum: 10c0/3254243391c9cf467ab65f75bb74d84e592c517a85e3215bf810aeb3fa242bf7b3866db9a92d80218354243109c40c6e7155dc510cc8b4282d1df37816f1a8e3
   languageName: node
   linkType: hard
 
-"@vueuse/shared@npm:12.3.0":
-  version: 12.3.0
-  resolution: "@vueuse/shared@npm:12.3.0"
+"@vueuse/shared@npm:12.4.0":
+  version: 12.4.0
+  resolution: "@vueuse/shared@npm:12.4.0"
   dependencies:
     vue: "npm:^3.5.13"
-  checksum: 10c0/af9b324fcebca776f53ab02a304beeba5592744577fb487bd10b6572d7835bb7dade2d671f9da0aae4315b1b0537d661eac602f6114202aaa953dbc2320e6661
+  checksum: 10c0/0e34bd94c9aee2240b45f33d952878dedb30f82348d05987e9dd99929a8d8984a753c5f9f2ed2e757bd29189b04119340c7c8ebfa812ceb86347809683ba6071
   languageName: node
   linkType: hard
 
@@ -5215,12 +5215,12 @@ __metadata:
     "@electron-toolkit/utils": "npm:^3.0.0"
     "@electron/notarize": "npm:^2.5.0"
     "@modyfi/vite-plugin-yaml": "npm:^1.1.0"
-    "@swc/core": "npm:^1.10.6"
+    "@swc/core": "npm:^1.10.7"
     "@trivago/prettier-plugin-sort-imports": "npm:^5.2.1"
     "@types/lodash": "npm:^4.17.14"
     "@types/luaparse": "npm:^0.2.12"
     "@types/markdown-it": "npm:^14.1.2"
-    "@types/node": "npm:^22.10.5"
+    "@types/node": "npm:^22.10.7"
     "@types/node-7z": "npm:^2.1.10"
     "@types/semver": "npm:^7.5.8"
     "@types/ws": "npm:^8.5.13"
@@ -5231,8 +5231,8 @@ __metadata:
     "@vicons/material": "npm:^0.13.0"
     "@vitejs/plugin-vue": "npm:^5.2.1"
     "@vitejs/plugin-vue-jsx": "npm:^4.1.1"
-    "@vueuse/components": "npm:^12.3.0"
-    "@vueuse/core": "npm:^12.3.0"
+    "@vueuse/components": "npm:^12.4.0"
+    "@vueuse/core": "npm:^12.4.0"
     ajv: "npm:^8.17.1"
     axios: "npm:^1.7.9"
     axios-retry: "npm:^4.5.0"

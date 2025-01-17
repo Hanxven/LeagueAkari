@@ -94,19 +94,20 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { AvailableBot, QueueEligibility } from '@shared/types/league-client/lobby'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NFlex, NInput, NSelect, useMessage } from 'naive-ui'
+import { NButton, NCard, NFlex, NInput, NSelect, useMessage, useNotification } from 'naive-ui'
 import { computed, reactive, ref, shallowRef } from 'vue'
 
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+
+const notification = useNotification()
 
 const getRandomLobbyName = () => {
   return `AKARI_${(Date.now() % 10000000) + 10000000}`
@@ -129,13 +130,13 @@ const handleCreatePractice5v5 = async () => {
     await lc.api.lobby.createPractice5x5(practice5v5LobbyName.value)
     practice5v5LobbyName.value = getRandomLobbyName()
   } catch (error) {
-    laNotification.warn(
-      t('LobbyTool.create5x5PracticeLobby.failedNotification.title'),
-      t('LobbyTool.create5x5PracticeLobby.failedNotification.description', {
-        reason: (error as Error).message
-      }),
-      error
-    )
+    notification.warning({
+      title: () => t('LobbyTool.create5x5PracticeLobby.failedNotification.title'),
+      content: () =>
+        t('LobbyTool.create5x5PracticeLobby.failedNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   } finally {
     isCreatingPractice5v5.value = false
   }
@@ -148,13 +149,13 @@ const handleAddBot = async () => {
   try {
     await lc.api.lobby.addBot(botSettings.difficulty, botSettings.championId, botSettings.team)
   } catch (error) {
-    laNotification.warn(
-      t('LobbyTool.addBot.failedNotification.title'),
-      t('LobbyTool.addBot.failedNotification.description', {
-        reason: (error as Error).message
-      }),
-      error
-    )
+    notification.warning({
+      title: () => t('LobbyTool.addBot.failedNotification.title'),
+      content: () =>
+        t('LobbyTool.addBot.failedNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   }
 }
 
@@ -170,13 +171,13 @@ const handleLoadEligibleQueues = async (show: boolean) => {
       eligiblePartyQueues.value = d1
       eligibleSelfQueues.value = d2
     } catch (error) {
-      laNotification.warn(
-        t('LobbyTool.loadEligibleQueuesFailedNotification.title'),
-        t('LobbyTool.loadEligibleQueuesFailedNotification.description', {
-          reason: (error as Error).message
-        }),
-        error
-      )
+      notification.warning({
+        title: () => t('LobbyTool.loadEligibleQueuesFailedNotification.title'),
+        content: () =>
+          t('LobbyTool.loadEligibleQueuesFailedNotification.description', {
+            reason: (error as Error).message
+          })
+      })
     }
   }
 }
@@ -320,13 +321,13 @@ const handleCreateQueueLobby = async () => {
   try {
     await lc.api.lobby.createQueueLobby(queueLobbySettings.queueId)
   } catch (error) {
-    laNotification.warn(
-      t('LobbyTool.createIdLobby.failedNotification.title'),
-      t('LobbyTool.createIdLobby.failedNotification.description', {
-        reason: (error as Error).message
-      }),
-      error
-    )
+    notification.warning({
+      title: () => t('LobbyTool.createIdLobby.failedNotification.title'),
+      content: () =>
+        t('LobbyTool.createIdLobby.failedNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   }
 }
 
@@ -347,12 +348,13 @@ const handleLoadAvailableBots = async (show: boolean) => {
         acknowledged = true
       }
     } catch (error) {
-      laNotification.warn(
-        t('LobbyTool.loadBots.failedNotification.title'),
-        t('LobbyTool.loadBots.failedNotification.description', {
-          reason: (error as Error).message
-        })
-      )
+      notification.warning({
+        title: () => t('LobbyTool.loadBots.failedNotification.title'),
+        content: () =>
+          t('LobbyTool.loadBots.failedNotification.description', {
+            reason: (error as Error).message
+          })
+      })
     }
   }
 }

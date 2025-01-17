@@ -39,7 +39,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { greeting } from '@renderer-shared/utils/greeting'
-import { KYOKO_MODE_KEY_SEQUENCE, LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
+import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { useTranslation } from 'i18next-vue'
 import { useMessage, useNotification } from 'naive-ui'
 import { provide, ref, watchEffect } from 'vue'
@@ -167,24 +167,6 @@ app.onSecondInstance(() => {
     content: '因为 Akari 是独一无二的，所以同一时间只能有一个 Akari',
     duration: 10000
   })
-})
-
-useKeyboardCombo(KYOKO_MODE_KEY_SEQUENCE, {
-  onFinish: () => {
-    if (as.settings.isInKyokoMode) {
-      return
-    }
-
-    app.setInKyokoMode(true)
-    notification.success({
-      title: 'League Akari 测试模式',
-      content: 'Kyoko Mode, on!',
-      duration: 6000
-    })
-  },
-  requireSameEl: true,
-  caseSensitive: false,
-  maxInterval: 500
 })
 
 const message = useMessage()

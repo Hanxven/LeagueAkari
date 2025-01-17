@@ -206,10 +206,10 @@
       <span class="text">{{ t('DebugSettings.inAdministrator.description') }}</span>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">Akari~</span></template>
+      <template #header><span class="card-header-title">Akari Zone</span></template>
       <ControlItem
         class="control-item-margin"
-        label="Kyoko Mode"
+        :label="t('DebugSettings.kyokoMode.title')"
         :label-description="t('DebugSettings.kyokoMode.description')"
         :label-width="320"
       >

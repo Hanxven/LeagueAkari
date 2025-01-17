@@ -34,7 +34,6 @@
 </template>
 
 <script setup lang="ts">
-import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -43,7 +42,7 @@ import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Game } from '@shared/types/league-client/match-history'
 import { AxiosError } from 'axios'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NModal } from 'naive-ui'
+import { NButton, NModal, useNotification } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
@@ -64,6 +63,8 @@ const sgp = useInstance<SgpRenderer>('sgp-renderer')
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 const sgps = useSgpStore()
 const lcs = useLeagueClientStore()
+
+const notification = useNotification()
 
 // 和战绩页面的设置共享
 const mhs = useMatchHistoryTabsStore()
@@ -110,7 +111,16 @@ const fetchGame = async (gameId: number, useSgpApi = false) => {
       isNotFound.value = true
     }
 
-    laNotification.warn('战绩卡片', `对局 ${props.gameId} 加载失败`, error)
+    notification.warning({
+      title: () =>
+        t('StandaloneMatchHistoryCardModal.errorNotification.title', {
+          gameId: props.gameId
+        }),
+      content: () =>
+        t('StandaloneMatchHistoryCardModal.errorNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   } finally {
     isLoading.value = false
   }

@@ -48,13 +48,12 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard } from 'naive-ui'
+import { NButton, NCard, useNotification } from 'naive-ui'
 import { computed } from 'vue'
 
 const { t } = useTranslation()
@@ -63,17 +62,19 @@ const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
+const notification = useNotification()
+
 const handleDodge = async () => {
   try {
     await lc.api.login.dodge()
   } catch (error) {
-    laNotification.warn(
-      t('GameflowInProgress.dodge.failedNotification.title'),
-      t('GameflowInProgress.dodge.failedNotification.description', {
-        reason: (error as Error).message
-      }),
-      error
-    )
+    notification.warning({
+      title: () => t('GameflowInProgress.dodge.failedNotification.title'),
+      content: () =>
+        t('GameflowInProgress.dodge.failedNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   }
 }
 
@@ -89,13 +90,13 @@ const handlePlayAgain = async () => {
   try {
     await lc.api.lobby.playAgain()
   } catch (error) {
-    laNotification.warn(
-      t('GameflowInProgress.playAgain.failedNotification.title'),
-      t('GameflowInProgress.playAgain.failedNotification.description', {
-        reason: (error as Error).message
-      }),
-      error
-    )
+    notification.warning({
+      title: () => t('GameflowInProgress.playAgain.failedNotification.title'),
+      content: () =>
+        t('GameflowInProgress.playAgain.failedNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   }
 }
 </script>

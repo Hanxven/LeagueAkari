@@ -72,7 +72,6 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { GameClientRenderer } from '@renderer-shared/shards/game-client'
@@ -83,7 +82,7 @@ import { summonerName } from '@shared/utils/name'
 import { useIntervalFn } from '@vueuse/core'
 import { AxiosError } from 'axios'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NDropdown, NInput } from 'naive-ui'
+import { NButton, NCard, NDropdown, NInput, useNotification } from 'naive-ui'
 import { computed, onActivated, onDeactivated, reactive, ref } from 'vue'
 
 const { t } = useTranslation()
@@ -92,6 +91,8 @@ const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const gc = useInstance<GameClientRenderer>('game-client-renderer')
 const app = useInstance<AppCommonRenderer>('app-common-renderer')
+
+const notification = useNotification()
 
 const spectator = reactive({
   summonerIdentity: '',
@@ -128,13 +129,13 @@ const handleSpectate = async () => {
         targetPuuid = puuid
       }
     } catch (error) {
-      laNotification.warn(
-        t('Spectate.spectate.notFoundNotification.title'),
-        t('Spectate.spectate.notFoundNotification.description', {
-          name: spectator.summonerIdentity
-        }),
-        error
-      )
+      notification.warning({
+        title: () => t('Spectate.spectate.notFoundNotification.title'),
+        content: () =>
+          t('Spectate.spectate.notFoundNotification.description', {
+            name: spectator.summonerIdentity
+          })
+      })
 
       spectator.isProcessing = false
       return
@@ -144,27 +145,27 @@ const handleSpectate = async () => {
   try {
     await lc.api.spectator.launchSpectator(targetPuuid)
 
-    laNotification.success(
-      t('Spectate.spectate.successNotification.title'),
-      t('Spectate.spectate.successNotification.description')
-    )
+    notification.success({
+      title: () => t('Spectate.spectate.successNotification.title'),
+      content: () => t('Spectate.spectate.successNotification.description')
+    })
   } catch (error) {
     if ((error as AxiosError).response?.status === 404) {
-      laNotification.warn(
-        t('Spectate.spectate.failedNotification.title'),
-        t('Spectate.spectate.failedNotification.description', {
-          reason: spectator.summonerIdentity
-        }),
-        error
-      )
+      notification.warning({
+        title: () => t('Spectate.spectate.failedNotification.title'),
+        content: () =>
+          t('Spectate.spectate.failedNotification.description', {
+            reason: spectator.summonerIdentity
+          })
+      })
     } else {
-      laNotification.warn(
-        t('Spectate.spectate.failedNotification.title'),
-        t('Spectate.spectate.failedNotification.description', {
-          reason: (error as Error).message
-        }),
-        error
-      )
+      notification.warning({
+        title: () => t('Spectate.spectate.failedNotification.title'),
+        content: () =>
+          t('Spectate.spectate.failedNotification.description', {
+            reason: (error as Error).message
+          })
+      })
     }
   }
 
@@ -182,18 +183,18 @@ const handleSpectatePuuid = async (puuid: string) => {
   try {
     await lc.api.spectator.launchSpectator(puuid)
 
-    laNotification.success(
-      t('Spectate.spectate.successNotification.title'),
-      t('Spectate.spectate.successNotification.description')
-    )
+    notification.success({
+      title: () => t('Spectate.spectate.successNotification.title'),
+      content: () => t('Spectate.spectate.successNotification.description')
+    })
   } catch (error) {
-    laNotification.warn(
-      t('Spectate.spectate.failedNotification.title'),
-      t('Spectate.spectate.failedNotification.description', {
-        reason: (error as Error).message
-      }),
-      error
-    )
+    notification.warning({
+      title: () => t('Spectate.spectate.failedNotification.title'),
+      content: () =>
+        t('Spectate.spectate.failedNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   } finally {
     spectator.isProcessing = false
   }
@@ -253,18 +254,18 @@ const handleSpectateByToken = async () => {
   try {
     await gc.launchSpectator(obj)
 
-    laNotification.success(
-      t('Spectate.token.successNotification.title'),
-      t('Spectate.token.successNotification.description')
-    )
+    notification.success({
+      title: () => t('Spectate.token.successNotification.title'),
+      content: () => t('Spectate.token.successNotification.description')
+    })
   } catch (error) {
-    laNotification.warn(
-      t('Spectate.token.failedNotification.title'),
-      t('Spectate.token.failedNotification.description', {
-        reason: (error as Error).message
-      }),
-      error
-    )
+    notification.warning({
+      title: () => t('Spectate.token.failedNotification.title'),
+      content: () =>
+        t('Spectate.token.failedNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   }
 }
 

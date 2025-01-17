@@ -36,29 +36,31 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
-import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { AvailabilityType } from '@shared/http-api-axios-helper/league-client/chat'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NFlex, NRadio, NRadioGroup } from 'naive-ui'
+import { NCard, NFlex, NRadio, NRadioGroup, useNotification } from 'naive-ui'
 
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 
+const notification = useNotification()
+
 const handleChangeAvailability = async (availability: string) => {
   try {
     await lc.api.chat.changeAvailability(availability as AvailabilityType)
   } catch (error) {
-    laNotification.warn(
-      t('ChatAvailability.availability.failedNotification.title'),
-      t('ChatAvailability.availability.failedNotification.description', {
-        reason: (error as Error).message
-      })
-    )
+    notification.warning({
+      title: () => t('ChatAvailability.availability.failedNotification.title'),
+      content: () =>
+        t('ChatAvailability.availability.failedNotification.description', {
+          reason: (error as Error).message
+        })
+    })
   }
 }
 </script>

@@ -55,20 +55,21 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import { laNotification } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NDivider } from 'naive-ui'
+import { NButton, NCard, NDivider, useNotification } from 'naive-ui'
 import { computed, ref } from 'vue'
 
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+
+const notification = useNotification()
 
 const benchChampions = computed(() => {
   if (!isBenchEnabledSession(lcs.champSelect.session)) {
@@ -118,11 +119,10 @@ const handleBenchSwap = async (championId: number) => {
   try {
     await lc.api.champSelect.benchSwap(championId)
   } catch (error) {
-    laNotification.warn(
-      t('ChampionBench.swapFailedNotification.title'),
-      t('ChampionBench.swapFailedNotification.description'),
-      error
-    )
+    notification.warning({
+      title: () => t('ChampionBench.swapFailedNotification.title'),
+      content: () => t('ChampionBench.swapFailedNotification.description')
+    })
   } finally {
     isSwapping.value = false
   }
@@ -148,11 +148,10 @@ const handleReroll = async (grabBack = false) => {
       }, 25)
     }
   } catch (error) {
-    laNotification.warn(
-      t('ChampionBench.rerollFailedNotification.title'),
-      t('ChampionBench.rerollFailedNotification.description'),
-      error
-    )
+    notification.warning({
+      title: () => t('ChampionBench.rerollFailedNotification.title'),
+      content: () => t('ChampionBench.rerollFailedNotification.description')
+    })
   } finally {
     isRerolling.value = false
   }
