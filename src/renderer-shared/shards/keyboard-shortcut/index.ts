@@ -46,10 +46,5 @@ export class KeyboardShortcutsRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getRegistration', shortcutId)
   }
 
-  async onInit() {
-    // @ts-ignore
-    window._getInternalVars = async () => {
-      return await this._ipc.call(MAIN_SHARD_NAMESPACE, '_getInternalVars')
-    }
-  }
+  async onInit() {}
 }

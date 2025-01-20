@@ -32,7 +32,6 @@
 
 <script setup lang="ts">
 import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
-import { setupNaiveUiNotificationEvents } from '@renderer-shared/notification'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -52,8 +51,6 @@ import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
 import { useMicaAvailability } from './compositions/useMicaAvailability'
 import { useMainWindowUiStore } from './shards/main-window-ui/store'
-
-setupNaiveUiNotificationEvents()
 
 const muis = useMainWindowUiStore()
 
@@ -184,7 +181,7 @@ useKeyboardCombo('AKARI', {
   },
   requireSameEl: true,
   caseSensitive: false,
-  maxInterval: 250
+  timeout: 250
 })
 
 const preferMica = useMicaAvailability()

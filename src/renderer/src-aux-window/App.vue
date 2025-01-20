@@ -53,7 +53,7 @@ useKeyboardCombo('AKARI', {
   },
   requireSameEl: true,
   caseSensitive: false,
-  maxInterval: 250
+  timeout: 250
 })
 </script>
 

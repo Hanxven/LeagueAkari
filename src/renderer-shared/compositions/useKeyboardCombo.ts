@@ -1,8 +1,7 @@
-import { type Fn, type MaybeRefOrGetter, noop } from '@vueuse/core'
+import { type Fn, type MaybeRefOrGetter, noop, tryOnScopeDispose } from '@vueuse/core'
 import { useEventListener } from '@vueuse/core'
-import { getCurrentScope, onScopeDispose } from 'vue'
 
-const defaultTimeout = 500
+const DEFAULT_TIMEOUT = 500
 
 type SeqKeyType = string | KeyType[]
 
@@ -19,7 +18,7 @@ export interface ComboOptions<T extends SeqKeyType> {
   immediate?: boolean
 
   /** 最大间隔，0 或 负数时代表不限时 */
-  maxInterval?: number
+  timeout?: number
 
   /** 是否大小写敏感 */
   caseSensitive?: boolean
@@ -49,7 +48,7 @@ export interface ComboReturn {
   isStarted: () => boolean
 }
 
-function keyEquals(key: string, targetKey: KeyType, caseSensitive: boolean): boolean {
+function isKeyEquals(key: string, targetKey: KeyType, caseSensitive: boolean): boolean {
   if (key === undefined) {
     return false
   }
@@ -94,11 +93,11 @@ export function useKeyboardCombo<T extends SeqKeyType>(
 ): ComboReturn {
   const {
     el,
-    requireSameEl,
-    immediate,
-    maxInterval,
-    caseSensitive,
-    matchCode,
+    requireSameEl = false,
+    immediate = true,
+    timeout = DEFAULT_TIMEOUT,
+    caseSensitive = false,
+    matchCode = false,
     onMatch,
     onMismatch,
     onFinish,
@@ -106,13 +105,12 @@ export function useKeyboardCombo<T extends SeqKeyType>(
   } = options
 
   const bindEl = el ? el : window.document.body
-  let timeout = maxInterval ?? defaultTimeout
 
   let timerId = 0
   let currentPos = 0
-  let started = typeof immediate === 'undefined' ? true : immediate
+  let started = immediate
 
-  const onKeyMatch = (key: string, ev: KeyboardEvent) => {
+  const _handleKeyMatch = (key: string, ev: KeyboardEvent) => {
     currentPos++
     onMatch?.(key, currentPos, comboSeq, ev)
     if (currentPos >= comboSeq.length) {
@@ -133,18 +131,18 @@ export function useKeyboardCombo<T extends SeqKeyType>(
     }
   }
 
-  const listener = (ev: KeyboardEvent) => {
+  const _handleKeyboardEvent = (ev: KeyboardEvent) => {
     let key: string
-    if (!!matchCode) {
+    if (matchCode) {
       key = ev.code
     } else {
       key = ev.key
     }
-    if (!!requireSameEl && ev.target !== ev.currentTarget) {
+    if (requireSameEl && ev.target !== ev.currentTarget) {
       return
     }
-    if (keyEquals(key, comboSeq[currentPos], !!caseSensitive)) {
-      onKeyMatch(key, ev)
+    if (isKeyEquals(key, comboSeq[currentPos], caseSensitive)) {
+      _handleKeyMatch(key, ev)
     } else {
       const prevPos = currentPos
       currentPos = 0
@@ -154,8 +152,8 @@ export function useKeyboardCombo<T extends SeqKeyType>(
         if (timeout > 0) {
           window.clearTimeout(timerId)
         }
-        if (keyEquals(key, comboSeq[currentPos], !!caseSensitive)) {
-          onKeyMatch(key, ev)
+        if (isKeyEquals(key, comboSeq[currentPos], caseSensitive)) {
+          _handleKeyMatch(key, ev)
         }
       }
     }
@@ -164,7 +162,7 @@ export function useKeyboardCombo<T extends SeqKeyType>(
   let off: Fn = noop
 
   if (started) {
-    off = useEventListener(bindEl, 'keydown', listener)
+    off = useEventListener(bindEl, 'keydown', _handleKeyboardEvent)
   }
 
   const stopFn = () => {
@@ -179,14 +177,12 @@ export function useKeyboardCombo<T extends SeqKeyType>(
 
   const startFn = () => {
     if (!started) {
-      off = useEventListener(bindEl, 'keydown', listener)
+      off = useEventListener(bindEl, 'keydown', _handleKeyboardEvent)
       started = true
     }
   }
 
-  if (getCurrentScope()) {
-    onScopeDispose(stopFn)
-  }
+  tryOnScopeDispose(stopFn)
 
   return { stop: stopFn, start: startFn, isStarted: () => started }
 }
