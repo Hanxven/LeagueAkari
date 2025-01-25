@@ -137,7 +137,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showMetTag: true,
       showTaggedTag: true,
       showWinRateTeamTag: true,
-      showPrivacyTag: true
+      showPrivacyTag: true,
+      showAkariScoreTag: true,
     }
   })
 

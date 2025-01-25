@@ -752,6 +752,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
         return 'ignore'
       }
 
+      if (!this.state.auxWindowReady) {
+        return 'ignore'
+      }
+
       switch (this._lc.data.gameflow.phase) {
         case 'ChampSelect':
           if (this._lc.data.champSelect.session?.isSpectating) {
@@ -768,6 +772,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
     const auxWindowOpggShowTiming = computed(() => {
       if (!this.settings.auxWindowAutoShow) {
+        return 'ignore'
+      }
+
+      if (!this.state.auxWindowReady) {
         return 'ignore'
       }
 
@@ -796,7 +804,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
         } else {
           this.hideAuxWindow()
         }
-      }
+      },
+      { fireImmediately: true }
     )
 
     // shows only in champ select and never hides

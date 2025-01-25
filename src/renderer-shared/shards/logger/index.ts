@@ -45,13 +45,14 @@ export class LoggerRenderer {
   }
 
   info(namespace: string, ...args: any[]) {
+    const { info } = this._getColorScheme()
     console.info(
       `%c[${dayjs().format('HH:mm:ss')}] %c[%c${namespace}%c] %c[info]`,
-      'color: #3498db; font-weight: bold;',
+      info.timestamp,
       'color: inherit;',
-      'color: #2e2571; font-weight: bold;',
+      info.namespace,
       'color: inherit;',
-      'color: #004c3c; font-weight: bold;',
+      info.level,
       ...args
     )
     return this._ipc.call(
@@ -64,13 +65,14 @@ export class LoggerRenderer {
   }
 
   warn(namespace: string, ...args: any[]) {
+    const { warn } = this._getColorScheme()
     console.warn(
       `%c[${dayjs().format('HH:mm:ss')}] %c[%c${namespace}%c] %c[warn]`,
-      'color: #3498db; font-weight: bold;',
+      warn.timestamp,
       'color: inherit;',
-      'color: #2e2571; font-weight: bold;',
+      warn.namespace,
       'color: inherit;',
-      'color: #004c3c; font-weight: bold;',
+      warn.level,
       ...args
     )
     return this._ipc.call(
@@ -83,13 +85,14 @@ export class LoggerRenderer {
   }
 
   error(namespace: string, ...args: any[]) {
+    const { error } = this._getColorScheme()
     console.error(
       `%c[${dayjs().format('HH:mm:ss')}] %c[%c${namespace}%c] %c[error]`,
-      'color: #3498db; font-weight: bold;',
+      error.timestamp,
       'color: inherit;',
-      'color: #2e2571; font-weight: bold;',
+      error.namespace,
       'color: inherit;',
-      'color: #004c3c; font-weight: bold;',
+      error.level,
       ...args
     )
     return this._ipc.call(
@@ -102,13 +105,14 @@ export class LoggerRenderer {
   }
 
   debug(namespace: string, ...args: any[]) {
+    const { debug } = this._getColorScheme()
     console.debug(
       `%c[${dayjs().format('HH:mm:ss')}] %c[%c${namespace}%c] %c[debug]`,
-      'color: #3498db; font-weight: bold;',
+      debug.timestamp,
       'color: inherit;',
-      'color: #2e2571; font-weight: bold;',
+      debug.namespace,
       'color: inherit;',
-      'color: #004c3c; font-weight: bold;',
+      debug.level,
       ...args
     )
     return this._ipc.call(
@@ -118,6 +122,58 @@ export class LoggerRenderer {
       'debug',
       this._objectsToString(...args)
     )
+  }
+
+  private _getColorScheme() {
+    const preferDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
+    const darkColors = {
+      debug: {
+        timestamp: 'color: #9aa0a6; font-weight: bold;',
+        namespace: 'color: #b39ddb; font-weight: bold;',
+        level: 'color: #26a69a; font-weight: bold;'
+      },
+      info: {
+        timestamp: 'color: #9aa0a6; font-weight: bold;',
+        namespace: 'color: #b39ddb; font-weight: bold;',
+        level: 'color: #42a5f5; font-weight: bold;'
+      },
+      warn: {
+        timestamp: 'color: #9aa0a6; font-weight: bold;',
+        namespace: 'color: #b39ddb; font-weight: bold;',
+        level: 'color: #ffc107; font-weight: bold;'
+      },
+      error: {
+        timestamp: 'color: #9aa0a6; font-weight: bold;',
+        namespace: 'color: #b39ddb; font-weight: bold;',
+        level: 'color: #ef5350; font-weight: bold;'
+      }
+    }
+
+    const lightColors = {
+      debug: {
+        timestamp: 'color: #555; font-weight: bold;',
+        namespace: 'color: #7e57c2; font-weight: bold;',
+        level: 'color: #00897b; font-weight: bold;'
+      },
+      info: {
+        timestamp: 'color: #555; font-weight: bold;',
+        namespace: 'color: #7e57c2; font-weight: bold;',
+        level: 'color: #1565c0; font-weight: bold;'
+      },
+      warn: {
+        timestamp: 'color: #555; font-weight: bold;',
+        namespace: 'color: #7e57c2; font-weight: bold;',
+        level: 'color: #fb8c00; font-weight: bold;'
+      },
+      error: {
+        timestamp: 'color: #555; font-weight: bold;',
+        namespace: 'color: #7e57c2; font-weight: bold;',
+        level: 'color: #d32f2f; font-weight: bold;'
+      }
+    }
+
+    return preferDark ? darkColors : lightColors
   }
 
   createLogger(namespace: string) {

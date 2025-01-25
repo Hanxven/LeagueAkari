@@ -231,6 +231,8 @@ OngoingGameSettings:
         label: Damage-Gold Efficiency Tag
       showPrivacyTag:
         label: Career Hidden Tag
+      showAkariScoreTag:
+        label: Akari Score
 
 AuxWindowSettings:
   title: Auxiliary Window
@@ -238,6 +240,8 @@ AuxWindowSettings:
   auxWindowEnabled:
     label: Enable Auxiliary Window
     description: Use a small window during certain game phases to display status and provide additional actions.
+    descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
+    descriptionPart2: ) or by right-clicking the tray icon and selecting "Aux Window").
 
   auxWindowAutoShow:
     label: Auto Show and Close

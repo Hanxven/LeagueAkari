@@ -453,7 +453,15 @@
         }}
       </div>
     </NPopover>
-    <NPopover :keep-alive-on-hover="false" v-if="as.settings.isInKyokoMode && analysis" :delay="50">
+    <NPopover
+      :keep-alive-on-hover="false"
+      v-if="
+        as.settings.isInKyokoMode &&
+        ogs.frontendSettings.playerCardTags.showAkariScoreTag &&
+        analysis
+      "
+      :delay="50"
+    >
       <template #trigger>
         <div class="tag akari-loved">Akari {{ analysis.akariScore.total.toFixed(1) }}</div>
       </template>

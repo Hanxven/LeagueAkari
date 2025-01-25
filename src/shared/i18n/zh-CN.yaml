@@ -234,6 +234,8 @@ OngoingGameSettings:
         label: 伤害经济效率
       showPrivacyTag:
         label: 生涯隐藏标记
+      showAkariScoreTag:
+        label: Akari Score
 
 AuxWindowSettings:
   title: 小窗口
@@ -241,6 +243,8 @@ AuxWindowSettings:
   auxWindowEnabled:
     label: 启用小窗口
     description: 在一些游戏流程中使用小窗口来展示状态以及提供额外操作
+    descriptionPart1: 可通过标题栏右侧的快捷图标 (
+    descriptionPart2: )，或托盘区右键菜单中的 “小窗口” 打开小窗口
 
   auxWindowAutoShow:
     label: 自动弹出和关闭
@@ -1795,10 +1799,10 @@ BenchChampionTracker:
 
 tray:
   quit: 退出
-  auxWindow: 辅助窗口
+  auxWindow: 小窗口
   dev:
     toggleMainWindowDevtools: Toggle DevTools - 主窗口
-    toggleAuxWindowDevtools: Toggle DevTools - 辅助窗口
+    toggleAuxWindowDevtools: Toggle DevTools - 小窗口
 
 windowOpenHandler:
   toAkari: 将转到 League Akari 的项目主页 ❤️

@@ -209,7 +209,7 @@
       <template #header><span class="card-header-title">Akari Zone</span></template>
       <ControlItem
         class="control-item-margin"
-        :label="t('DebugSettings.kyokoMode.title')"
+        :label="t('DebugSettings.kyokoMode.label')"
         :label-description="t('DebugSettings.kyokoMode.description')"
         :label-width="320"
       >

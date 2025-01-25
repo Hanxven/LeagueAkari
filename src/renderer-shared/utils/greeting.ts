@@ -1,6 +1,16 @@
+import { getCurrentInstance } from 'vue'
+
 export function greeting(version: string) {
-  console.log(
-    `%cLeague Akari v${version}`,
-    'border-radius: 4px; background: #f9ceeb; color: #ff59cb; font-size: 16px; font-weight: bold; padding: 4px;'
-  )
+  const instance = getCurrentInstance()
+  const logger =
+    instance?.appContext.config.globalProperties.$akariManager.getInstance('logger-renderer')
+
+  if (logger) {
+    logger.info('greeting', `League Akari v${version}`)
+  } else {
+    console.log(
+      `%cLeague Akari v${version}`,
+      'border-radius: 4px; background: #f9ceeb; color: #ff59cb; font-size: 16px; font-weight: bold; padding: 4px;'
+    )
+  }
 }

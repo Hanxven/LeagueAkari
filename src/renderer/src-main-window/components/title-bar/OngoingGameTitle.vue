@@ -2,6 +2,10 @@
   <div class="ongoing-game-title">
     <template v-if="ogs.queryStage.phase !== 'unavailable' && !isCsSpectateWait">
       <LcuImage v-if="intelligence.mapIconUri" :src="intelligence.mapIconUri" class="map-icon" />
+      <span class="ongoing-title-map-name" v-if="intelligence.modeName">{{
+        intelligence.modeName
+      }}</span>
+      <span class="dot-separator" v-if="intelligence.modeName && intelligence.mapName">·</span>
       <span class="ongoing-title-map-name" v-if="intelligence.mapName">{{
         intelligence.mapName
       }}</span>
@@ -151,6 +155,8 @@ const teamNameMap = computed(() => ({
 
 const intelligence = computed(() => {
   const mapName = lcs.gameflow.session?.map.name
+  const modeName =
+    lcs.gameflow.session?.map.gameModeName || lcs.gameflow.session?.map.gameModeShortName
 
   const selfPuuid = lcs.summoner.me?.puuid
   const team = Object.entries(ogs.teams).find(([_teamId, puuids]) =>
@@ -160,6 +166,7 @@ const intelligence = computed(() => {
 
   return {
     mapName,
+    modeName,
     teamName,
     mapIconUri: lcs.gameflow.session?.map?.assets?.['game-select-icon-hover']
   }

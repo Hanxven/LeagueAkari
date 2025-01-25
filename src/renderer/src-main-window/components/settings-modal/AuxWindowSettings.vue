@@ -7,9 +7,16 @@
       <ControlItem
         class="control-item-margin"
         :label="t('AuxWindowSettings.auxWindowEnabled.label')"
-        :label-description="t('AuxWindowSettings.auxWindowEnabled.description')"
         :label-width="320"
       >
+        <template #labelDescription>
+          <div>{{ t('AuxWindowSettings.auxWindowEnabled.description') }}</div>
+          <div>
+            {{ t('AuxWindowSettings.auxWindowEnabled.descriptionPart1')
+            }}<NIcon class="inline-icon"><Window24FilledIcon /></NIcon
+            >{{ t('AuxWindowSettings.auxWindowEnabled.descriptionPart2') }}
+          </div>
+        </template>
         <NSwitch
           size="small"
           :value="wms.settings.auxWindowEnabled"
@@ -76,8 +83,9 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NScrollbar, NSlider, NSwitch } from 'naive-ui'
+import { NButton, NCard, NIcon, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 const { t } = useTranslation()
 
@@ -99,5 +107,22 @@ const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
 
 .card-header-title.disabled {
   color: rgba(255, 255, 255, 0.35);
+}
+
+.inline-icon {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+[data-theme='dark'] {
+  .inline-icon {
+    color: #fff;
+  }
+}
+
+[data-theme='light'] {
+  .inline-icon {
+    color: #000;
+  }
 }
 </style>

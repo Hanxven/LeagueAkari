@@ -227,6 +227,12 @@
           <NCheckbox v-model:checked="ogs.frontendSettings.playerCardTags.showPrivacyTag">
             {{ t('OngoingGameSettings.playerCardTags.tags.showPrivacyTag.label') }}
           </NCheckbox>
+          <NCheckbox
+            v-if="as.settings.isInKyokoMode"
+            v-model:checked="ogs.frontendSettings.playerCardTags.showAkariScoreTag"
+          >
+            {{ t('OngoingGameSettings.playerCardTags.tags.showAkariScoreTag.label') }}
+          </NCheckbox>
         </NFlex>
       </ControlItem>
     </NCard>
@@ -236,6 +242,7 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
@@ -253,6 +260,7 @@ import {
 
 const { t } = useTranslation()
 
+const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
 const sgps = useSgpStore()

@@ -1137,6 +1137,9 @@ export interface MatchHistoryGamesAnalysisTeamSide {
   averageWinRate: number
   averageKda: number
   averageAkariScore: number
+  standardizedAkariScoreCv: number
+  // balanced strength index
+  akariScoreBsi: number
 }
 
 export function analyzeTeamMatchHistory(
@@ -1160,10 +1163,14 @@ export function analyzeTeamMatchHistory(
     totalAkariScore += analysis.akariScore.total
   }
 
+  const sc = calculateCoefficientOfVariation(standardize(analyses.map((a) => a.akariScore.total)))
+
   return {
     averageWinRate: totalWinRate / analyses.length,
     averageKda: (totalKills + totalAssists) / (totalDeaths || 1),
-    averageAkariScore: totalAkariScore / analyses.length
+    averageAkariScore: totalAkariScore / analyses.length,
+    standardizedAkariScoreCv: sc,
+    akariScoreBsi: totalAkariScore / analyses.length / (1 + sc)
   }
 }
 
@@ -1433,4 +1440,19 @@ function calculateCoefficientOfVariation(numbers: number[]): number {
   const standardDeviation = Math.sqrt(variance)
 
   return standardDeviation / mean
+}
+
+function standardize(numbers: number[]): number[] {
+  if (numbers.length === 0) return []
+
+  const min = Math.min(...numbers)
+  const max = Math.max(...numbers)
+  const range = max - min
+
+  if (range === 0) {
+    return new Array(numbers.length).fill(0)
+  }
+
+  // 标准化计算
+  return numbers.map((num) => (num - min) / range)
 }

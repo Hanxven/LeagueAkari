@@ -28,6 +28,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isChampionNameMatch, isChampionNameMatchKeywords } from '@shared/utils/string-match'
 import { useMediaQuery } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumn,
   DataTableColumns,
@@ -36,7 +37,6 @@ import {
   NInput
 } from 'naive-ui'
 import { computed, h, ref, useCssModule } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 const props = defineProps<{
   championId?: number
@@ -52,7 +52,6 @@ const props = defineProps<{
 const emits = defineEmits<{
   (e: 'toChampion', championId: number): void
 }>()
-
 
 const { t } = useTranslation()
 
@@ -91,7 +90,7 @@ const columns: DataTableColumns<any> = [
     }
   },
   {
-    title: t('OpggTier.columns.champion'),
+    title: () => t('OpggTier.columns.champion'),
     key: 'name',
     align: 'center',
     className: styles['column-title'],
@@ -128,7 +127,7 @@ const columns: DataTableColumns<any> = [
     }
   },
   {
-    title: t('OpggTier.columns.tier'),
+    title: () => t('OpggTier.columns.tier'),
     key: 'tier',
     align: 'center',
     width: 76,
@@ -186,7 +185,7 @@ const columns: DataTableColumns<any> = [
     }
   },
   {
-    title: t('OpggTier.columns.winRate'),
+    title: () => t('OpggTier.columns.winRate'),
     key: 'winRate',
     align: 'center',
     width: 76,
@@ -247,7 +246,7 @@ const columns: DataTableColumns<any> = [
     }
   },
   {
-    title: t('OpggTier.columns.pickRate'),
+    title: () => t('OpggTier.columns.pickRate'),
     key: 'pickRate',
     align: 'center',
     width: 86,
@@ -295,7 +294,7 @@ const columns: DataTableColumns<any> = [
 ]
 
 const countersColumn: DataTableColumn<any> = {
-  title: t('OpggTier.columns.counter'),
+  title: () => t('OpggTier.columns.counter'),
   key: 'counters',
   align: 'center',
   width: 90,
@@ -334,7 +333,7 @@ const countersColumn: DataTableColumn<any> = {
 }
 
 const banRateColumn: DataTableColumn<any> = {
-  title: t('OpggTier.columns.banRate'),
+  title: () => t('OpggTier.columns.banRate'),
   key: 'banRate',
   align: 'center',
   width: 86,

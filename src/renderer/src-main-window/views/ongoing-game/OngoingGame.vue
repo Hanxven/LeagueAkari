@@ -23,9 +23,10 @@
             <span :title="t('OngoingGame.avgTeamKda')">{{
               ogs.playerStats?.teams[team].averageKda.toFixed(2)
             }}</span>
-            <span title="Avg Akari Score" style="color: #ff65ce" v-if="as.settings.isInKyokoMode">{{
-              ogs.playerStats.teams[team].averageAkariScore.toFixed(2)
-            }}</span>
+            <span title="Akari Score" style="color: #ff65ce" v-if="as.settings.isInKyokoMode"
+              >Avg: {{ ogs.playerStats.teams[team].averageAkariScore.toFixed(2) }} | Team:
+              {{ ogs.playerStats.teams[team].akariScoreBsi.toFixed(2) }}</span
+            >
           </div>
         </div>
         <div class="team">

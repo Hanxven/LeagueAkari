@@ -351,7 +351,7 @@ const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
   try {
     await gc.setSettingsFileReadonlyOrWritable(mode)
     settingFileMode.value = await gc.getSettingsFileReadonlyOrWritable()
-    console.log(settingFileMode.value)
+
     if (mode === 'readonly') {
       message.success(t('Client.gameClient.settingsFileMode.setToReadonly'))
     } else {
