@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar style="max-height: 65vh">
+  <NScrollbar style="height: 65vh">
     <NCard size="small">
       <template #header>
         <span class="card-header-title">{{ t('MiscSettings.respawnTimer.title') }}</span>

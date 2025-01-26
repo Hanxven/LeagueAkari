@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar style="max-height: 65vh">
+  <NScrollbar style="height: 65vh">
     <NModal preset="card" size="small" v-model:show="editRuleModalShow" style="max-width: 500px">
       <template #header>{{ t('DebugSettings.lcuEvent.modal.title') }}</template>
       <template #footer>

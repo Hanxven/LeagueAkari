@@ -1,5 +1,5 @@
 <template>
-  <NScrollbar style="max-height: 65vh">
+  <NScrollbar style="height: 65vh">
     <NCard size="small">
       <template #header>
         <span class="card-header-title">{{ t('AppSettings.basic.title') }}</span>
@@ -35,7 +35,7 @@
       <ControlItem
         v-if="as.settings.isInKyokoMode"
         class="control-item-margin"
-        label="Theme Color"
+        label="Theme Color (experimental)"
         label-description="Theme color for League Akari"
         :label-width="320"
       >
@@ -49,7 +49,7 @@
       </ControlItem>
       <!-- 由于 Electron 的 bug (https://github.com/electron/electron/issues/41824), 禁用该功能 -->
       <ControlItem
-        v-if="as.settings.isInKyokoMode"
+        v-if="false && as.settings.isInKyokoMode"
         class="control-item-margin"
         :label="t('AppSettings.basic.backgroundMaterial.label')"
         :label-description="t('AppSettings.basic.backgroundMaterial.description')"

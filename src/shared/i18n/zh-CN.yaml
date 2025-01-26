@@ -364,7 +364,7 @@ AboutPane:
   title: 关于
   line1: ' (联盟阿卡林，Version {{version}}) 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖'
   line2: 项目参考
-  copyright: © 2025 Hanxven. 本软件是开源软件，遵循 GPL-3.0 许可证。
+  copyright: © 2025 Hanxven. League Akari 开源软件，遵循 GPL-3.0 许可证。
 
   checkFrom: 从下载源中 ({{ source }}) 检查更新
   checkUpdates: 检查更新

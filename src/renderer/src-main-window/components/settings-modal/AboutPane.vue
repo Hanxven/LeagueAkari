@@ -1,6 +1,14 @@
 <template>
-  <NScrollbar style="max-height: 65vh">
-    <div style="padding: 16px 16px 8px">
+  <div
+    style="
+      height: 65vh;
+      padding: 16px 16px 8px;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    "
+  >
+    <NScrollbar style="flex-grow: 1">
       <div
         style="display: flex; justify-content: center; vertical-align: bottom; margin-bottom: 16px"
       >
@@ -23,7 +31,6 @@
           >{{ t('AboutPane.line2') }}</a
         >.
       </div>
-
       <div class="about-para-2">
         <span style="margin-right: 4px">GitHub: </span>
         <a target="_blank" :href="LEAGUE_AKARI_GITHUB" style="text-indent: 0; margin-right: 8px"
@@ -35,8 +42,7 @@
             src="https://img.shields.io/github/stars/Hanxven/LeagueAkari"
         /></a>
       </div>
-      <div class="divider" />
-      <NCard size="small">
+      <NCard size="small" style="margin-top: 16px">
         <ControlItem
           class="control-item-margin"
           :label="t('AboutPane.checkUpdates')"
@@ -147,11 +153,11 @@
           }}</NButton>
         </ControlItem>
       </NCard>
-      <div class="about-para copyright">
-        {{ t('AboutPane.copyright') }}
-      </div>
+    </NScrollbar>
+    <div class="about-para copyright">
+      {{ t('AboutPane.copyright') }}
     </div>
-  </NScrollbar>
+  </div>
 </template>
 
 <script setup lang="ts">
