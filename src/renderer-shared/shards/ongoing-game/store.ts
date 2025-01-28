@@ -8,7 +8,7 @@ import {
 } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
 import { defineStore } from 'pinia'
-import { reactive, shallowReactive, shallowRef } from 'vue'
+import { reactive, ref, shallowReactive, shallowRef } from 'vue'
 
 // copied from main shard
 interface OngoingGameInfo {
@@ -138,7 +138,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showTaggedTag: true,
       showWinRateTeamTag: true,
       showPrivacyTag: true,
-      showAkariScoreTag: true,
+      showAkariScoreTag: true
     }
   })
 
@@ -167,20 +167,20 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
 
   const matchHistoryTag = shallowRef<string | null>(null)
 
-  const matchHistory = shallowRef<Record<string, MatchHistoryPlayer>>({})
-  const summoner = shallowRef<Record<string, SummonerPlayer>>({})
-  const rankedStats = shallowRef<Record<string, RankedStatsPlayer>>({})
-  const championMastery = shallowRef<Record<string, ChampionMasteryPlayer>>({})
-  const savedInfo = shallowRef<Record<string, SavedInfo>>({})
+  const matchHistory = ref<Record<string, MatchHistoryPlayer>>({})
+  const summoner = ref<Record<string, SummonerPlayer>>({})
+  const rankedStats = ref<Record<string, RankedStatsPlayer>>({})
+  const championMastery = ref<Record<string, ChampionMasteryPlayer>>({})
+  const savedInfo = ref<Record<string, SavedInfo>>({})
 
-  const cachedGames = shallowRef<Record<number, Game>>({})
+  const cachedGames = ref<Record<number, Game>>({})
 
-  const matchHistoryLoadingState = shallowRef<Record<string, string>>({})
+  const matchHistoryLoadingState = ref<Record<string, string>>({})
 
-  const summonerLoadingState = shallowRef<Record<string, string>>({}) // 未实装
-  const savedInfoLoadingState = shallowRef<Record<string, string>>({}) // 未实装
-  const rankedStatsLoadingState = shallowRef<Record<string, string>>({}) // 未实装
-  const championMasteryLoadingState = shallowRef<Record<string, string>>({}) // 未实装
+  const summonerLoadingState = ref<Record<string, string>>({}) // 未实装
+  const savedInfoLoadingState = ref<Record<string, string>>({}) // 未实装
+  const rankedStatsLoadingState = ref<Record<string, string>>({}) // 未实装
+  const championMasteryLoadingState = ref<Record<string, string>>({}) // 未实装
 
   return {
     settings,

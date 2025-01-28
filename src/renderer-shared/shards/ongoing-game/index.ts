@@ -81,6 +81,16 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     }>
   }
 
+  private _toShallowedMarkRaw<T extends object>(obj: T) {
+    return Object.entries(obj).reduce(
+      (acc, [key, value]) => {
+        acc[key] = markRaw(value)
+        return acc
+      },
+      {} as Record<keyof T, any>
+    )
+  }
+
   async onInit() {
     const store = useOngoingGameStore()
 
@@ -97,7 +107,7 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'match-history-loaded', (puuid: string, data) => {
-      store.matchHistory[puuid] = data
+      store.matchHistory[puuid] = markRaw(data)
 
       const games = data.data as Game[]
       games.forEach((game) => (store.cachedGames[game.gameId] = markRaw(game)))
@@ -108,28 +118,28 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'summoner-loaded', (puuid: string, data) => {
-      store.summoner[puuid] = data
+      store.summoner[puuid] = markRaw(data)
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'ranked-stats-loaded', (puuid: string, data) => {
-      store.rankedStats[puuid] = data
+      store.rankedStats[puuid] = markRaw(data)
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'champion-mastery-loaded', (puuid: string, data) => {
-      store.championMastery[puuid] = data
+      store.championMastery[puuid] = markRaw(data)
     })
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'saved-info-loaded', (puuid: string, data) => {
-      store.savedInfo[puuid] = data
+      store.savedInfo[puuid] = markRaw(data)
     })
 
     const { championMastery, matchHistory, rankedStats, savedInfo, summoner, additionalGames } =
       await this.getAll()
-    store.championMastery = championMastery
-    store.matchHistory = matchHistory
-    store.rankedStats = rankedStats
-    store.savedInfo = savedInfo
-    store.summoner = summoner
+    store.championMastery = this._toShallowedMarkRaw(championMastery)
+    store.matchHistory = this._toShallowedMarkRaw(matchHistory)
+    store.rankedStats = this._toShallowedMarkRaw(rankedStats)
+    store.savedInfo = this._toShallowedMarkRaw(savedInfo)
+    store.summoner = this._toShallowedMarkRaw(summoner)
 
     Object.values(matchHistory).forEach((data) => {
       const games = data.data as Game[]
