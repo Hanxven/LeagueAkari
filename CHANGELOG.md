@@ -1,26 +1,24 @@
-# v1.3.3 (?)
-
-## TODO
-
-- 遇到过标签中，提供更多信息。
+# v1.3.3 (2025-01-28)
 
 ## 新增
 
-- 添加了一个英雄配置器，使其可以在英雄选择阶段锁定英雄时，自动配置对应的符文和召唤师技能。
+- (实验性) 添加了一个手动英雄配置器，使其可以在英雄选择阶段锁定英雄时，自动配置对应的符文和召唤师技能。
 
 - 自动处理房间邀请时，考虑离开情况。
 
-- (Test Required) 自动交换可以忽略物主
+- 随机模式的自动交换功能中，可以忽略物主。
 
-- 对局页面的玩家卡片，部分内容可自定义是否展示。[#184](https://github.com/Hanxven/LeagueAkari/issues/184)
+- 对局页面的玩家卡片，部分内容可于设置内自定义是否展示。[#184](https://github.com/Hanxven/LeagueAkari/issues/184)
 
-- 外部 API 现在可以设置 HTTP 代理。
+- 外部 API 现在可以设置 HTTP 代理。(除任何 LCU API 之外的 HTTP 请求)
 
 - 对局页面的玩家卡片，可以显示当时对局的部分详细内容。[#182](https://github.com/Hanxven/LeagueAkari/issues/182)
 
 - 添加了一个代理设置项，可以设置 HTTP 代理。[#186](https://github.com/Hanxven/LeagueAkari/issues/186)
 
-- 小窗口添加了一个乱斗模式下的日志工具。
+- 小窗口添加了一个乱斗模式下的日志工具，将记录玩家之间的英雄交换、使用骰子和选择英雄的行为。
+
+- “遇到过” 标签中，提供简略的胜负和 KDA 信息。
 
 ## 修复
 
@@ -31,6 +29,8 @@
 ## 调整
 
 - 自动点赞逻辑会优先考虑预组队和队友。[#158](https://github.com/Hanxven/LeagueAkari/issues/158)
+
+- 调整了部分对局页面卡片的颜色。[#173](https://github.com/Hanxven/LeagueAkari/issues/173)
 
 # v1.3.2 (2024-12-10)
 
