@@ -151,7 +151,13 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
           Boolean(this._lc.data.champSelect.session)
         ] as const,
       ([id, g, c]) => {
-        if (id && this._lc.data.gameflow.phase === 'ChampSelect' && g && c) {
+        if (
+          this.settings.enabled &&
+          id &&
+          this._lc.data.gameflow.phase === 'ChampSelect' &&
+          g &&
+          c
+        ) {
           const gSession = this._lc.data.gameflow.session!
           const cSession = this._lc.data.champSelect.session!
 
