@@ -1,22 +1,21 @@
-## 公告 (2025-1-6 22:30)
+## 公告 (2025-01-28 12:05)
 
-## 新年快乐
+### 灵蛇启瑞，祥兆盈门
 
-祝大家 2025 新年快乐！
+金蛇狂舞迎新岁，祥瑞相伴庆团圆。愿幸福围绕，万事如意，蛇年大吉。
 
-### 存在问题
+### v1.3.3
 
-- 目前 `秒退` 相关功能已经无法使用。(包括 `最后一秒秒退` 以及 `秒退`)。目前该功能已无法修复，将于后续版本中移除。
+v1.3.3 已于 2025-01-28 发布。若无法自动更新，请于 [Gitee](https://gitee.com/Hanxven/LeagueAkari/releases/download/v1.3.3/League%20Akari-1.3.3-win.7z) 或 [GitHub](https://github.com/Hanxven/LeagueAkari/releases/download/v1.3.3/League.Akari-1.3.3-win.7z) 手动下载新版本。
 
-## 声明
-
-欢迎使用 League Akari。
+### League Akari
 
 QQ 群聊 (1)：[301157623](https://qm.qq.com/q/F1Xv85etlm) (密码：akari)
+
 QQ 群聊 (2)：[1021970497](https://qm.qq.com/q/SWfPsyeyKy) (密码：akari)
 
-本软件是开源软件，遵循 GPL-3.0 协议。
+League Akari 是开源软件，遵循 GPL-3.0 协议。
 
-本软件为**免费软件**，无付费项目。若您从任何渠道购买了本软件，请立即退款。
+League Akari 为**免费软件**，无付费项目。若您从任何渠道购买了本软件，请立即退款。
 
 支持此软件请 [Star](https://github.com/Hanxven/LeagueAkari) 本项目 ❤️。
