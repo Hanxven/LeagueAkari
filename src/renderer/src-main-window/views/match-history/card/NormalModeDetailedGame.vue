@@ -122,7 +122,7 @@
                 <div
                   :title="
                     t('DetailedGame.wardPlaced', {
-                      count: p.stats.wardsPlaced,
+                      countV: p.stats.wardsPlaced,
                       cleared: p.stats.wardsKilled
                     })
                   "
