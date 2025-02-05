@@ -194,45 +194,53 @@ export class RadixMatcher {
     }
 
     const node = this._findDynamicRouteNode(route)
-
-    if (!node) {
+    if (!node || node.data === null) {
       return false
     }
 
-    if (node.data) {
-      // 对于通配符节点，只可能在叶子节点，直接删除
-      if (node.type === RadixMatcherNodeType.WILDCARD) {
-        node.parent!.wildcardNode = null
-        return true
-      }
+    node.data = null
 
-      // 有子节点，直接清除数据并退出
-      if (node.normalNodes.size || node.placeholderNodes.size || node.wildcardNode) {
-        node.data = null
-        return true
-      }
-
-      // 没有子节点，删除到最近的一个有数据的父节点
-      let parentNode = node.parent
-      while (parentNode) {
-        if (parentNode.data) {
-          break
-        } else {
-          parentNode.normalNodes.clear()
-          parentNode.placeholderNodes.clear()
-          parentNode.wildcardNode = null
-        }
-        parentNode = parentNode.parent
-      }
-
-      if (this._staticRouteMap.has(route)) {
-        this._staticRouteMap.delete(route)
-      }
-
+    if (node.normalNodes.size > 0 || node.placeholderNodes.size > 0 || node.wildcardNode) {
       return true
     }
 
-    return false
+    let current = node
+    while (current.parent) {
+      const parent = current.parent
+
+      if (current.type === RadixMatcherNodeType.NORMAL) {
+        for (const [key, child] of parent.normalNodes.entries()) {
+          if (child === current) {
+            parent.normalNodes.delete(key)
+            break
+          }
+        }
+      } else if (current.type === RadixMatcherNodeType.PLACEHOLDER) {
+        for (const [key, child] of parent.placeholderNodes.entries()) {
+          if (child === current) {
+            parent.placeholderNodes.delete(key)
+            break
+          }
+        }
+      } else if (current.type === RadixMatcherNodeType.WILDCARD) {
+        if (parent.wildcardNode === current) {
+          parent.wildcardNode = null
+        }
+      }
+
+      if (
+        parent.data !== null ||
+        parent.normalNodes.size > 0 ||
+        parent.placeholderNodes.size > 0 ||
+        parent.wildcardNode
+      ) {
+        break
+      }
+
+      current = parent
+    }
+
+    return true
   }
 
   getRouteData(route: string): Omit<FindResult, 'params'> | undefined {
@@ -254,47 +262,49 @@ export class RadixMatcher {
   private _findDynamic(
     node: RadixMatcherNode,
     parts: string[],
+    index: number,
     result: FindResult[],
     params: [string, string][],
     onlyOne: boolean = false
   ) {
-    if (onlyOne && result.length) {
+    if (onlyOne && result.length > 0) {
       return
     }
 
-    if (node.wildcardNode) {
-      if (!parts.length) {
-        return
-      }
+    // 如果当前节点有通配符节点，并且还未处理完所有部分，则匹配剩余所有部分
+    if (node.wildcardNode && index < parts.length) {
       result.push({
         data: node.data,
         params: {
-          __: parts.join('/'),
+          __: parts.slice(index).join('/'),
           ...Object.fromEntries(params)
         }
       })
     }
 
-    if (node.data && parts.length === 0) {
-      result.push({
-        data: node.data,
-        params: Object.fromEntries(params)
-      })
+    // 如果已处理完所有部分，且当前节点存在数据，则收集匹配结果
+    if (index === parts.length) {
+      if (node.data) {
+        result.push({
+          data: node.data,
+          params: Object.fromEntries(params)
+        })
+      }
       return
     }
 
-    if (parts.length) {
-      const normalNode = node.normalNodes.get(parts[0])
-      if (normalNode) {
-        this._findDynamic(normalNode, parts.slice(1), result, params)
-      }
+    const part = parts[index]
 
-      if (node.placeholderNodes.size) {
-        for (const [k, childNode] of node.placeholderNodes) {
-          params.push([k, parts[0]])
-          this._findDynamic(childNode, parts.slice(1), result, params)
-          params.pop()
-        }
+    const normalNode = node.normalNodes.get(part)
+    if (normalNode) {
+      this._findDynamic(normalNode, parts, index + 1, result, params, onlyOne)
+    }
+
+    if (node.placeholderNodes.size) {
+      for (const [key, childNode] of node.placeholderNodes) {
+        params.push([key, part])
+        this._findDynamic(childNode, parts, index + 1, result, params, onlyOne)
+        params.pop()
       }
     }
   }
@@ -302,13 +312,13 @@ export class RadixMatcher {
   findOne(path: string): FindResult | undefined {
     if (this._staticRouteMap.has(path)) {
       return {
-        data: this._staticRouteMap.get(path)!.data
+        data: this._staticRouteMap.get(path)!
       }
     }
 
     const parts = path.split('/').filter(Boolean)
     const result: FindResult[] = []
-    this._findDynamic(this._root, parts, result, [], true)
+    this._findDynamic(this._root, parts, 0, result, [], true)
     return result[0]
   }
 
@@ -322,7 +332,7 @@ export class RadixMatcher {
       })
     }
 
-    this._findDynamic(this._root, parts, result, [])
+    this._findDynamic(this._root, parts, 0, result, [])
 
     return result
   }
