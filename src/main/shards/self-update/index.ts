@@ -88,7 +88,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     this._settingFactory = deps['setting-factory-main']
 
     this._log = this._loggerFactory.create(SelfUpdateMain.id)
-    this._setting = this._settingFactory.create(
+    this._setting = this._settingFactory.register(
       SelfUpdateMain.id,
       {
         autoCheckUpdates: { default: this.settings.autoCheckUpdates },

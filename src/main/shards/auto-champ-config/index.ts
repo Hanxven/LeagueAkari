@@ -47,7 +47,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     this._lc = deps['league-client-main']
     this._mobx = deps['mobx-utils-main']
     this._ipc = deps['akari-ipc-main']
-    this._setting = this._settingFactory.create(
+    this._setting = this._settingFactory.register(
       AutoChampionConfigMain.id,
       {
         enabled: { default: this.settings.enabled },

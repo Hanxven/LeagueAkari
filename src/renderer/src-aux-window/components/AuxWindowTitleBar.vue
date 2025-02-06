@@ -1,5 +1,5 @@
 <template>
-  <div class="title-bar" :class="{ blurred: wms.auxWindowFocus === 'blurred' }">
+  <div class="title-bar" :class="{ blurred: aws.focus === 'blurred' }">
     <div class="text-area">
       <div
         :title="t('AuxWindowTitleBar.indicatorTitle')"
@@ -24,12 +24,10 @@
     </div>
     <div class="traffic">
       <div
-        :title="
-          wms.settings.auxWindowPinned ? t('AuxWindowTitleBar.unpin') : t('AuxWindowTitleBar.pin')
-        "
+        :title="aws.settings.pinned ? t('AuxWindowTitleBar.unpin') : t('AuxWindowTitleBar.pin')"
         class="traffic-button pin"
-        :class="{ pinned: wms.settings.auxWindowPinned }"
-        @click="() => handlePin(!wms.settings.auxWindowPinned)"
+        :class="{ pinned: aws.settings.pinned }"
+        @click="() => handlePin(!aws.settings.pinned)"
       >
         <NIcon><PinFilledIcon /></NIcon>
       </div>
@@ -46,32 +44,31 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
 import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/fluent'
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { ArrowBackIosFilled as ArrowBackIosFilledIcon } from '@vicons/material'
+import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
 import { useRoute } from 'vue-router'
-
 
 const { t } = useTranslation()
 
-const wms = useWindowManagerStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const aws = useAuxWindowStore()
 
 const handleClose = () => {
-  return wm.hideAuxWindow()
+  return wm.auxWindow.hide()
 }
 
 const handleMinimize = () => {
-  return wm.minimizeAuxWindow()
+  return wm.auxWindow.minimize()
 }
 
 const handlePin = (b: boolean) => {
-  return wm.setAuxWindowPinned(b)
+  return wm.auxWindow.setPinned(b)
 }
 
 const route = useRoute()
@@ -82,7 +79,7 @@ const shortcuts = computed(() => {
       label: t('AuxWindowTitleBar.opgg'),
       description: t('AuxWindowTitleBar.opggTitle'),
       toggle: () => {
-        wm.setAuxWindowFunctionality('opgg')
+        wm.auxWindow.setFunctionality('opgg')
       }
     }
   ]
@@ -93,7 +90,7 @@ const isInIndicatorView = computed(() => {
 })
 
 const handleBackToIndicatorView = () => {
-  wm.setAuxWindowFunctionality('indicator')
+  wm.auxWindow.setFunctionality('indicator')
 }
 </script>
 

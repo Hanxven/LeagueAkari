@@ -19,8 +19,8 @@
         </template>
         <NSwitch
           size="small"
-          :value="wms.settings.auxWindowEnabled"
-          @update:value="(val) => wm.setAuxWindowEnabled(val)"
+          :value="aws.settings.enabled"
+          @update:value="(val) => wm.auxWindow.setEnabled(val)"
         />
       </ControlItem>
       <ControlItem
@@ -31,8 +31,8 @@
       >
         <NSwitch
           size="small"
-          :value="wms.settings.auxWindowAutoShow"
-          @update:value="(val) => wm.setAuxWindowAutoShow(val)"
+          :value="aws.settings.autoShow"
+          @update:value="(val) => wm.auxWindow.setAutoShow(val)"
         />
       </ControlItem>
       <ControlItem
@@ -48,8 +48,8 @@
           :max="1"
           :step="0.01"
           :format-tooltip="(v) => `${(v * 100).toFixed()} %`"
-          @update:value="(val) => wm.setAuxWindowOpacity(val)"
-          :value="wms.settings.auxWindowOpacity"
+          @update:value="(val) => wm.auxWindow.setOpacity(val)"
+          :value="aws.settings.opacity"
         ></NSlider>
       </ControlItem>
       <ControlItem
@@ -60,8 +60,8 @@
       >
         <NSwitch
           size="small"
-          :value="wms.settings.auxWindowShowSkinSelector"
-          @update:value="(val) => wm.setAuxWindowShowSkinSelector(val)"
+          :value="aws.settings.showSkinSelector"
+          @update:value="(val) => wm.auxWindow.setShowSkinSelector(val)"
         />
       </ControlItem>
       <ControlItem
@@ -70,9 +70,13 @@
         :label-description="t('AuxWindowSettings.resetAuxWindowPosition.description')"
         :label-width="320"
       >
-        <NButton size="small" type="warning" secondary @click="() => wm.resetAuxWindowPosition()">{{
-          t('AuxWindowSettings.resetAuxWindowPosition.button')
-        }}</NButton>
+        <NButton
+          size="small"
+          type="warning"
+          secondary
+          @click="() => wm.auxWindow.resetPosition()"
+          >{{ t('AuxWindowSettings.resetAuxWindowPosition.button') }}</NButton
+        >
       </ControlItem>
     </NCard>
   </NScrollbar>
@@ -82,14 +86,14 @@
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NIcon, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 const { t } = useTranslation()
 
-const wms = useWindowManagerStore()
+const aws = useAuxWindowStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
 </script>
 

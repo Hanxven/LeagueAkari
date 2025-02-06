@@ -35,7 +35,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._ipc = deps['akari-ipc-main']
     this._mobx = deps['mobx-utils-main']
 
-    this._setting = (deps['setting-factory-main'] as SettingFactoryMain).create(
+    this._setting = (deps['setting-factory-main'] as SettingFactoryMain).register(
       AppCommonMain.id,
       {
         isInKyokoMode: { default: this.settings.isInKyokoMode },

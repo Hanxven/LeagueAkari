@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
-import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { useMessage } from 'naive-ui'
 import { watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -22,13 +22,13 @@ import AuxWindowTitleBar from './components/AuxWindowTitleBar.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 
-const mws = useWindowManagerStore()
+const aws = useAuxWindowStore()
 
 const router = useRouter()
 const log = useInstance<LoggerRenderer>('logger-renderer')
 
 watch(
-  () => mws.auxWindowFunctionality,
+  () => aws.functionality,
   (fun) => {
     switch (fun) {
       case 'indicator':

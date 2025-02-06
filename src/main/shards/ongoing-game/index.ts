@@ -119,7 +119,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this._settingFactory = deps['setting-factory-main']
     this._sgp = deps['sgp-main']
     this._saved = deps['saved-player-main']
-    this._setting = this._settingFactory.create(
+    this._setting = this._settingFactory.register(
       OngoingGameMain.id,
       {
         concurrency: { default: this.settings.concurrency },

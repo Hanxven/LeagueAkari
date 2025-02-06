@@ -60,7 +60,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._mobx = deps['mobx-utils-main']
     this._ipc = deps['akari-ipc-main']
     this.state = new AutoGameflowState(this._lc.data, this.settings)
-    this._setting = this._settingFactory.create(
+    this._setting = this._settingFactory.register(
       AutoGameflowMain.id,
       {
         autoAcceptDelaySeconds: { default: this.settings.autoAcceptDelaySeconds },

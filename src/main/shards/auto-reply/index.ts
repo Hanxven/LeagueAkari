@@ -41,7 +41,7 @@ export class AutoReplyMain implements IAkariShardInitDispose {
     this._mobx = deps['mobx-utils-main']
     this._ipc = deps['akari-ipc-main']
     this._settingFactory = deps['setting-factory-main']
-    this._setting = this._settingFactory.create(
+    this._setting = this._settingFactory.register(
       AutoReplyMain.id,
       {
         enabled: { default: this.settings.enabled },

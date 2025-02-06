@@ -1,5 +1,5 @@
 <template>
-  <div class="traffic-buttons" :class="{ blurred: wms.mainWindowFocus === 'blurred' }">
+  <div class="traffic-buttons" :class="{ blurred: mws.focus === 'blurred' }">
     <NModal
       style="width: 300px"
       transform-origin="center"
@@ -42,18 +42,14 @@
       <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
     </div>
     <div
-      :title="
-        wms.mainWindowStatus === 'normal'
-          ? t('TrafficButtons.maximize')
-          : t('TrafficButtons.restore')
-      "
+      :title="mws.status === 'normal' ? t('TrafficButtons.maximize') : t('TrafficButtons.restore')"
       class="traffic-button maximize"
       @click="handleMaximize"
     >
       <NIcon
-        ><Maximize20RegularIcon
-          v-if="wms.mainWindowStatus === 'normal'"
-        /><WindowMultiple16FilledIcon v-else />
+        ><Maximize20RegularIcon v-if="mws.status === 'normal'" /><WindowMultiple16FilledIcon
+          v-else
+        />
       </NIcon>
     </div>
     <div :title="t('TrafficButtons.close')" class="traffic-button close" @click="handleClose">
@@ -67,7 +63,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import {
   MainWindowCloseAction,
-  useWindowManagerStore
+  useMainWindowStore
 } from '@renderer-shared/shards/window-manager/store'
 import { WindowMultiple16Filled as WindowMultiple16FilledIcon } from '@vicons/fluent'
 import {
@@ -82,18 +78,18 @@ import { ref, watch } from 'vue'
 const { t } = useTranslation()
 
 // 交通灯按钮
-const wms = useWindowManagerStore()
+const mws = useMainWindowStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
 
 const handleMinimize = async () => {
-  await wm.minimizeMainWindow()
+  await wm.mainWindow.minimize()
 }
 
 const handleMaximize = async () => {
-  if (wms.mainWindowStatus === 'normal') {
-    await wm.maximizeMainWindow()
+  if (mws.status === 'normal') {
+    await wm.mainWindow.maximize()
   } else {
-    await wm.unmaximizeMainWindow()
+    await wm.mainWindow.unmaximize()
   }
 }
 
@@ -102,19 +98,19 @@ const closeStrategy = ref<MainWindowCloseAction>('minimize-to-tray')
 const isRememberCloseStrategy = ref<boolean>(false)
 
 const handleClose = async () => {
-  await wm.closeMainWindow()
+  await wm.mainWindow.close()
 }
 
-wm.onAskClose(() => {
+wm.mainWindow.onAskClose(() => {
   isCloseConfirmationModelShow.value = true
 })
 
 const handleReallyClose = async () => {
   if (isRememberCloseStrategy.value) {
-    await wm.setMainWindowCloseAction(closeStrategy.value)
-    await wm.closeMainWindow()
+    await wm.mainWindow.setCloseAction(closeStrategy.value)
+    await wm.mainWindow.close()
   } else {
-    await wm.closeMainWindow(closeStrategy.value)
+    await wm.mainWindow.close(closeStrategy.value)
   }
 
   isCloseConfirmationModelShow.value = false

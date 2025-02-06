@@ -49,7 +49,7 @@ export class AutoSelectMain implements IAkariShardInitDispose {
     this._ipc = deps['akari-ipc-main']
     this._settingFactory = deps['setting-factory-main']
     this.state = new AutoSelectState(this._lc.data, this.settings)
-    this._setting = this._settingFactory.create(
+    this._setting = this._settingFactory.register(
       AutoSelectMain.id,
       {
         benchExpectedChampions: { default: this.settings.benchExpectedChampions },

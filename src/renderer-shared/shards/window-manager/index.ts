@@ -4,9 +4,140 @@ import { AkariIpcRenderer } from '../ipc'
 import { LoggerRenderer } from '../logger'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { useWindowManagerStore } from './store'
+import { useAuxWindowStore, useMainWindowStore, useWindowManagerStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'window-manager-main'
+const MAIN_SHARD_NAMESPACE_MAIN_WINDOW = 'window-manager-main/main-window'
+const MAIN_SHARD_NAMESPACE_AUX_WINDOW = 'window-manager-main/aux-window'
+
+export interface WindowManagerRendererContext {
+  ipc: AkariIpcRenderer
+  setting: SettingUtilsRenderer
+  pm: PiniaMobxUtilsRenderer
+}
+
+class AkariMainWindow {
+  constructor(private _context: WindowManagerRendererContext) {}
+
+  async onInit() {
+    const mwStore = useMainWindowStore()
+    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'state', mwStore)
+    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'settings', mwStore.settings)
+  }
+
+  onAskClose(fn: (...args: any[]) => void) {
+    return this._context.ipc.onEventVue(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'close-asking', fn)
+  }
+
+  maximize() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'maximize')
+  }
+
+  minimize() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'minimize')
+  }
+
+  restore() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'restore')
+  }
+
+  close(strategy?: string) {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'close', strategy)
+  }
+
+  toggleDevtools() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'toggleDevtools')
+  }
+
+  hide() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'hide')
+  }
+
+  show() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'show')
+  }
+
+  unmaximize() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'unmaximize')
+  }
+
+  setCloseAction(value: string) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeAction', value)
+  }
+
+  openDialog(
+    properties: string[] = ['openFile'],
+    filters: { extensions: string[]; name: string }[] = [{ name: 'All Files', extensions: ['*'] }]
+  ) {
+    return this._context.ipc.call(
+      MAIN_SHARD_NAMESPACE_MAIN_WINDOW,
+      'openDialog',
+      properties,
+      filters
+    )
+  }
+}
+
+/**
+ * 辅助窗口逻辑封装
+ */
+class AkariAuxWindow {
+  constructor(private _context: WindowManagerRendererContext) {}
+
+  async onInit() {
+    const awStore = useAuxWindowStore()
+    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'state', awStore)
+    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'settings', awStore.settings)
+  }
+
+  minimize() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'minimize')
+  }
+
+  restore() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'restore')
+  }
+
+  hide() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'hide')
+  }
+
+  show() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'show')
+  }
+
+  resetPosition() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'resetWindowPosition')
+  }
+
+  setFunctionality(functionality: string) {
+    return this._context.ipc.call(
+      MAIN_SHARD_NAMESPACE_AUX_WINDOW,
+      'setFunctionality',
+      functionality
+    )
+  }
+
+  setAutoShow(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'autoShow', value)
+  }
+
+  setEnabled(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'enabled', value)
+  }
+
+  setOpacity(value: number) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'opacity', value)
+  }
+
+  setPinned(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'pinned', value)
+  }
+
+  setShowSkinSelector(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'showSkinSelector', value)
+  }
+}
 
 export class WindowManagerRenderer implements IAkariShardInitDispose {
   static id = 'window-manager-renderer'
@@ -17,134 +148,32 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     'logger-renderer'
   ]
 
-  private readonly _setting: SettingUtilsRenderer
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _log: LoggerRenderer
+  private context: WindowManagerRendererContext
+
+  public mainWindow: AkariMainWindow
+  public auxWindow: AkariAuxWindow
 
   constructor(deps: any) {
-    this._setting = deps['setting-utils-renderer']
-    this._ipc = deps['akari-ipc-renderer']
-    this._pm = deps['pinia-mobx-utils-renderer']
-    this._log = deps['logger-renderer']
+    this.context = {
+      setting: deps['setting-utils-renderer'],
+      ipc: deps['akari-ipc-renderer'],
+      pm: deps['pinia-mobx-utils-renderer']
+    }
+
+    this.mainWindow = new AkariMainWindow(this.context)
+    this.auxWindow = new AkariAuxWindow(this.context)
   }
 
   async onInit() {
     const store = useWindowManagerStore()
+    await this.context.pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
+    await this.context.pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
 
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
-    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
-  }
-
-  onAskClose(fn: (...args: any[]) => void) {
-    return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'main-window-close-asking', fn)
-  }
-
-  maximizeMainWindow() {
-    this._log.info(WindowManagerRenderer.id, '最大化主窗口')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'main-window/maximize')
-  }
-
-  minimizeMainWindow() {
-    this._log.info(WindowManagerRenderer.id, '最小化主窗口')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'main-window/minimize')
-  }
-
-  restoreMainWindow() {
-    this._log.info(WindowManagerRenderer.id, '恢复主窗口')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'main-window/restore')
-  }
-
-  closeMainWindow(strategy?: string) {
-    this._log.info(WindowManagerRenderer.id, '关闭主窗口', `策略: ${strategy || '[NONE]'}`)
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'main-window/close', strategy)
-  }
-
-  toggleMainWindowDevtools() {
-    this._log.info(WindowManagerRenderer.id, '切换主窗口开发者工具')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'main-window/toggleDevtools')
-  }
-
-  hideMainWindow() {
-    this._log.info(WindowManagerRenderer.id, '隐藏主窗口')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'main-window/hide')
-  }
-
-  showMainWindow() {
-    this._log.info(WindowManagerRenderer.id, '显示主窗口')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'main-window/show')
-  }
-
-  minimizeAuxWindow() {
-    this._log.info(WindowManagerRenderer.id, '最小化辅助窗口')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'aux-window/minimize')
-  }
-
-  restoreAuxWindow() {
-    this._log.info(WindowManagerRenderer.id, '恢复辅助窗口')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'aux-window/restore')
-  }
-
-  hideAuxWindow() {
-    this._log.info(WindowManagerRenderer.id, '隐藏辅助窗口')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'aux-window/hide')
-  }
-
-  showAuxWindow() {
-    this._log.info(WindowManagerRenderer.id, '显示辅助窗口')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'aux-window/show')
-  }
-
-  resetAuxWindowPosition() {
-    this._log.info(WindowManagerRenderer.id, '重置辅助窗口位置')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'aux-window/resetWindowPosition')
-  }
-
-  setAuxWindowFunctionality(functionality: string) {
-    this._log.info(WindowManagerRenderer.id, '设置辅助窗口功能', functionality)
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'aux-window/setFunctionality', functionality)
-  }
-
-  unmaximizeMainWindow() {
-    this._log.info(WindowManagerRenderer.id, '取消最大化主窗口')
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'main-window/unmaximize')
-  }
-
-  setMainWindowCloseAction(value: string) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'mainWindowCloseAction', value)
-  }
-
-  setAuxWindowAutoShow(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'auxWindowAutoShow', value)
-  }
-
-  setAuxWindowEnabled(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'auxWindowEnabled', value)
-  }
-
-  setAuxWindowOpacity(value: number) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'auxWindowOpacity', value)
-  }
-
-  setAuxWindowPinned(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'auxWindowPinned', value)
-  }
-
-  setAuxWindowShowSkinSelector(value: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'auxWindowShowSkinSelector', value)
+    await this.mainWindow.onInit()
+    await this.auxWindow.onInit()
   }
 
   setBackgroundMaterial(value: string) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'backgroundMaterial', value)
-  }
-
-  mainWindowOpenDialog(
-    properties = ['openFile'],
-    filters: {
-      extensions: string[]
-      name: string
-    }[] = [{ name: 'All Files', extensions: ['*'] }]
-  ) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'main-window/openDialog', properties, filters)
+    return this.context.setting.set(MAIN_SHARD_NAMESPACE, 'backgroundMaterial', value)
   }
 }

@@ -4,6 +4,8 @@ import { Readable } from 'node:stream'
 
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { WindowManagerMain } from '../window-manager'
+import { AkariMainWindow } from '../window-manager/main-window/window'
+import { AkariAuxWindow } from '../window-manager/aux-window/window'
 
 /**
  * 实现 `akari://` 协议, 用户特殊资源的代理
@@ -30,13 +32,13 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
-    this._handlePartitionAkariProtocol(WindowManagerMain.MAIN_WINDOW_PARTITION)
-    this._handlePartitionAkariProtocol(WindowManagerMain.AUX_WINDOW_PARTITION)
+    this._handlePartitionAkariProtocol(AkariMainWindow.PARTITION)
+    this._handlePartitionAkariProtocol(AkariAuxWindow.PARTITION)
   }
 
   async onDispose() {
-    this._unhandlePartitionAkariProtocol(WindowManagerMain.MAIN_WINDOW_PARTITION)
-    this._unhandlePartitionAkariProtocol(WindowManagerMain.AUX_WINDOW_PARTITION)
+    this._unhandlePartitionAkariProtocol(AkariMainWindow.PARTITION)
+    this._unhandlePartitionAkariProtocol(AkariAuxWindow.PARTITION)
   }
 
   private _unhandlePartitionAkariProtocol(partition: string) {

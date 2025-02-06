@@ -89,7 +89,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
     this._shared = deps[SHARED_GLOBAL_ID]
     this._app = deps['app-common-main']
     this._log = this._loggerFactory.create(InGameSendMain.id)
-    this._setting = this._settingFactory.create(
+    this._setting = this._settingFactory.register(
       InGameSendMain.id,
       {
         customSend: { default: this.settings.customSend },

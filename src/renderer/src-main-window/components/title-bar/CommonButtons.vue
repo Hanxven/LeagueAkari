@@ -1,5 +1,5 @@
 <template>
-  <div class="common-buttons" :class="{ blurred: wms.mainWindowFocus === 'blurred' }">
+  <div class="common-buttons" :class="{ blurred: mws.focus === 'blurred' }">
     <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
         <div class="common-button-outer" @click="openAnnouncementModal">
@@ -20,7 +20,7 @@
       </template>
       {{ t('CommonButtons.github') }}
     </NTooltip>
-    <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" v-if="wms.settings.auxWindowEnabled">
+    <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" v-if="aws.settings.enabled">
       <template #trigger>
         <div class="common-button-outer" @click="handleShowAuxWindow">
           <div class="common-button-inner">
@@ -36,7 +36,7 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import { useAuxWindowStore, useMainWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { Notification as NotificationIcon } from '@vicons/carbon'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
@@ -47,7 +47,8 @@ import { inject } from 'vue'
 
 const { t } = useTranslation()
 
-const wms = useWindowManagerStore()
+const mws = useMainWindowStore()
+const aws = useAuxWindowStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
 
 const { openAnnouncementModal } = inject('app') as any
@@ -55,7 +56,7 @@ const { openAnnouncementModal } = inject('app') as any
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 
 const handleShowAuxWindow = () => {
-  wm.showAuxWindow()
+  wm.auxWindow.show()
 }
 
 const handleToGithub = () => {

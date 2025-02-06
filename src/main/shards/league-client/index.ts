@@ -120,7 +120,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       mobx: this._mobx
     })
     this._settingFactory = deps['setting-factory-main']
-    this._setting = this._settingFactory.create(
+    this._setting = this._settingFactory.register(
       LeagueClientMain.id,
       {
         autoConnect: { default: this.settings.autoConnect }

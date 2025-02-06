@@ -1,11 +1,7 @@
 <template>
   <NCard
     size="small"
-    v-if="
-      wms.settings.auxWindowShowSkinSelector &&
-      lcs.champSelect.currentChampion &&
-      skinOptions.length
-    "
+    v-if="aws.settings.showSkinSelector && lcs.champSelect.currentChampion && skinOptions.length"
   >
     <NFlex align="center" class="control-item" style="gap: 4px">
       <NSelect
@@ -38,9 +34,10 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { CarouselSkins } from '@shared/types/league-client/champ-select'
 import { ChampDetails } from '@shared/types/league-client/game-data'
+import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NCard,
@@ -51,12 +48,10 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, h, ref, shallowRef, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 
-const wms = useWindowManagerStore()
+const aws = useAuxWindowStore()
 const lcs = useLeagueClientStore()
 
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')

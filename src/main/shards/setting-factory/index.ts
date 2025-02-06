@@ -50,7 +50,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     this._storage = deps['storage-main']
   }
 
-  create<T extends object = any>(
+  register<T extends object = any>(
     namespace: string,
     schema: Partial<Record<Paths<T>, SettingSchema>>,
     obj: T

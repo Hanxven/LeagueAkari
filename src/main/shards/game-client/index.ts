@@ -79,7 +79,7 @@ export class GameClientMain implements IAkariShardInitDispose {
     this._mobx = deps['mobx-utils-main']
     this._ci = deps['client-installation-main']
 
-    this._setting = this._settingFactory.create(
+    this._setting = this._settingFactory.register(
       GameClientMain.id,
       {
         terminateGameClientWithShortcut: { default: this.settings.terminateGameClientWithShortcut },

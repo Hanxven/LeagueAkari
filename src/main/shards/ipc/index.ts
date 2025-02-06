@@ -27,11 +27,6 @@ export class AkariIpcMain implements IAkariShardInitDispose {
   private _callMap = new Map<string, Function>()
   private _renderers = new Set<number>()
 
-  /**
-   * 细分到事件类型的订阅: RendererId -> Set<Namespace:EventName>
-   */
-  private _renderers2 = new Map<number, Set<string>>()
-
   constructor() {
     this._handleRendererInvocation = this._handleRendererInvocation.bind(this)
     this._handleRendererRegister = this._handleRendererRegister.bind(this)

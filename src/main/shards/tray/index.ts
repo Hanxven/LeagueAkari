@@ -38,33 +38,33 @@ export class TrayMain implements IAkariShardInitDispose {
     this._auxWindowTrayItem = new MenuItem({
       label: i18next.t('tray.auxWindow'),
       type: 'normal',
-      click: () => this._wm.showOrRestoreAuxWindow()
+      click: () => this._wm.auxWindow.showOrRestore()
     })
 
     this._auxWindowTrayDevItem = new MenuItem({
       id: 'aux-window-dev',
       label: i18next.t('tray.dev.toggleAuxWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.toggleDevtoolsAuxWindow()
+      click: () => this._wm.auxWindow.toggleDevtools()
     })
 
     this._mainWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleMainWindowDevtools'),
       type: 'normal',
-      click: () => this._wm.toggleDevtoolsMainWindow()
+      click: () => this._wm.mainWindow.toggleDevtools()
     })
 
     this._quitTrayItem = new MenuItem({
       label: i18next.t('tray.quit'),
       type: 'normal',
-      click: () => this._wm.forceMainWindowQuit()
+      click: () => this._wm.mainWindow.forceQuit()
     })
 
     this._contextMenu = Menu.buildFromTemplate([
       {
         label: 'Akari~ Akari!',
         type: 'normal',
-        click: () => this._wm.showOrRestoreMainWindow()
+        click: () => this._wm.mainWindow.showOrRestore()
       },
       {
         type: 'separator'
@@ -83,14 +83,14 @@ export class TrayMain implements IAkariShardInitDispose {
 
     this._tray.setToolTip('League Akari')
     this._tray.setContextMenu(this._contextMenu)
-    this._tray.addListener('click', () => this._wm.toggleMainWindowMinimizedAndFocused())
+    this._tray.addListener('click', () => this._wm.mainWindow.toggleMinimizedAndFocused())
   }
 
   async onInit() {
     this._buildTray()
 
     this._mobx.reaction(
-      () => this._wm.settings.auxWindowEnabled,
+      () => this._wm.auxWindow.settings.enabled,
       (e) => {
         if (e) {
           this._auxWindowTrayDevItem.enabled = true

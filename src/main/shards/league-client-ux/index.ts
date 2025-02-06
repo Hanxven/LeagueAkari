@@ -48,7 +48,7 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     this._mobx = deps['mobx-utils-main']
     this._settingFactory = deps['setting-factory-main']
     this._log = this._loggerFactory.create(LeagueClientUxMain.id)
-    this._setting = this._settingFactory.create(
+    this._setting = this._settingFactory.register(
       LeagueClientUxMain.id,
       {
         useWmic: { default: this.settings.useWmic }

@@ -409,7 +409,7 @@ const handleRemoveEditRule = async (rule: string) => {
   rd.removeRule(rule)
 }
 const handleToggleDevtools = async () => {
-  await wm.toggleMainWindowDevtools()
+  await wm.mainWindow.toggleDevtools()
 }
 
 const handleShowLogsDir = async () => {

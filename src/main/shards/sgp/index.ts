@@ -114,7 +114,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._lc = deps['league-client-main']
     this._ipc = deps['akari-ipc-main']
     this._log = this._loggerFactory.create(SgpMain.id)
-    this._setting = this._settingFactory.create(SgpMain.id, {}, {})
+    this._setting = this._settingFactory.register(SgpMain.id, {}, {})
 
     this.state = new SgpState(this._lc.data)
   }

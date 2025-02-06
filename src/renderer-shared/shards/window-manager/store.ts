@@ -6,36 +6,57 @@ export type MainWindowCloseAction = 'minimize-to-tray' | 'quit' | 'ask'
 
 export const useWindowManagerStore = defineStore('shard:window-manager-renderer', () => {
   const settings = shallowReactive({
-    mainWindowCloseAction: 'ask' as MainWindowCloseAction,
-    auxWindowEnabled: true,
-    auxWindowAutoShow: true,
-    auxWindowOpacity: 0.9,
-    auxWindowPinned: true,
-    auxWindowShowSkinSelector: false,
     backgroundMaterial: 'none' as 'none' | 'mica'
   })
-
-  const mainWindowStatus = ref('normal')
-  const mainWindowFocus = ref('focused')
-  const mainWindowShow = ref(true)
-
-  const auxWindowStatus = ref('normal')
-  const auxWindowFocus = ref('focused')
-  const auxWindowShow = ref(true)
-  const auxWindowFunctionality = ref('indicator')
 
   const supportsMica = ref(false)
 
   return {
     settings,
-    mainWindowStatus,
-    mainWindowFocus,
-    mainWindowShow,
-    auxWindowStatus,
-    auxWindowFocus,
-    auxWindowShow,
-    auxWindowFunctionality,
-
     supportsMica
+  }
+})
+
+export const useMainWindowStore = defineStore('shard:main-window-renderer/main-window', () => {
+  const settings = shallowReactive({
+    closeAction: 'ask' as MainWindowCloseAction
+  })
+
+  const status = ref('normal')
+  const focus = ref('focused')
+  const show = ref(true)
+  const ready = ref(false)
+
+  return {
+    settings,
+    status,
+    focus,
+    show,
+    ready
+  }
+})
+
+export const useAuxWindowStore = defineStore('shard:main-window-renderer/aux-window', () => {
+  const settings = shallowReactive({
+    enabled: true,
+    autoShow: true,
+    opacity: 0.9,
+    pinned: true,
+    showSkinSelector: false
+  })
+
+  const status = ref('normal')
+  const focus = ref('focused')
+  const show = ref(true)
+  const functionality = ref('indicator')
+  const ready = ref(false)
+
+  return {
+    settings,
+    status,
+    focus,
+    show,
+    functionality,
+    ready
   }
 })

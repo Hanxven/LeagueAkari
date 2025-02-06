@@ -13,8 +13,8 @@
         <NSelect
           style="width: 160px"
           size="small"
-          :value="wms.settings.mainWindowCloseAction"
-          @update:value="(val) => wm.setMainWindowCloseAction(val)"
+          :value="mws.settings.closeAction"
+          @update:value="(val) => wm.mainWindow.setCloseAction(val)"
           :options="closeActions"
         />
       </ControlItem>
@@ -248,7 +248,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import { useMainWindowStore, useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
 import { useTranslation } from 'i18next-vue'
 import {
   NCard,
@@ -274,6 +274,7 @@ const sus = useSelfUpdateStore()
 const wms = useWindowManagerStore()
 const as = useAppCommonStore()
 const muis = useMainWindowUiStore()
+const mws = useMainWindowStore()
 
 const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
