@@ -79,13 +79,11 @@ export class AkariAuxWindow {
       setter()
     })
 
-    // TO MERGE
     const auxFBounds = await this._setting._getFromStorage('functionalityBounds')
     if (auxFBounds) {
       this.state.setFunctionalityBounds(auxFBounds)
     }
 
-    // TO MERGE
     const auxFunctionality = await this._setting._getFromStorage('functionality')
     if (auxFunctionality) {
       this.state.setFunctionality(auxFunctionality)

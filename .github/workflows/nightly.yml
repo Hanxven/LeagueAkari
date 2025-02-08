@@ -67,7 +67,7 @@ jobs:
 
       # Post build
       - name: Upload build outputs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: League Akari-${{ env.akari_version }}
           path: dist/win-unpacked

@@ -40,7 +40,6 @@ export class AkariMainWindow extends EventEmitter {
 
     this._namespace = `${_context.namespace}/main-window`
 
-    // TO MERGE
     this._setting = _context.settingFactory.register(
       this._namespace,
       {
@@ -63,7 +62,6 @@ export class AkariMainWindow extends EventEmitter {
 
     this._context.mobx.propSync(this._namespace, 'settings', this.settings, ['closeAction'])
 
-    // TO MERGE
     const windowSize = await this._setting._getFromStorage('size')
     if (windowSize) {
       this.state.setSize(windowSize)
@@ -208,7 +206,6 @@ export class AkariMainWindow extends EventEmitter {
         this._window?.show()
       }
 
-      // TO MERGE
       this._context.ipc.sendEvent(this._namespace, 'close-asking')
       this.showOrRestore()
     } else {
