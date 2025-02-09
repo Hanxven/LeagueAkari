@@ -33,7 +33,7 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
 
   async onInit() {
     // 用于渲染进程获取初始定义的状态列表
-    this._ipc.onCall(MobxUtilsMain.id, 'getStateProps', (namespace: string, stateId: string) => {
+    this._ipc.onCall(MobxUtilsMain.id, 'getStateProps', (_, namespace: string, stateId: string) => {
       const key = `${namespace}:${stateId}`
       if (!this._registeredStates.has(key)) {
         throw new Error(`State ${key} not found`)
@@ -53,7 +53,7 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
     this._ipc.onCall(
       MobxUtilsMain.id,
       'getStatePropValue',
-      (namespace: string, stateId: string, propPath: string) => {
+      (__, namespace: string, stateId: string, propPath: string) => {
         const key = `${namespace}:${stateId}`
         if (!this._registeredStates.has(key)) {
           throw new Error(`State ${key} not found`)
@@ -70,30 +70,34 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
       }
     )
 
-    this._ipc.onCall(MobxUtilsMain.id, 'getInitialState', (namespace: string, stateId: string) => {
-      const key = `${namespace}:${stateId}`
-      if (!this._registeredStates.has(key)) {
-        throw new Error(`State ${key} not found`)
+    this._ipc.onCall(
+      MobxUtilsMain.id,
+      'getInitialState',
+      (__, namespace: string, stateId: string) => {
+        const key = `${namespace}:${stateId}`
+        if (!this._registeredStates.has(key)) {
+          throw new Error(`State ${key} not found`)
+        }
+
+        const config = this._registeredStates.get(key)!
+
+        const props = Array.from(config.props.entries()).map(([path, config]) => ({
+          path,
+          config
+        }))
+
+        const statePlainObject = props.reduce(
+          (acc, { path }) => {
+            const _value = _.get(config.object, path)
+            acc[path] = isObservable(_value) ? toJS(_value) : _value
+            return acc
+          },
+          {} as Record<string, any>
+        )
+
+        return statePlainObject
       }
-
-      const config = this._registeredStates.get(key)!
-
-      const props = Array.from(config.props.entries()).map(([path, config]) => ({
-        path,
-        config
-      }))
-
-      const statePlainObject = props.reduce(
-        (acc, { path }) => {
-          const _value = _.get(config.object, path)
-          acc[path] = isObservable(_value) ? toJS(_value) : _value
-          return acc
-        },
-        {} as Record<string, any>
-      )
-
-      return statePlainObject
-    })
+    )
   }
 
   async onDispose() {

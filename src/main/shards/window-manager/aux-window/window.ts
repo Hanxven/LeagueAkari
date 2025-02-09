@@ -235,7 +235,7 @@ export class AkariAuxWindow {
   }
 
   private _handleIpcCall() {
-    this._context.ipc.onCall(this._namespace, 'setSize', async (width, height, animate) => {
+    this._context.ipc.onCall(this._namespace, 'setSize', async (_, width, height, animate) => {
       this._window?.setSize(width, height, animate)
     })
 
@@ -263,7 +263,7 @@ export class AkariAuxWindow {
       this._window?.webContents.toggleDevTools()
     })
 
-    this._context.ipc.onCall(this._namespace, 'setTitle', (title) => {
+    this._context.ipc.onCall(this._namespace, 'setTitle', (_, title) => {
       this._window?.setTitle(title)
     })
 
@@ -271,7 +271,7 @@ export class AkariAuxWindow {
       this.hideWindow()
     })
 
-    this._context.ipc.onCall(this._namespace, 'show', (inactive: boolean = false) => {
+    this._context.ipc.onCall(this._namespace, 'show', (_, inactive: boolean = false) => {
       this.showOrRestore(inactive)
     })
 
@@ -279,7 +279,7 @@ export class AkariAuxWindow {
       this.resetPosition()
     })
 
-    this._context.ipc.onCall(this._namespace, 'setWindowSize', (width, height) => {
+    this._context.ipc.onCall(this._namespace, 'setWindowSize', (_, width, height) => {
       this._window?.setSize(width, height)
     })
 
@@ -288,7 +288,7 @@ export class AkariAuxWindow {
       return { width, height }
     })
 
-    this._context.ipc.onCall(this._namespace, 'setFunctionality', (f: 'indicator' | 'opgg') => {
+    this._context.ipc.onCall(this._namespace, 'setFunctionality', (_, f: 'indicator' | 'opgg') => {
       this._adjustForFunctionality(f)
     })
   }

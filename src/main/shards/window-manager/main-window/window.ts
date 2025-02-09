@@ -119,7 +119,7 @@ export class AkariMainWindow extends EventEmitter {
       this._window?.restore()
     })
 
-    this._context.ipc.onCall(this._namespace, 'close', async (strategy) => {
+    this._context.ipc.onCall(this._namespace, 'close', async (_, strategy) => {
       this._nextCloseAction = strategy
       this._window?.close()
     })
@@ -128,7 +128,7 @@ export class AkariMainWindow extends EventEmitter {
       this._window?.webContents.toggleDevTools()
     })
 
-    this._context.ipc.onCall(this._namespace, 'setTitle', (title) => {
+    this._context.ipc.onCall(this._namespace, 'setTitle', (_, title) => {
       this._window?.setTitle(title)
     })
 
@@ -136,11 +136,11 @@ export class AkariMainWindow extends EventEmitter {
       this._window?.hide()
     })
 
-    this._context.ipc.onCall(this._namespace, 'show', (inactive = false) => {
+    this._context.ipc.onCall(this._namespace, 'show', (_, inactive = false) => {
       this.showOrRestore(inactive)
     })
 
-    this._context.ipc.onCall(this._namespace, 'setAlwaysOnTop', (flag, level, relativeLevel) => {
+    this._context.ipc.onCall(this._namespace, 'setAlwaysOnTop', (_, flag, level, relativeLevel) => {
       this._window?.setAlwaysOnTop(flag, level, relativeLevel)
     })
 
@@ -148,6 +148,7 @@ export class AkariMainWindow extends EventEmitter {
       this._namespace,
       'openDialog',
       async (
+        _,
         properties = ['openFile'],
         filters: {
           extensions: string[]

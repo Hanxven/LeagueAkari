@@ -235,7 +235,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       await this._correctTrackingState()
     }
 
-    this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistration', (shortcutId: string) => {
+    this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistration', (_, shortcutId: string) => {
       const r = this.getRegistration(shortcutId)
 
       if (!r) {
@@ -246,16 +246,20 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       return rest
     })
 
-    this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistrationByTargetId', (targetId: string) => {
-      const r = this.getRegistrationByTargetId(targetId)
+    this._ipc.onCall(
+      KeyboardShortcutsMain.id,
+      'getRegistrationByTargetId',
+      (_, targetId: string) => {
+        const r = this.getRegistrationByTargetId(targetId)
 
-      if (!r) {
-        return null
+        if (!r) {
+          return null
+        }
+
+        const { cb, ...rest } = r
+        return rest
       }
-
-      const { cb, ...rest } = r
-      return rest
-    })
+    )
 
     this._ipc.onCall(KeyboardShortcutsMain.id, '_getInternalVars', () => {
       // 调试用

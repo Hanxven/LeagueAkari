@@ -62,11 +62,11 @@ export class RendererDebugMain {
   }
 
   private _handleIpcCall() {
-    this._ipc.onCall(RendererDebugMain.id, 'setSendAllNativeLcuEvents', (enabled: boolean) => {
+    this._ipc.onCall(RendererDebugMain.id, 'setSendAllNativeLcuEvents', (_, enabled: boolean) => {
       this.state.setSendAllNativeLcuEvents(enabled)
     })
 
-    this._ipc.onCall(RendererDebugMain.id, 'setLogAllLcuEvents', (enabled: boolean) => {
+    this._ipc.onCall(RendererDebugMain.id, 'setLogAllLcuEvents', (_, enabled: boolean) => {
       this.state.setLogAllLcuEvents(enabled)
     })
   }

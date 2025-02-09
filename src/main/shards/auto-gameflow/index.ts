@@ -96,7 +96,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._ipc.onCall(AutoGameflowMain.id, 'cancelAutoMatchmaking', () => {
       this.cancelAutoMatchmaking('normal')
     })
-    this._ipc.onCall(AutoGameflowMain.id, 'setWillDodgeAtLastSecond', (enabled: boolean) => {
+    this._ipc.onCall(AutoGameflowMain.id, 'setWillDodgeAtLastSecond', (_, enabled: boolean) => {
       this.state.setWillDodgeAtLastSecond(enabled)
     })
   }

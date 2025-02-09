@@ -479,27 +479,27 @@ export class InGameSendMain implements IAkariShardInitDispose {
   }
 
   private async _handleIpcCall() {
-    this._ipc.onCall(InGameSendMain.id, 'createCustomSend', (name?: string) => {
+    this._ipc.onCall(InGameSendMain.id, 'createCustomSend', (_, name?: string) => {
       return this.createCustomSend(name)
     })
 
     this._ipc.onCall(
       InGameSendMain.id,
       'updateCustomSend',
-      (id: string, data: Partial<CustomSend>) => {
+      (_, id: string, data: Partial<CustomSend>) => {
         return this._updateCustomSend(id, data)
       }
     )
 
-    this._ipc.onCall(InGameSendMain.id, 'deleteCustomSend', (id: string) => {
+    this._ipc.onCall(InGameSendMain.id, 'deleteCustomSend', (_, id: string) => {
       return this._deleteCustomSend(id)
     })
 
-    this._ipc.onCall(InGameSendMain.id, 'updateSendStatsTemplate', (template: string) => {
+    this._ipc.onCall(InGameSendMain.id, 'updateSendStatsTemplate', (_, template: string) => {
       return this._updateSendStatsTemplate(template)
     })
 
-    this._ipc.onCall(InGameSendMain.id, 'dryRunStatsSend', (target) => {
+    this._ipc.onCall(InGameSendMain.id, 'dryRunStatsSend', (_, target) => {
       return this._dryRunStatsSend(target)
     })
   }

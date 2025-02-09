@@ -621,6 +621,7 @@ export class SgpMain implements IAkariShardInitDispose {
       SgpMain.id,
       'getMatchHistoryLcuFormat',
       async (
+        _,
         playerPuuid: string,
         start: number,
         count: number,
@@ -635,6 +636,7 @@ export class SgpMain implements IAkariShardInitDispose {
       SgpMain.id,
       'getMatchHistory',
       async (
+        _,
         playerPuuid: string,
         start: number,
         count: number,
@@ -645,38 +647,46 @@ export class SgpMain implements IAkariShardInitDispose {
       }
     )
 
-    this._ipc.onCall(SgpMain.id, 'getSummoner', async (puuid: string, sgpServerId?: string) => {
+    this._ipc.onCall(SgpMain.id, 'getSummoner', async (_, puuid: string, sgpServerId?: string) => {
       return this.getSummoner(puuid, sgpServerId)
     })
 
     this._ipc.onCall(
       SgpMain.id,
       'getSummonerLcuFormat',
-      async (puuid: string, sgpServerId?: string) => {
+      async (_, puuid: string, sgpServerId?: string) => {
         return this.getSummonerLcuFormat(puuid, sgpServerId)
       }
     )
 
-    this._ipc.onCall(SgpMain.id, 'getGameSummary', async (gameId: number, sgpServerId?: string) => {
-      return this.getGameSummary(gameId, sgpServerId)
-    })
+    this._ipc.onCall(
+      SgpMain.id,
+      'getGameSummary',
+      async (_, gameId: number, sgpServerId?: string) => {
+        return this.getGameSummary(gameId, sgpServerId)
+      }
+    )
 
     this._ipc.onCall(
       SgpMain.id,
       'getGameSummaryLcuFormat',
-      async (gameId: number, sgpServerId?: string) => {
+      async (_, gameId: number, sgpServerId?: string) => {
         return this.getGameSummaryLcuFormat(gameId, sgpServerId)
       }
     )
 
-    this._ipc.onCall(SgpMain.id, 'getRankedStats', async (puuid: string, sgpServerId?: string) => {
-      return this.getRankedStats(puuid, sgpServerId)
-    })
+    this._ipc.onCall(
+      SgpMain.id,
+      'getRankedStats',
+      async (_, puuid: string, sgpServerId?: string) => {
+        return this.getRankedStats(puuid, sgpServerId)
+      }
+    )
 
     this._ipc.onCall(
       SgpMain.id,
       'getSpectatorGameflow',
-      async (puuid: string, sgpServerId?: string) => {
+      async (_, puuid: string, sgpServerId?: string) => {
         return this.getSpectatorGameflow(puuid, sgpServerId)
       }
     )

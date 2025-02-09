@@ -150,14 +150,14 @@ export class GameClientMain implements IAkariShardInitDispose {
       this._terminateGameClient()
     })
 
-    this._ipc.onCall(GameClientMain.id, 'launchSpectator', (config: LaunchSpectatorConfig) => {
+    this._ipc.onCall(GameClientMain.id, 'launchSpectator', (_, config: LaunchSpectatorConfig) => {
       return this.launchSpectator(config)
     })
 
     this._ipc.onCall(
       GameClientMain.id,
       'setSettingsFileReadonlyOrWritable',
-      async (mode: 'readonly' | 'writable') => {
+      async (_, mode: 'readonly' | 'writable') => {
         await this._setSettingsFileReadonlyOrWritable(mode)
       }
     )

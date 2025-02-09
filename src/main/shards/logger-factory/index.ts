@@ -126,7 +126,7 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
     this._ipc.onCall(
       LoggerFactoryMain.id,
       'log',
-      (namespace: string, level: string, ...args: any[]) => {
+      (_, namespace: string, level: string, ...args: any[]) => {
         switch (level) {
           case 'info':
             this.info(namespace, ...args)

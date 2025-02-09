@@ -141,7 +141,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
       { fireImmediately: true }
     )
 
-    this._ipc.onCall(AppCommonMain.id, 'setDisableHardwareAcceleration', (s: boolean) => {
+    this._ipc.onCall(AppCommonMain.id, 'setDisableHardwareAcceleration', (_, s: boolean) => {
       this._setDisableHardwareAccelerationAndRelaunch(s)
     })
 
@@ -157,7 +157,7 @@ export class AppCommonMain implements IAkariShardInitDispose {
       return clipboard.readText()
     })
 
-    this._ipc.onCall(AppCommonMain.id, 'writeClipboardImage', (buffer: ArrayBuffer) => {
+    this._ipc.onCall(AppCommonMain.id, 'writeClipboardImage', (_, buffer: ArrayBuffer) => {
       const buf = Buffer.from(buffer)
       const image = nativeImage.createFromBuffer(buf)
       clipboard.writeImage(image)

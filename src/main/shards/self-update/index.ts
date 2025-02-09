@@ -654,7 +654,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       }
     })
 
-    this._ipc.onCall(SelfUpdateMain.id, 'setAnnouncementRead', async (md5: string) => {
+    this._ipc.onCall(SelfUpdateMain.id, 'setAnnouncementRead', async (_, md5: string) => {
       if (this.state.currentAnnouncement) {
         this.state.setAnnouncementRead(true)
         await this._setting._saveToStorage('lastReadAnnouncementMd5', md5)

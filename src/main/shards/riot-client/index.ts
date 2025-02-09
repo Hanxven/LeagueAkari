@@ -110,7 +110,7 @@ export class RiotClientMain implements IAkariShardInitDispose {
   }
 
   private _handleCall() {
-    this._ipc.onCall(RiotClientMain.id, 'http-request', async (config) => {
+    this._ipc.onCall(RiotClientMain.id, 'http-request', async (_, config) => {
       try {
         const { config: c, request, ...rest } = await this._http!.request(config)
 

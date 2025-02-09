@@ -62,7 +62,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     this._ipc.onCall(
       AutoChampionConfigMain.id,
       'updateRunes',
-      async (championId: number, key: string, runes: ChampionRunesConfig | null) => {
+      async (_, championId: number, key: string, runes: ChampionRunesConfig | null) => {
         this.settings.updateRunes(championId, key, runes)
         await this._setting.set('runesV2', this.settings.runesV2)
       }
@@ -71,7 +71,7 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     this._ipc.onCall(
       AutoChampionConfigMain.id,
       'updateSummonerSpells',
-      async (championId: number, key: string, spells: SummonerSpellsConfig | null) => {
+      async (_, championId: number, key: string, spells: SummonerSpellsConfig | null) => {
         this.settings.updateSummonerSpells(championId, key, spells)
         await this._setting.set('summonerSpells', this.settings.summonerSpells)
       }

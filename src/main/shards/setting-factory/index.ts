@@ -192,7 +192,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     this._ipc.onCall(
       SettingFactoryMain.id,
       'set',
-      async (namespace: string, key: string, newValue: any) => {
+      async (_, namespace: string, key: string, newValue: any) => {
         const service = this._settings.get(namespace)
 
         if (service) {
@@ -203,7 +203,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
       }
     )
 
-    this._ipc.onCall(SettingFactoryMain.id, 'get', async (namespace: string, key: string) => {
+    this._ipc.onCall(SettingFactoryMain.id, 'get', async (_, namespace: string, key: string) => {
       const service = this._settings.get(namespace)
       if (service) {
         return service.get(key)

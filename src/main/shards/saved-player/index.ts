@@ -217,50 +217,50 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
   }
 
   private _handleIpcCall() {
-    this._ipc.onCall(SavedPlayerMain.id, 'querySavedPlayer', (query: SavedPlayerQueryDto) => {
+    this._ipc.onCall(SavedPlayerMain.id, 'querySavedPlayer', (_, query: SavedPlayerQueryDto) => {
       return this.querySavedPlayer(query)
     })
 
     this._ipc.onCall(
       SavedPlayerMain.id,
       'querySavedPlayerWithGames',
-      (query: SavedPlayerQueryDto & WithEncounteredGamesQueryDto) => {
+      (_, query: SavedPlayerQueryDto & WithEncounteredGamesQueryDto) => {
         return this.querySavedPlayerWithGames(query)
       }
     )
 
-    this._ipc.onCall(SavedPlayerMain.id, 'saveSavedPlayer', (player: SavedPlayerSaveDto) => {
+    this._ipc.onCall(SavedPlayerMain.id, 'saveSavedPlayer', (_, player: SavedPlayerSaveDto) => {
       return this.saveSavedPlayer(player)
     })
 
-    this._ipc.onCall(SavedPlayerMain.id, 'deleteSavedPlayer', (query: SavedPlayerQueryDto) => {
+    this._ipc.onCall(SavedPlayerMain.id, 'deleteSavedPlayer', (_, query: SavedPlayerQueryDto) => {
       return this.deleteSavedPlayer(query)
     })
 
     this._ipc.onCall(
       SavedPlayerMain.id,
       'queryEncounteredGames',
-      (query: EncounteredGameQueryDto) => {
+      (_, query: EncounteredGameQueryDto) => {
         return this.queryEncounteredGames(query)
       }
     )
 
-    this._ipc.onCall(SavedPlayerMain.id, 'saveEncounteredGame', (dto: EncounteredGameSaveDto) => {
+    this._ipc.onCall(SavedPlayerMain.id, 'saveEncounteredGame', (_, dto: EncounteredGameSaveDto) => {
       return this.saveEncounteredGame(dto)
     })
 
-    this._ipc.onCall(SavedPlayerMain.id, 'getPlayerTags', (query: SavedPlayerQueryDto) => {
+    this._ipc.onCall(SavedPlayerMain.id, 'getPlayerTags', (_, query: SavedPlayerQueryDto) => {
       return this.getPlayerTags(query)
     })
 
-    this._ipc.onCall(SavedPlayerMain.id, 'updatePlayerTag', (dto: UpdateTagDto) => {
+    this._ipc.onCall(SavedPlayerMain.id, 'updatePlayerTag', (_, dto: UpdateTagDto) => {
       return this.updatePlayerTag(dto)
     })
 
     this._ipc.onCall(
       SavedPlayerMain.id,
       'queryAllSavedPlayers',
-      (query: QueryAllSavedPlayersDto) => {
+      (_, query: QueryAllSavedPlayersDto) => {
         return this.queryAllSavedPlayers(query)
       }
     )

@@ -33,7 +33,7 @@ export class AkariIpcMain implements IAkariShardInitDispose {
   }
 
   private _handleRendererInvocation(
-    _event: IpcMainInvokeEvent,
+    event: IpcMainInvokeEvent,
     namespace: string,
     fnName: string,
     ...args: any[]
@@ -45,7 +45,7 @@ export class AkariIpcMain implements IAkariShardInitDispose {
       throw new Error(`No function "${fnName}" in namespace "${namespace}"`)
     }
 
-    return AkariIpcMain._standardizeIpcData(() => fn(...args))
+    return AkariIpcMain._standardizeIpcData(() => fn(event, ...args))
   }
 
   /**
@@ -107,7 +107,11 @@ export class AkariIpcMain implements IAkariShardInitDispose {
    * 处理来自渲染进程的调用, 方法名使用 camelCase
    * @param cb
    */
-  onCall(namespace: string, fnName: string, cb: (...args: any[]) => Promise<any> | any) {
+  onCall(
+    namespace: string,
+    fnName: string,
+    cb: (event: IpcMainInvokeEvent, ...args: any[]) => Promise<any> | any
+  ) {
     const key = `${namespace}:${fnName}`
     if (this._callMap.has(key)) {
       throw new Error(`Function "${fnName}" in namespace "${namespace}" already exists`)

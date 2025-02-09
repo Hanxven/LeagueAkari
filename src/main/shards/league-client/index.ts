@@ -203,7 +203,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   }
 
   private _handleIpcCall() {
-    this._ipc.onCall(LeagueClientMain.id, 'http-request', async (config) => {
+    this._ipc.onCall(LeagueClientMain.id, 'http-request', async (_, config) => {
       if (this.state.connectionState !== 'connected') {
         throw new LeagueClientLcuUninitializedError()
       }
@@ -223,7 +223,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       }
     })
 
-    this._ipc.onCall(LeagueClientMain.id, 'connect', async (auth: UxCommandLine) => {
+    this._ipc.onCall(LeagueClientMain.id, 'connect', async (_, auth: UxCommandLine) => {
       if (this.state.connectionState === 'connected') {
         this._disconnect()
       }
@@ -240,12 +240,12 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     this._ipc.onCall(
       LeagueClientMain.id,
       'writeItemSetsToDisk',
-      async (itemSets: any[], clearPrevious: boolean) => {
+      async (_, itemSets: any[], clearPrevious: boolean) => {
         await this.writeItemSetsToDisk(itemSets, clearPrevious)
       }
     )
 
-    this._ipc.onCall(LeagueClientMain.id, 'fixWindowMethodA', async (config) => {
+    this._ipc.onCall(LeagueClientMain.id, 'fixWindowMethodA', async (_, config) => {
       await this.fixWindowMethodA(config)
     })
   }

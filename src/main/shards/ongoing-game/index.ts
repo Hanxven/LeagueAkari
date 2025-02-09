@@ -933,7 +933,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       }
     })
 
-    this._ipc.onCall(OngoingGameMain.id, 'setMatchHistoryTag', (tag: string) => {
+    this._ipc.onCall(OngoingGameMain.id, 'setMatchHistoryTag', (_, tag: string) => {
       if (OngoingGameMain.SAFE_TAGS.has(tag) || tag === 'all') {
         this.state.setMatchHistoryTag(tag)
         this._debouncedUpdateMatchHistoryFn()
