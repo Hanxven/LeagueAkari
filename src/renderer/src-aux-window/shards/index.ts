@@ -13,18 +13,16 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
 const manager = createManager()
 
-manager.use(
-  AkariIpcRenderer,
-  AppCommonRenderer,
-  AutoGameflowRenderer,
-  AutoSelectRenderer,
-  ExtraAssetsRenderer,
-  LeagueClientRenderer,
-  LoggerRenderer,
-  PiniaMobxUtilsRenderer,
-  SettingUtilsRenderer,
-  SgpRenderer,
-  WindowManagerRenderer
-)
+manager.use(AkariIpcRenderer)
+manager.use(AppCommonRenderer)
+manager.use(AutoGameflowRenderer)
+manager.use(AutoSelectRenderer)
+manager.use(ExtraAssetsRenderer)
+manager.use(LeagueClientRenderer)
+manager.use(LoggerRenderer)
+manager.use(PiniaMobxUtilsRenderer)
+manager.use(SettingUtilsRenderer)
+manager.use(SgpRenderer)
+manager.use(WindowManagerRenderer)
 
 export { manager }

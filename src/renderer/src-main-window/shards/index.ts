@@ -1,5 +1,6 @@
 import { createManager } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
+import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { AutoReplyRenderer } from '@renderer-shared/shards/auto-reply'
 import { AutoSelectRenderer } from '@renderer-shared/shards/auto-select'
@@ -25,37 +26,34 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
 import { MainWindowUiRenderer } from './main-window-ui'
 import { MatchHistoryTabsRenderer } from './match-history-tabs'
-import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 
 const manager = createManager()
 
-manager.use(
-  AkariIpcRenderer,
-  AppCommonRenderer,
-  AutoChampConfigRenderer,
-  AutoGameflowRenderer,
-  AutoSelectRenderer,
-  AutoReplyRenderer,
-  ClientInstallationRenderer,
-  ExtraAssetsRenderer,
-  GameClientRenderer,
-  InGameSendRenderer,
-  KeyboardShortcutsRenderer,
-  LeagueClientRenderer,
-  LeagueClientUxRenderer,
-  LoggerRenderer,
-  MatchHistoryTabsRenderer,
-  OngoingGameRenderer,
-  PiniaMobxUtilsRenderer,
-  RendererDebugRenderer,
-  RespawnTimerRenderer,
-  RiotClientRenderer,
-  SavedPlayerRenderer,
-  SelfUpdateRenderer,
-  SettingUtilsRenderer,
-  SgpRenderer,
-  WindowManagerRenderer,
-  MainWindowUiRenderer
-)
+manager.use(AkariIpcRenderer)
+manager.use(AppCommonRenderer)
+manager.use(AutoChampConfigRenderer)
+manager.use(AutoGameflowRenderer)
+manager.use(AutoSelectRenderer)
+manager.use(AutoReplyRenderer)
+manager.use(ClientInstallationRenderer)
+manager.use(ExtraAssetsRenderer)
+manager.use(GameClientRenderer)
+manager.use(InGameSendRenderer)
+manager.use(KeyboardShortcutsRenderer)
+manager.use(LeagueClientRenderer)
+manager.use(LeagueClientUxRenderer)
+manager.use(LoggerRenderer)
+manager.use(MatchHistoryTabsRenderer)
+manager.use(OngoingGameRenderer)
+manager.use(PiniaMobxUtilsRenderer)
+manager.use(RendererDebugRenderer)
+manager.use(RespawnTimerRenderer)
+manager.use(RiotClientRenderer)
+manager.use(SavedPlayerRenderer)
+manager.use(SelfUpdateRenderer)
+manager.use(SettingUtilsRenderer)
+manager.use(SgpRenderer)
+manager.use(WindowManagerRenderer)
+manager.use(MainWindowUiRenderer)
 
 export { manager }

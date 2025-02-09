@@ -1,7 +1,7 @@
 export type AkariDeps = Record<string, any>
 
 export interface AkariShardConstructor<T = any> {
-  new (deps?: any | AkariDeps): T
+  new (deps?: any | AkariDeps, config?: object): T
 
   /**
    * 关于此模块的唯一 id
@@ -29,7 +29,13 @@ export interface AkariSharedGlobal {}
 export const SHARED_GLOBAL_ID = '<akari-shared-global>'
 
 export class AkariManager {
-  private _registry: Map<string, AkariShardConstructor> = new Map()
+  private _registry: Map<
+    string,
+    {
+      cls: AkariShardConstructor
+      config?: object
+    }
+  > = new Map()
   private _instances: Map<string, any> = new Map()
 
   private _isSetup = false
@@ -40,55 +46,54 @@ export class AkariManager {
 
   private static INTERNAL_RUNNER_ID = '<akari-shard-runner-ヾ(≧▽≦*)o>'
 
-  /**
-   * 将模块注册到管理器中, 将在 setup 时初始化
-   * @param shard 类构造函数
-   */
-  use(...shards: AkariShardConstructor[]) {
-    const global = this.global
-    const manager = this
-    shards.push(
-      class __$SharedGlobalShard {
-        static id = SHARED_GLOBAL_ID
-        public readonly global: Record<string, any> = global
-        public readonly manager: AkariManager = manager
-      }
-    )
-
-    for (const shard of shards) {
-      if (!shard.id) {
-        throw new Error('Shard id is required')
-      }
-
-      if (this._registry.has(shard.id) || shard.id === AkariManager.INTERNAL_RUNNER_ID) {
-        throw new Error(`Shard with id "${shard.id}" already exists`)
-      }
-
-      this._registry.set(shard.id, shard)
+  use(shard: AkariShardConstructor, config?: object) {
+    if (!shard.id) {
+      throw new Error('Shard id is required')
     }
 
-    const allDeps = this._registry.keys()
+    if (
+      this._registry.has(shard.id) ||
+      shard.id === AkariManager.INTERNAL_RUNNER_ID ||
+      shard.id === SHARED_GLOBAL_ID
+    ) {
+      throw new Error(`Shard with id "${shard.id}" already exists`)
+    }
 
-    this._registry.set(
-      AkariManager.INTERNAL_RUNNER_ID,
-      class __$RootShard {
-        static id = AkariManager.INTERNAL_RUNNER_ID
-        static priority = -Infinity
-        static dependencies = [...allDeps].filter((dep) => dep !== AkariManager.INTERNAL_RUNNER_ID)
-      }
-    )
+    this._registry.set(shard.id, { cls: shard, config })
   }
 
   /**
-   * 启用所有注册的模块, Akari, 启动!
+   * 启用所有注册的模块，进行依赖解析、实例化和生命周期钩子调用
    */
   async setup() {
     if (this._isSetup) {
       throw new Error('Already setup')
     }
 
+    // 在 setup 阶段先注册全局 SharedGlobalShard（如果尚未注册）
+    if (!this._registry.has(SHARED_GLOBAL_ID)) {
+      const global = this.global
+      const manager = this
+      this._registry.set(SHARED_GLOBAL_ID, {
+        cls: class __$SharedGlobalShard {
+          static id = SHARED_GLOBAL_ID
+          public readonly global: Record<string, any> = global
+          public readonly manager: AkariManager = manager
+        }
+      })
+    }
+
+    const allDeps = [...this._registry.keys()]
+    this._registry.set(AkariManager.INTERNAL_RUNNER_ID, {
+      cls: class __$RootShard {
+        static id = AkariManager.INTERNAL_RUNNER_ID
+        static priority = -Infinity
+        static dependencies = allDeps
+      }
+    })
+
     this._initializationStack = []
-    this._resolve(AkariManager.INTERNAL_RUNNER_ID, new Set<string>(), this._initializationStack)
+    this._inflate(AkariManager.INTERNAL_RUNNER_ID, new Set<string>(), this._initializationStack)
 
     for (const id of this._initializationStack) {
       const instance = this._instances.get(id)
@@ -105,6 +110,8 @@ export class AkariManager {
         await instance.onFinish()
       }
     }
+
+    this._initializationStack = []
   }
 
   async dispose() {
@@ -127,32 +134,33 @@ export class AkariManager {
   /**
    * 获取某个模块的实例
    * @param id 模块 ID
-   * @returns 模块 ID 实例
+   * @returns 模块实例（可能为 undefined）
    */
   getInstance<T = any>(id: string) {
     return this._instances.get(id) as T | undefined
   }
 
   /**
-   * For debug purpose
+   * 仅用于调试：返回模块初始化顺序
+   * 仅在 setup 后有效
    */
   _getInitializationStack() {
     return this._initializationStack
   }
 
-  private _resolve(id: string, visited: Set<string>, stack: string[]) {
-    const cls = this._registry.get(id)
-    if (!cls) {
+  private _inflate(id: string, visited: Set<string>, stack: string[]) {
+    const c = this._registry.get(id)
+    if (!c) {
       throw new Error(`Shard with id "${id}" does not exist`)
     }
 
-    const dependencies = cls.dependencies
+    const dependencies = c.cls.dependencies
     const instances: AkariDeps = {}
 
     if (dependencies) {
       const sortedDependencies = dependencies.toSorted((a, b) => {
-        const aPriority = this._registry.get(a)?.priority ?? 0
-        const bPriority = this._registry.get(b)?.priority ?? 0
+        const aPriority = this._registry.get(a)?.cls?.priority ?? 0
+        const bPriority = this._registry.get(b)?.cls?.priority ?? 0
         return bPriority - aPriority
       })
 
@@ -169,14 +177,15 @@ export class AkariManager {
           instances[dep] = this._instances.get(dep)!
         } else {
           visited.add(dep)
-          instances[dep] = this._resolve(dep, visited, stack)
+          instances[dep] = this._inflate(dep, visited, stack)
           visited.delete(dep)
         }
       }
     }
 
     stack.push(id)
-    const instance = Object.keys(instances).length ? new cls(instances) : new cls()
+
+    const instance = new c.cls(instances, c.config)
     this._instances.set(id, instance)
 
     return instance

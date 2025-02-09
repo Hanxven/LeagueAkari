@@ -214,9 +214,9 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
           })
 
           const unionChampionIds = Array.from(new Set([...runesChampionIds, ...spellsChampionIds]))
-          const names = unionChampionIds.map(
-            (id) => this._lc.data.gameData.champions[id]?.name || id
-          )
+          const names = unionChampionIds
+            .map((id) => this._lc.data.gameData.champions[id]?.name || id)
+            .slice(0, 16)
 
           if (names.length) {
             this._sendInChat(

@@ -26,7 +26,7 @@ export function createManager() {
     },
     setup: () => akariManager.setup(),
     getInstance: (id: string) => akariManager.getInstance(id),
-    use: (...shards: AkariShardConstructor[]) => akariManager.use(...shards)
+    use: (shard: AkariShardConstructor, config?: object) => akariManager.use(shard, config)
   }
 }
 

@@ -191,46 +191,48 @@ export function bootstrap() {
       })
     }
 
-    manager.use(
-      // basic fundamental shards
-      AkariIpcMain,
-      AppCommonMain,
-      LoggerFactoryMain,
-      MobxUtilsMain,
+    // basic fundamental shards
 
-      ConfigMigrateMain,
-      SettingFactoryMain,
-      StorageMain,
+    manager.use(AkariIpcMain)
+    manager.use(AppCommonMain)
+    manager.use(LoggerFactoryMain)
+    manager.use(MobxUtilsMain)
 
-      // connection & data provider shards
-      AkariProtocolMain,
-      GameClientMain,
-      LeagueClientMain,
-      LeagueClientUxMain,
-      RiotClientMain,
+    // connection & data provider shards
 
-      // application specific shards
-      ClientInstallationMain,
-      WindowManagerMain,
-      TrayMain,
-      KeyboardShortcutsMain,
-      SelfUpdateMain,
+    manager.use(ConfigMigrateMain)
+    manager.use(SettingFactoryMain)
+    manager.use(StorageMain)
 
-      // functional shards
-      AutoChampionConfigMain,
-      AutoGameflowMain,
-      AutoReplyMain,
-      AutoSelectMain,
-      InGameSendMain,
-      OngoingGameMain,
-      RespawnTimerMain,
-      SavedPlayerMain,
-      SgpMain,
+    manager.use(AkariProtocolMain)
+    manager.use(GameClientMain)
+    manager.use(LeagueClientMain)
+    manager.use(LeagueClientUxMain)
+    manager.use(RiotClientMain)
 
-      // other
-      ExtraAssetsMain,
-      RendererDebugMain
-    )
+    // application specific shards
+
+    manager.use(ClientInstallationMain)
+    manager.use(WindowManagerMain)
+    manager.use(TrayMain)
+    manager.use(KeyboardShortcutsMain)
+    manager.use(SelfUpdateMain)
+
+    // functional shards
+
+    manager.use(AutoChampionConfigMain)
+    manager.use(AutoGameflowMain)
+    manager.use(AutoReplyMain)
+    manager.use(AutoSelectMain)
+    manager.use(InGameSendMain)
+    manager.use(OngoingGameMain)
+    manager.use(RespawnTimerMain)
+    manager.use(SavedPlayerMain)
+    manager.use(SgpMain)
+
+    // other
+    manager.use(ExtraAssetsMain)
+    manager.use(RendererDebugMain)
 
     app.on('second-instance', (_event, commandLine, workingDirectory) => {
       events.emit('second-instance', commandLine, workingDirectory)
