@@ -35,7 +35,7 @@ export class PiniaMobxUtilsRenderer implements IAkariShardInitDispose {
 
     const initial: Record<string, any> = await this._ipc.call(
       MAIN_SHARD_NAMESPACE,
-      'getInitialState',
+      'subscribeAndGetInitialState',
       namespace,
       stateId
     )

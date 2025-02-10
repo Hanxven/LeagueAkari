@@ -1,6 +1,6 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { isAxiosError } from 'axios'
-import { IpcMainInvokeEvent, ipcMain, webContents } from 'electron'
+import { IpcMainInvokeEvent, WebContents, ipcMain, webContents } from 'electron'
 
 export interface IpcMainSuccessDataType<T = any> {
   success: true
@@ -51,9 +51,9 @@ export class AkariIpcMain implements IAkariShardInitDispose {
   /**
    * 处理来自渲染进程的事件订阅
    * @param event
-   * @param action 可选值 subscribe / unsubscribe
+   * @param action 可选值 register / unregister
    */
-  private _handleRendererRegister(event: IpcMainInvokeEvent, action = 'subscribe') {
+  private _handleRendererRegister(event: IpcMainInvokeEvent, action = 'register') {
     const id = event.sender.id
 
     if (action === 'register' && !this._renderers.has(id)) {
@@ -95,12 +95,24 @@ export class AkariIpcMain implements IAkariShardInitDispose {
   }
 
   /**
-   * 发送到所有已订阅的渲染进程, 事件名使用 kebab-case
+   * 发送到所有已注册的渲染进程, 事件名使用 kebab-case
    */
   sendEvent(namespace: string, eventName: string, ...args: any[]) {
     this._renderers.forEach((id) =>
       webContents.fromId(id)?.send('akari-event', namespace, eventName, ...args)
     )
+  }
+
+  sendEventToWebContents(w: number, namespace: string, eventName: string, ...args: any[]): void
+  sendEventToWebContents(w: WebContents, namespace: string, eventName: string, ...args: any[]): void
+  sendEventToWebContents(
+    w: WebContents | number,
+    namespace: string,
+    eventName: string,
+    ...args: any[]
+  ) {
+    const wc = typeof w === 'number' ? webContents.fromId(w) : w
+    wc?.send('akari-event', namespace, eventName, ...args)
   }
 
   /**
@@ -161,5 +173,12 @@ export class AkariIpcMain implements IAkariShardInitDispose {
       success: false,
       error: { message: 'An error occurred' }
     }
+  }
+
+  /**
+   * 获取已注册的渲染进程 ID 列表
+   */
+  getRegisteredRendererIds() {
+    return Array.from(this._renderers)
   }
 }

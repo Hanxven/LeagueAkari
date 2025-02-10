@@ -27,6 +27,12 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
   private readonly _disposables = new Set<Function>()
   protected readonly _registeredStates = new Map<string, RegisteredState>()
 
+  /**
+   * 为减少同步开销, 仅在被订阅时才会推送事件
+   * uniqueId (namespace:stateId) -> webContentsIds
+   */
+  private readonly _rendererSubscription = new Map<string, Set<number>>()
+
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
   }
@@ -72,15 +78,20 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
 
     this._ipc.onCall(
       MobxUtilsMain.id,
-      'getInitialState',
-      (__, namespace: string, stateId: string) => {
+      'subscribeAndGetInitialState',
+      (event, namespace: string, stateId: string) => {
         const key = `${namespace}:${stateId}`
-        if (!this._registeredStates.has(key)) {
+        if (!this._registeredStates.has(key) || !this._rendererSubscription.has(key)) {
           throw new Error(`State ${key} not found`)
         }
 
-        const config = this._registeredStates.get(key)!
+        const subs = this._rendererSubscription.get(key)!
+        if (!subs.has(event.sender.id)) {
+          subs.add(event.sender.id)
+          event.sender.on('destroyed', () => subs.delete(event.sender.id))
+        }
 
+        const config = this._registeredStates.get(key)!
         const props = Array.from(config.props.entries()).map(([path, config]) => ({
           path,
           config
@@ -104,6 +115,7 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
     this._disposables.forEach((dispose) => dispose())
     this._disposables.clear()
     this._registeredStates.clear()
+    this._rendererSubscription.clear()
   }
 
   /**
@@ -120,6 +132,11 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
     propPath: Paths<T> | Paths<T>[]
   ) {
     const key = `${namespace}:${stateId}`
+
+    if (!this._rendererSubscription.has(key)) {
+      this._rendererSubscription.set(key, new Set())
+    }
+
     if (!this._registeredStates.has(key)) {
       this._registeredStates.set(key, {
         object: obj,
@@ -145,13 +162,16 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
       const fn = reaction(
         () => _.get(obj, path),
         (newValue) => {
-          this._ipc.sendEvent(
-            MobxUtilsMain.id,
-            `update-state-prop/${namespace}:${stateId}`,
-            path,
-            isObservable(newValue) ? toJS(newValue) : newValue,
-            { action: 'update' }
-          )
+          this._rendererSubscription.get(key)?.forEach((wcId) => {
+            this._ipc.sendEventToWebContents(
+              wcId,
+              MobxUtilsMain.id,
+              `update-state-prop/${key}`,
+              path,
+              isObservable(newValue) ? toJS(newValue) : newValue,
+              { action: 'update' }
+            )
+          })
         }
       )
 

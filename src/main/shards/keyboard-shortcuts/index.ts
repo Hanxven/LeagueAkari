@@ -91,6 +91,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   private _correctTask = new TimeoutTask(() => {
     if (this._pressedModifierKeys.size === 0 && this._pressedOtherKeys.size === 0) {
+      this._lastActiveShortcut = []
       return
     }
 
