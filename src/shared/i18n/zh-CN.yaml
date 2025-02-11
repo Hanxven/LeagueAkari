@@ -241,31 +241,49 @@ OngoingGameSettings:
 AuxWindowSettings:
   title: 小窗口
 
-  auxWindowEnabled:
+  enabled:
     label: 启用小窗口
     description: 在一些游戏流程中使用小窗口来展示状态以及提供额外操作
     descriptionPart1: 可通过标题栏右侧的快捷图标 (
     descriptionPart2: )，或托盘区右键菜单中的 “小窗口” 打开小窗口
 
-  auxWindowAutoShow:
+  autoShow:
     label: 自动弹出和关闭
     description: 在游戏流程的部分阶段，自动弹出或关闭小窗口
 
-  auxWindowOpacity:
+  opacity:
     label: 小窗口不透明度
     description: 小窗口的半透明状态
 
-  auxWindowShowSkinSelector:
+  showSkinSelector:
     label: 皮肤设置器
     description: 在小窗口展示一个设置皮肤的快捷入口
 
-  auxWindowZoomFactor:
-    label: 缩放
-    description: 可以调整小窗口的整体大小
-
-  resetAuxWindowPosition:
+  resetWindowPosition:
     label: 重置小窗口位置
     description: 重新设置小窗口的位置，还原到默认主屏幕正中心
+    button: 重置
+
+OpggWindowSettings:
+  title: OP.GG 窗口
+
+  enabled:
+    label: 启用 OP.GG 特性
+    description: 启用 OP.GG 相关功能
+    descriptionPart1: 可通过标题栏右侧的快捷图标 (
+    descriptionPart2: )，或托盘区右键菜单中的 “OP.GG 窗口” 打开 OP.GG 窗口
+
+  autoShow:
+    label: 自动弹出和关闭
+    description: 在游戏流程的部分阶段，自动弹出或关闭 OP.GG 窗口
+
+  opacity:
+    label: OP.GG 窗口不透明度
+    description: OP.GG 窗口的半透明状态
+
+  resetWindowPosition:
+    label: 重置 OP.GG 窗口位置
+    description: 重新设置 OP.GG 窗口的位置，还原到默认主屏幕正中心
     button: 重置
 
 MiscSettings:

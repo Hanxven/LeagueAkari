@@ -22,6 +22,9 @@
       <NTabPane name="aux-window" :tab="t('AuxWindowSettings.title')">
         <AuxWindowSettings />
       </NTabPane>
+      <NTabPane name="opgg-window" :tab="t('OpggWindowSettings.title')">
+        <OpggWindowSettings />
+      </NTabPane>
       <NTabPane name="misc" :tab="t('MiscSettings.title')">
         <MiscSettings />
       </NTabPane>
@@ -47,6 +50,7 @@ import { nextTick, useCssModule, useTemplateRef, watch } from 'vue'
 import AboutPane from './AboutPane.vue'
 import AppSettings from './AppSettings.vue'
 import AuxWindowSettings from './AuxWindowSettings.vue'
+import OpggWindowSettings from './OpggWindowSettings.vue'
 import DebugSettings from './DebugSettings.vue'
 import MatchHistoryTabsSettings from './MatchHistoryTabsSettings.vue'
 import MiscSettings from './MiscSettings.vue'

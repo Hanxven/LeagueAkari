@@ -6,15 +6,15 @@
       </template>
       <ControlItem
         class="control-item-margin"
-        :label="t('AuxWindowSettings.auxWindowEnabled.label')"
+        :label="t('AuxWindowSettings.enabled.label')"
         :label-width="320"
       >
         <template #labelDescription>
-          <div>{{ t('AuxWindowSettings.auxWindowEnabled.description') }}</div>
+          <div>{{ t('AuxWindowSettings.enabled.description') }}</div>
           <div>
-            {{ t('AuxWindowSettings.auxWindowEnabled.descriptionPart1')
+            {{ t('AuxWindowSettings.enabled.descriptionPart1')
             }}<NIcon class="inline-icon"><Window24FilledIcon /></NIcon
-            >{{ t('AuxWindowSettings.auxWindowEnabled.descriptionPart2') }}
+            >{{ t('AuxWindowSettings.enabled.descriptionPart2') }}
           </div>
         </template>
         <NSwitch
@@ -25,8 +25,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('AuxWindowSettings.auxWindowAutoShow.label')"
-        :label-description="t('AuxWindowSettings.auxWindowAutoShow.description')"
+        :label="t('AuxWindowSettings.autoShow.label')"
+        :label-description="t('AuxWindowSettings.autoShow.description')"
         :label-width="320"
       >
         <NSwitch
@@ -37,8 +37,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('AuxWindowSettings.auxWindowOpacity.label')"
-        :label-description="t('AuxWindowSettings.auxWindowOpacity.description')"
+        :label="t('AuxWindowSettings.opacity.label')"
+        :label-description="t('AuxWindowSettings.opacity.description')"
         :label-width="320"
       >
         <NSlider
@@ -54,8 +54,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('AuxWindowSettings.auxWindowShowSkinSelector.label')"
-        :label-description="t('AuxWindowSettings.auxWindowShowSkinSelector.description')"
+        :label="t('AuxWindowSettings.showSkinSelector.label')"
+        :label-description="t('AuxWindowSettings.showSkinSelector.description')"
         :label-width="320"
       >
         <NSwitch
@@ -66,8 +66,8 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label="t('AuxWindowSettings.resetAuxWindowPosition.label')"
-        :label-description="t('AuxWindowSettings.resetAuxWindowPosition.description')"
+        :label="t('AuxWindowSettings.resetWindowPosition.label')"
+        :label-description="t('AuxWindowSettings.resetWindowPosition.description')"
         :label-width="320"
       >
         <NButton
@@ -75,7 +75,7 @@
           type="warning"
           secondary
           @click="() => wm.auxWindow.resetPosition()"
-          >{{ t('AuxWindowSettings.resetAuxWindowPosition.button') }}</NButton
+          >{{ t('AuxWindowSettings.resetWindowPosition.button') }}</NButton
         >
       </ControlItem>
     </NCard>

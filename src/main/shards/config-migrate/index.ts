@@ -249,10 +249,6 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       'window-manager-main/main-window/size'
     )
 
-    await manager.save(
-      Setting.create(ConfigMigrateMain.MIGRATION_FROM_134, ConfigMigrateMain.MIGRATION_FROM_134)
-    )
-
     const boundsRecord = await manager.findOneBy(Setting, {
       key: Equal('window-manager-main/auxWindowFunctionalityBounds')
     })
@@ -269,6 +265,10 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
         await manager.save(Setting.create('window-manager-main/opgg-window/bounds', opgg))
       }
     }
+
+    await manager.save(
+      Setting.create(ConfigMigrateMain.MIGRATION_FROM_134, ConfigMigrateMain.MIGRATION_FROM_134)
+    )
 
     this._log.info(`迁移完成, 到 ${ConfigMigrateMain.MIGRATION_FROM_134}`)
   }
