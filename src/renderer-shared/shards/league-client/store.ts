@@ -5,7 +5,6 @@ import {
   ChampionSimple,
   Item,
   Perk,
-  Perkstyles,
   Queue,
   Style,
   SummonerSpell
