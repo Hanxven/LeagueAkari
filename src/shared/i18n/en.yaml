@@ -18,6 +18,7 @@ CommonButtons:
   announcement: Announcement
   github: Project GitHub
   auxWindow: Auxiliary Window
+  opggWindow: OP.GG
 
 TrafficButtons:
   minimize: Minimize
@@ -1403,8 +1404,16 @@ OngoingGame:
 AuxWindowTitleBar:
   opgg: OP.GG View
   opggTitle: View on OP.GG
+  close: Close
+  minimize: Minimize
   indicator: Aux Win.
   indicatorTitle: Auxiliary Window of League Akari
+  pin: Pin
+  unpin: Unpin
+
+OpggWindowTitleBar:
+  close: Close
+  minimize: Minimize
   pin: Pin
   unpin: Unpin
 
@@ -1796,9 +1805,11 @@ BenchChampionTracker:
 tray:
   quit: Quit
   auxWindow: Aux Window
+  opggWindow: OP.GG Window
   dev:
     toggleMainWindowDevtools: Toggle DevTools - Main Window
     toggleAuxWindowDevtools: Toggle DevTools - Aux Window
+    toggleOpggWindowDevtools: Toggle DevTools - OP.GG Window
 
 windowOpenHandler:
   toAkari: To League Akari GitHub ❤️

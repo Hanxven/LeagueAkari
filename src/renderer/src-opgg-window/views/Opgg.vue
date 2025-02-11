@@ -1,9 +1,9 @@
 <template>
   <div class="opgg-panel" ref="opgg-panel">
     <div class="tabs-area">
-      <a href="https://op.gg" :title="t('Opgg.toOpgg')" target="_blank"
-        ><OpggIcon class="opgg-icon"
-      /></a>
+      <a href="https://op.gg" :title="t('Opgg.toOpgg')" target="_blank">
+        <OpggIcon class="opgg-icon" />
+      </a>
       <NButton
         secondary
         class="square-button"
@@ -161,7 +161,7 @@
 </template>
 
 <script lang="ts" setup>
-import OpggIcon from '@aux-window/assets/icon/OpggIcon.vue'
+import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useStableComputed } from '@renderer-shared/compositions/useStableComputed'
 import { useInstance } from '@renderer-shared/shards'
@@ -736,7 +736,7 @@ z
   box-sizing: border-box;
   padding: 2px 8px 8px 8px;
   height: 100%;
-  min-width: 480px; // 小窗不再是小窗了, 笑 (╯°□°）╯︵ ┻━┻
+  min-width: 480px;
 
   .tabs-area {
     display: flex;

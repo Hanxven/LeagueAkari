@@ -4,8 +4,9 @@ import { Readable } from 'node:stream'
 
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { WindowManagerMain } from '../window-manager'
-import { AkariMainWindow } from '../window-manager/main-window/window'
 import { AkariAuxWindow } from '../window-manager/aux-window/window'
+import { AkariMainWindow } from '../window-manager/main-window/window'
+import { AkariOpggWindow } from '../window-manager/opgg-window/window'
 
 /**
  * 实现 `akari://` 协议, 用户特殊资源的代理
@@ -14,31 +15,24 @@ import { AkariAuxWindow } from '../window-manager/aux-window/window'
  */
 export class AkariProtocolMain implements IAkariShardInitDispose {
   static id = 'akari-protocol-main'
-  static dependencies = ['logger-factory-main']
 
   static AKARI_PROXY_PROTOCOL = 'akari'
-
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _log: AkariLogger
 
   private readonly _domainRegistry = new Map<
     string,
     (uri: string, req: Request) => Promise<Response> | Response
   >()
 
-  constructor(deps: any) {
-    this._loggerFactory = deps['logger-factory-main']
-    this._log = this._loggerFactory.create(AkariProtocolMain.id)
-  }
-
   async onInit() {
     this._handlePartitionAkariProtocol(AkariMainWindow.PARTITION)
     this._handlePartitionAkariProtocol(AkariAuxWindow.PARTITION)
+    this._handlePartitionAkariProtocol(AkariOpggWindow.PARTITION)
   }
 
   async onDispose() {
     this._unhandlePartitionAkariProtocol(AkariMainWindow.PARTITION)
     this._unhandlePartitionAkariProtocol(AkariAuxWindow.PARTITION)
+    this._unhandlePartitionAkariProtocol(AkariOpggWindow.PARTITION)
   }
 
   private _unhandlePartitionAkariProtocol(partition: string) {

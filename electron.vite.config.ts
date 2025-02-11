@@ -73,6 +73,7 @@ export default defineConfig({
       alias: {
         '@main-window': resolve('src/renderer/src-main-window'),
         '@aux-window': resolve('src/renderer/src-aux-window'),
+        '@opgg-window': resolve('src/renderer/src-opgg-window'),
         '@shared': resolve('src/shared'),
         '@renderer-shared': resolve('src/renderer-shared')
       }
@@ -93,7 +94,8 @@ export default defineConfig({
       rollupOptions: {
         input: {
           mainWindow: resolve(__dirname, 'src/renderer/main-window.html'),
-          auxWindow: resolve(__dirname, 'src/renderer/aux-window.html')
+          auxWindow: resolve(__dirname, 'src/renderer/aux-window.html'),
+          opggWindow: resolve(__dirname, 'src/renderer/opgg-window.html')
         }
       }
     }

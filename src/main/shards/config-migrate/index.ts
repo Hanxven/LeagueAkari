@@ -219,16 +219,6 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
 
     await this._do(
       manager,
-      'window-manager-main/auxWindowFunctionalityBounds',
-      'window-manager-main/aux-window/functionalityBounds'
-    )
-    await this._do(
-      manager,
-      'window-manager-main/auxWindowFunctionality',
-      'window-manager-main/aux-window/functionality'
-    )
-    await this._do(
-      manager,
       'window-manager-main/auxWindowPinned',
       'window-manager-main/aux-window/pinned'
     )
@@ -262,6 +252,23 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     await manager.save(
       Setting.create(ConfigMigrateMain.MIGRATION_FROM_134, ConfigMigrateMain.MIGRATION_FROM_134)
     )
+
+    const boundsRecord = await manager.findOneBy(Setting, {
+      key: Equal('window-manager-main/auxWindowFunctionalityBounds')
+    })
+
+    if (boundsRecord) {
+      const indicator = boundsRecord.value.indicator
+      const opgg = boundsRecord.value.opgg
+
+      if (indicator) {
+        await manager.save(Setting.create('window-manager-main/aux-window/bounds', indicator))
+      }
+
+      if (opgg) {
+        await manager.save(Setting.create('window-manager-main/opgg-window/bounds', opgg))
+      }
+    }
 
     this._log.info(`迁移完成, 到 ${ConfigMigrateMain.MIGRATION_FROM_134}`)
   }

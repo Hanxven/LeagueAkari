@@ -9,6 +9,7 @@ import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
 import { AkariMainWindow } from './main-window/window'
+import { AkariOpggWindow } from './opgg-window/window'
 import { WindowManagerSettings, WindowManagerState } from './state'
 
 export interface WindowManagerMainContext {
@@ -49,6 +50,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
   public mainWindow: AkariMainWindow
   public auxWindow: AkariAuxWindow
+  public opggWindow: AkariOpggWindow
 
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
@@ -69,6 +71,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     const wContext = this.getContext()
     this.mainWindow = new AkariMainWindow(wContext)
     this.auxWindow = new AkariAuxWindow(wContext)
+    this.opggWindow = new AkariOpggWindow(wContext)
   }
 
   getContext(): WindowManagerMainContext {
@@ -98,10 +101,12 @@ export class WindowManagerMain implements IAkariShardInitDispose {
 
     this.mainWindow.on('forceClose', () => {
       this.auxWindow.closeWindow(true)
+      this.opggWindow.closeWindow(true)
     })
 
     await this.mainWindow.onInit()
     await this.auxWindow.onInit()
+    await this.opggWindow.onInit()
   }
 
   async onFinish() {

@@ -1,14 +1,19 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 
 import { AkariIpcRenderer } from '../ipc'
-import { LoggerRenderer } from '../logger'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { useAuxWindowStore, useMainWindowStore, useWindowManagerStore } from './store'
+import {
+  useAuxWindowStore,
+  useMainWindowStore,
+  useOpggWindowStore,
+  useWindowManagerStore
+} from './store'
 
 const MAIN_SHARD_NAMESPACE = 'window-manager-main'
 const MAIN_SHARD_NAMESPACE_MAIN_WINDOW = 'window-manager-main/main-window'
 const MAIN_SHARD_NAMESPACE_AUX_WINDOW = 'window-manager-main/aux-window'
+const MAIN_SHARD_NAMESPACE_OPGG_WINDOW = 'window-manager-main/opgg-window'
 
 export interface WindowManagerRendererContext {
   ipc: AkariIpcRenderer
@@ -110,14 +115,6 @@ class AkariAuxWindow {
     return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'resetWindowPosition')
   }
 
-  setFunctionality(functionality: string) {
-    return this._context.ipc.call(
-      MAIN_SHARD_NAMESPACE_AUX_WINDOW,
-      'setFunctionality',
-      functionality
-    )
-  }
-
   setAutoShow(value: boolean) {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'autoShow', value)
   }
@@ -139,6 +136,52 @@ class AkariAuxWindow {
   }
 }
 
+class AkariOpggWindow {
+  constructor(private _context: WindowManagerRendererContext) {}
+
+  async onInit() {
+    const awStore = useOpggWindowStore()
+    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'state', awStore)
+    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'settings', awStore.settings)
+  }
+
+  minimize() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'minimize')
+  }
+
+  restore() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'restore')
+  }
+
+  hide() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'hide')
+  }
+
+  show() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'show')
+  }
+
+  resetPosition() {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'resetWindowPosition')
+  }
+
+  setAutoShow(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'autoShow', value)
+  }
+
+  setEnabled(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'enabled', value)
+  }
+
+  setOpacity(value: number) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'opacity', value)
+  }
+
+  setPinned(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'pinned', value)
+  }
+}
+
 export class WindowManagerRenderer implements IAkariShardInitDispose {
   static id = 'window-manager-renderer'
   static dependencies = [
@@ -152,6 +195,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
 
   public mainWindow: AkariMainWindow
   public auxWindow: AkariAuxWindow
+  public opggWindow: AkariOpggWindow
 
   constructor(deps: any) {
     this.context = {
@@ -162,6 +206,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
 
     this.mainWindow = new AkariMainWindow(this.context)
     this.auxWindow = new AkariAuxWindow(this.context)
+    this.opggWindow = new AkariOpggWindow(this.context)
   }
 
   async onInit() {
@@ -171,6 +216,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
 
     await this.mainWindow.onInit()
     await this.auxWindow.onInit()
+    await this.opggWindow.onInit()
   }
 
   setBackgroundMaterial(value: string) {

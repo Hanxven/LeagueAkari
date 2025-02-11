@@ -2,26 +2,25 @@ import { is } from '@electron-toolkit/utils'
 import { i18next } from '@main/i18n'
 import { AkariLogger } from '@main/shards/logger-factory'
 import { SetterSettingService } from '@main/shards/setting-factory/setter-setting-service'
-import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { BrowserWindow, dialog, screen, shell } from 'electron'
 import { comparer, computed } from 'mobx'
 import path from 'node:path'
 
 import type { WindowManagerMainContext } from '..'
-import icon from '../../../../../resources/LA_ICON.ico?asset'
-import { AuxWindowSettings, AuxWindowState } from './state'
+import icon from '../../../../../resources/OPGG_ICON.ico?asset'
+import { OpggWindowSettings, OpggWindowState } from './state'
 
-export class AkariAuxWindow {
-  static PARTITION = 'persist:aux-window'
+export class AkariOpggWindow {
+  static PARTITION = 'persist:opgg-window'
 
   static INITIAL_SHOW = false
-  static BASE_WIDTH = 340
-  static BASE_HEIGHT = 420
-  static MIN_WIDTH = 340
-  static MIN_HEIGHT = 420
+  static BASE_WIDTH = 480
+  static BASE_HEIGHT = 720
+  static MIN_WIDTH = 530
+  static MIN_HEIGHT = 530
 
-  public readonly settings = new AuxWindowSettings()
-  public readonly state = new AuxWindowState()
+  public readonly settings = new OpggWindowSettings()
+  public readonly state = new OpggWindowState()
 
   private readonly _setting: SetterSettingService
   private readonly _log: AkariLogger
@@ -36,15 +35,14 @@ export class AkariAuxWindow {
   }
 
   constructor(private _context: WindowManagerMainContext) {
-    this._namespace = `${_context.namespace}/aux-window`
+    this._namespace = `${_context.namespace}/opgg-window`
     this._setting = _context.settingFactory.register(
       this._namespace,
       {
         enabled: { default: this.settings.enabled },
         autoShow: { default: this.settings.autoShow },
         opacity: { default: this.settings.opacity },
-        pinned: { default: this.settings.pinned },
-        showSkinSelector: { default: this.settings.showSkinSelector }
+        pinned: { default: this.settings.pinned }
       },
       this.settings
     )
@@ -60,8 +58,7 @@ export class AkariAuxWindow {
       'enabled',
       'autoShow',
       'opacity',
-      'pinned',
-      'showSkinSelector'
+      'pinned'
     ])
 
     this._setting.onChange('pinned', (value, { setter }) => {
@@ -92,33 +89,30 @@ export class AkariAuxWindow {
 
       switch (this._context.leagueClient.data.gameflow.phase) {
         case 'ChampSelect':
-          if (this._context.leagueClient.data.champSelect.session?.isSpectating) {
-            return 'ignore'
-          }
-        case 'Lobby':
-        case 'Matchmaking':
-        case 'ReadyCheck':
           return 'show'
       }
 
-      return 'hide'
+      return 'normal'
     })
 
-    // normally show & hide
+    // 在英雄选择阶段会主动展示, 其他阶段不会主动关闭
     this._context.mobx.reaction(
       () => showTiming.get(),
       (timing) => {
-        if (timing === 'ignore') {
-          return
-        }
-
         if (timing === 'show') {
           this.showOrRestore(true)
-        } else {
-          this.hideWindow()
+        }
+      }
+    )
+
+    this._context.mobx.reaction(
+      () => this.state.bounds,
+      (bounds) => {
+        if (bounds) {
+          this._setting._saveToStorage('bounds', bounds)
         }
       },
-      { fireImmediately: true }
+      { delay: 250, equals: comparer.shallow }
     )
 
     this._context.mobx.reaction(
@@ -143,25 +137,6 @@ export class AkariAuxWindow {
         }
       },
       { fireImmediately: true, delay: 500, equals: comparer.shallow }
-    )
-
-    this._context.mobx.reaction(
-      () => this._context.leagueClient.state.connectionState,
-      (state) => {
-        if (state !== 'connected') {
-          this.hideWindow()
-        }
-      }
-    )
-
-    this._context.mobx.reaction(
-      () => this.state.bounds,
-      (bounds) => {
-        if (bounds) {
-          this._setting._saveToStorage('bounds', bounds)
-        }
-      },
-      { delay: 250, equals: comparer.shallow }
     )
   }
 
@@ -228,14 +203,12 @@ export class AkariAuxWindow {
 
   private _createWindow() {
     this._window = new BrowserWindow({
-      width: AkariAuxWindow.BASE_WIDTH,
-      height: AkariAuxWindow.BASE_HEIGHT,
-      minWidth: AkariAuxWindow.MIN_WIDTH,
-      minHeight: AkariAuxWindow.MIN_HEIGHT,
+      minWidth: AkariOpggWindow.MIN_WIDTH,
+      minHeight: AkariOpggWindow.MIN_HEIGHT,
       resizable: true,
       frame: false,
-      show: AkariAuxWindow.INITIAL_SHOW,
-      title: 'Mini Akari',
+      show: AkariOpggWindow.INITIAL_SHOW,
+      title: 'OP.GG Akari',
       autoHideMenuBar: true,
       maximizable: false,
       minimizable: true,
@@ -247,7 +220,7 @@ export class AkariAuxWindow {
         sandbox: false,
         spellcheck: false,
         backgroundThrottling: false,
-        partition: AkariAuxWindow.PARTITION
+        partition: AkariOpggWindow.PARTITION
       }
     })
 
@@ -261,16 +234,15 @@ export class AkariAuxWindow {
       }
     })
 
-    this.state.setShow(AkariAuxWindow.INITIAL_SHOW)
+    this.state.setShow(AkariOpggWindow.INITIAL_SHOW)
 
     if (this.state.bounds) {
       this._window.setBounds(this.state.bounds)
     } else {
-      this._window.setSize(AkariAuxWindow.BASE_WIDTH, AkariAuxWindow.BASE_HEIGHT)
+      this._window.setSize(AkariOpggWindow.BASE_WIDTH, AkariOpggWindow.BASE_HEIGHT)
     }
 
     this._window.setOpacity(this.settings.opacity)
-
     this._window.setAlwaysOnTop(this.settings.pinned, 'normal')
 
     this._window.webContents.on('did-finish-load', () => {
@@ -284,11 +256,9 @@ export class AkariAuxWindow {
           buttons: [i18next.t('common.yes'), i18next.t('common.no')],
           defaultId: 0,
           title: i18next.t('common.confirm'),
-          message: details.url.startsWith(LEAGUE_AKARI_GITHUB)
-            ? i18next.t('windowOpenHandler.toAkari')
-            : i18next.t('windowOpenHandler.toExternalLink', {
-                target: new URL(details.url).origin
-              }),
+          message: i18next.t('windowOpenHandler.toExternalLink', {
+            target: new URL(details.url).origin
+          }),
           detail: details.url
         })
         .then((r) => {
@@ -341,7 +311,7 @@ export class AkariAuxWindow {
     this._window.on('closed', () => {
       this.state.setReady(false)
       this._window = null
-      this._log.info('辅助窗口关闭')
+      this._log.info('OP.GG 窗口关闭')
     })
 
     this._window.on('move', () => {
@@ -370,12 +340,12 @@ export class AkariAuxWindow {
     })
 
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-      this._window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/aux-window.html`)
+      this._window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/opgg-window.html`)
     } else {
-      this._window.loadFile(path.join(__dirname, '../renderer/aux-window.html'))
+      this._window.loadFile(path.join(__dirname, '../renderer/opgg-window.html'))
     }
 
-    this._log.info('创建辅助窗口')
+    this._log.info('创建 OP.GG 窗口')
   }
 
   closeWindow(force = false) {
@@ -390,11 +360,11 @@ export class AkariAuxWindow {
     if (this._window) {
       const bounds = this._window.getBounds()
       const p = this._getCenteredRectangle(bounds.width, bounds.height)
-      this._window.setSize(AkariAuxWindow.BASE_WIDTH, AkariAuxWindow.BASE_HEIGHT)
+      this._window.setSize(AkariOpggWindow.BASE_WIDTH, AkariOpggWindow.BASE_HEIGHT)
       this._window.setPosition(p.x, p.y)
     }
 
-    this._log.info('重置辅助窗口位置到主显示器中心')
+    this._log.info('重置 OP.GG 窗口位置到主显示器中心')
   }
 
   private _getCenteredRectangle(width: number, height: number) {

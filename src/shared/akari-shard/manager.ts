@@ -1,7 +1,7 @@
 export type AkariDeps = Record<string, any>
 
 export interface AkariShardConstructor<T = any> {
-  new (deps?: any | AkariDeps, config?: object): T
+  new (deps: any | AkariDeps, config: object): T
 
   /**
    * 关于此模块的唯一 id
@@ -33,7 +33,7 @@ export class AkariManager {
     string,
     {
       cls: AkariShardConstructor
-      config?: object
+      config: object
     }
   > = new Map()
   private _instances: Map<string, any> = new Map()
@@ -59,7 +59,7 @@ export class AkariManager {
       throw new Error(`Shard with id "${shard.id}" already exists`)
     }
 
-    this._registry.set(shard.id, { cls: shard, config })
+    this._registry.set(shard.id, { cls: shard, config: config ?? {} })
   }
 
   /**
@@ -79,7 +79,8 @@ export class AkariManager {
           static id = SHARED_GLOBAL_ID
           public readonly global: Record<string, any> = global
           public readonly manager: AkariManager = manager
-        }
+        },
+        config: {}
       })
     }
 
@@ -89,7 +90,8 @@ export class AkariManager {
         static id = AkariManager.INTERNAL_RUNNER_ID
         static priority = -Infinity
         static dependencies = allDeps
-      }
+      },
+      config: {}
     })
 
     this._initializationStack = []

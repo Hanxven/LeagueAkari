@@ -5,7 +5,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: () => import('@aux-window/views/Indicator.vue')
+      name: 'root',
+      component: () => import('@opgg-window/views/Opgg.vue')
     }
   ]
 })

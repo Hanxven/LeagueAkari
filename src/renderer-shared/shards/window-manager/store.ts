@@ -60,3 +60,25 @@ export const useAuxWindowStore = defineStore('shard:main-window-renderer/aux-win
     ready
   }
 })
+
+export const useOpggWindowStore = defineStore('shard:main-window-renderer/opgg-window', () => {
+  const settings = shallowReactive({
+    enabled: true,
+    autoShow: true,
+    opacity: 0.9,
+    pinned: true
+  })
+
+  const status = ref('normal')
+  const focus = ref('focused')
+  const show = ref(true)
+  const ready = ref(false)
+
+  return {
+    settings,
+    status,
+    focus,
+    show,
+    ready
+  }
+})

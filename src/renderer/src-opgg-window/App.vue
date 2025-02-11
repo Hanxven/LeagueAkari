@@ -1,6 +1,6 @@
 <template>
-  <div id="aux-window-frame">
-    <AuxWindowTitleBar />
+  <div id="opgg-window-frame">
+    <OpggWindowTitleBar />
     <div class="content">
       <RouterView v-slot="{ Component }">
         <KeepAlive>
@@ -12,11 +12,11 @@
 </template>
 
 <script setup lang="ts">
-import AuxWindowTitleBar from './components/AuxWindowTitleBar.vue'
+import OpggWindowTitleBar from './components/OpggWindowTitleBar.vue'
 </script>
 
 <style lang="less">
-#aux-window-frame {
+#opgg-window-frame {
   height: 100%;
   display: flex;
   flex-direction: column;

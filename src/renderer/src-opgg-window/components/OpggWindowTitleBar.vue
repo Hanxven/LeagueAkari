@@ -1,21 +1,25 @@
 <template>
-  <div class="title-bar" :class="{ blurred: aws.focus === 'blurred' }">
+  <div class="title-bar" :class="{ blurred: ws.focus === 'blurred' }">
     <div class="title-area">
-      <span class="title">Mini Akari</span>
+      <span class="title">League Akari - OP.GG</span>
     </div>
     <div class="traffic">
       <div
-        :title="aws.settings.pinned ? t('AuxWindowTitleBar.unpin') : t('AuxWindowTitleBar.pin')"
+        :title="ws.settings.pinned ? t('OpggWindowTitleBar.unpin') : t('OpggWindowTitleBar.pin')"
         class="traffic-button pin"
-        :class="{ pinned: aws.settings.pinned }"
-        @click="() => handlePin(!aws.settings.pinned)"
+        :class="{ pinned: ws.settings.pinned }"
+        @click="() => handlePin(!ws.settings.pinned)"
       >
         <NIcon><PinFilledIcon /></NIcon>
       </div>
-      <div :title="t('AuxWindowTitleBar.minimize')" class="traffic-button minimize" @click="handleMinimize">
+      <div
+        :title="t('OpggWindowTitleBar.minimize')"
+        class="traffic-button minimize"
+        @click="handleMinimize"
+      >
         <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
       </div>
-      <div :title="t('AuxWindowTitleBar.close')" class="traffic-button close" @click="handleClose">
+      <div :title="t('OpggWindowTitleBar.close')" class="traffic-button close" @click="handleClose">
         <NIcon><CloseIcon /></NIcon>
       </div>
     </div>
@@ -25,7 +29,7 @@
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import { useAuxWindowStore } from '@renderer-shared/shards/window-manager/store'
+import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
 import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/fluent'
 import { Close as CloseIcon } from '@vicons/ionicons5'
@@ -35,18 +39,18 @@ import { NIcon } from 'naive-ui'
 const { t } = useTranslation()
 
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
-const aws = useAuxWindowStore()
+const ws = useOpggWindowStore()
 
 const handleClose = () => {
-  return wm.auxWindow.hide()
+  return wm.opggWindow.hide()
 }
 
 const handleMinimize = () => {
-  return wm.auxWindow.minimize()
+  return wm.opggWindow.minimize()
 }
 
 const handlePin = (b: boolean) => {
-  return wm.auxWindow.setPinned(b)
+  return wm.opggWindow.setPinned(b)
 }
 </script>
 

@@ -20,6 +20,7 @@ CommonButtons:
   announcement: 公告
   github: 项目主页
   auxWindow: 小窗口
+  opggWindow: OP.GG
 
 TrafficButtons:
   minimize: 最小化
@@ -1410,8 +1411,16 @@ OngoingGame:
 AuxWindowTitleBar:
   opgg: 使用 OP.GG
   opggTitle: 集成的 OP.GG
+  close: 关闭
+  minimize: 最小化
   indicator: 小窗
   indicatorTitle: League Akari 的小型辅助功能窗口
+  pin: 置顶
+  unpin: 取消置顶
+
+OpggWindowTitleBar:
+  close: 关闭
+  minimize: 最小化
   pin: 置顶
   unpin: 取消置顶
 
@@ -1800,9 +1809,11 @@ BenchChampionTracker:
 tray:
   quit: 退出
   auxWindow: 小窗口
+  opggWindow: OP.GG 窗口
   dev:
     toggleMainWindowDevtools: Toggle DevTools - 主窗口
     toggleAuxWindowDevtools: Toggle DevTools - 小窗口
+    toggleOpggWindowDevtools: Toggle DevTools - OP.GG 窗口
 
 windowOpenHandler:
   toAkari: 将转到 League Akari 的项目主页 ❤️

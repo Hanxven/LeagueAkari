@@ -30,13 +30,26 @@
       </template>
       {{ t('CommonButtons.auxWindow') }}
     </NTooltip>
+    <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" v-if="ows.settings.enabled">
+      <template #trigger>
+        <div class="common-button-outer" @click="handleShowOpggWindow">
+          <OpggIcon class="common-button-inner common-button-inner-img" />
+        </div>
+      </template>
+      {{ t('CommonButtons.opggWindow') }}
+    </NTooltip>
   </div>
 </template>
 
 <script setup lang="ts">
+import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import { useAuxWindowStore, useMainWindowStore } from '@renderer-shared/shards/window-manager/store'
+import {
+  useAuxWindowStore,
+  useMainWindowStore,
+  useOpggWindowStore
+} from '@renderer-shared/shards/window-manager/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { Notification as NotificationIcon } from '@vicons/carbon'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
@@ -49,6 +62,7 @@ const { t } = useTranslation()
 
 const mws = useMainWindowStore()
 const aws = useAuxWindowStore()
+const ows = useOpggWindowStore()
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
 
 const { openAnnouncementModal } = inject('app') as any
@@ -57,6 +71,10 @@ const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 
 const handleShowAuxWindow = () => {
   wm.auxWindow.show()
+}
+
+const handleShowOpggWindow = () => {
+  wm.opggWindow.show()
 }
 
 const handleToGithub = () => {
@@ -96,6 +114,11 @@ const handleToGithub = () => {
     i {
       display: block;
     }
+  }
+
+  .common-button-inner-img {
+    width: 16px;
+    height: 16px;
   }
 }
 
