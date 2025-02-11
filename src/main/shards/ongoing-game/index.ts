@@ -464,7 +464,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       const current = this.state.gameTimeline[gameId]
 
       if (!force && current && current.source === (isAbleToUseSgpApi ? 'sgp' : 'lcu')) {
-        this._log.info('游戏时间线查询条件未变化, 跳过', gameId)
+        this._log.debug('游戏时间线查询条件未变化, 跳过', gameId)
         return
       }
 
@@ -479,7 +479,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       }
 
       if (isAbleToUseSgpApi) {
-        this._log.info('加载游戏时间线: SGP API', gameId)
+        this._log.debug('加载游戏时间线: SGP API', gameId)
 
         const res = await this._queue
           .add(() => this._sgp.getTimelineLcuFormat(gameId), {
@@ -489,7 +489,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           .catch((error) => this._handleError(error, 'game-timeline', gameId))
 
         if (res) {
-          this._log.info('游戏时间线加载完成: SGP', gameId)
+          this._log.debug('游戏时间线加载完成: SGP', gameId)
 
           const toBeLoaded = {
             data: res,
@@ -503,7 +503,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           this._ipc.sendEvent(OngoingGameMain.id, 'game-timeline-loaded', gameId, toBeLoaded)
         }
       } else {
-        this._log.info('加载游戏时间线: LCU API', gameId)
+        this._log.debug('加载游戏时间线: LCU API', gameId)
 
         const res = await this._queue
           .add(() => this._lc.api.matchHistory.getTimeline(gameId), {
@@ -513,7 +513,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           .catch((error) => this._handleError(error, 'game-timeline', gameId))
 
         if (res) {
-          this._log.info('游戏时间线加载完成: LCU', gameId)
+          this._log.debug('游戏时间线加载完成: LCU', gameId)
 
           const toBeLoaded = {
             data: res.data,
@@ -549,7 +549,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       const current = this.state.additionalGame[gameId]
 
       if (!force && current && current.source === (isAbleToUseSgpApi ? 'sgp' : 'lcu')) {
-        this._log.info('游戏时间线查询条件未变化, 跳过', gameId)
+        this._log.debug('游戏时间线查询条件未变化, 跳过', gameId)
         return
       }
 
@@ -574,7 +574,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           .catch((error) => this._handleError(error, 'additional-game', gameId))
 
         if (res) {
-          this._log.info('额外对局信息加载完成: SGP', gameId)
+          this._log.debug('额外对局信息加载完成: SGP', gameId)
 
           const toBeLoaded = {
             data: res,
@@ -598,7 +598,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
           .catch((error) => this._handleError(error, 'additional-game', gameId))
 
         if (res) {
-          this._log.info('额外对局信息加载完成: LCU', gameId)
+          this._log.debug('额外对局信息加载完成: LCU', gameId)
 
           const toBeLoaded = {
             data: res.data,
@@ -643,7 +643,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     ) {
       // 以上不需要重新加载的前提, 是假设在一个对局期间, 这些数据都不会发生变化
       // ) 事实上在一个对局期间, 大部分情况是不会发生变化的
-      this._log.info('玩家战绩查询条件未变化, 跳过', puuid)
+      this._log.debug('玩家战绩查询条件未变化, 跳过', puuid)
       return
     }
 
@@ -671,7 +671,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
         return
       }
 
-      this._log.info('加载玩家战绩完成: SGP API', puuid)
+      this._log.debug('加载玩家战绩完成: SGP API', puuid)
 
       this._loadGameTimeline(
         data.games.games.map((g) => g.gameId).slice(0, this.settings.gameTimelineLoadCount),
@@ -733,7 +733,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
       await Promise.allSettled(res.data.games.games.map((g) => loadGame(g.gameId)))
 
-      this._log.info('加载玩家战绩完成: LCU API', puuid)
+      this._log.debug('加载玩家战绩完成: LCU API', puuid)
 
       const games = res.data.games.games.map((g) => detailedGameMap[g.gameId] || g)
 
@@ -760,7 +760,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
     // 如果不是强制更新, 并且已经有数据, 那么就不再加载
     if (!force && this.state.summoner[puuid]) {
-      this._log.info('召唤师信息已存在', puuid)
+      this._log.debug('召唤师信息已存在', puuid)
       return
     }
 
@@ -775,7 +775,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('加载召唤师信息完成', puuid)
+    this._log.debug('加载召唤师信息完成', puuid)
 
     const data = res.data
     const toBeLoaded = { data, source: 'lcu' as 'sgp' | 'lcu' }
@@ -843,7 +843,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const { signal, force } = options
 
     if (!force && this.state.rankedStats[puuid]) {
-      this._log.info('排位赛数据已存在', puuid)
+      this._log.debug('排位赛数据已存在', puuid)
       return
     }
 
@@ -858,7 +858,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('加载排位赛数据完成', puuid)
+    this._log.debug('加载排位赛数据完成', puuid)
 
     const data = res.data
     const toBeLoaded = { data, source: 'lcu' as 'sgp' | 'lcu' }
@@ -876,7 +876,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     const { signal, force } = options
 
     if (!force && this.state.championMastery[puuid]) {
-      this._log.info('英雄成就已存在', puuid)
+      this._log.debug('英雄成就已存在', puuid)
       return
     }
 
@@ -891,7 +891,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       return
     }
 
-    this._log.info('英雄成就加载完成', puuid)
+    this._log.debug('英雄成就加载完成', puuid)
 
     const data = res.data
 
