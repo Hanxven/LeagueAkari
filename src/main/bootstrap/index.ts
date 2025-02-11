@@ -75,7 +75,7 @@ declare module '@shared/akari-shard/manager' {
      */
     baseConfig: {
       value: BaseConfig | null
-      write: (config: BaseConfig) => void
+      write: (config: Partial<BaseConfig>) => void
     }
 
     version: string
@@ -131,8 +131,12 @@ export const isAdministrator = tools.isElevated()
  * 应用级别的初始化启动细节，基础组件注入和基础事件处理
  */
 export function bootstrap() {
+  // 基础设置
+  const baseConfig = readBaseConfig()
+
   // 创建全局唯一的日志器
-  const logger = initAppLogger()
+  const logLevel = baseConfig && baseConfig.logLevel ? baseConfig.logLevel : 'info'
+  const logger = initAppLogger(logLevel)
 
   // 应用级别的事件总线
   const events = new EventEmitter<AkariAppEventMap>()
@@ -154,8 +158,6 @@ export function bootstrap() {
   })
 
   try {
-    // 基础设置
-    const baseConfig = readBaseConfig()
     if (
       baseConfig &&
       baseConfig.disableHardwareAcceleration &&

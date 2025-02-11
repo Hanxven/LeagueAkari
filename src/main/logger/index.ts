@@ -59,7 +59,7 @@ const LEVEL_COLORS = {
   error: STYLES.red
 }
 
-export function initAppLogger() {
+export function initAppLogger(level: string = 'info') {
   const appDir = path.join(app.getPath('exe'), '..')
   const logsDir = path.join(appDir, 'logs')
 
@@ -83,7 +83,7 @@ export function initAppLogger() {
       new transports.File({
         filename: `LA_${dayjs().format('YYYYMMDD_HHmmssSSS')}.log`,
         dirname: logsDir,
-        level: 'info',
+        level,
         maxsize: 1024 * 1024 * 128, // 128MB
         format: format.combine(
           format.timestamp(),

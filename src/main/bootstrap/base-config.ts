@@ -4,6 +4,7 @@ import { join } from 'node:path'
 
 export interface BaseConfig {
   disableHardwareAcceleration?: boolean
+  logLevel?: string
 }
 
 /**
@@ -30,11 +31,14 @@ export function readBaseConfig() {
   }
 }
 
-/**
- * 重写这些配置
- */
-export function writeBaseConfig(config: BaseConfig) {
+export function writeBaseConfig(config: Partial<BaseConfig>) {
   const path = join(app.getPath('userData'), 'base-config.json')
-  const json = JSON.stringify(config)
-  writeFileSync(path, json, 'utf-8')
+
+  const cfg = readBaseConfig()
+
+  if (cfg) {
+    writeFileSync(path, JSON.stringify({ ...cfg, ...config }), 'utf-8')
+  } else {
+    writeFileSync(path, JSON.stringify(config), 'utf-8')
+  }
 }
