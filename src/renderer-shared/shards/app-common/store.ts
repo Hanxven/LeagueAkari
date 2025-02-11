@@ -22,7 +22,8 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
       enabled: false,
       port: 0,
       host: ''
-    } as HttpProxySetting
+    } as HttpProxySetting,
+    forceDisableProxy: false
   })
 
   const version = ref('0.0.0')

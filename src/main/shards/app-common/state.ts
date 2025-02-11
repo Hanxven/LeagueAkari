@@ -62,6 +62,9 @@ export class AppCommonSettings {
     host: '127.0.0.1'
   }
 
+  // 强制不走代理, 暂未实装
+  forceDisableProxy: boolean = false
+
   setShowFreeSoftwareDeclaration(s: boolean) {
     this.showFreeSoftwareDeclaration = s
   }
@@ -80,6 +83,10 @@ export class AppCommonSettings {
 
   setHttpProxy(s: { enabled: boolean; port: number; host: string }) {
     this.httpProxy = s
+  }
+
+  setForceDisableProxy(s: boolean) {
+    this.forceDisableProxy = s
   }
 
   constructor() {
