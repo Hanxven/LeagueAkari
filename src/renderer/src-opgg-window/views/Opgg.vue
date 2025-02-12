@@ -106,11 +106,11 @@
         :tier="tier"
         :loading="isLoading"
         :version="version || undefined"
-        @to-champion="handleToChampion"
+        @to-champion="(id) => handleToChampion(id, false)"
       />
       <OpggChampion
         v-show="currentTab === 'champion'"
-        @show-champion="(id) => handleToChampion(id)"
+        @show-champion="(id) => handleToChampion(id, false)"
         :data="champion"
         :champion="championItem"
         :loading="isLoading"
@@ -125,11 +125,7 @@
       />
     </div>
     <Transition name="fade">
-      <div
-        class="settings-overlay"
-        v-if="isSettingsLayerShow"
-        @click.self="isSettingsLayerShow = false"
-      >
+      <div class="settings-overlay" v-if="isSettingsLayerShow">
         <div class="header">
           <span class="title">{{ t('Opgg.settings.title') }}</span>
           <div class="close-btn" @click="isSettingsLayerShow = false" :title="t('Opgg.close')">
@@ -154,6 +150,16 @@
               </NFlex>
             </NRadioGroup>
           </ControlItem>
+          <!-- TODO: i18n -->
+          <ControlItem
+            class="control-item-margin"
+            style="justify-content: space-between"
+            :label="t('Opgg.settings.autoApply.label')"
+            :label-description="t('Opgg.settings.autoApply.description')"
+            :label-width="300"
+          >
+            <NSwitch v-model:value="os.frontendSettings.autoApply" size="small" />
+          </ControlItem>
         </div>
       </div>
     </Transition>
@@ -161,6 +167,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useOpggStore } from '@opgg-window/shards/opgg/store'
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useStableComputed } from '@renderer-shared/compositions/useStableComputed'
@@ -169,6 +176,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
+import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { OpggDataApi } from '@shared/data-sources/opgg'
 import {
   ModeType,
@@ -189,12 +197,14 @@ import {
 import { useLocalStorage, useMediaQuery, watchDebounced } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import {
+  MessageReactive,
   NButton,
   NFlex,
   NIcon,
   NRadio,
   NRadioGroup,
   NSelect,
+  NSwitch,
   NTab,
   NTabs,
   SelectRenderLabel,
@@ -215,6 +225,10 @@ const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const log = useInstance<LoggerRenderer>('logger-renderer')
 
 const as = useAppCommonStore()
+
+// --- 自动应用 (粗糙版) ---
+const ows = useOpggWindowStore()
+const os = useOpggStore()
 
 const savedPreferences = useLocalStorage('opgg-preferences', {
   mode: 'ranked',
@@ -251,7 +265,7 @@ const version = ref<string | null>(null)
 
 const versions = shallowRef<string[]>([])
 
-const opgg = new OpggDataApi()
+const api = new OpggDataApi()
 
 watchEffect(async () => {
   if ((!version.value || !versions.value.includes(version.value)) && versions.value.length > 0) {
@@ -263,12 +277,12 @@ watch(
   () => as.settings.httpProxy,
   (httpProxy) => {
     if (httpProxy) {
-      opgg.http.defaults.proxy = {
+      api.http.defaults.proxy = {
         host: httpProxy.host,
         port: httpProxy.port
       }
     } else {
-      opgg.http.defaults.proxy = false
+      api.http.defaults.proxy = undefined
     }
   },
   { immediate: true }
@@ -285,6 +299,9 @@ const isLoadingVersions = ref(false)
 const isLoadingChampion = ref(false)
 const isLoadingTier = ref(false)
 const isSettingsLayerShow = ref(false)
+
+// 标记当前加载的数据是否与模式匹配
+const isModeMatch = ref(false)
 
 const isLoading = computed(
   () => isLoadingVersions.value || isLoadingChampion.value || isLoadingTier.value
@@ -322,7 +339,7 @@ const loadVersionsData = async () => {
 
   try {
     versions.value = (
-      await opgg.getVersions({
+      await api.getVersions({
         region: region.value,
         mode: mode.value,
         signal: loadVersionsController.signal
@@ -353,7 +370,7 @@ const loadTierData = async () => {
   loadTierController = new AbortController()
 
   try {
-    tierData.value = await opgg.getChampionsTier({
+    tierData.value = await api.getChampionsTier({
       region: region.value,
       mode: mode.value,
       tier: tier.value,
@@ -372,7 +389,7 @@ const loadTierData = async () => {
   }
 }
 
-const loadChampionData = async () => {
+const loadChampionData = async (shouldAutoApply: boolean) => {
   if (!championId.value) {
     return
   }
@@ -385,7 +402,7 @@ const loadChampionData = async () => {
   loadChampionController = new AbortController()
 
   try {
-    champion.value = await opgg.getChampion({
+    champion.value = await api.getChampion({
       region: region.value,
       mode: mode.value,
       tier: tier.value,
@@ -394,6 +411,37 @@ const loadChampionData = async () => {
       position: position.value,
       signal: loadChampionController.signal
     })
+
+    // 这段逻辑先耦合在这里, 以后可能会被移除
+    if (
+      shouldAutoApply &&
+      os.frontendSettings.autoApply &&
+      automation.value?.championId === championId.value &&
+      isModeMatch.value &&
+      ows.show
+    ) {
+      // any 大法好
+      const anyChampion = champion.value as any
+
+      const spells = anyChampion.data.summoner_spells
+      const runes = anyChampion.data.runes
+
+      let spellToApply = spells[0]
+      let runeToApply = runes[0]
+
+      // 至少有一个存在的情况下, 将走自动应用流程
+      if (spellToApply || runeToApply) {
+        message.info('将自动设置召唤师技能和符文')
+
+        if (spellToApply) {
+          await setSummonerSpells(spellToApply.ids)
+        }
+
+        if (runeToApply) {
+          await setRunes(runeToApply)
+        }
+      }
+    }
   } catch (error) {
     if ((error as any).name === 'CanceledError') {
       return
@@ -413,7 +461,7 @@ const loadAll = async () => {
     versions.value = []
     await loadVersionsData()
     await loadTierData()
-    await loadChampionData()
+    await loadChampionData(false)
   } catch {
   } finally {
   }
@@ -448,14 +496,14 @@ const handlePositionChange = async (p: PositionType) => {
   position.value = p
   savedPreferences.value.position = p
   champion.value = null
-  await loadChampionData()
+  await loadChampionData(false)
 }
 
-const handleToChampion = (id: number) => {
+const handleToChampion = async (id: number, shouldAutoApply: boolean) => {
   currentTab.value = 'champion'
   championId.value = id
   champion.value = null
-  loadChampionData()
+  await loadChampionData(shouldAutoApply)
 }
 
 onMounted(() => {
@@ -545,6 +593,8 @@ const automation = useStableComputed(() => {
   }
 })
 
+const applyAll = async () => {}
+
 watchDebounced(
   automation,
   async (atm) => {
@@ -573,6 +623,8 @@ watchDebounced(
       }
     }
 
+    isModeMatch.value = true
+
     switch (atm.gameMode) {
       case 'CLASSIC':
         mode.value = 'ranked'
@@ -591,13 +643,14 @@ watchDebounced(
       case 'ARURF':
         mode.value = 'urf'
         break
+      default:
+        isModeMatch.value = false
     }
 
     await loadAll()
 
-    // 排除 PVE 模式的英雄
     if (atm.championId && !lcs.champSelect.disabledChampionIds.has(atm.championId)) {
-      handleToChampion(atm.championId)
+      await handleToChampion(atm.championId, true)
     }
   },
   { immediate: true, debounce: 500 }
@@ -638,9 +691,11 @@ const setSummonerSpells = async (ids: number[]) => {
       spell1Id: newSpell1Id,
       spell2Id: newSpell2Id
     })
-    message.success(t('Opgg.success'))
-
-    console.log(lcs.chat.conversations.championSelect)
+    message.success(() =>
+      t('Opgg.success', {
+        reason: t('Opgg.summonerSpells')
+      })
+    )
 
     if (lcs.chat.conversations.championSelect) {
       lc.api.chat
@@ -709,7 +764,11 @@ const setRunes = async (r: {
       await lc.api.perks.putCurrentPage(page1.id)
     }
 
-    message.success(t('Opgg.success'))
+    message.success(() =>
+      t('Opgg.success', {
+        reason: t('Opgg.runes')
+      })
+    )
 
     if (lcs.chat.conversations.championSelect) {
       lc.api.chat.chatSend(
@@ -726,8 +785,24 @@ const setRunes = async (r: {
     message.warning(t('Opgg.setRunesFailedMessage', { reason: (error as any).message }))
   }
 }
+
+const notConnectedMessageRef = shallowRef<MessageReactive | null>(null)
+watch(
+  () => lcs.isConnected,
+  (isConnected) => {
+    if (isConnected) {
+      notConnectedMessageRef.value?.destroy()
+    } else {
+      notConnectedMessageRef.value?.destroy()
+      notConnectedMessageRef.value = message.warning(() => t('Opgg.notConnected'), {
+        duration: 0
+      })
+    }
+  },
+  { immediate: true }
+)
 </script>
-z
+
 <style lang="less" scoped>
 .opgg-panel {
   position: relative;
@@ -809,7 +884,7 @@ z
         }
 
         &:hover .close-icon {
-          transform: rotateZ(180deg);
+          transform: rotateZ(90deg);
         }
       }
 

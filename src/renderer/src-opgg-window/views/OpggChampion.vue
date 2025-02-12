@@ -1,7 +1,7 @@
 <template>
   <div class="opgg-champion-wrapper">
     <!-- 真的想不出一点容易组织的结构, 就这样复制粘贴吧 -->
-    <NSpin description="从 OP.GG 拉取数据中 ..." v-if="loading" class="spin-mask"></NSpin>
+    <NSpin description="Loading ..." v-if="loading" class="spin-mask"></NSpin>
     <NScrollbar>
       <div class="card-area" v-if="info">
         <div class="card-content">

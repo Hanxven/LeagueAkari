@@ -1566,21 +1566,28 @@ Opgg:
   version: Version
   replace: Provide
   create: Create
+  notConnected: Not connected to the client, some resources may not be loaded
 
   settings:
     button: Settings
-    title: OP.GG Mini-window Settings
+    title: OP.GG Settings
 
     flashPosition:
       label: Flash Position Preference
       description: When setting summoner spells, prioritize the position for Flash if it is selected
-      auto: Auto
+      auto: Current Flash position
       options:
         d: Default Flash position is D
         f: Default Flash position is F
         auto: Decide based on the current Flash position
+    autoApply:
+      label: Auto-Apply
+      description: If the champion's data matches the current mode, automatically apply the summoner spells, runes with the highest usage rate. Only works when the OP.GG window is enabled and visible
 
-  success: Request sent
+
+  success: 'Request sent: {{reason}}'
+  summonerSpells: Summoner Spells
+  runes: Rune Builds
   loadVersionsFailedMessage: 'Failed to fetch version data: {{reason}}'
   loadTierFailedMessage: 'Failed to fetch tier data: {{reason}}'
   loadChampionFailedMessage: 'Failed to fetch champion data: {{reason}}'

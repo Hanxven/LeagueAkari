@@ -1572,21 +1572,27 @@ Opgg:
   version: 版本
   replace: 提供
   create: 创建
+  notConnected: 未连接到客户端，部分资源无法加载
 
   settings:
     button: 设置
-    title: 小窗 OP.GG 设置
+    title: OP.GG 设置
 
     flashPosition:
       label: 闪现位置偏好
       description: 设置召唤师技能时，若存在闪现技能，优先选择的位置"
-      auto: 自动
+      auto: 当前闪现的位置
       options:
         d: 闪现位置默认在 D
         f: 闪现位置默认在 F
         auto: 根据当前闪现的位置决定
+    autoApply:
+      label: 自动应用
+      description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
 
-  success: 请求已发送
+  success: '请求已发送: {{reason}}'
+  summonerSpells: 召唤师技能
+  runes: 符文配法
   loadVersionsFailedMessage: 获取版本数据失败：{{reason}}
   loadTierFailedMessage: 获取梯队数据失败：{{reason}}
   loadChampionFailedMessage: 获取英雄数据失败：{{reason}}

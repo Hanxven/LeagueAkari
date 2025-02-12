@@ -8,6 +8,8 @@ import { PiniaMobxUtilsRenderer } from '@renderer-shared/shards/pinia-mobx-utils
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
+import { OpggRenderer } from './opgg'
+
 const manager = createManager()
 
 manager.use(AkariIpcRenderer)
@@ -15,6 +17,7 @@ manager.use(AppCommonRenderer)
 manager.use(ExtraAssetsRenderer)
 manager.use(LeagueClientRenderer)
 manager.use(LoggerRenderer)
+manager.use(OpggRenderer)
 manager.use(PiniaMobxUtilsRenderer)
 manager.use(SettingUtilsRenderer)
 manager.use(WindowManagerRenderer)

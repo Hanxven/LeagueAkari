@@ -42,7 +42,7 @@
   - [x] Respawn timer
   - [x] Send KDA reports during champion selection or in-game
   - [x] Fake ranks, modify career background, remove avatar frames and medals
-  - [x] Dodge in the last second during champion selection
+  - [ ] (No longer working) Dodge in the last second during champion selection
   - [x] CD-free champion swapping in ARAM
   - [x] Create 5v5 practice rooms
   - [x] Spectate matches within the same region or limited cross-region
