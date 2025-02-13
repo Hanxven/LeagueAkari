@@ -1,12 +1,19 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import {
+  AkariSharedGlobal,
+  AkariSharedGlobalShard,
+  SHARED_GLOBAL_ID
+} from '@shared/akari-shard/manager'
+import { LEAGUE_AKARI_DB_CURRENT_VERSION } from '@shared/constants/common'
 import { Paths } from '@shared/utils/types'
-import { app } from 'electron'
-import fs from 'node:fs'
+import { app, dialog } from 'electron'
+import fs from 'node:original-fs'
 import path from 'node:path'
 
-import { AkariIpcMain } from '../ipc'
+import { AkariIpcError, AkariIpcMain } from '../ipc'
 import { StorageMain } from '../storage'
 import { Setting } from '../storage/entities/Settings'
+import { type WindowManagerMain } from '../window-manager'
 import { SetterSettingService } from './setter-setting-service'
 
 export type OnChangeCallback<T = any> = (
@@ -38,16 +45,18 @@ export interface SettingSchema<T = any> {
  */
 export class SettingFactoryMain implements IAkariShardInitDispose {
   static id = 'setting-factory-main'
-  static dependencies = ['storage-main', 'akari-ipc-main']
+  static dependencies = ['storage-main', 'akari-ipc-main', SHARED_GLOBAL_ID]
 
   private readonly _ipc: AkariIpcMain
   private readonly _storage: StorageMain
+  private readonly _shared: AkariSharedGlobalShard
 
   private readonly _settings: Map<string, SetterSettingService> = new Map()
 
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
     this._storage = deps['storage-main']
+    this._shared = deps[SHARED_GLOBAL_ID]
   }
 
   register<T extends object = any>(
@@ -211,6 +220,94 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
 
       return this._getFromStorage(namespace, key)
     })
+
+    this._ipc.onCall(SettingFactoryMain.id, 'exportSettingsToJsonFile', async () => {
+      const w = this._shared.manager.getInstance<WindowManagerMain>('window-manager-main')
+
+      if (!w || !w.mainWindow.window) {
+        throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
+      }
+
+      const result = await dialog.showSaveDialog(w.mainWindow.window, {
+        defaultPath: 'league-akari-settings.json',
+        filters: [{ name: 'JSON', extensions: ['json'] }]
+      })
+
+      if (result.canceled) {
+        return
+      }
+
+      const filePath = result.filePath
+      return await this._writeSettingsToJsonFile(filePath)
+    })
+
+    this._ipc.onCall(SettingFactoryMain.id, 'importSettingsFromJsonFile', async () => {
+      const w = this._shared.manager.getInstance<WindowManagerMain>('window-manager-main')
+
+      if (!w || !w.mainWindow.window) {
+        throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
+      }
+
+      const result = await dialog.showOpenDialog(w.mainWindow.window, {
+        defaultPath: 'league-akari-settings.json',
+        filters: [{ name: 'JSON', extensions: ['json'] }]
+      })
+
+      if (result.canceled) {
+        return
+      }
+
+      const filePath = result.filePaths[0]
+      return await this._readSettingsFromJsonFile(filePath)
+    })
+  }
+
+  private async _writeSettingsToJsonFile(path: string) {
+    const all = await this._storage.dataSource.manager.find(Setting)
+
+    const jsonContent = {
+      databaseVersion: LEAGUE_AKARI_DB_CURRENT_VERSION,
+      type: 'league-akari-settings',
+      data: all
+    }
+
+    await fs.promises.writeFile(path, JSON.stringify(jsonContent), 'utf-8')
+
+    return path
+  }
+
+  private async _readSettingsFromJsonFile(path: string) {
+    await fs.promises.access(path, fs.constants.F_OK)
+
+    const content = JSON.parse(await fs.promises.readFile(path, 'utf-8'))
+
+    // 检查文件类型
+    if (content.type !== 'league-akari-settings') {
+      throw new AkariIpcError(`The file is not a valid settings file`, 'InvalidSettingsFile')
+    }
+
+    // 检查数据库版本
+    if (content.databaseVersion > LEAGUE_AKARI_DB_CURRENT_VERSION) {
+      throw new AkariIpcError(
+        `The file is from a newer version of the application, please update the application first`,
+        'InvalidDatabaseVersion'
+      )
+    }
+
+    // 检查字段类型
+    if (
+      !Array.isArray(content.data) &&
+      content.data.every((v: any) => {
+        typeof v !== 'object' || typeof v.key !== 'string' || v.value !== 'string'
+      })
+    ) {
+      throw new AkariIpcError(`The file is not a valid settings file`, 'InvalidSettingsData')
+    }
+
+    // 替换数据库中上述提到的设置项
+    await this._storage.dataSource.manager.save(Setting, content.data)
+
+    this._shared.global.restart()
   }
 
   async onDispose() {

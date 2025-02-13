@@ -2,6 +2,16 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { isAxiosError } from 'axios'
 import { IpcMainInvokeEvent, WebContents, ipcMain, webContents } from 'electron'
 
+export class AkariIpcError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string
+  ) {
+    super(message)
+    this.name = 'AkariIpcError'
+  }
+}
+
 export interface IpcMainSuccessDataType<T = any> {
   success: true
   data: T
@@ -165,6 +175,16 @@ export class AkariIpcMain implements IAkariShardInitDispose {
           message: error.message,
           stack: error.stack,
           name: error.name
+        }
+      }
+    } else if (error instanceof AkariIpcError) {
+      return {
+        success: false,
+        error: {
+          message: error.message,
+          stack: error.stack,
+          name: error.name,
+          code: error.code
         }
       }
     }

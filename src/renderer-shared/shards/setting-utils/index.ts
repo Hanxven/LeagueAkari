@@ -26,6 +26,14 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
     return (await this._ipc.call(MAIN_SHARD_NAMESPACE, 'get', namespace, key)) ?? defaultValue
   }
 
+  exportSettingsToJsonFile() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'exportSettingsToJsonFile')
+  }
+
+  importSettingsFromJsonFile() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'importSettingsFromJsonFile')
+  }
+
   /**
    * 远古工具方法 2.0, 仅用于渲染进程的某些数据存储和初始化
    * 用于持久化某些仅用于渲染进程的数据

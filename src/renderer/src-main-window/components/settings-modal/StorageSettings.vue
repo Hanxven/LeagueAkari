@@ -1,6 +1,31 @@
 <template>
   <NScrollbar style="height: 65vh">
     <NCard size="small">
+      <template #header>
+        <span class="card-header-title">{{ t('StorageSettings.settings.title') }}</span>
+      </template>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('StorageSettings.settings.export.label')"
+        :label-description="t('StorageSettings.settings.export.description')"
+        :label-width="320"
+      >
+        <NButton type="primary" secondary size="small" @click="handleExportSettings">
+          {{ t('StorageSettings.settings.export.button') }}
+        </NButton>
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('StorageSettings.settings.import.label')"
+        :label-description="t('StorageSettings.settings.import.description')"
+        :label-width="320"
+      >
+        <NButton type="primary" secondary size="small" @click="handleImportSettings">{{
+          t('StorageSettings.settings.import.button')
+        }}</NButton>
+      </ControlItem>
+    </NCard>
+    <NCard size="small">
       <template #header><span class="card-header-title">存储的玩家记录 (开发中)</span></template>
       <div class="operations">
         <NButton :disabled="isLoading" size="small" @click="handleReload">刷新</NButton>
@@ -21,9 +46,13 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
+import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
+import { ReturnDownBack } from '@vicons/ionicons5'
 import dayjs from 'dayjs'
+import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumns,
   NButton,
@@ -32,9 +61,14 @@ import {
   NPopconfirm,
   NScrollbar,
   PaginationProps,
+  useDialog,
   useMessage
 } from 'naive-ui'
 import { computed, h, onMounted, reactive, ref, useCssModule } from 'vue'
+
+const { t } = useTranslation()
+
+const s = useInstance<SettingUtilsRenderer>('setting-utils-renderer')
 
 const sp = useInstance<SavedPlayerRenderer>('saved-player-renderer')
 const styles = useCssModule()
@@ -231,12 +265,68 @@ onMounted(() => {
 const rowBaseClass = () => {
   return styles['row-base']
 }
+
+const handleExportSettings = async () => {
+  try {
+    const exportPath = await s.exportSettingsToJsonFile()
+
+    if (exportPath) {
+      message.success(() => t('StorageSettings.settings.exported', { path: exportPath }))
+    }
+  } catch (error: any) {
+    message.error(() => t('StorageSettings.settings.errorExport', { reason: error.message }))
+  }
+}
+
+const dialog = useDialog()
+
+// TODO I18N
+const handleImportSettings = async () => {
+  dialog.warning({
+    title: () => t('StorageSettings.settings.import.label'),
+    content: () => t('StorageSettings.settings.import.dialogWarning'),
+    positiveText: t('StorageSettings.settings.import.dialogPositiveText'),
+    negativeText: t('StorageSettings.settings.import.dialogNegativeText'),
+    onPositiveClick: async () => {
+      try {
+        await s.importSettingsFromJsonFile()
+      } catch (error: any) {
+        if (error.code) {
+          switch (error.code) {
+            case 'InvalidSettingsFile':
+            case 'InvalidSettingsData':
+              message.error(() => t('StorageSettings.settings.errorCode.InvalidSettingsFile'))
+              break
+            case 'InvalidDatabaseVersion':
+              message.error(() => t('StorageSettings.settings.errorCode.InvalidDatabaseVersion'))
+              break
+            default:
+              message.error(() =>
+                t('StorageSettings.settings.errorCode.importDefault', { reason: error.message })
+              )
+              break
+          }
+        } else {
+          message.error(() =>
+            t('StorageSettings.settings.errorCode.importDefault', { reason: error.message })
+          )
+        }
+      }
+    }
+  })
+}
 </script>
 
 <style lang="less" scoped>
 .card-header-title {
   font-weight: bold;
   font-size: 18px;
+}
+
+.control-item-margin {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
 }
 
 .control-line {

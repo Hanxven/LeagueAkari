@@ -31,7 +31,7 @@
       <NTabPane name="debug" :tab="t('DebugSettings.title')">
         <DebugSettings />
       </NTabPane>
-      <NTabPane v-if="as.settings.isInKyokoMode" name="storage" :tab="`存储`">
+      <NTabPane v-if="as.settings.isInKyokoMode" name="storage" :tab="t('StorageSettings.title')">
         <StorageSettings />
       </NTabPane>
       <NTabPane name="about" :tab="t('AboutPane.title')">

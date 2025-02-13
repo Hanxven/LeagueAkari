@@ -376,6 +376,33 @@ DebugSettings:
     label: Kyoko Mode
     description: Enabled features that are deprecated or experimental. Use with caution.
 
+StorageSettings:
+  title: Storage
+
+  settings:
+    title: Settings
+    export:
+      label: Export Settings
+      description: Export the current application settings to a JSON file
+      button: Export
+
+    import:
+      label: Import Settings
+      description: Import settings from a JSON file
+      dialogWarning: Importing settings will overwrite the current settings and restart the application. Continue?
+      dialogPositiveText: Import
+      dialogNegativeText: Cancel
+      button: Import
+
+    errorCode:
+      InvalidSettingsFile: Invalid settings file
+      InvalidDatabaseVersion: The target version of the settings file is not supported
+      importDefault: 'Failed to import settings: {{reason}}'
+
+    exported: 'Settings exported: {{path}}'
+    errorExport: 'Failed to export settings: {{reason}}'
+
+
 AboutPane:
   title: About
   line1: ' (联盟阿卡林, Version {{version}}) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'

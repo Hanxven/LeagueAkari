@@ -221,7 +221,6 @@ export function bootstrap() {
     manager.use(SelfUpdateMain)
 
     // functional shards
-
     manager.use(AutoChampionConfigMain)
     manager.use(AutoGameflowMain)
     manager.use(AutoReplyMain)
