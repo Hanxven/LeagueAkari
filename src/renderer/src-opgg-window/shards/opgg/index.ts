@@ -15,7 +15,7 @@ export class OpggRenderer {
   async onInit() {
     const store = useOpggStore()
 
-    this._setting.autoSavePropVue(
+    this._setting.savedGetterVue(
       OpggRenderer.id,
       'autoApply',
       () => store.frontendSettings.autoApply,

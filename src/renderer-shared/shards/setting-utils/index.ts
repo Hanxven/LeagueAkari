@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import _ from 'lodash'
 import { toRaw, watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
@@ -29,7 +30,7 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
    * 远古工具方法 2.0, 仅用于渲染进程的某些数据存储和初始化
    * 用于持久化某些仅用于渲染进程的数据
    */
-  async autoSavePropVue(
+  async savedGetterVue(
     namespace: string,
     key: string,
     getter: () => any,
@@ -39,6 +40,18 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
     const stopHandle = watch(getter, (value) => {
       this.set(namespace, key, toRaw(value))
     })
+    this._stopHandles.add(stopHandle)
+  }
+
+  async savedPropVue(namespace: string, object: object, propKey: string) {
+    const value = await this.get(namespace, propKey, _.get(object, propKey))
+    _.set(object, propKey, value)
+    const stopHandle = watch(
+      () => _.get(object, propKey),
+      (value) => {
+        this.set(namespace, propKey, toRaw(value))
+      }
+    )
     this._stopHandles.add(stopHandle)
   }
 

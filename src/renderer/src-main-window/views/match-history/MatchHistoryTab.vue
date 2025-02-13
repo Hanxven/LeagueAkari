@@ -585,8 +585,7 @@ import {
   useMessage,
   useNotification
 } from 'naive-ui'
-import { computed, markRaw, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
-import { h } from 'vue'
+import { computed, markRaw, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
 import RankedTable from '@main-window/components/RankedTable.vue'
@@ -1188,7 +1187,13 @@ watch(
   }
 )
 
-handleRefresh()
+if (mhs.settings.matchHistoryUseSgpApi) {
+  if (sgps.isTokenReady) {
+    handleRefresh()
+  }
+} else {
+  handleRefresh()
+}
 
 const FREQUENT_USE_CHAMPION_THRESHOLD = 1
 const RECENTLY_PLAYED_PLAYER_THRESHOLD = 2

@@ -89,7 +89,7 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     const store = useAppCommonStore()
     store.version = await this.getVersion()
 
-    await this._setting.autoSavePropVue(
+    await this._setting.savedGetterVue(
       AppCommonRenderer.id,
       'tempAkariSubscriptionInfo',
       () => store.tempAkariSubscriptionInfo,

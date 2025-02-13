@@ -149,14 +149,14 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
   private async _handleSettings() {
     const store = useMainWindowUiStore()
 
-    await this._setting.autoSavePropVue(
+    await this._setting.savedGetterVue(
       MainWindowUiRenderer.id,
       'useProfileSkinAsBackground',
       () => store.settings.useProfileSkinAsBackground,
       (v) => (store.settings.useProfileSkinAsBackground = v)
     )
 
-    await this._setting.autoSavePropVue(
+    await this._setting.savedGetterVue(
       MainWindowUiRenderer.id,
       'customBackgroundSkinPath',
       () => store.settings.customBackgroundSkinPath,
