@@ -84,10 +84,9 @@ import { AutoGameflowRenderer } from '@renderer-shared/shards/auto-gameflow'
 import { useAutoGameflowStore } from '@renderer-shared/shards/auto-gameflow/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { ExpandMoreSharp as ExpandMoreSharpIcon } from '@vicons/material'
+import { useTranslation } from 'i18next-vue'
 import { NCard, NFlex, NIcon, NInputNumber, NPopover, NSwitch } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

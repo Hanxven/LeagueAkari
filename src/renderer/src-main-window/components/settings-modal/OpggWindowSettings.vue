@@ -12,8 +12,7 @@
         <template #labelDescription>
           <div>{{ t('OpggWindowSettings.enabled.description') }}</div>
           <div>
-            {{ t('OpggWindowSettings.enabled.descriptionPart1')
-            }}<OpggIcon class="inline-icon" />{{
+            {{ t('OpggWindowSettings.enabled.descriptionPart1') }}<OpggIcon class="inline-icon" />{{
               t('OpggWindowSettings.enabled.descriptionPart2')
             }}
           </div>

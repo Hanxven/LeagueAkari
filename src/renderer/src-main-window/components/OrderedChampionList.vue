@@ -45,6 +45,7 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { maybePveChampion } from '@shared/types/league-client/game-data'
+import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NModal,
@@ -53,10 +54,8 @@ import {
   TransferRenderTargetLabel
 } from 'naive-ui'
 import { computed, h, ref, useCssModule } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
-
 
 const { t } = useTranslation()
 

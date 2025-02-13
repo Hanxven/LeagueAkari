@@ -61,15 +61,14 @@ import { Game, Participant, Player } from '@shared/types/league-client/match-his
 import { summonerName } from '@shared/utils/name'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import dayjs from 'dayjs'
+import { useTranslation } from 'i18next-vue'
 import { DataTableColumns, NDataTable } from 'naive-ui'
 import { RowData } from 'naive-ui/es/data-table/src/interface'
 import { computed, h } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 const props = defineProps<{
   game: Game
 }>()
-
 
 const { t } = useTranslation()
 

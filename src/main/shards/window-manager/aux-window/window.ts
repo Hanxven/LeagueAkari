@@ -9,8 +9,8 @@ import path from 'node:path'
 
 import type { WindowManagerMainContext } from '..'
 import icon from '../../../../../resources/LA_ICON.ico?asset'
-import { AuxWindowSettings, AuxWindowState } from './state'
 import { repositionWindowIfInvisible } from '../position-utils'
+import { AuxWindowSettings, AuxWindowState } from './state'
 
 export class AkariAuxWindow {
   static PARTITION = 'persist:aux-window'

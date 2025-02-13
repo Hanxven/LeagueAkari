@@ -12,7 +12,11 @@
       >
         <NIcon><PinFilledIcon /></NIcon>
       </div>
-      <div :title="t('AuxWindowTitleBar.minimize')" class="traffic-button minimize" @click="handleMinimize">
+      <div
+        :title="t('AuxWindowTitleBar.minimize')"
+        class="traffic-button minimize"
+        @click="handleMinimize"
+      >
         <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
       </div>
       <div :title="t('AuxWindowTitleBar.close')" class="traffic-button close" @click="handleClose">

@@ -47,29 +47,29 @@ export interface RecommendPositions {
 }
 
 export interface RecommendPage {
-  isDefaultPosition: boolean;
-  isRecommendationOverride: boolean;
-  keystone: Keystone;
-  perks: Keystone[];
-  position: string;
-  primaryPerkStyleId: number;
-  primaryRecommendationAttribute: string;
-  recommendationChampionId: number;
-  recommendationId: string;
-  secondaryPerkStyleId: number;
-  secondaryRecommendationAttribute: string;
-  summonerSpellIds: number[];
+  isDefaultPosition: boolean
+  isRecommendationOverride: boolean
+  keystone: Keystone
+  perks: Keystone[]
+  position: string
+  primaryPerkStyleId: number
+  primaryRecommendationAttribute: string
+  recommendationChampionId: number
+  recommendationId: string
+  secondaryPerkStyleId: number
+  secondaryRecommendationAttribute: string
+  summonerSpellIds: number[]
 }
 
 interface Keystone {
-  iconPath: string;
-  id: number;
-  longDesc: string;
-  name: string;
-  recommendationDescriptor: string;
-  shortDesc: string;
-  slotType: string;
-  styleId: number;
-  styleIdName: string;
-  tooltip: string;
+  iconPath: string
+  id: number
+  longDesc: string
+  name: string
+  recommendationDescriptor: string
+  shortDesc: string
+  slotType: string
+  styleId: number
+  styleIdName: string
+  tooltip: string
 }

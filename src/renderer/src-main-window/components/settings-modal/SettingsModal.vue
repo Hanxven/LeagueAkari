@@ -50,11 +50,11 @@ import { nextTick, useCssModule, useTemplateRef, watch } from 'vue'
 import AboutPane from './AboutPane.vue'
 import AppSettings from './AppSettings.vue'
 import AuxWindowSettings from './AuxWindowSettings.vue'
-import OpggWindowSettings from './OpggWindowSettings.vue'
 import DebugSettings from './DebugSettings.vue'
 import MatchHistoryTabsSettings from './MatchHistoryTabsSettings.vue'
 import MiscSettings from './MiscSettings.vue'
 import OngoingGameSettings from './OngoingGameSettings.vue'
+import OpggWindowSettings from './OpggWindowSettings.vue'
 import StorageSettings from './StorageSettings.vue'
 
 const { t } = useTranslation()

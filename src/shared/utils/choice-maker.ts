@@ -59,7 +59,7 @@ export class ChoiceMaker<T = any> {
     if (count > this.choices.length) {
       throw new Error('Count cannot exceed the number of choices')
     }
-    
+
     if (count === 1) {
       return [this.chooseIndex()]
     }

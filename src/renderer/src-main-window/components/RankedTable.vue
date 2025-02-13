@@ -87,7 +87,6 @@ const { rankedStats } = defineProps<{
   rankedStats: RankedStats
 }>()
 
-
 const { t } = useTranslation()
 
 const RANKED_MEDAL_MAP: Record<string, string> = {

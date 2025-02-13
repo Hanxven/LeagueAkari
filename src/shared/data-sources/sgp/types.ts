@@ -705,7 +705,6 @@ export interface SgpSummoner {
   expToNextLevel: number
 }
 
-
 export interface SpectatorData {
   reconnectDelay: number
   gameName: string

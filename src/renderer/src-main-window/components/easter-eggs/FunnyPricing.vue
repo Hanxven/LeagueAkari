@@ -57,7 +57,7 @@
 
 <script lang="ts" setup>
 import { Checkmark as CheckmarkIcon } from '@vicons/carbon'
-import { useTranslation } from 'i18next-vue';
+import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NModal } from 'naive-ui'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 

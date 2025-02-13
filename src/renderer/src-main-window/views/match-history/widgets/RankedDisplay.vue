@@ -49,8 +49,8 @@
 
 <script lang="ts" setup>
 import { RankedEntry } from '@shared/types/league-client/ranked'
-import { computed } from 'vue'
 import { useTranslation } from 'i18next-vue'
+import { computed } from 'vue'
 
 import RankedBronze from '@main-window/assets/ranked-icons-large/bronze.png'
 import RankedChallenger from '@main-window/assets/ranked-icons-large/challenger.png'
@@ -78,7 +78,6 @@ const props = defineProps<{
   rankedEntry?: RankedEntry
   small?: boolean
 }>()
-
 
 const { t } = useTranslation()
 

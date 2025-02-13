@@ -88,9 +88,9 @@
 </template>
 
 <script setup lang="ts">
+import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
 
 const {
   baselineDamage = 1,
@@ -109,7 +109,6 @@ const {
   width?: number
   height?: number
 }>()
-
 
 const { t } = useTranslation()
 

@@ -245,9 +245,13 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
       }
     )
 
-    this._ipc.onCall(SavedPlayerMain.id, 'saveEncounteredGame', (_, dto: EncounteredGameSaveDto) => {
-      return this.saveEncounteredGame(dto)
-    })
+    this._ipc.onCall(
+      SavedPlayerMain.id,
+      'saveEncounteredGame',
+      (_, dto: EncounteredGameSaveDto) => {
+        return this.saveEncounteredGame(dto)
+      }
+    )
 
     this._ipc.onCall(SavedPlayerMain.id, 'getPlayerTags', (_, query: SavedPlayerQueryDto) => {
       return this.getPlayerTags(query)

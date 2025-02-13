@@ -248,7 +248,10 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import { useMainWindowStore, useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
+import {
+  useMainWindowStore,
+  useWindowManagerStore
+} from '@renderer-shared/shards/window-manager/store'
 import { useTranslation } from 'i18next-vue'
 import {
   NCard,

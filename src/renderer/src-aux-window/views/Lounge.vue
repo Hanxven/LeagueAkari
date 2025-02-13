@@ -115,10 +115,9 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { GetSearch } from '@shared/types/league-client/matchmaking'
 import { useIntervalFn } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { NButton } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

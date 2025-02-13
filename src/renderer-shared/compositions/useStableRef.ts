@@ -1,5 +1,5 @@
-import { customRef } from 'vue'
 import _ from 'lodash'
+import { customRef } from 'vue'
 
 export function useStableRef<T = any>(initialValue: T) {
   return customRef<T>((track, trigger) => {

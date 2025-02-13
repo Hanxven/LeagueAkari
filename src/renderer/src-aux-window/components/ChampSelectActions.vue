@@ -44,10 +44,9 @@ import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Action } from '@shared/types/league-client/champ-select'
+import { useTranslation } from 'i18next-vue'
 import { NCard, NTimeline, NTimelineItem } from 'naive-ui'
 import { computed } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

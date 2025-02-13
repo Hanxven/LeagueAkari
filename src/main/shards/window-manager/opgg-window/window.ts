@@ -8,8 +8,8 @@ import path from 'node:path'
 
 import type { WindowManagerMainContext } from '..'
 import icon from '../../../../../resources/OPGG_ICON.ico?asset'
-import { OpggWindowSettings, OpggWindowState } from './state'
 import { repositionWindowIfInvisible } from '../position-utils'
+import { OpggWindowSettings, OpggWindowState } from './state'
 
 export class AkariOpggWindow {
   static PARTITION = 'persist:opgg-window'

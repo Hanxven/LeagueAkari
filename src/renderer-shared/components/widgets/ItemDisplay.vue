@@ -66,8 +66,8 @@
 
 <script setup lang="ts">
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { NPopover } from 'naive-ui'
 import { useTranslation } from 'i18next-vue'
+import { NPopover } from 'naive-ui'
 
 import LcuImage from '../LcuImage.vue'
 
@@ -81,7 +81,6 @@ const {
   maxWidth?: number
   size?: number
 }>()
-
 
 const { t } = useTranslation()
 

@@ -24,10 +24,9 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { isBenchEnabledSession } from '@shared/types/league-client/champ-select'
 import { useIntervalFn } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { NCard, NFlex } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
-
 
 const { t } = useTranslation()
 

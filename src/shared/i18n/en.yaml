@@ -402,7 +402,6 @@ StorageSettings:
     exported: 'Settings exported: {{path}}'
     errorExport: 'Failed to export settings: {{reason}}'
 
-
 AboutPane:
   title: About
   line1: ' (联盟阿卡林, Version {{version}}) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
@@ -1610,7 +1609,6 @@ Opgg:
     autoApply:
       label: Auto-Apply
       description: If the champion's data matches the current mode, automatically apply the summoner spells, runes with the highest usage rate. Only works when the OP.GG window is enabled and visible
-
 
   success: 'Request sent: {{reason}}'
   summonerSpells: Summoner Spells

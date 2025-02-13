@@ -3,7 +3,10 @@ import { ref, watch } from 'vue'
 
 const INTERVAL_CONSTANT = 92
 
-export function useCountdownSeconds(start: MaybeRefOrGetter<boolean>, deadline: MaybeRefOrGetter<number>) {
+export function useCountdownSeconds(
+  start: MaybeRefOrGetter<boolean>,
+  deadline: MaybeRefOrGetter<number>
+) {
   const _countdownTime = ref(0)
   const _deadline = toRef(deadline)
   const _start = toRef(start)

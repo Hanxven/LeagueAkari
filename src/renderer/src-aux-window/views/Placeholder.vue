@@ -4,7 +4,9 @@
     <span class="sub" v-if="lcs.gameflow.phase === 'InProgress'">{{
       t('Placeholder.inProgress')
     }}</span>
-    <span class="sub" v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating">{{ t('Placeholder.idle') }}</span>
+    <span class="sub" v-else-if="lcs.champSelect.session && lcs.champSelect.session.isSpectating">{{
+      t('Placeholder.idle')
+    }}</span>
     <span class="sub" v-else>{{ t('Placeholder.idle') }}</span>
   </div>
 </template>

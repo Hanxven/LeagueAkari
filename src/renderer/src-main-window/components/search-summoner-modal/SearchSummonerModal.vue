@@ -181,6 +181,7 @@ import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
 import { isAxiosError } from 'axios'
+import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NCard,
@@ -194,11 +195,9 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, markRaw, nextTick, reactive, ref, shallowRef, useTemplateRef, watch } from 'vue'
-import { useTranslation } from 'i18next-vue'
 import { useRoute } from 'vue-router'
 
 import { MatchHistoryTabsRenderer, SearchHistoryItem } from '@main-window/shards/match-history-tabs'
-
 
 const { t } = useTranslation()
 
@@ -225,7 +224,8 @@ const placeholderTexts = computed(() => {
   ]
 })
 
-const placeholderText = placeholderTexts.value[Math.floor(Math.random() * placeholderTexts.value.length)]
+const placeholderText =
+  placeholderTexts.value[Math.floor(Math.random() * placeholderTexts.value.length)]
 
 /**
  * 识别 {gameName}#{tagLIne} 或 {fuzzyGameName} 的输入
