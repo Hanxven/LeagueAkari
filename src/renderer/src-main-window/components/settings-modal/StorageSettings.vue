@@ -25,7 +25,7 @@
         }}</NButton>
       </ControlItem>
     </NCard>
-    <NCard size="small">
+    <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">存储的玩家记录 (开发中)</span></template>
       <div class="operations">
         <NButton :disabled="isLoading" size="small" @click="handleReload">刷新</NButton>

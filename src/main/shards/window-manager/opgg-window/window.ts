@@ -9,6 +9,7 @@ import path from 'node:path'
 import type { WindowManagerMainContext } from '..'
 import icon from '../../../../../resources/OPGG_ICON.ico?asset'
 import { OpggWindowSettings, OpggWindowState } from './state'
+import { repositionWindowIfInvisible } from '../position-utils'
 
 export class AkariOpggWindow {
   static PARTITION = 'persist:opgg-window'
@@ -272,6 +273,7 @@ export class AkariOpggWindow {
 
     this._window.on('ready-to-show', () => {
       this.state.setReady(true)
+      repositionWindowIfInvisible(this._window!)
     })
 
     if (this._window.isMinimized()) {

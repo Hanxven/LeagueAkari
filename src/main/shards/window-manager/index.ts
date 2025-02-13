@@ -1,5 +1,6 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
+import { BrowserWindow, Display, screen } from 'electron'
 
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -10,6 +11,7 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
 import { AkariMainWindow } from './main-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
+import { rectDistance, rectsIntersect } from './position-utils'
 import { WindowManagerSettings, WindowManagerState } from './state'
 
 export interface WindowManagerMainContext {

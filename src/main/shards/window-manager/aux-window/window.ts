@@ -10,6 +10,7 @@ import path from 'node:path'
 import type { WindowManagerMainContext } from '..'
 import icon from '../../../../../resources/LA_ICON.ico?asset'
 import { AuxWindowSettings, AuxWindowState } from './state'
+import { repositionWindowIfInvisible } from '../position-utils'
 
 export class AkariAuxWindow {
   static PARTITION = 'persist:aux-window'
@@ -302,6 +303,7 @@ export class AkariAuxWindow {
 
     this._window.on('ready-to-show', () => {
       this.state.setReady(true)
+      repositionWindowIfInvisible(this._window!)
     })
 
     if (this._window.isMinimized()) {
