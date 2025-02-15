@@ -27,7 +27,7 @@ export type OnChangeCallback<T = any> = (
   }
 ) => void | Promise<void>
 
-export interface SettingSchema<T = any> {
+export interface SettingConfig<T = any> {
   /**
    * 这个设置项的默认值
    */
@@ -38,6 +38,8 @@ export interface SettingSchema<T = any> {
    */
   onChange?: OnChangeCallback<T>
 }
+
+export type SettingSchema<T extends object> = Partial<Record<Paths<T>, SettingConfig>>
 
 /**
  * 创建日志记录器的工厂, 供给其他模块使用
@@ -61,7 +63,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
 
   register<T extends object = any>(
     namespace: string,
-    schema: Partial<Record<Paths<T>, SettingSchema>>,
+    schema: SettingSchema<T>,
     obj: T
   ) {
     if (this._settings.has(namespace)) {

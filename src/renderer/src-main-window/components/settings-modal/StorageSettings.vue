@@ -1,48 +1,70 @@
 <template>
-  <NScrollbar style="height: 65vh">
-    <NCard size="small">
-      <template #header>
-        <span class="card-header-title">{{ t('StorageSettings.settings.title') }}</span>
-      </template>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('StorageSettings.settings.export.label')"
-        :label-description="t('StorageSettings.settings.export.description')"
-        :label-width="320"
-      >
-        <NButton type="primary" secondary size="small" @click="handleExportSettings">
-          {{ t('StorageSettings.settings.export.button') }}
-        </NButton>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('StorageSettings.settings.import.label')"
-        :label-description="t('StorageSettings.settings.import.description')"
-        :label-width="320"
-      >
-        <NButton type="primary" secondary size="small" @click="handleImportSettings">{{
-          t('StorageSettings.settings.import.button')
-        }}</NButton>
-      </ControlItem>
-    </NCard>
-    <NCard size="small" style="margin-top: 8px">
-      <template #header><span class="card-header-title">存储的玩家记录 (开发中)</span></template>
-      <div class="operations">
-        <NButton :disabled="isLoading" size="small" @click="handleReload">刷新</NButton>
-      </div>
-      <NDataTable
-        :single-line="false"
-        :loading="isLoading"
-        :row-class-name="rowBaseClass"
-        :row-key="(d) => d.id"
-        size="small"
-        remote
-        :pagination
-        :columns
-        :data
-      />
-    </NCard>
-  </NScrollbar>
+  <NTabs
+    size="small"
+    style="height: 65vh"
+    placement="left"
+    :tabs-padding="4"
+    :tab-style="{
+      padding: '6px 24px 6px 12px'
+    }"
+    :pane-style="{
+      'padding-left': '16px',
+      'border-left': '1px solid var(--n-border-color)'
+    }"
+  >
+    <NTabPane name="设置项" display-directive="show">
+      <NScrollbar>
+        <NCard size="small">
+          <template #header>
+            <span class="card-header-title">{{ t('StorageSettings.settings.title') }}</span>
+          </template>
+          <ControlItem
+            class="control-item-margin"
+            :label="t('StorageSettings.settings.export.label')"
+            :label-description="t('StorageSettings.settings.export.description')"
+            :label-width="320"
+          >
+            <NButton type="primary" secondary size="small" @click="handleExportSettings">
+              {{ t('StorageSettings.settings.export.button') }}
+            </NButton>
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            :label="t('StorageSettings.settings.import.label')"
+            :label-description="t('StorageSettings.settings.import.description')"
+            :label-width="320"
+          >
+            <NButton type="primary" secondary size="small" @click="handleImportSettings">{{
+              t('StorageSettings.settings.import.button')
+            }}</NButton>
+          </ControlItem>
+        </NCard>
+      </NScrollbar>
+    </NTabPane>
+    <NTabPane name="标记的玩家" display-directive="show">
+      <NScrollbar>
+        <NCard size="small">
+          <template #header
+            ><span class="card-header-title">存储的玩家记录 (开发中)</span></template
+          >
+          <div class="operations">
+            <NButton :disabled="isLoading" size="small" @click="handleReload">刷新</NButton>
+          </div>
+          <NDataTable
+            :single-line="false"
+            :loading="isLoading"
+            :row-class-name="rowBaseClass"
+            :row-key="(d) => d.id"
+            size="small"
+            remote
+            :pagination
+            :columns
+            :data
+          />
+        </NCard>
+      </NScrollbar>
+    </NTabPane>
+  </NTabs>
 </template>
 
 <script setup lang="ts">
@@ -50,7 +72,6 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
-import { ReturnDownBack } from '@vicons/ionicons5'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import {
@@ -60,6 +81,8 @@ import {
   NDataTable,
   NPopconfirm,
   NScrollbar,
+  NTabPane,
+  NTabs,
   PaginationProps,
   useDialog,
   useMessage

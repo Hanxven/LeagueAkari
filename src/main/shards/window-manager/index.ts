@@ -2,6 +2,7 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 import { BrowserWindow, Display, screen } from 'electron'
 
+import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -11,7 +12,6 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
 import { AkariMainWindow } from './main-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
-import { rectDistance, rectsIntersect } from './position-utils'
 import { WindowManagerSettings, WindowManagerState } from './state'
 
 export interface WindowManagerMainContext {
@@ -23,6 +23,7 @@ export interface WindowManagerMainContext {
   settingFactory: SettingFactoryMain
   loggerFactory: LoggerFactoryMain
   leagueClient: LeagueClientMain
+  protocol: AkariProtocolMain
   mobx: MobxUtilsMain
   log: AkariLogger
 }
@@ -35,7 +36,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     'mobx-utils-main',
     'logger-factory-main',
     'setting-factory-main',
-    'league-client-main'
+    'league-client-main',
+    'akari-protocol-main'
   ]
 
   private readonly _ipc: AkariIpcMain
@@ -46,6 +48,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   private readonly _setting: SetterSettingService
   private readonly _lc: LeagueClientMain
   private readonly _shared: AkariSharedGlobalShard
+  private readonly _protocol: AkariProtocolMain
 
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
@@ -69,6 +72,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       this.settings
     )
     this._lc = deps['league-client-main']
+    this._protocol = deps['akari-protocol-main']
 
     const wContext = this.getContext()
     this.mainWindow = new AkariMainWindow(wContext)
@@ -86,6 +90,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       settingFactory: this._settingFactory,
       loggerFactory: this._loggerFactory,
       leagueClient: this._lc,
+      protocol: this._protocol,
       mobx: this._mobx,
       log: this._log
     }
@@ -101,9 +106,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._mobx.propSync(WindowManagerMain.id, 'state', this.state, ['supportsMica'])
     this._mobx.propSync(WindowManagerMain.id, 'settings', this.settings, ['backgroundMaterial'])
 
-    this.mainWindow.on('forceClose', () => {
-      this.auxWindow.closeWindow(true)
-      this.opggWindow.closeWindow(true)
+    this.mainWindow.on('force-close', () => {
+      this.auxWindow.close(true)
+      this.opggWindow.close(true)
     })
 
     await this.mainWindow.onInit()

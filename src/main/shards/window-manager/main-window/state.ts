@@ -1,3 +1,4 @@
+import { Rectangle } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
 
 /**
@@ -12,7 +13,19 @@ export type MainWindowCloseAction = 'minimize-to-tray' | 'quit' | 'ask'
  * 分离设置项到独立的类
  */
 export class MainWindowSettings {
+  pinned: boolean = false
+
+  opacity: number = 1
+
   closeAction: MainWindowCloseAction = 'ask'
+
+  setPinned(pinned: boolean) {
+    this.pinned = pinned
+  }
+
+  setOpacity(opacity: number) {
+    this.opacity = opacity
+  }
 
   setCloseAction(action: MainWindowCloseAction) {
     this.closeAction = action
@@ -37,6 +50,8 @@ export class MainWindowState {
 
   size: [number, number] = [1380, 860]
 
+  bounds: Rectangle | null
+
   setStatus(status: 'normal' | 'maximized' | 'minimized') {
     this.status = status
   }
@@ -55,6 +70,10 @@ export class MainWindowState {
 
   setSize(size: [number, number]) {
     this.size = size
+  }
+
+  setBounds(bounds: Rectangle | null) {
+    this.bounds = bounds
   }
 
   constructor() {

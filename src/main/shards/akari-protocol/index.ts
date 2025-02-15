@@ -2,12 +2,6 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { protocol, session } from 'electron'
 import { Readable } from 'node:stream'
 
-import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
-import { WindowManagerMain } from '../window-manager'
-import { AkariAuxWindow } from '../window-manager/aux-window/window'
-import { AkariMainWindow } from '../window-manager/main-window/window'
-import { AkariOpggWindow } from '../window-manager/opgg-window/window'
-
 /**
  * 实现 `akari://` 协议, 用户特殊资源的代理
  * akari://league-client/* 代理到 LeagueClient 的 HTTP 服务
@@ -23,17 +17,11 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
     (uri: string, req: Request) => Promise<Response> | Response
   >()
 
-  async onInit() {
-    this._handlePartitionAkariProtocol(AkariMainWindow.PARTITION)
-    this._handlePartitionAkariProtocol(AkariAuxWindow.PARTITION)
-    this._handlePartitionAkariProtocol(AkariOpggWindow.PARTITION)
-  }
+  private readonly _partitionRegistry = new Set<string>()
 
-  async onDispose() {
-    this._unhandlePartitionAkariProtocol(AkariMainWindow.PARTITION)
-    this._unhandlePartitionAkariProtocol(AkariAuxWindow.PARTITION)
-    this._unhandlePartitionAkariProtocol(AkariOpggWindow.PARTITION)
-  }
+  async onInit() {}
+
+  async onDispose() {}
 
   private _unhandlePartitionAkariProtocol(partition: string) {
     session.fromPartition(partition).protocol.unhandle(AkariProtocolMain.AKARI_PROXY_PROTOCOL)
@@ -79,6 +67,24 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
     })
 
     return nodeStream
+  }
+
+  registerPartition(partition: string) {
+    if (this._partitionRegistry.has(partition)) {
+      throw new Error(`Partition ${partition} is already registered`)
+    }
+
+    this._partitionRegistry.add(partition)
+    this._handlePartitionAkariProtocol(partition)
+  }
+
+  unregisterPartition(partition: string) {
+    if (!this._partitionRegistry.has(partition)) {
+      throw new Error(`Partition ${partition} is not registered`)
+    }
+
+    this._partitionRegistry.delete(partition)
+    this._unhandlePartitionAkariProtocol(partition)
   }
 
   registerDomain(

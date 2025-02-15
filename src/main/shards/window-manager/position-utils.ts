@@ -156,3 +156,12 @@ export function isWindowPartiallyVisible(win: BrowserWindow, threshold = 0.98) {
   const visibleFraction = winArea > 0 ? visibleArea / winArea : 0
   return visibleFraction >= threshold
 }
+
+export function getCenteredRectangle(width: number, height: number) {
+  let { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize
+
+  let x = Math.round((screenWidth - width) / 2)
+  let y = Math.round((screenHeight - height) / 2)
+
+  return { x, y, width, height }
+}

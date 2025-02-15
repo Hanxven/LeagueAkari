@@ -1,4 +1,5 @@
 import input from '@main/native/la-input-win64.node'
+import toolsAddon from '@main/native/la-tools-win64.node'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 import { isBotQueue } from '@shared/types/league-client/game-data'

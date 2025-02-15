@@ -47,7 +47,7 @@ class AkariMainWindow {
   }
 
   close(strategy?: string) {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'close', strategy)
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeMainWindow', strategy)
   }
 
   toggleDevtools() {
@@ -68,18 +68,6 @@ class AkariMainWindow {
 
   setCloseAction(value: string) {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeAction', value)
-  }
-
-  openDialog(
-    properties: string[] = ['openFile'],
-    filters: { extensions: string[]; name: string }[] = [{ name: 'All Files', extensions: ['*'] }]
-  ) {
-    return this._context.ipc.call(
-      MAIN_SHARD_NAMESPACE_MAIN_WINDOW,
-      'openDialog',
-      properties,
-      filters
-    )
   }
 }
 
@@ -112,7 +100,7 @@ class AkariAuxWindow {
   }
 
   resetPosition() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'resetWindowPosition')
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'resetPosition')
   }
 
   setAutoShow(value: boolean) {
@@ -162,7 +150,7 @@ class AkariOpggWindow {
   }
 
   resetPosition() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'resetWindowPosition')
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'resetPosition')
   }
 
   setAutoShow(value: boolean) {

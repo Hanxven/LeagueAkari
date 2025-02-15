@@ -174,26 +174,32 @@ Napi::Value GetLeagueClientWindowPlacementInfo(const Napi::CallbackInfo& info) {
   // 使用类名和窗口名查找窗口
   HWND hwnd = FindWindowW(APPLICATION_CLASS_NAME, APPLICATION_NAME);
   if (hwnd == NULL) {
-    // 如果窗口不存在，返回null
     return env.Null();
   }
 
   WINDOWPLACEMENT wp;
   wp.length = sizeof(WINDOWPLACEMENT);
-  if (GetWindowPlacement(hwnd, &wp)) {
-    // 创建一个返回对象
-    Napi::Object result = Napi::Object::New(env);
-    result.Set("left", Napi::Number::New(env, wp.rcNormalPosition.left));
-    result.Set("top", Napi::Number::New(env, wp.rcNormalPosition.top));
-    result.Set("right", Napi::Number::New(env, wp.rcNormalPosition.right));
-    result.Set("bottom", Napi::Number::New(env, wp.rcNormalPosition.bottom));
-    result.Set("shownState", Napi::Number::New(env, wp.showCmd));
-
-    return result;
-  } else {
-    // 如果无法获取窗口位置，返回null
+  if (!GetWindowPlacement(hwnd, &wp)) {
     return env.Null();
   }
+
+  // 结合 IsIconic 和 IsZoomed 获取更准确的状态信息
+  bool isMinimized = IsIconic(hwnd);
+  bool isMaximized = IsZoomed(hwnd);
+  bool isNormal = !isMinimized && !isMaximized;
+
+  Napi::Object result = Napi::Object::New(env);
+  result.Set("left", Napi::Number::New(env, wp.rcNormalPosition.left));
+  result.Set("top", Napi::Number::New(env, wp.rcNormalPosition.top));
+  result.Set("right", Napi::Number::New(env, wp.rcNormalPosition.right));
+  result.Set("bottom", Napi::Number::New(env, wp.rcNormalPosition.bottom));
+  result.Set("shownState", Napi::Number::New(env, wp.showCmd));
+
+  result.Set("isMinimized", Napi::Boolean::New(env, isMinimized));
+  result.Set("isMaximized", Napi::Boolean::New(env, isMaximized));
+  result.Set("isNormal", Napi::Boolean::New(env, isNormal));
+
+  return result;
 }
 
 Napi::Value IsElevated(const Napi::CallbackInfo& info) {
