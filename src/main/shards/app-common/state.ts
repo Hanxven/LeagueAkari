@@ -53,17 +53,14 @@ export class AppCommonSettings {
    * HTTP 代理
    */
   httpProxy: {
-    enabled: boolean
+    strategy: 'force' | 'auto' | 'disable'
     port: number
     host: string
   } = {
-    enabled: false,
+    strategy: 'auto',
     port: 7890,
     host: '127.0.0.1'
   }
-
-  // 强制不走代理, 暂未实装
-  forceDisableProxy: boolean = false
 
   setShowFreeSoftwareDeclaration(s: boolean) {
     this.showFreeSoftwareDeclaration = s
@@ -81,12 +78,8 @@ export class AppCommonSettings {
     this.theme = s
   }
 
-  setHttpProxy(s: { enabled: boolean; port: number; host: string }) {
+  setHttpProxy(s: { strategy: 'force' | 'auto' | 'disable'; port: number; host: string }) {
     this.httpProxy = s
-  }
-
-  setForceDisableProxy(s: boolean) {
-    this.forceDisableProxy = s
   }
 
   constructor() {

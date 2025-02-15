@@ -119,9 +119,13 @@ AppSettings:
       negativeText: Cancel
 
     httpProxy:
-      enabled:
-        label: Enable HTTP Proxy
-        description: Set an HTTP proxy. All network requests except LCU HTTP will be routed through this proxy
+      strategy:
+        label: HTTP Proxy
+        description: Set the HTTP proxy. All network requests except LCU HTTP will be routed through this proxy
+        options:
+          force: Use Proxy
+          auto: Auto
+          disable: Disable
       host:
         label: Proxy Host
         description: The host of the proxy server

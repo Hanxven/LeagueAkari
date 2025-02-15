@@ -249,6 +249,20 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
       'window-manager-main/main-window/size'
     )
 
+    const httpProxySetting = await manager.findOneBy(Setting, {
+      key: Equal('app-common-main/httpProxy')
+    })
+
+    if (httpProxySetting) {
+      await manager.save(
+        Setting.create('app-common-main/httpProxy', {
+          strategy: httpProxySetting.value.enabled ? 'force' : 'auto',
+          port: httpProxySetting.value.port,
+          host: httpProxySetting.value.host
+        })
+      )
+    }
+
     const boundsRecord = await manager.findOneBy(Setting, {
       key: Equal('window-manager-main/auxWindowFunctionalityBounds')
     })

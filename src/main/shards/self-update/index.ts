@@ -755,13 +755,15 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this._app.settings.httpProxy,
       (httpProxy) => {
-        if (httpProxy.enabled) {
+        if (httpProxy.strategy === 'force') {
           this._http.defaults.proxy = {
             host: httpProxy.host,
             port: httpProxy.port
           }
-        } else {
+        } else if (httpProxy.strategy === 'auto') {
           this._http.defaults.proxy = undefined
+        } else if (httpProxy.strategy === 'disable') {
+          this._http.defaults.proxy = false
         }
       },
       { fireImmediately: true }

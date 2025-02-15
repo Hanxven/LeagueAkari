@@ -68,7 +68,7 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this._app.settings.httpProxy,
       (httpProxy) => {
-        if (httpProxy.enabled) {
+        if (httpProxy.strategy === 'force') {
           this._gtimgApi.http.defaults.proxy = {
             host: httpProxy.host,
             port: httpProxy.port
@@ -77,9 +77,12 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
             host: httpProxy.host,
             port: httpProxy.port
           }
-        } else {
+        } else if (httpProxy.strategy === 'auto') {
           this._gtimgApi.http.defaults.proxy = undefined
           this._fandomApi.http.defaults.proxy = undefined
+        } else if (httpProxy.strategy === 'disable') {
+          this._gtimgApi.http.defaults.proxy = false
+          this._fandomApi.http.defaults.proxy = false
         }
       },
       { fireImmediately: true }

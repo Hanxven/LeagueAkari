@@ -7,7 +7,7 @@ interface BaseConfig {
 }
 
 export interface HttpProxySetting {
-  enabled: boolean
+  strategy: 'auto' | 'force' | 'disable'
   port: number
   host: string
 }
@@ -19,7 +19,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     locale: 'zh-CN',
     theme: 'default' as 'default' | 'dark' | 'light',
     httpProxy: {
-      enabled: false,
+      strategy: 'auto' as 'auto' | 'force' | 'disable',
       port: 0,
       host: ''
     } as HttpProxySetting,

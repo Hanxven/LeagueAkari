@@ -177,49 +177,54 @@
       </template>
       <ControlItem
         class="control-item-margin"
-        :label="t('AppSettings.misc.httpProxy.enabled.label')"
-        :label-description="t('AppSettings.misc.httpProxy.enabled.description')"
+        :label="t('AppSettings.misc.httpProxy.strategy.label')"
+        :label-description="t('AppSettings.misc.httpProxy.strategy.description')"
         :label-width="320"
       >
-        <NSwitch
-          size="small"
-          :value="as.settings.httpProxy.enabled"
-          @update:value="(val) => updateHttpProxySettings({ enabled: val })"
-        />
-      </ControlItem>
-      <ControlItem
-        v-if="as.settings.httpProxy.enabled"
-        class="control-item-margin"
-        :label="t('AppSettings.misc.httpProxy.host.label')"
-        :label-description="t('AppSettings.misc.httpProxy.host.description')"
-        :label-width="320"
-      >
-        <NInput
-          :value="as.settings.httpProxy.host"
+        <NSelect
+          :options="httpProxyStrategies"
           style="width: 160px"
           size="small"
-          placeholder="Host"
-          :status="as.settings.httpProxy.host.trim() ? 'success' : 'warning'"
-          @update:value="(val) => updateHttpProxySettings({ host: val })"
+          :value="as.settings.httpProxy.strategy"
+          @update:value="(val) => updateHttpProxySettings({ strategy: val })"
         />
       </ControlItem>
-      <ControlItem
-        v-if="as.settings.httpProxy.enabled"
+      <NCollapseTransition
         class="control-item-margin"
-        :label="t('AppSettings.misc.httpProxy.port.label')"
-        :label-description="t('AppSettings.misc.httpProxy.port.description')"
-        :label-width="320"
+        :show="as.settings.httpProxy.strategy === 'force'"
       >
-        <NInputNumber
-          :show-button="false"
-          :min="1"
-          :max="65535"
-          :value="as.settings.httpProxy.port"
-          style="width: 160px"
-          size="small"
-          @update:value="(val) => updateHttpProxySettings({ port: val || 1 })"
-        />
-      </ControlItem>
+        <ControlItem
+          class="control-item-margin"
+          :label="t('AppSettings.misc.httpProxy.host.label')"
+          :label-description="t('AppSettings.misc.httpProxy.host.description')"
+          :label-width="320"
+        >
+          <NInput
+            :value="as.settings.httpProxy.host"
+            style="width: 160px"
+            size="small"
+            placeholder="Host"
+            :status="as.settings.httpProxy.host.trim() ? 'success' : 'warning'"
+            @update:value="(val) => updateHttpProxySettings({ host: val })"
+          />
+        </ControlItem>
+        <ControlItem
+          class="control-item-margin"
+          :label="t('AppSettings.misc.httpProxy.port.label')"
+          :label-description="t('AppSettings.misc.httpProxy.port.description')"
+          :label-width="320"
+        >
+          <NInputNumber
+            :show-button="false"
+            :min="1"
+            :max="65535"
+            :value="as.settings.httpProxy.port"
+            style="width: 160px"
+            size="small"
+            @update:value="(val) => updateHttpProxySettings({ port: val || 1 })"
+          />
+        </ControlItem>
+      </NCollapseTransition>
       <ControlItem
         class="control-item-margin"
         :label="t('AppSettings.misc.disableHardwareAcceleration.label')"
@@ -255,6 +260,7 @@ import {
 import { useTranslation } from 'i18next-vue'
 import {
   NCard,
+  NCollapseTransition,
   NFlex,
   NInput,
   NInputNumber,
@@ -336,6 +342,23 @@ const handleDisableHardwareAcceleration = (val: boolean) => {
     }
   })
 }
+
+const httpProxyStrategies = computed(() => {
+  return [
+    {
+      label: t('AppSettings.misc.httpProxy.strategy.options.auto'),
+      value: 'auto'
+    },
+    {
+      label: t('AppSettings.misc.httpProxy.strategy.options.disable'),
+      value: 'disable'
+    },
+    {
+      label: t('AppSettings.misc.httpProxy.strategy.options.force'),
+      value: 'force'
+    }
+  ]
+})
 
 const updateHttpProxySettings = (obj: Partial<HttpProxySetting>) => {
   app.setHttpProxy({ ...as.settings.httpProxy, ...obj })
