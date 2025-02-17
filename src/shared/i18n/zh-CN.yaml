@@ -158,6 +158,10 @@ OngoingGameSettings:
     label: 启用
     description: 在进入英雄选择中或对局时，将进行对局分析
 
+  autoRouteWhenGameStarts:
+    label: 自动切换到对局页面
+    description: 在进入英雄选择阶段或对局开始时，自动切换到对局页面
+
   matchHistoryLoadCount:
     label: 对局战绩分析数量
     description: 在对局页面中，用于分析每名玩家的战绩拉取对局数量

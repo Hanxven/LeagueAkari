@@ -18,6 +18,14 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
+        :label="t('OngoingGameSettings.autoRouteWhenGameStarts.label')"
+        :label-description="t('OngoingGameSettings.autoRouteWhenGameStarts.description')"
+        :label-width="320"
+      >
+        <NSwitch size="small" v-model:value="ogs.frontendSettings.autoRouteWhenGameStarts" />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
         :label="t('OngoingGameSettings.matchHistoryLoadCount.label')"
         :label-description="t('OngoingGameSettings.matchHistoryLoadCount.description')"
         :label-width="320"

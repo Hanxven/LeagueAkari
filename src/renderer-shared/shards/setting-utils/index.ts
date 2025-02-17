@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Paths } from '@shared/utils/types'
 import _ from 'lodash'
 import { toRaw, watch } from 'vue'
 
@@ -51,13 +52,22 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
     this._stopHandles.add(stopHandle)
   }
 
-  async savedPropVue(namespace: string, object: object, propKey: string) {
-    const value = await this.get(namespace, propKey, _.get(object, propKey))
+  async savedPropVue<T extends object>(
+    namespace: string,
+    object: T,
+    propKey: Paths<T>,
+    savePropKey?: string
+  ) {
+    const value = await this.get(
+      namespace,
+      savePropKey ? savePropKey : propKey,
+      _.get(object, propKey)
+    )
     _.set(object, propKey, value)
     const stopHandle = watch(
       () => _.get(object, propKey),
       (value) => {
-        this.set(namespace, propKey, toRaw(value))
+        this.set(namespace, savePropKey ? savePropKey : propKey, toRaw(value))
       }
     )
     this._stopHandles.add(stopHandle)

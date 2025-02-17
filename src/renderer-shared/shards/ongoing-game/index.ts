@@ -1,6 +1,7 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { Game } from '@shared/types/league-client/match-history'
-import { effectScope, markRaw, toRaw, watch } from 'vue'
+import { computed, effectScope, markRaw, toRaw, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -25,8 +26,6 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
   private readonly _ipc: AkariIpcRenderer
   private readonly _pm: PiniaMobxUtilsRenderer
   private readonly _setting: SettingUtilsRenderer
-
-  private _scope = effectScope()
 
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-renderer']
@@ -150,63 +149,55 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       store.cachedGames[data.data.gameId] = markRaw(data.data)
     })
 
-    store.settings.orderPlayerBy = await this._setting.get(
+    // 出于历史原因, 此设置项仍位于 settings/ 下而非 frontendSettings/
+    await this._setting.savedPropVue(OngoingGameRenderer.id, store.settings, 'orderPlayerBy')
+
+    await this._setting.savedPropVue(
       OngoingGameRenderer.id,
-      'orderPlayerBy',
-      store.settings.orderPlayerBy
+      store.frontendSettings,
+      'autoRouteWhenGameStarts'
     )
 
-    store.frontendSettings.showChampionUsage = await this._setting.get(
+    await this._setting.savedPropVue(
       OngoingGameRenderer.id,
-      'frontend/showChampionUsage',
-      store.frontendSettings.showChampionUsage
+      store.frontendSettings,
+      'showChampionUsage',
+      'frontend/showChampionUsage'
     )
 
-    store.frontendSettings.showMatchHistoryItemBorder = await this._setting.get(
+    await this._setting.savedPropVue(
       OngoingGameRenderer.id,
-      'frontend/showMatchHistoryItemBorder',
-      store.frontendSettings.showMatchHistoryItemBorder
+      store.frontendSettings,
+      'showMatchHistoryItemBorder',
+      'frontend/showMatchHistoryItemBorder'
     )
 
-    store.frontendSettings.playerCardTags = await this._setting.get(
+    await this._setting.savedPropVue(
       OngoingGameRenderer.id,
-      'frontend/playerCard',
-      store.frontendSettings.playerCardTags
+      store.frontendSettings,
+      'playerCardTags',
+      'frontend/playerCard'
     )
+  }
 
-    this._scope.run(() => {
-      watch(
-        () => store.settings.orderPlayerBy,
-        (newValue) => {
-          this._setting.set(OngoingGameRenderer.id, 'orderPlayerBy', newValue)
-        }
-      )
+  setupAutoRouteWhenGameStarts() {
+    const router = useRouter()
+    const store = useOngoingGameStore()
 
-      watch(
-        () => store.frontendSettings.showChampionUsage,
-        (newValue) => {
-          this._setting.set(OngoingGameRenderer.id, 'frontend/showChampionUsage', newValue)
-        }
-      )
-
-      watch(
-        () => store.frontendSettings.showMatchHistoryItemBorder,
-        (newValue) => {
-          this._setting.set(OngoingGameRenderer.id, 'frontend/showMatchHistoryItemBorder', newValue)
-        }
-      )
-
-      watch(
-        () => store.frontendSettings.playerCardTags,
-        (newValue) => {
-          this._setting.set(OngoingGameRenderer.id, 'frontend/playerCard', toRaw(newValue))
-        },
-        { deep: true }
-      )
+    const shouldRoute = computed(() => {
+      return store.queryStage.phase !== 'unavailable'
     })
+
+    watch(
+      () => shouldRoute.value,
+      (value) => {
+        if (value && store.frontendSettings.autoRouteWhenGameStarts) {
+          router.replace({ name: 'ongoing-game' })
+        }
+      },
+      { immediate: true }
+    )
   }
 
-  async onDispose() {
-    this._scope.stop()
-  }
+  async onDispose() {}
 }

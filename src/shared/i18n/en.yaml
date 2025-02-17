@@ -155,6 +155,10 @@ OngoingGameSettings:
     label: Enable
     description: Perform match analysis when entering champion selection or during a match.
 
+  autoRouteWhenGameStarts:
+    label: Auto Route to Ongoing-Game
+    description: Automatically switch to the ongoing-game page when entering the champion selection phase or when the game starts.
+
   matchHistoryLoadCount:
     label: Match History Load Count
     description: Number of matches to fetch for analyzing each player's performance on the match page.
@@ -1612,7 +1616,7 @@ Opgg:
         auto: Decide based on the current Flash position
     autoApply:
       label: Auto-Apply
-      description: If the champion's data matches the current mode, automatically apply the summoner spells, runes with the highest usage rate. Only works when the OP.GG window is enabled and visible
+      description: If the champion's data matches the current mode, automatically apply the summoner spells, runes with the highest pick rate. Only works when the OP.GG window is enabled and not hidden
 
   success: 'Request sent: {{reason}}'
   summonerSpells: Summoner Spells

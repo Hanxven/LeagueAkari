@@ -48,7 +48,6 @@ export const useAuxWindowStore = defineStore('shard:main-window-renderer/aux-win
   const status = ref('normal')
   const focus = ref('focused')
   const show = ref(true)
-  const functionality = ref('indicator')
   const ready = ref(false)
 
   return {
@@ -56,7 +55,6 @@ export const useAuxWindowStore = defineStore('shard:main-window-renderer/aux-win
     status,
     focus,
     show,
-    functionality,
     ready
   }
 })

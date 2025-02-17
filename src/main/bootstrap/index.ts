@@ -20,6 +20,7 @@ import { LeagueClientUxMain } from '@main/shards/league-client-ux'
 import { LoggerFactoryMain } from '@main/shards/logger-factory'
 import { MobxUtilsMain } from '@main/shards/mobx-utils'
 import { OngoingGameMain } from '@main/shards/ongoing-game'
+import { PlayerStalkingMain } from '@main/shards/player-stalking'
 import { RendererDebugMain } from '@main/shards/renderer-debug'
 import { RespawnTimerMain } from '@main/shards/respawn-timer'
 import { RiotClientMain } from '@main/shards/riot-client'
@@ -194,14 +195,12 @@ export function bootstrap() {
     }
 
     // basic fundamental shards
-
     manager.use(AkariIpcMain)
     manager.use(AppCommonMain)
     manager.use(LoggerFactoryMain)
     manager.use(MobxUtilsMain)
 
     // connection & data provider shards
-
     manager.use(ConfigMigrateMain)
     manager.use(SettingFactoryMain)
     manager.use(StorageMain)
@@ -213,7 +212,6 @@ export function bootstrap() {
     manager.use(RiotClientMain)
 
     // application specific shards
-
     manager.use(ClientInstallationMain)
     manager.use(WindowManagerMain)
     manager.use(TrayMain)
@@ -227,6 +225,7 @@ export function bootstrap() {
     manager.use(AutoSelectMain)
     manager.use(InGameSendMain)
     manager.use(OngoingGameMain)
+    manager.use(PlayerStalkingMain)
     manager.use(RespawnTimerMain)
     manager.use(SavedPlayerMain)
     manager.use(SgpMain)

@@ -35,6 +35,7 @@ import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { greeting } from '@renderer-shared/utils/greeting'
@@ -58,7 +59,7 @@ const sus = useSelfUpdateStore()
 const as = useAppCommonStore()
 
 const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
-
+const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
 const app = useInstance<AppCommonRenderer>('app-common-renderer')
 
 const { t } = useTranslation()
@@ -185,6 +186,8 @@ useKeyboardCombo('AKARI', {
 })
 
 const preferMica = useMicaAvailability()
+
+og.setupAutoRouteWhenGameStarts()
 </script>
 
 <style lang="less">
