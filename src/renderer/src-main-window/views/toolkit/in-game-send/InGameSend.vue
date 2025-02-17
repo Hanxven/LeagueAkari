@@ -530,11 +530,6 @@ watch(
   }
 }
 
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .single-root {
   height: 100%;
 }

@@ -88,11 +88,6 @@ const handleSaveTag = async () => {
 </script>
 
 <style lang="less" scoped>
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .summoner-info {
   display: flex;
   align-items: center;

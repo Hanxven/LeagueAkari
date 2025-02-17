@@ -433,11 +433,6 @@ const handleReload = () => {
   margin-bottom: 8px;
 }
 
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .check-box {
   font-size: 13px;
 }

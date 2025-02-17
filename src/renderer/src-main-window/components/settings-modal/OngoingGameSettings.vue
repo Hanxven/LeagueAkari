@@ -275,21 +275,6 @@ const sgps = useSgpStore()
 </script>
 
 <style lang="less" scoped>
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
-
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.card-header-title.disabled {
-  color: rgba(255, 255, 255, 0.35);
-}
-
 .unsupported-sgp-server {
   color: rgb(230, 114, 41);
   font-weight: bold;

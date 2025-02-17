@@ -104,11 +104,6 @@ const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
   }
 }
 
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .card-header-title.disabled {
   color: rgba(255, 255, 255, 0.35);
 }

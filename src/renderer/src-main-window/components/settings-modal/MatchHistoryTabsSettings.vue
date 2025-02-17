@@ -71,11 +71,6 @@ const lcs = useLeagueClientStore()
   }
 }
 
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 [data-theme='dark'] {
   .sgp-server-hint-ok {
     color: #63e2b7;

@@ -1,3 +1,4 @@
+import '@renderer-shared/assets/css/base-styles.less'
 import { i18next } from '@renderer-shared/i18n'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'

@@ -366,9 +366,4 @@ const handleLoadAvailableBots = async (show: boolean) => {
     margin-bottom: 12px;
   }
 }
-
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
 </style>

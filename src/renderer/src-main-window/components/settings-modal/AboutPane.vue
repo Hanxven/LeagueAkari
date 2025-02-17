@@ -297,11 +297,6 @@ const processStatus = computed(() => {
   color: rgb(87, 87, 87);
 }
 
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .divider {
   height: 1px;
   background-color: rgb(54, 54, 54);
@@ -317,12 +312,6 @@ const processStatus = computed(() => {
 [data-theme='light'] {
   .divider {
     background-color: rgba(0, 0, 0, 0.1);
-  }
-}
-
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
   }
 }
 

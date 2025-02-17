@@ -406,11 +406,6 @@ const handleReroll = async (grabBack = false) => {
   border-radius: 2px;
 }
 
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .raw-popover {
   background-color: rgba(0, 0, 0, 0.866);
   padding: 4px 8px;

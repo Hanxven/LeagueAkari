@@ -125,7 +125,7 @@ import MatchHistoryTabsSettings from './MatchHistoryTabsSettings.vue'
 import MiscSettings from './MiscSettings.vue'
 import OngoingGameSettings from './OngoingGameSettings.vue'
 import OpggWindowSettings from './OpggWindowSettings.vue'
-import StorageSettings from './StorageSettings.vue'
+import StorageSettings from './storage-settings/StorageSettings.vue'
 
 const { t } = useTranslation()
 
@@ -169,11 +169,6 @@ watch(
   margin-top: 8px;
   font-size: 12px;
   color: rgb(87, 87, 87);
-}
-
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
 }
 
 .divider {

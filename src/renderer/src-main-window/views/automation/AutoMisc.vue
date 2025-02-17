@@ -88,11 +88,6 @@ watchEffect(() => {
   }
 }
 
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .outer-wrapper {
   position: relative;
   height: 100%;

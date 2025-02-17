@@ -73,11 +73,6 @@ const handleRead = () => {
 </script>
 
 <style lang="less" scoped>
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .para,
 .small-link {
   font-size: 13px;

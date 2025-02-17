@@ -48,11 +48,6 @@ const show = defineModel<boolean>('show', { default: false })
 </script>
 
 <style lang="less" scoped>
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .para {
   font-size: 13px;
 }

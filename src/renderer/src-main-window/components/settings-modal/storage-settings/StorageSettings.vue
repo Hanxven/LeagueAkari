@@ -12,36 +12,14 @@
       'border-left': '1px solid var(--n-border-color)'
     }"
   >
-    <NTabPane name="设置项" display-directive="show">
-      <NScrollbar>
-        <NCard size="small">
-          <template #header>
-            <span class="card-header-title">{{ t('StorageSettings.settings.title') }}</span>
-          </template>
-          <ControlItem
-            class="control-item-margin"
-            :label="t('StorageSettings.settings.export.label')"
-            :label-description="t('StorageSettings.settings.export.description')"
-            :label-width="400"
-          >
-            <NButton type="primary" secondary size="small" @click="handleExportSettings">
-              {{ t('StorageSettings.settings.export.button') }}
-            </NButton>
-          </ControlItem>
-          <ControlItem
-            class="control-item-margin"
-            :label="t('StorageSettings.settings.import.label')"
-            :label-description="t('StorageSettings.settings.import.description')"
-            :label-width="400"
-          >
-            <NButton type="primary" secondary size="small" @click="handleImportSettings">{{
-              t('StorageSettings.settings.import.button')
-            }}</NButton>
-          </ControlItem>
-        </NCard>
-      </NScrollbar>
+    <NTabPane :tab="t('StorageSettings.tabs.settings')" name="settings" display-directive="show">
+      <SavedSettings />
     </NTabPane>
-    <NTabPane name="标记的玩家" display-directive="show">
+    <NTabPane
+      :tab="t('StorageSettings.tabs.tagged-players')"
+      name="tagged-players"
+      display-directive="show"
+    >
       <NScrollbar>
         <NCard size="small">
           <template #header
@@ -88,6 +66,8 @@ import {
   useMessage
 } from 'naive-ui'
 import { computed, h, onMounted, reactive, ref, useCssModule } from 'vue'
+
+import SavedSettings from './SavedSettings.vue'
 
 const { t } = useTranslation()
 
@@ -288,92 +268,9 @@ onMounted(() => {
 const rowBaseClass = () => {
   return styles['row-base']
 }
-
-const handleExportSettings = async () => {
-  try {
-    const exportPath = await s.exportSettingsToJsonFile()
-
-    if (exportPath) {
-      message.success(() => t('StorageSettings.settings.exported', { path: exportPath }))
-    }
-  } catch (error: any) {
-    message.error(() => t('StorageSettings.settings.errorExport', { reason: error.message }))
-  }
-}
-
-const dialog = useDialog()
-
-// TODO I18N
-const handleImportSettings = async () => {
-  dialog.warning({
-    title: () => t('StorageSettings.settings.import.label'),
-    content: () => t('StorageSettings.settings.import.dialogWarning'),
-    positiveText: t('StorageSettings.settings.import.dialogPositiveText'),
-    negativeText: t('StorageSettings.settings.import.dialogNegativeText'),
-    onPositiveClick: async () => {
-      try {
-        await s.importSettingsFromJsonFile()
-      } catch (error: any) {
-        if (error.code) {
-          switch (error.code) {
-            case 'InvalidSettingsFile':
-            case 'InvalidSettingsData':
-              message.error(() => t('StorageSettings.settings.errorCode.InvalidSettingsFile'))
-              break
-            case 'InvalidDatabaseVersion':
-              message.error(() => t('StorageSettings.settings.errorCode.InvalidDatabaseVersion'))
-              break
-            default:
-              message.error(() =>
-                t('StorageSettings.settings.errorCode.importDefault', { reason: error.message })
-              )
-              break
-          }
-        } else {
-          message.error(() =>
-            t('StorageSettings.settings.errorCode.importDefault', { reason: error.message })
-          )
-        }
-      }
-    }
-  })
-}
 </script>
 
 <style lang="less" scoped>
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
-
-.control-line {
-  display: flex;
-  align-items: center;
-  font-size: 13px;
-  height: 30px;
-
-  &:not(:last-child) {
-    margin-bottom: 16px;
-  }
-
-  .label {
-    width: 130px;
-  }
-
-  // .control {
-  // }
-
-  .input-number {
-    width: 120px;
-  }
-}
-
 .operations {
   display: flex;
   margin-bottom: 8px;

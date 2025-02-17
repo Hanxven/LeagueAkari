@@ -54,11 +54,6 @@ const ac = useInstance<AutoChampConfigRenderer>('auto-champ-config-renderer')
   }
 }
 
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .outer-wrapper {
   position: relative;
   height: 100%;

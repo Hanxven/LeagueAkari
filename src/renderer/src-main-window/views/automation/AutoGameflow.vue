@@ -405,11 +405,6 @@ const handleChangeInvitationStrategy = (queueType: string, strategy: string) => 
   }
 }
 
-.card-header-title {
-  font-weight: bold;
-  font-size: 18px;
-}
-
 .divider {
   margin-top: 12px;
   margin-bottom: 12px;

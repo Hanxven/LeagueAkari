@@ -389,29 +389,32 @@ DebugSettings:
 
 StorageSettings:
   title: 存储
+  tabs:
+    settings: 设置项
+    tagged-players: 标记的玩家
 
-  settings:
-    title: 设置项
-    export:
-      label: 导出设置项
-      description: 将应用目前的设置项导出为 JSON 文件
-      button: 导出
+SavedSettings:
+  title: 设置项
+  export:
+    label: 导出设置项
+    description: 将应用目前的设置项导出为 JSON 文件
+    button: 导出
 
-    import:
-      label: 导入设置项
-      description: 从 JSON 文件导入设置项
-      dialogWarning: 导入设置项将会覆盖当前已有的设置项，并重启应用。是否继续？
-      dialogPositiveText: 导入
-      dialogNegativeText: 取消
-      button: 导入
+  import:
+    label: 导入设置项
+    description: 从 JSON 文件导入设置项
+    dialogWarning: 导入设置项将会覆盖当前已有的设置项，并重启应用。是否继续？
+    dialogPositiveText: 导入
+    dialogNegativeText: 取消
+    button: 导入
 
-    errorCode:
-      InvalidSettingsFile: 无效的设置文件
-      InvalidDatabaseVersion: 目标版本的设置文件不受支持
-      importDefault: 无法导入设置项：{{reason}}
+  errorCode:
+    InvalidSettingsFile: 无效的设置文件
+    InvalidDatabaseVersion: 目标版本的设置文件不受支持
+    importDefault: 无法导入设置项：{{reason}}
 
-    exported: 已导出设置项：{{path}}
-    errorExport: 导出设置项失败：{{reason}}
+  exported: 已导出设置项：{{path}}
+  errorExport: 导出设置项失败：{{reason}}
 
 AboutPane:
   title: 关于
