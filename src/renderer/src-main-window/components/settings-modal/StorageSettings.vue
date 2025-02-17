@@ -22,7 +22,7 @@
             class="control-item-margin"
             :label="t('StorageSettings.settings.export.label')"
             :label-description="t('StorageSettings.settings.export.description')"
-            :label-width="320"
+            :label-width="400"
           >
             <NButton type="primary" secondary size="small" @click="handleExportSettings">
               {{ t('StorageSettings.settings.export.button') }}
@@ -32,7 +32,7 @@
             class="control-item-margin"
             :label="t('StorageSettings.settings.import.label')"
             :label-description="t('StorageSettings.settings.import.description')"
-            :label-width="320"
+            :label-width="400"
           >
             <NButton type="primary" secondary size="small" @click="handleImportSettings">{{
               t('StorageSettings.settings.import.button')

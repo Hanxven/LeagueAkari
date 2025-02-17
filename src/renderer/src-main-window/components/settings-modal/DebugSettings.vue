@@ -33,7 +33,7 @@
         class="control-item-margin"
         :label="t('DebugSettings.electron.devTools.label')"
         :label-description="t('DebugSettings.electron.devTools.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NButton size="small" secondary type="primary" @click="handleToggleDevtools">{{
           t('DebugSettings.electron.devTools.button')
@@ -43,7 +43,7 @@
         class="control-item-margin"
         :label="t('DebugSettings.electron.reload.label')"
         :label-description="t('DebugSettings.electron.reload.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NButton size="small" secondary type="primary" @click="handleReload">
           {{ t('DebugSettings.electron.reload.button') }}
@@ -58,7 +58,7 @@
         class="control-item-margin"
         :label="t('DebugSettings.files.logs.label')"
         :label-description="t('DebugSettings.files.logs.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NButton size="small" secondary type="primary" @click="() => handleShowLogsDir()"
           >{{ t('DebugSettings.files.logs.button') }}
@@ -67,7 +67,7 @@
       <ControlItem
         class="control-item-margin"
         :label="t('DebugSettings.files.appData.label')"
-        :label-width="320"
+        :label-width="400"
       >
         <template #labelDescription>
           {{ t('DebugSettings.files.appData.description.part1') }}
@@ -211,7 +211,7 @@
         class="control-item-margin"
         :label="t('DebugSettings.kyokoMode.label')"
         :label-description="t('DebugSettings.kyokoMode.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"

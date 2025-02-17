@@ -7,7 +7,7 @@
       <ControlItem
         class="control-item-margin"
         :label="t('AuxWindowSettings.enabled.label')"
-        :label-width="320"
+        :label-width="400"
       >
         <template #labelDescription>
           <div>{{ t('AuxWindowSettings.enabled.description') }}</div>
@@ -27,7 +27,7 @@
         class="control-item-margin"
         :label="t('AuxWindowSettings.autoShow.label')"
         :label-description="t('AuxWindowSettings.autoShow.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"
@@ -39,7 +39,7 @@
         class="control-item-margin"
         :label="t('AuxWindowSettings.opacity.label')"
         :label-description="t('AuxWindowSettings.opacity.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSlider
           size=""
@@ -56,7 +56,7 @@
         class="control-item-margin"
         :label="t('AuxWindowSettings.showSkinSelector.label')"
         :label-description="t('AuxWindowSettings.showSkinSelector.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"
@@ -68,7 +68,7 @@
         class="control-item-margin"
         :label="t('AuxWindowSettings.resetWindowPosition.label')"
         :label-description="t('AuxWindowSettings.resetWindowPosition.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NButton
           size="small"

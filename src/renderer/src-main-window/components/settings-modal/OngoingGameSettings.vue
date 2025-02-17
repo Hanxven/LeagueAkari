@@ -8,7 +8,7 @@
         class="control-item-margin"
         :label="t('OngoingGameSettings.enabled.label')"
         :label-description="t('OngoingGameSettings.enabled.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"
@@ -20,7 +20,7 @@
         class="control-item-margin"
         :label="t('OngoingGameSettings.autoRouteWhenGameStarts.label')"
         :label-description="t('OngoingGameSettings.autoRouteWhenGameStarts.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch size="small" v-model:value="ogs.frontendSettings.autoRouteWhenGameStarts" />
       </ControlItem>
@@ -28,7 +28,7 @@
         class="control-item-margin"
         :label="t('OngoingGameSettings.matchHistoryLoadCount.label')"
         :label-description="t('OngoingGameSettings.matchHistoryLoadCount.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NInputNumber
           style="width: 100px"
@@ -47,7 +47,7 @@
             threshold: ogs.settings.premadeTeamThreshold
           })
         "
-        :label-width="320"
+        :label-width="400"
       >
         <NInputNumber
           style="width: 100px"
@@ -61,7 +61,7 @@
         class="control-item-margin"
         :label="t('OngoingGameSettings.concurrency.label')"
         :label-description="t('OngoingGameSettings.concurrency.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NInputNumber
           style="width: 100px"
@@ -79,7 +79,7 @@
             countV: ogs.settings.gameTimelineLoadCount
           })
         "
-        :label-width="320"
+        :label-width="400"
       >
         <NInputNumber
           style="width: 100px"
@@ -92,7 +92,7 @@
       <ControlItem
         class="control-item-margin"
         :label="t('OngoingGameSettings.matchHistoryUseSgpApi.label')"
-        :label-width="320"
+        :label-width="400"
       >
         <template #labelDescription>
           <div>{{ t('OngoingGameSettings.matchHistoryUseSgpApi.description') }}</div>
@@ -118,7 +118,7 @@
         class="control-item-margin"
         :label="t('OngoingGameSettings.matchHistoryTagPreference.label')"
         :label-description="t('OngoingGameSettings.matchHistoryTagPreference.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NRadioGroup
           :value="ogs.settings.matchHistoryTagPreference"
@@ -139,7 +139,7 @@
       </template>
       <ControlItem
         class="control-item-margin"
-        :label-width="320"
+        :label-width="400"
         :label="t('OngoingGameSettings.showChampionUsage.label')"
         :label-description="t('OngoingGameSettings.showChampionUsage.description')"
       >
@@ -157,7 +157,7 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label-width="320"
+        :label-width="400"
         :label="t('OngoingGameSettings.showMatchHistoryItemBorder.label')"
         :label-description="t('OngoingGameSettings.showMatchHistoryItemBorder.description')"
       >
@@ -165,7 +165,7 @@
       </ControlItem>
       <ControlItem
         class="control-item-margin"
-        :label-width="320"
+        :label-width="400"
         :label="t('OngoingGameSettings.playerCardTags.label')"
         align="start"
         :label-description="t('OngoingGameSettings.playerCardTags.description')"

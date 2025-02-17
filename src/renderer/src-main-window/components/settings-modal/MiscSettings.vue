@@ -8,7 +8,7 @@
         class="control-item-margin"
         :label="t('MiscSettings.respawnTimer.enabled.label')"
         :label-description="t('MiscSettings.respawnTimer.enabled.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"

@@ -8,7 +8,7 @@
         class="control-item-margin"
         :label="t('AppSettings.basic.mainWindowCloseAction.label')"
         :label-description="t('AppSettings.basic.mainWindowCloseAction.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSelect
           style="width: 160px"
@@ -22,7 +22,7 @@
         class="control-item-margin"
         label="语言 / Language"
         label-description="设置应用的主语言 / Set primary language for League Akari"
-        :label-width="320"
+        :label-width="400"
       >
         <NSelect
           style="width: 160px"
@@ -37,7 +37,7 @@
         class="control-item-margin"
         label="Theme Color (experimental)"
         label-description="Theme color for League Akari"
-        :label-width="320"
+        :label-width="400"
       >
         <NSelect
           style="width: 160px"
@@ -53,7 +53,7 @@
         class="control-item-margin"
         :label="t('AppSettings.basic.backgroundMaterial.label')"
         :label-description="t('AppSettings.basic.backgroundMaterial.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSelect
           style="width: 160px"
@@ -72,7 +72,7 @@
         class="control-item-margin"
         :label="t('AppSettings.selfUpdate.autoCheckUpdates.label')"
         :label-description="t('AppSettings.selfUpdate.autoCheckUpdates.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"
@@ -84,7 +84,7 @@
         class="control-item-margin"
         :label="t('AppSettings.selfUpdate.autoDownloadUpdates.label')"
         :label-description="t('AppSettings.selfUpdate.autoDownloadUpdates.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"
@@ -96,7 +96,7 @@
         class="control-item-margin"
         :label="t('AppSettings.selfUpdate.downloadSource.label')"
         :label-description="t('AppSettings.selfUpdate.downloadSource.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NFlex align="center">
           <NSelect
@@ -132,7 +132,7 @@
         class="control-item-margin"
         :label="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.label')"
         :label-description="t('AppSettings.mainWindowUi.useProfileSkinAsBackground.description')"
-        :label-width="320"
+        :label-width="400"
         :disabled="preferMica"
       >
         <NSwitch
@@ -150,7 +150,7 @@
         class="control-item-margin"
         :label="t('AppSettings.lcConnection.autoConnect.label')"
         :label-description="t('AppSettings.lcConnection.autoConnect.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"
@@ -162,7 +162,7 @@
         class="control-item-margin"
         :label="t('AppSettings.lcConnection.useWmic.label')"
         :label-description="t('AppSettings.lcConnection.useWmic.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"
@@ -179,7 +179,7 @@
         class="control-item-margin"
         :label="t('AppSettings.misc.httpProxy.strategy.label')"
         :label-description="t('AppSettings.misc.httpProxy.strategy.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSelect
           :options="httpProxyStrategies"
@@ -197,7 +197,7 @@
           class="control-item-margin"
           :label="t('AppSettings.misc.httpProxy.host.label')"
           :label-description="t('AppSettings.misc.httpProxy.host.description')"
-          :label-width="320"
+          :label-width="400"
         >
           <NInput
             :value="as.settings.httpProxy.host"
@@ -212,7 +212,7 @@
           class="control-item-margin"
           :label="t('AppSettings.misc.httpProxy.port.label')"
           :label-description="t('AppSettings.misc.httpProxy.port.description')"
-          :label-width="320"
+          :label-width="400"
         >
           <NInputNumber
             :show-button="false"
@@ -229,7 +229,7 @@
         class="control-item-margin"
         :label="t('AppSettings.misc.disableHardwareAcceleration.label')"
         :label-description="t('AppSettings.misc.disableHardwareAcceleration.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"

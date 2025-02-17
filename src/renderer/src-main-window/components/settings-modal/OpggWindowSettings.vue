@@ -7,7 +7,7 @@
       <ControlItem
         class="control-item-margin"
         :label="t('OpggWindowSettings.enabled.label')"
-        :label-width="320"
+        :label-width="400"
       >
         <template #labelDescription>
           <div>{{ t('OpggWindowSettings.enabled.description') }}</div>
@@ -27,7 +27,7 @@
         class="control-item-margin"
         :label="t('OpggWindowSettings.autoShow.label')"
         :label-description="t('OpggWindowSettings.autoShow.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch
           size="small"
@@ -39,7 +39,7 @@
         class="control-item-margin"
         :label="t('OpggWindowSettings.opacity.label')"
         :label-description="t('OpggWindowSettings.opacity.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSlider
           size=""
@@ -56,7 +56,7 @@
         class="control-item-margin"
         :label="t('OpggWindowSettings.resetWindowPosition.label')"
         :label-description="t('OpggWindowSettings.resetWindowPosition.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NButton
           size="small"

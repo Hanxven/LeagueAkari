@@ -9,32 +9,93 @@
     <template #header>
       <span class="card-header-title">{{ t('SettingModal.title') }}</span>
     </template>
-    <NTabs ref="tabs" type="line" animated size="small" v-model:value="tabName">
-      <NTabPane name="basic" :tab="t('AppSettings.title')">
+    <NTabs
+      ref="tabs"
+      type="line"
+      animated
+      size="medium"
+      v-model:value="tabName"
+      :theme-overrides="{ tabGapMediumLine: '18px' }"
+    >
+      <NTabPane name="basic">
+        <template #tab>
+          <div class="tab-icon-title">
+            <NIcon class="icon"><Settings16FilledIcon /> </NIcon>
+            <span>{{ t('AppSettings.title') }}</span>
+          </div>
+        </template>
         <AppSettings />
       </NTabPane>
-      <NTabPane name="match-history-tabs" :tab="t('MatchHistoryTabsSettings.title')">
+      <NTabPane name="match-history-tabs">
+        <template #tab>
+          <div class="tab-icon-title">
+            <NIcon class="icon"><LayersIcon /> </NIcon>
+            <span>{{ t('MatchHistoryTabsSettings.title') }}</span>
+          </div>
+        </template>
         <MatchHistoryTabsSettings />
       </NTabPane>
-      <NTabPane name="ongoing-game" :tab="t('OngoingGameSettings.title')">
+      <NTabPane name="ongoing-game">
+        <template #tab>
+          <div class="tab-icon-title">
+            <NIcon class="icon"><Games24FilledIcon /> </NIcon>
+            <span>{{ t('OngoingGameSettings.title') }}</span>
+          </div>
+        </template>
         <OngoingGameSettings />
       </NTabPane>
-      <NTabPane name="aux-window" :tab="t('AuxWindowSettings.title')">
+      <NTabPane name="aux-window">
+        <template #tab>
+          <div class="tab-icon-title">
+            <NIcon class="icon"><Window24FilledIcon /> </NIcon>
+            <span>{{ t('AuxWindowSettings.title') }}</span>
+          </div>
+        </template>
         <AuxWindowSettings />
       </NTabPane>
-      <NTabPane name="opgg-window" :tab="t('OpggWindowSettings.title')">
+      <NTabPane name="opgg-window">
+        <template #tab>
+          <div class="tab-icon-title">
+            <OpggIcon class="opgg-icon" />
+            <span>{{ t('OpggWindowSettings.title') }}</span>
+          </div>
+        </template>
         <OpggWindowSettings />
       </NTabPane>
       <NTabPane name="misc" :tab="t('MiscSettings.title')">
+        <template #tab>
+          <div class="tab-icon-title">
+            <NIcon class="icon"><ToolkitIcon /> </NIcon>
+            <span>{{ t('MiscSettings.title') }}</span>
+          </div>
+        </template>
         <MiscSettings />
       </NTabPane>
-      <NTabPane name="debug" :tab="t('DebugSettings.title')">
+      <NTabPane name="debug">
+        <template #tab>
+          <div class="tab-icon-title">
+            <NIcon class="icon"><DebugIcon /> </NIcon>
+            <span>{{ t('DebugSettings.title') }}</span>
+          </div>
+        </template>
         <DebugSettings />
       </NTabPane>
-      <NTabPane v-if="as.settings.isInKyokoMode" name="storage" :tab="t('StorageSettings.title')">
+      <NTabPane name="storage">
+        <template #tab>
+          <div class="tab-icon-title">
+            <NIcon class="icon"><Storage24FilledIcon /> </NIcon>
+            <span>{{ t('StorageSettings.title') }}</span>
+          </div>
+        </template>
         <StorageSettings />
       </NTabPane>
-      <NTabPane name="about" :tab="t('AboutPane.title')">
+      <NTabPane name="about">
+        <template #tab>
+          <div class="tab-icon-title">
+            <NIcon class="icon"><InfoSharpIcon /> </NIcon>
+            <span>{{ t('AboutPane.title') }}</span>
+          </div>
+        </template>
         <AboutPane />
       </NTabPane>
     </NTabs>
@@ -42,9 +103,18 @@
 </template>
 
 <script setup lang="ts">
+import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { Debug as DebugIcon, Layers as LayersIcon, ToolKit as ToolkitIcon } from '@vicons/carbon'
+import {
+  Games24Filled as Games24FilledIcon,
+  Settings16Filled as Settings16FilledIcon,
+  Storage24Filled as Storage24FilledIcon,
+  Window24Filled as Window24FilledIcon
+} from '@vicons/fluent'
+import { InfoSharp as InfoSharpIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NModal, NTabPane, NTabs } from 'naive-ui'
+import { NIcon, NModal, NTabPane, NTabs } from 'naive-ui'
 import { nextTick, useCssModule, useTemplateRef, watch } from 'vue'
 
 import AboutPane from './AboutPane.vue'
@@ -111,12 +181,29 @@ watch(
   background-color: rgb(54, 54, 54);
   margin: 12px 24px;
 }
+
+.tab-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 4px;
+  vertical-align: middle;
+
+  .icon {
+    font-size: 18px;
+  }
+
+  .opgg-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
 </style>
 
 <style lang="less" module>
 .settings-modal {
   width: 90%;
   min-width: 720px;
-  max-width: 1000px;
+  max-width: 1106px;
 }
 </style>

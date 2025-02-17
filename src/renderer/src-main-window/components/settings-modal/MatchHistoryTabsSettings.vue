@@ -8,14 +8,14 @@
         class="control-item-margin"
         :label="t('MatchHistoryTabsSettings.refreshTabsAfterGameEnds.label')"
         :label-description="t('MatchHistoryTabsSettings.refreshTabsAfterGameEnds.description')"
-        :label-width="320"
+        :label-width="400"
       >
         <NSwitch size="small" v-model:value="mhs.settings.refreshTabsAfterGameEnds" />
       </ControlItem>
       <ControlItem
         class="control-item-margin"
         :label="t('MatchHistoryTabsSettings.matchHistoryUseSgpApi.label')"
-        :label-width="320"
+        :label-width="400"
       >
         <template #labelDescription>
           <div>{{ t('MatchHistoryTabsSettings.matchHistoryUseSgpApi.description') }}</div>
