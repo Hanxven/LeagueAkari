@@ -215,7 +215,7 @@ const renderSgpServerTag = (sgpServerId: string) => {
       bordered: false,
       type: isTencentServer(sgpServerId) ? 'success' : 'info'
     },
-    () => sgps.availability.sgpServers.servers[sgpServerId]?.name || sgpServerId
+    () => t(`sgpServers.${sgpServerId}`, sgpServerId)
   )
 }
 

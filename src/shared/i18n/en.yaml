@@ -2056,3 +2056,29 @@ common:
     MASTER: MASTR
     GRANDMASTER: GM
     CHALLENGER: CHALL
+
+sgpServers:
+  TENCENT_HN10: Black Rose
+  TENCENT_HN1: Ionia
+  TENCENT_NJ100: League 1
+  TENCENT_GZ100: League 2
+  TENCENT_CQ100: League 3
+  TENCENT_TJ100: League 4
+  TENCENT_TJ101: League 5
+  TENCENT_BGP2: Summit
+  TENCENT_PBE: Tencent PBE
+  TW2: Taiwan
+  SG2: Singapore
+  PH2: Philippines
+  VN2: Vietnam
+  PBE: PBE
+  EUN: Europe NE
+  EUW: Europe West
+  KR: Korea
+  BR1: Brazil
+  LA1: Latin America
+  LA2: Latin America
+  OC1: Oceania
+  TR1: Turkey
+  RU: Russia
+  JP1: Japan

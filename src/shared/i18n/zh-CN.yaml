@@ -2060,3 +2060,29 @@ common:
     MASTER: 大师
     GRANDMASTER: 宗师
     CHALLENGER: 王者
+
+sgpServers:
+  TENCENT_HN10: 黑色玫瑰
+  TENCENT_HN1: 艾欧尼亚
+  TENCENT_NJ100: 联盟一区
+  TENCENT_GZ100: 联盟二区
+  TENCENT_CQ100: 联盟三区
+  TENCENT_TJ100: 联盟四区
+  TENCENT_TJ101: 联盟五区
+  TENCENT_BGP2: 峡谷之巅
+  TENCENT_PBE: 体验服
+  TW2: 台湾
+  SG2: 新加坡
+  PH2: 菲律宾
+  VN2: 越南
+  PBE: PBE
+  EUN: 欧洲东北
+  EUW: 欧洲西
+  KR: 韩国
+  BR1: 巴西
+  LA1: 拉丁美洲
+  LA2: 拉丁美洲
+  OC1: 大洋洲
+  TR1: 土耳其
+  RU: 俄罗斯
+  JP1: 日本
