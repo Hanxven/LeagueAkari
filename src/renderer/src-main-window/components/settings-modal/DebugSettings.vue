@@ -241,7 +241,9 @@
           {{ runtimeInfo.env.NODE_ENV }}
         </NDescriptionsItem>
         <NDescriptionsItem label="Argv" :span="6">
-          {{ runtimeInfo.argv.join(' ') }}
+          <span style="font-family: monospace">{{
+            runtimeInfo.argv.map((a: string) => (a.includes(' ') ? `"${a}"` : a)).join(' ')
+          }}</span>
         </NDescriptionsItem>
         <NDescriptionsItem label="Electron">
           {{ runtimeInfo.versions.electron }}
