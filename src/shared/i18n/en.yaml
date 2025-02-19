@@ -413,6 +413,33 @@ SavedSettings:
   exported: 'Settings exported: {{path}}'
   errorExport: 'Failed to export settings: {{reason}}'
 
+TaggedPlayers:
+  editModal:
+    title: Edit Tagged Player
+    inputPlaceholder: Edit this tag
+
+  columns:
+    tagger: Tagger
+    tagged: Tagged
+    tag: Tag
+    sgpServer: Server
+
+  refreshButton: Refresh
+  onlyCurrentAccountCheckbox: Only Current Account
+  na: (Unavailable) {{truncatedPuuid}}...
+  player: 'Player: {{puuid}}'
+  empty: (Empty)
+  naPopoverContent: Unable to retrieve information for this summoner due to the server being unavailable or not loaded
+
+  saveButton: Save
+  cancelButton: Cancel
+  editButton: Edit
+  deleteButton: Delete
+
+  deletePopconfirmContent: Confirm deletion? This operation cannot be undone
+  updated: Updated
+  updateFailed: Update failed {{reason}}
+
 AboutPane:
   title: About
   line1: ' (联盟阿卡林, Version {{version}}) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'

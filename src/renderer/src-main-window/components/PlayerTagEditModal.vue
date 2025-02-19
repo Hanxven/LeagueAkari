@@ -61,7 +61,7 @@ const emits = defineEmits<{
 }>()
 
 const { summoner, tags } = defineProps<{
-  puuid: string
+  puuid?: string
   summoner?: SummonerInfo | null
   tags?: PlayerTagDto[]
 }>()

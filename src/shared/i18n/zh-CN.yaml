@@ -55,7 +55,7 @@ AppSettings:
     title: 基础
 
     mainWindowCloseAction:
-      label: 窗口关闭策略
+      label: 主窗口关闭策略
       description: 当关闭主窗口时所执行的行为
       options:
         minimize-to-tray: 最小化到托盘
@@ -416,11 +416,38 @@ SavedSettings:
   exported: 已导出设置项：{{path}}
   errorExport: 导出设置项失败：{{reason}}
 
+TaggedPlayers:
+  editModal:
+    title: 编辑标记玩家
+    inputPlaceholder: 编辑此标记
+
+  columns:
+    tagger: 标记者
+    tagged: 被标记者
+    tag: 标记
+    sgpServer: 区服
+
+  refreshButton: 刷新
+  onlyCurrentAccountCheckbox: 仅当前账户
+  na: (不可用) {{truncatedPuuid}}...
+  player: '玩家: {{puuid}}'
+  empty: (空)
+  naPopoverContent: 由于未加载或未位于可加载服务器，无法获取该召唤师的信息
+
+  saveButton: 保存
+  cancelButton: 取消
+  editButton: 编辑
+  deleteButton: 删除
+
+  deletePopconfirmContent: 确认删除？此操作无法恢复
+  updated: 已更新
+  updateFailed: 更新失败 {{reason}}
+
 AboutPane:
   title: 关于
   line1: ' (联盟阿卡林，Version {{version}}) 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖'
   line2: 项目参考
-  copyright: © 2025 Hanxven. League Akari 开源软件，遵循 GPL-3.0 许可证。
+  copyright: © 2025 Hanxven. 本软件为开源软件，遵循 GPL-3.0 许可证。
 
   checkFrom: 从下载源中 ({{ source }}) 检查更新
   checkUpdates: 检查更新

@@ -5,7 +5,7 @@ import { Paths } from '@shared/utils/types'
 import { BrowserWindow, BrowserWindowConstructorOptions, Event, dialog, shell } from 'electron'
 import { comparer, runInAction } from 'mobx'
 import EventEmitter from 'node:events'
-import path from 'path'
+import path from 'node:path'
 
 import { WindowManagerMain, type WindowManagerMainContext } from '.'
 import { AkariProtocolMain } from '../akari-protocol'

@@ -25,6 +25,15 @@ export interface SavedPlayerQueryDto {
   region: string
 }
 
+export interface PaginationDto {
+  page: number
+  pageSize: number
+}
+
+export interface OrderByDto {
+  timeOrder: 'desc' | 'asc'
+}
+
 export interface WithEncounteredGamesQueryDto {
   queueType?: string
 }

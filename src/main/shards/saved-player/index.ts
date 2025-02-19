@@ -1,5 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { Equal } from 'typeorm'
+import { Equal, FindOptionsOrder, FindOptionsWhere, IsNull, Not } from 'typeorm'
 
 import { AkariIpcMain } from '../ipc'
 import { StorageMain } from '../storage'
@@ -8,6 +8,8 @@ import { SavedPlayer } from '../storage/entities/SavedPlayers'
 import {
   EncounteredGameQueryDto,
   EncounteredGameSaveDto,
+  OrderByDto,
+  PaginationDto,
   QueryAllSavedPlayersDto,
   SavedPlayerQueryDto,
   SavedPlayerSaveDto,
@@ -123,9 +125,6 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
       throw new Error('puuid, selfPuuid or region cannot be empty')
     }
 
-    query.region = 'TENCENT'
-    query.rsoPlatformId = 'HN10'
-
     return this._storage.dataSource.manager.remove(SavedPlayer, query)
   }
 
@@ -152,6 +151,59 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     }
 
     return this._storage.dataSource.manager.save(savedPlayer)
+  }
+
+  /**
+   * 用于管理的 API, 查询所有玩家的标记, 甚至可以跨区服查询
+   * @param query
+   */
+  async getAllPlayerTags(query: SavedPlayerQueryDto & PaginationDto & OrderByDto) {
+    const whereClause: FindOptionsWhere<SavedPlayer> = {
+      tag: Not(IsNull())
+    }
+    const orderBy: FindOptionsOrder<SavedPlayer> = {}
+
+    const { page = 1, pageSize = 40 } = query
+
+    if (query.puuid !== undefined) {
+      whereClause.puuid = Equal(query.puuid)
+    }
+
+    if (query.selfPuuid !== undefined) {
+      whereClause.selfPuuid = Equal(query.selfPuuid)
+    }
+
+    if (query.region !== undefined) {
+      whereClause.region = Equal(query.region)
+    }
+
+    if (query.rsoPlatformId !== undefined) {
+      whereClause.rsoPlatformId = Equal(query.rsoPlatformId)
+    }
+
+    if (query.timeOrder) {
+      orderBy.updateAt = query.timeOrder
+    } else {
+      orderBy.updateAt = 'desc'
+    }
+
+    const players = await this._storage.dataSource.manager.find(SavedPlayer, {
+      take: pageSize || 20,
+      skip: (page - 1) * pageSize,
+      where: whereClause,
+      order: orderBy
+    })
+
+    const total = await this._storage.dataSource.manager.count(SavedPlayer, {
+      where: whereClause
+    })
+
+    return {
+      data: players,
+      page,
+      pageSize,
+      total
+    }
   }
 
   /**
@@ -266,6 +318,14 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
       'queryAllSavedPlayers',
       (_, query: QueryAllSavedPlayersDto) => {
         return this.queryAllSavedPlayers(query)
+      }
+    )
+
+    this._ipc.onCall(
+      SavedPlayerMain.id,
+      'getAllPlayerTags',
+      (_, query: SavedPlayerQueryDto & PaginationDto & OrderByDto) => {
+        return this.getAllPlayerTags(query)
       }
     )
   }

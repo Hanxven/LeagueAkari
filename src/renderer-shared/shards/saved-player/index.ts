@@ -11,6 +11,16 @@ interface SavedPlayerQueryDto {
   puuid: string
 }
 
+interface AllTaggedPlayerQueryDto {
+  selfPuuid: string
+  puuid: string
+  region: string
+  rsoPlatformId: string
+  timeOrder: 'desc' | 'asc'
+  page: number
+  pageSize: number
+}
+
 // copied from main shard
 export interface PlayerTagDto {
   markedBySelf: boolean
@@ -46,6 +56,10 @@ export class SavedPlayerRenderer {
 
   querySavedPlayerWithGames(dto: SavedPlayerQueryDto) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'querySavedPlayerWithGames', dto)
+  }
+
+  getAllPlayerTags(dto: Partial<AllTaggedPlayerQueryDto> = {}) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getAllPlayerTags', dto)
   }
 
   getPlayerTags(dto: SavedPlayerQueryDto): Promise<PlayerTagDto[]> {
