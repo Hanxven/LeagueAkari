@@ -37,7 +37,9 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.sendAllyShortcut"
-              @update:shortcut-id="(id) => ig.setSendAllyShortcut(id)"
+              @update:shortcut-id="
+                (id) => ig.setSendAllyShortcut(id! /* language-tools 1e84c6a  */)
+              "
             />
           </ControlItem>
           <ControlItem
@@ -51,7 +53,9 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ENEMY"
               :shortcut-id="igs.settings.sendEnemyShortcut"
-              @update:shortcut-id="(id) => ig.setSendEnemyShortcut(id)"
+              @update:shortcut-id="
+                (id) => ig.setSendEnemyShortcut(id! /* language-tools 1e84c6a  */)
+              "
             />
           </ControlItem>
           <ControlItem
@@ -65,7 +69,9 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALL_ALLIES"
               :shortcut-id="igs.settings.sendAllAlliesShortcut"
-              @update:shortcut-id="(id) => ig.setSendAllAlliesShortcut(id)"
+              @update:shortcut-id="
+                (id) => ig.setSendAllAlliesShortcut(id! /* language-tools 1e84c6a  */)
+              "
             />
           </ControlItem>
           <ControlItem
@@ -79,7 +85,9 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALL_ENEMIES"
               :shortcut-id="igs.settings.sendAllEnemiesShortcut"
-              @update:shortcut-id="(id) => ig.setSendAllEnemiesShortcut(id)"
+              @update:shortcut-id="
+                (id) => ig.setSendAllEnemiesShortcut(id! /* language-tools 1e84c6a  */)
+              "
             />
           </ControlItem>
           <ControlItem
@@ -324,7 +332,9 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.cancelShortcut"
-              @update:shortcut-id="(id) => ig.setCancelShortcut(id)"
+              @update:shortcut-id="
+                (id) => ig.setCancelShortcut(id! /* language-tools 1e84c6a  */)
+              "
             />
           </ControlItem>
           <ControlItem

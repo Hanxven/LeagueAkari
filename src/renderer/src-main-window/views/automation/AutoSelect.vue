@@ -199,7 +199,7 @@
             <OrderedChampionList
               type="pick"
               :champions="store.settings.benchExpectedChampions"
-              @update:champions="(list) => as.setBenchExpectedChampions(list)"
+              @update:champions="(list) => as.setBenchExpectedChampions(list! /* language-tools 1e84c6a  */)"
             />
           </ControlItem>
         </NCard>

@@ -206,6 +206,58 @@
       <span class="text">{{ t('DebugSettings.inAdministrator.description') }}</span>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
+      <template #header>
+        <span class="card-header-title">Runtime Info</span>
+      </template>
+      <NDescriptions
+        v-if="runtimeInfo"
+        bordered
+        size="small"
+        :columns="6"
+        label-placement="top"
+        style="user-select: text"
+      >
+        <NDescriptionsItem label="League Akari Version">{{
+          runtimeInfo.version
+        }}</NDescriptionsItem>
+        <NDescriptionsItem label="PID">{{ runtimeInfo.pid }}</NDescriptionsItem>
+        <NDescriptionsItem label="Platform">{{ runtimeInfo.platform }}</NDescriptionsItem>
+        <NDescriptionsItem label="Arch">{{ runtimeInfo.arch }}</NDescriptionsItem>
+        <NDescriptionsItem label="Uptime">{{ runtimeInfo.uptime.toFixed(2) }} s</NDescriptionsItem>
+        <NDescriptionsItem label="CPUs">
+          {{ runtimeInfo.os.cpus.length }}
+        </NDescriptionsItem>
+        <NDescriptionsItem label="OS Type">
+          {{ runtimeInfo.os.type }}
+        </NDescriptionsItem>
+        <NDescriptionsItem label="OS Release">
+          {{ runtimeInfo.os.release }}
+        </NDescriptionsItem>
+        <NDescriptionsItem label="Memory">
+          {{ runtimeInfo.os.totalmem }} ({{ (runtimeInfo.os.totalmem / 1073741824).toFixed(2) }}
+          GB)
+        </NDescriptionsItem>
+        <NDescriptionsItem label="NODE_ENV" :span="3">
+          {{ runtimeInfo.env.NODE_ENV }}
+        </NDescriptionsItem>
+        <NDescriptionsItem label="Argv" :span="6">
+          {{ runtimeInfo.argv.join(' ') }}
+        </NDescriptionsItem>
+        <NDescriptionsItem label="Electron">
+          {{ runtimeInfo.versions.electron }}
+        </NDescriptionsItem>
+        <NDescriptionsItem label="Node">
+          {{ runtimeInfo.versions.node }}
+        </NDescriptionsItem>
+        <NDescriptionsItem label="Chrome">
+          {{ runtimeInfo.versions.chrome }}
+        </NDescriptionsItem>
+        <NDescriptionsItem label="V8">
+          {{ runtimeInfo.versions.v8 }}
+        </NDescriptionsItem>
+      </NDescriptions>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
       <template #header><span class="card-header-title">Akari Zone</span></template>
       <ControlItem
         class="control-item-margin"
@@ -237,6 +289,7 @@ import { useRendererDebugStore } from '@renderer-shared/shards/renderer-debug/st
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import { RadixMatcher } from '@shared/utils/radix-matcher'
+import { useIntervalFn } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumn,
@@ -246,6 +299,8 @@ import {
   NCheckbox,
   NCollapseTransition,
   NDataTable,
+  NDescriptions,
+  NDescriptionsItem,
   NFlex,
   NModal,
   NPopover,
@@ -253,7 +308,7 @@ import {
   NSwitch,
   NTable
 } from 'naive-ui'
-import { computed, h, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { computed, h, nextTick, onMounted, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 import { LCU_ENDPOINTS } from './lcu-endpoints'
 
@@ -423,6 +478,17 @@ const handleShowUserDataDir = async () => {
 const handleReload = () => {
   location.reload()
 }
+
+const runtimeInfo = shallowRef<any>(null)
+
+useIntervalFn(
+  async () => {
+    runtimeInfo.value = await app.getRuntimeInfo()
+    console.log('update', runtimeInfo.value)
+  },
+  2000,
+  { immediateCallback: true }
+)
 </script>
 
 <style lang="less" scoped>

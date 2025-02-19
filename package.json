@@ -75,13 +75,13 @@
     "prettier": "^3.5.1",
     "quick-lru": "^7.0.0",
     "semver": "^7.7.1",
-    "typescript": "~5.6.3",
+    "typescript": "~5.7.3",
     "vfonts": "^0.0.3",
     "vite": "^6.1.1",
     "vite-plugin-vue-devtools": "^7.7.2",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
-    "vue-tsc": "^2.2.0"
+    "vue-tsc": "^2.2.2"
   },
   "packageManager": "yarn@4.6.0"
 }
