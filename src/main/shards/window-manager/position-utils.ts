@@ -1,4 +1,8 @@
+import toolsAddon from '@main/native/la-tools-win64.node'
 import { BrowserWindow, Display, Rectangle, screen } from 'electron'
+
+import { WindowManagerMainContext } from '.'
+import { BaseAkariWindow } from './base-akari-window'
 
 export function rectsIntersect(rect1: Rectangle, rect2: Rectangle) {
   return (
@@ -96,48 +100,68 @@ export function intersectionArea(rect1: Rectangle, rect2: Rectangle) {
   return xOverlap * yOverlap
 }
 
-export function repositionWindowWithSnap(win: BrowserWindow, targetBounds: Rectangle) {
+export function repositionWindowWithSnap(
+  win: BrowserWindow,
+  targetBounds: Rectangle,
+  placement: 'top-left' | 'bottom-left' | 'top-right' | 'bottom-right' = 'top-left'
+) {
   if (!win || win.isDestroyed()) return
 
-  // 获取当前窗口的尺寸信息
   const winBounds = win.getBounds()
 
-  // 找到目标窗口所在的显示器
+  const { x, y } = getPositionWithSnap(winBounds, targetBounds, placement)
+
+  win.setPosition(x, y)
+}
+
+export function getPositionWithSnap(
+  from: Rectangle,
+  targetBounds: Rectangle,
+  placement: 'top-left' | 'bottom-left' | 'top-right' | 'bottom-right' = 'top-left'
+) {
+  const winBounds = from
   const display = screen.getDisplayMatching(targetBounds)
   const workArea = display.workArea
+  let newX: number, newY: number
 
-  // 尽量保持上边沿与目标窗口对齐
-  let newY = targetBounds.y
-
-  // 当前窗口中心点位于目标窗口的左侧还是右侧
-  const winCenterX = winBounds.x + winBounds.width / 2
-  const targetCenterX = targetBounds.x + targetBounds.width / 2
-  let newX: number
-  if (winCenterX < targetCenterX) {
-    // 当前窗口在目标窗口左侧，尝试将窗口右边与目标窗口左边对齐
-    newX = targetBounds.x - winBounds.width
-  } else {
-    // 当前窗口在目标窗口右侧，尝试将窗口左边与目标窗口右边对齐
-    newX = targetBounds.x + targetBounds.width
+  switch (placement) {
+    case 'top-left':
+      // win 的右边对齐目标窗口左边，顶部对齐
+      newX = targetBounds.x - winBounds.width
+      newY = targetBounds.y
+      break
+    case 'bottom-left':
+      // win 的右边对齐目标窗口左边，底部对齐
+      newX = targetBounds.x - winBounds.width
+      newY = targetBounds.y + targetBounds.height - winBounds.height
+      break
+    case 'top-right':
+      // win 的左边对齐目标窗口右边，顶部对齐
+      newX = targetBounds.x + targetBounds.width
+      newY = targetBounds.y
+      break
+    case 'bottom-right':
+      // win 的左边对齐目标窗口右边，底部对齐
+      newX = targetBounds.x + targetBounds.width
+      newY = targetBounds.y + targetBounds.height - winBounds.height
+      break
   }
 
-  // 调整 newX 和 newY，确保窗口完全处于显示区域内
+  // 如果新位置超出 workArea 的水平范围，则贴边 workArea
   if (newX < workArea.x) {
-    // 如果 newX 超出左侧，则调整为最左边
     newX = workArea.x
   } else if (newX + winBounds.width > workArea.x + workArea.width) {
-    // 如果右侧超出，则向左平移
     newX = workArea.x + workArea.width - winBounds.width
   }
 
-  // 对垂直位置同样做调整
+  // 如果新位置超出 workArea 的垂直范围，则贴边 workArea
   if (newY < workArea.y) {
     newY = workArea.y
   } else if (newY + winBounds.height > workArea.y + workArea.height) {
     newY = workArea.y + workArea.height - winBounds.height
   }
 
-  win.setPosition(newX, newY)
+  return { x: newX, y: newY }
 }
 
 export function isWindowPartiallyVisible(win: BrowserWindow, threshold = 0.98) {
@@ -164,4 +188,21 @@ export function getCenteredRectangle(width: number, height: number) {
   let y = Math.round((screenHeight - height) / 2)
 
   return { x, y, width, height }
+}
+
+export function repositionToAlignLeagueClientUx(
+  win: BrowserWindow,
+  placement?: 'top-left' | 'bottom-left' | 'top-right' | 'bottom-right'
+) {
+  const info = toolsAddon.GetLeagueClientWindowPlacementInfo()
+  if (info) {
+    const { left, top, width, height } = info
+
+    // League Client Ux 的窗口在最小化时会变为 { x: 0, y: 0, width: 134, height: 37 }
+    if (width < 200 && height < 50) {
+      return
+    }
+
+    repositionWindowWithSnap(win, { x: left, y: top, width, height }, placement)
+  }
 }

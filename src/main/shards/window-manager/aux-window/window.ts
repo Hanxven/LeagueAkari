@@ -6,16 +6,24 @@ import { BaseAkariWindow } from '../base-akari-window'
 import { AuxWindowSettings, AuxWindowState } from './state'
 
 export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSettings> {
+  static readonly NAMESPACE_SUFFIX = 'aux-window'
+  static readonly HTML_ENTRY = 'aux-window.html'
+  static readonly TITLE = 'Mini Akari'
+  static readonly BASE_WIDTH = 340
+  static readonly BASE_HEIGHT = 420
+  static readonly MIN_WIDTH = 340
+  static readonly MIN_HEIGHT = 420
+
   constructor(_context: WindowManagerMainContext) {
     const state = new AuxWindowState()
     const settings = new AuxWindowSettings()
 
-    super(_context, 'aux-window', state, settings, {
-      baseWidth: 340,
-      baseHeight: 420,
-      minWidth: 340,
-      minHeight: 420,
-      htmlEntry: 'aux-window.html',
+    super(_context, AkariAuxWindow.NAMESPACE_SUFFIX, state, settings, {
+      baseWidth: AkariAuxWindow.BASE_WIDTH,
+      baseHeight: AkariAuxWindow.BASE_HEIGHT,
+      minWidth: AkariAuxWindow.MIN_WIDTH,
+      minHeight: AkariAuxWindow.MIN_HEIGHT,
+      htmlEntry: AkariAuxWindow.HTML_ENTRY,
       rememberPosition: true,
       rememberSize: true,
       settingSchema: {
@@ -24,7 +32,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
         showSkinSelector: { default: settings.showSkinSelector }
       },
       browserWindowOptions: {
-        title: 'Mini Akari',
+        title: AkariAuxWindow.TITLE,
         icon: icon,
         show: false,
         frame: false,

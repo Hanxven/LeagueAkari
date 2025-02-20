@@ -62,6 +62,15 @@
         </template>
         <OpggWindowSettings />
       </NTabPane>
+      <NTabPane name="storage">
+        <template #tab>
+          <div class="tab-icon-title">
+            <NIcon class="icon"><Storage24FilledIcon /> </NIcon>
+            <span>{{ t('StorageSettings.title') }}</span>
+          </div>
+        </template>
+        <StorageSettings />
+      </NTabPane>
       <NTabPane name="misc" :tab="t('MiscSettings.title')">
         <template #tab>
           <div class="tab-icon-title">
@@ -79,15 +88,6 @@
           </div>
         </template>
         <DebugSettings />
-      </NTabPane>
-      <NTabPane name="storage">
-        <template #tab>
-          <div class="tab-icon-title">
-            <NIcon class="icon"><Storage24FilledIcon /> </NIcon>
-            <span>{{ t('StorageSettings.title') }}</span>
-          </div>
-        </template>
-        <StorageSettings />
       </NTabPane>
       <NTabPane name="about">
         <template #tab>

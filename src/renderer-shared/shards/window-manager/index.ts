@@ -153,6 +153,13 @@ class AkariOpggWindow {
     return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'resetPosition')
   }
 
+  repositionToAlignLeagueClientUx() {
+    return this._context.ipc.call(
+      MAIN_SHARD_NAMESPACE_OPGG_WINDOW,
+      'repositionToAlignLeagueClientUx'
+    )
+  }
+
   setAutoShow(value: boolean) {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'autoShow', value)
   }

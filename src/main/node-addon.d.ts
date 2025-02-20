@@ -84,7 +84,9 @@ declare module '@main/native/la-tools-win64.node' {
       top: number
       right: number
       bottom: number
-      shownState: numbre
+      height: number
+      width: number
+      shownState: number
     } | null
 
     /**

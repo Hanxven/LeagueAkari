@@ -41,7 +41,7 @@
         >
           {{ t('TaggedPlayers.refreshButton') }}
         </NButton>
-        <NCheckbox v-model:checked="onlyCurrentAccount">
+        <NCheckbox v-model:checked="onlyCurrentAccount" :disabled="!lcs.summoner.me">
           {{ t('TaggedPlayers.onlyCurrentAccountCheckbox') }}
         </NCheckbox>
       </div>
