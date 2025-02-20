@@ -687,15 +687,15 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       if (this._autoAcceptTimerId) {
         clearTimeout(this._autoAcceptTimerId)
         this._autoAcceptTimerId = null
+        if (reason === 'accepted') {
+          this._log.info(`取消了即将进行的接受 - 已经被接受`)
+        } else if (reason === 'declined') {
+          this._log.info(`取消了即将进行的接受 - 已经被拒绝`)
+        } else {
+          this._log.info(`取消了即将进行的接受`)
+        }
       }
       this.state.clearAutoAccept()
-      if (reason === 'accepted') {
-        this._log.info(`取消了即将进行的接受 - 已经被接受`)
-      } else if (reason === 'declined') {
-        this._log.info(`取消了即将进行的接受 - 已经被拒绝`)
-      } else {
-        this._log.info(`取消了即将进行的接受`)
-      }
     }
   }
 

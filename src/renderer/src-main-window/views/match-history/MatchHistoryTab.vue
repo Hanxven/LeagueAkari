@@ -1161,23 +1161,19 @@ watch(
   async (current, prev) => {
     if (current && !prev) {
       const fn1 = async () => {
-        if (sgps.availability.sgpServerId !== tab.sgpServerId && tab.summoner === null) {
+        if (tab.summoner === null) {
           await loadSummoner()
         }
       }
 
       const fn2 = async () => {
-        if (
-          mhs.settings.matchHistoryUseSgpApi &&
-          currentSgpServerSupported.value.matchHistory &&
-          tab.matchHistoryPage === null
-        ) {
+        if (tab.matchHistoryPage === null) {
           await loadMatchHistory()
         }
       }
 
       const fn3 = async () => {
-        if (sgps.availability.serversSupported.common && tab.spectatorData === null) {
+        if (tab.spectatorData === null) {
           await updateSpectatorData()
         }
       }

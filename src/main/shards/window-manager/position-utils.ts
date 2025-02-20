@@ -1,9 +1,6 @@
 import toolsAddon from '@main/native/la-tools-win64.node'
 import { BrowserWindow, Display, Rectangle, screen } from 'electron'
 
-import { WindowManagerMainContext } from '.'
-import { BaseAkariWindow } from './base-akari-window'
-
 export function rectsIntersect(rect1: Rectangle, rect2: Rectangle) {
   return (
     rect1.x < rect2.x + rect2.width &&

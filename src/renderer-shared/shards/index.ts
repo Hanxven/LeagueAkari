@@ -9,6 +9,12 @@ declare module 'vue' {
   }
 }
 
+declare global {
+  interface Window {
+    akariManager: AkariManager
+  }
+}
+
 /**
  * Vue 版本插件工厂, 特别地, 日志工具被内置到支持中
  * @returns
@@ -19,10 +25,12 @@ export function createManager() {
   return {
     install: (app: App) => {
       app.config.globalProperties.$akariManager = akariManager
-      app.config.errorHandler = (err, instance, info) => {
+      app.config.errorHandler = (err, _instance, info) => {
         const logger = akariManager.getInstance<LoggerRenderer>('logger-renderer')
         logger?.error('Vue', err, info)
       }
+
+      window.akariManager = akariManager
     },
     setup: () => akariManager.setup(),
     getInstance: (id: string) => akariManager.getInstance(id),

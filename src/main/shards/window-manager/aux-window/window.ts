@@ -84,7 +84,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
     )
 
     this._context.mobx.reaction(
-      () => [this.settings.enabled, this._windowManager.state.isShardsReady] as const,
+      () => [this.settings.enabled, this._windowManager.state.isManagerFinishedInit] as const,
       ([enabled, ready]) => {
         if (!ready) {
           return

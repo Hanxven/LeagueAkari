@@ -1,6 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
-import { BrowserWindow, Display, screen } from 'electron'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
@@ -120,7 +119,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._shared.global.events.on('second-instance', () => {
       this.mainWindow.showOrRestore()
     })
-    this.state.setShardsReady(true)
+    this.state.setManagerFinishedInit(true)
     this.mainWindow.createWindow()
   }
 

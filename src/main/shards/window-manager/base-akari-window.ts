@@ -168,6 +168,10 @@ export abstract class BaseAkariWindow<
       this._window?.minimize()
     })
 
+    this._context.ipc.onCall(this._namespace, 'maximize', async () => {
+      this._window?.maximize()
+    })
+
     this._context.ipc.onCall(this._namespace, 'unmaximize', async () => {
       this._window?.unmaximize()
     })
@@ -325,6 +329,10 @@ export abstract class BaseAkariWindow<
 
     this._window.on('unmaximize', () => {
       runInAction(() => (this.state.status = 'normal'))
+    })
+
+    this._window.on('maximize', () => {
+      runInAction(() => (this.state.status = 'maximized'))
     })
 
     this._window.on('minimize', () => {
