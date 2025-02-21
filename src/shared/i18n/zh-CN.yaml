@@ -1153,6 +1153,7 @@ MatchHistoryTabs:
   disconnected: 未连接到客户端
   noActiveTab: 当前没有活跃的战绩页面
   copiedToClipboard: 已复制到剪贴板
+  dropZoneRosterMember: 投放以转到该玩家
 
 MatchHistoryTab:
   prevPage: 上一页

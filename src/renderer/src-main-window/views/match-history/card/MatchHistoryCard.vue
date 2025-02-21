@@ -330,7 +330,7 @@ useTimeoutPoll(
       .fromNow()
   },
   60000,
-  { immediate: true }
+  { immediate: true, immediateCallback: true }
 )
 
 watch(

@@ -32,7 +32,7 @@ export class BaseAkariWindowRenderer<
     return this._context.ipc.call(this._mainShardNamespace, 'setSize', width, height)
   }
 
-  getSize() {
+  getSize(): Promise<[number, number]> {
     return this._context.ipc.call(this._mainShardNamespace, 'getSize')
   }
 
@@ -87,8 +87,6 @@ export class BaseAkariWindowRenderer<
   async onInit() {
     const state = this.stateGetter()
     const settings = this.settingsGetter()
-
-    console.log(state, settings)
 
     await this._context.pm.sync(this._mainShardNamespace, 'state', state)
     await this._context.pm.sync(this._mainShardNamespace, 'settings', settings)

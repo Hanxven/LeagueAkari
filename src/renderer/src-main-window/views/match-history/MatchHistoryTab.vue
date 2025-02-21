@@ -141,6 +141,11 @@
             </div>
           </div>
           <div class="buttons-container">
+            <NButton secondary class="square-button" :title="`观察`" v-if="!isSelfTab">
+              <template #icon>
+                <NIcon><EyeIcon /></NIcon>
+              </template>
+            </NButton>
             <NButton
               secondary
               class="square-button"
@@ -563,7 +568,7 @@ import {
 import { summonerName } from '@shared/utils/name'
 import { Delete as DeleteIcon } from '@vicons/carbon'
 import { Edit20Filled as EditIcon } from '@vicons/fluent'
-import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
+import { Eye as EyeIcon, RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import {
   MoreHorizFilled as MoreHorizFilledIcon,
   NavigateBeforeOutlined as NavigateBeforeOutlinedIcon,

@@ -1147,6 +1147,7 @@ MatchHistoryTabs:
   disconnected: Not connected to the client
   noActiveTab: No active match history tab
   copiedToClipboard: Copied to clipboard
+  dropZoneRosterMember: Drop here to navigate to the player's profile
 
 MatchHistoryTab:
   prevPage: Previous
