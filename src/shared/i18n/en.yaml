@@ -243,53 +243,56 @@ OngoingGameSettings:
       showAkariScoreTag:
         label: Akari Score
 
-AuxWindowSettings:
-  title: Auxiliary Window
+MultiWindowSettings:
+  title: Multi-Window
 
-  enabled:
-    label: Enable Auxiliary Window
-    description: Use a small window during certain game phases to display status and provide additional actions.
-    descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
-    descriptionPart2: ) or by right-clicking the tray icon and selecting "Aux Window").
+  auxWindow:
+    title: Auxiliary Window
 
-  autoShow:
-    label: Auto Show and Close
-    description: Automatically show or close the auxiliary window during specific game phases.
+    enabled:
+      label: Enable Auxiliary Window
+      description: Use a small window during certain game phases to display status and provide additional actions.
+      descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
+      descriptionPart2: ) or by right-clicking the tray icon and selecting "Aux Window").
 
-  opacity:
-    label: Window Opacity
-    description: Adjust the transparency level of the auxiliary window.
+    autoShow:
+      label: Auto Show and Close
+      description: Automatically show or close the auxiliary window during specific game phases.
 
-  showSkinSelector:
-    label: Skin Selector
-    description: Display a quick access skin selection tool in the auxiliary window.
+    opacity:
+      label: Window Opacity
+      description: Adjust the transparency level of the auxiliary window.
 
-  resetWindowPosition:
-    label: Reset Window Position
-    description: Reset the position of the auxiliary window to its default location in the center of the main screen.
-    button: Reset
+    showSkinSelector:
+      label: Skin Selector
+      description: Display a quick access skin selection tool in the auxiliary window.
 
-OpggWindowSettings:
-  title: OP.GG Window
+    resetWindowPosition:
+      label: Reset Window Position
+      description: Reset the position of the auxiliary window to its default location in the center of the main screen.
+      button: Reset
 
-  enabled:
-    label: Enable OP.GG Features
-    description: Use the OP.GG window to view detailed player information and match history
-    descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
-    descriptionPart2: ) or by right-clicking the tray icon and selecting "OP.GG Window").
+  opggWindow:
+    title: OP.GG Window
 
-  autoShow:
-    label: Auto Show and Close
-    description: Automatically show or close the OP.GG window during specific game phases.
+    enabled:
+      label: Enable OP.GG Features
+      description: Use the OP.GG window to view detailed player information and match history
+      descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
+      descriptionPart2: ) or by right-clicking the tray icon and selecting "OP.GG Window").
 
-  opacity:
-    label: Window Opacity
-    description: Adjust the transparency level of the OP.GG window.
+    autoShow:
+      label: Auto Show and Close
+      description: Automatically show or close the OP.GG window during specific game phases.
 
-  resetWindowPosition:
-    label: Reset Window Position
-    description: Reset the position of the OP.GG window to its default location in the center of the main screen.
-    button: Reset
+    opacity:
+      label: Window Opacity
+      description: Adjust the transparency level of the OP.GG window.
+
+    resetWindowPosition:
+      label: Reset Window Position
+      description: Reset the position of the OP.GG window to its default location in the center of the main screen.
+      button: Reset
 
 MiscSettings:
   title: Misc

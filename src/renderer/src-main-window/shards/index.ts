@@ -26,6 +26,7 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
 import { MainWindowUiRenderer } from './main-window-ui'
 import { MatchHistoryTabsRenderer } from './match-history-tabs'
+import { PlayerStalkingRenderer } from '@renderer-shared/shards/player-stalking'
 
 const manager = createManager()
 
@@ -46,6 +47,7 @@ manager.use(LoggerRenderer)
 manager.use(MatchHistoryTabsRenderer)
 manager.use(OngoingGameRenderer)
 manager.use(PiniaMobxUtilsRenderer)
+manager.use(PlayerStalkingRenderer)
 manager.use(RendererDebugRenderer)
 manager.use(RespawnTimerRenderer)
 manager.use(RiotClientRenderer)

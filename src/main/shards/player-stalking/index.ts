@@ -1,4 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { isTencentServer } from '@shared/data-sources/sgp/utils'
 
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -121,11 +122,7 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
     const data = await this._fetchPlayer(player.puuid, player.sgpServerId)
 
     if (data === null) {
-      this.state.updatePlayer(player.puuid, {
-        summoner: null,
-        spectator: null,
-        lastUpdated: Date.now()
-      })
+      this.state.updatePlayer(player.puuid, null)
       return
     } else {
       this.state.updatePlayer(player.puuid, {
@@ -141,12 +138,12 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
   }
 
   private _patchTasks() {
-    const canUseSgpApi = (p: StalkedPlayer) => {
-      if (!this._sgp.state.availability.serversSupported.common) {
+    const canUpdate = (p: StalkedPlayer) => {
+      if (!this.state.isSgpAvailable) {
         return false
       }
 
-      if (this._sgp.state.availability.region === 'TENCENT') {
+      if (isTencentServer(this._sgp.state.availability.sgpServerId)) {
         return this._sgp.state.availability.sgpServers.tencentServerSpectatorInteroperability.includes(
           p.sgpServerId
         )
@@ -155,36 +152,39 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
       return this._sgp.state.availability.sgpServerId === p.sgpServerId
     }
 
+    // 删掉不在设置项中但仍有计时器的
     for (const puuid of this.state.timers.keys()) {
       if (!this.settings.playersToStalk.some((p) => p.puuid === puuid)) {
         this.state.clearTimer(puuid)
+        this.state.updatePlayer(puuid, null)
       }
     }
 
+    const tracked: string[] = []
     this.settings.playersToStalk.forEach((p) => {
-      if (p.enabled && canUseSgpApi(p)) {
+      if (p.enabled && canUpdate(p)) {
         if (!this.state.timers.has(p.puuid)) {
           this.setTimeoutPollTask(p)
+          tracked.push(p.puuid)
         }
       } else {
         this.state.clearTimer(p.puuid)
+        this.state.updatePlayer(p.puuid, null)
       }
     })
+
+    this._log.info('更新追踪列表', tracked)
   }
 
   private _handleTimePlayer() {
     // DO NOT TIME OTHERS
     this._mobx.reaction(
       () =>
-        [
-          this.settings.enabled,
-          this.state.isSgpAvailable,
-          this._sgp.state.isTokenReady,
-          this.settings.playersToStalk
-        ] as const,
-      ([enabled, available, ready, _players]) => {
-        if (!enabled || !available || !ready) {
+        [this.settings.enabled, this.state.isSgpAvailable, this.settings.playersToStalk] as const,
+      ([enabled, available, _players]) => {
+        if (!enabled || !available) {
           this.state.clearTimers()
+          this.state.clearTracking()
           return
         }
 
@@ -208,7 +208,7 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
           return
         }
 
-        this.settings.setPlayersToStalk([
+        this._setting.set('playersToStalk', [
           ...this.settings.playersToStalk,
           {
             enabled: true,
@@ -220,7 +220,8 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
     )
 
     this._ipc.onCall(PlayerStalkingMain.id, 'removePlayer', async (_, puuid: string) => {
-      this.settings.setPlayersToStalk(this.settings.playersToStalk.filter((p) => p.puuid !== puuid))
+      const players = this.settings.playersToStalk.filter((p) => p.puuid !== puuid)
+      this._setting.set('playersToStalk', players)
     })
 
     this._ipc.onCall(
@@ -234,18 +235,18 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
           return
         }
 
-        this.settings.setPlayersToStalk(
-          this.settings.playersToStalk.map((p) => {
-            if (p.puuid === puuid) {
-              return {
-                ...p,
-                enabled
-              }
+        const updated = this.settings.playersToStalk.map((p) => {
+          if (p.puuid === puuid) {
+            return {
+              ...p,
+              enabled
             }
+          }
 
-            return p
-          })
-        )
+          return p
+        })
+
+        this._setting.set('playersToStalk', updated)
       }
     )
   }

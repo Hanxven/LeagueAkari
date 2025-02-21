@@ -14,7 +14,7 @@ export class PlayerStalkingSettings {
   /**
    * 总开关
    */
-  enabled: boolean
+  enabled: boolean = true
   /**
    * puuid 列表
    */
@@ -68,6 +68,10 @@ export class PlayerStalkingState {
     }
   }
 
+  clearTracking() {
+    this.tracking = {}
+  }
+
   clearTimers() {
     for (const [_, timer] of this.timers) {
       clearTimeout(timer)
@@ -84,7 +88,7 @@ export class PlayerStalkingState {
   }
 
   get isSgpAvailable() {
-    return this._sgpState.availability.serversSupported.common
+    return this._sgpState.availability.serversSupported.common && this._sgpState.isTokenReady
   }
 
   constructor(private readonly _sgpState: SgpState) {
