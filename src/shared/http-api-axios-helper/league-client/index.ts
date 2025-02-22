@@ -12,7 +12,7 @@ import { HonorHttpApi } from './honor'
 import { LoadoutsHttpApi } from './loadouts'
 import { LobbyHttpApi } from './lobby'
 import { LoginHttpApi } from './login'
-import { LolLeagueSessionHttpApi } from './lol-league-session'
+import { LeagueSessionHttpApi } from './league-session'
 import { LootHttpApi } from './loot'
 import { MatchHistoryHttpApi } from './match-history'
 import { MatchmakingHttpApi } from './matchmaking'
@@ -41,7 +41,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly honor: HonorHttpApi
   public readonly lobby: LobbyHttpApi
   public readonly login: LoginHttpApi
-  public readonly lolLeagueSession: LolLeagueSessionHttpApi
+  public readonly leagueSession: LeagueSessionHttpApi
   public readonly loot: LootHttpApi
   public readonly matchHistory: MatchHistoryHttpApi
   public readonly matchmaking: MatchmakingHttpApi
@@ -70,7 +70,7 @@ export class LeagueClientHttpApiAxiosHelper {
     this.honor = new HonorHttpApi(this._http)
     this.lobby = new LobbyHttpApi(this._http)
     this.login = new LoginHttpApi(this._http)
-    this.lolLeagueSession = new LolLeagueSessionHttpApi(this._http)
+    this.leagueSession = new LeagueSessionHttpApi(this._http)
     this.loot = new LootHttpApi(this._http)
     this.matchHistory = new MatchHistoryHttpApi(this._http)
     this.matchmaking = new MatchmakingHttpApi(this._http)

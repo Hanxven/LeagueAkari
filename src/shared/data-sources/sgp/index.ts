@@ -64,7 +64,7 @@ export class SgpApi {
    * SGP API 需要用户登录的 Session
    */
   private _entitlementToken: string | null = null
-  private _lolLeagueSessionToken: string | null = null
+  private _leagueSessionToken: string | null = null
   private _http = axios.create({
     headers: {
       'User-Agent': SgpApi.USER_AGENT
@@ -113,16 +113,16 @@ export class SgpApi {
     return this._entitlementToken !== null
   }
 
-  hasLolLeagueSessionToken() {
-    return this._lolLeagueSessionToken !== null
+  hasLeagueSessionToken() {
+    return this._leagueSessionToken !== null
   }
 
   setEntitlementsToken(token: string | null) {
     this._entitlementToken = token
   }
 
-  setLolLeagueSessionToken(token: string) {
-    this._lolLeagueSessionToken = token
+  setLeagueSessionToken(token: string) {
+    this._leagueSessionToken = token
   }
 
   private _getSgpServer(sgpServerId: string) {
@@ -217,7 +217,7 @@ export class SgpApi {
   }
 
   getRankedStats(platformId: string, puuid: string) {
-    if (!this._lolLeagueSessionToken) {
+    if (!this._leagueSessionToken) {
       throw new Error('jwt token is not set')
     }
 
@@ -226,13 +226,13 @@ export class SgpApi {
     return this._http.get<SgpRankedStats>(`/leagues-ledge/v2/rankedStats/puuid/${puuid}`, {
       baseURL: sgpServer.common,
       headers: {
-        Authorization: `Bearer ${this._lolLeagueSessionToken}`
+        Authorization: `Bearer ${this._leagueSessionToken}`
       }
     })
   }
 
   getSummonerByPuuid(sgpServerId: string, puuid: string) {
-    if (!this._lolLeagueSessionToken) {
+    if (!this._leagueSessionToken) {
       throw new Error('jwt token is not set')
     }
 
@@ -246,14 +246,14 @@ export class SgpApi {
       {
         baseURL: sgpServer.common,
         headers: {
-          Authorization: `Bearer ${this._lolLeagueSessionToken}`
+          Authorization: `Bearer ${this._leagueSessionToken}`
         }
       }
     )
   }
 
   getSpectatorGameflowByPuuid(sgpServerId: string, puuid: string) {
-    if (!this._lolLeagueSessionToken) {
+    if (!this._leagueSessionToken) {
       throw new Error('jwt token is not set')
     }
 
@@ -264,13 +264,13 @@ export class SgpApi {
     return this._http.get<SpectatorData>(`/gsm/v1/ledge/spectator/region/${subId}/puuid/${puuid}`, {
       baseURL: sgpServer.common,
       headers: {
-        Authorization: `Bearer ${this._lolLeagueSessionToken}`
+        Authorization: `Bearer ${this._leagueSessionToken}`
       }
     })
   }
 
   getMatchHistoryReplayStream(sgpServerId: string, gameId: number) {
-    if (!this._lolLeagueSessionToken) {
+    if (!this._leagueSessionToken) {
       throw new Error('jwt token is not set')
     }
 
@@ -283,7 +283,7 @@ export class SgpApi {
       {
         baseURL: sgpServer.matchHistory,
         headers: {
-          Authorization: `Bearer ${this._lolLeagueSessionToken}`
+          Authorization: `Bearer ${this._leagueSessionToken}`
         },
         responseType: 'stream'
       }
