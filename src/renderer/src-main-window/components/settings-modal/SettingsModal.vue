@@ -47,8 +47,7 @@
       <NTabPane name="multi-window">
         <template #tab>
           <div class="tab-icon-title">
-            <OpggIcon class="opgg-icon" />
-            <NIcon class="icon"><Window24FilledIcon /> </NIcon>
+            <NIcon class="icon"><WindowMultiple20RegularIcon /> </NIcon>
             <span>{{ t('MultiWindowSettings.title') }}</span>
           </div>
         </template>
@@ -95,14 +94,13 @@
 </template>
 
 <script setup lang="ts">
-import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { Debug as DebugIcon, Layers as LayersIcon, ToolKit as ToolkitIcon } from '@vicons/carbon'
 import {
   Games24Filled as Games24FilledIcon,
   Settings16Filled as Settings16FilledIcon,
   Storage24Filled as Storage24FilledIcon,
-  Window24Filled as Window24FilledIcon
+  WindowMultiple20Regular as WindowMultiple20RegularIcon
 } from '@vicons/fluent'
 import { InfoSharp as InfoSharpIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
@@ -111,12 +109,11 @@ import { nextTick, useCssModule, useTemplateRef, watch } from 'vue'
 
 import AboutPane from './AboutPane.vue'
 import AppSettings from './AppSettings.vue'
-import AuxWindowSettings from './AuxWindowSettings.vue'
 import DebugSettings from './DebugSettings.vue'
 import MatchHistoryTabsSettings from './MatchHistoryTabsSettings.vue'
 import MiscSettings from './MiscSettings.vue'
-import OngoingGameSettings from './OngoingGameSettings.vue'
 import MultiWindowSettings from './MultiWindowSettings.vue'
+import OngoingGameSettings from './OngoingGameSettings.vue'
 import StorageSettings from './storage-settings/StorageSettings.vue'
 
 const { t } = useTranslation()

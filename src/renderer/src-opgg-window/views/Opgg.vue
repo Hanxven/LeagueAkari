@@ -824,6 +824,7 @@ watch(
     display: block;
     height: 32px;
     width: 32px;
+    color: #fff;
   }
 
   .square-button {
