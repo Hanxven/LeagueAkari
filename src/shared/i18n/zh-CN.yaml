@@ -55,7 +55,7 @@ AppSettings:
     title: 基础
 
     mainWindowCloseAction:
-      label: 窗口关闭策略
+      label: 主窗口关闭策略
       description: 当关闭主窗口时所执行的行为
       options:
         minimize-to-tray: 最小化到托盘
@@ -246,53 +246,56 @@ OngoingGameSettings:
       showAkariScoreTag:
         label: Akari Score
 
-AuxWindowSettings:
-  title: 小窗口
+MultiWindowSettings:
+  title: 多窗口
 
-  enabled:
-    label: 启用小窗口
-    description: 在一些游戏流程中使用小窗口来展示状态以及提供额外操作
-    descriptionPart1: 可通过标题栏右侧的快捷图标 (
-    descriptionPart2: )，或托盘区右键菜单中的 “小窗口” 打开小窗口
+  auxWindow:
+    title: 小窗口
 
-  autoShow:
-    label: 自动弹出和关闭
-    description: 在游戏流程的部分阶段，自动弹出或关闭小窗口
+    enabled:
+      label: 启用小窗口
+      description: 在一些游戏流程中使用小窗口来展示状态以及提供额外操作
+      descriptionPart1: 可通过标题栏右侧的快捷图标 (
+      descriptionPart2: )，或托盘区右键菜单中的 “小窗口” 打开小窗口
 
-  opacity:
-    label: 小窗口不透明度
-    description: 小窗口的半透明状态
+    autoShow:
+      label: 自动弹出和关闭
+      description: 在游戏流程的部分阶段，自动弹出或关闭小窗口
 
-  showSkinSelector:
-    label: 皮肤设置器
-    description: 在小窗口展示一个设置皮肤的快捷入口
+    opacity:
+      label: 小窗口不透明度
+      description: 小窗口的半透明状态
 
-  resetWindowPosition:
-    label: 重置小窗口位置
-    description: 重新设置小窗口的位置，还原到默认主屏幕正中心
-    button: 重置
+    showSkinSelector:
+      label: 皮肤设置器
+      description: 在小窗口展示一个设置皮肤的快捷入口
 
-OpggWindowSettings:
-  title: OP.GG 窗口
+    resetWindowPosition:
+      label: 重置小窗口位置
+      description: 重新设置小窗口的位置，还原到默认主屏幕正中心
+      button: 重置
 
-  enabled:
-    label: 启用 OP.GG 特性
-    description: 启用 OP.GG 相关功能
-    descriptionPart1: 可通过标题栏右侧的快捷图标 (
-    descriptionPart2: )，或托盘区右键菜单中的 “OP.GG 窗口” 打开 OP.GG 窗口
+  opggWindow:
+    title: OP.GG 窗口
 
-  autoShow:
-    label: 自动弹出和关闭
-    description: 在游戏流程的部分阶段，自动弹出或关闭 OP.GG 窗口
+    enabled:
+      label: 启用 OP.GG 特性
+      description: 启用 OP.GG 相关功能
+      descriptionPart1: 可通过标题栏右侧的快捷图标 (
+      descriptionPart2: )，或托盘区右键菜单中的 “OP.GG 窗口” 打开 OP.GG 窗口
 
-  opacity:
-    label: OP.GG 窗口不透明度
-    description: OP.GG 窗口的半透明状态
+    autoShow:
+      label: 自动弹出和关闭
+      description: 在游戏流程的部分阶段，自动弹出或关闭 OP.GG 窗口
 
-  resetWindowPosition:
-    label: 重置 OP.GG 窗口位置
-    description: 重新设置 OP.GG 窗口的位置，还原到默认主屏幕正中心
-    button: 重置
+    opacity:
+      label: OP.GG 窗口不透明度
+      description: OP.GG 窗口的半透明状态
+
+    resetWindowPosition:
+      label: 重置 OP.GG 窗口位置
+      description: 重新设置 OP.GG 窗口的位置，还原到默认主屏幕正中心
+      button: 重置
 
 MiscSettings:
   title: 其他
@@ -416,11 +419,38 @@ SavedSettings:
   exported: 已导出设置项：{{path}}
   errorExport: 导出设置项失败：{{reason}}
 
+TaggedPlayers:
+  editModal:
+    title: 编辑标记玩家
+    inputPlaceholder: 编辑此标记
+
+  columns:
+    tagger: 标记者
+    tagged: 被标记者
+    tag: 标记
+    sgpServer: 区服
+
+  refreshButton: 刷新
+  onlyCurrentAccountCheckbox: 仅当前账户
+  na: (不可用) {{truncatedPuuid}}...
+  player: '玩家: {{puuid}}'
+  empty: (空)
+  naPopoverContent: 由于未加载或未位于可加载服务器，无法获取该召唤师的信息
+
+  saveButton: 保存
+  cancelButton: 取消
+  editButton: 编辑
+  deleteButton: 删除
+
+  deletePopconfirmContent: 确认删除？此操作无法恢复
+  updated: 已更新
+  updateFailed: 更新失败 {{reason}}
+
 AboutPane:
   title: 关于
   line1: ' (联盟阿卡林，Version {{version}}) 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖'
   line2: 项目参考
-  copyright: © 2025 Hanxven. League Akari 开源软件，遵循 GPL-3.0 许可证。
+  copyright: © 2025 Hanxven. 本软件为开源软件，遵循 GPL-3.0 许可证。
 
   checkFrom: 从下载源中 ({{ source }}) 检查更新
   checkUpdates: 检查更新
@@ -1126,6 +1156,7 @@ MatchHistoryTabs:
   disconnected: 未连接到客户端
   noActiveTab: 当前没有活跃的战绩页面
   copiedToClipboard: 已复制到剪贴板
+  dropZoneRosterMember: 投放以转到该玩家
 
 MatchHistoryTab:
   prevPage: 上一页
@@ -2038,3 +2069,29 @@ common:
     MASTER: 大师
     GRANDMASTER: 宗师
     CHALLENGER: 王者
+
+sgpServers:
+  TENCENT_HN10: 黑色玫瑰
+  TENCENT_HN1: 艾欧尼亚
+  TENCENT_NJ100: 联盟一区
+  TENCENT_GZ100: 联盟二区
+  TENCENT_CQ100: 联盟三区
+  TENCENT_TJ100: 联盟四区
+  TENCENT_TJ101: 联盟五区
+  TENCENT_BGP2: 峡谷之巅
+  TENCENT_PBE: 体验服
+  TW2: 台湾
+  SG2: 新加坡
+  PH2: 菲律宾
+  VN2: 越南
+  PBE: PBE
+  EUN: 欧洲东北
+  EUW: 欧洲西
+  KR: 韩国
+  BR1: 巴西
+  LA1: 拉丁美洲
+  LA2: 拉丁美洲
+  OC1: 大洋洲
+  TR1: 土耳其
+  RU: 俄罗斯
+  JP1: 日本

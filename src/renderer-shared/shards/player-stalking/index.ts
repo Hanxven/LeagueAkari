@@ -7,9 +7,6 @@ import { usePlayerStalkingStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'player-stalking-main'
 
-/**
- * 连接到主进程的快捷键服务
- */
 export class PlayerStalkingRenderer implements IAkariShardInitDispose {
   static id = 'player-stalking-renderer'
   static dependencies = [
@@ -17,8 +14,6 @@ export class PlayerStalkingRenderer implements IAkariShardInitDispose {
     'pinia-mobx-utils-renderer',
     'setting-utils-renderer'
   ]
-
-  static DISABLED_KEYS_TARGET_ID = 'akari-disabled-keys'
 
   private readonly _ipc: AkariIpcRenderer
   private readonly _pm: PiniaMobxUtilsRenderer

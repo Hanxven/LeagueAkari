@@ -100,6 +100,10 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
+  getRuntimeInfo() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getRuntimeInfo') as Promise<any>
+  }
+
   async onDispose() {
     this._scope.stop()
   }

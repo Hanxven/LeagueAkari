@@ -10,9 +10,9 @@
         :positive-text="t('ChampSelectOperations.dodge.positiveText')"
       >
         <template #trigger>
-          <NButton size="tiny" type="warning" secondary>{{
-            t('ChampSelectOperations.dodge.button')
-          }}</NButton>
+          <NButton size="tiny" type="warning" secondary @click.right="handleDodge">
+            {{ t('ChampSelectOperations.dodge.button') }}
+          </NButton>
         </template>
         <span style="font-size: 12px">{{ t('ChampSelectOperations.dodge.popconfirm') }}</span>
       </NPopconfirm>

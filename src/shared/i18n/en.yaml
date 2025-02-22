@@ -243,53 +243,56 @@ OngoingGameSettings:
       showAkariScoreTag:
         label: Akari Score
 
-AuxWindowSettings:
-  title: Auxiliary Window
+MultiWindowSettings:
+  title: Multi-Window
 
-  enabled:
-    label: Enable Auxiliary Window
-    description: Use a small window during certain game phases to display status and provide additional actions.
-    descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
-    descriptionPart2: ) or by right-clicking the tray icon and selecting "Aux Window").
+  auxWindow:
+    title: Auxiliary Window
 
-  autoShow:
-    label: Auto Show and Close
-    description: Automatically show or close the auxiliary window during specific game phases.
+    enabled:
+      label: Enable Auxiliary Window
+      description: Use a small window during certain game phases to display status and provide additional actions.
+      descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
+      descriptionPart2: ) or by right-clicking the tray icon and selecting "Aux Window").
 
-  opacity:
-    label: Window Opacity
-    description: Adjust the transparency level of the auxiliary window.
+    autoShow:
+      label: Auto Show and Close
+      description: Automatically show or close the auxiliary window during specific game phases.
 
-  showSkinSelector:
-    label: Skin Selector
-    description: Display a quick access skin selection tool in the auxiliary window.
+    opacity:
+      label: Window Opacity
+      description: Adjust the transparency level of the auxiliary window.
 
-  resetWindowPosition:
-    label: Reset Window Position
-    description: Reset the position of the auxiliary window to its default location in the center of the main screen.
-    button: Reset
+    showSkinSelector:
+      label: Skin Selector
+      description: Display a quick access skin selection tool in the auxiliary window.
 
-OpggWindowSettings:
-  title: OP.GG Window
+    resetWindowPosition:
+      label: Reset Window Position
+      description: Reset the position of the auxiliary window to its default location in the center of the main screen.
+      button: Reset
 
-  enabled:
-    label: Enable OP.GG Features
-    description: Use the OP.GG window to view detailed player information and match history
-    descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
-    descriptionPart2: ) or by right-clicking the tray icon and selecting "OP.GG Window").
+  opggWindow:
+    title: OP.GG Window
 
-  autoShow:
-    label: Auto Show and Close
-    description: Automatically show or close the OP.GG window during specific game phases.
+    enabled:
+      label: Enable OP.GG Features
+      description: Use the OP.GG window to view detailed player information and match history
+      descriptionPart1: Can be opened by clicking the quick icon on the right side of the title bar (
+      descriptionPart2: ) or by right-clicking the tray icon and selecting "OP.GG Window").
 
-  opacity:
-    label: Window Opacity
-    description: Adjust the transparency level of the OP.GG window.
+    autoShow:
+      label: Auto Show and Close
+      description: Automatically show or close the OP.GG window during specific game phases.
 
-  resetWindowPosition:
-    label: Reset Window Position
-    description: Reset the position of the OP.GG window to its default location in the center of the main screen.
-    button: Reset
+    opacity:
+      label: Window Opacity
+      description: Adjust the transparency level of the OP.GG window.
+
+    resetWindowPosition:
+      label: Reset Window Position
+      description: Reset the position of the OP.GG window to its default location in the center of the main screen.
+      button: Reset
 
 MiscSettings:
   title: Misc
@@ -412,6 +415,33 @@ SavedSettings:
 
   exported: 'Settings exported: {{path}}'
   errorExport: 'Failed to export settings: {{reason}}'
+
+TaggedPlayers:
+  editModal:
+    title: Edit Tagged Player
+    inputPlaceholder: Edit this tag
+
+  columns:
+    tagger: Tagger
+    tagged: Tagged
+    tag: Tag
+    sgpServer: Server
+
+  refreshButton: Refresh
+  onlyCurrentAccountCheckbox: Only Current Account
+  na: (Unavailable) {{truncatedPuuid}}...
+  player: 'Player: {{puuid}}'
+  empty: (Empty)
+  naPopoverContent: Unable to retrieve information for this summoner due to the server being unavailable or not loaded
+
+  saveButton: Save
+  cancelButton: Cancel
+  editButton: Edit
+  deleteButton: Delete
+
+  deletePopconfirmContent: Confirm deletion? This operation cannot be undone
+  updated: Updated
+  updateFailed: Update failed {{reason}}
 
 AboutPane:
   title: About
@@ -1120,6 +1150,7 @@ MatchHistoryTabs:
   disconnected: Not connected to the client
   noActiveTab: No active match history tab
   copiedToClipboard: Copied to clipboard
+  dropZoneRosterMember: Drop here to navigate to the player's profile
 
 MatchHistoryTab:
   prevPage: Previous
@@ -2034,3 +2065,29 @@ common:
     MASTER: MASTR
     GRANDMASTER: GM
     CHALLENGER: CHALL
+
+sgpServers:
+  TENCENT_HN10: Black Rose
+  TENCENT_HN1: Ionia
+  TENCENT_NJ100: League 1
+  TENCENT_GZ100: League 2
+  TENCENT_CQ100: League 3
+  TENCENT_TJ100: League 4
+  TENCENT_TJ101: League 5
+  TENCENT_BGP2: Summit
+  TENCENT_PBE: Tencent PBE
+  TW2: Taiwan
+  SG2: Singapore
+  PH2: Philippines
+  VN2: Vietnam
+  PBE: PBE
+  EUN: Europe NE
+  EUW: Europe West
+  KR: Korea
+  BR1: Brazil
+  LA1: Latin America
+  LA2: Latin America
+  OC1: Oceania
+  TR1: Turkey
+  RU: Russia
+  JP1: Japan

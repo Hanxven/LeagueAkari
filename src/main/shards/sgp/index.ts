@@ -6,6 +6,7 @@ import {
   SgpMatchHistoryLol,
   SgpSummoner
 } from '@shared/data-sources/sgp/types'
+import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import { Game, GameTimeline, MatchHistory } from '@shared/types/league-client/match-history'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { formatError } from '@shared/utils/errors'
@@ -190,8 +191,7 @@ export class SgpMain implements IAkariShardInitDispose {
           return
         }
 
-        const sgpServerId =
-          auth.region === 'TENCENT' ? `${auth.region}_${auth.rsoPlatformId}` : auth.region
+        const sgpServerId = getSgpServerId(auth.region, auth.rsoPlatformId)
 
         const supported = this._sgp.supportsSgpServer(sgpServerId)
         const sgpServers = this._sgp.sgpServers()

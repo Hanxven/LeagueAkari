@@ -1,6 +1,5 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
-import { BrowserWindow, Display, screen } from 'electron'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AkariIpcMain } from '../ipc'
@@ -53,9 +52,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
 
-  public mainWindow: AkariMainWindow
-  public auxWindow: AkariAuxWindow
-  public opggWindow: AkariOpggWindow
+  public readonly mainWindow: AkariMainWindow
+  public readonly auxWindow: AkariAuxWindow
+  public readonly opggWindow: AkariOpggWindow
 
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
@@ -120,7 +119,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._shared.global.events.on('second-instance', () => {
       this.mainWindow.showOrRestore()
     })
-    this.state.setShardsReady(true)
+    this.state.setManagerFinishedInit(true)
     this.mainWindow.createWindow()
   }
 

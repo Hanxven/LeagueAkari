@@ -3,7 +3,6 @@ name: BUG 反馈
 about: 这些信息对定位 BUG 会有很大的帮助
 title: '[Bug] '
 labels: ''
-assignees: Hanxven
 ---
 
 0. 不要原封不动地粘贴这个模板。

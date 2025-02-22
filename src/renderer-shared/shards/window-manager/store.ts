@@ -19,18 +19,22 @@ export const useWindowManagerStore = defineStore('shard:window-manager-renderer'
 
 export const useMainWindowStore = defineStore('shard:main-window-renderer/main-window', () => {
   const settings = shallowReactive({
-    closeAction: 'ask' as MainWindowCloseAction
+    closeAction: 'ask' as MainWindowCloseAction,
+    opacity: 1,
+    pinned: false
   })
 
-  const status = ref('normal')
-  const focus = ref('focused')
+  const status = ref<'normal' | 'maximized' | 'minimized'>('normal')
+  const focus = ref<'focused' | 'blurred'>('focused')
   const show = ref(true)
+  const bounds = ref(null)
   const ready = ref(false)
 
   return {
     settings,
     status,
     focus,
+    bounds,
     show,
     ready
   }
@@ -45,14 +49,16 @@ export const useAuxWindowStore = defineStore('shard:main-window-renderer/aux-win
     showSkinSelector: false
   })
 
-  const status = ref('normal')
-  const focus = ref('focused')
+  const status = ref<'normal' | 'maximized' | 'minimized'>('normal')
+  const focus = ref<'focused' | 'blurred'>('focused')
   const show = ref(true)
   const ready = ref(false)
+  const bounds = ref(null)
 
   return {
     settings,
     status,
+    bounds,
     focus,
     show,
     ready
@@ -67,14 +73,16 @@ export const useOpggWindowStore = defineStore('shard:main-window-renderer/opgg-w
     pinned: true
   })
 
-  const status = ref('normal')
-  const focus = ref('focused')
+  const status = ref<'normal' | 'maximized' | 'minimized'>('normal')
+  const focus = ref<'focused' | 'blurred'>('focused')
   const show = ref(true)
+  const bounds = ref(null)
   const ready = ref(false)
 
   return {
     settings,
     status,
+    bounds,
     focus,
     show,
     ready

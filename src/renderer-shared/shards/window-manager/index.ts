@@ -3,6 +3,7 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
+import { BaseAkariWindowRenderer } from './base-akari-window'
 import {
   useAuxWindowStore,
   useMainWindowStore,
@@ -21,86 +22,43 @@ export interface WindowManagerRendererContext {
   pm: PiniaMobxUtilsRenderer
 }
 
-class AkariMainWindow {
-  constructor(private _context: WindowManagerRendererContext) {}
-
-  async onInit() {
-    const mwStore = useMainWindowStore()
-    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'state', mwStore)
-    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'settings', mwStore.settings)
+class AkariMainWindow extends BaseAkariWindowRenderer<
+  ReturnType<typeof useMainWindowStore>,
+  ReturnType<typeof useMainWindowStore>['settings']
+> {
+  constructor(_context: WindowManagerRendererContext) {
+    super(
+      _context,
+      MAIN_SHARD_NAMESPACE_MAIN_WINDOW,
+      () => useMainWindowStore(),
+      () => useMainWindowStore().settings
+    )
   }
 
   onAskClose(fn: (...args: any[]) => void) {
     return this._context.ipc.onEventVue(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'close-asking', fn)
   }
 
-  maximize() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'maximize')
-  }
-
-  minimize() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'minimize')
-  }
-
-  restore() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'restore')
-  }
-
-  close(strategy?: string) {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeMainWindow', strategy)
-  }
-
-  toggleDevtools() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'toggleDevtools')
-  }
-
-  hide() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'hide')
-  }
-
-  show() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'show')
-  }
-
-  unmaximize() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'unmaximize')
-  }
-
   setCloseAction(value: string) {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeAction', value)
   }
+
+  override close(strategy?: string) {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_MAIN_WINDOW, 'closeMainWindow', strategy)
+  }
 }
 
-/**
- * 辅助窗口逻辑封装
- */
-class AkariAuxWindow {
-  constructor(private _context: WindowManagerRendererContext) {}
-
-  async onInit() {
-    const awStore = useAuxWindowStore()
-    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'state', awStore)
-    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'settings', awStore.settings)
-  }
-
-  minimize() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'minimize')
-  }
-
-  restore() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'restore')
-  }
-
-  hide() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'hide')
-  }
-
-  show() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'show')
-  }
-
-  resetPosition() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'resetPosition')
+class AkariAuxWindow extends BaseAkariWindowRenderer<
+  ReturnType<typeof useAuxWindowStore>,
+  ReturnType<typeof useAuxWindowStore>['settings']
+> {
+  constructor(_context: WindowManagerRendererContext) {
+    super(
+      _context,
+      MAIN_SHARD_NAMESPACE_AUX_WINDOW,
+      () => useAuxWindowStore(),
+      () => useAuxWindowStore().settings
+    )
   }
 
   setAutoShow(value: boolean) {
@@ -111,46 +69,22 @@ class AkariAuxWindow {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'enabled', value)
   }
 
-  setOpacity(value: number) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'opacity', value)
-  }
-
-  setPinned(value: boolean) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'pinned', value)
-  }
-
   setShowSkinSelector(value: boolean) {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'showSkinSelector', value)
   }
 }
 
-class AkariOpggWindow {
-  constructor(private _context: WindowManagerRendererContext) {}
-
-  async onInit() {
-    const awStore = useOpggWindowStore()
-    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'state', awStore)
-    await this._context.pm.sync(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'settings', awStore.settings)
-  }
-
-  minimize() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'minimize')
-  }
-
-  restore() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'restore')
-  }
-
-  hide() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'hide')
-  }
-
-  show() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'show')
-  }
-
-  resetPosition() {
-    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'resetPosition')
+class AkariOpggWindow extends BaseAkariWindowRenderer<
+  ReturnType<typeof useOpggWindowStore>,
+  ReturnType<typeof useOpggWindowStore>['settings']
+> {
+  constructor(_context: WindowManagerRendererContext) {
+    super(
+      _context,
+      MAIN_SHARD_NAMESPACE_OPGG_WINDOW,
+      () => useOpggWindowStore(),
+      () => useOpggWindowStore().settings
+    )
   }
 
   setAutoShow(value: boolean) {
@@ -159,14 +93,6 @@ class AkariOpggWindow {
 
   setEnabled(value: boolean) {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'enabled', value)
-  }
-
-  setOpacity(value: number) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'opacity', value)
-  }
-
-  setPinned(value: boolean) {
-    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'pinned', value)
   }
 }
 

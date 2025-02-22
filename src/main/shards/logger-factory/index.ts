@@ -2,7 +2,7 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 import { formatError } from '@shared/utils/errors'
 import { app, shell } from 'electron'
-import { join } from 'node:path'
+import path from 'node:path'
 import { Logger } from 'winston'
 
 import { AkariIpcMain } from '../ipc'
@@ -46,8 +46,8 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
   private readonly _shared: AkariSharedGlobalShard
 
   constructor(deps: any) {
-    this._appDir = join(app.getPath('exe'), '..')
-    this._logsDir = join(this._appDir, 'logs')
+    this._appDir = path.join(app.getPath('exe'), '..')
+    this._logsDir = path.join(this._appDir, 'logs')
     this._shared = deps[SHARED_GLOBAL_ID]
     this._logger = this._shared.global.logger
     this._ipc = deps['akari-ipc-main']
@@ -82,7 +82,7 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
   }
 
   openLogsDir() {
-    return shell.openPath(this._logsDir)
+    return shell.showItemInFolder(path.join(this._logsDir, this._shared.global.logFilename))
   }
 
   /**

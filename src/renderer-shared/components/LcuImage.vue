@@ -37,5 +37,6 @@ const handleError = () => {
   border: 1px solid #fff2;
   background-color: #0006;
   border-radius: 4px;
+  box-sizing: border-box;
 }
 </style>

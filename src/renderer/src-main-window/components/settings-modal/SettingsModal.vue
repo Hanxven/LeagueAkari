@@ -44,23 +44,24 @@
         </template>
         <OngoingGameSettings />
       </NTabPane>
-      <NTabPane name="aux-window">
-        <template #tab>
-          <div class="tab-icon-title">
-            <NIcon class="icon"><Window24FilledIcon /> </NIcon>
-            <span>{{ t('AuxWindowSettings.title') }}</span>
-          </div>
-        </template>
-        <AuxWindowSettings />
-      </NTabPane>
-      <NTabPane name="opgg-window">
+      <NTabPane name="multi-window">
         <template #tab>
           <div class="tab-icon-title">
             <OpggIcon class="opgg-icon" />
-            <span>{{ t('OpggWindowSettings.title') }}</span>
+            <NIcon class="icon"><Window24FilledIcon /> </NIcon>
+            <span>{{ t('MultiWindowSettings.title') }}</span>
           </div>
         </template>
-        <OpggWindowSettings />
+        <MultiWindowSettings />
+      </NTabPane>
+      <NTabPane name="storage">
+        <template #tab>
+          <div class="tab-icon-title">
+            <NIcon class="icon"><Storage24FilledIcon /> </NIcon>
+            <span>{{ t('StorageSettings.title') }}</span>
+          </div>
+        </template>
+        <StorageSettings />
       </NTabPane>
       <NTabPane name="misc" :tab="t('MiscSettings.title')">
         <template #tab>
@@ -79,15 +80,6 @@
           </div>
         </template>
         <DebugSettings />
-      </NTabPane>
-      <NTabPane name="storage">
-        <template #tab>
-          <div class="tab-icon-title">
-            <NIcon class="icon"><Storage24FilledIcon /> </NIcon>
-            <span>{{ t('StorageSettings.title') }}</span>
-          </div>
-        </template>
-        <StorageSettings />
       </NTabPane>
       <NTabPane name="about">
         <template #tab>
@@ -124,7 +116,7 @@ import DebugSettings from './DebugSettings.vue'
 import MatchHistoryTabsSettings from './MatchHistoryTabsSettings.vue'
 import MiscSettings from './MiscSettings.vue'
 import OngoingGameSettings from './OngoingGameSettings.vue'
-import OpggWindowSettings from './OpggWindowSettings.vue'
+import MultiWindowSettings from './MultiWindowSettings.vue'
 import StorageSettings from './storage-settings/StorageSettings.vue'
 
 const { t } = useTranslation()

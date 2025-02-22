@@ -1,5 +1,5 @@
 <template>
-  <div class="tabs-wrapper">
+  <div class="tabs-wrapper" ref="tabs-wrapper">
     <template v-if="mhs.currentTabId">
       <MatchHistoryTab
         v-for="tab of mhs.tabs"
@@ -30,6 +30,11 @@
         </template>
       </div>
     </div>
+    <Transition name="bi-fade">
+      <div class="drop-overlay" v-if="isOverDropZone">
+        <span class="centered-hint">{{ t('MatchHistoryTabs.dropZoneRosterMember') }}</span>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -42,6 +47,7 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { useDropZone } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 import { computed, onActivated, onDeactivated, useTemplateRef, watch } from 'vue'
@@ -192,10 +198,27 @@ mh.events.on('screenshot-tab', (tabId: string) => {
     tab.screenshot()
   }
 })
+
+const tabsWrapperEl = useTemplateRef('tabs-wrapper')
+const { isOverDropZone } = useDropZone(tabsWrapperEl, {
+  dataTypes: ['application/riot.roster-member+json'],
+  onDrop: (_, event) => {
+    const socialMemberData = event.dataTransfer?.getData('application/riot.roster-member+json')
+
+    if (socialMemberData) {
+      try {
+        const json = JSON.parse(socialMemberData)
+        const puuid = json.id.split('@')[0]
+        navigateToTabByPuuid(puuid)
+      } catch {}
+    }
+  }
+})
 </script>
 
 <style lang="less" scoped>
 .tabs-wrapper {
+  position: relative;
   height: 100%;
   max-width: 100%;
   display: flex;
@@ -266,6 +289,25 @@ mh.events.on('screenshot-tab', (tabId: string) => {
   }
 }
 
+.drop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+
+  .centered-hint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+  }
+}
+
 [data-theme='dark'] {
   .tabs-placeholder {
     .disconnected {
@@ -290,6 +332,14 @@ mh.events.on('screenshot-tab', (tabId: string) => {
       .shortcut-tag-line {
         color: rgba(255, 255, 255, 0.4);
       }
+    }
+  }
+
+  .drop-overlay {
+    background-color: rgba(0, 0, 0, 0.4);
+
+    .centered-hint {
+      color: rgba(255, 255, 255, 0.95);
     }
   }
 }
@@ -318,6 +368,14 @@ mh.events.on('screenshot-tab', (tabId: string) => {
       .shortcut-tag-line {
         color: rgba(0, 0, 0, 0.4);
       }
+    }
+  }
+
+  .drop-overlay {
+    background-color: rgba(255, 255, 255, 0.4);
+
+    .centered-hint {
+      color: rgba(0, 0, 0, 0.95);
     }
   }
 }

@@ -143,6 +143,18 @@
           <div class="buttons-container">
             <NButton
               secondary
+              :type="isBeingStalked ? 'primary' : 'default'"
+              class="square-button"
+              :title="`观察`"
+              v-if="!isSelfTab"
+              @click="handleStalk"
+            >
+              <template #icon>
+                <NIcon><EyeIcon /></NIcon>
+              </template>
+            </NButton>
+            <NButton
+              secondary
               class="square-button"
               :title="t('MatchHistoryTab.tagPlayer')"
               @click="handleTagPlayer"
@@ -551,6 +563,8 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
+import { PlayerStalkingRenderer } from '@renderer-shared/shards/player-stalking'
+import { usePlayerStalkingStore } from '@renderer-shared/shards/player-stalking/store'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
@@ -563,7 +577,7 @@ import {
 import { summonerName } from '@shared/utils/name'
 import { Delete as DeleteIcon } from '@vicons/carbon'
 import { Edit20Filled as EditIcon } from '@vicons/fluent'
-import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
+import { Eye as EyeIcon, RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import {
   MoreHorizFilled as MoreHorizFilledIcon,
   NavigateBeforeOutlined as NavigateBeforeOutlinedIcon,
@@ -1161,23 +1175,19 @@ watch(
   async (current, prev) => {
     if (current && !prev) {
       const fn1 = async () => {
-        if (sgps.availability.sgpServerId !== tab.sgpServerId && tab.summoner === null) {
+        if (tab.summoner === null) {
           await loadSummoner()
         }
       }
 
       const fn2 = async () => {
-        if (
-          mhs.settings.matchHistoryUseSgpApi &&
-          currentSgpServerSupported.value.matchHistory &&
-          tab.matchHistoryPage === null
-        ) {
+        if (tab.matchHistoryPage === null) {
           await loadMatchHistory()
         }
       }
 
       const fn3 = async () => {
-        if (sgps.availability.serversSupported.common && tab.spectatorData === null) {
+        if (tab.spectatorData === null) {
           await updateSpectatorData()
         }
       }
@@ -1424,6 +1434,29 @@ const handleScreenshot = async () => {
     tab.isTakingScreenshot = false
   }
 }
+
+const ps = useInstance<PlayerStalkingRenderer>('player-stalking-renderer')
+const pss = usePlayerStalkingStore()
+
+const isBeingStalked = computed(() => {
+  return pss.settings.playersToStalk.some((p) => p.puuid === tab.puuid)
+})
+
+const handleStalk = () => {
+  if (isBeingStalked.value) {
+    ps.removePlayer(tab.puuid)
+  } else {
+    ps.addPlayer(tab.puuid, tab.sgpServerId)
+  }
+}
+
+watch(
+  () => pss.tracking,
+  () => {
+    console.log('tracking', pss.tracking)
+  },
+  { immediate: true }
+)
 
 defineExpose({
   id: tab.id,

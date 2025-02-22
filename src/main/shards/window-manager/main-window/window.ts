@@ -6,25 +6,33 @@ import { BaseAkariWindow } from '../base-akari-window'
 import { MainWindowSettings, MainWindowState } from './state'
 
 export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindowSettings> {
+  static readonly NAMESPACE_SUFFIX = 'main-window'
+  static readonly HTML_ENTRY = 'main-window.html'
+  static readonly TITLE = 'League Akari'
+  static readonly BASE_WIDTH = 1380
+  static readonly BASE_HEIGHT = 860
+  static readonly MIN_WIDTH = 840
+  static readonly MIN_HEIGHT = 600
+
   private _nextCloseAction: string | null = null
 
   constructor(_context: WindowManagerMainContext) {
     const state = new MainWindowState()
     const settings = new MainWindowSettings()
 
-    super(_context, 'main-window', state, settings, {
-      baseWidth: 1380,
-      baseHeight: 860,
-      minWidth: 840,
-      minHeight: 600,
-      htmlEntry: 'main-window.html',
+    super(_context, AkariMainWindow.NAMESPACE_SUFFIX, state, settings, {
+      baseWidth: AkariMainWindow.BASE_WIDTH,
+      baseHeight: AkariMainWindow.BASE_HEIGHT,
+      minWidth: AkariMainWindow.MIN_WIDTH,
+      minHeight: AkariMainWindow.MIN_HEIGHT,
+      htmlEntry: AkariMainWindow.HTML_ENTRY,
       rememberPosition: false,
       rememberSize: true,
       settingSchema: {
         closeAction: { default: settings.closeAction }
       },
       browserWindowOptions: {
-        title: 'League Akari',
+        title: AkariMainWindow.TITLE,
         icon: icon,
         show: false,
         frame: false,

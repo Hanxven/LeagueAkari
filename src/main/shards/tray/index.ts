@@ -71,7 +71,7 @@ export class TrayMain implements IAkariShardInitDispose {
     this._quitTrayItem = new MenuItem({
       label: i18next.t('tray.quit'),
       type: 'normal',
-      click: () => this._wm.mainWindow.forceQuit()
+      click: () => this._wm.mainWindow.close(true)
     })
 
     this._contextMenu = Menu.buildFromTemplate([

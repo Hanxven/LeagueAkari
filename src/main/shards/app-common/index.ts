@@ -3,6 +3,7 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 import { app, nativeImage, nativeTheme, shell } from 'electron'
 import { clipboard } from 'electron'
+import os from 'node:os'
 
 import { AkariIpcMain } from '../ipc'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -93,6 +94,41 @@ export class AppCommonMain implements IAkariShardInitDispose {
     return shell.openPath(app.getPath('userData'))
   }
 
+  async getRuntimeInfo() {
+    const processMemoryInfo = await process.getProcessMemoryInfo()
+
+    return {
+      version: app.getVersion(),
+      platform: process.platform,
+      arch: process.arch,
+      execPath: process.execPath,
+      pid: process.pid,
+      title: process.title,
+      memoryUsage: process.memoryUsage(),
+      cpuUsage: process.cpuUsage(),
+      uptime: process.uptime(),
+      type: process.type,
+      resourcesPath: process.resourcesPath,
+      versions: process.versions,
+      env: {
+        NODE_ENV: process.env.NODE_ENV,
+        PATH: process.env.PATH
+      },
+      gpuStatus: app.getGPUFeatureStatus(),
+      os: {
+        type: os.type(),
+        release: os.release(),
+        totalmem: os.totalmem(),
+        freemem: os.freemem(),
+        cpus: os.cpus(),
+        homedir: os.homedir(),
+        tmpdir: os.tmpdir()
+      },
+      argv: process.argv,
+      processMemoryInfo
+    }
+  }
+
   private async _handleState() {
     await this._setting.applyToState()
     this._mobx.propSync(AppCommonMain.id, 'settings', this.settings, [
@@ -161,6 +197,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
       const buf = Buffer.from(buffer)
       const image = nativeImage.createFromBuffer(buf)
       clipboard.writeImage(image)
+    })
+
+    this._ipc.onCall(AppCommonMain.id, 'getRuntimeInfo', () => {
+      return this.getRuntimeInfo()
     })
   }
 }

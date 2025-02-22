@@ -15,14 +15,14 @@ export class WindowManagerSettings {
 export class WindowManagerState {
   supportsMica: boolean = false
 
-  isShardsReady: boolean = false
+  isManagerFinishedInit: boolean = false
 
   setSupportsMica(supports: boolean) {
     this.supportsMica = supports
   }
 
-  setShardsReady(ready: boolean) {
-    this.isShardsReady = ready
+  setManagerFinishedInit(ready: boolean) {
+    this.isManagerFinishedInit = ready
   }
 
   constructor() {

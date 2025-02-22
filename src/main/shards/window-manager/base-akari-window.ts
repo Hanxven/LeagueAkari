@@ -5,7 +5,7 @@ import { Paths } from '@shared/utils/types'
 import { BrowserWindow, BrowserWindowConstructorOptions, Event, dialog, shell } from 'electron'
 import { comparer, runInAction } from 'mobx'
 import EventEmitter from 'node:events'
-import path from 'path'
+import path from 'node:path'
 
 import { WindowManagerMain, type WindowManagerMainContext } from '.'
 import { AkariProtocolMain } from '../akari-protocol'
@@ -168,6 +168,10 @@ export abstract class BaseAkariWindow<
       this._window?.minimize()
     })
 
+    this._context.ipc.onCall(this._namespace, 'maximize', async () => {
+      this._window?.maximize()
+    })
+
     this._context.ipc.onCall(this._namespace, 'unmaximize', async () => {
       this._window?.unmaximize()
     })
@@ -325,6 +329,10 @@ export abstract class BaseAkariWindow<
 
     this._window.on('unmaximize', () => {
       runInAction(() => (this.state.status = 'normal'))
+    })
+
+    this._window.on('maximize', () => {
+      runInAction(() => (this.state.status = 'maximized'))
     })
 
     this._window.on('minimize', () => {

@@ -42,6 +42,7 @@ import { configure } from 'mobx'
 import EventEmitter from 'node:events'
 import os from 'node:os'
 import { Logger } from 'winston'
+import { FileTransportInstance } from 'winston/lib/winston/transports'
 
 import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
 
@@ -55,6 +56,11 @@ declare module '@shared/akari-shard/manager' {
      * 应用日志记录对象
      */
     logger: Logger
+
+    /**
+     * 日志文件名
+     */
+    logFilename: string
 
     /**
      * 特殊事件总线
@@ -137,7 +143,7 @@ export function bootstrap() {
 
   // 创建全局唯一的日志器
   const logLevel = baseConfig && baseConfig.logLevel ? baseConfig.logLevel : 'info'
-  const logger = initAppLogger(logLevel)
+  const { logger, filename: logFilename } = initAppLogger(logLevel)
 
   // 应用级别的事件总线
   const events = new EventEmitter<AkariAppEventMap>()
@@ -173,6 +179,7 @@ export function bootstrap() {
     // 启用所有 akari shard
     const manager = new AkariManager()
     manager.global.logger = logger
+    manager.global.logFilename = logFilename
     manager.global.events = events
     manager.global.baseConfig = {
       value: baseConfig,

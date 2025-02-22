@@ -760,6 +760,11 @@ interface COMPANIONSLOT {
   itemId: number
 }
 
+/**
+ * 曾经用于判断是否是无限狂潮 (Swarm) 模式的英雄
+ * @param id
+ * @returns
+ */
 export function maybePveChampion(id: number) {
   return id >= 3000 && id < 4000
 }

@@ -175,7 +175,6 @@ Napi::Value FixWindowMethodA(const Napi::CallbackInfo& info) {
 Napi::Value GetLeagueClientWindowPlacementInfo(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
-  // 使用类名和窗口名查找窗口
   HWND hwnd = FindWindowW(APPLICATION_CLASS_NAME, APPLICATION_NAME);
   if (hwnd == NULL) {
     return env.Null();
@@ -187,18 +186,28 @@ Napi::Value GetLeagueClientWindowPlacementInfo(const Napi::CallbackInfo& info) {
     return env.Null();
   }
 
-  // 结合 IsIconic 和 IsZoomed 获取更准确的状态信息
+  UINT dpi = GetDpiForWindow(hwnd);
+  float scaleFactor = static_cast<float>(dpi) / 96.0f; // 96 DPI 对应 100% 缩放
+
+  int left   = static_cast<int>(wp.rcNormalPosition.left / scaleFactor);
+  int top    = static_cast<int>(wp.rcNormalPosition.top / scaleFactor);
+  int right  = static_cast<int>(wp.rcNormalPosition.right / scaleFactor);
+  int bottom = static_cast<int>(wp.rcNormalPosition.bottom / scaleFactor);
+  int width  = right - left;
+  int height = bottom - top;
+
   bool isMinimized = IsIconic(hwnd);
   bool isMaximized = IsZoomed(hwnd);
   bool isNormal = !isMinimized && !isMaximized;
 
   Napi::Object result = Napi::Object::New(env);
-  result.Set("left", Napi::Number::New(env, wp.rcNormalPosition.left));
-  result.Set("top", Napi::Number::New(env, wp.rcNormalPosition.top));
-  result.Set("right", Napi::Number::New(env, wp.rcNormalPosition.right));
-  result.Set("bottom", Napi::Number::New(env, wp.rcNormalPosition.bottom));
+  result.Set("left", Napi::Number::New(env, left));
+  result.Set("top", Napi::Number::New(env, top));
+  result.Set("right", Napi::Number::New(env, right));
+  result.Set("bottom", Napi::Number::New(env, bottom));
+  result.Set("width", Napi::Number::New(env, width));
+  result.Set("height", Napi::Number::New(env, height));
   result.Set("shownState", Napi::Number::New(env, wp.showCmd));
-
   result.Set("isMinimized", Napi::Boolean::New(env, isMinimized));
   result.Set("isMaximized", Napi::Boolean::New(env, isMaximized));
   result.Set("isNormal", Napi::Boolean::New(env, isNormal));

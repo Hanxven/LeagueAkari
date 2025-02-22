@@ -23,22 +23,28 @@
           v-model:checked="isRememberCloseStrategy"
           style="margin-right: auto"
           size="small"
-          >{{ t('TrafficButtons.modal.remember') }}</NCheckbox
         >
+          {{ t('TrafficButtons.modal.remember') }}
+        </NCheckbox>
         <NFlex style="gap: 4px">
           <NButton
             style="font-size: 13px"
             size="small"
             @click="isCloseConfirmationModelShow = false"
-            >{{ t('TrafficButtons.modal.cancel') }}</NButton
           >
-          <NButton style="font-size: 13px" size="small" type="primary" @click="handleReallyClose">{{
-            t('TrafficButtons.modal.ok')
-          }}</NButton>
+            {{ t('TrafficButtons.modal.cancel') }}
+          </NButton>
+          <NButton style="font-size: 13px" size="small" type="primary" @click="handleReallyClose">
+            {{ t('TrafficButtons.modal.ok') }}
+          </NButton>
         </NFlex>
       </NFlex>
     </NModal>
-    <div title="最小化" class="traffic-button minimize" @click="handleMinimize">
+    <div
+      :title="t('TrafficButtons.minimize')"
+      class="traffic-button minimize"
+      @click="handleMinimize"
+    >
       <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
     </div>
     <div

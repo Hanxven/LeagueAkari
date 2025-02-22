@@ -108,7 +108,7 @@ watchEffect(() => {
   }
 })
 
-const handleMenuChange = async (val: string) => {
+const handleMenuChange = async (val: string | undefined) => {
   try {
     await router.replace({ name: val })
   } catch (error) {

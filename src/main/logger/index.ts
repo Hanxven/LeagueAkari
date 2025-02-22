@@ -78,10 +78,12 @@ export function initAppLogger(level: string = 'info') {
     }
   }
 
-  return createLogger({
+  const filename = `LA_${dayjs().format('YYYYMMDD_HHmmssSSS')}.log`
+
+  const logger = createLogger({
     transports: [
       new transports.File({
-        filename: `LA_${dayjs().format('YYYYMMDD_HHmmssSSS')}.log`,
+        filename,
         dirname: logsDir,
         level,
         maxsize: 1024 * 1024 * 128, // 128MB
@@ -108,4 +110,10 @@ export function initAppLogger(level: string = 'info') {
       })
     ]
   })
+
+  return {
+    logger,
+    logsDir,
+    filename
+  }
 }
