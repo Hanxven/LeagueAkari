@@ -1747,6 +1747,11 @@ InGameSend:
   sendStats:
     title: 对局玩家信息发送
     titleRequireAdmin: 对局玩家信息发送 (需要管理员权限)
+    titleAdmin: 是否是管理员权限启动项目
+    requireAdmin: 申请管理员权限
+    isAdmin: 管理员
+    requireAdminDesc: 申请管理员权限需要重启应用
+    requireAdminTip: 申请管理员权限需要重启应用，是否重启应用？
     enabled:
       label: 启用
       description: 在英雄选择或对局中，发送队友或敌方的数据统计分析

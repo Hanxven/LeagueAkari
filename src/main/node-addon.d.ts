@@ -109,6 +109,11 @@ declare module '@main/native/la-tools-win64.node' {
      * @param pid 进程 PID
      */
     isProcessForeground(pid: number): boolean
+    /**
+     * 获取管理员权限
+     * @constructor
+     */
+    requestAdmin(): boolean
   }
 
   const toolsAddon: LeagueAkariToolsAddon
@@ -168,6 +173,12 @@ declare module '*/laToolkitWin32x64.node' {
      * @param pid 进程 PID
      */
     isProcessForeground(pid: number): boolean
+    /**
+     * 获取管理员权限
+     * @constructor
+     */
+    requestAdmin(): boolean
+
   }
 
   const lt1: LeagueAkari1Addon

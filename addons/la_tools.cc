@@ -6,7 +6,11 @@
 #include <windows.h>
 #include <TlHelp32.h>
 #include <winternl.h>
-
+#include <stdint.h>   // 引入固定宽度整数类型的定义
+#include <psapi.h>    // 引入用于获取进程信息的API
+#include <string>
+#include <memory> // 引入智能指针
+#include <shellapi.h>
 constexpr wchar_t APPLICATION_CLASS_NAME[] = L"RCLIENT";
 constexpr wchar_t APPLICATION_NAME[] = L"League of Legends";
 constexpr wchar_t CEF_WINDOW_NAME[] = L"CefBrowserWindow";
@@ -275,7 +279,68 @@ Napi::Boolean IsProcessForegroundNode(const Napi::CallbackInfo& info) {
   bool isForeground = IsProcessForeground(processID);
   return Napi::Boolean::New(env, isForeground);
 }
-
+// 获取当前应用程序的路径
+std::wstring GetCurrentAppPath()
+{
+  wchar_t buffer[MAX_PATH];
+  // 显式调用 Unicode 版本的函数
+  GetModuleFileNameW(NULL, buffer, MAX_PATH);
+  return std::wstring(buffer);
+}
+// 检查当前进程是否以管理员权限运行
+bool IsRunAsAdmin()
+{
+  BOOL fRet = FALSE;
+  DWORD dwError = 0;
+  PSID pAdministratorsGroup;
+  SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+  if (!AllocateAndInitializeSid(
+          &NtAuthority,
+          2,
+          SECURITY_BUILTIN_DOMAIN_RID,
+          DOMAIN_ALIAS_RID_ADMINS,
+          0, 0, 0, 0, 0, 0,
+          &pAdministratorsGroup))
+  {
+    dwError = GetLastError();
+    return false;
+  }
+  if (!CheckTokenMembership(NULL, pAdministratorsGroup, &fRet))
+  {
+    dwError = GetLastError();
+    FreeSid(pAdministratorsGroup);
+    return false;
+  }
+  FreeSid(pAdministratorsGroup);
+  return fRet;
+}
+// 请求管理员权限
+bool RequestAdminPrivileges()
+{
+  if (IsRunAsAdmin())
+  {
+    return true;
+  }
+  std::wstring appPath = GetCurrentAppPath();
+  HINSTANCE hInst = ShellExecuteW(NULL, L"runas", appPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+  if ((int)hInst <= 32)
+  {
+    return false;
+  }
+  ExitProcess(0);
+  return true;
+}
+// N-API 包装函数，用于在 Node.js 中调用请求管理员权限的功能
+Napi::Value RequestAdmin(const Napi::CallbackInfo &info)
+{
+  Napi::Env env = info.Env();
+  if (!RequestAdminPrivileges())
+  {
+    Napi::TypeError::New(env, "Failed to request admin privileges").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+  return Napi::Boolean::New(env, true);
+}
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set("fixWindowMethodA", Napi::Function::New(env, FixWindowMethodA));
   exports.Set("isElevated", Napi::Function::New(env, IsElevated));
@@ -284,6 +349,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set("getPidsByName", Napi::Function::New(env, GetPidsByName));
   exports.Set("terminateProcess", Napi::Function::New(env, TerminateProcessNode));
   exports.Set("isProcessForeground", Napi::Function::New(env, IsProcessForegroundNode));
+  exports.Set("requestAdmin", Napi::Function::New(env, RequestAdmin));
   return exports;
 }
 

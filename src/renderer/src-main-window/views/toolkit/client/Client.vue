@@ -74,7 +74,7 @@
             <ShortcutSelector
               :target-id="GameClientRenderer.SHORTCUT_ID_TERMINATE_GAME_CLIENT"
               :shortcut-id="gcs.settings.terminateShortcut"
-              @update:shortcut-id="(v) => gc.setTerminateShortcut(v)"
+              @update:shortcut-id="(v) => gc.setTerminateShortcut(v as string)"
               :disabled="!as.isAdministrator"
             />
           </ControlItem>

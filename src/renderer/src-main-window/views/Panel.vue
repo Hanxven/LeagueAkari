@@ -5,7 +5,7 @@
         class="sidebar-menu"
         :items="menu"
         :current="currentMenu"
-        @update:current="(key) => handleMenuChange(key)"
+        @update:current="(key) => handleMenuChange(key as string)"
       />
       <div class="padding-zone"></div>
       <SidebarFixed />

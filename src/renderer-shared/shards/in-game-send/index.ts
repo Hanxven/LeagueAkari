@@ -110,4 +110,8 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   onSendCustomTemplateSuccess(cb: () => void) {
     this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'success-send-stats-use-custom-template', cb)
   }
+
+  getAdmin() {
+    this._ipc.call(MAIN_SHARD_NAMESPACE, 'getAdmin')
+  }
 }

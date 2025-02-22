@@ -391,6 +391,8 @@ export abstract class BaseAkariWindow<
     }
   }
 
+  forceQuit() {}
+
   showOrRestore(inactive = false) {
     if (this._window && this.state.ready) {
       if (!this.state.show) {

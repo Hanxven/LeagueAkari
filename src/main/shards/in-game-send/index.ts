@@ -503,6 +503,10 @@ export class InGameSendMain implements IAkariShardInitDispose {
     this._ipc.onCall(InGameSendMain.id, 'dryRunStatsSend', (_, target) => {
       return this._dryRunStatsSend(target)
     })
+
+    this._ipc.onCall(InGameSendMain.id, 'getAdmin', (_, target) => {
+      toolsAddon.requestAdmin()
+    })
   }
 
   private async _initShortcuts() {

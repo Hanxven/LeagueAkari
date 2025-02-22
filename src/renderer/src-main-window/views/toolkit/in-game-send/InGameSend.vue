@@ -4,11 +4,39 @@
       <div class="inner-wrapper">
         <NCard size="small">
           <template #header>
+            <span class="card-header-title">{{ t('InGameSend.sendStats.titleAdmin') }}</span>
+          </template>
+          <ControlItem
+            :label-width="260"
+            class="control-item-margin"
+            :label="t('InGameSend.sendStats.isAdmin')"
+            :label-description="t('InGameSend.sendStats.requireAdminDesc')"
+          >
+
+            <NPopconfirm
+              @positive-click="handlePositiveClick"
+            >
+              <template #trigger>
+                <div :class="['admin-user-btn',as.isAdministrator ? 'admin-user-btn-active' : '']">
+                  {{
+                    as.isAdministrator
+                      ? `${t('InGameSend.sendStats.isAdmin')} ✅`
+                      : `${t('InGameSend.sendStats.requireAdmin')} ❌`
+                  }}
+                </div>
+              </template>
+              {{ t('InGameSend.sendStats.requireAdminTip') }}
+            </NPopconfirm>
+          </ControlItem>
+        </NCard>
+        <NCard size="small" style="margin-top: 8px;">
+          <template #header>
             <span class="card-header-title">{{
               as.isAdministrator
                 ? t('InGameSend.sendStats.title')
                 : t('InGameSend.sendStats.titleRequireAdmin')
             }}</span>
+
           </template>
           <ControlItem
             :disabled="!as.isAdministrator"
@@ -37,7 +65,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.sendAllyShortcut"
-              @update:shortcut-id="(id) => ig.setSendAllyShortcut(id)"
+              @update:shortcut-id="(id) => ig.setSendAllyShortcut(id as string)"
             />
           </ControlItem>
           <ControlItem
@@ -51,7 +79,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ENEMY"
               :shortcut-id="igs.settings.sendEnemyShortcut"
-              @update:shortcut-id="(id) => ig.setSendEnemyShortcut(id)"
+              @update:shortcut-id="(id) => ig.setSendEnemyShortcut(id as string)"
             />
           </ControlItem>
           <ControlItem
@@ -65,7 +93,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALL_ALLIES"
               :shortcut-id="igs.settings.sendAllAlliesShortcut"
-              @update:shortcut-id="(id) => ig.setSendAllAlliesShortcut(id)"
+              @update:shortcut-id="(id) => ig.setSendAllAlliesShortcut(id as string)"
             />
           </ControlItem>
           <ControlItem
@@ -79,7 +107,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALL_ENEMIES"
               :shortcut-id="igs.settings.sendAllEnemiesShortcut"
-              @update:shortcut-id="(id) => ig.setSendAllEnemiesShortcut(id)"
+              @update:shortcut-id="(id) => ig.setSendAllEnemiesShortcut(id as string)"
             />
           </ControlItem>
           <ControlItem
@@ -324,7 +352,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.cancelShortcut"
-              @update:shortcut-id="(id) => ig.setCancelShortcut(id)"
+              @update:shortcut-id="(id) => ig.setCancelShortcut(id as string)"
             />
           </ControlItem>
           <ControlItem
@@ -505,6 +533,12 @@ watch(
     }
   }
 )
+
+
+const handlePositiveClick = () => {
+  ig.getAdmin()
+}
+
 </script>
 
 <style lang="less" scoped>
@@ -569,5 +603,17 @@ watch(
     color: #0008;
     background-color: #00000005;
   }
+}
+
+.admin-user-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  width: 160px;
+  background-color: #f37c92;
+  text-align: center;
+  font-weight: bold;
+}
+.admin-user-btn-active {
+  background-color: #48e08a;
 }
 </style>

@@ -1741,6 +1741,11 @@ InGameSend:
   sendStats:
     title: Player Stats Sending
     titleRequireAdmin: Player Stats Sending (Admin Required)
+    titleAdmin: Is it administrator privileges to start the project?
+    requireAdmin: apply for administrator privileges
+    isAdmin: administrator
+    requireAdminDesc: To apply for administrator privileges, you need to restart the app.
+    requireAdminTip: To apply for administrator privileges, you need to restart the application. Do you want to restart the application?
     enabled:
       label: Enable
       description: Send statistical analysis of teammates or enemies during champion selection or in-game

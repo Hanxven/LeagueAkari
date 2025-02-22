@@ -6,6 +6,5 @@
   "dependencies": {
     "node-addon-api": "^8.2.1"
   },
-  "scripts": {},
   "gypfile": true
 }

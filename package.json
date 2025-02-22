@@ -13,7 +13,7 @@
     "typecheck:web": "vue-tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
-    "dev": "electron-vite dev -- --inspect",
+    "dev": "chcp 65001 & electron-vite dev -- --inspect",
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:win": "npm run build && electron-builder --win --config"
@@ -60,7 +60,7 @@
     "@vitejs/plugin-vue-jsx": "^4.1.1",
     "@vueuse/components": "^12.5.0",
     "@vueuse/core": "^12.5.0",
-    "electron": "33.4.0",
+    "electron": "^34.2.0",
     "electron-builder": "25.1.8",
     "electron-vite": "^2.3.0",
     "html-to-image": "^1.11.12",
