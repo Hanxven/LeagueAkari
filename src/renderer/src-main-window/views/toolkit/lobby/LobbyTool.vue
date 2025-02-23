@@ -360,10 +360,4 @@ const handleLoadAvailableBots = async (show: boolean) => {
 }
 </script>
 
-<style lang="less" scoped>
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
-</style>
+<style lang="less" scoped></style>

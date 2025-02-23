@@ -75,10 +75,4 @@ const handleChangeAvailability = async (availability: string) => {
 .fade-leave-to {
   opacity: 0;
 }
-
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
 </style>

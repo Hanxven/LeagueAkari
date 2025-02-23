@@ -48,6 +48,7 @@
             :position="ogs.positionAssignments?.[player]"
             :premade-team-id="premadeTeamInfo.players[player]"
             :currentHighlightingPremadeTeamId="currentHighlightingPremadeTeamIdD"
+            :kda-iqr="kdaOutliers?.[player]"
             :query-stage="ogs.queryStage"
             @show-game="handleShowGame"
             @show-game-by-id="handleShowGameById"
@@ -95,10 +96,11 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { Game } from '@shared/types/league-client/match-history'
+import { findOutliersByIqr } from '@shared/utils/analysis'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { NScrollbar } from 'naive-ui'
-import { computed, reactive, ref, useTemplateRef } from 'vue'
+import { computed, reactive, ref, useTemplateRef, watchEffect } from 'vue'
 
 import EasyToLaunch from '@main-window/components/EasyToLaunch.vue'
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
@@ -273,6 +275,35 @@ const handleHighlightSubTeam = (preMadeTeamId: string, highlight: boolean) => {
     currentHighlightingPremadeTeamId.value = null
   }
 }
+
+const IQR_THRESHOLD = 0.65
+const kdaOutliers = computed(() => {
+  if (!ogs.playerStats || Object.keys(ogs.playerStats.players).length < 5) {
+    return null
+  }
+
+  const kdaList = Object.entries(ogs.playerStats?.players || {}).map(([puuid, p]) => ({
+    puuid,
+    kda: p.summary.averageKda
+  }))
+
+  const iqr = findOutliersByIqr(kdaList, (a) => a.kda, IQR_THRESHOLD)
+  const result: Record<string, 'over' | 'below'> = {}
+
+  iqr.over.forEach((a) => {
+    result[a.puuid] = 'over'
+  })
+
+  iqr.below.forEach((a) => {
+    result[a.puuid] = 'below'
+  })
+
+  return result
+})
+
+watchEffect(() => {
+  console.log('Outliers:', kdaOutliers.value)
+})
 
 const isStandaloneMatchHistoryCardShow = ref(false)
 const handleShowGame = (game: Game, puuid: string) => {

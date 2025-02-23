@@ -220,34 +220,6 @@ interface PlayerWithKda {
   kda: number
 }
 
-// 暂未实装
-export function findOutstandingPlayers(
-  players: PlayerWithKda[],
-  thresholdMultiplier: number = 1.5,
-  includeAverage: boolean = true
-): PlayerWithKda[] {
-  if (players.length === 0) return []
-
-  // 计算平均KDA
-  const totalKda = players.reduce((acc, player) => acc + player.kda, 0)
-  const averageKda = totalKda / players.length
-
-  // 计算标准差
-  const variance =
-    players.reduce((acc, player) => acc + Math.pow(player.kda - averageKda, 2), 0) / players.length
-  const standardDeviation = Math.sqrt(variance)
-
-  // 根据是否包括平均值调整阈值的计算
-  const threshold = includeAverage
-    ? averageKda + thresholdMultiplier * standardDeviation
-    : thresholdMultiplier * standardDeviation
-
-  // 筛选出超过阈值的突出玩家
-  const outstandingPlayers = players.filter((player) => player.kda > threshold)
-
-  return outstandingPlayers
-}
-
 interface SoloKillInfo {
   time: number
   position: {
@@ -322,11 +294,16 @@ export interface MatchHistoryGamesAnalysis {
 
   win: boolean
 
+  visionScore: number
+
   // -
   championId: number
 
   // SGP 数据字段 teamPosition, 若不存在则为空字符串
   position: string | null
+
+  // SGP 数据字段 enemyMissingPings, 若不存在则为 null
+  enemyMissingPings: number | null
 
   // timeline
   soloKills: SoloKillInfo[] | null
@@ -379,6 +356,8 @@ export interface MatchHistoryGamesAnalysisSummary {
   averageGoldShareToTop: number
   averageGoldShareOfTeam: number
 
+  averageVisionScore: number
+
   averageDamageGoldEfficiency: number
 
   totalKills: number
@@ -408,6 +387,9 @@ export interface MatchHistoryGamesAnalysisSummary {
   flashOnF: number
 
   sinceLast: number
+
+  // SGP Only
+  averageEnemyMissingPings: number | null
 }
 
 export interface MatchHistoryChampionAnalysis {
@@ -599,6 +581,8 @@ export function analyzeMatchHistory(
       goldShareToTop: 0,
       goldShareOfTeam: 0,
 
+      visionScore: watashi.stats.visionScore,
+
       // 经济转换率
       damageGoldEfficiency: Math.min(
         watashi.stats.totalDamageDealtToChampions / watashi.stats.goldEarned,
@@ -612,6 +596,7 @@ export function analyzeMatchHistory(
 
       // sgp only
       position: watashi.stats.teamPosition || null,
+      enemyMissingPings: watashi.stats.enemyMissingPings ?? null,
 
       // timeline
       soloKills: null,
@@ -921,6 +906,8 @@ export function analyzeMatchHistory(
     averageGoldShareToTop: 0,
     averageGoldShareOfTeam: 0,
 
+    averageVisionScore: 0,
+
     averageDamageGoldEfficiency: 0,
 
     totalKills: 0,
@@ -947,7 +934,10 @@ export function analyzeMatchHistory(
 
     flashOnD: 0,
     flashOnF: 0,
-    sinceLast: Date.now() - detailedGames[0].gameCreation
+    sinceLast: Date.now() - detailedGames[0].gameCreation,
+
+    // SGP Only
+    averageEnemyMissingPings: 0
   }
 
   let totalDamageShareToTop = 0
@@ -986,7 +976,11 @@ export function analyzeMatchHistory(
   let totalGoldShareToTop = 0
   let totalGoldShareOfTeam = 0
 
+  let totalVisionScore = 0
+
   let totalDamageGoldEfficiency = 0
+
+  let totalEnemyMissingPings: number | null = 0
 
   let positionCount = 0
   const positions: Record<string, number> = {}
@@ -1035,6 +1029,8 @@ export function analyzeMatchHistory(
     totalGoldShareToTop += analysis.goldShareToTop
     totalGoldShareOfTeam += analysis.goldShareOfTeam
 
+    totalVisionScore += analysis.visionScore
+
     totalDamageGoldEfficiency += analysis.damageGoldEfficiency
 
     if (analysis.position) {
@@ -1046,6 +1042,12 @@ export function analyzeMatchHistory(
       summary.flashOnD++
     } else if (analysis.flashSlot === 'F') {
       summary.flashOnF++
+    }
+
+    if (analysis.enemyMissingPings === null || totalEnemyMissingPings === null) {
+      totalEnemyMissingPings = null
+    } else {
+      totalEnemyMissingPings += analysis.enemyMissingPings
     }
   }
 
@@ -1113,7 +1115,14 @@ export function analyzeMatchHistory(
   summary.averageGoldShareToTop = totalGoldShareToTop / (gameAnalyses.length || 1)
   summary.averageGoldShareOfTeam = totalGoldShareOfTeam / (gameAnalyses.length || 1)
 
+  summary.averageVisionScore = totalVisionScore / (gameAnalyses.length || 1)
+
   summary.averageDamageGoldEfficiency = totalDamageGoldEfficiency / (gameAnalyses.length || 1)
+
+  // SGP Only
+  if (totalEnemyMissingPings !== null) {
+    summary.averageEnemyMissingPings = totalEnemyMissingPings / (gameAnalyses.length || 1)
+  }
 
   return {
     games: gamesAnalysisMap,
@@ -1265,7 +1274,7 @@ function percentile(sorted: number[], p: number): number {
 /**
  * 是找出过高高评分和过低评分的玩家
  */
-export function findOutliersByIQR<T>(
+export function findOutliersByIqr<T>(
   data: T[],
   keyGetter?: (value: T) => number,
   threshold: number = 1.5

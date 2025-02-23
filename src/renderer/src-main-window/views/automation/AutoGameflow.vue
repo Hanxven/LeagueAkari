@@ -399,12 +399,6 @@ const handleChangeInvitationStrategy = (queueType: string, strategy: string) => 
 </script>
 
 <style lang="less" scoped>
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
-
 .divider {
   margin-top: 12px;
   margin-bottom: 12px;

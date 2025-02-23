@@ -76,7 +76,8 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
     )
 
     this._context.mobx.reaction(
-      () => [this.settings.enabled, this._context.windowManager.state.isManagerFinishedInit] as const,
+      () =>
+        [this.settings.enabled, this._context.windowManager.state.isManagerFinishedInit] as const,
       ([enabled, ready]) => {
         if (!ready) {
           return

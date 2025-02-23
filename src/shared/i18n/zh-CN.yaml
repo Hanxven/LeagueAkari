@@ -136,7 +136,7 @@ AppSettings:
         label: 代理端口
         description: 代理服务器的端口
 
-MatchHistoryTabsSettings:
+MatchHistorySettings:
   title: 战绩页面
 
   refreshTabsAfterGameEnds:
@@ -243,6 +243,10 @@ OngoingGameSettings:
         label: 伤害经济效率
       showPrivacyTag:
         label: 生涯隐藏标记
+      showAverageEnemyMissingPingsTag:
+        label: 场均敌方消失信号数
+      showAverageVisionScoreTag:
+        label: 场均视野得分
       showAkariScoreTag:
         label: Akari Score
 
@@ -1436,6 +1440,10 @@ PlayerInfoCard:
   teamGoldSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍经济占比为 {{rate}}%
   damageGoldEfficiency: 伤转率 {{rate}}%
   damageGoldEfficiencyPopover: 在最近的 {{countV}} 场对局中，该玩家的平均伤害转化率为 {{rate}}%
+  enemyMissingPings: 问号 {{countV}} 次
+  enemyMissingPingsPopover: 该玩家平均每局发送敌方消失信号 {{countV}} 次
+  visionScore: 视野分 {{countV}}
+  visionScorePopover: 该玩家平均每局视野得分 {{countV}} 分
   metPopover:
     title: 最近在 {{date}} 遇到过该玩家，共遇到过 {{countV}} 次
     gameId: 对局 ID

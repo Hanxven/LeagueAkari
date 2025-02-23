@@ -134,6 +134,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
       showAverageTeamDamageTakenTag: false,
       showAverageTeamGoldTag: false,
       showAverageDamageGoldEfficiencyTag: false,
+      showAverageEnemyMissingPingsTag: false,
+      showAverageVisionScoreTag: false,
       showSelfTag: true,
       showMetTag: true,
       showTaggedTag: true,

@@ -385,12 +385,6 @@ const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
   }
 }
 
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
-
 .single-root {
   height: 100%;
 }

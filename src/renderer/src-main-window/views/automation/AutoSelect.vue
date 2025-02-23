@@ -199,7 +199,9 @@
             <OrderedChampionList
               type="pick"
               :champions="store.settings.benchExpectedChampions"
-              @update:champions="(list) => as.setBenchExpectedChampions(list! /* language-tools 1e84c6a  */)"
+              @update:champions="
+                (list) => as.setBenchExpectedChampions(list! /* language-tools 1e84c6a  */)
+              "
             />
           </ControlItem>
         </NCard>
@@ -321,12 +323,6 @@ const roles = computed(() => {
   margin-bottom: 12px;
   height: 1px;
   background-color: rgba(255, 255, 255, 0.084);
-}
-
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
 }
 
 .outer-wrapper {

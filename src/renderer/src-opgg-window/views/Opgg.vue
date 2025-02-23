@@ -901,12 +901,6 @@ watch(
   }
 }
 
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
-
 .settings-aux-window-only {
   font-size: 12px;
   font-weight: bold;

@@ -15,6 +15,7 @@ import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { PiniaMobxUtilsRenderer } from '@renderer-shared/shards/pinia-mobx-utils'
+import { PlayerStalkingRenderer } from '@renderer-shared/shards/player-stalking'
 import { RendererDebugRenderer } from '@renderer-shared/shards/renderer-debug'
 import { RespawnTimerRenderer } from '@renderer-shared/shards/respawn-timer'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
@@ -26,7 +27,6 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
 import { MainWindowUiRenderer } from './main-window-ui'
 import { MatchHistoryTabsRenderer } from './match-history-tabs'
-import { PlayerStalkingRenderer } from '@renderer-shared/shards/player-stalking'
 
 const manager = createManager()
 

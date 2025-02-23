@@ -519,12 +519,6 @@ useIntervalFn(
 .text {
   font-size: 13px;
 }
-
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
 </style>
 
 <style module lang="less">
