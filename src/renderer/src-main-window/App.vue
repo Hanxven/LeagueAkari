@@ -25,7 +25,7 @@
         }"
       ></div>
     </Transition>
-    <MainWindowTitleBar />
+    <MainWindowTitleBar v-if="!isOverlay" />
     <div id="app-content"><RouterView /></div>
   </div>
 </template>
@@ -42,8 +42,9 @@ import { greeting } from '@renderer-shared/utils/greeting'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { useTranslation } from 'i18next-vue'
 import { useMessage, useNotification } from 'naive-ui'
-import { provide, ref, watchEffect } from 'vue'
+import { provide, ref, watchEffect, computed } from 'vue'
 import { h } from 'vue'
+import { useRoute } from 'vue-router'
 
 import AnnouncementModal from './components/AnnouncementModal.vue'
 import DeclarationModal from './components/DeclarationModal.vue'
@@ -63,6 +64,8 @@ const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
 const app = useInstance<AppCommonRenderer>('app-common-renderer')
 
 const { t } = useTranslation()
+
+const route = useRoute()
 
 greeting(as.version)
 
@@ -94,6 +97,17 @@ const isShowingNewUpdateModal = ref(false)
 const isShowingNewUpdate = ref(false)
 const isShowingFreeSoftwareDeclaration = ref(false)
 const isShowingAnnouncementModal = ref(false)
+
+const isOverlay = computed(() => {
+  if (route.name !== 'ongoing-game') {
+    return false
+  }
+  const mode = route.params.mode as string
+  if (!mode) {
+    return false
+  }
+  return true
+})
 
 watchEffect(() => {
   if (as.settings.showFreeSoftwareDeclaration) {

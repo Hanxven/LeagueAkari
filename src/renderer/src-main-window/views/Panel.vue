@@ -1,6 +1,6 @@
 <template>
   <div class="panel">
-    <div class="left-side-content">
+    <div class="left-side-content" v-if="!isOverlay">
       <SidebarMenu
         class="sidebar-menu"
         :items="menu"
@@ -66,6 +66,17 @@ watch(
     }
   }
 )
+
+const isOverlay = computed(() => {
+  if (route.name !== 'ongoing-game') {
+    return false
+  }
+  const mode = route.params.mode as string
+  if (!mode) {
+    return false
+  }
+  return true
+})
 
 const currentMenu = ref('match-history')
 const menu = computed(() => {

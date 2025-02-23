@@ -1,4 +1,4 @@
-import { Event } from 'electron'
+import { BrowserWindow, Event } from 'electron'
 
 import type { WindowManagerMainContext } from '..'
 import icon from '../../../../../resources/LA_ICON.ico?asset'
@@ -9,16 +9,15 @@ import { Overlay } from '@leaguetavern/electron-overlay-win'
 
 export class AkariOverlayWindow extends BaseAkariWindow<OverlayWindowState, OverlayWindowSettings> {
   static readonly NAMESPACE_SUFFIX = 'overlay-window'
-  static readonly HTML_ENTRY = ''
+  static readonly HTML_ENTRY = 'main-window.html'
+  static readonly HTML_ENTRY_HASH = 'ongoing-game/overlay'
   static readonly TITLE = 'League Overlay'
   static readonly BASE_WIDTH = 1500
   static readonly BASE_HEIGHT = 860
-  static readonly MIN_WIDTH = 840
-  static readonly MIN_HEIGHT = 600
 
   static readonly _overlay: Overlay = new Overlay;
   private readonly _timer: NodeJS.Timeout;
-  private visible: boolean = false
+  private _visible: boolean = false
 
   constructor(_context: WindowManagerMainContext) {
     const state = new OverlayWindowState()
@@ -27,19 +26,19 @@ export class AkariOverlayWindow extends BaseAkariWindow<OverlayWindowState, Over
     super(_context, AkariOverlayWindow.NAMESPACE_SUFFIX, state, settings, {
       baseWidth: AkariOverlayWindow.BASE_WIDTH,
       baseHeight: AkariOverlayWindow.BASE_HEIGHT,
-      minWidth: AkariOverlayWindow.MIN_WIDTH,
-      minHeight: AkariOverlayWindow.MIN_HEIGHT,
-      htmlEntry: AkariOverlayWindow.HTML_ENTRY,
+      minWidth: AkariOverlayWindow.BASE_WIDTH,
+      minHeight: AkariOverlayWindow.BASE_HEIGHT,
+      htmlEntry: { path: AkariOverlayWindow.HTML_ENTRY, hash: AkariOverlayWindow.HTML_ENTRY_HASH } ,
       rememberPosition: false,
-      rememberSize: true,
       settingSchema: {},
       browserWindowOptions: {
         title: AkariOverlayWindow.TITLE,
         icon: icon,
         show: false,
         frame: false,
+        resizable: false,
         focusable: false,
-        maximizable: true,
+        maximizable: false,
         minimizable: false,
         fullscreenable: false,
         skipTaskbar: true,
@@ -47,25 +46,21 @@ export class AkariOverlayWindow extends BaseAkariWindow<OverlayWindowState, Over
         backgroundColor: '#00000000',
       }
     })
-    
-
     this._timer = setInterval(()=>{
-      if (!GameClientMain.isGameClientForeground() && this.visible) {
+      if (!GameClientMain.isGameClientForeground() && this._visible) {
         this.hide()
       }
     }, 200)
   }
 
-  private _handleMainWindowLogics() {
+  private _handleOverlayWindowLogics() {
     this._mobx.reaction(
       () => this.state.ready,
       (ready) => {
         if (!ready) {
           return 
         }
-        if (!AkariOverlayWindow._overlay.enable(this.window.getNativeWindowHandle()).res) {
-          this.close();
-        }
+        this._setTop()
       }
     )
   }
@@ -86,24 +81,47 @@ export class AkariOverlayWindow extends BaseAkariWindow<OverlayWindowState, Over
   override async onInit() {
     await super.onInit()
 
-    this._handleMainWindowLogics()
+    this._handleOverlayWindowLogics()
   }
 
   public toggleVisible() {
-    (GameClientMain.isGameClientForeground() && this.visible) ? this._hide(): this._show()
+    if (GameClientMain.isGameClientForeground()) {
+      this._visible ? this._hide(): this._show()
+    }
+  }
+
+  _setTop() {
+    if (this.window && !AkariOverlayWindow._overlay.enable(this.window.getNativeWindowHandle()).res) {
+      this.close()
+      return
+    }
+  }
+
+  _toggleClickThrough(value: boolean) {
+    if (value) {
+      this.window?.setIgnoreMouseEvents(true, { forward: true });
+    } else {
+      this.window?.setIgnoreMouseEvents(false);
+    }
   }
 
   _show() {
-    if (!this.visible) {
+    if (!this._visible) {
+      this.window?.setBounds({width:AkariOverlayWindow.BASE_WIDTH ,height: AkariOverlayWindow.BASE_HEIGHT})
+      this.window?.center()
       this.showOrRestore()
-      this.visible = true
+      this._toggleClickThrough(true)
+      this._visible = true
     }
   }
 
   _hide() {
-    if (this.visible) {
+    if (this._visible) {
+      // bug: https://github.com/electron/electron/issues/42772
+      // 目前的解决方案是缩小到左上角进行隐藏, 需要时再转换回来
+      this.window?.setBounds({x:0, y:0, width:0 ,height: 0})
       this.hide()
-      this.visible = false
+      this._visible = false
     }
   }
 }

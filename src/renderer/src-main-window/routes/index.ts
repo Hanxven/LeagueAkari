@@ -21,7 +21,7 @@ const router = createRouter({
         },
         {
           name: 'ongoing-game',
-          path: '/ongoing-game',
+          path: '/ongoing-game/:mode?',
           component: () => import('@main-window/views/ongoing-game/OngoingGame.vue')
         },
         {
