@@ -2,7 +2,7 @@ import { Rectangle } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class OverlayWindowSettings {
-  pinned: boolean = false
+  pinned: boolean = true
 
   opacity: number = 1
 
