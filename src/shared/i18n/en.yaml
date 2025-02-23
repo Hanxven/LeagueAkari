@@ -133,7 +133,7 @@ AppSettings:
         label: Proxy Port
         description: The port of the proxy server
 
-MatchHistoryTabsSettings:
+MatchHistorySettings:
   title: Match History Tabs
 
   refreshTabsAfterGameEnds:
@@ -240,6 +240,10 @@ OngoingGameSettings:
         label: Damage-Gold Efficiency Tag
       showPrivacyTag:
         label: Career Hidden Tag
+      showAverageEnemyMissingPingsTag:
+        label: Average Enemy Missing Pings
+      showAverageVisionScoreTag:
+        label: Average Vision Score
       showAkariScoreTag:
         label: Akari Score
 
@@ -1429,6 +1433,10 @@ PlayerInfoCard:
   teamGoldSharePopover: In the recent {{countV}} games, this player's average team gold share is {{rate}}%
   damageGoldEfficiency: Dmg-Gold {{rate}}%
   damageGoldEfficiencyPopover: In the recent {{countV}} games, this player's average damage to gold efficiency is {{rate}}%
+  enemyMissingPings: Missing pings {{countV}}
+  enemyMissingPingsPopover: This player has sent enemy missing pings an average of {{countV}} times per game
+  visionScore: Vision Score {{countV}}
+  visionScorePopover: This player's average vision score is {{countV}}
   metPopover:
     title: Previously encountered this player in {{date}}, a total of {{countV}} times.
     gameId: Game ID

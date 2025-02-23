@@ -91,7 +91,8 @@
         <template #labelDescription>
           <div>{{ t('MultiWindowSettings.opggWindow.enabled.description') }}</div>
           <div>
-            {{ t('MultiWindowSettings.opggWindow.enabled.descriptionPart1') }}<OpggIcon class="inline-icon" />{{
+            {{ t('MultiWindowSettings.opggWindow.enabled.descriptionPart1')
+            }}<OpggIcon class="inline-icon" />{{
               t('MultiWindowSettings.opggWindow.enabled.descriptionPart2')
             }}
           </div>
@@ -155,8 +156,9 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useAuxWindowStore, useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
+import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NScrollbar, NSlider, NSwitch } from 'naive-ui'
+import { NButton, NCard, NIcon, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 const { t } = useTranslation()
 

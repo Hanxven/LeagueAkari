@@ -16,9 +16,9 @@ import { EntitlementsState } from './entitlements'
 import { GameDataState } from './game-data'
 import { GameflowState } from './gameflow'
 import { HonorState } from './honor'
+import { LeagueSessionState } from './league-session'
 import { LobbyState } from './lobby'
 import { LoginState } from './login'
-import { LolLeagueSessionState } from './lol-league-session'
 import { MatchmakingState } from './matchmaking'
 import { SummonerState } from './summoner'
 
@@ -43,7 +43,7 @@ export class LeagueClientSyncedData {
   public matchmaking = new MatchmakingState()
   public gameData = new GameDataState()
   public entitlements = new EntitlementsState()
-  public lolLeagueSession = new LolLeagueSessionState()
+  public leagueSession = new LeagueSessionState()
 
   constructor(
     private readonly _i: LeagueClientMain,
@@ -70,7 +70,7 @@ export class LeagueClientSyncedData {
     this._syncLcuMatchmaking()
     this._syncLcuSummoner()
     this._syncLcuEntitlements()
-    this._syncLcuLolLeagueSession()
+    this._syncLcuLeagueSession()
   }
 
   private _syncLcuGameData() {
@@ -1033,34 +1033,34 @@ export class LeagueClientSyncedData {
     })
   }
 
-  private _syncLcuLolLeagueSession() {
-    this._mobx.propSync(this._C.id, 'lolLeagueSession', this.lolLeagueSession, 'token')
+  private _syncLcuLeagueSession() {
+    this._mobx.propSync(this._C.id, 'leagueSession', this.leagueSession, 'token')
 
     this._mobx.reaction(
       () => this._i.state.connectionState,
       async (state) => {
         if (state === 'connected') {
           try {
-            const data = (await this._i.api.lolLeagueSession.getLolLeagueSessionToken()).data
-            this.lolLeagueSession.setToken(data)
+            const data = (await this._i.api.leagueSession.getLeagueSessionToken()).data
+            this.leagueSession.setToken(data)
           } catch (error) {
             if (isAxiosError(error) && error.response?.status === 404) {
-              this.lolLeagueSession.setToken(null)
+              this.leagueSession.setToken(null)
               return
             }
 
-            this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-lol-league-session-token')
+            this._ipc.sendEvent(this._C.id, 'error-sync-data', 'get-league-session-token')
             this._log.warn(`获取 LOL League Session 失败`, error)
           }
         } else {
-          this.lolLeagueSession.setToken(null)
+          this.leagueSession.setToken(null)
         }
       },
       { fireImmediately: true }
     )
 
     this._i.events.on('/lol-league-session/v1/league-session-token', (event) => {
-      this.lolLeagueSession.setToken(event.data)
+      this.leagueSession.setToken(event.data)
     })
   }
 }

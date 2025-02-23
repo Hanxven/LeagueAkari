@@ -1,6 +1,6 @@
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 
-export class LolLeagueSessionState {
+export class LeagueSessionState {
   token: string | null = null
 
   setToken(t: string | null) {

@@ -40,7 +40,7 @@ export class SgpState {
   }
 
   get isTokenReady() {
-    if (this._lcData.lolLeagueSession.token && this._lcData.entitlements.token) {
+    if (this._lcData.leagueSession.token && this._lcData.entitlements.token) {
       return true
     }
 

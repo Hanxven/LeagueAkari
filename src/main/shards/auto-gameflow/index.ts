@@ -559,6 +559,22 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     )
   }
 
+  private _handlePreEndOfGame() {
+    this._lc.events.on('/lol-pre-end-of-game/v1/currentSequenceEvent', async (event) => {
+      if (event.data) {
+        // TODO: 暂时将 missions-celebration 合并到 play-again 逻辑设置下
+        if (this.settings.playAgainEnabled && event.data.name === 'missions-celebration') {
+          this._log.info('PreEndOfGame currentSequenceEvent: missions-celebration，尝试完成')
+          try {
+            await this._lc.api.preEndOfGame.complete('missions-celebration')
+          } catch (error) {
+            this._log.warn(`无法完成 missions-celebration: ${formatError(error)}`)
+          }
+        }
+      }
+    })
+  }
+
   private async _acceptMatch() {
     try {
       await this._lc.api.matchmaking.accept()
@@ -778,6 +794,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._handleLogging()
     this._handleLastSecondDodge()
     this._handleAutoSearchMatch()
+    this._handlePreEndOfGame()
   }
 
   async onDispose() {}

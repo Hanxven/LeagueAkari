@@ -82,12 +82,6 @@ watchEffect(() => {
 </script>
 
 <style lang="less" scoped>
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
-
 .outer-wrapper {
   position: relative;
   height: 100%;

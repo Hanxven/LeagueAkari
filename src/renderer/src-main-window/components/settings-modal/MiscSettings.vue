@@ -35,12 +35,6 @@ const rt = useInstance<RespawnTimerRenderer>('respawn-timer-renderer')
 </script>
 
 <style lang="less" scoped>
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
-
 .card-header-title.disabled {
   color: rgba(255, 255, 255, 0.35);
 }

@@ -162,21 +162,28 @@ export class OngoingGameRenderer implements IAkariShardInitDispose {
       OngoingGameRenderer.id,
       store.frontendSettings,
       'showChampionUsage',
-      'frontend/showChampionUsage'
+      {
+        savePropKey: 'frontend/showChampionUsage'
+      }
     )
 
     await this._setting.savedPropVue(
       OngoingGameRenderer.id,
       store.frontendSettings,
       'showMatchHistoryItemBorder',
-      'frontend/showMatchHistoryItemBorder'
+      {
+        savePropKey: 'frontend/showMatchHistoryItemBorder'
+      }
     )
 
     await this._setting.savedPropVue(
       OngoingGameRenderer.id,
       store.frontendSettings,
       'playerCardTags',
-      'frontend/playerCard'
+      {
+        savePropKey: 'frontend/playerCard',
+        watchOptions: { deep: true }
+      }
     )
   }
 

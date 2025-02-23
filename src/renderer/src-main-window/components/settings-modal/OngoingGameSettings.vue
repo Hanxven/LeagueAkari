@@ -236,6 +236,16 @@
             {{ t('OngoingGameSettings.playerCardTags.tags.showPrivacyTag.label') }}
           </NCheckbox>
           <NCheckbox
+            v-model:checked="ogs.frontendSettings.playerCardTags.showAverageEnemyMissingPingsTag"
+          >
+            {{ t('OngoingGameSettings.playerCardTags.tags.showAverageEnemyMissingPingsTag.label') }}
+          </NCheckbox>
+          <NCheckbox
+            v-model:checked="ogs.frontendSettings.playerCardTags.showAverageVisionScoreTag"
+          >
+            {{ t('OngoingGameSettings.playerCardTags.tags.showAverageVisionScoreTag.label') }}
+          </NCheckbox>
+          <NCheckbox
             v-if="as.settings.isInKyokoMode"
             v-model:checked="ogs.frontendSettings.playerCardTags.showAkariScoreTag"
           >

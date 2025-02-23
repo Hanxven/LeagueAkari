@@ -332,9 +332,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.cancelShortcut"
-              @update:shortcut-id="
-                (id) => ig.setCancelShortcut(id! /* language-tools 1e84c6a  */)
-              "
+              @update:shortcut-id="(id) => ig.setCancelShortcut(id! /* language-tools 1e84c6a  */)"
             />
           </ControlItem>
           <ControlItem
@@ -531,12 +529,6 @@ watch(
 
   :deep(.n-card) {
     background-color: transparent;
-  }
-}
-
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
   }
 }
 

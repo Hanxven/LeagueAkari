@@ -1,7 +1,7 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { Paths } from '@shared/utils/types'
 import _ from 'lodash'
-import { toRaw, watch } from 'vue'
+import { WatchOptions, toRaw, watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 
@@ -56,8 +56,13 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
     namespace: string,
     object: T,
     propKey: Paths<T>,
-    savePropKey?: string
+    options: {
+      savePropKey?: string
+      watchOptions?: WatchOptions
+    } = {}
   ) {
+    const { savePropKey, watchOptions } = options
+
     const value = await this.get(
       namespace,
       savePropKey ? savePropKey : propKey,
@@ -68,7 +73,8 @@ export class SettingUtilsRenderer implements IAkariShardInitDispose {
       () => _.get(object, propKey),
       (value) => {
         this.set(namespace, savePropKey ? savePropKey : propKey, toRaw(value))
-      }
+      },
+      watchOptions
     )
     this._stopHandles.add(stopHandle)
   }

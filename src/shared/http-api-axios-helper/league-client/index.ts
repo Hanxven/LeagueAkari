@@ -9,16 +9,17 @@ import { EntitlementsHttpApi } from './entitlements'
 import { GameDataHttpApi } from './game-data'
 import { GameflowHttpApi } from './gameflow'
 import { HonorHttpApi } from './honor'
+import { LeagueSessionHttpApi } from './league-session'
 import { LoadoutsHttpApi } from './loadouts'
 import { LobbyHttpApi } from './lobby'
 import { LoginHttpApi } from './login'
-import { LolLeagueSessionHttpApi } from './lol-league-session'
 import { LootHttpApi } from './loot'
 import { MatchHistoryHttpApi } from './match-history'
 import { MatchmakingHttpApi } from './matchmaking'
 import { MissionsHttpApi } from './missions'
 import { PerksHttpApi } from './perks'
 import { PlayerNotificationsHttpApi } from './player-notifications'
+import { PreEndOfGameHttpApi } from './pre-end-of-game'
 import { ProcessControlHttpApi } from './process-control'
 import { RankedHttpApi } from './ranked'
 import { RegaliaHttpApi } from './regalia'
@@ -40,7 +41,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly honor: HonorHttpApi
   public readonly lobby: LobbyHttpApi
   public readonly login: LoginHttpApi
-  public readonly lolLeagueSession: LolLeagueSessionHttpApi
+  public readonly leagueSession: LeagueSessionHttpApi
   public readonly loot: LootHttpApi
   public readonly matchHistory: MatchHistoryHttpApi
   public readonly matchmaking: MatchmakingHttpApi
@@ -57,6 +58,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly missions: MissionsHttpApi
   public readonly endOfGame: EndOfGameHttpApi
   public readonly remedy: RemedyHttpApi
+  public readonly preEndOfGame: PreEndOfGameHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -68,7 +70,7 @@ export class LeagueClientHttpApiAxiosHelper {
     this.honor = new HonorHttpApi(this._http)
     this.lobby = new LobbyHttpApi(this._http)
     this.login = new LoginHttpApi(this._http)
-    this.lolLeagueSession = new LolLeagueSessionHttpApi(this._http)
+    this.leagueSession = new LeagueSessionHttpApi(this._http)
     this.loot = new LootHttpApi(this._http)
     this.matchHistory = new MatchHistoryHttpApi(this._http)
     this.matchmaking = new MatchmakingHttpApi(this._http)
@@ -85,5 +87,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.missions = new MissionsHttpApi(this._http)
     this.endOfGame = new EndOfGameHttpApi(this._http)
     this.remedy = new RemedyHttpApi(this._http)
+    this.preEndOfGame = new PreEndOfGameHttpApi(this._http)
   }
 }

@@ -113,11 +113,11 @@
         <NPopover :keep-alive-on-hover="false" :disabled="!analysis" :delay="50">
           <template #trigger>
             <div
-              class="win-rate-cherry gte-53"
+              class="win-rate-cherry"
               :class="{
-                'gte-53': analysis.summary.winRate >= 0.53,
-                'gt-47-lt-53': analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
-                'lte-47': analysis.summary.winRate <= 0.47
+                'good': analysis.summary.winRate >= 0.53,
+                'normal': analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
+                'bad': analysis.summary.winRate <= 0.47
               }"
               :title="`${t('PlayerInfoCard.top4Rate')} & ${t('PlayerInfoCard.1stRate')}`"
               v-if="analysis"
@@ -150,9 +150,9 @@
               v-if="analysis"
               class="win-rate"
               :class="{
-                'gte-53': analysis.summary.winRate >= 0.53,
-                'gt-47-lt-53': analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
-                'lte-47': analysis.summary.winRate <= 0.47
+                'good': analysis.summary.winRate >= 0.53,
+                'normal': analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
+                'bad': analysis.summary.winRate <= 0.47
               }"
             >
               {{ (analysis.summary.winRate * 100).toFixed() }}%<span class="game-count"
@@ -175,7 +175,16 @@
       </template>
       <NPopover :keep-alive-on-hover="false" :disabled="!analysis" :delay="50">
         <template #trigger>
-          <div class="kda">{{ analysis?.summary.averageKda.toFixed(2) || '—' }}</div>
+          <div
+            class="kda"
+            :class="{
+              'good': kdaIqr === 'over',
+              'normal': kdaIqr === null,
+              'bad': kdaIqr === 'below'
+            }"
+          >
+            {{ analysis?.summary.averageKda.toFixed(2) || '—' }}
+          </div>
         </template>
         <div class="popover-text" v-if="analysis">
           {{
@@ -187,7 +196,7 @@
               assists: (analysis.summary.totalAssists / analysis.summary.count || 1).toFixed(2)
             })
           }}
-          | {{ analysis.summary.kdaCv.toFixed(2) }}
+          (KDA CV: {{ analysis.summary.kdaCv.toFixed(2) }})
         </div>
       </NPopover>
       <NPopover v-if="positionInfo">
@@ -454,6 +463,7 @@ const {
   currentHighlightingPremadeTeamId?: string | null
   team?: string
   queueType?: string
+  kdaIqr?: 'below' | 'over' | null
   position?: {
     position: string
     role: ParsedRole | null
@@ -974,22 +984,21 @@ const matches = computed(() => {
     }
   }
 
-  .gte-53 {
+  .good {
     color: #4cc69d;
   }
 
-  .gt-47-lt-53 {
+  .normal {
     color: #dcdcdc;
   }
 
-  .lte-47 {
+  .bad {
     color: #ff6161;
   }
 
   .kda {
     flex: 1;
     font-size: 13px;
-    color: #ffffffe0;
     font-weight: bold;
     text-align: center;
   }

@@ -456,6 +456,54 @@
     <NPopover
       :keep-alive-on-hover="false"
       v-if="
+        ogs.frontendSettings.playerCardTags.showAverageEnemyMissingPingsTag &&
+        analysis &&
+        analysis.summary.averageEnemyMissingPings !== null
+      "
+      :delay="50"
+    >
+      <template #trigger>
+        <div class="tag enemy-missing-pings">
+          {{
+            t('PlayerInfoCard.enemyMissingPings', {
+              countV: truncateTailingZeros(analysis.summary.averageEnemyMissingPings)
+            })
+          }}
+        </div>
+      </template>
+      <div class="popover-text">
+        {{
+          t('PlayerInfoCard.enemyMissingPingsPopover', {
+            countV: analysis.summary.averageEnemyMissingPings.toFixed(3)
+          })
+        }}
+      </div>
+    </NPopover>
+    <NPopover
+      :keep-alive-on-hover="false"
+      v-if="ogs.frontendSettings.playerCardTags.showAverageVisionScoreTag && analysis"
+      :delay="50"
+    >
+      <template #trigger>
+        <div class="tag vision-score">
+          {{
+            t('PlayerInfoCard.visionScore', {
+              countV: truncateTailingZeros(analysis.summary.averageVisionScore)
+            })
+          }}
+        </div>
+      </template>
+      <div class="popover-text">
+        {{
+          t('PlayerInfoCard.visionScorePopover', {
+            countV: analysis.summary.averageVisionScore.toFixed(3)
+          })
+        }}
+      </div>
+    </NPopover>
+    <NPopover
+      :keep-alive-on-hover="false"
+      v-if="
         as.settings.isInKyokoMode &&
         ogs.frontendSettings.playerCardTags.showAkariScoreTag &&
         analysis
@@ -685,6 +733,12 @@ const encounteredGames = computed(() => {
   return mapped
 })
 
+const truncateTailingZeros = (num: number, precision = 1) => {
+  const str = num.toFixed(precision)
+  const trimmed = str.replace(/\.?0+$/, '')
+  return trimmed
+}
+
 onDeactivated(() => {
   if (premadeTeamId) {
     emits('highlight', premadeTeamId, false)
@@ -774,6 +828,15 @@ onDeactivated(() => {
 
     &.damage-gold-efficiency {
       background-color: #8f411e;
+    }
+
+    &.enemy-missing-pings {
+      background-color: #e7da30;
+      color: #000;
+    }
+
+    &.vision-score {
+      background-color: #2451a6;
     }
   }
 }

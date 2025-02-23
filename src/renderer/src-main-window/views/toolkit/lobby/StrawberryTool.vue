@@ -323,10 +323,4 @@ const setDifficulty = async () => {
 }
 </script>
 
-<style lang="less" scoped>
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
-}
-</style>
+<style lang="less" scoped></style>

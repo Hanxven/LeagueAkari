@@ -129,7 +129,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._handleUpdateHttpProxy()
     this._handleUpdateSupportedInfo()
     this._maintainEntitlementsToken()
-    this._maintainLolLeagueSessionToken()
+    this._maintainLeagueSessionToken()
   }
 
   private async _loadAvailableServersFromLocalFile() {
@@ -714,9 +714,9 @@ export class SgpMain implements IAkariShardInitDispose {
     )
   }
 
-  private _maintainLolLeagueSessionToken() {
+  private _maintainLeagueSessionToken() {
     this._mobx.reaction(
-      () => this._lc.data.lolLeagueSession.token,
+      () => this._lc.data.leagueSession.token,
       (token) => {
         if (!token) {
           this._sgp.setEntitlementsToken(null)
@@ -727,7 +727,7 @@ export class SgpMain implements IAkariShardInitDispose {
 
         this._log.info(`更新 Lol League Session Token: ${copied}`)
 
-        this._sgp.setLolLeagueSessionToken(token)
+        this._sgp.setLeagueSessionToken(token)
       },
       { fireImmediately: true }
     )

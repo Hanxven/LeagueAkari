@@ -1,5 +1,6 @@
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
 import axios from 'axios'
+import axiosRetry from 'axios-retry'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -34,9 +35,9 @@ export class LeagueClientRenderer {
   private readonly _pm: PiniaMobxUtilsRenderer
   private readonly _setting: SettingUtilsRenderer
 
-  public readonly api = new LeagueClientHttpApiAxiosHelper(
-    axios.create({ baseURL: 'akari://league-client', adapter: 'fetch' })
-  )
+  private readonly _http = axios.create({ baseURL: 'akari://league-client', adapter: 'fetch' })
+
+  public readonly api: LeagueClientHttpApiAxiosHelper
 
   async onInit() {
     const store = useLeagueClientStore()
@@ -100,6 +101,19 @@ export class LeagueClientRenderer {
     this._pm = deps['pinia-mobx-utils-renderer']
     this._ipc = deps['akari-ipc-renderer']
     this._setting = deps['setting-utils-renderer']
+
+    axiosRetry(this._http, {
+      retries: 2,
+      retryCondition: (error) => {
+        if (error.response === undefined) {
+          return true
+        }
+
+        return !(error.response.status >= 400 && error.response.status < 500)
+      }
+    })
+
+    this.api = new LeagueClientHttpApiAxiosHelper(this._http)
   }
 
   url(uri: string) {

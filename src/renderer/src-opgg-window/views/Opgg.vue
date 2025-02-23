@@ -824,6 +824,7 @@ watch(
     display: block;
     height: 32px;
     width: 32px;
+    color: #fff;
   }
 
   .square-button {
@@ -897,12 +898,6 @@ watch(
     .items {
       margin-top: 24px;
     }
-  }
-}
-
-.control-item-margin {
-  &:not(:last-child) {
-    margin-bottom: 12px;
   }
 }
 
