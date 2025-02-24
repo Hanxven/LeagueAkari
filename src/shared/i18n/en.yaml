@@ -383,6 +383,7 @@ DebugSettings:
     WaitingForStats: 'Waiting for Stats'
     PreEndOfGame: 'Before Game End'
     WatchInProgress: 'Spectating'
+    TerminatedInError: 'Terminated in Error'
 
   inAdministrator:
     description: League Akari is running with administrator privileges, required for certain client-specific functionalities.
@@ -1415,7 +1416,7 @@ PlayerInfoCard:
   errorLoadingMatchHistory: Unable to load
   top4Rate: Top 4 Rate
   1stRate: First Place Rate
-  1st: First {{rate}}%
+  1st: '{{rate}}%'
   position:
     recentlyPlayed: 'Preference:'
     selection: 'Selection:'

@@ -50,6 +50,7 @@
             :currentHighlightingPremadeTeamId="currentHighlightingPremadeTeamIdD"
             :kda-iqr="kdaOutliers?.[player]"
             :query-stage="ogs.queryStage"
+            :queue-type="ogs.queryStage.gameInfo?.queueType"
             @show-game="handleShowGame"
             @show-game-by-id="handleShowGameById"
             @to-summoner="handleToSummoner"
@@ -109,6 +110,7 @@ import StandaloneMatchHistoryCardModal from '../match-history/card/StandaloneMat
 import PlayerInfoCard from './PlayerInfoCard.vue'
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,
+  FIXED_CARD_WIDTH_PX_NUMBER,
   PREMADE_TEAMS,
   TeamMeta,
   useIdleState
@@ -120,6 +122,10 @@ const as = useAppCommonStore()
 const { t } = useTranslation()
 
 const ogs = useOngoingGameStore()
+
+watchEffect(() => {
+  console.log('why', ogs.queryStage.gameInfo)
+}, {})
 
 const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 
@@ -282,7 +288,7 @@ const kdaOutliers = computed(() => {
     return null
   }
 
-  const kdaList = Object.entries(ogs.playerStats?.players || {}).map(([puuid, p]) => ({
+  const kdaList = Object.entries(ogs.playerStats.players).map(([puuid, p]) => ({
     puuid,
     kda: p.summary.averageKda
   }))
@@ -333,31 +339,11 @@ const columnsNeed = computed(() => {
     .map((t) => t.length)
     .reduce((a, b) => Math.max(a, b), 0)
 
-  if (width.value > 1990) {
-    return Math.min(8, teamColumns)
-  }
+  const maxAllowed = [8, 7, 6, 5, 4, 3].find(
+    (col) => width.value > FIXED_CARD_WIDTH_PX_NUMBER * (col + 0.25)
+  )
 
-  if (width.value > 1740) {
-    return Math.min(7, teamColumns)
-  }
-
-  if (width.value > 1500) {
-    return Math.min(6, teamColumns)
-  }
-
-  if (width.value > 1250) {
-    return Math.min(5, teamColumns)
-  }
-
-  if (width.value > 1010) {
-    return Math.min(4, teamColumns)
-  }
-
-  if (width.value > 760) {
-    return Math.min(3, teamColumns)
-  }
-
-  return Math.min(2, teamColumns)
+  return Math.min(maxAllowed || 2, teamColumns)
 })
 </script>
 

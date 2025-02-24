@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import { effectScope, watch } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
+import { LoggerRenderer } from '../logger'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { useRendererDebugStore } from './store'
 
@@ -12,10 +13,11 @@ const MAIN_SHARD_NAMESPACE = 'renderer-debug-main'
 
 export class RendererDebugRenderer implements IAkariShardInitDispose {
   static id = 'renderer-debug-renderer'
-  static dependencies = ['akari-ipc-renderer', 'pinia-mobx-utils-renderer']
+  static dependencies = ['akari-ipc-renderer', 'pinia-mobx-utils-renderer', 'logger-renderer']
 
   private readonly _ipc: AkariIpcRenderer
   private readonly _pm: PiniaMobxUtilsRenderer
+  private readonly _log: LoggerRenderer
 
   private readonly _matcher = new RadixEventEmitter()
   private readonly _scope = effectScope()
@@ -23,6 +25,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-renderer']
     this._pm = deps['pinia-mobx-utils-renderer']
+    this._log = deps['logger-renderer']
   }
 
   async onInit() {
@@ -32,7 +35,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'lc-event', (data: LcuEvent) => {
       if (store.printAll) {
-        this.log(data.uri, data.eventType, data.data)
+        this._log.info(data.uri, data.eventType, data.data)
       } else {
         // forward again~
         this._matcher.emit(data.uri, data)
@@ -48,18 +51,6 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
         }
       })
     })
-  }
-
-  log(uri: string, type: string, ...args: any[]) {
-    console.info(
-      `%c[${dayjs().format('HH:mm:ss')}] %c[%c${uri}%c] %c[${type}]`,
-      'color: #3938fb; font-weight: bold;',
-      'color: inherit;',
-      'color: #2e2571; font-weight: bold;',
-      'color: inherit;',
-      'color: #000c3c; font-weight: bold;',
-      ...args
-    )
   }
 
   private _sanitizeRule(rule: string) {
@@ -80,7 +71,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
 
     const stopFn = this._matcher.on(rule, (data) => {
       if (!store.printAll) {
-        this.log(data.uri, data.eventType, data.data)
+        this._log.info(data.uri, data.eventType, data.data)
       }
     })
 
@@ -105,7 +96,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
 
     const stopFn = this._matcher.on(rule, (data) => {
       if (!store.printAll) {
-        this.log(data.uri, data.eventType, data.data)
+        this._log.info(data.uri, data.eventType, data.data)
       }
     })
 

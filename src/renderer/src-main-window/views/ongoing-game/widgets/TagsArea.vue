@@ -843,7 +843,7 @@ onDeactivated(() => {
 
 .popover-text {
   font-size: 12px;
-  max-width: 200px;
+  max-width: 240px;
 }
 
 .popover-text.have-met-popover {

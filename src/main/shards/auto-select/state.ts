@@ -5,6 +5,8 @@ import { LeagueClientSyncedData } from '../league-client/lc-state'
 
 export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in'
 
+export const ARENA_RANDOM_CHAMPION_ID = -3
+
 export class AutoSelectSettings {
   normalModeEnabled: boolean = false
   expectedChampions: Record<string, number[]> = {

@@ -42,7 +42,6 @@ import { configure } from 'mobx'
 import EventEmitter from 'node:events'
 import os from 'node:os'
 import { Logger } from 'winston'
-import { FileTransportInstance } from 'winston/lib/winston/transports'
 
 import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
 

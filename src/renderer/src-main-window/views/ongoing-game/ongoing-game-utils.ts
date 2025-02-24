@@ -90,3 +90,4 @@ export const PREMADE_TEAM_COLORS = {
 }
 
 export const FIXED_CARD_WIDTH_PX_LITERAL = '240px'
+export const FIXED_CARD_WIDTH_PX_NUMBER = 240

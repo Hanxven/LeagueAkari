@@ -386,6 +386,7 @@ DebugSettings:
     WaitingForStats: '等待结果'
     PreEndOfGame: '结束游戏之前'
     WatchInProgress: '在观战中'
+    TerminatedInError: '错误终止'
 
   inAdministrator:
     description: League Akari 运行在管理员权限，仅用于实现特定的客户端功能
@@ -1422,7 +1423,7 @@ PlayerInfoCard:
   errorLoadingMatchHistory: 无法加载
   top4Rate: 前四率
   1stRate: 第一率
-  1st: 第一 {{rate}}%
+  1st: '{{rate}}%'
   position:
     recentlyPlayed: 近期偏好：
     selection: 位置选择：

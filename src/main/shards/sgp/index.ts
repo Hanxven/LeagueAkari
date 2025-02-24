@@ -282,6 +282,8 @@ export class SgpMain implements IAkariShardInitDispose {
   ) {
     const result = await this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)
 
+    fs.writeFileSync(`C:/Users/hanxv/Desktop/mh/mh_${playerPuuid}.json`, JSON.stringify(result, null, 2))
+
     try {
       return this.parseSgpMatchHistoryToLcu0Format(result, start, count)
     } catch (error) {
@@ -326,7 +328,12 @@ export class SgpMain implements IAkariShardInitDispose {
     }
   }
 
-  parseSgpGameSummaryToLcu0Format(game: SgpGameSummaryLol): Game {
+  parseSgpGameSummaryToLcu0Format(game: SgpGameSummaryLol): Game | null {
+    // 有些时候没有这个 json 字段, 只有 metadata 字段
+    if (!game.json) {
+      return null
+    }
+
     const { participants, teams, ...rest } = game.json
 
     const participantIdentities = participants.map((p) => {
@@ -496,7 +503,7 @@ export class SgpMain implements IAkariShardInitDispose {
       gameEndDate: '', // 默认值
       gameIndexBegin: start,
       gameIndexEnd: start + count - 1,
-      games: jsonArr
+      games: jsonArr.filter((g) => g !== null) as Game[]
     }
 
     return {

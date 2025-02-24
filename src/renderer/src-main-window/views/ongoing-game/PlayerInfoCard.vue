@@ -115,19 +115,23 @@
             <div
               class="win-rate-cherry"
               :class="{
-                'good': analysis.summary.winRate >= 0.53,
-                'normal': analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
-                'bad': analysis.summary.winRate <= 0.47
+                good: analysis.summary.winRate >= 0.53,
+                normal: analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
+                bad: analysis.summary.winRate <= 0.47
               }"
               :title="`${t('PlayerInfoCard.top4Rate')} & ${t('PlayerInfoCard.1stRate')}`"
               v-if="analysis"
             >
-              {{ analysis.summary.winRate.toFixed() }} %
-              <span class="first-rate"
-                >({{
-                  t('PlayerInfoCard.1st', { rate: analysis.summary.cherry.top1Rate.toFixed() })
-                }})</span
+              {{ (analysis.summary.winRate * 100).toFixed() }} %
+              <span class="top1-rate"
+                >/
+                {{
+                  t('PlayerInfoCard.1st', {
+                    rate: (analysis.summary.cherry.top1Rate * 100).toFixed()
+                  })
+                }}</span
               >
+              <span class="game-count">({{ analysis.summary.count }})</span>
             </div>
             <div v-else class="win-rate">— %</div>
           </template>
@@ -135,9 +139,9 @@
             {{
               t('PlayerInfoCard.cherryWinRatePopover', {
                 countV: analysis.summary.count,
-                winRate: (analysis.summary.winRate * 100).toFixed(),
+                winRate: (analysis.summary.winRate * 100).toFixed(2),
                 cherryCount: analysis.summary.cherry.count,
-                top1Rate: analysis.summary.cherry.top1Rate
+                top1Rate: (analysis.summary.cherry.top1Rate * 100).toFixed(2)
               })
             }}
           </div>
@@ -150,14 +154,13 @@
               v-if="analysis"
               class="win-rate"
               :class="{
-                'good': analysis.summary.winRate >= 0.53,
-                'normal': analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
-                'bad': analysis.summary.winRate <= 0.47
+                good: analysis.summary.winRate >= 0.53,
+                normal: analysis.summary.winRate > 0.47 && analysis.summary.winRate < 0.53,
+                bad: analysis.summary.winRate <= 0.47
               }"
             >
-              {{ (analysis.summary.winRate * 100).toFixed() }}%<span class="game-count"
-                >({{ analysis.summary.count }})</span
-              >
+              {{ (analysis.summary.winRate * 100).toFixed() }}%
+              <span class="game-count">({{ analysis.summary.count }})</span>
             </div>
             <div class="win-rate" v-else>— %</div>
           </template>
@@ -178,9 +181,9 @@
           <div
             class="kda"
             :class="{
-              'good': kdaIqr === 'over',
-              'normal': kdaIqr === null,
-              'bad': kdaIqr === 'below'
+              good: kdaIqr === 'over',
+              normal: kdaIqr === null,
+              bad: kdaIqr === 'below'
             }"
           >
             {{ analysis?.summary.averageKda.toFixed(2) || '—' }}
@@ -454,7 +457,8 @@ const {
   summoner,
   rankedStats,
   savedInfo,
-  championMastery
+  championMastery,
+  queueType
 } = defineProps<{
   puuid: string
   championId?: number
@@ -963,13 +967,6 @@ const matches = computed(() => {
     font-weight: bold;
     text-align: center;
     flex: 1;
-
-    .game-count {
-      margin-left: 2px;
-      color: #fffa;
-      font-weight: normal;
-      font-size: 9px;
-    }
   }
 
   .win-rate-cherry {
@@ -981,6 +978,16 @@ const matches = computed(() => {
     .top1-rate {
       font-size: 11px;
       font-weight: normal;
+    }
+  }
+
+  .win-rate,
+  .win-rate-cherry {
+    .game-count {
+      margin-left: 4px;
+      color: #fffa;
+      font-weight: normal;
+      font-size: 9px;
     }
   }
 

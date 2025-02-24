@@ -69,10 +69,10 @@ export class OngoingGameState {
     }
 
     return {
-      queueId: !this._lcData.gameflow.session.gameData.queue.id,
-      queueType: !this._lcData.gameflow.session.gameData.queue.type,
-      gameId: !this._lcData.gameflow.session.gameData.gameId,
-      gameMode: !this._lcData.gameflow.session.gameData.queue.gameMode
+      queueId: this._lcData.gameflow.session.gameData.queue.id,
+      queueType: this._lcData.gameflow.session.gameData.queue.type,
+      gameId: this._lcData.gameflow.session.gameData.gameId,
+      gameMode: this._lcData.gameflow.session.gameData.queue.gameMode
     }
   }
 
@@ -208,6 +208,15 @@ export class OngoingGameState {
         return {}
       }
 
+      if (this.queryStage.gameInfo.queueType === 'CHERRY') {
+        return {
+          all: [
+            ...this._lcData.champSelect.session.myTeam,
+            ...this._lcData.champSelect.session.theirTeam
+          ].map((p) => p.puuid)
+        }
+      }
+
       const teams: Record<string, string[]> = {}
 
       this._lcData.champSelect.session.myTeam
@@ -234,6 +243,15 @@ export class OngoingGameState {
     } else if (this.queryStage.phase === 'in-game') {
       if (!this._lcData.gameflow.session) {
         return {}
+      }
+
+      if (this.queryStage.gameInfo.queueType === 'CHERRY') {
+        return {
+          all: [
+            ...this._lcData.gameflow.session.gameData.teamOne,
+            ...this._lcData.gameflow.session.gameData.teamTwo
+          ].map((p) => p.puuid)
+        }
       }
 
       const teams: Record<string, string[]> = {

@@ -145,12 +145,15 @@
               secondary
               :type="isBeingStalked ? 'primary' : 'default'"
               class="square-button"
-              :title="`观察`"
+              :title="`关注`"
               v-if="!isSelfTab"
               @click="handleStalk"
             >
               <template #icon>
-                <NIcon><EyeIcon /></NIcon>
+                <NIcon>
+                  <Star24FilledIcon v-if="isBeingStalked" />
+                  <Star24RegularIcon v-else />
+                </NIcon>
               </template>
             </NButton>
             <NButton
@@ -576,8 +579,12 @@ import {
 } from '@shared/utils/analysis'
 import { summonerName } from '@shared/utils/name'
 import { Delete as DeleteIcon } from '@vicons/carbon'
-import { Edit20Filled as EditIcon } from '@vicons/fluent'
-import { Eye as EyeIcon, RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
+import {
+  Edit20Filled as EditIcon,
+  Star24Filled as Star24FilledIcon,
+  Star24Regular as Star24RegularIcon
+} from '@vicons/fluent'
+import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import {
   MoreHorizFilled as MoreHorizFilledIcon,
   NavigateBeforeOutlined as NavigateBeforeOutlinedIcon,
