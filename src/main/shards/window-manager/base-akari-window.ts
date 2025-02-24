@@ -46,7 +46,7 @@ export interface AkariBaseWindowConfig<TSettings extends AkariBaseWindowBasicSet
   /**
    * HTML 入口文件, 对应 renderer 目录下对应文件
    */
-  htmlEntry: string
+  htmlEntry: string | { path: string, hash: string }
 
   repositionWindowIfInvisible?: boolean
 
@@ -243,7 +243,7 @@ export abstract class BaseAkariWindow<
         preload: path.join(__dirname, '../preload/index.js'),
         sandbox: false,
         spellcheck: false,
-        backgroundThrottling: false,
+        // backgroundThrottling: false,
         partition: this._partition
       },
       ...this._config.browserWindowOptions // 仍然允许覆盖
@@ -385,9 +385,17 @@ export abstract class BaseAkariWindow<
     })
 
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-      this._window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/${this._config.htmlEntry}`)
+      if (typeof this._config.htmlEntry !== 'string') {
+        this._window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/${this._config.htmlEntry.path}#${this._config.htmlEntry.hash}`)
+      } else {
+        this._window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/${this._config.htmlEntry}`)
+      }
     } else {
-      this._window.loadFile(path.join(__dirname, `../renderer/${this._config.htmlEntry}`))
+      if (typeof this._config.htmlEntry !== 'string') {
+        this._window.loadFile(path.join(__dirname, `../renderer/${this._config.htmlEntry.path}`), { hash: this._config.htmlEntry.hash })
+      } else {
+        this._window.loadFile(path.join(__dirname, `../renderer/${this._config.htmlEntry}`))
+      }
     }
 
     this._log.info(`创建 ${this._namespace} 窗口`)

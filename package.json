@@ -21,6 +21,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
+    "@leaguetavern/electron-overlay-win": "^1.0.1",
     "@types/luaparse": "^0.2.12",
     "ajv": "^8.17.1",
     "axios": "^1.7.9",
