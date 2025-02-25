@@ -3,6 +3,8 @@ import { makeAutoObservable } from 'mobx'
 export class WindowManagerSettings {
   backgroundMaterial: 'mica' | 'none' = 'none'
 
+  overlayType: 'window-band' | 'topmost' = 'window-band'
+
   setBackgroundMaterial(material: 'mica' | 'none') {
     this.backgroundMaterial = material
   }
