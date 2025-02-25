@@ -11,7 +11,7 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
 import { AkariMainWindow } from './main-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
-import { AkariOverlayWindow } from './overlay-window/window'
+import { AkariOngoingGameOverlayWindow } from './ongoing-game-overlay-window/window'
 import { WindowManagerSettings, WindowManagerState } from './state'
 import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { AppCommonMain } from '../app-common'
@@ -62,7 +62,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   public readonly mainWindow: AkariMainWindow
   public readonly auxWindow: AkariAuxWindow
   public readonly opggWindow: AkariOpggWindow
-  public readonly overlayWindow: AkariOverlayWindow
+  public readonly overlayWindow: AkariOngoingGameOverlayWindow
 
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
@@ -88,7 +88,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this.auxWindow = new AkariAuxWindow(wContext)
     this.opggWindow = new AkariOpggWindow(wContext)
     if (this._app.state.isAdministrator) {
-      this.overlayWindow = new AkariOverlayWindow(wContext);
+      this.overlayWindow = new AkariOngoingGameOverlayWindow(wContext);
     }
   }
 
@@ -166,7 +166,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   _registerOverlayShortCuts() {
     if (this.overlayWindow) {
       this._kbd.register(`${WindowManagerMain.id}/overlay-visible`, 'LeftControl+X', 'normal', () => {
-        let t = this.overlayWindow as AkariOverlayWindow;
+        let t = this.overlayWindow as AkariOngoingGameOverlayWindow;
         t.toggleVisible()
       })
     }

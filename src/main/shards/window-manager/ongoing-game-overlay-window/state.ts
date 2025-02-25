@@ -1,7 +1,7 @@
 import { Rectangle } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
 
-export class OverlayWindowSettings {
+export class OngoingGameOverlayWindowSettings {
   pinned: boolean = true
 
   opacity: number = 1
@@ -19,7 +19,7 @@ export class OverlayWindowSettings {
   }
 }
 
-export class OverlayWindowState {
+export class OngoingGameOverlayWindowState {
   status: 'normal' | 'maximized' | 'minimized' = 'normal'
 
   focus: 'focused' | 'blurred' = 'focused'
@@ -57,6 +57,7 @@ export class OverlayWindowState {
 
   constructor() {
     makeAutoObservable(this, {
+      bounds: observable.ref
     })
   }
 }

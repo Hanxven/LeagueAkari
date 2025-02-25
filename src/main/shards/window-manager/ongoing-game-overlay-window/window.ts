@@ -1,38 +1,47 @@
-import { BrowserWindow, Event } from 'electron'
+import { Overlay } from '@leaguetavern/electron-overlay-win'
+import { GameClientMain } from '@main/shards/game-client'
+import { Event } from 'electron'
 
 import type { WindowManagerMainContext } from '..'
 import icon from '../../../../../resources/LA_ICON.ico?asset'
 import { BaseAkariWindow } from '../base-akari-window'
-import { OverlayWindowSettings, OverlayWindowState } from './state'
-import { GameClientMain } from '@main/shards/game-client'
-import { Overlay } from '@leaguetavern/electron-overlay-win'
+import { OngoingGameOverlayWindowSettings, OngoingGameOverlayWindowState } from './state'
 
-export class AkariOverlayWindow extends BaseAkariWindow<OverlayWindowState, OverlayWindowSettings> {
-  static readonly NAMESPACE_SUFFIX = 'overlay-window'
+export class AkariOngoingGameOverlayWindow extends BaseAkariWindow<
+  OngoingGameOverlayWindowState,
+  OngoingGameOverlayWindowSettings
+> {
+  static readonly NAMESPACE_SUFFIX = 'ongoing-game-overlay-window'
   static readonly HTML_ENTRY = 'main-window.html'
   static readonly HTML_ENTRY_HASH = 'ongoing-game/overlay'
-  static readonly TITLE = 'League Overlay'
+  static readonly TITLE = 'Akari Overlay'
   static readonly BASE_WIDTH = 1500
   static readonly BASE_HEIGHT = 860
 
-  static readonly _overlay: Overlay = new Overlay;
-  private readonly _timer: NodeJS.Timeout;
+  static readonly _overlay: Overlay = new Overlay()
+
+  // unused yet
+  private readonly _timer: NodeJS.Timeout
+
   private _visible: boolean = false
 
   constructor(_context: WindowManagerMainContext) {
-    const state = new OverlayWindowState()
-    const settings = new OverlayWindowSettings()
+    const state = new OngoingGameOverlayWindowState()
+    const settings = new OngoingGameOverlayWindowSettings()
 
-    super(_context, AkariOverlayWindow.NAMESPACE_SUFFIX, state, settings, {
-      baseWidth: AkariOverlayWindow.BASE_WIDTH,
-      baseHeight: AkariOverlayWindow.BASE_HEIGHT,
-      minWidth: AkariOverlayWindow.BASE_WIDTH,
-      minHeight: AkariOverlayWindow.BASE_HEIGHT,
-      htmlEntry: { path: AkariOverlayWindow.HTML_ENTRY, hash: AkariOverlayWindow.HTML_ENTRY_HASH } ,
+    super(_context, AkariOngoingGameOverlayWindow.NAMESPACE_SUFFIX, state, settings, {
+      baseWidth: AkariOngoingGameOverlayWindow.BASE_WIDTH,
+      baseHeight: AkariOngoingGameOverlayWindow.BASE_HEIGHT,
+      minWidth: AkariOngoingGameOverlayWindow.BASE_WIDTH,
+      minHeight: AkariOngoingGameOverlayWindow.BASE_HEIGHT,
+      htmlEntry: {
+        path: AkariOngoingGameOverlayWindow.HTML_ENTRY,
+        hash: AkariOngoingGameOverlayWindow.HTML_ENTRY_HASH
+      },
       rememberPosition: false,
       settingSchema: {},
       browserWindowOptions: {
-        title: AkariOverlayWindow.TITLE,
+        title: AkariOngoingGameOverlayWindow.TITLE,
         icon: icon,
         show: false,
         frame: false,
@@ -43,10 +52,10 @@ export class AkariOverlayWindow extends BaseAkariWindow<OverlayWindowState, Over
         fullscreenable: false,
         skipTaskbar: true,
         autoHideMenuBar: true,
-        backgroundColor: '#00000000',
+        backgroundColor: '#00000000'
       }
     })
-    this._timer = setInterval(()=>{
+    this._timer = setInterval(() => {
       if (!GameClientMain.isGameClientForeground() && this._visible) {
         this.hide()
       }
@@ -58,7 +67,7 @@ export class AkariOverlayWindow extends BaseAkariWindow<OverlayWindowState, Over
       () => this.state.ready,
       (ready) => {
         if (!ready) {
-          return 
+          return
         }
         this._setTop()
       }
@@ -86,12 +95,16 @@ export class AkariOverlayWindow extends BaseAkariWindow<OverlayWindowState, Over
 
   public toggleVisible() {
     if (GameClientMain.isGameClientForeground()) {
-      this._visible ? this._hide(): this._show()
+      this._visible ? this._hideOverlay() : this._showOverlay()
     }
   }
 
   _setTop() {
-    if (this.window && !AkariOverlayWindow._overlay.enable(this.window.getNativeWindowHandle()).res) {
+    if (
+      this.window &&
+      !AkariOngoingGameOverlayWindow._overlay.enable(this.window.getNativeWindowHandle()).res
+    ) {
+      this._log.warn('Overlay 无法初始化')
       this.close()
       return
     }
@@ -99,15 +112,18 @@ export class AkariOverlayWindow extends BaseAkariWindow<OverlayWindowState, Over
 
   _toggleClickThrough(value: boolean) {
     if (value) {
-      this.window?.setIgnoreMouseEvents(true, { forward: true });
+      this.window?.setIgnoreMouseEvents(true, { forward: true })
     } else {
-      this.window?.setIgnoreMouseEvents(false);
+      this.window?.setIgnoreMouseEvents(false)
     }
   }
 
-  _show() {
+  _showOverlay() {
     if (!this._visible) {
-      this.window?.setBounds({width:AkariOverlayWindow.BASE_WIDTH ,height: AkariOverlayWindow.BASE_HEIGHT})
+      this.window?.setBounds({
+        width: AkariOngoingGameOverlayWindow.BASE_WIDTH,
+        height: AkariOngoingGameOverlayWindow.BASE_HEIGHT
+      })
       this.window?.center()
       this.showOrRestore()
       this._toggleClickThrough(true)
@@ -115,11 +131,11 @@ export class AkariOverlayWindow extends BaseAkariWindow<OverlayWindowState, Over
     }
   }
 
-  _hide() {
+  _hideOverlay() {
     if (this._visible) {
       // bug: https://github.com/electron/electron/issues/42772
       // 目前的解决方案是缩小到左上角进行隐藏, 需要时再转换回来
-      this.window?.setBounds({x:0, y:0, width:0 ,height: 0})
+      this.window?.setBounds({ x: 0, y: 0, width: 0, height: 0 })
       this.hide()
       this._visible = false
     }
