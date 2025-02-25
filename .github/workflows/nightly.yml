@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: windows-2022
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
