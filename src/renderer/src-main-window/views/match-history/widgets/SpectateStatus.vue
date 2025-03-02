@@ -173,7 +173,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NPopover, useMessage } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
+import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 
 import IndicatorPulse from './IndicatorPulse.vue'
 

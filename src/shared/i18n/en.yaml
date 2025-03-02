@@ -298,6 +298,18 @@ MultiWindowSettings:
       description: Reset the position of the OP.GG window to its default location in the center of the main screen.
       button: Reset
 
+  ongoingGameWindow:
+    title: Ongoing Game Overlay Window
+    titleRequireAdmin: Ongoing Game Overlay Window (Admin Required)
+
+    enabled:
+      label: Enable Ongoing Game Window
+      description: Display an overlay window during the game to show ongoing game information.
+
+    showShortcut:
+      label: Show Shortcut
+      description: Hold the shortcut key to show the overlay window during the game
+
 MiscSettings:
   title: Misc
 
@@ -1911,6 +1923,7 @@ tray:
     toggleMainWindowDevtools: Toggle DevTools - Main Window
     toggleAuxWindowDevtools: Toggle DevTools - Aux Window
     toggleOpggWindowDevtools: Toggle DevTools - OP.GG Window
+    toggleOngoingGameWindowDevtools: Toggle DevTools - Ongoing Game Window
 
 windowOpenHandler:
   toAkari: To League Akari GitHub ❤️

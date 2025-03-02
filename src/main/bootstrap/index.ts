@@ -137,6 +137,9 @@ export const isAdministrator = tools.isElevated()
  * 应用级别的初始化启动细节，基础组件注入和基础事件处理
  */
 export function bootstrap() {
+  // transparent window 的 show 和 hide 会引起奇妙闪烁, 添加这个属性以禁用窗口动画
+  app.commandLine.appendSwitch('wm-window-animations-disabled')
+
   // 基础设置
   const baseConfig = readBaseConfig()
 

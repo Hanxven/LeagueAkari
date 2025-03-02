@@ -558,6 +558,8 @@
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import RankedTable from '@renderer-shared/components/RankedTable.vue'
+import MatchHistoryCard from '@renderer-shared/components/match-history-card/MatchHistoryCard.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -609,7 +611,6 @@ import {
 import { computed, markRaw, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import PlayerTagEditModal from '@main-window/components/PlayerTagEditModal.vue'
-import RankedTable from '@main-window/components/RankedTable.vue'
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import {
   GameDataState,
@@ -617,7 +618,6 @@ import {
   useMatchHistoryTabsStore
 } from '@main-window/shards/match-history-tabs/store'
 
-import MatchHistoryCard from './card/MatchHistoryCard.vue'
 import IndicatorPulse from './widgets/IndicatorPulse.vue'
 import RankedDisplay from './widgets/RankedDisplay.vue'
 import SpectateStatus from './widgets/SpectateStatus.vue'
@@ -1456,14 +1456,6 @@ const handleStalk = () => {
     ps.addPlayer(tab.puuid, tab.sgpServerId)
   }
 }
-
-watch(
-  () => pss.tracking,
-  () => {
-    console.log('tracking', pss.tracking)
-  },
-  { immediate: true }
-)
 
 defineExpose({
   id: tab.id,

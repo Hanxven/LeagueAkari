@@ -4,6 +4,22 @@ import { ref, shallowReactive } from 'vue'
 // copied
 export type MainWindowCloseAction = 'minimize-to-tray' | 'quit' | 'ask'
 
+export function useBasicWindowStates() {
+  const status = ref<'normal' | 'maximized' | 'minimized'>('normal')
+  const focus = ref<'focused' | 'blurred'>('blurred')
+  const show = ref(false)
+  const bounds = ref(null)
+  const ready = ref(false)
+
+  return {
+    status,
+    focus,
+    bounds,
+    show,
+    ready
+  }
+}
+
 export const useWindowManagerStore = defineStore('shard:window-manager-renderer', () => {
   const settings = shallowReactive({
     backgroundMaterial: 'none' as 'none' | 'mica'
@@ -24,19 +40,11 @@ export const useMainWindowStore = defineStore('shard:main-window-renderer/main-w
     pinned: false
   })
 
-  const status = ref<'normal' | 'maximized' | 'minimized'>('normal')
-  const focus = ref<'focused' | 'blurred'>('focused')
-  const show = ref(true)
-  const bounds = ref(null)
-  const ready = ref(false)
+  const basicWindowState = useBasicWindowStates()
 
   return {
     settings,
-    status,
-    focus,
-    bounds,
-    show,
-    ready
+    ...basicWindowState
   }
 })
 
@@ -49,19 +57,11 @@ export const useAuxWindowStore = defineStore('shard:main-window-renderer/aux-win
     showSkinSelector: false
   })
 
-  const status = ref<'normal' | 'maximized' | 'minimized'>('normal')
-  const focus = ref<'focused' | 'blurred'>('focused')
-  const show = ref(true)
-  const ready = ref(false)
-  const bounds = ref(null)
+  const basicWindowState = useBasicWindowStates()
 
   return {
     settings,
-    status,
-    bounds,
-    focus,
-    show,
-    ready
+    ...basicWindowState
   }
 })
 
@@ -73,18 +73,29 @@ export const useOpggWindowStore = defineStore('shard:main-window-renderer/opgg-w
     pinned: true
   })
 
-  const status = ref<'normal' | 'maximized' | 'minimized'>('normal')
-  const focus = ref<'focused' | 'blurred'>('focused')
-  const show = ref(true)
-  const bounds = ref(null)
-  const ready = ref(false)
+  const basicWindowState = useBasicWindowStates()
 
   return {
     settings,
-    status,
-    bounds,
-    focus,
-    show,
-    ready
+    ...basicWindowState
   }
 })
+
+export const useOngoingGameWindowStore = defineStore(
+  'shard:main-window-renderer/ongoing-game-window',
+  () => {
+    const settings = shallowReactive({
+      enabled: true,
+      showShortcut: null as string | null,
+      opacity: 0.9,
+      pinned: true
+    })
+
+    const basicWindowState = useBasicWindowStates()
+
+    return {
+      settings,
+      ...basicWindowState
+    }
+  }
+)

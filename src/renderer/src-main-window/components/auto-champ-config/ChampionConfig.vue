@@ -421,7 +421,7 @@ import { computed, ref, toRaw, watch } from 'vue'
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
 import { useMapAssets } from '@main-window/compositions/useMapAssets'
 
-import PositionIcon from '../icons/position-icons/PositionIcon.vue'
+import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import RuneV2Edit from './RuneV2Edit.vue'
 import SummonerSpellEdit from './SummonerSpellEdit.vue'
 import { useValidatedRunes } from './utils'

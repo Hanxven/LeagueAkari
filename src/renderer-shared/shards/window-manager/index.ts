@@ -7,6 +7,7 @@ import { BaseAkariWindowRenderer } from './base-akari-window'
 import {
   useAuxWindowStore,
   useMainWindowStore,
+  useOngoingGameWindowStore,
   useOpggWindowStore,
   useWindowManagerStore
 } from './store'
@@ -15,6 +16,7 @@ const MAIN_SHARD_NAMESPACE = 'window-manager-main'
 const MAIN_SHARD_NAMESPACE_MAIN_WINDOW = 'window-manager-main/main-window'
 const MAIN_SHARD_NAMESPACE_AUX_WINDOW = 'window-manager-main/aux-window'
 const MAIN_SHARD_NAMESPACE_OPGG_WINDOW = 'window-manager-main/opgg-window'
+const MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW = 'window-manager-main/ongoing-game-window'
 
 export interface WindowManagerRendererContext {
   ipc: AkariIpcRenderer
@@ -96,6 +98,34 @@ class AkariOpggWindow extends BaseAkariWindowRenderer<
   }
 }
 
+export class AkariOngoingGameWindow extends BaseAkariWindowRenderer<
+  ReturnType<typeof useOngoingGameWindowStore>,
+  ReturnType<typeof useOngoingGameWindowStore>['settings']
+> {
+  static SHOW_WINDOW_SHORTCUT_TARGET_ID = `${MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW}/show`
+
+  constructor(_context: WindowManagerRendererContext) {
+    super(
+      _context,
+      MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW,
+      () => useOngoingGameWindowStore(),
+      () => useOngoingGameWindowStore().settings
+    )
+  }
+
+  setEnabled(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW, 'enabled', value)
+  }
+
+  setShowShortcut(value: string | null) {
+    return this._context.setting.set(
+      MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW,
+      'showShortcut',
+      value
+    )
+  }
+}
+
 export class WindowManagerRenderer implements IAkariShardInitDispose {
   static id = 'window-manager-renderer'
   static dependencies = [
@@ -110,6 +140,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
   public mainWindow: AkariMainWindow
   public auxWindow: AkariAuxWindow
   public opggWindow: AkariOpggWindow
+  public ongoingGameWindow: AkariOngoingGameWindow
 
   constructor(deps: any) {
     this.context = {
@@ -121,6 +152,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     this.mainWindow = new AkariMainWindow(this.context)
     this.auxWindow = new AkariAuxWindow(this.context)
     this.opggWindow = new AkariOpggWindow(this.context)
+    this.ongoingGameWindow = new AkariOngoingGameWindow(this.context)
   }
 
   async onInit() {
@@ -131,6 +163,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     await this.mainWindow.onInit()
     await this.auxWindow.onInit()
     await this.opggWindow.onInit()
+    await this.ongoingGameWindow.onInit()
   }
 
   setBackgroundMaterial(value: string) {

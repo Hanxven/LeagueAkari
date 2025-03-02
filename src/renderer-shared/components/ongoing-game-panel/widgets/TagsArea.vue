@@ -551,7 +551,7 @@ import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
-import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
+import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 
 import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
 

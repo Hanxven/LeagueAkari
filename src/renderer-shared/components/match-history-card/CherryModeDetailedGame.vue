@@ -161,7 +161,7 @@ import { createReusableTemplate } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
-import DamageMetricsBar from '../widgets/DamageMetricsBar.vue'
+import DamageMetricsBar from './widgets/DamageMetricsBar.vue'
 
 const { t } = useTranslation()
 const as = useAppCommonStore()

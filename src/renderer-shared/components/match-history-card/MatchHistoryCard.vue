@@ -292,7 +292,6 @@ import { useTranslation } from 'i18next-vue'
 import { NIcon, NModal } from 'naive-ui'
 import { computed, ref, watch } from 'vue'
 
-import '../lol-view.less'
 import CherryModeDetailedGame from './CherryModeDetailedGame.vue'
 import MiscellaneousPanel from './MiscellaneousPanel.vue'
 import NormalModeDetailedGame from './NormalModeDetailedGame.vue'

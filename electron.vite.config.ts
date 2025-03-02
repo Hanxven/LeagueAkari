@@ -74,6 +74,7 @@ export default defineConfig({
         '@main-window': resolve('src/renderer/src-main-window'),
         '@aux-window': resolve('src/renderer/src-aux-window'),
         '@opgg-window': resolve('src/renderer/src-opgg-window'),
+        '@ongoing-game-window': resolve('src/renderer/src-ongoing-game-window'),
         '@shared': resolve('src/shared'),
         '@renderer-shared': resolve('src/renderer-shared')
       }
@@ -95,7 +96,8 @@ export default defineConfig({
         input: {
           mainWindow: resolve(__dirname, 'src/renderer/main-window.html'),
           auxWindow: resolve(__dirname, 'src/renderer/aux-window.html'),
-          opggWindow: resolve(__dirname, 'src/renderer/opgg-window.html')
+          opggWindow: resolve(__dirname, 'src/renderer/opgg-window.html'),
+          ongoingGameWindow: resolve(__dirname, 'src/renderer/ongoing-game-window.html')
         }
       }
     }

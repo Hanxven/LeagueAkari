@@ -8,16 +8,15 @@
 </template>
 
 <script setup lang="ts">
+import leagueIco from '@renderer-shared/assets/ico/league.ico'
+import riotClient from '@renderer-shared/assets/ico/riotclient.ico'
+import weGameIco from '@renderer-shared/assets/ico/wegame.ico'
 import { useInstance } from '@renderer-shared/shards'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
 import { useTranslation } from 'i18next-vue'
 import { useMessage } from 'naive-ui'
 import { computed } from 'vue'
-
-import leagueIco from '@main-window/assets/ico/league.ico'
-import riotClient from '@main-window/assets/ico/riotclient.ico'
-import weGameIco from '@main-window/assets/ico/wegame.ico'
 
 const { t } = useTranslation()
 

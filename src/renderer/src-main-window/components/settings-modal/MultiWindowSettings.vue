@@ -147,6 +147,43 @@
         >
       </ControlItem>
     </NCard>
+    <NCard size="small">
+      <template #header>
+        <span class="card-header-title">{{
+          as.isAdministrator
+            ? t('MultiWindowSettings.ongoingGameWindow.title')
+            : t('MultiWindowSettings.ongoingGameWindow.titleRequireAdmin')
+        }}</span>
+      </template>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('MultiWindowSettings.ongoingGameWindow.enabled.label')"
+        :label-description="t('MultiWindowSettings.ongoingGameWindow.enabled.description')"
+        :label-width="400"
+      >
+        <NSwitch
+          size="small"
+          :value="ogws.settings.enabled"
+          @update:value="(val) => wm.ongoingGameWindow.setEnabled(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        :disabled="!as.isAdministrator"
+        :label-width="400"
+        class="control-item-margin"
+        :label="t('MultiWindowSettings.ongoingGameWindow.showShortcut.label')"
+        :label-description="t('MultiWindowSettings.ongoingGameWindow.showShortcut.label')"
+      >
+        <ShortcutSelector
+          :disabled="!as.isAdministrator"
+          :target-id="AkariOngoingGameWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
+          :shortcut-id="ogws.settings.showShortcut"
+          @update:shortcut-id="
+            (id) => wm.ongoingGameWindow.setShowShortcut(id! /* language-tools 1e84c6a  */)
+          "
+        />
+      </ControlItem>
+    </NCard>
   </NScrollbar>
 </template>
 
@@ -154,16 +191,26 @@
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
-import { useAuxWindowStore, useOpggWindowStore } from '@renderer-shared/shards/window-manager/store'
+import { AkariOngoingGameWindow } from '@renderer-shared/shards/window-manager'
+import {
+  useAuxWindowStore,
+  useOngoingGameWindowStore,
+  useOpggWindowStore
+} from '@renderer-shared/shards/window-manager/store'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NIcon, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
+import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
+
 const { t } = useTranslation()
 
+const as = useAppCommonStore()
 const aws = useAuxWindowStore()
 const ows = useOpggWindowStore()
+const ogws = useOngoingGameWindowStore()
 
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
 </script>

@@ -2,9 +2,13 @@ import { Rectangle } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class OngoingGameOverlayWindowSettings {
+  enabled: boolean = true
+
   pinned: boolean = true
 
   opacity: number = 1
+
+  showShortcut: string | null = null
 
   setPinned(pinned: boolean) {
     this.pinned = pinned
@@ -12,6 +16,14 @@ export class OngoingGameOverlayWindowSettings {
 
   setOpacity(opacity: number) {
     this.opacity = opacity
+  }
+
+  setShowShortcut(shortcut: string | null) {
+    this.showShortcut = shortcut
+  }
+
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled
   }
 
   constructor() {
@@ -24,9 +36,6 @@ export class OngoingGameOverlayWindowState {
 
   focus: 'focused' | 'blurred' = 'focused'
 
-  /**
-   * 对应 Electron 的 ready 事件
-   */
   ready: boolean = false
 
   show: boolean = true

@@ -1,16 +1,15 @@
+import BronzeMedal from '@renderer-shared/assets/ranked-icons/bronze.png'
+import ChallengerMedal from '@renderer-shared/assets/ranked-icons/challenger.png'
+import DiamondMedal from '@renderer-shared/assets/ranked-icons/diamond.png'
+import EmeraldMedal from '@renderer-shared/assets/ranked-icons/emerald.png'
+import GoldMedal from '@renderer-shared/assets/ranked-icons/gold.png'
+import GrandmasterMedal from '@renderer-shared/assets/ranked-icons/grandmaster.png'
+import IronMedal from '@renderer-shared/assets/ranked-icons/iron.png'
+import MasterMedal from '@renderer-shared/assets/ranked-icons/master.png'
+import PlatinumMedal from '@renderer-shared/assets/ranked-icons/platinum.png'
+import SilverMedal from '@renderer-shared/assets/ranked-icons/silver.png'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { computed } from 'vue'
-
-import BronzeMedal from '@main-window/assets/ranked-icons/bronze.png'
-import ChallengerMedal from '@main-window/assets/ranked-icons/challenger.png'
-import DiamondMedal from '@main-window/assets/ranked-icons/diamond.png'
-import EmeraldMedal from '@main-window/assets/ranked-icons/emerald.png'
-import GoldMedal from '@main-window/assets/ranked-icons/gold.png'
-import GrandmasterMedal from '@main-window/assets/ranked-icons/grandmaster.png'
-import IronMedal from '@main-window/assets/ranked-icons/iron.png'
-import MasterMedal from '@main-window/assets/ranked-icons/master.png'
-import PlatinumMedal from '@main-window/assets/ranked-icons/platinum.png'
-import SilverMedal from '@main-window/assets/ranked-icons/silver.png'
 
 export const RANKED_MEDAL_MAP: Record<string, string> = {
   IRON: IronMedal,

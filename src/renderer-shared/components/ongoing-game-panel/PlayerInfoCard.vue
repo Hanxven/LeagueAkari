@@ -411,6 +411,8 @@
 </template>
 
 <script setup lang="ts">
+import RankedTable from '@renderer-shared/components/RankedTable.vue'
+import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -437,9 +439,6 @@ import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NPopover, NSpin, NVirtualList } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
-
-import RankedTable from '@main-window/components/RankedTable.vue'
-import PositionIcon from '@main-window/components/icons/position-icons/PositionIcon.vue'
 
 import {
   FIXED_CARD_WIDTH_PX_LITERAL,

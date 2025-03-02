@@ -42,7 +42,7 @@ import { greeting } from '@renderer-shared/utils/greeting'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { useTranslation } from 'i18next-vue'
 import { useMessage, useNotification } from 'naive-ui'
-import { provide, ref, watchEffect, computed } from 'vue'
+import { computed, provide, ref, watchEffect } from 'vue'
 import { h } from 'vue'
 import { useRoute } from 'vue-router'
 

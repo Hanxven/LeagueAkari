@@ -68,6 +68,8 @@ export class GameClientMain implements IAkariShardInitDispose {
 
   public readonly settings = new GameClientSettings()
 
+  private _gcCachedRunningPids: number[] = []
+
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
     this._loggerFactory = deps['logger-factory-main']
@@ -340,6 +342,22 @@ export class GameClientMain implements IAkariShardInitDispose {
     return toolkit
       .getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
       .some((pid) => toolkit.isProcessForeground(pid))
+  }
+
+  isGameClientForegroundCached() {
+    if (this._gcCachedRunningPids.length === 0) {
+      this._gcCachedRunningPids = toolkit.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+    } else {
+      this._gcCachedRunningPids = this._gcCachedRunningPids.filter((pid) =>
+        toolkit.isProcessRunning(pid)
+      )
+
+      if (this._gcCachedRunningPids.length === 0) {
+        this._gcCachedRunningPids = toolkit.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+      }
+    }
+
+    return this._gcCachedRunningPids.some((pid) => toolkit.isProcessForeground(pid))
   }
 
   private async _setSettingsFileReadonlyOrWritable(mode: 'readonly' | 'writable' = 'readonly') {

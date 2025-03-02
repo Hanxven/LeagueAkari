@@ -13,6 +13,7 @@ interface ShortcutDetails {
   keys: { keyId: string; isModifier: boolean; keyCode: number }[]
   id: string
   unifiedId: string
+  pressed: boolean
 }
 
 /**
@@ -30,12 +31,15 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   /** 除了修饰键之外的其他按键 */
   private readonly _pressedOtherKeys = new Set<number>()
-
   /** 修饰键 */
   private readonly _pressedModifierKeys = new Set<number>()
-
-  /** 最后一次激活的快捷键组合, 用于追踪在所有按键结束后的快捷键情况 */
+  /** 最后一次激活的快捷键组合，用于 normal / last-active 逻辑 */
   private _lastActiveShortcut: number[] = []
+  /**
+   * stateful 类型：当前处于按下状态的快捷键组合，
+   * 记录的组合为排序后的修饰键 + 最后按下的非修饰键
+   */
+  private _activeStatefulShortcut: number[] = []
 
   /**
    * 修饰键的惯例可读顺序, 用于组合成好看的字符串
@@ -61,27 +65,29 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     13 // Enter
   ]
 
-  /**
-   * 原生监听到的键盘事件
-   */
   public readonly events = new EventEmitter<{
     /**
-     * 在任意一个有意义的快捷键被按下时触发
+     * 普通快捷键：在任意有意义的快捷键按下时触发（无差别分发)
      */
     shortcut: [details: ShortcutDetails]
-
     /**
-     * last-active: 在所有按键松开后再触发
-     * 在所有按键结束后, 且最后一次激活的快捷键组合被触发时触发
-     * 这个事件用于规避 SendInput 在模拟过程中, 和现有正在进行的按键冲突的问题
+     * last-active：在所有按键松开后触发，用于规避模拟冲突的问题 （无差别分发)
      */
     'last-active-shortcut': [details: ShortcutDetails]
+    /**
+     * stateful 类型：按下时触发 (仅存在订阅时才会被分发)
+     */
+    'stateful-shortcut-pressed': [details: ShortcutDetails]
+    /**
+     * stateful 类型：松开时触发 (仅存在订阅时才会被分发)
+     */
+    'stateful-shortcut-released': [details: ShortcutDetails]
   }>()
 
   private _registrationMap = new Map<
     string,
     {
-      type: 'last-active' | 'normal'
+      type: 'last-active' | 'normal' | 'stateful'
       targetId: string
       cb: (details: ShortcutDetails) => void
     }
@@ -94,7 +100,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       this._lastActiveShortcut = []
       return
     }
-
     this._correctTrackingState()
   }, 2000)
 
@@ -105,144 +110,157 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     this._log = this._loggerFactory.create(KeyboardShortcutsMain.id)
   }
 
+  // fast equal for two arrays (shallow)
+  private _areArraysEqual(arr1: number[], arr2: number[]): boolean {
+    if (arr1.length !== arr2.length) return false
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) return false
+    }
+    return true
+  }
+
+  private _buildShortcutDetails(keyCodes: number[], pressed: boolean): ShortcutDetails {
+    const keys = keyCodes.map((k) => ({
+      keyId: VKEY_MAP[k].keyId,
+      keyCode: k,
+      isModifier: isModifierKey(k)
+    }))
+    const id = keys.map((k) => k.keyId).join('+')
+    const unifiedId = [
+      ...new Set(keyCodes.map((k) => UNIFIED_KEY_ID[k] || VKEY_MAP[k].keyId))
+    ].join('+')
+    return { keyCodes, keys, id, unifiedId, pressed }
+  }
+
+  // 当所有按键松开时，发送 last-active 快捷键信息
+  private _emitLastActiveShortcutIfNeeded(): void {
+    if (
+      this._pressedModifierKeys.size === 0 &&
+      this._pressedOtherKeys.size === 0 &&
+      this._lastActiveShortcut.length > 0
+    ) {
+      const details = this._buildShortcutDetails(this._lastActiveShortcut, false)
+      this.events.emit('last-active-shortcut', details)
+      this._ipc.sendEvent(KeyboardShortcutsMain.id, 'last-active-shortcut', details)
+      const registration = this._registrationMap.get(details.id)
+      if (registration && registration.type === 'last-active') {
+        registration.cb(details)
+      }
+      this._lastActiveShortcut = []
+    }
+  }
+
+  // 处理修饰键的按下和释放
+  private _handleModifierKey(keyCode: number, isDown: boolean): void {
+    if (this._pressedModifierKeys.has(keyCode) === isDown) return
+    if (isDown) {
+      this._pressedModifierKeys.add(keyCode)
+    } else {
+      this._pressedModifierKeys.delete(keyCode)
+    }
+  }
+
+  // 处理非修饰键按下事件
+  private _handleNonModifierKeyDown(keyCode: number): void {
+    this._pressedOtherKeys.add(keyCode)
+    const modifiers = Array.from(this._pressedModifierKeys.values())
+    const sortedModifiers = modifiers.toSorted((a, b) => {
+      return (
+        KeyboardShortcutsMain.MODIFIER_READING_ORDER[a] -
+        KeyboardShortcutsMain.MODIFIER_READING_ORDER[b]
+      )
+    })
+    const keyCodes = [...sortedModifiers, keyCode]
+    const details = this._buildShortcutDetails(keyCodes, true)
+
+    // 更新 lastActive 用于 normal/last-active 逻辑
+    this._lastActiveShortcut = keyCodes
+
+    // 触发普通快捷键事件
+    this.events.emit('shortcut', details)
+
+    const registration = this._registrationMap.get(details.id)
+    if (registration) {
+      if (registration.type === 'normal') {
+        registration.cb(details)
+      } else if (registration.type === 'stateful') {
+        // 如果 stateful 组合发生变化，则先触发之前的 released，再触发新的 pressed
+        if (!this._areArraysEqual(this._activeStatefulShortcut, keyCodes)) {
+          if (this._activeStatefulShortcut.length) {
+            const prevDetails = this._buildShortcutDetails(this._activeStatefulShortcut, false)
+            this.events.emit('stateful-shortcut-released', prevDetails)
+            registration.cb(prevDetails)
+          }
+          this._activeStatefulShortcut = keyCodes
+          this.events.emit('stateful-shortcut-pressed', details)
+          registration.cb(details)
+        }
+      }
+    }
+
+    // 通知 IPC 保持原有逻辑
+    this._ipc.sendEvent(KeyboardShortcutsMain.id, 'shortcut', details)
+  }
+
+  // 处理非修饰键释放事件
+  private _handleNonModifierKeyUp(keyCode: number): void {
+    this._pressedOtherKeys.delete(keyCode)
+    // 如果释放的键是当前 stateful 快捷键中的关键非修饰键，则发出 released 事件
+    if (
+      this._activeStatefulShortcut.length &&
+      this._activeStatefulShortcut[this._activeStatefulShortcut.length - 1] === keyCode
+    ) {
+      const details = this._buildShortcutDetails(this._activeStatefulShortcut, false)
+      this.events.emit('stateful-shortcut-released', details)
+      const registration = this._registrationMap.get(details.id)
+      if (registration && registration.type === 'stateful') {
+        registration.cb(details)
+      }
+      this._activeStatefulShortcut = []
+    }
+  }
+
+  private _handleNativeKeyEvent(rawData: string): void {
+    const [keyCodeRaw, state] = rawData.split(',')
+    // 忽略 VK_PACKET（231）以及未在 VKEY_MAP 中定义的键
+    if (keyCodeRaw === '231' || !VKEY_MAP[keyCodeRaw]) return
+
+    const keyCode = parseInt(keyCodeRaw, 10)
+    const isDown = state === 'DOWN'
+
+    // 按下时启动纠正任务
+    if (isDown) {
+      this._correctTask.start()
+    }
+
+    // 如果是常见修饰键则不处理
+    if (isCommonModifierKey(keyCode)) return
+
+    if (isModifierKey(keyCode)) {
+      this._handleModifierKey(keyCode, isDown)
+    } else {
+      if (isDown) {
+        this._handleNonModifierKeyDown(keyCode)
+      } else {
+        this._handleNonModifierKeyUp(keyCode)
+      }
+    }
+
+    // 检查是否所有按键都已释放，若是则发出 last-active 快捷键事件
+    this._emitLastActiveShortcutIfNeeded()
+  }
+
   async onInit() {
     if (this._app.state.isAdministrator) {
-      input.startHook()
-
       this._log.info('监听键盘事件')
-
-      input.onKeyEvent((key) => {
-        const [keyCodeRaw, state] = key.split(',')
-
-        // ignore VK_PACKET (231)
-        if (keyCodeRaw === '231' || !VKEY_MAP[keyCodeRaw]) {
-          return
-        }
-
-        const keyCode = parseInt(keyCodeRaw, 10)
-
-        if (isCommonModifierKey(keyCode)) {
-          return
-        }
-
-        const isDown = state === 'DOWN'
-
-        // 定期尝试修正状态 (无奈之举)
-        if (isDown) {
-          this._correctTask.start()
-        }
-
-        if (isModifierKey(keyCode)) {
-          // skip if unchanged
-          if (this._pressedModifierKeys.has(keyCode) === isDown) {
-            return
-          }
-
-          if (isDown) {
-            this._pressedModifierKeys.add(keyCode)
-          } else {
-            this._pressedModifierKeys.delete(keyCode)
-          }
-        } else {
-          if (isDown) {
-            this._pressedOtherKeys.add(keyCode)
-            const modifiers = Array.from(this._pressedModifierKeys.values())
-            const sorted = modifiers.toSorted((a, b) => {
-              return (
-                KeyboardShortcutsMain.MODIFIER_READING_ORDER[a] -
-                KeyboardShortcutsMain.MODIFIER_READING_ORDER[b]
-              )
-            })
-
-            const keyCodes = [...sorted, keyCode]
-            const keys = keyCodes.map((k) => ({
-              keyId: VKEY_MAP[k].keyId,
-              keyCode: k,
-              isModifier: isModifierKey(k)
-            }))
-            const combined = keys.map((k) => k.keyId).join('+')
-            const unified = [
-              ...new Set(keyCodes.map((k) => UNIFIED_KEY_ID[k] || VKEY_MAP[k].keyId))
-            ].join('+')
-
-            this._lastActiveShortcut = keyCodes
-
-            this.events.emit('shortcut', { keyCodes, keys, id: combined, unifiedId: unified })
-
-            const registration = this._registrationMap.get(combined)
-            if (registration && registration.type === 'normal') {
-              registration.cb({
-                keyCodes,
-                keys,
-                id: combined,
-                unifiedId: unified
-              })
-            }
-
-            this._ipc.sendEvent(KeyboardShortcutsMain.id, 'shortcut', {
-              keyCodes,
-              keys,
-              id: combined,
-              unifiedId: unified
-            })
-          } else {
-            this._pressedOtherKeys.delete(keyCode)
-          }
-        }
-
-        if (
-          this._pressedModifierKeys.size === 0 &&
-          this._pressedOtherKeys.size === 0 &&
-          this._lastActiveShortcut.length > 0
-        ) {
-          const keys = this._lastActiveShortcut.map((k) => ({
-            keyId: VKEY_MAP[k].keyId,
-            keyCode: k,
-            isModifier: isModifierKey(k)
-          }))
-          const combined = keys.map((k) => k.keyId).join('+')
-          const unified = [
-            ...new Set(this._lastActiveShortcut.map((k) => UNIFIED_KEY_ID[k] || VKEY_MAP[k].keyId))
-          ].join('+')
-
-          this.events.emit('last-active-shortcut', {
-            keyCodes: this._lastActiveShortcut,
-            keys,
-            id: combined,
-            unifiedId: unified
-          })
-
-          this._ipc.sendEvent(KeyboardShortcutsMain.id, 'last-active-shortcut', {
-            keyCodes: this._lastActiveShortcut,
-            keys,
-            id: combined,
-            unifiedId: unified
-          })
-
-          const registration = this._registrationMap.get(combined)
-          if (registration && registration.type === 'last-active') {
-            registration.cb({
-              keyCodes: this._lastActiveShortcut,
-              keys,
-              id: combined,
-              unifiedId: unified
-            })
-          }
-
-          this._lastActiveShortcut = []
-        }
-      })
-
+      input.startHook()
+      input.onKeyEvent((key) => this._handleNativeKeyEvent(key))
       await this._correctTrackingState()
     }
 
     this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistration', (_, shortcutId: string) => {
       const r = this.getRegistration(shortcutId)
-
-      if (!r) {
-        return null
-      }
-
+      if (!r) return null
       const { cb, ...rest } = r
       return rest
     })
@@ -252,70 +270,64 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       'getRegistrationByTargetId',
       (_, targetId: string) => {
         const r = this.getRegistrationByTargetId(targetId)
-
-        if (!r) {
-          return null
-        }
-
+        if (!r) return null
         const { cb, ...rest } = r
         return rest
       }
     )
 
     this._ipc.onCall(KeyboardShortcutsMain.id, '_getInternalVars', () => {
-      // 调试用
       return {
         _pressedOtherKeys: this._pressedOtherKeys,
         _pressedModifierKeys: this._pressedModifierKeys,
-        _lastActiveShortcut: this._lastActiveShortcut
+        _lastActiveShortcut: this._lastActiveShortcut,
+        _activeStatefulShortcut: this._activeStatefulShortcut
       }
     })
   }
 
-  /**
-   * 修正当前的按键状态, 最大程度上保证状态的一致性
-   */
   private async _correctTrackingState() {
     const states = await input.getAllKeyStatesAsync()
-
     this._pressedModifierKeys.clear()
     this._pressedOtherKeys.clear()
 
     states.forEach((key) => {
       const { vkCode, pressed } = key
 
-      // 你知道吗? 当微信启动的时候, 会伸出一个无形的大手将 F22 (VK_CODE 133) 按下, 然后永远不松开
-      // 使用此逻辑以释放 F22
+      // 当微信启动时 F22 可能被意外按下，释放之
       if (vkCode === KeyboardShortcutsMain.VK_CODE_F22 && pressed) {
         this._log.info('F22 被按下, 试图释放')
         input.sendKeyAsync(KeyboardShortcutsMain.VK_CODE_F22, false).catch(() => {})
         return
       }
 
-      if (isCommonModifierKey(vkCode)) {
-        return
-      }
+      if (isCommonModifierKey(vkCode)) return
 
       if (isModifierKey(vkCode)) {
-        if (pressed) {
-          this._pressedModifierKeys.add(vkCode)
-        }
+        if (pressed) this._pressedModifierKeys.add(vkCode)
       } else {
-        if (pressed) {
-          this._pressedOtherKeys.add(vkCode)
-        }
+        if (pressed) this._pressedOtherKeys.add(vkCode)
       }
     })
+
+    if (this._activeStatefulShortcut.length) {
+      const lastKey = this._activeStatefulShortcut[this._activeStatefulShortcut.length - 1]
+      if (!this._pressedOtherKeys.has(lastKey)) {
+        const details = this._buildShortcutDetails(this._activeStatefulShortcut, false)
+        this.events.emit('stateful-shortcut-released', details)
+        const registration = this._registrationMap.get(details.id)
+        if (registration && registration.type === 'stateful') {
+          registration.cb(details)
+        }
+        this._activeStatefulShortcut = []
+      }
+    }
   }
 
-  /**
-   * 注册一个精准快捷键
-   * 同 targetId 的快捷键允许被覆盖, 否则会抛出异常
-   */
   register(
     targetId: string,
     shortcutId: string,
-    type: 'last-active' | 'normal',
+    type: 'last-active' | 'normal' | 'stateful',
     cb: (details: ShortcutDetails) => void
   ) {
     if (!this._app.state.isAdministrator) {
@@ -337,7 +349,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
     this._registrationMap.set(shortcutId, { type, targetId, cb })
     this._targetIdMap.set(targetId, shortcutId)
-
     this._log.info(`注册快捷键 ${shortcutId} (${type})`)
   }
 
@@ -349,7 +360,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       this._log.info(`注销快捷键 ${shortcutId}`)
       return true
     }
-
     return false
   }
 
@@ -360,7 +370,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       this._targetIdMap.delete(targetId)
       return true
     }
-
     return false
   }
 
@@ -373,7 +382,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
         cb: () => {}
       }
     }
-
     return this._registrationMap.get(shortcutId) || null
   }
 
@@ -385,7 +393,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
         cb: () => {}
       }
     }
-
     const shortcutId = this._targetIdMap.get(targetId)
     if (shortcutId) {
       return this._registrationMap.get(shortcutId) || null

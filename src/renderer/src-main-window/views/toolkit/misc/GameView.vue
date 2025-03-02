@@ -3,7 +3,11 @@
     <template #header>
       <span class="card-header-title">{{ t('GameView.title') }}</span>
     </template>
-    <StandaloneMatchHistoryCardModal v-model:show="show" :game-id="viewingGameId" />
+    <StandaloneMatchHistoryCardModal
+      v-model:show="show"
+      :game-id="viewingGameId"
+      @to-summoner="navigateToTabByPuuid"
+    />
     <ControlItem
       class="control-item-margin"
       :label="t('GameView.game.label')"
@@ -22,11 +26,13 @@
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import StandaloneMatchHistoryCardModal from '@renderer-shared/components/match-history-card/StandaloneMatchHistoryCardModal.vue'
+import { useInstance } from '@renderer-shared/shards'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NInputNumber } from 'naive-ui'
 import { ref } from 'vue'
 
-import StandaloneMatchHistoryCardModal from '../../match-history/card/StandaloneMatchHistoryCardModal.vue'
+import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
 const { t } = useTranslation()
 
@@ -38,6 +44,10 @@ const handleInspect = () => {
   show.value = true
   viewingGameId.value = gameId.value
 }
+
+const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
+
+const { navigateToTabByPuuid } = mh.useNavigateToTab()
 </script>
 
 <style lang="less" scoped></style>

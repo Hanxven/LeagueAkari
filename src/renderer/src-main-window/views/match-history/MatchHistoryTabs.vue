@@ -39,6 +39,7 @@
 </template>
 
 <script setup lang="ts">
+import EasyToLaunch from '@renderer-shared/components/EasyToLaunch.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
@@ -53,8 +54,6 @@ import { useMessage } from 'naive-ui'
 import { computed, onActivated, onDeactivated, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import EasyToLaunch from '@main-window/components/EasyToLaunch.vue'
-// import SearchSummoner from '@main-window/components/search-summoner/SearchSummoner.vue'
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
 

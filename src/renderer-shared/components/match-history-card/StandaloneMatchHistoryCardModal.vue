@@ -10,7 +10,7 @@
         :is-loading="!game && isLoading"
         :is-expanded="selfPuuid ? isExpanded : true"
         @set-show-detailed-game="(_, expand) => (isExpanded = expand)"
-        @to-summoner="(puuid) => handleToSummoner(puuid)"
+        @to-summoner="emits('toSummoner', $event)"
       />
       <div class="placeholder" v-else>
         <span>{{
@@ -21,7 +21,7 @@
             : t('StandaloneMatchHistoryCardModal.loading')
         }}</span>
         <NButton
-          :disabled="!props.gameId || isNotFound"
+          :disabled="!gameId || isNotFound"
           size="small"
           secondary
           v-if="isFailedToLoad"
@@ -34,6 +34,7 @@
 </template>
 
 <script setup lang="ts">
+import MatchHistoryCard from '@renderer-shared/components/match-history-card/MatchHistoryCard.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -45,29 +46,30 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NModal, useNotification } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
-import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs/store'
-
-import MatchHistoryCard from './MatchHistoryCard.vue'
-
-const props = defineProps<{
+const {
+  source = 'lcu',
+  game,
+  gameId: propGameId,
+  selfPuuid
+} = defineProps<{
   game?: Game | null
   gameId?: number
   selfPuuid?: string
+  source?: 'lcu' | 'sgp'
+}>()
+
+const emits = defineEmits<{
+  toSummoner: [puuid: string]
 }>()
 
 const { t } = useTranslation()
 
 const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
 const sgp = useInstance<SgpRenderer>('sgp-renderer')
-const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
 const sgps = useSgpStore()
 const lcs = useLeagueClientStore()
 
 const notification = useNotification()
-
-// 和战绩页面的设置共享
-const mhs = useMatchHistoryTabsStore()
 
 const show = defineModel<boolean>('show', { default: false })
 
@@ -78,15 +80,11 @@ const isFailedToLoad = ref(false)
 const isNotFound = ref(false)
 
 const isAbleToUseSgpApi = computed(() => {
-  return (
-    mhs.settings.matchHistoryUseSgpApi &&
-    sgps.availability.serversSupported.matchHistory &&
-    sgps.isTokenReady
-  )
+  return source === 'sgp' && sgps.availability.serversSupported.matchHistory && sgps.isTokenReady
 })
 
 const showingGame = computed(() => {
-  return props.game || uncontrolledData.value || null
+  return game || uncontrolledData.value || null
 })
 
 const fetchGame = async (gameId: number, useSgpApi = false) => {
@@ -101,7 +99,7 @@ const fetchGame = async (gameId: number, useSgpApi = false) => {
     const g = useSgpApi
       ? await sgp.getGameSummaryLcuFormat(gameId)
       : (await lc.api.matchHistory.getGame(gameId)).data
-    if (g.gameId === props.gameId) {
+    if (g.gameId === gameId) {
       uncontrolledData.value = g
     }
   } catch (error) {
@@ -114,7 +112,7 @@ const fetchGame = async (gameId: number, useSgpApi = false) => {
     notification.warning({
       title: () =>
         t('StandaloneMatchHistoryCardModal.errorNotification.title', {
-          gameId: props.gameId
+          gameId
         }),
       content: () =>
         t('StandaloneMatchHistoryCardModal.errorNotification.description', {
@@ -133,20 +131,14 @@ const handleHideModal = () => {
 }
 
 const handleReload = async () => {
-  if (!props.gameId || props.game) {
+  if (!propGameId || game) {
     return
   }
-  await fetchGame(props.gameId, isAbleToUseSgpApi.value)
+  await fetchGame(propGameId, isAbleToUseSgpApi.value)
 }
 
 watch(
-  [
-    () => props.game,
-    () => props.gameId,
-    () => props.selfPuuid,
-    () => isAbleToUseSgpApi.value,
-    () => show.value
-  ],
+  [() => game, () => propGameId, () => selfPuuid, () => isAbleToUseSgpApi.value, () => show.value],
   ([game, gameId, _selfId, useSgpApi, show]) => {
     if (game) {
       return
@@ -161,12 +153,6 @@ watch(
   },
   { immediate: true }
 )
-
-const { navigateToTabByPuuid } = mh.useNavigateToTab()
-
-const handleToSummoner = (puuid) => {
-  navigateToTabByPuuid(puuid)
-}
 </script>
 
 <style lang="less" scoped>

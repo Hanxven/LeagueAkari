@@ -13,6 +13,10 @@
     "UNRANKED"
   ],
   "files.associations": {
+    "*.sqlbook": "sql",
+    "*.ndjson": "jsonl",
+    "*.dbclient-js": "javascript",
+    "*.ejs": "html",
     "xstring": "cpp",
     "algorithm": "cpp",
     "array": "cpp",
@@ -85,7 +89,8 @@
     "xstddef": "cpp",
     "xtr1common": "cpp",
     "xtree": "cpp",
-    "xutility": "cpp"
+    "xutility": "cpp",
+    "condition_variable": "cpp"
   },
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "compile-hero.disable-compile-files-on-did-save-code": false

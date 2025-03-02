@@ -105,15 +105,15 @@ import {
 import { InfoSharp as InfoSharpIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NModal, NTabPane, NTabs } from 'naive-ui'
-import { nextTick, useCssModule, useTemplateRef, watch } from 'vue'
+import { useCssModule, useTemplateRef, watch } from 'vue'
 
 import AboutPane from './AboutPane.vue'
 import AppSettings from './AppSettings.vue'
 import DebugSettings from './DebugSettings.vue'
+import MatchHistorySettings from './MatchHistorySettings.vue'
 import MiscSettings from './MiscSettings.vue'
 import MultiWindowSettings from './MultiWindowSettings.vue'
 import OngoingGameSettings from './OngoingGameSettings.vue'
-import MatchHistorySettings from './MatchHistorySettings.vue'
 import StorageSettings from './storage-settings/StorageSettings.vue'
 
 const { t } = useTranslation()

@@ -25,6 +25,7 @@ export class TrayMain implements IAkariShardInitDispose {
   private _auxWindowTrayDevItem: MenuItem
   private _opggWindowTrayItem: MenuItem
   private _opggWindowTrayDevItem: MenuItem
+  private _ongoingGameWindowTrayItem: MenuItem
   private _quitTrayItem: MenuItem
   private _contextMenu: Menu
 
@@ -68,6 +69,12 @@ export class TrayMain implements IAkariShardInitDispose {
       click: () => this._wm.opggWindow.toggleDevtools()
     })
 
+    this._ongoingGameWindowTrayItem = new MenuItem({
+      label: i18next.t('tray.dev.toggleOngoingGameWindowDevtools'),
+      type: 'normal',
+      click: () => this._wm.ongoingGameWindow?.toggleDevtools()
+    })
+
     this._quitTrayItem = new MenuItem({
       label: i18next.t('tray.quit'),
       type: 'normal',
@@ -76,7 +83,7 @@ export class TrayMain implements IAkariShardInitDispose {
 
     this._contextMenu = Menu.buildFromTemplate([
       {
-        label: 'Akari~ Akari!',
+        label: 'League Akari',
         type: 'normal',
         click: () => this._wm.mainWindow.showOrRestore()
       },
@@ -89,7 +96,8 @@ export class TrayMain implements IAkariShardInitDispose {
         submenu: Menu.buildFromTemplate([
           this._mainWindowDevTrayItem,
           this._auxWindowTrayDevItem,
-          this._opggWindowTrayDevItem
+          this._opggWindowTrayDevItem,
+          this._ongoingGameWindowTrayItem
         ])
       },
       {
@@ -114,13 +122,9 @@ export class TrayMain implements IAkariShardInitDispose {
         if (e) {
           this._auxWindowTrayDevItem.enabled = true
           this._auxWindowTrayItem.enabled = true
-          this._opggWindowTrayDevItem.enabled = true
-          this._opggWindowTrayItem.enabled = true
         } else {
           this._auxWindowTrayDevItem.enabled = false
           this._auxWindowTrayItem.enabled = false
-          this._opggWindowTrayDevItem.enabled = false
-          this._opggWindowTrayItem.enabled = false
         }
       },
       { fireImmediately: true }
@@ -135,6 +139,18 @@ export class TrayMain implements IAkariShardInitDispose {
         } else {
           this._opggWindowTrayDevItem.enabled = false
           this._opggWindowTrayItem.enabled = false
+        }
+      },
+      { fireImmediately: true }
+    )
+
+    this._mobx.reaction(
+      () => this._wm.ongoingGameWindow?.settings.enabled,
+      (e) => {
+        if (e) {
+          this._ongoingGameWindowTrayItem.enabled = true
+        } else {
+          this._ongoingGameWindowTrayItem.enabled = false
         }
       },
       { fireImmediately: true }

@@ -1,3 +1,5 @@
+import type { IgnoreMouseEventsOptions } from 'electron'
+
 import { WindowManagerRendererContext } from '.'
 
 export interface AkariBaseWindowRendererBasicState {
@@ -82,6 +84,10 @@ export class BaseAkariWindowRenderer<
 
   setPinned(value: boolean) {
     return this._context.setting.set(this._mainShardNamespace, 'pinned', value)
+  }
+
+  setIgnoreMouseEvents(value: boolean, options?: IgnoreMouseEventsOptions) {
+    return this._context.ipc.call(this._mainShardNamespace, 'setIgnoreMouseEvents', value, options)
   }
 
   async onInit() {

@@ -2,20 +2,30 @@ import { is } from '@electron-toolkit/utils'
 import { i18next } from '@main/i18n'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { Paths } from '@shared/utils/types'
-import { BrowserWindow, BrowserWindowConstructorOptions, Event, dialog, shell } from 'electron'
+import {
+  BrowserWindow,
+  BrowserWindowConstructorOptions,
+  Event,
+  IgnoreMouseEventsOptions,
+  dialog,
+  shell
+} from 'electron'
 import { comparer, runInAction } from 'mobx'
 import EventEmitter from 'node:events'
 import path from 'node:path'
 
 import { WindowManagerMain, type WindowManagerMainContext } from '.'
 import { AkariProtocolMain } from '../akari-protocol'
+import { GameClientMain } from '../game-client'
 import { AkariIpcMain } from '../ipc'
+import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingSchema } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { getCenteredRectangle, repositionWindowIfInvisible } from './position-utils'
+import { AppCommonMain } from '../app-common'
 
 /**
  * 具备的一些基础属性
@@ -41,12 +51,12 @@ export interface AkariBaseWindowConfig<TSettings extends AkariBaseWindowBasicSet
   /**
    * 设置项的额外 schema
    */
-  settingSchema: SettingSchema<TSettings>
+  settingSchema?: SettingSchema<TSettings>
 
   /**
    * HTML 入口文件, 对应 renderer 目录下对应文件
    */
-  htmlEntry: string | { path: string, hash: string }
+  htmlEntry: string | { path: string; hash: string }
 
   repositionWindowIfInvisible?: boolean
 
@@ -68,6 +78,9 @@ export interface AkariBaseWindowConfig<TSettings extends AkariBaseWindowBasicSet
 
 export interface AkariBaseWindowBasicSetting {
   pinned: boolean
+
+  // 一些情况下, 在设置非 1 的不透明度后将完全不可见
+  // 该问题位于 https://github.com/electron/electron/issues/45730
   opacity: number
 }
 
@@ -87,6 +100,8 @@ export abstract class BaseAkariWindow<
 
   protected readonly _setting: SetterSettingService
 
+  protected readonly _app: AppCommonMain
+
   /** an alias for this._context.ipc */
   protected readonly _ipc: AkariIpcMain
 
@@ -96,6 +111,9 @@ export abstract class BaseAkariWindow<
   /** an alias for this._context.leagueClient */
   protected readonly _leagueClient: LeagueClientMain
 
+  /** an alias for this._context.gameClient */
+  protected readonly _gameClient: GameClientMain
+
   /** an alias for this._context.windowManager */
   protected readonly _windowManager: WindowManagerMain
 
@@ -104,6 +122,8 @@ export abstract class BaseAkariWindow<
 
   /** an alias for this._context.protocol */
   protected readonly _protocol: AkariProtocolMain
+
+  protected readonly _keyboardShortcuts: KeyboardShortcutsMain
 
   constructor(
     /**
@@ -133,12 +153,15 @@ export abstract class BaseAkariWindow<
     this._namespace = `${_context.namespace}/${_namespaceSuffix}`
     this._partition = `persist:${_namespaceSuffix}`
     this._log = _context.loggerFactory.create(this._namespace)
+    this._app = _context.app
     this._ipc = _context.ipc
     this._mobx = _context.mobx
     this._leagueClient = _context.leagueClient
+    this._gameClient = _context.gameClient
     this._windowManager = _context.windowManager
     this._loggerFactory = _context.loggerFactory
     this._protocol = _context.protocol
+    this._keyboardShortcuts = _context.keyboardShortcuts
     this._setting = _context.settingFactory.register(
       this._namespace,
       {
@@ -203,6 +226,14 @@ export abstract class BaseAkariWindow<
     this._context.ipc.onCall(this._namespace, 'resetPosition', () => {
       this.resetPosition()
     })
+
+    this._context.ipc.onCall(
+      this._namespace,
+      'setIgnoreMouseEvent',
+      (_, ignore, options: IgnoreMouseEventsOptions) => {
+        this._window?.setIgnoreMouseEvents(ignore, options)
+      }
+    )
   }
 
   protected _baseWindowObservations() {
@@ -243,10 +274,10 @@ export abstract class BaseAkariWindow<
         preload: path.join(__dirname, '../preload/index.js'),
         sandbox: false,
         spellcheck: false,
-        // backgroundThrottling: false,
-        partition: this._partition
+        partition: this._partition,
+        backgroundThrottling: false
       },
-      ...this._config.browserWindowOptions // 仍然允许覆盖
+      ...this._config.browserWindowOptions
     })
 
     runInAction(() => {
@@ -275,7 +306,9 @@ export abstract class BaseAkariWindow<
     })
 
     this._window.setOpacity(this.settings.opacity)
-    this._window.setAlwaysOnTop(this.settings.pinned, 'normal')
+    this._window.setAlwaysOnTop(this.settings.pinned, 'screen-saver')
+
+    runInAction(() => (this.state.focus = this._window!.isFocused() ? 'focused' : 'blurred'))
 
     if (this.state.bounds) {
       if (this._config.rememberPosition && this._config.rememberSize) {
@@ -386,13 +419,17 @@ export abstract class BaseAkariWindow<
 
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       if (typeof this._config.htmlEntry !== 'string') {
-        this._window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/${this._config.htmlEntry.path}#${this._config.htmlEntry.hash}`)
+        this._window.loadURL(
+          `${process.env['ELECTRON_RENDERER_URL']}/${this._config.htmlEntry.path}#${this._config.htmlEntry.hash}`
+        )
       } else {
         this._window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/${this._config.htmlEntry}`)
       }
     } else {
       if (typeof this._config.htmlEntry !== 'string') {
-        this._window.loadFile(path.join(__dirname, `../renderer/${this._config.htmlEntry.path}`), { hash: this._config.htmlEntry.hash })
+        this._window.loadFile(path.join(__dirname, `../renderer/${this._config.htmlEntry.path}`), {
+          hash: this._config.htmlEntry.hash
+        })
       } else {
         this._window.loadFile(path.join(__dirname, `../renderer/${this._config.htmlEntry}`))
       }
@@ -423,6 +460,16 @@ export abstract class BaseAkariWindow<
         this._window.restore()
       }
       this._window.focus()
+    }
+  }
+
+  show(inactive = false) {
+    if (this._window && !this.state.show) {
+      if (inactive) {
+        this._window.showInactive()
+      } else {
+        this._window.show()
+      }
     }
   }
 

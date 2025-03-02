@@ -8,9 +8,14 @@
     "src/renderer/src-aux-window/**/*.vue",
     "src/renderer/src-opgg-window/**/*",
     "src/renderer/src-opgg-window/**/*.vue",
+    "src/renderer/src-ongoing-game-window/**/*",
+    "src/renderer/src-ongoing-game-window/**/*.vue",
     "src/preload/*.d.ts",
     "src/shared/**/*",
-    "src/renderer-shared/**/*"
+    "src/renderer-shared/**/*",
+    "examples/legacy/ongoing-game-utils.ts",
+    "examples/legacy/PlayerInfoCard.vue",
+    "examples/legacy/OngoingGame1.vue"
   ],
   "compilerOptions": {
     "target": "ESNext",
@@ -22,6 +27,7 @@
       "@main-window/*": ["src/renderer/src-main-window/*"],
       "@aux-window/*": ["src/renderer/src-aux-window/*"],
       "@opgg-window/*": ["src/renderer/src-opgg-window/*"],
+      "@ongoing-game-window/*": ["src/renderer/src-ongoing-game-window/*"],
       "@shared/*": ["src/shared/*"],
       "@renderer-shared/*": ["src/renderer-shared/*"]
     },

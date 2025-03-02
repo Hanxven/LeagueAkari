@@ -61,7 +61,6 @@
           @update:value="(val) => ps.setEnabled(val)"
         />
       </ControlItem>
-
     </NCard>
   </NScrollbar>
 </template>

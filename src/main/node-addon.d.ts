@@ -28,7 +28,7 @@ declare module '@main/native/la-input-win64.node' {
 
     /**
      * 设置 **一个** 监听器，新设置会替换之前的
-     * 将会收到类似于 `132,DOWN` 或 `132,UP` 的类似的字符串
+     * 将会收到类似于 `132,DOWN,1` 或 `132,UP,1` 的类似的字符串 {vkCode},{DOWN|UP}
      * @param cb 回调
      */
     onKeyEvent(cb: (raw: string) => void): void
@@ -111,6 +111,12 @@ declare module '@main/native/la-tools-win64.node' {
      * @param pid 进程 PID
      */
     isProcessForeground(pid: number): boolean
+
+    /**
+     * 判断进程是否在运行
+     * @param pid 进程 PID
+     */
+    isProcessRunning(pid: number): boolean
   }
 
   const toolsAddon: LeagueAkariToolsAddon

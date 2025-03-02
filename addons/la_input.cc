@@ -1,12 +1,12 @@
-#include <windows.h>
-#include <napi.h>
-#include <thread>
-#include <string>
-#include <mutex>
-#include <condition_variable>
+﻿#include <condition_variable>
 #include <functional>
-#include <vector>
+#include <mutex>
+#include <napi.h>
 #include <queue>
+#include <string>
+#include <thread>
+#include <vector>
+#include <windows.h>
 
 HHOOK hKeyboardHook;
 std::mutex mtx;
@@ -14,6 +14,7 @@ std::condition_variable cv;
 bool running = true;
 std::string keyEventOutput;
 Napi::ThreadSafeFunction tsfn;
+bool tsfnInitialized = false;
 
 std::queue<std::function<void()>> taskQueue;
 bool sendingThreadRunning = true;
@@ -28,7 +29,7 @@ LRESULT CALLBACK KeyboardEvent(int nCode, WPARAM wParam, LPARAM lParam) {
 
     std::string keyEventOutput = std::to_string(key) + "," + action;
 
-    if (tsfn) {
+    if (tsfnInitialized) {
       tsfn.BlockingCall([keyEventOutput](Napi::Env env, Napi::Function jsCallback) {
         jsCallback.Call({Napi::String::New(env, keyEventOutput)});
       });
@@ -101,6 +102,7 @@ Napi::Value OnKeyEvent(const Napi::CallbackInfo& info) {
       0,                  // Max queue size (0 = unlimited)
       1                   // Initial thread count
   );
+  tsfnInitialized = true;
 
   return env.Undefined();
 }
@@ -239,7 +241,9 @@ public:
     deferred.Reject(e.Value());
   }
 
-  Napi::Promise GetPromise() { return deferred.Promise(); }
+  Napi::Promise GetPromise() {
+    return deferred.Promise();
+  }
 
 private:
   std::u16string msg;
@@ -249,9 +253,11 @@ private:
 class SendKeyWorker : public Napi::AsyncWorker {
 public:
   SendKeyWorker(const Napi::Env& env, WORD key, bool press)
-    : Napi::AsyncWorker(env), key(key), press(press), deferred(Napi::Promise::Deferred::New(env)) {}
+      : Napi::AsyncWorker(env), key(key), press(press), deferred(Napi::Promise::Deferred::New(env)) {
+  }
 
-  ~SendKeyWorker() {}
+  ~SendKeyWorker() {
+  }
 
   void Execute() override {
     PressKey(key, press);
@@ -265,7 +271,9 @@ public:
     deferred.Reject(e.Value());
   }
 
-  Napi::Promise GetPromise() { return deferred.Promise(); }
+  Napi::Promise GetPromise() {
+    return deferred.Promise();
+  }
 
 private:
   WORD key;
@@ -282,10 +290,11 @@ public:
   };
 
   GetAllKeyStatesWorker(const Napi::Env& env)
-      : Napi::AsyncWorker(env)
-      , deferred(Napi::Promise::Deferred::New(env)) {}
+      : Napi::AsyncWorker(env), deferred(Napi::Promise::Deferred::New(env)) {
+  }
 
-  ~GetAllKeyStatesWorker() {}
+  ~GetAllKeyStatesWorker() {
+  }
 
   void Execute() override {
     for (int vk = 0; vk < 256; ++vk) {
@@ -295,9 +304,9 @@ public:
       UINT scanCode = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
 
       KeyStateInfo info;
-      info.vkCode    = vk;
+      info.vkCode = vk;
       info.isPressed = pressed;
-      info.scanCode  = scanCode;
+      info.scanCode = scanCode;
 
       results.push_back(info);
     }
@@ -309,9 +318,9 @@ public:
     Napi::Array arr = Napi::Array::New(env, results.size());
     for (size_t i = 0; i < results.size(); i++) {
       Napi::Object entry = Napi::Object::New(env);
-      entry.Set("vkCode",    Napi::Number::New(env, results[i].vkCode));
-      entry.Set("pressed",   Napi::Boolean::New(env, results[i].isPressed));
-      entry.Set("scanCode",  Napi::Number::New(env, results[i].scanCode));
+      entry.Set("vkCode", Napi::Number::New(env, results[i].vkCode));
+      entry.Set("pressed", Napi::Boolean::New(env, results[i].isPressed));
+      entry.Set("scanCode", Napi::Number::New(env, results[i].scanCode));
 
       arr.Set(i, entry);
     }
@@ -323,7 +332,9 @@ public:
     deferred.Reject(e.Value());
   }
 
-  Napi::Promise GetPromise() { return deferred.Promise(); }
+  Napi::Promise GetPromise() {
+    return deferred.Promise();
+  }
 
 private:
   Napi::Promise::Deferred deferred;

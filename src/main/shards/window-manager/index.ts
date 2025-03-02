@@ -1,8 +1,12 @@
+import { Overlay } from '@leaguetavern/electron-overlay-win'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 
 import { AkariProtocolMain } from '../akari-protocol'
+import { AppCommonMain } from '../app-common'
+import { GameClientMain } from '../game-client'
 import { AkariIpcMain } from '../ipc'
+import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -10,16 +14,15 @@ import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
 import { AkariMainWindow } from './main-window/window'
+import { AkariOngoingGameWindow } from './ongoing-game-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
-import { AkariOngoingGameOverlayWindow } from './ongoing-game-overlay-window/window'
 import { WindowManagerSettings, WindowManagerState } from './state'
-import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
-import { AppCommonMain } from '../app-common'
 
 export interface WindowManagerMainContext {
   namespace: string
   windowManagerClass: typeof WindowManagerMain
   windowManager: WindowManagerMain
+  app: AppCommonMain
   ipc: AkariIpcMain
   setting: SetterSettingService
   settingFactory: SettingFactoryMain
@@ -28,6 +31,8 @@ export interface WindowManagerMainContext {
   protocol: AkariProtocolMain
   mobx: MobxUtilsMain
   log: AkariLogger
+  gameClient: GameClientMain
+  keyboardShortcuts: KeyboardShortcutsMain
 }
 
 export class WindowManagerMain implements IAkariShardInitDispose {
@@ -39,10 +44,13 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     'logger-factory-main',
     'setting-factory-main',
     'league-client-main',
+    'game-client-main',
     'akari-protocol-main',
     'keyboard-shortcuts-main',
     'app-common-main'
   ]
+
+  public static readonly overlay = new Overlay()
 
   private readonly _ipc: AkariIpcMain
   private readonly _mobx: MobxUtilsMain
@@ -55,6 +63,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   private readonly _protocol: AkariProtocolMain
   private readonly _kbd: KeyboardShortcutsMain
   private readonly _app: AppCommonMain
+  private readonly _gc: GameClientMain
 
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
@@ -62,7 +71,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   public readonly mainWindow: AkariMainWindow
   public readonly auxWindow: AkariAuxWindow
   public readonly opggWindow: AkariOpggWindow
-  public readonly overlayWindow: AkariOngoingGameOverlayWindow
+  public readonly ongoingGameWindow: AkariOngoingGameWindow
 
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
@@ -82,20 +91,20 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this._protocol = deps['akari-protocol-main']
     this._kbd = deps['keyboard-shortcuts-main']
     this._app = deps['app-common-main']
+    this._gc = deps['game-client-main']
 
     const wContext = this.getContext()
     this.mainWindow = new AkariMainWindow(wContext)
     this.auxWindow = new AkariAuxWindow(wContext)
     this.opggWindow = new AkariOpggWindow(wContext)
-    if (this._app.state.isAdministrator) {
-      this.overlayWindow = new AkariOngoingGameOverlayWindow(wContext);
-    }
+    this.ongoingGameWindow = new AkariOngoingGameWindow(wContext)
   }
 
   getContext(): WindowManagerMainContext {
     return {
       namespace: WindowManagerMain.id,
       windowManagerClass: WindowManagerMain,
+      app: this._app,
       windowManager: this,
       ipc: this._ipc,
       setting: this._setting,
@@ -104,7 +113,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       leagueClient: this._lc,
       protocol: this._protocol,
       mobx: this._mobx,
-      log: this._log
+      log: this._log,
+      gameClient: this._gc,
+      keyboardShortcuts: this._kbd
     }
   }
 
@@ -121,15 +132,13 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this.mainWindow.on('force-close', () => {
       this.auxWindow.close(true)
       this.opggWindow.close(true)
-      this.overlayWindow?.close(true)
+      this.ongoingGameWindow.close(true)
     })
 
     await this.mainWindow.onInit()
     await this.auxWindow.onInit()
     await this.opggWindow.onInit()
-    await this.overlayWindow?.onInit()
-
-    this._registerOverlayShortCuts()
+    await this.ongoingGameWindow.onInit()
   }
 
   async onFinish() {
@@ -138,7 +147,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     })
     this.state.setManagerFinishedInit(true)
     this.mainWindow.createWindow()
-    this.overlayWindow?.createWindow()
   }
 
   /**
@@ -161,14 +169,5 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     }
 
     return 'none'
-  }
-
-  _registerOverlayShortCuts() {
-    if (this.overlayWindow) {
-      this._kbd.register(`${WindowManagerMain.id}/overlay-visible`, 'LeftControl+X', 'normal', () => {
-        let t = this.overlayWindow as AkariOngoingGameOverlayWindow;
-        t.toggleVisible()
-      })
-    }
   }
 }

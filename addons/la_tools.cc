@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <napi.h>
 #include <ntstatus.h>
 #include <shlobj.h>
@@ -285,6 +285,25 @@ Napi::Boolean IsProcessForegroundNode(const Napi::CallbackInfo& info) {
   return Napi::Boolean::New(env, isForeground);
 }
 
+// 进程是否存在
+Napi::Boolean IsProcessRunningNode(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  if (info.Length() < 1 || !info[0].IsNumber()) {
+    Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException();
+    return Napi::Boolean::New(env, false);
+  }
+
+  DWORD processID = info[0].As<Napi::Number>().Uint32Value();
+  HANDLE hProcess = OpenProcessFromPid(processID, PROCESS_QUERY_LIMITED_INFORMATION);
+  if (hProcess == NULL) {
+    return Napi::Boolean::New(env, false);
+  }
+
+  CloseHandle(hProcess);
+  return Napi::Boolean::New(env, true);
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set("fixWindowMethodA", Napi::Function::New(env, FixWindowMethodA));
   exports.Set("isElevated", Napi::Function::New(env, IsElevated));
@@ -293,6 +312,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set("getPidsByName", Napi::Function::New(env, GetPidsByName));
   exports.Set("terminateProcess", Napi::Function::New(env, TerminateProcessNode));
   exports.Set("isProcessForeground", Napi::Function::New(env, IsProcessForegroundNode));
+  exports.Set("isProcessRunning", Napi::Function::New(env, IsProcessRunningNode));
   return exports;
 }
 

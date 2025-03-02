@@ -301,6 +301,18 @@ MultiWindowSettings:
       description: 重新设置 OP.GG 窗口的位置，还原到默认主屏幕正中心
       button: 重置
 
+  ongoingGameWindow:
+    title: 对局叠加窗口
+    titleRequireAdmin: 对局叠加窗口 (管理员权限)
+
+    enabled:
+      label: 启用对局窗口
+      description: 在游戏中时，通过叠加窗口展示对局信息
+
+    showShortcut:
+      label: 显示快捷键
+      description: 在游戏中，长按快捷键以展示叠加对局窗口
+
 MiscSettings:
   title: 其他
 
@@ -1915,6 +1927,7 @@ tray:
     toggleMainWindowDevtools: Toggle DevTools - 主窗口
     toggleAuxWindowDevtools: Toggle DevTools - 小窗口
     toggleOpggWindowDevtools: Toggle DevTools - OP.GG 窗口
+    toggleOngoingGameWindowDevtools: Toggle DevTools - 对局窗口
 
 windowOpenHandler:
   toAkari: 将转到 League Akari 的项目主页 ❤️
