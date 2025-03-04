@@ -26,7 +26,7 @@ static bool is_process_running(const std::string& processName) {
   pe.dwSize = sizeof(pe);
   if (Process32First(hSnapshot, &pe)) {
     do {
-      if (_stricmp(pe.szExeFile, processName.c_str()) == 0) {
+      if (_stricmp((const char*)pe.szExeFile, processName.c_str()) == 0) {
         CloseHandle(hSnapshot);
         return true;
       }

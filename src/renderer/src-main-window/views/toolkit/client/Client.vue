@@ -74,7 +74,7 @@
             <ShortcutSelector
               :target-id="GameClientRenderer.SHORTCUT_ID_TERMINATE_GAME_CLIENT"
               :shortcut-id="gcs.settings.terminateShortcut"
-              @update:shortcut-id="(v) => gc.setTerminateShortcut(v! /* language-tools 1e84c6a  */)"
+              @update:shortcut-id="(v) => gc.setTerminateShortcut(v)"
               :disabled="!as.isAdministrator"
             />
           </ControlItem>
@@ -127,7 +127,8 @@
                 :disabled="!as.isAdministrator || lcs.connectionState !== 'connected'"
                 :show-button="false"
                 :min="1"
-                v-model:value="fixWindowMethodAOptions.baseWidth"
+                @update:value="(val) => (fixWindowMethodAOptions.baseWidth = val || 0)"
+                :value="fixWindowMethodAOptions.baseWidth"
                 @keyup.enter="() => fixWindowInputButton2?.focus()"
               >
                 <template #prefix>W</template>
@@ -139,7 +140,8 @@
                 size="small"
                 :show-button="false"
                 :min="1"
-                v-model:value="fixWindowMethodAOptions.baseHeight"
+                @update:value="(val) => (fixWindowMethodAOptions.baseHeight = val || 0)"
+                :value="fixWindowMethodAOptions.baseHeight"
                 @keyup.enter="() => handleFixWindowMethodA()"
                 ><template #prefix>H</template>
               </NInputNumber>

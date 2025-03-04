@@ -6,6 +6,7 @@ import { SettingUtilsRenderer } from '../setting-utils'
 import { BaseAkariWindowRenderer } from './base-akari-window'
 import {
   useAuxWindowStore,
+  useCdTimerWindowStore,
   useMainWindowStore,
   useOngoingGameWindowStore,
   useOpggWindowStore,
@@ -17,6 +18,7 @@ const MAIN_SHARD_NAMESPACE_MAIN_WINDOW = 'window-manager-main/main-window'
 const MAIN_SHARD_NAMESPACE_AUX_WINDOW = 'window-manager-main/aux-window'
 const MAIN_SHARD_NAMESPACE_OPGG_WINDOW = 'window-manager-main/opgg-window'
 const MAIN_SHARD_NAMESPACE_ONGOING_GAME_WINDOW = 'window-manager-main/ongoing-game-window'
+const MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW = 'window-manager-main/cd-timer-window'
 
 export interface WindowManagerRendererContext {
   ipc: AkariIpcRenderer
@@ -126,6 +128,34 @@ export class AkariOngoingGameWindow extends BaseAkariWindowRenderer<
   }
 }
 
+export class AkariCdTimerWindow extends BaseAkariWindowRenderer<
+  ReturnType<typeof useCdTimerWindowStore>,
+  ReturnType<typeof useCdTimerWindowStore>['settings']
+> {
+  static SHOW_WINDOW_SHORTCUT_TARGET_ID = `${MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW}/show`
+
+  constructor(_context: WindowManagerRendererContext) {
+    super(
+      _context,
+      MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW,
+      () => useCdTimerWindowStore(),
+      () => useCdTimerWindowStore().settings
+    )
+  }
+
+  setEnabled(value: boolean) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW, 'enabled', value)
+  }
+
+  setShowShortcut(value: string | null) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW, 'showShortcut', value)
+  }
+
+  setTimerType(value: 'countdown' | 'countup') {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW, 'timerType', value)
+  }
+}
+
 export class WindowManagerRenderer implements IAkariShardInitDispose {
   static id = 'window-manager-renderer'
   static dependencies = [
@@ -141,6 +171,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
   public auxWindow: AkariAuxWindow
   public opggWindow: AkariOpggWindow
   public ongoingGameWindow: AkariOngoingGameWindow
+  public cdTimerWindow: AkariCdTimerWindow
 
   constructor(deps: any) {
     this.context = {
@@ -153,6 +184,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     this.auxWindow = new AkariAuxWindow(this.context)
     this.opggWindow = new AkariOpggWindow(this.context)
     this.ongoingGameWindow = new AkariOngoingGameWindow(this.context)
+    this.cdTimerWindow = new AkariCdTimerWindow(this.context)
   }
 
   async onInit() {
@@ -164,6 +196,7 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
     await this.auxWindow.onInit()
     await this.opggWindow.onInit()
     await this.ongoingGameWindow.onInit()
+    await this.cdTimerWindow.onInit()
   }
 
   setBackgroundMaterial(value: string) {

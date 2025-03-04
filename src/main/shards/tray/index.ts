@@ -1,6 +1,7 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { Menu, MenuItem, Tray } from 'electron'
 import i18next from 'i18next'
+import { comparer } from 'mobx'
 
 import icon from '../../../../resources/LA_ICON.ico?asset'
 import { AppCommonMain } from '../app-common'
@@ -22,10 +23,11 @@ export class TrayMain implements IAkariShardInitDispose {
   private _tray: Tray | null = null
   private _mainWindowDevTrayItem: MenuItem
   private _auxWindowTrayItem: MenuItem
-  private _auxWindowTrayDevItem: MenuItem
+  private _auxWindowDevTrayItem: MenuItem
   private _opggWindowTrayItem: MenuItem
-  private _opggWindowTrayDevItem: MenuItem
-  private _ongoingGameWindowTrayItem: MenuItem
+  private _opggWindowDevTrayItem: MenuItem
+  private _ongoingGameWindowDevTrayItem: MenuItem
+  private _cdTimerWindowDevTrayItem: MenuItem
   private _quitTrayItem: MenuItem
   private _contextMenu: Menu
 
@@ -44,7 +46,7 @@ export class TrayMain implements IAkariShardInitDispose {
       click: () => this._wm.auxWindow.showOrRestore()
     })
 
-    this._auxWindowTrayDevItem = new MenuItem({
+    this._auxWindowDevTrayItem = new MenuItem({
       id: 'aux-window-dev',
       label: i18next.t('tray.dev.toggleAuxWindowDevtools'),
       type: 'normal',
@@ -63,16 +65,22 @@ export class TrayMain implements IAkariShardInitDispose {
       click: () => this._wm.opggWindow.showOrRestore()
     })
 
-    this._opggWindowTrayDevItem = new MenuItem({
+    this._opggWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleOpggWindowDevtools'),
       type: 'normal',
       click: () => this._wm.opggWindow.toggleDevtools()
     })
 
-    this._ongoingGameWindowTrayItem = new MenuItem({
+    this._ongoingGameWindowDevTrayItem = new MenuItem({
       label: i18next.t('tray.dev.toggleOngoingGameWindowDevtools'),
       type: 'normal',
       click: () => this._wm.ongoingGameWindow?.toggleDevtools()
+    })
+
+    this._cdTimerWindowDevTrayItem = new MenuItem({
+      label: i18next.t('tray.dev.toggleCdTimerWindowDevtools'),
+      type: 'normal',
+      click: () => this._wm.cdTimerWindow.toggleDevtools()
     })
 
     this._quitTrayItem = new MenuItem({
@@ -95,9 +103,10 @@ export class TrayMain implements IAkariShardInitDispose {
         type: 'submenu',
         submenu: Menu.buildFromTemplate([
           this._mainWindowDevTrayItem,
-          this._auxWindowTrayDevItem,
-          this._opggWindowTrayDevItem,
-          this._ongoingGameWindowTrayItem
+          this._auxWindowDevTrayItem,
+          this._opggWindowDevTrayItem,
+          this._ongoingGameWindowDevTrayItem,
+          this._cdTimerWindowDevTrayItem
         ])
       },
       {
@@ -117,40 +126,52 @@ export class TrayMain implements IAkariShardInitDispose {
     this._buildTray()
 
     this._mobx.reaction(
-      () => this._wm.auxWindow.settings.enabled,
-      (e) => {
-        if (e) {
-          this._auxWindowTrayDevItem.enabled = true
+      () => [this._wm.auxWindow.settings.enabled, this._wm.auxWindow.state.ready],
+      ([enabled, ready]) => {
+        if (enabled && ready) {
+          this._auxWindowDevTrayItem.enabled = true
           this._auxWindowTrayItem.enabled = true
         } else {
-          this._auxWindowTrayDevItem.enabled = false
+          this._auxWindowDevTrayItem.enabled = false
           this._auxWindowTrayItem.enabled = false
         }
       },
-      { fireImmediately: true }
+      { fireImmediately: true, equals: comparer.shallow }
     )
 
     this._mobx.reaction(
-      () => this._wm.opggWindow.settings.enabled,
-      (e) => {
-        if (e) {
-          this._opggWindowTrayDevItem.enabled = true
+      () => [this._wm.opggWindow.settings.enabled, this._wm.opggWindow.state.ready],
+      ([enabled, ready]) => {
+        if (enabled && ready) {
+          this._opggWindowDevTrayItem.enabled = true
           this._opggWindowTrayItem.enabled = true
         } else {
-          this._opggWindowTrayDevItem.enabled = false
+          this._opggWindowDevTrayItem.enabled = false
           this._opggWindowTrayItem.enabled = false
         }
       },
-      { fireImmediately: true }
+      { fireImmediately: true, equals: comparer.shallow }
     )
 
     this._mobx.reaction(
-      () => this._wm.ongoingGameWindow?.settings.enabled,
-      (e) => {
-        if (e) {
-          this._ongoingGameWindowTrayItem.enabled = true
+      () => [this._wm.ongoingGameWindow.settings.enabled, this._wm.ongoingGameWindow.state.ready],
+      ([enabled, ready]) => {
+        if (enabled && ready) {
+          this._ongoingGameWindowDevTrayItem.enabled = true
         } else {
-          this._ongoingGameWindowTrayItem.enabled = false
+          this._ongoingGameWindowDevTrayItem.enabled = false
+        }
+      },
+      { fireImmediately: true, equals: comparer.shallow }
+    )
+
+    this._mobx.reaction(
+      () => [this._wm.cdTimerWindow.settings.enabled, this._wm.cdTimerWindow.state.ready],
+      ([enabled, ready]) => {
+        if (enabled && ready) {
+          this._cdTimerWindowDevTrayItem.enabled = true
+        } else {
+          this._cdTimerWindowDevTrayItem.enabled = false
         }
       },
       { fireImmediately: true }

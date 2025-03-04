@@ -44,7 +44,7 @@
               />
             </NProgress>
             <NBadge v-else dot processing :show="lcs.isDisconnected && clients.others.length > 0">
-              <NIcon class="menu-item-icon"><BareMetalServerIcon /></NIcon>
+              <NIcon class="menu-item-icon"><PlugDisconnected20FilledIcon /></NIcon>
             </NBadge>
           </div>
         </div>
@@ -114,7 +114,7 @@
       <template #trigger>
         <div class="menu-item" @click="handleOpenSettingsModal">
           <div class="menu-item-inner">
-            <NIcon class="menu-item-icon"><SettingsIcon /></NIcon>
+            <NIcon class="menu-item-icon"><Settings28FilledIcon /></NIcon>
           </div>
         </div>
       </template>
@@ -135,8 +135,12 @@ import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
-import { BareMetalServer as BareMetalServerIcon, Settings as SettingsIcon } from '@vicons/carbon'
-import { PlugDisconnected24Filled as PlugDisconnected24FilledIcon } from '@vicons/fluent'
+import { BareMetalServer as BareMetalServerIcon } from '@vicons/carbon'
+import {
+  PlugDisconnected24Filled as PlugDisconnected24FilledIcon,
+  Settings28Filled as Settings28FilledIcon,
+  PlugDisconnected20Filled as PlugDisconnected20FilledIcon
+} from '@vicons/fluent'
 import { Hourglass as HourglassIcon } from '@vicons/ionicons5'
 import { useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'

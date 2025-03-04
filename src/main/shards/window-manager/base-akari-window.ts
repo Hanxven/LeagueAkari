@@ -16,6 +16,7 @@ import path from 'node:path'
 
 import { WindowManagerMain, type WindowManagerMainContext } from '.'
 import { AkariProtocolMain } from '../akari-protocol'
+import { AppCommonMain } from '../app-common'
 import { GameClientMain } from '../game-client'
 import { AkariIpcMain } from '../ipc'
 import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
@@ -25,12 +26,11 @@ import { MobxUtilsMain } from '../mobx-utils'
 import { SettingSchema } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { getCenteredRectangle, repositionWindowIfInvisible } from './position-utils'
-import { AppCommonMain } from '../app-common'
 
 /**
  * 具备的一些基础属性
  */
-export interface AkariBaseWindowBasicState {
+export interface BaseAkariWindowBasicState {
   status: 'normal' | 'maximized' | 'minimized'
 
   focus: 'focused' | 'blurred'
@@ -42,7 +42,7 @@ export interface AkariBaseWindowBasicState {
   bounds: Electron.Rectangle | null
 }
 
-export interface AkariBaseWindowConfig<TSettings extends AkariBaseWindowBasicSetting> {
+export interface AkariBaseWindowConfig<TSettings extends BaseAkariWindowBasicSetting> {
   baseWidth: number
   baseHeight: number
   minWidth: number
@@ -58,15 +58,18 @@ export interface AkariBaseWindowConfig<TSettings extends AkariBaseWindowBasicSet
    */
   htmlEntry: string | { path: string; hash: string }
 
+  /**
+   * 重新定位窗口, 当窗口不可见时, default: false
+   */
   repositionWindowIfInvisible?: boolean
 
   /**
-   * 将记忆上一次的窗口位置
+   * 将记忆上一次的窗口位置, default: false
    */
   rememberPosition?: boolean
 
   /**
-   * 将记忆上一次的窗口大小
+   * 将记忆上一次的窗口大小, default: false
    */
   rememberSize?: boolean
 
@@ -76,7 +79,7 @@ export interface AkariBaseWindowConfig<TSettings extends AkariBaseWindowBasicSet
   browserWindowOptions?: BrowserWindowConstructorOptions
 }
 
-export interface AkariBaseWindowBasicSetting {
+export interface BaseAkariWindowBasicSetting {
   pinned: boolean
 
   // 一些情况下, 在设置非 1 的不透明度后将完全不可见
@@ -88,8 +91,8 @@ export interface AkariBaseWindowBasicSetting {
  * 预制菜, 封装了窗口的常见状态
  */
 export abstract class BaseAkariWindow<
-  TState extends AkariBaseWindowBasicState,
-  TSettings extends AkariBaseWindowBasicSetting
+  TState extends BaseAkariWindowBasicState,
+  TSettings extends BaseAkariWindowBasicSetting
 > extends EventEmitter {
   protected _window: BrowserWindow | null = null
   protected _namespace: string
@@ -187,6 +190,14 @@ export abstract class BaseAkariWindow<
       return this._window?.getSize()
     })
 
+    this._context.ipc.onCall(this._namespace, 'setPosition', async (_, x, y, animate) => {
+      this._window?.setPosition(x, y, animate)
+    })
+
+    this._context.ipc.onCall(this._namespace, 'getPosition', async () => {
+      return this._window?.getPosition()
+    })
+
     this._context.ipc.onCall(this._namespace, 'minimize', async () => {
       this._window?.minimize()
     })
@@ -229,7 +240,7 @@ export abstract class BaseAkariWindow<
 
     this._context.ipc.onCall(
       this._namespace,
-      'setIgnoreMouseEvent',
+      'setIgnoreMouseEvents',
       (_, ignore, options: IgnoreMouseEventsOptions) => {
         this._window?.setIgnoreMouseEvents(ignore, options)
       }
@@ -248,7 +259,7 @@ export abstract class BaseAkariWindow<
     this._context.mobx.reaction(
       () => this.settings.pinned,
       (pinned) => {
-        this._window?.setAlwaysOnTop(pinned, 'normal')
+        this._window?.setAlwaysOnTop(pinned, 'screen-saver')
       },
       { fireImmediately: true }
     )
@@ -265,6 +276,8 @@ export abstract class BaseAkariWindow<
   }
 
   protected _createWindow() {
+    const { webPreferences, ...rest } = this._config.browserWindowOptions || {}
+
     this._window = new BrowserWindow({
       width: this._config.baseWidth,
       height: this._config.baseHeight,
@@ -275,9 +288,10 @@ export abstract class BaseAkariWindow<
         sandbox: false,
         spellcheck: false,
         partition: this._partition,
-        backgroundThrottling: false
+        backgroundThrottling: false,
+        ...webPreferences
       },
-      ...this._config.browserWindowOptions
+      ...rest
     })
 
     runInAction(() => {
@@ -489,9 +503,7 @@ export abstract class BaseAkariWindow<
 
   resetPosition() {
     if (this._window) {
-      const p = getCenteredRectangle(...(this._window.getSize() as [number, number]))
-      this._window.setSize(this._config.baseWidth, this._config.baseHeight)
-      this._window.setPosition(p.x, p.y)
+      this._window.center()
     }
 
     this._log.info(`重置 ${this._namespace} 位置到主显示器中心`)

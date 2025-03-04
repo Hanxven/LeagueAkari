@@ -1,6 +1,7 @@
 import { Overlay } from '@leaguetavern/electron-overlay-win'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
+import { BrowserWindow } from 'electron'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
@@ -13,6 +14,7 @@ import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
+import { AkariCdTimerWindow } from './cd-timer-window'
 import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
@@ -72,6 +74,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   public readonly auxWindow: AkariAuxWindow
   public readonly opggWindow: AkariOpggWindow
   public readonly ongoingGameWindow: AkariOngoingGameWindow
+  public readonly cdTimerWindow: AkariCdTimerWindow
 
   constructor(deps: any) {
     this._ipc = deps['akari-ipc-main']
@@ -98,6 +101,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this.auxWindow = new AkariAuxWindow(wContext)
     this.opggWindow = new AkariOpggWindow(wContext)
     this.ongoingGameWindow = new AkariOngoingGameWindow(wContext)
+    this.cdTimerWindow = new AkariCdTimerWindow(wContext)
   }
 
   getContext(): WindowManagerMainContext {
@@ -133,12 +137,14 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       this.auxWindow.close(true)
       this.opggWindow.close(true)
       this.ongoingGameWindow.close(true)
+      this.cdTimerWindow.close(true)
     })
 
     await this.mainWindow.onInit()
     await this.auxWindow.onInit()
     await this.opggWindow.onInit()
     await this.ongoingGameWindow.onInit()
+    await this.cdTimerWindow.onInit()
   }
 
   async onFinish() {
@@ -147,6 +153,11 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     })
     this.state.setManagerFinishedInit(true)
     this.mainWindow.createWindow()
+  }
+
+  static setAboveTheWorld(window: BrowserWindow) {
+    const result = WindowManagerMain.overlay.enable(window.getNativeWindowHandle())
+    return { res: result.res, msg: result.msg }
   }
 
   /**

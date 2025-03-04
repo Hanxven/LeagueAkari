@@ -1,23 +1,22 @@
 import { Rectangle } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
 
-/**
- * 主窗口关闭策略
- * - minimize-to-tray: 最小化到托盘
- * - quit: 退出应用
- * - ask: 询问用户
- */
-export type MainWindowCloseAction = 'minimize-to-tray' | 'quit' | 'ask'
+export class CdTimerWindowSettings {
+  enabled: boolean = true
 
-/**
- * 分离设置项到独立的类
- */
-export class MainWindowSettings {
-  pinned: boolean = false
+  pinned: boolean = true
 
   opacity: number = 1
 
-  closeAction: MainWindowCloseAction = 'ask'
+  showShortcut: string | null = null
+
+  /**
+   * 默认计时器的类型
+   * - countdown: 倒计时模式, 使用默认的技能冷却时间
+   * - countup: 正计时模式, 从 0 开始计时
+   * 对于自定义的计时器, 永远为 countup
+   */
+  timerType: 'countdown' | 'countup' = 'countdown'
 
   setPinned(pinned: boolean) {
     this.pinned = pinned
@@ -27,8 +26,16 @@ export class MainWindowSettings {
     this.opacity = opacity
   }
 
-  setCloseAction(action: MainWindowCloseAction) {
-    this.closeAction = action
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled
+  }
+
+  setShowShortcut(showShortcut: string | null) {
+    this.showShortcut = showShortcut
+  }
+
+  setTimerType(timerType: 'countdown' | 'countup') {
+    this.timerType = timerType
   }
 
   constructor() {
@@ -36,14 +43,11 @@ export class MainWindowSettings {
   }
 }
 
-export class MainWindowState {
+export class CdTimerWindowState {
   status: 'normal' | 'maximized' | 'minimized' = 'normal'
 
   focus: 'focused' | 'blurred' = 'focused'
 
-  /**
-   * 对应 Electron 的 ready 事件
-   */
   ready: boolean = false
 
   show: boolean = true
@@ -52,10 +56,6 @@ export class MainWindowState {
 
   setStatus(status: 'normal' | 'maximized' | 'minimized') {
     this.status = status
-  }
-
-  setFocus(focus: 'focused' | 'blurred') {
-    this.focus = focus
   }
 
   setReady(ready: boolean) {

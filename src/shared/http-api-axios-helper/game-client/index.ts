@@ -1,6 +1,7 @@
 import { PlayerList } from '@shared/types/game-client'
 import { AxiosInstance } from 'axios'
 
+// https://static.developer.riotgames.com/docs/lol/liveclientdata_sample.json
 export class GameClientHttpApiAxiosHelper {
   constructor(private _http: AxiosInstance) {}
 

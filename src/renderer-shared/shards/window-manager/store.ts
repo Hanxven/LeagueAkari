@@ -33,7 +33,7 @@ export const useWindowManagerStore = defineStore('shard:window-manager-renderer'
   }
 })
 
-export const useMainWindowStore = defineStore('shard:main-window-renderer/main-window', () => {
+export const useMainWindowStore = defineStore('shard:window-manager-renderer/main-window', () => {
   const settings = shallowReactive({
     closeAction: 'ask' as MainWindowCloseAction,
     opacity: 1,
@@ -48,7 +48,7 @@ export const useMainWindowStore = defineStore('shard:main-window-renderer/main-w
   }
 })
 
-export const useAuxWindowStore = defineStore('shard:main-window-renderer/aux-window', () => {
+export const useAuxWindowStore = defineStore('shard:window-manager-renderer/aux-window', () => {
   const settings = shallowReactive({
     enabled: true,
     autoShow: true,
@@ -65,7 +65,7 @@ export const useAuxWindowStore = defineStore('shard:main-window-renderer/aux-win
   }
 })
 
-export const useOpggWindowStore = defineStore('shard:main-window-renderer/opgg-window', () => {
+export const useOpggWindowStore = defineStore('shard:window-manager-renderer/opgg-window', () => {
   const settings = shallowReactive({
     enabled: true,
     autoShow: true,
@@ -82,13 +82,35 @@ export const useOpggWindowStore = defineStore('shard:main-window-renderer/opgg-w
 })
 
 export const useOngoingGameWindowStore = defineStore(
-  'shard:main-window-renderer/ongoing-game-window',
+  'shard:window-manager-renderer/ongoing-game-window',
   () => {
     const settings = shallowReactive({
       enabled: true,
       showShortcut: null as string | null,
-      opacity: 0.9,
+      opacity: 1,
       pinned: true
+    })
+
+    const basicWindowState = useBasicWindowStates()
+    const fakeShow = ref(false)
+
+    return {
+      settings,
+      ...basicWindowState,
+      fakeShow
+    }
+  }
+)
+
+export const useCdTimerWindowStore = defineStore(
+  'shard:window-manager-renderer/cd-timer-window',
+  () => {
+    const settings = shallowReactive({
+      enabled: true,
+      opacity: 1,
+      pinned: true,
+      showShortcut: null as string | null,
+      timerType: 'countdown' as 'countdown' | 'countup'
     })
 
     const basicWindowState = useBasicWindowStates()

@@ -94,7 +94,7 @@ import { Game } from '@shared/types/league-client/match-history'
 import { findOutliersByIqr } from '@shared/utils/analysis'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NScrollbar } from 'naive-ui'
+import { NScrollbar, NButton } from 'naive-ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import PlayerInfoCard from './PlayerInfoCard.vue'

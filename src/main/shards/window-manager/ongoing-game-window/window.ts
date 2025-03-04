@@ -6,11 +6,11 @@ import { comparer } from 'mobx'
 import { WindowManagerMain, type WindowManagerMainContext } from '..'
 import icon from '../../../../../resources/LA_ICON.ico?asset'
 import { BaseAkariWindow } from '../base-akari-window'
-import { OngoingGameOverlayWindowSettings, OngoingGameOverlayWindowState } from './state'
+import { OngoingGameWindowSettings, OngoingGameWindowState } from './state'
 
 export class AkariOngoingGameWindow extends BaseAkariWindow<
-  OngoingGameOverlayWindowState,
-  OngoingGameOverlayWindowSettings
+  OngoingGameWindowState,
+  OngoingGameWindowSettings
 > {
   static readonly NAMESPACE_SUFFIX = 'ongoing-game-window'
   static readonly HTML_ENTRY = 'ongoing-game-window.html'
@@ -23,8 +23,8 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
   public shortcutTargetId: string
 
   constructor(_context: WindowManagerMainContext) {
-    const state = new OngoingGameOverlayWindowState()
-    const settings = new OngoingGameOverlayWindowSettings()
+    const state = new OngoingGameWindowState()
+    const settings = new OngoingGameWindowSettings()
 
     super(_context, AkariOngoingGameWindow.NAMESPACE_SUFFIX, state, settings, {
       baseWidth: AkariOngoingGameWindow.BASE_WIDTH,
@@ -33,6 +33,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
       minHeight: AkariOngoingGameWindow.BASE_HEIGHT,
       htmlEntry: AkariOngoingGameWindow.HTML_ENTRY,
       rememberPosition: false,
+      rememberSize: false,
       settingSchema: {
         enabled: { default: settings.enabled },
         showShortcut: { default: settings.showShortcut }
@@ -50,7 +51,10 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
         transparent: true,
         skipTaskbar: true,
         autoHideMenuBar: true,
-        backgroundColor: '#00000000'
+        // backgroundColor: '#00000000',
+        webPreferences: {
+          backgroundThrottling: true // focusable 和 backgroundThrottling 一起使用, 会出现莫名其妙的 BUG
+        }
       }
     })
 
@@ -59,7 +63,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
 
   private _handleOngoingGameWindowLogics() {
     if (!this.settings.pinned) {
-      this.settings.setPinned(true)
+      this._setting.set('pinned', true)
     }
 
     this._setting.onChange('pinned', (value: boolean) => {
@@ -95,8 +99,27 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
           return
         }
 
-        this._setAboveTheWorld()
+        if (this._window) {
+          this._window.setIgnoreMouseEvents(true)
+          this.show()
+
+          if (!WindowManagerMain.setAboveTheWorld(this._window).res) {
+            this._log.warn('无法将 ongoing-game 窗口置顶')
+          }
+        }
       }
+    )
+
+    this._mobx.reaction(
+      () => this.state.fakeShow,
+      (fakeShow) => {
+        if (fakeShow) {
+          this._window?.setIgnoreMouseEvents(false)
+        } else {
+          this._window?.setIgnoreMouseEvents(true)
+        }
+      },
+      { fireImmediately: true }
     )
 
     this._mobx.reaction(
@@ -111,15 +134,16 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
               (event) => {
                 if (event.pressed) {
                   if (is.dev || GameClientMain.isGameClientForeground()) {
-                    // backgroundThrottling 为 false 可以保证动画效果
-                    // 但不知道为什么, 如果同时设置 focusable 为 false, 会在 hide 之后导致鼠标事件无法响应
-                    // 这里先设置为 true, 等待 hide 完成后再设置为 false
-                    this._window?.setFocusable(true)
-                    this.show()
-                    this._window?.setFocusable(false)
+                    if (!this.state.show) {
+                      this.show()
+                    }
+
+                    this._window?.setIgnoreMouseEvents(false)
+                    this.state.setFakeShow(true)
                   }
                 } else {
-                  this.hide()
+                  this._window?.setIgnoreMouseEvents(true)
+                  this.state.setFakeShow(false)
                 }
               }
             )
@@ -136,7 +160,9 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
     )
   }
 
-  private _updateShortcut() {}
+  override hide() {
+    this.state.setFakeShow(true)
+  }
 
   override async onInit() {
     await super.onInit()
@@ -149,19 +175,11 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
     this._handleOngoingGameWindowLogics()
   }
 
-  private _setAboveTheWorld() {
-    if (this.window) {
-      const result = WindowManagerMain.overlay.enable(this.window.getNativeWindowHandle())
-
-      if (!result.res) {
-        this._log.warn('无法更改 ongoing-game 窗口层级', result.msg)
-      }
-    } else {
-      this._log.warn('无法更改 ongoing-game 窗口层级, 窗口不存在')
-    }
-  }
-
   protected override getSettingPropKeys() {
     return ['enabled', 'showShortcut'] as const
+  }
+
+  protected override getStatePropKeys() {
+    return ['fakeShow'] as const
   }
 }

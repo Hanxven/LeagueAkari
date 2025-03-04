@@ -307,11 +307,30 @@ MultiWindowSettings:
 
     enabled:
       label: 启用对局窗口
-      description: 在游戏中时，通过叠加窗口展示对局信息
+      description: 在游戏中时，通过叠加窗口展示对局信息。此功能依赖窗口置顶，需启用游戏的无边框或窗口模式
 
     showShortcut:
       label: 显示快捷键
       description: 在游戏中，长按快捷键以展示叠加对局窗口
+
+  cdTimerWindow:
+    title: 计时器叠加窗口
+    titleRequireAdmin: 计时器叠加窗口 (管理员权限)
+
+    enabled:
+      label: 启用计时器窗口
+      description: 在游戏中时，通过叠加窗口提供便捷计时器。此功能依赖窗口置顶，需启用游戏的无边框或窗口模式
+
+    showShortcut:
+      label: 显示快捷键
+      description: 在游戏中，使用快捷键以打开或关闭计时器窗口
+
+    timerType:
+      label: 计时器类型
+      description: 选择计时器的类型。倒计时模式将使用预设的技能时间，计时模式则从 0 开始。自定义计时器则固定为计时模式
+      options:
+        countdown: 倒计时模式
+        countup: 计时模式
 
 MiscSettings:
   title: 其他
@@ -1928,6 +1947,7 @@ tray:
     toggleAuxWindowDevtools: Toggle DevTools - 小窗口
     toggleOpggWindowDevtools: Toggle DevTools - OP.GG 窗口
     toggleOngoingGameWindowDevtools: Toggle DevTools - 对局窗口
+    toggleCdTimerWindowDevtools: Toggle DevTools - 计时器窗口
 
 windowOpenHandler:
   toAkari: 将转到 League Akari 的项目主页 ❤️

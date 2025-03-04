@@ -147,7 +147,7 @@
         >
       </ControlItem>
     </NCard>
-    <NCard size="small">
+    <NCard size="small" style="margin-top: 8px">
       <template #header>
         <span class="card-header-title">{{
           as.isAdministrator
@@ -172,16 +172,68 @@
         :label-width="400"
         class="control-item-margin"
         :label="t('MultiWindowSettings.ongoingGameWindow.showShortcut.label')"
-        :label-description="t('MultiWindowSettings.ongoingGameWindow.showShortcut.label')"
+        :label-description="t('MultiWindowSettings.ongoingGameWindow.showShortcut.description')"
       >
         <ShortcutSelector
           :disabled="!as.isAdministrator"
           :target-id="AkariOngoingGameWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
           :shortcut-id="ogws.settings.showShortcut"
-          @update:shortcut-id="
-            (id) => wm.ongoingGameWindow.setShowShortcut(id! /* language-tools 1e84c6a  */)
-          "
+          @update:shortcut-id="(id) => wm.ongoingGameWindow.setShowShortcut(id)"
         />
+      </ControlItem>
+    </NCard>
+    <NCard size="small" style="margin-top: 8px">
+      <template #header>
+        <span class="card-header-title">{{
+          as.isAdministrator
+            ? t('MultiWindowSettings.cdTimerWindow.title')
+            : t('MultiWindowSettings.cdTimerWindow.titleRequireAdmin')
+        }}</span>
+      </template>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('MultiWindowSettings.cdTimerWindow.enabled.label')"
+        :label-description="t('MultiWindowSettings.cdTimerWindow.enabled.description')"
+        :label-width="400"
+      >
+        <NSwitch
+          size="small"
+          :value="ctws.settings.enabled"
+          @update:value="(val) => wm.cdTimerWindow.setEnabled(val)"
+        />
+      </ControlItem>
+      <ControlItem
+        :disabled="!as.isAdministrator"
+        :label-width="400"
+        class="control-item-margin"
+        :label="t('MultiWindowSettings.cdTimerWindow.showShortcut.label')"
+        :label-description="t('MultiWindowSettings.cdTimerWindow.showShortcut.description')"
+      >
+        <ShortcutSelector
+          :disabled="!as.isAdministrator"
+          :target-id="AkariCdTimerWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
+          :shortcut-id="ctws.settings.showShortcut"
+          @update:shortcut-id="(id) => wm.cdTimerWindow.setShowShortcut(id)"
+        />
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('MultiWindowSettings.cdTimerWindow.timerType.label')"
+        :label-description="t('MultiWindowSettings.cdTimerWindow.timerType.description')"
+        :label-width="400"
+      >
+        <NRadioGroup
+          size="small"
+          :value="ctws.settings.timerType"
+          @update:value="(val) => wm.cdTimerWindow.setTimerType(val)"
+        >
+          <NRadio value="countdown">{{
+            t('MultiWindowSettings.cdTimerWindow.timerType.options.countdown')
+          }}</NRadio>
+          <NRadio value="countup">{{
+            t('MultiWindowSettings.cdTimerWindow.timerType.options.countup')
+          }}</NRadio>
+        </NRadioGroup>
       </ControlItem>
     </NCard>
   </NScrollbar>
@@ -192,16 +244,26 @@ import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
+import { AkariCdTimerWindow, WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { AkariOngoingGameWindow } from '@renderer-shared/shards/window-manager'
 import {
   useAuxWindowStore,
+  useCdTimerWindowStore,
   useOngoingGameWindowStore,
   useOpggWindowStore
 } from '@renderer-shared/shards/window-manager/store'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NIcon, NScrollbar, NSlider, NSwitch } from 'naive-ui'
+import {
+  NButton,
+  NCard,
+  NIcon,
+  NRadio,
+  NRadioGroup,
+  NScrollbar,
+  NSlider,
+  NSwitch
+} from 'naive-ui'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
@@ -211,6 +273,7 @@ const as = useAppCommonStore()
 const aws = useAuxWindowStore()
 const ows = useOpggWindowStore()
 const ogws = useOngoingGameWindowStore()
+const ctws = useCdTimerWindowStore()
 
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
 </script>

@@ -38,7 +38,7 @@
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.sendAllyShortcut"
               @update:shortcut-id="
-                (id) => ig.setSendAllyShortcut(id! /* language-tools 1e84c6a  */)
+                (id) => ig.setSendAllyShortcut(id)
               "
             />
           </ControlItem>
@@ -54,7 +54,7 @@
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ENEMY"
               :shortcut-id="igs.settings.sendEnemyShortcut"
               @update:shortcut-id="
-                (id) => ig.setSendEnemyShortcut(id! /* language-tools 1e84c6a  */)
+                (id) => ig.setSendEnemyShortcut(id)
               "
             />
           </ControlItem>
@@ -70,7 +70,7 @@
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALL_ALLIES"
               :shortcut-id="igs.settings.sendAllAlliesShortcut"
               @update:shortcut-id="
-                (id) => ig.setSendAllAlliesShortcut(id! /* language-tools 1e84c6a  */)
+                (id) => ig.setSendAllAlliesShortcut(id)
               "
             />
           </ControlItem>
@@ -86,7 +86,7 @@
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALL_ENEMIES"
               :shortcut-id="igs.settings.sendAllEnemiesShortcut"
               @update:shortcut-id="
-                (id) => ig.setSendAllEnemiesShortcut(id! /* language-tools 1e84c6a  */)
+                (id) => ig.setSendAllEnemiesShortcut(id)
               "
             />
           </ControlItem>
@@ -332,7 +332,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.cancelShortcut"
-              @update:shortcut-id="(id) => ig.setCancelShortcut(id! /* language-tools 1e84c6a  */)"
+              @update:shortcut-id="(id) => ig.setCancelShortcut(id)"
             />
           </ControlItem>
           <ControlItem
@@ -385,6 +385,7 @@ import {
 import { h, reactive, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
+import { identity } from '@vueuse/core'
 
 const { t } = useTranslation()
 

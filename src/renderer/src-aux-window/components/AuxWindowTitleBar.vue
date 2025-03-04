@@ -1,7 +1,7 @@
 <template>
   <div class="title-bar" :class="{ blurred: aws.focus === 'blurred' }">
     <div class="title-area">
-      <span class="title">Mini Akari</span>
+      <span class="title">League Akari - Mini</span>
     </div>
     <div class="traffic">
       <div

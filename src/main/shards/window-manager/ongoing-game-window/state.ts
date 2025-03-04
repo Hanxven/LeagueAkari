@@ -1,8 +1,8 @@
 import { Rectangle } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
 
-export class OngoingGameOverlayWindowSettings {
-  enabled: boolean = true
+export class OngoingGameWindowSettings {
+  enabled: boolean = false
 
   pinned: boolean = true
 
@@ -31,7 +31,7 @@ export class OngoingGameOverlayWindowSettings {
   }
 }
 
-export class OngoingGameOverlayWindowState {
+export class OngoingGameWindowState {
   status: 'normal' | 'maximized' | 'minimized' = 'normal'
 
   focus: 'focused' | 'blurred' = 'focused'
@@ -40,9 +40,12 @@ export class OngoingGameOverlayWindowState {
 
   show: boolean = true
 
-  size: [number, number] = [1500, 860]
-
   bounds: Rectangle | null
+
+  /**
+   * 用于指示渲染层面的显示状态，不会影响窗口的实际显示状态
+   */
+  fakeShow: boolean = false
 
   setStatus(status: 'normal' | 'maximized' | 'minimized') {
     this.status = status
@@ -56,12 +59,12 @@ export class OngoingGameOverlayWindowState {
     this.show = show
   }
 
-  setSize(size: [number, number]) {
-    this.size = size
-  }
-
   setBounds(bounds: Rectangle | null) {
     this.bounds = bounds
+  }
+
+  setFakeShow(show: boolean) {
+    this.fakeShow = show
   }
 
   constructor() {
