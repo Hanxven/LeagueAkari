@@ -282,11 +282,6 @@ export class SgpMain implements IAkariShardInitDispose {
   ) {
     const result = await this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)
 
-    fs.writeFileSync(
-      `C:/Users/hanxv/Desktop/mh/mh_${playerPuuid}.json`,
-      JSON.stringify(result, null, 2)
-    )
-
     try {
       return this.parseSgpMatchHistoryToLcu0Format(result, start, count)
     } catch (error) {
