@@ -61,3 +61,11 @@ interface Item {
   rawDisplayName: string
   slot: number
 }
+
+export interface GameStats {
+  gameMode: string
+  gameTime: number // in seconds (float)
+  mapName: string // e.g. 'Map11
+  mapNumber: number
+  mapTerrain: number
+}

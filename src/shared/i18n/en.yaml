@@ -324,7 +324,7 @@ MultiWindowSettings:
 
       timerType:
         label: Timer Type
-        description: Select the type of timer. The countdown mode will use the preset summoner spell time, while the count-up mode will start from 0. Note that the custom timers are always in countup mode.
+        description: Select the type of timer. The countdown mode will use the preset summoner spell time (has errors), while the count-up mode will start from 0. Note that the custom timers are always in countup mode.
         options:
           countdown: Countdown Mode
           countup: Count-Up Mode

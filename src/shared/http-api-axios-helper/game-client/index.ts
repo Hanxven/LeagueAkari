@@ -1,4 +1,4 @@
-import { PlayerList } from '@shared/types/game-client'
+import { GameStats, PlayerList } from '@shared/types/game-client'
 import { AxiosInstance } from 'axios'
 
 // https://static.developer.riotgames.com/docs/lol/liveclientdata_sample.json
@@ -38,7 +38,7 @@ export class GameClientHttpApiAxiosHelper {
   }
 
   getGameStats() {
-    return this._http.get('/liveclientdata/gamestats')
+    return this._http.get<GameStats>('/liveclientdata/gamestats')
   }
 
   getPlayerItems() {

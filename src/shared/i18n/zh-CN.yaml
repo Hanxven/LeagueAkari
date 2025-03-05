@@ -327,7 +327,7 @@ MultiWindowSettings:
 
     timerType:
       label: 计时器类型
-      description: 选择计时器的类型。倒计时模式将使用预设的技能时间，计时模式则从 0 开始。自定义计时器则固定为计时模式
+      description: 选择计时器的类型。倒计时模式将使用预设的技能时间 (存在误差)，计时模式则从 0 开始。自定义计时器则固定为计时模式
       options:
         countdown: 倒计时模式
         countup: 计时模式
@@ -2000,6 +2000,12 @@ auto-champ-config-main:
 
   auto-config-enabled-no-champion: 已启用自动配置，但无已配置的英雄
   auto-config-enabled: 已启用自动配置，已配置的英雄：{{names}}
+
+window-manager-main:
+  aux-window:
+    quickClose:
+      title: 不需要小窗?
+      body: 可以在设置项中 (设置 > 多窗口) 永久禁用小窗口
 
 common:
   appName: League Akari

@@ -121,7 +121,7 @@ export class SgpApi {
     this._entitlementToken = token
   }
 
-  setLeagueSessionToken(token: string) {
+  setLeagueSessionToken(token: string | null) {
     this._leagueSessionToken = token
   }
 

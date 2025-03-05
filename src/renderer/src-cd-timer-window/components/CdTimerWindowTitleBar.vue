@@ -15,10 +15,7 @@
 import { useInstance } from '@renderer-shared/shards'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { Close as CloseIcon } from '@vicons/ionicons5'
-import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
-
-const { t } = useTranslation()
 
 const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
 

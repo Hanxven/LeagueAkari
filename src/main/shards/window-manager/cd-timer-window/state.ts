@@ -54,6 +54,24 @@ export class CdTimerWindowState {
 
   bounds: Rectangle | null
 
+  /**
+   * 支持的游戏模式, 基准时间被硬编码
+   */
+  supportedGameModes: {
+    gameMode: string
+    abilityHaste: number
+  }[] = [
+    { gameMode: 'CLASSIC', abilityHaste: 0 },
+    { gameMode: 'ARAM', abilityHaste: 70 },
+    { gameMode: 'URF', abilityHaste: 300 },
+    { gameMode: 'ONEFORALL', abilityHaste: 0 },
+    { gameMode: 'NEXUSBLITZ', abilityHaste: 0 },
+    { gameMode: 'ULTBOOK', abilityHaste: 0 },
+    { gameMode: 'ONEFORALL', abilityHaste: 0 }
+  ]
+
+  gameTime: number | null = null
+
   setStatus(status: 'normal' | 'maximized' | 'minimized') {
     this.status = status
   }
@@ -70,9 +88,23 @@ export class CdTimerWindowState {
     this.bounds = bounds
   }
 
+  setSupportedGameModes(
+    supportedGameModes: {
+      gameMode: string
+      abilityHaste: number
+    }[]
+  ) {
+    this.supportedGameModes = supportedGameModes
+  }
+
+  setGameTime(gameTime: number | null) {
+    this.gameTime = gameTime
+  }
+
   constructor() {
     makeAutoObservable(this, {
-      bounds: observable.ref
+      bounds: observable.ref,
+      supportedGameModes: observable.ref
     })
   }
 }

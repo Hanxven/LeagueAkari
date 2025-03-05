@@ -114,9 +114,18 @@ export const useCdTimerWindowStore = defineStore(
     })
 
     const basicWindowState = useBasicWindowStates()
+    const supportedGameModes = ref<
+      {
+        gameMode: string
+        abilityHaste: number
+      }[]
+    >([])
+    const gameTime = ref<number | null>(null)
 
     return {
       settings,
+      supportedGameModes,
+      gameTime,
       ...basicWindowState
     }
   }

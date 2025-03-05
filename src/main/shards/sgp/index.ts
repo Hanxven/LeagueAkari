@@ -729,7 +729,7 @@ export class SgpMain implements IAkariShardInitDispose {
       () => this._lc.data.leagueSession.token,
       (token) => {
         if (!token) {
-          this._sgp.setEntitlementsToken(null)
+          this._sgp.setLeagueSessionToken(null)
           return
         }
 

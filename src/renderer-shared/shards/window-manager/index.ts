@@ -154,6 +154,11 @@ export class AkariCdTimerWindow extends BaseAkariWindowRenderer<
   setTimerType(value: 'countdown' | 'countup') {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW, 'timerType', value)
   }
+
+  // 一份复制后的逻辑, 嗯. 就这样吧
+  sendInGame(text: string) {
+    return this._context.ipc.call(MAIN_SHARD_NAMESPACE_CD_TIMER_WINDOW, 'sendInGame', text)
+  }
 }
 
 export class WindowManagerRenderer implements IAkariShardInitDispose {

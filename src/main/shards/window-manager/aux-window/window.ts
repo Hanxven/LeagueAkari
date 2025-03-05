@@ -1,3 +1,5 @@
+import { i18next } from '@main/i18n'
+import { Notification } from 'electron'
 import { comparer, computed } from 'mobx'
 
 import { WindowManagerMainContext } from '..'
@@ -13,6 +15,8 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
   static readonly BASE_HEIGHT = 420
   static readonly MIN_WIDTH = 340
   static readonly MIN_HEIGHT = 420
+
+  static readonly QUICK_CLOSE_TIP_STORAGE_KEY = 'quickCloseTip'
 
   constructor(_context: WindowManagerMainContext) {
     const state = new AuxWindowState()
@@ -67,7 +71,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
     })
 
     // normally show & hide
-    this._context.mobx.reaction(
+    this._mobx.reaction(
       () => showTiming.get(),
       (timing) => {
         if (timing === 'ignore') {
@@ -75,7 +79,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
         }
 
         if (timing === 'show') {
-          this.showOrRestore(true)
+          this.showOrRestore()
         } else {
           this.hide()
         }
@@ -83,7 +87,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
       { fireImmediately: true }
     )
 
-    this._context.mobx.reaction(
+    this._mobx.reaction(
       () => [this.settings.enabled, this._windowManager.state.isManagerFinishedInit] as const,
       ([enabled, finishedInit]) => {
         if (!finishedInit) {
@@ -99,7 +103,7 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
       { fireImmediately: true, delay: 500, equals: comparer.shallow }
     )
 
-    this._context.mobx.reaction(
+    this._mobx.reaction(
       () => this._leagueClient.state.connectionState,
       (state) => {
         if (state !== 'connected') {
@@ -107,6 +111,42 @@ export class AkariAuxWindow extends BaseAkariWindow<AuxWindowState, AuxWindowSet
         }
       }
     )
+
+    // 快速关闭会提供提示
+    this._setting._getFromStorage(AkariAuxWindow.QUICK_CLOSE_TIP_STORAGE_KEY).then((tip) => {
+      if (!tip) {
+        let _lastShow = -Infinity
+        let inARow = 0
+        let cb: Function | null = null
+        cb = this._mobx.reaction(
+          () => this.state.show,
+          (show) => {
+            if (show) {
+              _lastShow = Date.now()
+            } else {
+              if (Date.now() - _lastShow < 1000) {
+                inARow++
+
+                if (inARow < 5) {
+                  return
+                }
+
+                new Notification({
+                  title: i18next.t('window-manager-main.aux-window.quickClose.title'),
+                  body: i18next.t('window-manager-main.aux-window.quickClose.body'),
+                  icon: icon
+                }).show()
+
+                this._setting._saveToStorage(AkariAuxWindow.QUICK_CLOSE_TIP_STORAGE_KEY, true)
+                cb?.()
+              } else {
+                inARow = 0
+              }
+            }
+          }
+        )
+      }
+    })
   }
 
   override async onInit() {

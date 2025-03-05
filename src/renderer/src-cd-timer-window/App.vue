@@ -47,6 +47,13 @@ body,
   box-sizing: border-box;
   overflow: hidden;
 
-  opacity: 1;
+  .content {
+    opacity: 0.7;
+    transition: opacity 0.3s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
 }
 </style>

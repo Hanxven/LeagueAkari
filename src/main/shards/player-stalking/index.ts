@@ -1,5 +1,6 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { isTencentServer } from '@shared/data-sources/sgp/utils'
+import { comparer } from 'mobx'
 
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -191,7 +192,8 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
         this._patchTasks()
       },
       {
-        fireImmediately: true
+        fireImmediately: true,
+        equals: comparer.shallow
       }
     )
   }

@@ -1,4 +1,7 @@
+import input from '@main/native/la-input-win64.node'
+import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
+import { sleep } from '@shared/utils/sleep'
 import { comparer, computed } from 'mobx'
 
 import { WindowManagerMain, type WindowManagerMainContext } from '..'
@@ -14,8 +17,15 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
   static readonly BASE_HEIGHT = 220 // 220 for 5 players (as default)
   static readonly MIN_WIDTH = 100
   static readonly MIN_HEIGHT = 100
+  static readonly GAME_STATS_POLL_INTERVAL = 4000
+
+  static readonly ENTER_KEY_CODE = 13
+  static readonly ENTER_KEY_INTERNAL_DELAY = 20
+  static readonly INPUT_DELAY = 65
 
   public shortcutTargetId: string
+
+  private _gameStatsPollTimer: NodeJS.Timeout | null = null
 
   constructor(_context: WindowManagerMainContext) {
     const state = new CdTimerWindowState()
@@ -101,9 +111,6 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
             this._log.warn('无法将 cd-timer 窗口置顶')
           }
         }
-
-        // DEBUG
-        this.show()
       }
     )
 
@@ -132,8 +139,20 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       { fireImmediately: true }
     )
 
-    const shouldShow = computed(() => {
-      if (this._leagueClient.data.gameflow.phase === 'InProgress') {
+    const shouldUseCdTimer = computed(() => {
+      if (!this.state.ready || !this.settings.enabled) {
+        return false
+      }
+
+      const session = this._leagueClient.data.gameflow.session
+
+      if (
+        session &&
+        session.phase === 'InProgress' &&
+        this.state.supportedGameModes.some(
+          (mode) => mode.gameMode === session.gameData.queue.gameMode
+        )
+      ) {
         return true
       }
 
@@ -141,9 +160,9 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     })
 
     this._mobx.reaction(
-      () => shouldShow.get(),
-      (show) => {
-        if (show) {
+      () => shouldUseCdTimer.get(),
+      (should) => {
+        if (should) {
           this.show()
         } else {
           this.hide()
@@ -151,6 +170,58 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       },
       { fireImmediately: true }
     )
+
+    this._mobx.reaction(
+      () => shouldUseCdTimer.get(),
+      (should) => {
+        if (should) {
+          this._log.info('轮询游戏对局信息开始')
+          this._updateGameStats()
+          this._gameStatsPollTimer = setInterval(
+            () => this._updateGameStats(),
+            AkariCdTimerWindow.GAME_STATS_POLL_INTERVAL
+          )
+        } else {
+          if (this._gameStatsPollTimer) {
+            this._log.info('轮询游戏对局信息结束')
+            clearInterval(this._gameStatsPollTimer)
+            this._gameStatsPollTimer = null
+          }
+
+          this.state.setGameTime(null)
+        }
+      },
+      { fireImmediately: true }
+    )
+  }
+
+  private _handleIpcCall() {
+    let isSending = false
+    this._ipc.onCall(this._namespace, 'sendInGame', async (_, text: string) => {
+      if (!isSending && GameClientMain.isGameClientForeground()) {
+        isSending = true
+        await input.sendKeyAsync(AkariCdTimerWindow.ENTER_KEY_CODE, true)
+        await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
+        await input.sendKeyAsync(AkariCdTimerWindow.ENTER_KEY_CODE, false)
+        await sleep(AkariCdTimerWindow.INPUT_DELAY)
+        await input.sendKeysAsync(text)
+        await sleep(AkariCdTimerWindow.INPUT_DELAY)
+        await input.sendKeyAsync(AkariCdTimerWindow.ENTER_KEY_CODE, true)
+        await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
+        await input.sendKeyAsync(AkariCdTimerWindow.ENTER_KEY_CODE, false)
+        isSending = false
+      }
+    })
+  }
+
+  private async _updateGameStats() {
+    try {
+      const { data } = await this._gameClient.api.getGameStats()
+      this.state.setGameTime(data.gameTime)
+    } catch (error) {
+      this.state.setGameTime(null)
+      this._log.warn('获取游戏数据失败', error)
+    }
   }
 
   override async onInit() {
@@ -161,7 +232,12 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
       return
     }
 
+    this._handleIpcCall()
     this._handleCdTimerWindowLogics()
+  }
+
+  protected override getStatePropKeys() {
+    return ['supportedGameModes', 'gameTime'] as const
   }
 
   protected override getSettingPropKeys() {
