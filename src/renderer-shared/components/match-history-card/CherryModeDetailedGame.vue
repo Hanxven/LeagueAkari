@@ -66,12 +66,14 @@
                 </div>
               </div>
             </td>
-            <td style="width: 92px">
+            <td style="width: 120px">
               <div class="augments">
                 <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment1" />
                 <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment2" />
                 <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment3" />
                 <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment4" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment5" />
+                <AugmentDisplay :size="18" :augment-id="p.stats.playerAugment6" />
               </div>
             </td>
             <td style="width: 96px">

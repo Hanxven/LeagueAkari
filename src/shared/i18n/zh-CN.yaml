@@ -307,7 +307,7 @@ MultiWindowSettings:
 
     enabled:
       label: 启用对局窗口
-      description: 在游戏中时，通过叠加窗口展示对局信息。此功能依赖窗口置顶，需启用游戏的无边框或窗口模式
+      description: 在游戏中时，通过叠加窗口展示对局信息。此功能依赖窗口置顶，为保证兼容性，可能需启用游戏的无边框或窗口模式
 
     showShortcut:
       label: 显示快捷键
@@ -319,7 +319,7 @@ MultiWindowSettings:
 
     enabled:
       label: 启用计时器窗口
-      description: 在游戏中时，通过叠加窗口提供便捷计时器。此功能依赖窗口置顶，需启用游戏的无边框或窗口模式
+      description: 在游戏中时，通过叠加窗口提供便捷计时器。此功能依赖窗口置顶，为保证兼容性，可能需启用游戏的无边框或窗口模式
 
     showShortcut:
       label: 显示快捷键

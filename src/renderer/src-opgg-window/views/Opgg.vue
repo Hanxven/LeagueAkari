@@ -426,8 +426,8 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
       const spells = anyChampion.data.summoner_spells
       const runes = anyChampion.data.runes
 
-      let spellToApply = spells[0]
-      let runeToApply = runes[0]
+      let spellToApply = spells?.[0]
+      let runeToApply = runes?.[0]
 
       // 至少有一个存在的情况下, 将走自动应用流程
       if (spellToApply || runeToApply) {

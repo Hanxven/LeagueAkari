@@ -4,6 +4,7 @@ import { MaybeRefOrGetter, ref } from 'vue'
 export function useRightClick(
   el: MaybeRefOrGetter<HTMLElement | null | undefined>,
   callback: Function,
+  clicksRequired = 2,
   delay = 400
 ) {
   const clickCount = ref(0)
@@ -13,23 +14,28 @@ export function useRightClick(
     event.preventDefault()
     clickCount.value++
 
-    if (!clickTimer) {
-      clickTimer = window.setTimeout(() => {
-        if (clickCount.value === 2) {
-          callback?.()
-        }
-        resetClickCount()
-      }, delay)
+    if (clickCount.value === clicksRequired) {
+      callback?.()
+      resetClickCount()
+      return
     }
+
+    if (clickTimer) clearTimeout(clickTimer)
+
+    clickTimer = window.setTimeout(() => {
+      resetClickCount()
+    }, delay)
   })
 
   const resetClickCount = () => {
     clickCount.value = 0
-    clearTimeout(clickTimer!)
-    clickTimer = null
+    if (clickTimer) {
+      clearTimeout(clickTimer)
+      clickTimer = null
+    }
   }
 
   tryOnScopeDispose(() => {
-    clearTimeout(clickTimer!)
+    if (clickTimer) clearTimeout(clickTimer)
   })
 }

@@ -52,7 +52,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     'app-common-main'
   ]
 
-  public static readonly overlay = new Overlay()
+  public overlay: Overlay
 
   private readonly _ipc: AkariIpcMain
   private readonly _mobx: MobxUtilsMain
@@ -126,6 +126,9 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   async onInit() {
     await this._setting.applyToState()
 
+    const { Overlay } = await import('@leaguetavern/electron-overlay-win')
+    this.overlay = new Overlay()
+
     if (this._shared.global.isWindows11_22H2_OrHigher) {
       this.state.setSupportsMica(true)
     }
@@ -155,8 +158,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this.mainWindow.createWindow()
   }
 
-  static setAboveTheWorld(window: BrowserWindow) {
-    const result = WindowManagerMain.overlay.enable(window.getNativeWindowHandle())
+  setAboveTheWorld(window: BrowserWindow) {
+    const result = this.overlay.enable(window.getNativeWindowHandle())
     return { res: result.res, msg: result.msg }
   }
 
