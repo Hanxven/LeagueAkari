@@ -103,7 +103,7 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
           this._window.setIgnoreMouseEvents(true)
           this.show()
 
-          if (!WindowManagerMain.setAboveTheWorld(this._window).res) {
+          if (!this._windowManager.setAboveTheWorld(this._window).res) {
             this._log.warn('无法将 ongoing-game 窗口置顶')
           }
         }

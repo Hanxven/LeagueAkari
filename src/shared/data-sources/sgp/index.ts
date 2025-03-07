@@ -289,4 +289,22 @@ export class SgpApi {
       }
     )
   }
+
+  // /stats/endOfGame/region/SG2/gameId/58550669/puuid/18ed240b-db4b-5a90-a69b-f943e4187e5e
+  getEndOfGameStats(sgpServerId: string, gameId: number, puuid: string) {
+    if (!this._leagueSessionToken) {
+      throw new Error('jwt token is not set')
+    }
+
+    const sgpServer = this._getSgpServer(sgpServerId)
+
+    const subId = this._getSubId(sgpServerId)
+
+    return this._http.get(`/stats/endOfGame/region/${subId}/gameId/${gameId}/puuid/${puuid}`, {
+      baseURL: sgpServer.common,
+      headers: {
+        Authorization: `Bearer ${this._leagueSessionToken}`
+      }
+    })
+  }
 }

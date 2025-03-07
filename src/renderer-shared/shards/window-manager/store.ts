@@ -70,7 +70,8 @@ export const useOpggWindowStore = defineStore('shard:window-manager-renderer/opg
     enabled: true,
     autoShow: true,
     opacity: 0.9,
-    pinned: true
+    pinned: true,
+    showShortcut: null as string | null
   })
 
   const basicWindowState = useBasicWindowStates()

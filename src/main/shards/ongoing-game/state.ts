@@ -214,8 +214,8 @@ export class OngoingGameState {
             ...this._lcData.champSelect.session.myTeam,
             ...this._lcData.champSelect.session.theirTeam
           ]
-            .map((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-            .filter(Boolean)
+            .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
+            .map((p) => p.puuid)
         }
       }
 
@@ -253,8 +253,8 @@ export class OngoingGameState {
             ...this._lcData.gameflow.session.gameData.teamOne,
             ...this._lcData.gameflow.session.gameData.teamTwo
           ]
-            .map((p) => p.puuid && p.puuid !== EMPTY_PUUID)
-            .filter(Boolean)
+            .filter((p) => p.puuid && p.puuid !== EMPTY_PUUID)
+            .map((p) => p.puuid)
         }
       }
 

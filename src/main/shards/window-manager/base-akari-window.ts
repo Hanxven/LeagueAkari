@@ -452,6 +452,18 @@ export abstract class BaseAkariWindow<
     this._log.info(`创建 ${this._namespace} 窗口`)
   }
 
+  setOpacity(opacity: number) {
+    runInAction(() => {
+      this.settings.opacity = opacity
+    })
+  }
+
+  setPinned(pinned: boolean) {
+    runInAction(() => {
+      this.settings.pinned = pinned
+    })
+  }
+
   createWindow() {
     if (!this._window || this._window.isDestroyed()) {
       this._createWindow()

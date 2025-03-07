@@ -53,6 +53,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useCdTimerWindowStore } from '@renderer-shared/shards/window-manager/store'
+import { EMPTY_PUUID } from '@shared/constants/common'
 import { computed, shallowReactive, watch } from 'vue'
 
 import TimerItem from './TimerItem.vue'
@@ -128,46 +129,69 @@ const items = computed(() => {
   // 因此在目前缺少必要的字段以区分阵营时, 只能通过这些数据来实现阵营判断
   // 期待日后 playerChampionSelections 能提供必要的 puuid 字段
   const selections = lcs.gameflow.session.gameData.playerChampionSelections
-
-  if (selections.length !== 10) {
-    return createEmptyTimer(5)
-  }
-
-  const teamA = selections.slice(0, 5)
-  const teamB = selections.slice(5)
-
   const teamOne = lcs.gameflow.session.gameData.teamOne
   const teamTwo = lcs.gameflow.session.gameData.teamTwo
 
-  const otherTeam = teamOne.some((player) => player.puuid === selfPuuid) ? teamTwo : teamOne
+  if (
+    selections[0] &&
+    selections[0].puuid !== undefined &&
+    selections[0].puuid !== '' &&
+    selections[0].puuid !== EMPTY_PUUID
+  ) {
+    // able to distinguish by puuid field
+    const otherTeam = teamOne.some((player) => player.puuid === selfPuuid) ? teamTwo : teamOne
 
-  const teamAMatchCount = teamA.reduce((acc, player) => {
-    if (otherTeam.some((p) => p.championId === player.championId)) {
-      return acc + 1
+    const theirTeamSelections = selections.filter((player) =>
+      otherTeam.some((p) => p.puuid === player.puuid)
+    )
+
+    return theirTeamSelections.map((p, i) => ({
+      id: `champion-${i}-${p.championId}-${p.spell1Id}-${p.spell2Id}`,
+      type: 'summoner-spell',
+      timer1Id: `champion-${i}-${p.championId}-${p.spell1Id}`,
+      timer2Id: `champion-${i}-${p.championId}-${p.spell2Id}`,
+      ...p
+    }))
+  } else {
+    // previously, it has only summonerInternalName field (which is completely useless)
+    // thus we can only infer team members by championId
+    if (selections.length !== 10) {
+      return createEmptyTimer(5)
     }
 
-    return acc
-  }, 0)
+    const teamA = selections.slice(0, 5)
+    const teamB = selections.slice(5)
 
-  const teamBMatchCount = teamB.reduce((acc, player) => {
-    if (otherTeam.some((p) => p.championId === player.championId)) {
-      return acc + 1
-    }
+    const otherTeam = teamOne.some((player) => player.puuid === selfPuuid) ? teamTwo : teamOne
 
-    return acc
-  }, 0)
+    const teamAMatchCount = teamA.reduce((acc, player) => {
+      if (otherTeam.some((p) => p.championId === player.championId)) {
+        return acc + 1
+      }
 
-  const presumedEnemyTeam = teamAMatchCount > teamBMatchCount ? teamA : teamB
+      return acc
+    }, 0)
 
-  const enemyTeam = presumedEnemyTeam.map((p, i) => ({
-    id: `champion-${i}-${p.championId}-${p.spell1Id}-${p.spell2Id}`,
-    type: 'summoner-spell',
-    timer1Id: `champion-${i}-${p.championId}-${p.spell1Id}`,
-    timer2Id: `champion-${i}-${p.championId}-${p.spell2Id}`,
-    ...p
-  }))
+    const teamBMatchCount = teamB.reduce((acc, player) => {
+      if (otherTeam.some((p) => p.championId === player.championId)) {
+        return acc + 1
+      }
 
-  return [...enemyTeam, ...createEmptyTimer(2)]
+      return acc
+    }, 0)
+
+    const presumedEnemyTeam = teamAMatchCount > teamBMatchCount ? teamA : teamB
+
+    const enemyTeam = presumedEnemyTeam.map((p, i) => ({
+      id: `champion-${i}-${p.championId}-${p.spell1Id}-${p.spell2Id}`,
+      type: 'summoner-spell',
+      timer1Id: `champion-${i}-${p.championId}-${p.spell1Id}`,
+      timer2Id: `champion-${i}-${p.championId}-${p.spell2Id}`,
+      ...p
+    }))
+
+    return [...enemyTeam, ...createEmptyTimer(2)]
+  }
 })
 
 const sendInGameText = (

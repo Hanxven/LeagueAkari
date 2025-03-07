@@ -301,13 +301,17 @@ MultiWindowSettings:
       description: 重新设置 OP.GG 窗口的位置，还原到默认主屏幕正中心
       button: 重置
 
+    showShortcut:
+      label: 显示快捷键
+      description: 使用快捷键以显示或关闭 OP.GG 窗口。当游戏位于前台时，将自动转为置顶状态。请确保开启了游戏的无边框或窗口模式，以便此窗口正常显示
+
   ongoingGameWindow:
     title: 对局叠加窗口
     titleRequireAdmin: 对局叠加窗口 (管理员权限)
 
     enabled:
       label: 启用对局窗口
-      description: 在游戏中时，通过叠加窗口展示对局信息。此功能依赖窗口置顶，为保证兼容性，可能需启用游戏的无边框或窗口模式
+      description: 在游戏中时，通过叠加窗口展示对局信息。若无法正常显示，需启用游戏的无边框或窗口模式
 
     showShortcut:
       label: 显示快捷键
@@ -319,7 +323,7 @@ MultiWindowSettings:
 
     enabled:
       label: 启用计时器窗口
-      description: 在游戏中时，通过叠加窗口提供便捷计时器。此功能依赖窗口置顶，为保证兼容性，可能需启用游戏的无边框或窗口模式
+      description: 在游戏中时，通过叠加窗口提供便捷计时器。若无法正常显示，需启用游戏的无边框或窗口模式
 
     showShortcut:
       label: 显示快捷键

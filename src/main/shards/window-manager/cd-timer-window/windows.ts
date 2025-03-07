@@ -107,7 +107,7 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
 
         // TODO DEBUG NEVER ABOVE
         if (this._window) {
-          if (!WindowManagerMain.setAboveTheWorld(this._window!).res) {
+          if (!this._windowManager.setAboveTheWorld(this._window!).res) {
             this._log.warn('无法将 cd-timer 窗口置顶')
           }
         }
@@ -120,7 +120,6 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
         if (shortcut) {
           try {
             this._keyboardShortcuts.register(this.shortcutTargetId, shortcut, 'normal', () => {
-              this._log.debug('cd-timer 窗口快捷键触发')
               if (this.state.show) {
                 this.hide()
               } else {

@@ -78,10 +78,12 @@ class AkariAuxWindow extends BaseAkariWindowRenderer<
   }
 }
 
-class AkariOpggWindow extends BaseAkariWindowRenderer<
+export class AkariOpggWindow extends BaseAkariWindowRenderer<
   ReturnType<typeof useOpggWindowStore>,
   ReturnType<typeof useOpggWindowStore>['settings']
 > {
+  static SHOW_WINDOW_SHORTCUT_TARGET_ID = `${MAIN_SHARD_NAMESPACE_OPGG_WINDOW}/show`
+
   constructor(_context: WindowManagerRendererContext) {
     super(
       _context,
@@ -97,6 +99,10 @@ class AkariOpggWindow extends BaseAkariWindowRenderer<
 
   setEnabled(value: boolean) {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'enabled', value)
+  }
+
+  setShowShortcut(value: string | null) {
+    return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'showShortcut', value)
   }
 }
 

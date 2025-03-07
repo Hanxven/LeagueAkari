@@ -298,6 +298,10 @@ MultiWindowSettings:
       description: Reset the position of the OP.GG window to its default location in the center of the main screen.
       button: Reset
 
+    showShortcut:
+      label: Show Shortcut
+      description: Use the shortcut key to show or hide the OP.GG window. If the game is in the foreground, it will automatically get pinned. Make sure the game is in borderless or windowed mode for this window to display correctly.
+
   ongoingGameWindow:
     title: Ongoing Game Overlay Window
     titleRequireAdmin: Ongoing Game Overlay Window (Admin Required)

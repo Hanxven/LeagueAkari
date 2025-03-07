@@ -14,7 +14,7 @@ import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
-import { AkariCdTimerWindow } from './cd-timer-window'
+import { AkariCdTimerWindow } from './cd-timer-window/windows'
 import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
@@ -52,7 +52,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     'app-common-main'
   ]
 
-  public overlay: Overlay
+  public overlay: Overlay | null = null
 
   private readonly _ipc: AkariIpcMain
   private readonly _mobx: MobxUtilsMain
@@ -126,8 +126,11 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   async onInit() {
     await this._setting.applyToState()
 
-    const { Overlay } = await import('@leaguetavern/electron-overlay-win')
-    this.overlay = new Overlay()
+    // disabled for now
+    if (false && this._app.state.isAdministrator) {
+      const { Overlay } = await import('@leaguetavern/electron-overlay-win')
+      this.overlay = new Overlay()
+    }
 
     if (this._shared.global.isWindows11_22H2_OrHigher) {
       this.state.setSupportsMica(true)
@@ -159,7 +162,10 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   }
 
   setAboveTheWorld(window: BrowserWindow) {
-    const result = this.overlay.enable(window.getNativeWindowHandle())
+    const result = this.overlay?.enable(window.getNativeWindowHandle()) || {
+      res: false,
+      msg: 'NotEnabled'
+    }
     return { res: result.res, msg: result.msg }
   }
 

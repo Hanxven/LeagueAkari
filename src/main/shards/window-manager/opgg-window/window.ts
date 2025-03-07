@@ -1,14 +1,10 @@
-import toolsAddon from '@main/native/la-tools-win64.node'
+import { GameClientMain } from '@main/shards/game-client'
 import { comparer, computed } from 'mobx'
 
 import type { WindowManagerMainContext } from '..'
 import icon from '../../../../../resources/OPGG_ICON.ico?asset'
 import { BaseAkariWindow } from '../base-akari-window'
-import {
-  getPositionWithSnap,
-  repositionToAlignLeagueClientUx,
-  repositionWindowWithSnap
-} from '../position-utils'
+import { repositionToAlignLeagueClientUx } from '../position-utils'
 import { OpggWindowSettings, OpggWindowState } from './state'
 
 export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindowSettings> {
@@ -19,6 +15,8 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
   static readonly BASE_HEIGHT = 720
   static readonly MIN_WIDTH = 530
   static readonly MIN_HEIGHT = 530
+
+  public shortcutTargetId: string
 
   constructor(_context: WindowManagerMainContext) {
     const state = new OpggWindowState()
@@ -34,7 +32,8 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
       rememberSize: true,
       settingSchema: {
         enabled: { default: settings.enabled },
-        autoShow: { default: settings.autoShow }
+        autoShow: { default: settings.autoShow },
+        showShortcut: { default: settings.showShortcut }
       },
       browserWindowOptions: {
         title: AkariOpggWindow.TITLE,
@@ -45,6 +44,8 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
         maximizable: false
       }
     })
+
+    this.shortcutTargetId = `${this._namespace}/show`
   }
 
   private _handleOpggWindowLogics() {
@@ -97,6 +98,35 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
         repositionToAlignLeagueClientUx(this._window, placement)
       }
     })
+
+    this._mobx.reaction(
+      () => this.settings.showShortcut,
+      (shortcut) => {
+        if (shortcut) {
+          try {
+            this._keyboardShortcuts.register(this.shortcutTargetId, shortcut, 'normal', () => {
+              if (this.state.show) {
+                this.hide()
+              } else {
+                if (GameClientMain.isGameClientForeground()) {
+                  this.setPinned(true)
+                  this.show(true)
+                } else {
+                  this.show()
+                }
+              }
+            })
+          } catch {
+            this._log.warn('无法注册 opgg 窗口快捷键')
+            this._setting.set('showShortcut', null)
+          }
+        } else {
+          this._log.debug('注销 opgg 窗口快捷键')
+          this._keyboardShortcuts.unregisterByTargetId(this.shortcutTargetId)
+        }
+      },
+      { fireImmediately: true }
+    )
   }
 
   override async onInit() {
@@ -106,6 +136,6 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
   }
 
   protected override getSettingPropKeys() {
-    return ['enabled', 'autoShow'] as const
+    return ['enabled', 'autoShow', 'showShortcut'] as const
   }
 }

@@ -116,6 +116,20 @@
         />
       </ControlItem>
       <ControlItem
+        :disabled="!as.isAdministrator"
+        :label-width="400"
+        class="control-item-margin"
+        :label="t('MultiWindowSettings.opggWindow.showShortcut.label')"
+        :label-description="t('MultiWindowSettings.opggWindow.showShortcut.description')"
+      >
+        <ShortcutSelector
+          :disabled="!as.isAdministrator"
+          :target-id="AkariOpggWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
+          :shortcut-id="ows.settings.showShortcut"
+          @update:shortcut-id="(id) => wm.opggWindow.setShowShortcut(id)"
+        />
+      </ControlItem>
+      <ControlItem
         class="control-item-margin"
         :label="t('MultiWindowSettings.opggWindow.opacity.label')"
         :label-description="t('MultiWindowSettings.opggWindow.opacity.description')"
@@ -244,7 +258,7 @@ import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { AkariCdTimerWindow, WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
+import { AkariCdTimerWindow, AkariOpggWindow, WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { AkariOngoingGameWindow } from '@renderer-shared/shards/window-manager'
 import {
   useAuxWindowStore,
@@ -254,16 +268,7 @@ import {
 } from '@renderer-shared/shards/window-manager/store'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import {
-  NButton,
-  NCard,
-  NIcon,
-  NRadio,
-  NRadioGroup,
-  NScrollbar,
-  NSlider,
-  NSwitch
-} from 'naive-ui'
+import { NButton, NCard, NIcon, NRadio, NRadioGroup, NScrollbar, NSlider, NSwitch } from 'naive-ui'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 

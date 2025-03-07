@@ -6,6 +6,7 @@ export class OpggWindowSettings {
   autoShow: boolean = true
   opacity: number = 0.9
   pinned: boolean = true
+  showShortcut: string | null = null
 
   setOpacity(opacity: number) {
     this.opacity = opacity
@@ -21,6 +22,10 @@ export class OpggWindowSettings {
 
   setEnabled(enabled: boolean) {
     this.enabled = enabled
+  }
+
+  setShowShortcut(showShortcut: string | null) {
+    this.showShortcut = showShortcut
   }
 
   constructor() {
