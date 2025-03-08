@@ -6,7 +6,7 @@
     height="128"
     />
   </div>
-  基于 LCU API 的英雄联盟客户端工具集
+  A League of Legends client toolkit based on the LCU API
 </div>
 
 <p align="center">
@@ -20,138 +20,72 @@
 
 # 1. League Akari
 
-[简体中文](README.md) | [English](README-en.md)
+A League of Legends client toolkit based on the LCU API.
 
-Gitee 镜像站点：[https://gitee.com/Hanxven/LeagueAkari](https://gitee.com/Hanxven/LeagueAkari)
+## 1.2 Usage Instructions
 
-## 1.1 已支持功能
+Admin privileges are not required to run, but they enable additional features.
 
-- **战绩查询**
-  - [x] 同大区玩家战绩查询以及有限的跨区查询
-- **自动操作**
-  - [x] 接受对局
-  - [x] 点赞玩家
-  - [x] 返回房间
-  - [x] 英雄选择（普通模式、大乱斗模式等）
-  - [x] 英雄禁用
-  - [x] 符文配置和召唤师技能配置
-  - [x] 重新匹配对局
-  - [x] 自动回复
-- **对局分析**
-  - [x] 战绩分析
-  - [x] 开黑分析
-- **其他功能**
-  - [x] 重生倒计时
-  - [x] 英雄选择或游戏内发送 KDA 简报
-  - [x] 虚假段位、修改生涯背景、卸下头像框和勋章
-  - [ ] (已失效) 英雄选择时秒退，最后一秒秒退
-  - [x] 大乱斗无 CD 换英雄
-  - [x] 创建 5x5 训练房间
-  - [x] 同大区以及有限的跨大区观战
-  - [x] 自定义在线状态
-  - [x] 游戏内发送自定义文本
-  - [x] 修复客户端窗口大小
-- **外部数据源**
-  - [x] 英雄平衡性信息 (Fandom)
-  - [x] OP.GG
-- **其他功能**
-  - [x] 敬请探索
+Supports most of the riot servers (not including Tencent).
 
-## 1.2 使用方法
+## 1.3 Feedback Group
 
-在右侧 Release 中寻找最新的构建版本压缩包，解压后即可运行。
+Fun places for casual chats, party setups, bug reports, and suggestions.
 
-运行时不需要管理员权限，但高权限会提供更多的功能。
+QQ Group 1: 301157623 (Passcode: akari)
 
-支持腾讯服以及非腾讯服客户端。
+QQ Group 2: 1021970497 (Passcode: akari)
 
-> [!NOTE]
-> 一旦检测到游戏客户端，则会自动连接，无需考虑启动顺序。
->
-> League Akari 会很好地处理中途启动的情景，并始终维持合适的连接状态。
+Telegram Group: https://t.me/leagueakari
 
-## 1.3 企鹅群组
+## 1.4 Beta Versions (.rabi)
 
-一个适合吹水开黑聊天的好地方，甚至还能反馈 BUG 和提出建议。
+"rabi" versions with features slated for the next release are periodically shared in the group chat.
 
-企鹅群组 1：301157623 (密码为 akari)
+# 2. Contributing to Development
 
-企鹅群组 2：1021970497 (密码：akari)
-
-## 1.4 测试版本
-
-在群聊中，定期会发布测试版本，测试版本会包含若干将在下个正式版本中发布的功能。
-
-# 2. 加入到开发
-
-百密一疏，各种问题总是难以避免，作为使用者，您可以：
+Issues are inevitable; as a user, you can:
 
 ## 2.1 GitHub Issues
 
-GitHub Issues 是最重要的反馈渠道，请精准描述您的需求、遇到的问题或任何可行的想法。
+GitHub Issues is the primary channel for feedback. Please clearly describe your requirements, issues, or suggestions.
 
-## 2.2 加入开发
+## 2.2 Contribute Code
 
-如果您对此项目感兴趣，欢迎加入到开发之中，提交 PR，为其添加更多功能。
+Interested in the project? Feel free to contribute by submitting PRs and adding new features.
 
-# 3. 编译 & 构建 & 运行
+# 3. Build & Run
 
-本章节指示如何通过源码构建 League Akari。
+This section describes how to build League Akari from the source code.
 
-## 3.1 Electron 主程序
-
-安装依赖：`yarn install`
-
-dev：`yarn dev`
-
-build（for Windows only）: `yarn build:win`
-
-## 3.2 Node 原生模块 (可选)
-
-需要 MSVC 编译环境和 `node-gyp`。
-
-Node Addons 使 League Akari 具备更强大的功能，因为它为其提供了操作系统级 API 的调用入口。这些模块位于 `addons/` 下。
-
-如果你修改了 `addons/*` 下的模块内容，请重新编译。
+## 3.1 Electron Main Program
 
 ```bash
 yarn install
+yarn dev
+yarn build:win
 ```
 
+## 3.2 Node Native Modules (Optional)
+
+If you modify files in `addons/*`, recompile as follows:
+
 ```bash
+yarn install
 node-gyp configure
 node-gyp build
 ```
 
-之后将 `la-input-win64.node` 以及 `la-tools-win64.node` 复制到应用源码 `src/main/native` 下，并更新类型定义 `src/main/node-addon.d.ts`。
+Then copy `la-input-win64.node` and `la-tools-win64.node` to the app source directory at `src/main/native` and update type definitions in `src/main/node-addon.d.ts`.
 
-# 4. 参考
+# 4. Disclaimer
 
-League Akari 的实现参考了许多现有的优秀开源项目，这些项目为软件的部分模块开发提供了清晰的思路指导，特此表示感谢。❤️
+This software is a tool developed based on Riot's League Client Update (LCU) API. It does not use intrusive techniques and theoretically does not directly interfere with or modify game data. However, please be aware of potential compatibility issues or risks associated with game updates or anti-cheat systems.
 
-| 项目名称                                                                                                  | 描述                                |
-| --------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| ⭐⭐⭐ [Pengu Loader](https://github.com/PenguLoader/PenguLoader)                                         | 用于 UX 客户端调试和逆向工程工具    |
-| ⭐⭐⭐ [League of Legends LCU and Riot Client API Docs](https://github.com/KebsCS/lcu-and-riotclient-api) | LCU API 文档参考                    |
-| ⭐⭐ [Community Dragon](https://www.communitydragon.org/documentation/assets)                             | 资源管理和参考文档                  |
-| ⭐⭐ [Seraphine](https://github.com/Zzaphkiel/Seraphine)                                                  | 缝合重灾区，提供了集成思路          |
-| ⭐ [fix-lcu-window](https://github.com/LeagueTavern/fix-lcu-window)                                       | 修复客户端窗口大小问题的思路借鉴    |
-| ⭐ [Joi](https://github.com/watchingfun/Joi)                                                              | OP.GG 相关实现的参考                |
-| ⭐ [lol-helper](https://github.com/4379711/lol-helper)                                                    | (曾经的) 卡炫彩功能和工具设计的参考 |
-| ⭐ [vscode-league-respawn-timer](https://github.com/Coooookies/vscode-league-respawn-timer)               | 重生倒计时功能的参考                |
-| ⭐ [LeaguePrank](https://github.com/LeagueTavern/LeaguePrank)                                             | 趣味功能的实现参考                  |
-| ⭐ [LCU API](https://www.mingweisamuel.com/lcu-schema/tool/#/)                                            | LCU API 早期参考文档                |
+The developer is not responsible for any consequences, such as account bans or data loss, resulting from the use of this software. Users are advised to fully understand the risks and take responsibility for their actions.
 
-# 5. FAQ - 常见问题及回答
+Additionally, **this application is not officially supported or endorsed by Riot Games**, all right reserved by Riot Games. Use it at your own risk, as it may violate the game's terms of service.
 
-[常见问题及解答](https://hanxven.github.io/LeagueAkari/faq.html 'FAQ')
-
-# 6. 免责声明
-
-本软件作为基于 Riot 提供的 League Client Update (LCU) API 开发的辅助工具，由于其设计和实施均未采用侵入性技术手段，理论上不会直接干预或修改游戏数据。然而，需明确指出的是，虽然本软件在原理上并未直接修改游戏内部数据，但在游戏环境的持续更新和演变中 (如未来腾讯可能的反作弊系统或其他保护服务的更新)，无法完全排除由于版本更新导致的兼容性问题或其他意外后果。
-
-特此强调，对于使用本软件可能带来的任何后果，包括但不限于游戏账户的封禁、数据损坏或其他任何形式的游戏体验负面影响，本软件的开发者将不承担任何责任。用户在决定使用本软件时，应充分考虑并自行承担由此产生的所有风险和后果。
-
-本声明旨在全面而详尽地通知用户关于本软件使用的可能风险，以便用户在使用过程中做出充分的风险评估和明智的决策。感谢您的关注，同时敬请遵守相关游戏规则和使用指南，确保一种健康和公平的游戏环境。
+This disclaimer is intended to provide transparency and enable users to make informed decisions. Thank you for your understanding, and please ensure fair play in the gaming environment.
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Hanxven/LeagueAkari&type=Date)](https://star-history.com/#Hanxven/LeagueAkari&Date)

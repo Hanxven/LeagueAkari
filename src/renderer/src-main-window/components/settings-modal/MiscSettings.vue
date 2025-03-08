@@ -17,12 +17,26 @@
         />
       </ControlItem>
     </NCard>
+    <NCard size="small" style="margin-top: 8px">
+      <template #header>
+        <span class="card-header-title">{{ t('MiscSettings.streamerMode.title') }}</span>
+      </template>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('MiscSettings.streamerMode.enabled.label')"
+        :label-description="t('MiscSettings.streamerMode.enabled.description')"
+        :label-width="400"
+      >
+        <NSwitch size="small" v-model:value="as.frontendSettings.streamerMode" />
+      </ControlItem>
+    </NCard>
   </NScrollbar>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { RespawnTimerRenderer } from '@renderer-shared/shards/respawn-timer'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
 import { useTranslation } from 'i18next-vue'
@@ -30,6 +44,7 @@ import { NCard, NScrollbar, NSwitch } from 'naive-ui'
 
 const { t } = useTranslation()
 
+const as = useAppCommonStore()
 const rts = useRespawnTimerStore()
 const rt = useInstance<RespawnTimerRenderer>('respawn-timer-renderer')
 </script>

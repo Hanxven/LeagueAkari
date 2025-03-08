@@ -174,6 +174,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
    */
   _settingToNativeBackgroundMaterial(material: string) {
     if (material === 'mica' && process.env['NODE_ENV'] !== 'development') {
+      // fixed in v35.0.0, https://github.com/electron/electron/pull/45525
       this._log.warn(
         'Mica is disabled in production mode. (https://github.com/electron/electron/issues/41824)'
       )

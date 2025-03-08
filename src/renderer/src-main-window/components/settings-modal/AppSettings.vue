@@ -47,7 +47,6 @@
           :options="themes"
         />
       </ControlItem>
-      <!-- 由于 Electron 的 bug (https://github.com/electron/electron/issues/41824), 禁用该功能 -->
       <ControlItem
         v-if="false && as.settings.isInKyokoMode"
         class="control-item-margin"

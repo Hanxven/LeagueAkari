@@ -26,6 +26,10 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     forceDisableProxy: false
   })
 
+  const frontendSettings = shallowReactive({
+    streamerMode: false
+  })
+
   const version = ref('0.0.0')
   const isAdministrator = ref(false)
   const disableHardwareAcceleration = ref(false)
@@ -49,6 +53,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
 
   return {
     settings,
+    frontendSettings,
     isAdministrator,
     disableHardwareAcceleration,
     version,

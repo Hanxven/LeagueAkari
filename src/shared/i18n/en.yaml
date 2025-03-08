@@ -12,7 +12,7 @@ DeclarationModal:
   showAgain: Show again
   line1: (联盟阿卡林) is open-source software designed to provide additional auxiliary features. You should not obtain this software through any paid channels.
   line2: Please be aware that this software takes no responsibility for any consequences that may arise from its use, including but not limited to game account bans, data corruption, or any other negative impact on your gaming experience.
-  line3: Users should carefully consider and fully assume all risks and consequences associated with using this software.
+  line3: League Akari no longer supports Tencent servers. Please do not use it on Tencent servers. Using this software may violate the relevant rules of Tencent games, and you will be responsible for any possible consequences.
 
 CommonButtons:
   announcement: Announcement
@@ -342,6 +342,13 @@ MiscSettings:
     enabled:
       label: Enable
       description: Display an indicator in the side bar showing the remaining time until respawn.
+
+  streamerMode:
+    title: Streamer Mode
+
+    enabled:
+      label: Enable
+      description: Hide sensitive information, such as the player's name, in the application interface.
 
 DebugSettings:
   title: Debug

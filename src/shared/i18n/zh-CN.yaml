@@ -14,7 +14,7 @@ DeclarationModal:
   showAgain: 再次提醒
   line1: (联盟阿卡林) 是开源软件，旨在提供额外的辅助功能。您不应从任何付费渠道获取此软件。
   line2: 同时告知，对于使用本软件可能带来的任何后果，包括但不限于游戏账户的封禁、数据损坏或其他任何形式的游戏体验负面影响，本软件不承担任何责任。
-  line3: 用户在决定使用本软件时，应充分考虑并自行承担由此产生的所有风险和后果。
+  line3: League Akari 不再支持腾讯服务器，请勿将其用于腾讯服务器。使用本软件可能会违反腾讯游戏的相关规定，您需承担任何可能的后果。
 
 CommonButtons:
   announcement: 公告
@@ -345,6 +345,13 @@ MiscSettings:
     enabled:
       label: 启用
       description: 在侧边栏展示一个距离重生剩余时间的指示器
+
+  streamerMode:
+    title: 主播模式
+
+    enabled:
+      label: 启用
+      description: 启用主播模式，将隐藏所有敏感信息 (玩家 ID，区服等)
 
 DebugSettings:
   title: 调试

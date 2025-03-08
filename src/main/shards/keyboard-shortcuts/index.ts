@@ -1,5 +1,4 @@
 import input from '@main/native/la-input-win64.node'
-import { TimeoutTask } from '@main/utils/timer'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import EventEmitter from 'node:events'
 
@@ -94,14 +93,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   >()
 
   private _targetIdMap = new Map<string, string>()
-
-  private _correctTask = new TimeoutTask(() => {
-    if (this._pressedModifierKeys.size === 0 && this._pressedOtherKeys.size === 0) {
-      this._lastActiveShortcut = []
-      return
-    }
-    this._correctTrackingState()
-  }, 2000)
 
   constructor(deps: any) {
     this._app = deps['app-common-main']
@@ -228,11 +219,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     const keyCode = parseInt(keyCodeRaw, 10)
     const isDown = state === 'DOWN'
 
-    // 按下时启动纠正任务
-    if (isDown) {
-      this._correctTask.start()
-    }
-
     // 如果是常见修饰键则不处理
     if (isCommonModifierKey(keyCode)) return
 
@@ -255,7 +241,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
       this._log.info('监听键盘事件')
       input.startHook()
       input.onKeyEvent((key) => this._handleNativeKeyEvent(key))
-      await this._correctTrackingState()
     }
 
     this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistration', (_, shortcutId: string) => {
@@ -284,44 +269,6 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
         _activeStatefulShortcut: this._activeStatefulShortcut
       }
     })
-  }
-
-  private async _correctTrackingState() {
-    const states = await input.getAllKeyStatesAsync()
-    this._pressedModifierKeys.clear()
-    this._pressedOtherKeys.clear()
-
-    states.forEach((key) => {
-      const { vkCode, pressed } = key
-
-      // 当微信启动时 F22 可能被意外按下，释放之
-      if (vkCode === KeyboardShortcutsMain.VK_CODE_F22 && pressed) {
-        this._log.info('F22 被按下, 试图释放')
-        input.sendKeyAsync(KeyboardShortcutsMain.VK_CODE_F22, false).catch(() => {})
-        return
-      }
-
-      if (isCommonModifierKey(vkCode)) return
-
-      if (isModifierKey(vkCode)) {
-        if (pressed) this._pressedModifierKeys.add(vkCode)
-      } else {
-        if (pressed) this._pressedOtherKeys.add(vkCode)
-      }
-    })
-
-    if (this._activeStatefulShortcut.length) {
-      const lastKey = this._activeStatefulShortcut[this._activeStatefulShortcut.length - 1]
-      if (!this._pressedOtherKeys.has(lastKey)) {
-        const details = this._buildShortcutDetails(this._activeStatefulShortcut, false)
-        this.events.emit('stateful-shortcut-released', details)
-        const registration = this._registrationMap.get(details.id)
-        if (registration && registration.type === 'stateful') {
-          registration.cb(details)
-        }
-        this._activeStatefulShortcut = []
-      }
-    }
   }
 
   register(
@@ -408,6 +355,5 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     this.events.removeAllListeners()
     this._registrationMap.clear()
     this._targetIdMap.clear()
-    this._correctTask.cancel()
   }
 }
