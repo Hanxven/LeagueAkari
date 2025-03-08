@@ -1,4 +1,5 @@
 import { Event } from 'electron'
+import { comparer } from 'mobx'
 
 import type { WindowManagerMainContext } from '..'
 import icon from '../../../../../resources/LA_ICON.ico?asset'
@@ -37,7 +38,8 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         show: false,
         frame: false,
         fullscreenable: true,
-        maximizable: true
+        maximizable: true,
+        backgroundMaterial: 'mica'
       }
     })
   }
@@ -50,6 +52,18 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
           this.showOrRestore()
         }
       }
+    )
+
+    this._mobx.reaction(
+      () => [this._windowManager.settings.backgroundMaterial, this.state.ready] as const,
+      ([material, ready]) => {
+        if (ready) {
+          this._window?.setBackgroundMaterial(
+            this._windowManager._settingToNativeBackgroundMaterial(material)
+          )
+        }
+      },
+      { fireImmediately: true, equals: comparer.shallow }
     )
   }
 

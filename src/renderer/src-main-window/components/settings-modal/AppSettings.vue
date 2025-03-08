@@ -48,7 +48,7 @@
         />
       </ControlItem>
       <ControlItem
-        v-if="false && as.settings.isInKyokoMode"
+        v-if="as.settings.isInKyokoMode"
         class="control-item-margin"
         :label="t('AppSettings.basic.backgroundMaterial.label')"
         :label-description="t('AppSettings.basic.backgroundMaterial.description')"

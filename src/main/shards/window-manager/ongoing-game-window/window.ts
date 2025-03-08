@@ -3,7 +3,7 @@ import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
 import { comparer } from 'mobx'
 
-import { WindowManagerMain, type WindowManagerMainContext } from '..'
+import { type WindowManagerMainContext } from '..'
 import icon from '../../../../../resources/LA_ICON.ico?asset'
 import { BaseAkariWindow } from '../base-akari-window'
 import { OngoingGameWindowSettings, OngoingGameWindowState } from './state'

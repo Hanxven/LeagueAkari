@@ -32,9 +32,7 @@ Supports most of the riot servers (not including Tencent).
 
 Fun places for casual chats, party setups, bug reports, and suggestions.
 
-QQ Group 1: 301157623 (Passcode: akari)
-
-QQ Group 2: 1021970497 (Passcode: akari)
+QQ Group: 301157623 (Passcode: akari)
 
 Telegram Group: https://t.me/leagueakari
 
