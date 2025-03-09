@@ -112,9 +112,6 @@
         <span class="card-header-title">{{ t('DebugSettings.lcuEvent.label') }}</span>
       </template>
       <div class="operations">
-        <NCheckbox size="small" class="check-box" v-model:checked="rds.printAll">{{
-          t('DebugSettings.lcuEvent.printAll')
-        }}</NCheckbox>
         <NCheckbox
           size="small"
           class="check-box"
@@ -122,16 +119,11 @@
           @update:checked="(val) => rd.setLogAllLcuEvents(val)"
           >{{ t('DebugSettings.lcuEvent.logAll') }}</NCheckbox
         >
-        <NButton
-          size="tiny"
-          @click="handleShowAddModal"
-          v-show="!rds.printAll"
-          secondary
-          type="primary"
-          >{{ t('DebugSettings.lcuEvent.addRule') }}</NButton
-        >
+        <NButton size="tiny" @click="handleShowAddModal" secondary type="primary">{{
+          t('DebugSettings.lcuEvent.addRule')
+        }}</NButton>
       </div>
-      <NCollapseTransition :show="!rds.printAll">
+      <NCollapseTransition>
         <NDataTable
           :class="$style.table"
           :columns="columns"
@@ -486,7 +478,6 @@ const runtimeInfo = shallowRef<any>(null)
 useIntervalFn(
   async () => {
     runtimeInfo.value = await app.getRuntimeInfo()
-    console.log('update', runtimeInfo.value)
   },
   2000,
   { immediateCallback: true }

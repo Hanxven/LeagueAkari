@@ -1221,6 +1221,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hanxven/league-akari-addons@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@hanxven/league-akari-addons@npm:1.0.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40hanxven%2Fleague-akari-addons%2F1.0.0%2F747e1ebfa1b90f6aac31521ea9fef08ef0deb174"
+  dependencies:
+    node-addon-api: "npm:^8.3.1"
+  checksum: 10c0/5d9730cdc3b52123d437810c781487d0c917a0f76d1753e9d4d074affd352bcb533983ac0de2973484024780a75049a996e8f0232dbbe6c06cc587fd33b3bcba
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -5176,6 +5185,7 @@ __metadata:
     "@electron-toolkit/tsconfig": "npm:^1.0.1"
     "@electron-toolkit/utils": "npm:^4.0.0"
     "@electron/notarize": "npm:^2.5.0"
+    "@hanxven/league-akari-addons": "npm:^1.0.0"
     "@leaguetavern/electron-overlay-win": "npm:^1.0.1"
     "@modyfi/vite-plugin-yaml": "npm:^1.1.1"
     "@swc/core": "npm:^1.11.7"
@@ -6035,6 +6045,15 @@ __metadata:
   dependencies:
     node-gyp: "npm:latest"
   checksum: 10c0/fb32a206276d608037fa1bcd7e9921e177fe992fc610d098aa3128baca3c0050fc1e014fa007e9b3874cf865ddb4f5bd9f43ccb7cbbbe4efaff6a83e920b17e9
+  languageName: node
+  linkType: hard
+
+"node-addon-api@npm:^8.3.1":
+  version: 8.3.1
+  resolution: "node-addon-api@npm:8.3.1"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 10c0/e28f1c5094130ecc3a0bf882e0385e74cac9c5112d35287dbce369959551ab7ca4d1f1a69af737107c894c14b4063dd5002e2b3c16a27035d025bb06eefee058
   languageName: node
   linkType: hard
 

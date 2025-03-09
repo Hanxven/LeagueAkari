@@ -1,5 +1,7 @@
-import toolsAddon from '@main/native/la-tools-win64.node'
+import { tools } from '@hanxven/league-akari-addons'
+
 import { BrowserWindow, Display, Rectangle, screen } from 'electron'
+import {  } from '@hanxven/league-akari-addons'
 
 export function rectsIntersect(rect1: Rectangle, rect2: Rectangle) {
   return (
@@ -191,7 +193,7 @@ export function repositionToAlignLeagueClientUx(
   win: BrowserWindow,
   placement?: 'top-left' | 'bottom-left' | 'top-right' | 'bottom-right'
 ) {
-  const info = toolsAddon.GetLeagueClientWindowPlacementInfo()
+  const info = tools.getLeagueClientWindowPlacementInfo()
   if (info) {
     const { left, top, width, height } = info
 

@@ -1,4 +1,4 @@
-import input from '@main/native/la-input-win64.node'
+import { input } from '@hanxven/league-akari-addons'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
 import { sleep } from '@shared/utils/sleep'
@@ -199,15 +199,15 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     this._ipc.onCall(this._namespace, 'sendInGame', async (_, text: string) => {
       if (!isSending && GameClientMain.isGameClientForeground()) {
         isSending = true
-        await input.sendKeyAsync(AkariCdTimerWindow.ENTER_KEY_CODE, true)
+        await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
         await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
-        await input.sendKeyAsync(AkariCdTimerWindow.ENTER_KEY_CODE, false)
+        await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
         await sleep(AkariCdTimerWindow.INPUT_DELAY)
-        await input.sendKeysAsync(text)
+        await input.instance.sendString(text)
         await sleep(AkariCdTimerWindow.INPUT_DELAY)
-        await input.sendKeyAsync(AkariCdTimerWindow.ENTER_KEY_CODE, true)
+        await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, true)
         await sleep(AkariCdTimerWindow.ENTER_KEY_INTERNAL_DELAY)
-        await input.sendKeyAsync(AkariCdTimerWindow.ENTER_KEY_CODE, false)
+        await input.instance.sendKey(AkariCdTimerWindow.ENTER_KEY_CODE, false)
         isSending = false
       }
     })

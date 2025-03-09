@@ -1,7 +1,7 @@
 import { optimizer } from '@electron-toolkit/utils'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
-import tools from '@main/native/la-tools-win64.node'
+import { tools } from '@hanxven/league-akari-addons'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
 import { AppCommonMain } from '@main/shards/app-common'
 import { AutoChampionConfigMain } from '@main/shards/auto-champ-config'

@@ -1,6 +1,6 @@
 {
   "name": "league-akari",
-  "version": "1.3.5-rabi.3",
+  "version": "1.3.5-rabi.4",
   "author": {
     "name": "Hanxven",
     "email": "hanxven@gmail.com"
@@ -21,6 +21,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
+    "@hanxven/league-akari-addons": "^1.0.0",
     "@leaguetavern/electron-overlay-win": "^1.0.1",
     "@types/luaparse": "^0.2.12",
     "ajv": "^8.17.1",

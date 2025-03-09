@@ -34,22 +34,20 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
 
     this._ipc.onEvent(MAIN_SHARD_NAMESPACE, 'lc-event', (data: LcuEvent) => {
-      if (store.printAll) {
-        this._log.info(data.uri, data.eventType, data.data)
-      } else {
-        // forward again~
-        this._matcher.emit(data.uri, data)
-      }
+      this._matcher.emit(data.uri, data)
     })
 
     this._scope.run(() => {
-      watch([() => store.rules.length, () => store.printAll], ([len, printAll]) => {
-        if (len || printAll) {
-          this.setSendAllNativeLcuEvents(true)
-        } else {
-          this.setSendAllNativeLcuEvents(false)
+      watch(
+        () => store.rules.length,
+        (len) => {
+          if (len) {
+            this.setSendAllNativeLcuEvents(true)
+          } else {
+            this.setSendAllNativeLcuEvents(false)
+          }
         }
-      })
+      )
     })
   }
 
@@ -70,9 +68,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
     rule = this._sanitizeRule(rule)
 
     const stopFn = this._matcher.on(rule, (data) => {
-      if (!store.printAll) {
-        this._log.info(data.uri, data.eventType, data.data)
-      }
+      this._log.info(data.uri, data.eventType, data.data)
     })
 
     store.rules.push({
@@ -95,9 +91,7 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
     ruleO.enabled = true
 
     const stopFn = this._matcher.on(rule, (data) => {
-      if (!store.printAll) {
-        this._log.info(data.uri, data.eventType, data.data)
-      }
+      this._log.info(data.uri, data.eventType, data.data)
     })
 
     ruleO.stopFn = stopFn

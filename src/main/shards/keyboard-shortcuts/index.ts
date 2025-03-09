@@ -1,11 +1,10 @@
-import input from '@main/native/la-input-win64.node'
+import { input } from '@hanxven/league-akari-addons'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import EventEmitter from 'node:events'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
-import { UNIFIED_KEY_ID, VKEY_MAP, isCommonModifierKey, isModifierKey } from './definitions'
 
 interface ShortcutDetails {
   keyCodes: number[]
@@ -112,13 +111,13 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   private _buildShortcutDetails(keyCodes: number[], pressed: boolean): ShortcutDetails {
     const keys = keyCodes.map((k) => ({
-      keyId: VKEY_MAP[k].keyId,
+      keyId: input.VKEY_MAP[k].keyId,
       keyCode: k,
-      isModifier: isModifierKey(k)
+      isModifier: input.isModifierKey(k)
     }))
     const id = keys.map((k) => k.keyId).join('+')
     const unifiedId = [
-      ...new Set(keyCodes.map((k) => UNIFIED_KEY_ID[k] || VKEY_MAP[k].keyId))
+      ...new Set(keyCodes.map((k) => input.UNIFIED_KEY_ID[k] || input.VKEY_MAP[k].keyId))
     ].join('+')
     return { keyCodes, keys, id, unifiedId, pressed }
   }
@@ -142,12 +141,15 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   // 处理修饰键的按下和释放
-  private _handleModifierKey(keyCode: number, isDown: boolean): void {
-    if (this._pressedModifierKeys.has(keyCode) === isDown) return
-    if (isDown) {
-      this._pressedModifierKeys.add(keyCode)
+  private _handleModifierKey(event: input.KeyEvent): void {
+    if (this._pressedModifierKeys.has(event.keyCode) === event.isDown) {
+      return
+    }
+
+    if (event.isDown) {
+      this._pressedModifierKeys.add(event.keyCode)
     } else {
-      this._pressedModifierKeys.delete(keyCode)
+      this._pressedModifierKeys.delete(event.keyCode)
     }
   }
 
@@ -211,24 +213,23 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     }
   }
 
-  private _handleNativeKeyEvent(rawData: string): void {
-    const [keyCodeRaw, state] = rawData.split(',')
-    // 忽略 VK_PACKET（231）以及未在 VKEY_MAP 中定义的键
-    if (keyCodeRaw === '231' || !VKEY_MAP[keyCodeRaw]) return
-
-    const keyCode = parseInt(keyCodeRaw, 10)
-    const isDown = state === 'DOWN'
+  private _handleNativeKeyEvent(event: input.KeyEvent): void {
+    if (event.keyCode === 231) {
+      return
+    }
 
     // 如果是常见修饰键则不处理
-    if (isCommonModifierKey(keyCode)) return
+    if (event.isCommonModifier) {
+      return
+    }
 
-    if (isModifierKey(keyCode)) {
-      this._handleModifierKey(keyCode, isDown)
+    if (event.isModifier) {
+      this._handleModifierKey(event)
     } else {
-      if (isDown) {
-        this._handleNonModifierKeyDown(keyCode)
+      if (event.isDown) {
+        this._handleNonModifierKeyDown(event.keyCode)
       } else {
-        this._handleNonModifierKeyUp(keyCode)
+        this._handleNonModifierKeyUp(event.keyCode)
       }
     }
 
@@ -239,8 +240,9 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   async onInit() {
     if (this._app.state.isAdministrator) {
       this._log.info('监听键盘事件')
-      input.startHook()
-      input.onKeyEvent((key) => this._handleNativeKeyEvent(key))
+      input.instance.on('keyEvent', (key) => {
+        this._handleNativeKeyEvent(key)
+      })
     }
 
     this._ipc.onCall(KeyboardShortcutsMain.id, 'getRegistration', (_, shortcutId: string) => {
@@ -321,7 +323,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   }
 
   getRegistration(shortcutId: string) {
-    const reservedKeyIds = KeyboardShortcutsMain.DISABLED_KEYS.map((k) => VKEY_MAP[k].keyId)
+    const reservedKeyIds = KeyboardShortcutsMain.DISABLED_KEYS.map((k) => input.VKEY_MAP[k].keyId)
     if (reservedKeyIds.some((k) => shortcutId.includes(k))) {
       return {
         type: 'normal',
@@ -350,7 +352,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   async onDispose() {
     if (this._app.state.isAdministrator) {
       this._log.info('停止监听键盘事件')
-      input.stopHook()
+      input.instance.uninstall()
     }
     this.events.removeAllListeners()
     this._registrationMap.clear()

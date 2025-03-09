@@ -1,5 +1,4 @@
-import input from '@main/native/la-input-win64.node'
-import toolsAddon from '@main/native/la-tools-win64.node'
+import { input } from '@hanxven/league-akari-addons'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
 import { isBotQueue } from '@shared/types/league-client/game-data'
@@ -13,7 +12,6 @@ import fs from 'node:fs'
 import { AppCommonMain } from '../app-common'
 import { GameClientMain } from '../game-client'
 import { AkariIpcMain } from '../ipc'
-import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -22,6 +20,7 @@ import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import defaultTemplate from './default-template.ejs?asset'
 import { CustomSend, InGameSendSettings, InGameSendState } from './state'
+import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 
 /**
  * 用于在游戏中模拟发送的相关功能
@@ -162,15 +161,15 @@ export class InGameSendMain implements IAkariShardInitDispose {
     } else {
       for (let i = 0; i < messages.length; i++) {
         tasks.push(async () => {
-          await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, true)
+          await input.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
           await sleep(InGameSendMain.ENTER_KEY_INTERNAL_DELAY)
-          await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, false)
+          await input.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
           await sleep(interval)
-          await input.sendKeysAsync(messages[i])
+          await input.instance.sendString(messages[i])
           await sleep(interval)
-          await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, true)
+          await input.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, true)
           await sleep(InGameSendMain.ENTER_KEY_INTERNAL_DELAY)
-          await input.sendKeyAsync(InGameSendMain.ENTER_KEY_CODE, false)
+          await input.instance.sendKey(InGameSendMain.ENTER_KEY_CODE, false)
         })
 
         if (i !== messages.length - 1) {

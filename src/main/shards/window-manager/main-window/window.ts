@@ -38,8 +38,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         show: false,
         frame: false,
         fullscreenable: true,
-        maximizable: true,
-        backgroundMaterial: 'mica'
+        maximizable: true
       }
     })
   }

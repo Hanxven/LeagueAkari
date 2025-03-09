@@ -105,15 +105,14 @@ export class AkariOpggWindow extends BaseAkariWindow<OpggWindowState, OpggWindow
         if (shortcut) {
           try {
             this._keyboardShortcuts.register(this.shortcutTargetId, shortcut, 'normal', () => {
+              if (!this.state.show && GameClientMain.isGameClientForeground()) {
+                this.setPinned(true)
+              }
+
               if (this.state.show) {
                 this.hide()
               } else {
-                if (GameClientMain.isGameClientForeground()) {
-                  this.setPinned(true)
-                  this.show(true)
-                } else {
-                  this.show()
-                }
+                this.show()
               }
             })
           } catch {

@@ -1,4 +1,4 @@
-import toolkit from '@main/native/la-tools-win64.node'
+import { tools } from '@hanxven/league-akari-addons'
 import { SpawnOptionsWithoutStdio, spawn } from 'node:child_process'
 import fs from 'node:fs'
 
@@ -179,12 +179,12 @@ export async function queryUxCommandLine(arg: string | number): Promise<UxComman
 }
 
 export function queryUxCommandLineNative(clientName: string): UxCommandLine[] {
-  const pids = toolkit.getPidsByName(clientName)
+  const pids = tools.getPidsByName(clientName)
 
   const auths: UxCommandLine[] = []
   for (const p of pids) {
     try {
-      const cmd = toolkit.getCommandLine1(p)
+      const cmd = tools.getCommandLine1(p)
       const parsed = parseCommandLine(cmd)
       if (parsed) {
         auths.push(parsed)

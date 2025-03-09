@@ -63,6 +63,10 @@
         @update:value="(val) => as.setBenchModeEnabled(val)"
       />
     </NFlex>
+    <NFlex align="center" class="control-item">
+      <span class="label" style="flex: 1">{{ '我要创建一个没有勇者的世界' }}</span>
+      <NButton size="tiny" type="warning" @click="handleBan_3">懦夫模式</NButton>
+    </NFlex>
   </NCard>
 </template>
 
@@ -140,6 +144,33 @@ watchEffect(() => {
     )
   }
 })
+
+const handleBan_3 = async () => {
+  if (!lcs.champSelect.session) {
+    return
+  }
+
+  try {
+    const actions = lcs.champSelect.session.actions.flat()
+
+    const thatAction = actions.find((action) => {
+      return (
+        action.actorCellId === lcs.champSelect.session?.localPlayerCellId &&
+        action.type === 'ban' &&
+        action.completed === false
+      )
+    })
+
+    if (!thatAction) {
+      message.error('No ban action found')
+      return
+    }
+
+    await lc.api.champSelect.pickOrBan(-3, true, 'ban', thatAction.id)
+  } catch (error: any) {
+    message.error(error.message)
+  }
+}
 </script>
 
 <style scoped lang="less">

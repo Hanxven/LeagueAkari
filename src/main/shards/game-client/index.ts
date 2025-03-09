@@ -1,4 +1,4 @@
-import toolkit from '@main/native/la-tools-win64.node'
+import { tools } from '@hanxven/league-akari-addons'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game-client'
 import axios from 'axios'
@@ -9,13 +9,13 @@ import path from 'node:path'
 
 import { ClientInstallationMain } from '../client-installation'
 import { AkariIpcMain } from '../ipc'
-import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { GameClientSettings } from './state'
+import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 
 export interface LaunchSpectatorConfig {
   locale?: string
@@ -171,15 +171,15 @@ export class GameClientMain implements IAkariShardInitDispose {
 
   private _terminateGameClient() {
     this._log.info('尝试终止游戏客户端进程')
-    toolkit.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME).forEach((pid) => {
+    tools.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME).forEach((pid) => {
       this._log.info('存在进程', pid)
-      if (!toolkit.isProcessForeground(pid)) {
+      if (!tools.isProcessForeground(pid)) {
         this._log.info('进程非在前台', pid)
         return
       }
 
       this._log.info(`终止游戏客户端进程 ${pid}`)
-      toolkit.terminateProcess(pid)
+      tools.terminateProcess(pid)
     })
   }
 
@@ -339,25 +339,25 @@ export class GameClientMain implements IAkariShardInitDispose {
   }
 
   static isGameClientForeground() {
-    return toolkit
+    return tools
       .getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
-      .some((pid) => toolkit.isProcessForeground(pid))
+      .some((pid) => tools.isProcessForeground(pid))
   }
 
   isGameClientForegroundCached() {
     if (this._gcCachedRunningPids.length === 0) {
-      this._gcCachedRunningPids = toolkit.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+      this._gcCachedRunningPids = tools.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
     } else {
       this._gcCachedRunningPids = this._gcCachedRunningPids.filter((pid) =>
-        toolkit.isProcessRunning(pid)
+        tools.isProcessRunning(pid)
       )
 
       if (this._gcCachedRunningPids.length === 0) {
-        this._gcCachedRunningPids = toolkit.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
+        this._gcCachedRunningPids = tools.getPidsByName(GameClientMain.GAME_CLIENT_PROCESS_NAME)
       }
     }
 
-    return this._gcCachedRunningPids.some((pid) => toolkit.isProcessForeground(pid))
+    return this._gcCachedRunningPids.some((pid) => tools.isProcessForeground(pid))
   }
 
   private async _setSettingsFileReadonlyOrWritable(mode: 'readonly' | 'writable' = 'readonly') {

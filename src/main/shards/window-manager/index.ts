@@ -7,7 +7,6 @@ import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
 import { GameClientMain } from '../game-client'
 import { AkariIpcMain } from '../ipc'
-import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -19,6 +18,7 @@ import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
 import { WindowManagerSettings, WindowManagerState } from './state'
+import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 
 export interface WindowManagerMainContext {
   namespace: string

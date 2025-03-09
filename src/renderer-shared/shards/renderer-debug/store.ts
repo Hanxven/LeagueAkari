@@ -3,7 +3,6 @@ import { ref } from 'vue'
 
 export const useRendererDebugStore = defineStore('shard:renderer-debug-renderer', () => {
   const sendAllNativeLcuEvents = ref(false)
-  const printAll = ref(false)
   const logAllLcuEvents = ref(false)
   const rules = ref<
     {
@@ -15,7 +14,6 @@ export const useRendererDebugStore = defineStore('shard:renderer-debug-renderer'
 
   return {
     sendAllNativeLcuEvents,
-    printAll,
     rules,
     logAllLcuEvents
   }
