@@ -68,7 +68,11 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
     rule = this._sanitizeRule(rule)
 
     const stopFn = this._matcher.on(rule, (data) => {
-      this._log.info(data.uri, data.eventType, data.data)
+      if (store.logAllLcuEvents) {
+        this._log.info(data.uri, data.eventType, data.data)
+      } else {
+        this._log.infoRenderer(data.uri, data.eventType, data.data)
+      }
     })
 
     store.rules.push({
@@ -91,7 +95,11 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
     ruleO.enabled = true
 
     const stopFn = this._matcher.on(rule, (data) => {
-      this._log.info(data.uri, data.eventType, data.data)
+      if (store.logAllLcuEvents) {
+        this._log.info(data.uri, data.eventType, data.data)
+      } else {
+        this._log.infoRenderer(data.uri, data.eventType, data.data)
+      }
     })
 
     ruleO.stopFn = stopFn

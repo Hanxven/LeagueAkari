@@ -192,6 +192,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
   private _cancelPrevScheduledPickIfExists() {
     if (this.state.upcomingPick) {
+      if (!this._pickTask.isStarted) {
+        return
+      }
+
       this._log.info(
         `取消即将进行的选择自动选择: ${this._lc.data.gameData.champions[this.state.upcomingPick.championId]?.name || this.state.upcomingPick.championId}`
       )
@@ -209,6 +213,10 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
   private _cancelPrevScheduledBanIfExists() {
     if (this.state.upcomingBan) {
+      if (!this._banTask.isStarted) {
+        return
+      }
+
       this._log.info(
         `取消即将进行的自动禁用: ${this._lc.data.gameData.champions[this.state.upcomingBan.championId]?.name || this.state.upcomingBan.championId}`
       )
@@ -329,7 +337,6 @@ export class AutoSelectMain implements IAkariShardInitDispose {
               seconds: (delayMs / 1e3).toFixed(1)
             })}`
           )
-
           this.state.setUpcomingBan(ban.championId, Date.now() + delayMs)
           this._banTask.setTask(
             () =>

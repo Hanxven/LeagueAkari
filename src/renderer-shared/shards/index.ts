@@ -43,7 +43,9 @@ export function createManager() {
  * @param id
  * @returns
  */
-export function useInstance<T = any>(id: string) {
+export function useInstance<T>(id: string): T
+export function useInstance<T extends new (...args: any[]) => any>(Ctor: T): InstanceType<T>
+export function useInstance<T>(idOrCtor: string | (new (...args: any[]) => T)): T {
   const ctx = getCurrentInstance()
 
   if (!ctx) {
@@ -52,6 +54,17 @@ export function useInstance<T = any>(id: string) {
 
   if (!ctx.appContext.config.globalProperties.$akariManager) {
     throw new Error('AkariManager not found in app context')
+  }
+
+  let id: string
+
+  if (typeof idOrCtor === 'string') {
+    id = idOrCtor
+  } else {
+    if (!('id' in idOrCtor)) {
+      throw new Error('Constructor must have a static "id" field')
+    }
+    id = (idOrCtor as any).id
   }
 
   const ins = ctx.appContext.config.globalProperties.$akariManager.getInstance(id)

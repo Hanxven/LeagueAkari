@@ -64,17 +64,11 @@ yarn dev
 yarn build:win
 ```
 
-## 3.2 Node Native Modules (Optional)
+## Private Packages
 
-If you modify files in `addons/*`, recompile as follows:
+A valid GitHub PAT is required to install private packages.
 
-```bash
-yarn install
-node-gyp configure
-node-gyp build
-```
-
-Then copy `la-input-win64.node` and `la-tools-win64.node` to the app source directory at `src/main/native` and update type definitions in `src/main/node-addon.d.ts`.
+`NODE_AUTH_TOKEN` must be set to the PAT value.
 
 # 4. Disclaimer
 

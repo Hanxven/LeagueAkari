@@ -168,6 +168,7 @@ const handleBan_3 = async () => {
 
     await lc.api.champSelect.pickOrBan(-3, true, 'ban', thatAction.id)
   } catch (error: any) {
+    console.error(error)
     message.error(error.message)
   }
 }

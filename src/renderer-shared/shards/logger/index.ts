@@ -44,17 +44,30 @@ export class LoggerRenderer {
       .join(' ')
   }
 
-  info(namespace: string, ...args: any[]) {
-    const { info } = this._getColorScheme()
-    console.info(
-      `%c[${dayjs().format('HH:mm:ss')}] %c[%c${namespace}%c] %c[info]`,
-      info.timestamp,
+  private _log(level: string, namespace: string, ...args: any[]) {
+    const fn = {
+      info: console.info,
+      warn: console.warn,
+      error: console.error,
+      debug: console.debug
+    }
+
+    const scheme = this._getColorScheme()
+
+    fn[level]?.(
+      `%c[${dayjs().format('HH:mm:ss')}] %c[%c${namespace}%c] %c[${level}]`,
+      scheme[level].timestamp,
       'color: inherit;',
-      info.namespace,
+      scheme[level].namespace,
       'color: inherit;',
-      info.level,
+      scheme[level].level,
       ...args
     )
+  }
+
+  info(namespace: string, ...args: any[]) {
+    this._log('info', namespace, ...args)
+
     return this._ipc.call(
       MAIN_SHARD_NAMESPACE,
       'log',
@@ -65,16 +78,8 @@ export class LoggerRenderer {
   }
 
   warn(namespace: string, ...args: any[]) {
-    const { warn } = this._getColorScheme()
-    console.warn(
-      `%c[${dayjs().format('HH:mm:ss')}] %c[%c${namespace}%c] %c[warn]`,
-      warn.timestamp,
-      'color: inherit;',
-      warn.namespace,
-      'color: inherit;',
-      warn.level,
-      ...args
-    )
+    this._log('warn', namespace, ...args)
+
     return this._ipc.call(
       MAIN_SHARD_NAMESPACE,
       'log',
@@ -85,16 +90,8 @@ export class LoggerRenderer {
   }
 
   error(namespace: string, ...args: any[]) {
-    const { error } = this._getColorScheme()
-    console.error(
-      `%c[${dayjs().format('HH:mm:ss')}] %c[%c${namespace}%c] %c[error]`,
-      error.timestamp,
-      'color: inherit;',
-      error.namespace,
-      'color: inherit;',
-      error.level,
-      ...args
-    )
+    this._log('error', namespace, ...args)
+
     return this._ipc.call(
       MAIN_SHARD_NAMESPACE,
       'log',
@@ -105,16 +102,8 @@ export class LoggerRenderer {
   }
 
   debug(namespace: string, ...args: any[]) {
-    const { debug } = this._getColorScheme()
-    console.debug(
-      `%c[${dayjs().format('HH:mm:ss')}] %c[%c${namespace}%c] %c[debug]`,
-      debug.timestamp,
-      'color: inherit;',
-      debug.namespace,
-      'color: inherit;',
-      debug.level,
-      ...args
-    )
+    this._log('debug', namespace, ...args)
+
     return this._ipc.call(
       MAIN_SHARD_NAMESPACE,
       'log',
@@ -122,6 +111,22 @@ export class LoggerRenderer {
       'debug',
       this._objectsToString(...args)
     )
+  }
+
+  infoRenderer(namespace: string, ...args: any[]) {
+    this._log('info', namespace, ...args)
+  }
+
+  warnRenderer(namespace: string, ...args: any[]) {
+    this._log('warn', namespace, ...args)
+  }
+
+  errorRenderer(namespace: string, ...args: any[]) {
+    this._log('error', namespace, ...args)
+  }
+
+  debugRenderer(namespace: string, ...args: any[]) {
+    this._log('debug', namespace, ...args)
   }
 
   private _getColorScheme() {

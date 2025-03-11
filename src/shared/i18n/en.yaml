@@ -388,7 +388,7 @@ DebugSettings:
   lcuEvent:
     label: Print LCU Events to Console
     printAll: Print All Events
-    logAll: Log All Events
+    logAll: Log All Events Into File
     addRule: Add Rule
     empty: No Rules
     enable: Enable

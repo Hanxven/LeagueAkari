@@ -391,7 +391,7 @@ DebugSettings:
   lcuEvent:
     label: 在控制台打印 LCU 事件
     printAll: 打印全部事件
-    logAll: 日志记录全部事件
+    logAll: 写入到日志中
     addRule: 添加规则
     empty: 无规则
     enable: 启用
