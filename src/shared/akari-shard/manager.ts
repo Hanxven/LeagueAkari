@@ -16,7 +16,7 @@ export interface AkariShardConstructor<T = any> {
   /**
    * 依赖的模块 ID 列表
    */
-  dependencies?: string[]
+  dependencies?: (string | AkariShardConstructor)[]
 }
 
 export interface AkariSharedGlobalShard {
@@ -161,26 +161,30 @@ export class AkariManager {
 
     if (dependencies) {
       const sortedDependencies = dependencies.toSorted((a, b) => {
-        const aPriority = this._registry.get(a)?.cls?.priority ?? 0
-        const bPriority = this._registry.get(b)?.cls?.priority ?? 0
+        const aDepId = typeof a === 'string' ? a : a.id
+        const bDepId = typeof b === 'string' ? b : b.id
+        const aPriority = this._registry.get(aDepId)?.cls?.priority ?? 0
+        const bPriority = this._registry.get(bDepId)?.cls?.priority ?? 0
         return bPriority - aPriority
       })
 
       for (const dep of sortedDependencies) {
-        if (visited.has(dep)) {
+        const depId = typeof dep === 'string' ? dep : dep.id
+
+        if (visited.has(depId)) {
           throw new Error(`Circular dependency detected: ${[...visited, dep].join(' -> ')}`)
         }
 
-        if (instances[dep]) {
+        if (instances[depId]) {
           throw new Error(`Duplicate dependency: ${dep} from [${dependencies.join(', ')}]`)
         }
 
-        if (this._instances.has(dep)) {
-          instances[dep] = this._instances.get(dep)!
+        if (this._instances.has(depId)) {
+          instances[depId] = this._instances.get(depId)!
         } else {
-          visited.add(dep)
-          instances[dep] = this._inflate(dep, visited, stack)
-          visited.delete(dep)
+          visited.add(depId)
+          instances[depId] = this._inflate(depId, visited, stack)
+          visited.delete(depId)
         }
       }
     }
