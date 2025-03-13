@@ -392,7 +392,7 @@ const { t } = useTranslation()
 const as = useAppCommonStore()
 const igs = useInGameSendStore()
 
-const ig = useInstance<InGameSendRenderer>('in-game-send-renderer')
+const ig = useInstance(InGameSendRenderer)
 
 const dialog = useDialog()
 

@@ -182,7 +182,7 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const sus = useSelfUpdateStore()
-const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
+const su = useInstance(SelfUpdateRenderer)
 
 const message = useMessage()
 

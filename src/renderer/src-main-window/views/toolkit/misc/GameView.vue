@@ -45,7 +45,7 @@ const handleInspect = () => {
   viewingGameId.value = gameId.value
 }
 
-const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
+const mh = useInstance(MatchHistoryTabsRenderer)
 
 const { navigateToTabByPuuid } = mh.useNavigateToTab()
 </script>

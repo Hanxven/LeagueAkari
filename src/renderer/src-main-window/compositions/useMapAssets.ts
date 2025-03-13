@@ -6,7 +6,7 @@ import { readonly, shallowRef, watch } from 'vue'
 
 export function useMapAssets() {
   const lcs = useLeagueClientStore()
-  const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+  const lc = useInstance(LeagueClientRenderer)
 
   const data = shallowRef<GameMapAsset | null>(null)
 

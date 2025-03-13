@@ -124,8 +124,8 @@ const { t } = useTranslation()
 const agfs = useAutoGameflowStore()
 const lcs = useLeagueClientStore()
 
-const agf = useInstance<AutoGameflowRenderer>('auto-gameflow-renderer')
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const agf = useInstance(AutoGameflowRenderer)
+const lc = useInstance(LeagueClientRenderer)
 
 const willAcceptIn = ref(0)
 const { pause: pauseAC, resume: resumeAC } = useIntervalFn(

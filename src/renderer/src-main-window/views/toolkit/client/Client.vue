@@ -235,8 +235,8 @@ const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 const gcs = useGameClientStore()
 
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
-const gc = useInstance<GameClientRenderer>('game-client-renderer')
+const lc = useInstance(LeagueClientRenderer)
+const gc = useInstance(GameClientRenderer)
 
 const dialog = useDialog()
 

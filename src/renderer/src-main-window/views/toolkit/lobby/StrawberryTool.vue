@@ -108,7 +108,7 @@ import { computed, ref } from 'vue'
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const lc = useInstance(LeagueClientRenderer)
 
 let isInitialized = false
 

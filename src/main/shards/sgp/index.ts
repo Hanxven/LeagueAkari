@@ -117,7 +117,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._log = this._loggerFactory.create(SgpMain.id)
     this._setting = this._settingFactory.register(SgpMain.id, {}, {})
 
-    this.state = new SgpState(this._lc.data)
+    this.state = new SgpState()
   }
 
   async onInit() {
@@ -703,6 +703,7 @@ export class SgpMain implements IAkariShardInitDispose {
       (token) => {
         if (!token) {
           this._sgp.setEntitlementsToken(null)
+          this.state.setEntitlementsTokenSet(false)
           return
         }
 
@@ -714,6 +715,7 @@ export class SgpMain implements IAkariShardInitDispose {
         this._log.info(`更新 Entitlements Token: ${JSON.stringify(copiedToken)}`)
 
         this._sgp.setEntitlementsToken(token.accessToken)
+        this.state.setEntitlementsTokenSet(true)
       },
       { fireImmediately: true }
     )
@@ -725,6 +727,7 @@ export class SgpMain implements IAkariShardInitDispose {
       (token) => {
         if (!token) {
           this._sgp.setLeagueSessionToken(null)
+          this.state.setLeagueSessionTokenSet(false)
           return
         }
 
@@ -733,6 +736,7 @@ export class SgpMain implements IAkariShardInitDispose {
         this._log.info(`更新 Lol League Session Token: ${copied}`)
 
         this._sgp.setLeagueSessionToken(token)
+        this.state.setLeagueSessionTokenSet(true)
       },
       { fireImmediately: true }
     )

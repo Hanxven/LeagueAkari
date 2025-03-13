@@ -93,7 +93,7 @@ const { t } = useTranslation()
 const agfs = useAutoGameflowStore()
 const lcs = useLeagueClientStore()
 
-const agf = useInstance<AutoGameflowRenderer>('auto-gameflow-renderer')
+const agf = useInstance(AutoGameflowRenderer)
 
 const isCustomGame = computed(() => {
   if (!lcs.gameflow.session) {

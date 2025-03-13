@@ -79,7 +79,7 @@ import { useMatchHistoryTabsStore } from '@main-window/shards/match-history-tabs
 
 const { t } = useTranslation()
 
-const ps = useInstance<PlayerStalkingRenderer>('player-stalking-renderer')
+const ps = useInstance(PlayerStalkingRenderer)
 
 const mhs = useMatchHistoryTabsStore()
 const sgps = useSgpStore()

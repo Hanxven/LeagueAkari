@@ -60,7 +60,7 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const lc = useInstance(LeagueClientRenderer)
 
 const notification = useNotification()
 

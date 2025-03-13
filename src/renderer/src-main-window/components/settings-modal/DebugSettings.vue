@@ -312,10 +312,10 @@ const lc = useLeagueClientStore()
 const rds = useRendererDebugStore()
 const as = useAppCommonStore()
 
-const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
-const log = useInstance<LoggerRenderer>('logger-renderer')
-const app = useInstance<AppCommonRenderer>('app-common-renderer')
-const rd = useInstance<RendererDebugRenderer>('renderer-debug-renderer')
+const wm = useInstance(WindowManagerRenderer)
+const log = useInstance(LoggerRenderer)
+const app = useInstance(AppCommonRenderer)
+const rd = useInstance(RendererDebugRenderer)
 
 const gameflowText = computed(() => {
   return {

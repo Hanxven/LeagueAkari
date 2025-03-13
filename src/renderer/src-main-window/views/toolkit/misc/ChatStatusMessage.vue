@@ -47,7 +47,7 @@ import { ref } from 'vue'
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const lc = useInstance(LeagueClientRenderer)
 
 const text = ref('')
 const isSetting = ref(false)

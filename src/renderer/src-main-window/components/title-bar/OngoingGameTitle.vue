@@ -61,7 +61,7 @@ const { t } = useTranslation()
 const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 
 const ogs = useOngoingGameStore()
-const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
+const og = useInstance(OngoingGameRenderer)
 const lcs = useLeagueClientStore()
 
 const isCsSpectateWait = computed(() => {

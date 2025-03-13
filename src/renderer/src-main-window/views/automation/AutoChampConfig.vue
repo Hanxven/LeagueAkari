@@ -44,7 +44,7 @@ import ChampionConfig from '@main-window/components/auto-champ-config/ChampionCo
 const { t } = useTranslation()
 
 const acs = useAutoChampConfigStore()
-const ac = useInstance<AutoChampConfigRenderer>('auto-champ-config-renderer')
+const ac = useInstance(AutoChampConfigRenderer)
 </script>
 
 <style lang="less" scoped>

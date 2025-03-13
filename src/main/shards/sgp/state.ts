@@ -20,6 +20,18 @@ export class SgpState {
     } as AvailableServersMap
   }
 
+  isEntitlementsTokenSet = false
+
+  isLeagueSessionTokenSet = false
+
+  setEntitlementsTokenSet(value: boolean) {
+    this.isEntitlementsTokenSet = value
+  }
+
+  setLeagueSessionTokenSet(value: boolean) {
+    this.isLeagueSessionTokenSet = value
+  }
+
   setAvailability(
     region: string,
     rsoPlatform: string,
@@ -40,14 +52,10 @@ export class SgpState {
   }
 
   get isTokenReady() {
-    if (this._lcData.leagueSession.token && this._lcData.entitlements.token) {
-      return true
-    }
-
-    return false
+    return this.isEntitlementsTokenSet && this.isLeagueSessionTokenSet
   }
 
-  constructor(private readonly _lcData: LeagueClientSyncedData) {
+  constructor() {
     makeAutoObservable(this)
   }
 }

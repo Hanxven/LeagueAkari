@@ -70,8 +70,8 @@ const VIEW_NAMESPACE = 'view:MatchHistoryTabs'
 
 const mhs = useMatchHistoryTabsStore()
 const ogs = useOngoingGameStore()
-const log = useInstance<LoggerRenderer>('logger-renderer')
-const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
+const log = useInstance(LoggerRenderer)
+const mh = useInstance(MatchHistoryTabsRenderer)
 
 const tabsRef = useTemplateRef('tabs-ref')
 

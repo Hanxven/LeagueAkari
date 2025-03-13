@@ -202,11 +202,11 @@ import { MatchHistoryTabsRenderer, SearchHistoryItem } from '@main-window/shards
 const { t } = useTranslation()
 
 const show = defineModel<boolean>('show', { default: false })
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
-const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
-const sgp = useInstance<SgpRenderer>('sgp-renderer')
+const lc = useInstance(LeagueClientRenderer)
+const rc = useInstance(RiotClientRenderer)
+const sgp = useInstance(SgpRenderer)
 
-const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
+const mh = useInstance(MatchHistoryTabsRenderer)
 
 const sgps = useSgpStore()
 

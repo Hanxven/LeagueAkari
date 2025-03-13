@@ -214,7 +214,7 @@ const isTftMode = computed(() => {
 })
 
 const lcs = useLeagueClientStore()
-const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
+const rc = useInstance(RiotClientRenderer)
 
 const teams = computed(() => {
   if (!data) {

@@ -63,7 +63,7 @@ const { t } = useTranslation()
 const mws = useMainWindowStore()
 const aws = useAuxWindowStore()
 const ows = useOpggWindowStore()
-const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const wm = useInstance(WindowManagerRenderer)
 
 const { openAnnouncementModal } = inject('app') as any
 

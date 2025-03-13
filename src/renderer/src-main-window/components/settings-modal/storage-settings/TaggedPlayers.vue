@@ -119,11 +119,11 @@ interface MappedRecordType extends RecordType {
 }
 
 const { t } = useTranslation()
-const sp = useInstance<SavedPlayerRenderer>('saved-player-renderer')
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
-const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
-const sgp = useInstance<SgpRenderer>('sgp-renderer')
-const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
+const sp = useInstance(SavedPlayerRenderer)
+const lc = useInstance(LeagueClientRenderer)
+const mh = useInstance(MatchHistoryTabsRenderer)
+const sgp = useInstance(SgpRenderer)
+const rc = useInstance(RiotClientRenderer)
 
 const lcs = useLeagueClientStore()
 

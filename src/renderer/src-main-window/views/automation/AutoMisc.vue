@@ -66,7 +66,7 @@ import { ref, watchEffect } from 'vue'
 const { t } = useTranslation()
 
 const ar = useAutoReplyStore()
-const arm = useInstance<AutoReplyRenderer>('auto-reply-renderer')
+const arm = useInstance(AutoReplyRenderer)
 
 const message = useMessage()
 const tempText = ref('')

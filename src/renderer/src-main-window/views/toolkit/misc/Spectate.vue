@@ -88,9 +88,9 @@ import { computed, onActivated, onDeactivated, reactive, ref } from 'vue'
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
-const gc = useInstance<GameClientRenderer>('game-client-renderer')
-const app = useInstance<AppCommonRenderer>('app-common-renderer')
+const lc = useInstance(LeagueClientRenderer)
+const gc = useInstance(GameClientRenderer)
+const app = useInstance(AppCommonRenderer)
 
 const notification = useNotification()
 

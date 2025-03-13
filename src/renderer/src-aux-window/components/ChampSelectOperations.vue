@@ -92,9 +92,9 @@ const as2 = useAutoSelectStore()
 const agfs = useAutoGameflowStore()
 const aps = useAppCommonStore()
 
-const agf = useInstance<AutoGameflowRenderer>('auto-gameflow-renderer')
-const as = useInstance<AutoSelectRenderer>('auto-select-renderer')
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const agf = useInstance(AutoGameflowRenderer)
+const as = useInstance(AutoSelectRenderer)
+const lc = useInstance(LeagueClientRenderer)
 
 const isBenchMode = computed(() => isBenchEnabledSession(lcs.champSelect.session))
 

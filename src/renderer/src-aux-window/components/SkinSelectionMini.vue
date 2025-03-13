@@ -54,7 +54,7 @@ const { t } = useTranslation()
 const aws = useAuxWindowStore()
 const lcs = useLeagueClientStore()
 
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const lc = useInstance(LeagueClientRenderer)
 
 const currentSkinId = ref<number>()
 const isSettingSkin = ref(false)

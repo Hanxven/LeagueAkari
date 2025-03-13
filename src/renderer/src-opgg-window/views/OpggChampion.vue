@@ -786,8 +786,8 @@ const emits = defineEmits<{
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
-const log = useInstance<LoggerRenderer>('logger-renderer')
+const lc = useInstance(LeagueClientRenderer)
+const log = useInstance(LoggerRenderer)
 
 const info = computed(() => {
   if (!props.champion) {

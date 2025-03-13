@@ -628,14 +628,14 @@ const { tab } = defineProps<{
 
 const { t } = useTranslation()
 
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
-const rc = useInstance<RiotClientRenderer>('riot-client-renderer')
-const sgp = useInstance<SgpRenderer>('sgp-renderer')
-const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
-const log = useInstance<LoggerRenderer>('logger-renderer')
-const sp = useInstance<SavedPlayerRenderer>('saved-player-renderer')
-const gc = useInstance<GameClientRenderer>('game-client-renderer')
-const app = useInstance<AppCommonRenderer>('app-common-renderer')
+const lc = useInstance(LeagueClientRenderer)
+const rc = useInstance(RiotClientRenderer)
+const sgp = useInstance(SgpRenderer)
+const mh = useInstance(MatchHistoryTabsRenderer)
+const log = useInstance(LoggerRenderer)
+const sp = useInstance(SavedPlayerRenderer)
+const gc = useInstance(GameClientRenderer)
+const app = useInstance(AppCommonRenderer)
 
 const lcs = useLeagueClientStore()
 const mhs = useMatchHistoryTabsStore()
@@ -1442,7 +1442,7 @@ const handleScreenshot = async () => {
   }
 }
 
-const ps = useInstance<PlayerStalkingRenderer>('player-stalking-renderer')
+const ps = useInstance(PlayerStalkingRenderer)
 const pss = usePlayerStalkingStore()
 
 const isBeingStalked = computed(() => {

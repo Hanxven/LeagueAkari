@@ -56,7 +56,7 @@ const { t } = useTranslation()
 const as = useAppCommonStore()
 
 const sus = useSelfUpdateStore()
-const aum = useInstance<SelfUpdateRenderer>('self-update-renderer')
+const aum = useInstance(SelfUpdateRenderer)
 
 const markdownHtmlText = computed(() => {
   return markdownIt.render(sus.currentAnnouncement?.content || '当前没有任何公告')

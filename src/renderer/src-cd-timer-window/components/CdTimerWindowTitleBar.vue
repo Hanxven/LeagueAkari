@@ -17,7 +17,7 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { Close as CloseIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 
-const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const wm = useInstance(WindowManagerRenderer)
 
 const handleClose = () => {
   return wm.cdTimerWindow.hide()

@@ -430,7 +430,7 @@ const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const acs = useAutoChampConfigStore()
-const ac = useInstance<AutoChampConfigRenderer>('auto-champ-config-renderer')
+const ac = useInstance(AutoChampConfigRenderer)
 
 const { match: isNameMatch } = useChampionNameMatch()
 

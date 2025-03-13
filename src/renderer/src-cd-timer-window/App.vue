@@ -17,7 +17,7 @@ import SummonerSpellsCdTimer from './components/SummonerSpellsCdTimer.vue'
 const wrapperEl = useTemplateRef('wrapper')
 
 const { height, width } = useElementSize(wrapperEl)
-const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const wm = useInstance(WindowManagerRenderer)
 
 watch(
   [() => width.value, () => height.value],

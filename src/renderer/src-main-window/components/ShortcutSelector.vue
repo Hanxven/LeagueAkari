@@ -78,7 +78,7 @@ defineProps<{
 
 const { t } = useTranslation()
 
-const kbd = useInstance<KeyboardShortcutsRenderer>('keyboard-shortcuts-renderer')
+const kbd = useInstance(KeyboardShortcutsRenderer)
 
 const show = defineModel<boolean>('show', { default: false })
 const shortcutId = defineModel<string | null>('shortcutId', { default: null })

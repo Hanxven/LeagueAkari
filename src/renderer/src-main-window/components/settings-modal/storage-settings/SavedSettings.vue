@@ -36,7 +36,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NScrollbar, useDialog, useMessage } from 'naive-ui'
 
 const { t } = useTranslation()
-const s = useInstance<SettingUtilsRenderer>('setting-utils-renderer')
+const s = useInstance(SettingUtilsRenderer)
 
 const dialog = useDialog()
 const message = useMessage()

@@ -38,7 +38,7 @@ import { NIcon } from 'naive-ui'
 
 const { t } = useTranslation()
 
-const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const wm = useInstance(WindowManagerRenderer)
 const aws = useAuxWindowStore()
 
 const handleClose = () => {

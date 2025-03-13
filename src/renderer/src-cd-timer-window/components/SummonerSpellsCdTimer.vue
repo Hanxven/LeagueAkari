@@ -61,7 +61,7 @@ import TimerItem from './TimerItem.vue'
 const lcs = useLeagueClientStore()
 const ctws = useCdTimerWindowStore()
 
-const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const wm = useInstance(WindowManagerRenderer)
 
 const createEmptyTimer = (count: number) => {
   return Array.from({ length: count }, (_, i) => ({

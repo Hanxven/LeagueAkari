@@ -64,8 +64,8 @@ const emits = defineEmits<{
 
 const { t } = useTranslation()
 
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
-const sgp = useInstance<SgpRenderer>('sgp-renderer')
+const lc = useInstance(LeagueClientRenderer)
+const sgp = useInstance(SgpRenderer)
 const sgps = useSgpStore()
 const lcs = useLeagueClientStore()
 

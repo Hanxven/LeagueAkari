@@ -280,7 +280,7 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
-const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
+const og = useInstance(OngoingGameRenderer)
 const sgps = useSgpStore()
 </script>
 

@@ -130,7 +130,7 @@ const mhs = useMatchHistoryTabsStore()
 const sgps = useSgpStore()
 const ogs = useOngoingGameStore()
 const lcs = useLeagueClientStore()
-const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
+const mh = useInstance(MatchHistoryTabsRenderer)
 
 const scrollBarEl = useTemplateRef('scrollbar')
 const handleWheel = (e: WheelEvent) => {

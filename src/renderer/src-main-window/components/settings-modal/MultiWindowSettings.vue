@@ -280,7 +280,7 @@ const ows = useOpggWindowStore()
 const ogws = useOngoingGameWindowStore()
 const ctws = useCdTimerWindowStore()
 
-const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const wm = useInstance(WindowManagerRenderer)
 </script>
 
 <style lang="less" scoped>

@@ -20,7 +20,7 @@ import { computed } from 'vue'
 
 const { t } = useTranslation()
 
-const ci = useInstance<ClientInstallationRenderer>('client-installation-renderer')
+const ci = useInstance(ClientInstallationRenderer)
 const cis = useClientInstallationStore()
 
 const message = useMessage()

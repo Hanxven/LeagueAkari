@@ -85,7 +85,7 @@ const { t } = useTranslation()
 
 // 交通灯按钮
 const mws = useMainWindowStore()
-const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
+const wm = useInstance(WindowManagerRenderer)
 
 const handleMinimize = async () => {
   await wm.mainWindow.minimize()

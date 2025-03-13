@@ -284,11 +284,11 @@ const as = useAppCommonStore()
 const muis = useMainWindowUiStore()
 const mws = useMainWindowStore()
 
-const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
-const wm = useInstance<WindowManagerRenderer>('window-manager-renderer')
-const app = useInstance<AppCommonRenderer>('app-common-renderer')
-const lcu = useInstance<LeagueClientUxRenderer>('league-client-ux-renderer')
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const su = useInstance(SelfUpdateRenderer)
+const wm = useInstance(WindowManagerRenderer)
+const app = useInstance(AppCommonRenderer)
+const lcu = useInstance(LeagueClientUxRenderer)
+const lc = useInstance(LeagueClientRenderer)
 
 const preferMica = useMicaAvailability()
 

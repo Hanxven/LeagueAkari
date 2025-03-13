@@ -59,9 +59,9 @@ const muis = useMainWindowUiStore()
 const sus = useSelfUpdateStore()
 const as = useAppCommonStore()
 
-const su = useInstance<SelfUpdateRenderer>('self-update-renderer')
-const og = useInstance<OngoingGameRenderer>('ongoing-game-renderer')
-const app = useInstance<AppCommonRenderer>('app-common-renderer')
+const su = useInstance(SelfUpdateRenderer)
+const og = useInstance(OngoingGameRenderer)
+const app = useInstance(AppCommonRenderer)
 
 const { t } = useTranslation()
 

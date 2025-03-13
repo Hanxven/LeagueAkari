@@ -291,7 +291,7 @@ import {
 import { computed } from 'vue'
 
 const store = useAutoGameflowStore()
-const shard = useInstance<AutoGameflowRenderer>('auto-gameflow-renderer')
+const shard = useInstance(AutoGameflowRenderer)
 
 const invitationStrategiesPopselectArray = computed(() => {
   return Object.keys(store.settings.invitationHandlingStrategies)

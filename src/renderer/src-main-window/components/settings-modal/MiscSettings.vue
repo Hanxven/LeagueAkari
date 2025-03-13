@@ -46,7 +46,7 @@ const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const rts = useRespawnTimerStore()
-const rt = useInstance<RespawnTimerRenderer>('respawn-timer-renderer')
+const rt = useInstance(RespawnTimerRenderer)
 </script>
 
 <style lang="less" scoped>

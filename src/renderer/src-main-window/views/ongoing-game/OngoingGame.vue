@@ -24,7 +24,7 @@ import { reactive, ref } from 'vue'
 
 import { MatchHistoryTabsRenderer } from '@main-window/shards/match-history-tabs'
 
-const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
+const mh = useInstance(MatchHistoryTabsRenderer)
 
 const { navigateToTabByPuuid } = mh.useNavigateToTab()
 

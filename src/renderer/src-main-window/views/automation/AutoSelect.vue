@@ -303,7 +303,7 @@ import OrderedChampionList from '@main-window/components/OrderedChampionList.vue
 const { t } = useTranslation()
 
 const store = useAutoSelectStore()
-const as = useInstance<AutoSelectRenderer>('auto-select-renderer')
+const as = useInstance(AutoSelectRenderer)
 
 const roles = computed(() => {
   return [

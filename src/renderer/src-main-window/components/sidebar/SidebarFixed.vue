@@ -155,8 +155,8 @@ const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
 const rts = useRespawnTimerStore()
 
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
-const mh = useInstance<MatchHistoryTabsRenderer>('match-history-tabs-renderer')
+const lc = useInstance(LeagueClientRenderer)
+const mh = useInstance(MatchHistoryTabsRenderer)
 
 const formattedCountdown = computed(() => {
   const seconds = rts.info.timeLeft

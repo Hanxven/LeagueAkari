@@ -138,7 +138,7 @@ import { useChampionNameMatch } from '@main-window/compositions/useChampionNameM
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
-const lc = useInstance<LeagueClientRenderer>('league-client-renderer')
+const lc = useInstance(LeagueClientRenderer)
 
 const { match: isNameMatch } = useChampionNameMatch()
 
