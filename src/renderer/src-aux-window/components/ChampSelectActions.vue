@@ -11,25 +11,33 @@
         </template>
         <template v-if="a[0].completed">
           <div class="solution completed" v-if="a[0].type === 'pick'">
-            <LcuImage class="image" :src="championIconUri(a[0].championId)" />
+            <ChampionIcon class="image" :stretched="false" :champion-id="a[0].championId" />
             <span class="label">{{ t('ChampSelectActions.picked') }}</span>
           </div>
           <div class="solution completed" v-else-if="a[0].type === 'vote'">
-            <LcuImage class="image" :src="championIconUri(a[0].championId)" />
+            <ChampionIcon class="image" :stretched="false" :champion-id="a[0].championId" />
             <span class="label">{{ t('ChampSelectActions.voted') }}</span>
           </div>
           <div class="solution completed" v-else-if="a[0].type === 'ban'">
-            <LcuImage class="image" :src="championIconUri(a[0].championId)" />
+            <ChampionIcon class="image" :stretched="false" :champion-id="a[0].championId" />
             <span class="label">{{ t('ChampSelectActions.banned') }}</span>
           </div>
         </template>
         <template v-else>
           <div class="solution" v-if="as2.targetPick && as2.targetPick.action.id === a[0].id">
-            <LcuImage class="image" :src="championIconUri(as2.targetPick.championId)" />
+            <ChampionIcon
+              class="image"
+              :stretched="false"
+              :champion-id="as2.targetPick.championId"
+            />
             <span class="label">{{ t('ChampSelectActions.autoPick') }}</span>
           </div>
           <div class="solution" v-if="as2.targetBan && as2.targetBan.action.id === a[0].id">
-            <LcuImage class="image" :src="championIconUri(as2.targetBan.championId)" />
+            <ChampionIcon
+              class="image"
+              :stretched="false"
+              :champion-id="as2.targetBan.championId"
+            />
             <span class="label">{{ t('ChampSelectActions.autoBan') }}</span>
           </div>
         </template>
@@ -39,10 +47,9 @@
 </template>
 
 <script setup lang="ts">
-import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Action } from '@shared/types/league-client/champ-select'
 import { useTranslation } from 'i18next-vue'
 import { NCard, NTimeline, NTimelineItem } from 'naive-ui'

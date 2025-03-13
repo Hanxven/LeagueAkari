@@ -57,10 +57,11 @@
                 >
                   <Transition name="fade" mode="out-in">
                     <NSpin v-if="tabLoadingStateMap[tab.id]" :size="12" class="tab-icon" />
-                    <LcuImage
+                    <ChampionIcon
                       class="tab-icon"
                       v-else-if="ogs.championSelections && ogs.championSelections[tab.puuid]"
-                      :src="championIconUri(ogs.championSelections[tab.puuid])"
+                      :stretched="false"
+                      :champion-id="ogs.championSelections[tab.puuid]"
                     />
                     <LcuImage
                       class="tab-icon"
@@ -106,9 +107,10 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
+import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'

@@ -35,7 +35,7 @@
                 })
               })
             }}</span>
-            <LcuImage class="image" :src="championIconUri(e.championId)" />
+            <ChampionIcon class="image" :stretched="false" :champion-id="e.championId" />
           </div>
           <div class="solution" v-else-if="e.type === 'trade'">
             <span class="action">
@@ -52,8 +52,8 @@
                 })
               }}
             </span>
-            <LcuImage class="image" :src="championIconUri(e.champion1Id)" />
-            <LcuImage class="image" :src="championIconUri(e.champion2Id)" />
+            <ChampionIcon class="image" :stretched="false" :champion-id="e.champion1Id" />
+            <ChampionIcon class="image" :stretched="false" :champion-id="e.champion2Id" />
           </div>
           <div class="solution" v-else-if="e.type === 'swap'">
             <span class="action">
@@ -66,7 +66,7 @@
                 })
               }}
             </span>
-            <LcuImage class="image" :src="championIconUri(e.championId)" />
+            <ChampionIcon class="image" :stretched="false" :champion-id="e.championId" />
           </div>
         </NTimelineItem>
       </NTimeline>
@@ -76,9 +76,9 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import {
   CircleRegular as CircleRegularIcon,
   Dice as DiceIcon,
