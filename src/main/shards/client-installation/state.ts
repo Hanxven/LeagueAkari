@@ -27,6 +27,8 @@ export class ClientInstallationState {
    */
   officialRiotClientExecutablePath: string | null = null
 
+  detectedLiveStreamingClients: string[] = []
+
   setLeagueClientExecutablePaths(clients: string[]) {
     this.leagueClientExecutablePaths = clients
   }
@@ -51,9 +53,14 @@ export class ClientInstallationState {
     this.hasWeGameLauncher = has
   }
 
+  setDetectedLiveStreamingClients(clients: string[]) {
+    this.detectedLiveStreamingClients = clients
+  }
+
   constructor() {
     makeAutoObservable(this, {
-      leagueClientExecutablePaths: observable.struct
+      leagueClientExecutablePaths: observable.struct,
+      detectedLiveStreamingClients: observable.struct,
     })
   }
 }

@@ -347,11 +347,11 @@ MiscSettings:
       description: 在侧边栏展示一个距离重生剩余时间的指示器
 
   streamerMode:
-    title: 主播模式
+    title: 直播模式
 
     enabled:
       label: 启用
-      description: 启用主播模式，将隐藏所有敏感信息 (玩家 ID，区服等)
+      description: 启用直播模式，将隐藏所有敏感信息 (玩家 ID，区服等)
 
 DebugSettings:
   title: 调试
@@ -1954,6 +1954,15 @@ BenchChampionTracker:
   useReroll: '{{player}} 使用了一个骰子'
   tradeWithPlayer: '{{player1}} 与 {{player2}} 交换'
   swapFromBench: '{{player}} 从备选区拿取'
+
+useLiveStreamingHints:
+  dismiss: 关闭
+  neverShowAgain: 不再显示
+  toSettings: 到设置项
+
+  liveStreamingDetected:
+    title: 在直播吗？
+    hintToStreamerModeSettings: League Akari 检测到一个或多个直播工具正在运行。您可以启用主播模式以隐藏敏感信息
 
 tray:
   quit: 退出

@@ -25,7 +25,7 @@
         }"
       ></div>
     </Transition>
-    <MainWindowTitleBar v-if="!isOverlay" />
+    <MainWindowTitleBar />
     <div id="app-content"><RouterView /></div>
   </div>
 </template>
@@ -42,15 +42,15 @@ import { greeting } from '@renderer-shared/utils/greeting'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { useTranslation } from 'i18next-vue'
 import { useMessage, useNotification } from 'naive-ui'
-import { computed, provide, ref, watchEffect } from 'vue'
+import { provide, ref, watchEffect } from 'vue'
 import { h } from 'vue'
-import { useRoute } from 'vue-router'
 
 import AnnouncementModal from './components/AnnouncementModal.vue'
 import DeclarationModal from './components/DeclarationModal.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
+import { useLiveStreamingHints } from './compositions/useLiveStreamingHints'
 import { useMicaAvailability } from './compositions/useMicaAvailability'
 import { useMainWindowUiStore } from './shards/main-window-ui/store'
 
@@ -65,11 +65,9 @@ const app = useInstance(AppCommonRenderer)
 
 const { t } = useTranslation()
 
-const route = useRoute()
-
 greeting(as.version)
 
-provide('app', {
+const appInject = {
   openSettingsModal: (tabName?: string) => {
     isShowingSettingModal.value = true
     if (tabName) {
@@ -87,7 +85,9 @@ provide('app', {
   openAnnouncementModal: () => {
     isShowingAnnouncementModal.value = true
   }
-})
+}
+
+provide('app', appInject)
 
 const notification = useNotification()
 
@@ -97,17 +97,6 @@ const isShowingNewUpdateModal = ref(false)
 const isShowingNewUpdate = ref(false)
 const isShowingFreeSoftwareDeclaration = ref(false)
 const isShowingAnnouncementModal = ref(false)
-
-const isOverlay = computed(() => {
-  if (route.name !== 'ongoing-game') {
-    return false
-  }
-  const mode = route.params.mode as string
-  if (!mode) {
-    return false
-  }
-  return true
-})
 
 watchEffect(() => {
   if (as.settings.showFreeSoftwareDeclaration) {
@@ -202,6 +191,12 @@ useKeyboardCombo('AKARI', {
 const preferMica = useMicaAvailability()
 
 og.setupAutoRouteWhenGameStarts()
+
+useLiveStreamingHints({
+  onToSettings: () => {
+    appInject.openSettingsModal('misc')
+  }
+})
 </script>
 
 <style lang="less">

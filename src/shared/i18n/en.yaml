@@ -1951,6 +1951,15 @@ BenchChampionTracker:
   tradeWithPlayer: '{{player1}} traded with {{player2}}'
   swapFromBench: '{{player}} swapped from the bench'
 
+useLiveStreamingHints:
+  dismiss: Dismiss
+  neverShowAgain: Never Show Again
+  toSettings: To Settings
+
+  liveStreamingDetected:
+    title: Are you live streaming?
+    hintToStreamerModeSettings: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
+
 tray:
   quit: Quit
   auxWindow: Aux Window

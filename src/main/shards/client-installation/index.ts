@@ -1,3 +1,4 @@
+import { tools } from '@hanxven/league-akari-addons'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import cp from 'node:child_process'
 import fs from 'node:fs'
@@ -9,6 +10,8 @@ import RES_POSITIONER from '../../../../resources/AKARI?asset&asarUnpack'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
+import { SettingFactoryMain } from '../setting-factory'
+import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { ClientInstallationState } from './state'
 
 const execAsync = util.promisify(cp.exec)
@@ -16,17 +19,31 @@ const execAsync = util.promisify(cp.exec)
 regedit.setExternalVBSLocation(path.resolve(RES_POSITIONER, '..', 'regedit-vbs'))
 
 /**
- * 以各种方式搜索不同目标的安装位置, 这是必要的情报收集操作
+ * 情报搜集模块
  */
 export class ClientInstallationMain implements IAkariShardInitDispose {
   static id = 'client-installation-main'
-  static dependencies = ['akari-ipc-main', 'logger-factory-main', 'mobx-utils-main']
+  static dependencies = [AkariIpcMain.id, LoggerFactoryMain.id, MobxUtilsMain.id]
 
-  static TENCENT_REG_INSTALL_PATH = 'HKCU\\Software\\Tencent\\LOL'
-  static TENCENT_REG_INSTALL_VALUE = 'InstallPath'
-  static TENCENT_INSTALL_DIRNAME = 'WeGameApps'
-  static TENCENT_LOL_DIRNAME = '英雄联盟'
-  static WEGAME_DEFAULTICON_PATH = 'HKCU\\wegame\\DefaultIcon' // 这个 key 代表了 WeGame 的图标, 间接代表了安装位置
+  static readonly TENCENT_REG_INSTALL_PATH = 'HKCU\\Software\\Tencent\\LOL'
+  static readonly TENCENT_REG_INSTALL_VALUE = 'InstallPath'
+  static readonly TENCENT_INSTALL_DIRNAME = 'WeGameApps'
+  static readonly TENCENT_LOL_DIRNAME = '英雄联盟'
+  static readonly WEGAME_DEFAULTICON_PATH = 'HKCU\\wegame\\DefaultIcon' // 这个 key 代表了 WeGame 的图标, 间接代表了安装位置
+
+  static readonly LIVE_STREAMING_CLIENTS = [
+    'obs32.exe',
+    'obs64.exe',
+    'obs.exe',
+    'xsplit.core.exe',
+    'livehime.exe',
+    'pandatool.exe',
+    'yymixer.exe',
+    'douyutool.exe',
+    'huomaotool.exe'
+  ]
+
+  static readonly LIVE_STREAMING_CLIENT_POLL_INTERVAL = 20 * 60 * 1000
 
   public readonly state = new ClientInstallationState()
 
@@ -35,11 +52,13 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _mobx: MobxUtilsMain
 
+  private _liveStreamingTimer: NodeJS.Timeout | null = null
+
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-main']
-    this._loggerFactory = deps['logger-factory-main']
+    this._ipc = deps[AkariIpcMain.id]
+    this._loggerFactory = deps[LoggerFactoryMain.id]
     this._log = this._loggerFactory.create(ClientInstallationMain.id)
-    this._mobx = deps['mobx-utils-main']
+    this._mobx = deps[MobxUtilsMain.id]
   }
 
   async onInit() {
@@ -48,6 +67,12 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     this._updateTencentPathsByReg()
     this._updateTencentPathsByFile()
     this._updateLeagueClientInstallationByFile()
+
+    this._updateLiveStreamingClientsRunningInfo()
+    this._liveStreamingTimer = setInterval(
+      () => this._updateLiveStreamingClientsRunningInfo(),
+      ClientInstallationMain.LIVE_STREAMING_CLIENT_POLL_INTERVAL
+    )
   }
 
   private async _handleState() {
@@ -57,7 +82,8 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       'weGameExecutablePath',
       'officialRiotClientExecutablePath',
       'hasTcls',
-      'hasWeGameLauncher'
+      'hasWeGameLauncher',
+      'detectedLiveStreamingClients'
     ])
   }
 
@@ -264,6 +290,22 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     }
   }
 
+  /**
+   * try being a spyware 👁️👁️
+   */
+  private _updateLiveStreamingClientsRunningInfo() {
+    const result: string[] = []
+
+    for (const client of ClientInstallationMain.LIVE_STREAMING_CLIENTS) {
+      const r = tools.getPidsByName(client)
+      if (r.length) {
+        result.push(client)
+      }
+    }
+
+    this.state.setDetectedLiveStreamingClients(result)
+  }
+
   private _handleIpcCall() {
     this._ipc.onCall(ClientInstallationMain.id, 'launchTencentTcls', async () => {
       await this._launchTencentTcls()
@@ -320,5 +362,11 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
       `"${this.state.officialRiotClientExecutablePath}" --launch-product=league_of_legends --launch-patchline=live`,
       { shell: 'cmd' }
     )
+  }
+
+  async onDispose() {
+    if (this._liveStreamingTimer) {
+      clearInterval(this._liveStreamingTimer)
+    }
   }
 }
