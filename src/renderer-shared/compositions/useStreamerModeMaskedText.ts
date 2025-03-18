@@ -6,17 +6,9 @@ export function useStreamerModeMaskedText() {
   const app = useAppCommonStore()
   const { t } = useTranslation()
 
-  const summonerName = (index: number) => {
+  const summonerName = (seed: string, index: number) => {
     if (app.frontendSettings.streamerModeUseAkariStyledName) {
-      const name = getNameFromYuriyuri(index, app.settings.locale)
-
-      if (name) {
-        return name
-      }
-
-      return t('common.summonerPlaceholder', {
-        index: index + 1
-      })
+      return getNameFromYuriyuri(seed, app.settings.locale)
     }
 
     return t('common.summonerPlaceholder', { index: index + 1 })

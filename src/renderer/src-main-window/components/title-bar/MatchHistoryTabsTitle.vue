@@ -78,7 +78,7 @@
                   <StreamerModeMaskedText>
                     <template #masked>
                       <div class="summoner-name">
-                        <span class="game-name-line">{{ summonerName(index) }}</span>
+                        <span class="game-name-line">{{ summonerName(tab.puuid, index) }}</span>
                       </div>
                     </template>
                     <div class="summoner-name">

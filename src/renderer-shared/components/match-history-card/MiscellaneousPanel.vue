@@ -358,7 +358,7 @@ const columns = computed(() => {
                   participantInfoMap.value[p.participantId].summonerName,
                 participantInfoMap.value[p.participantId].tagLine
               ),
-              maskedSummonerName(index)
+              maskedSummonerName(participantInfoMap.value[p.participantId].puuid, index)
             )
           )
         ])

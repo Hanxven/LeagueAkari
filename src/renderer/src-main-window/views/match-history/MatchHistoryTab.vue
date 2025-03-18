@@ -92,7 +92,7 @@
               <div class="game-name-line">
                 <StreamerModeMaskedText>
                   <template #masked>
-                    <span class="game-name">{{ maskedSummonerName(index) }}</span>
+                    <span class="game-name">{{ maskedSummonerName(tab.puuid, index) }}</span>
                   </template>
                   <CopyableText
                     class="game-name"
@@ -497,7 +497,9 @@
                   >
                     <StreamerModeMaskedText>
                       <template #masked>
-                        <span class="game-name-line">{{ maskedSummonerName(index) }}</span>
+                        <span class="game-name-line">{{
+                          maskedSummonerName(p.targetPuuid, index)
+                        }}</span>
                       </template>
                       <span class="game-name-line">{{ p.targetGameName }}</span>
                       <span class="tag-line">#{{ p.targetTagLine }}</span>
@@ -533,7 +535,10 @@
                     <StreamerModeMaskedText>
                       <template #masked>
                         <span class="game-name-line">{{
-                          maskedSummonerName(index + recentlyPlayers.teammates.length)
+                          maskedSummonerName(
+                            p.targetPuuid,
+                            index + recentlyPlayers.teammates.length
+                          )
                         }}</span>
                       </template>
                       <span class="game-name-line">{{ p.targetGameName }}</span>

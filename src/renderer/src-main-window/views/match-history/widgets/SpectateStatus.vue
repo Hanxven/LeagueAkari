@@ -112,7 +112,7 @@
             >
               <StreamerModeMaskedText>
                 <template #masked>
-                  <span class="name">{{ summonerName(index) }}</span>
+                  <span class="name">{{ summonerName(player.puuid, index) }}</span>
                 </template>
                 <span class="name">{{
                   updatedSummonerInfo[player.puuid]
