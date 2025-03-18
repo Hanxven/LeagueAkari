@@ -28,7 +28,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
 
   const frontendSettings = shallowReactive({
     streamerMode: false,
-    streamerModeUseAkariStyledName: true, // ok, let's use this
+    streamerModeUseAkariStyledName: false, // ok, let's use this
   })
 
   const version = ref('0.0.0')

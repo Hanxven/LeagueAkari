@@ -50,7 +50,7 @@
                   >{{
                     masked(
                       summoner?.gameName || summoner?.displayName || '—',
-                      lcs.gameData.champions[championId || -1]?.name || '—'
+                      name(championId || -1)
                     )
                   }}</span
                 >
@@ -454,6 +454,7 @@ import {
   RANKED_MEDAL_MAP
 } from './ongoing-game-utils'
 import TagsArea from './widgets/TagsArea.vue'
+import { useChampionInfo } from '@renderer-shared/compositions/useChampionInfo'
 
 const {
   puuid,
@@ -790,6 +791,7 @@ const matches = computed(() => {
 })
 
 const { masked } = useStreamerModeMaskedText()
+const { name } = useChampionInfo()
 </script>
 
 <style lang="less" scoped>
