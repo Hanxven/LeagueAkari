@@ -97,6 +97,11 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     )
 
     await this._setting.savedPropVue(AppCommonRenderer.id, store.frontendSettings, 'streamerMode')
+    await this._setting.savedPropVue(
+      AppCommonRenderer.id,
+      store.frontendSettings,
+      'streamerModeUseAkariStyledName'
+    )
 
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)

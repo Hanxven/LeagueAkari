@@ -3,9 +3,9 @@
     <NModal size="small" v-model:show="isModalShow">
       <MiscellaneousPanel :game="game" />
     </NModal>
-    <DefineSubTeam v-slot="{ participants, mode, index }">
+    <DefineSubTeam v-slot="{ participants, mode }">
       <div class="sub-team" :class="{ 'only-one-team': isOnlyOneTeam }" v-if="participants?.length">
-        <div class="player" v-for="(p, innerIndex) of participants" :key="p.participantId">
+        <div class="player" v-for="p of participants" :key="p.participantId">
           <LcuImage
             class="image"
             :src="championIconUri(p.championId)"
@@ -18,9 +18,7 @@
                   p.identity.player.gameName || p.identity.player.summonerName,
                   p.identity.player.tagLine
                 ),
-                t('common.summonerPlaceholder', {
-                  index: index * participants.length + innerIndex + 1
-                })
+                name(p.championId)
               )
             "
             class="name"
@@ -35,9 +33,7 @@
                   p.identity.player.gameName || p.identity.player.summonerName,
                   p.identity.player.tagLine
                 ),
-                t('common.summonerPlaceholder', {
-                  index: index * participants.length + innerIndex + 1
-                })
+                name(p.championId)
               )
             }}
           </div>
@@ -295,6 +291,7 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useChampionInfo } from '@renderer-shared/compositions/useChampionInfo'
 import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -539,6 +536,8 @@ const handleToggleShowDetailedGame = () => {
   }
   emits('setShowDetailedGame', props.game.gameId, !props.isExpanded)
 }
+
+const { name } = useChampionInfo()
 </script>
 
 <style lang="less" scoped>

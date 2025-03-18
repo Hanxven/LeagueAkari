@@ -112,11 +112,7 @@
             >
               <StreamerModeMaskedText>
                 <template #masked>
-                  <span class="name">{{
-                    t('common.summonerPlaceholder', {
-                      index: index + 1
-                    })
-                  }}</span>
+                  <span class="name">{{ summonerName(index) }}</span>
                 </template>
                 <span class="name">{{
                   updatedSummonerInfo[player.puuid]
@@ -168,6 +164,7 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -368,6 +365,8 @@ const handleCopyToken = () => {
       message.error(t('SpectateStatus.tokenSpectate.copyFailed'))
     })
 }
+
+const { summonerName } = useStreamerModeMaskedText()
 </script>
 
 <style lang="less" scoped>

@@ -350,6 +350,10 @@ MiscSettings:
       label: Enable
       description: Hide sensitive information, such as the player's name, in the application interface.
 
+    useAkariStyledName:
+      label: Use Akari-Styled Name
+      description: Use the Akari-styled names in summoner placeholder.
+
 DebugSettings:
   title: Debug
 
@@ -1959,6 +1963,9 @@ useLiveStreamingHints:
   liveStreamingDetected:
     title: Are you live streaming?
     hintToStreamerModeSettings: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
+
+champions:
+  bravery: Bravery
 
 tray:
   quit: Quit

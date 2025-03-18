@@ -1,7 +1,26 @@
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
+import { getNameFromYuriyuri } from '@shared/utils/yuriyuri-names'
+import { useTranslation } from 'i18next-vue'
 
 export function useStreamerModeMaskedText() {
   const app = useAppCommonStore()
+  const { t } = useTranslation()
+
+  const summonerName = (index: number) => {
+    if (app.frontendSettings.streamerModeUseAkariStyledName) {
+      const name = getNameFromYuriyuri(index, app.settings.locale)
+
+      if (name) {
+        return name
+      }
+
+      return t('common.summonerPlaceholder', {
+        index: index + 1
+      })
+    }
+
+    return t('common.summonerPlaceholder', { index: index + 1 })
+  }
 
   /**
    * 将敏感文本替换为星号 (或自定义的字符串)
@@ -23,5 +42,5 @@ export function useStreamerModeMaskedText() {
     }
   }
 
-  return { masked }
+  return { masked, summonerName }
 }

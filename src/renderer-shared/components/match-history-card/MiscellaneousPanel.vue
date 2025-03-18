@@ -98,7 +98,7 @@ const hasBan = computed(() => {
 
 const lcs = useLeagueClientStore()
 
-const { masked } = useStreamerModeMaskedText()
+const { masked, summonerName: maskedSummonerName } = useStreamerModeMaskedText()
 
 const RESERVED_COLUMN_WIDTH = 120
 
@@ -358,7 +358,7 @@ const columns = computed(() => {
                   participantInfoMap.value[p.participantId].summonerName,
                 participantInfoMap.value[p.participantId].tagLine
               ),
-              t('common.summonerPlaceholder', { index: index + 1 })
+              maskedSummonerName(index)
             )
           )
         ])

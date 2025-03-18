@@ -38,7 +38,8 @@
     "Unconfigured",
     "UNRANKED",
     "unspectatable",
-    "writability"
+    "writability",
+    "Yuriyuri"
   ],
   "files.associations": {
     "*.sqlbook": "sql",

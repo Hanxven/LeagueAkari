@@ -1,6 +1,6 @@
 <template>
   <div class="detailed-game-card">
-    <DefineDetailedTable v-slot="{ participants, aggregateTeamStats, index }">
+    <DefineDetailedTable v-slot="{ participants, aggregateTeamStats }">
       <table
         class="team"
         :class="{
@@ -29,7 +29,7 @@
           <tr
             class="participant"
             :class="{ self: p.isSelf }"
-            v-for="(p, innerIndex) of participants"
+            v-for="p of participants"
             :key="p.identity.player.puuid"
           >
             <td style="min-width: 100px">
@@ -50,9 +50,7 @@
                           p.identity.player.gameName || p.identity.player.summonerName,
                           p.identity.player.tagLine
                         ),
-                        t('common.summonerPlaceholder', {
-                          index: index * participants.length + innerIndex + 1
-                        })
+                        name(p.championId)
                       )
                     "
                     class="name"
@@ -67,9 +65,7 @@
                           p.identity.player.gameName || p.identity.player.summonerName,
                           p.identity.player.tagLine
                         ),
-                        t('common.summonerPlaceholder', {
-                          index: index * participants.length + innerIndex + 1
-                        })
+                        name(p.championId)
                       )
                     }}
                   </div>
@@ -165,6 +161,7 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useChampionInfo } from '@renderer-shared/compositions/useChampionInfo'
 import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
@@ -287,6 +284,7 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
 }
 
 const { masked } = useStreamerModeMaskedText()
+const { name } = useChampionInfo()
 </script>
 
 <style lang="less" scoped>

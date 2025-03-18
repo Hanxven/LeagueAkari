@@ -353,6 +353,10 @@ MiscSettings:
       label: 启用
       description: 启用直播模式，将隐藏所有敏感信息 (玩家 ID，区服等)
 
+    useAkariStyledName:
+      label: 使用 Akari 风格的名字
+      description: 使用 Akari 风格的占位名字
+
 DebugSettings:
   title: 调试
 
@@ -489,7 +493,7 @@ TaggedPlayers:
   editButton: 编辑
   deleteButton: 删除
 
-  streamerModeWarning: 将暴露敏感信息
+  streamerModeWarning: 当前位于直播模式，将暴露敏感信息
   showButton: 显示
 
   deletePopconfirmContent: 确认删除？此操作无法恢复
@@ -787,7 +791,7 @@ MatchHistoryTabsTitle:
   closeOthers: 关闭其他页面
   closeToTheRight: 关闭右侧页面
   screenshot: 截图当前页面
-  searchButtonStreamerModeWarning: 搜索玩家将暴露敏感信息，是否继续？
+  searchButtonStreamerModeWarning: 当前位于直播模式，搜索玩家将暴露敏感信息，是否继续？
 
 SearchSummonerModal:
   title: 召唤师搜索
@@ -1963,6 +1967,9 @@ useLiveStreamingHints:
   liveStreamingDetected:
     title: 在直播吗？
     hintToStreamerModeSettings: League Akari 检测到一个或多个直播工具正在运行。您可以启用主播模式以隐藏敏感信息
+
+champions:
+  bravery: 勇敢举动
 
 tray:
   quit: 退出

@@ -29,6 +29,19 @@
       >
         <NSwitch size="small" v-model:value="as.frontendSettings.streamerMode" />
       </ControlItem>
+      <NCollapseTransition :show="as.frontendSettings.streamerMode">
+        <ControlItem
+          class="control-item-margin"
+          :label="t('MiscSettings.streamerMode.useAkariStyledName.label')"
+          :label-description="t('MiscSettings.streamerMode.useAkariStyledName.description')"
+          :label-width="400"
+        >
+          <NSwitch
+            size="small"
+            v-model:value="as.frontendSettings.streamerModeUseAkariStyledName"
+          />
+        </ControlItem>
+      </NCollapseTransition>
     </NCard>
   </NScrollbar>
 </template>
@@ -40,7 +53,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { RespawnTimerRenderer } from '@renderer-shared/shards/respawn-timer'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NScrollbar, NSwitch } from 'naive-ui'
+import { NCard, NCollapseTransition, NScrollbar, NSwitch } from 'naive-ui'
 
 const { t } = useTranslation()
 

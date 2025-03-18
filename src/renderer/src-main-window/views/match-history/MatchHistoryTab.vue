@@ -92,11 +92,7 @@
               <div class="game-name-line">
                 <StreamerModeMaskedText>
                   <template #masked>
-                    <span class="game-name">{{
-                      t('common.summonerPlaceholder', {
-                        index: index + 1
-                      })
-                    }}</span>
+                    <span class="game-name">{{ maskedSummonerName(index) }}</span>
                   </template>
                   <CopyableText
                     class="game-name"
@@ -501,11 +497,7 @@
                   >
                     <StreamerModeMaskedText>
                       <template #masked>
-                        <span class="game-name-line">{{
-                          t('common.summonerPlaceholder', {
-                            index: index + 1
-                          })
-                        }}</span>
+                        <span class="game-name-line">{{ maskedSummonerName(index) }}</span>
                       </template>
                       <span class="game-name-line">{{ p.targetGameName }}</span>
                       <span class="tag-line">#{{ p.targetTagLine }}</span>
@@ -541,9 +533,7 @@
                     <StreamerModeMaskedText>
                       <template #masked>
                         <span class="game-name-line">{{
-                          t('common.summonerPlaceholder', {
-                            index: index + 1
-                          })
+                          maskedSummonerName(index + recentlyPlayers.teammates.length)
                         }}</span>
                       </template>
                       <span class="game-name-line">{{ p.targetGameName }}</span>
@@ -590,9 +580,10 @@
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import MatchHistoryCard from '@renderer-shared/components/match-history-card/MatchHistoryCard.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -1490,6 +1481,8 @@ const handleStalk = () => {
     ps.addPlayer(tab.puuid, tab.sgpServerId)
   }
 }
+
+const { summonerName: maskedSummonerName } = useStreamerModeMaskedText()
 
 defineExpose({
   id: tab.id,

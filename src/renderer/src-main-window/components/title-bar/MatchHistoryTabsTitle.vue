@@ -78,9 +78,7 @@
                   <StreamerModeMaskedText>
                     <template #masked>
                       <div class="summoner-name">
-                        <span class="game-name-line">{{
-                          t('common.summonerPlaceholder', { index: index + 1 })
-                        }}</span>
+                        <span class="game-name-line">{{ summonerName(index) }}</span>
                       </div>
                     </template>
                     <div class="summoner-name">
@@ -139,6 +137,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -431,6 +430,8 @@ const handleShowSearchSummonerModalInPopconfirm = () => {
   searchSummonerModalShow.value = true
   warningShown = true
 }
+
+const { summonerName } = useStreamerModeMaskedText()
 </script>
 
 <style lang="less" scoped>
