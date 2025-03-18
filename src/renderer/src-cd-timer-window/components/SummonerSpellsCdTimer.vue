@@ -116,14 +116,6 @@ const items = computed(() => {
     return createEmptyTimer(5)
   }
 
-  if (
-    !ctws.supportedGameModes.some(
-      (mode) => mode.gameMode === lcs.gameflow.session?.gameData.queue.gameMode
-    )
-  ) {
-    return createEmptyTimer(5)
-  }
-
   const selfPuuid = lcs.summoner.me.puuid
   // 注意到, playerChampionSelections 中提供的列表的顺序是按照阵营排序好的
   // 因此在目前缺少必要的字段以区分阵营时, 只能通过这些数据来实现阵营判断
@@ -141,6 +133,10 @@ const items = computed(() => {
     // able to distinguish by puuid field
     const otherTeam = teamOne.some((player) => player.puuid === selfPuuid) ? teamTwo : teamOne
 
+    if (!otherTeam.length) {
+      return createEmptyTimer(5)
+    }
+
     const theirTeamSelections = selections.filter((player) =>
       otherTeam.some((p) => p.puuid === player.puuid)
     )
@@ -153,6 +149,14 @@ const items = computed(() => {
       ...p
     }))
   } else {
+    if (
+      !ctws.supportedGameModes.some(
+        (mode) => mode.gameMode === lcs.gameflow.session?.gameData.queue.gameMode
+      )
+    ) {
+      return createEmptyTimer(5)
+    }
+
     // previously, it has only summonerInternalName field (which is completely useless)
     // thus we can only infer team members by championId
     if (selections.length !== 10) {

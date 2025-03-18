@@ -91,7 +91,7 @@
           </div>
         </div>
         <div class="team-players" :class="{ blue: id === 100 || id === 0, red: id === 200 }">
-          <div v-for="player in players" :key="player.puuid" class="team-player">
+          <div v-for="(player, index) in players" :key="player.puuid" class="team-player">
             <PositionIcon
               class="position-icon"
               v-if="player.selectedPosition !== 'NONE'"
@@ -110,14 +110,23 @@
               @mousedown="handleMouseDown"
               :class="{ self: player.puuid === puuid }"
             >
-              <span class="name">{{
-                updatedSummonerInfo[player.puuid]
-                  ? updatedSummonerInfo[player.puuid].gameName
-                  : player.summonerName
-              }}</span>
-              <span v-if="updatedSummonerInfo[player.puuid]" class="tag-line"
-                >#{{ updatedSummonerInfo[player.puuid].tagLine }}</span
-              >
+              <StreamerModeMaskedText>
+                <template #masked>
+                  <span class="name">{{
+                    t('common.summonerPlaceholder', {
+                      index: index + 1
+                    })
+                  }}</span>
+                </template>
+                <span class="name">{{
+                  updatedSummonerInfo[player.puuid]
+                    ? updatedSummonerInfo[player.puuid].gameName
+                    : player.summonerName
+                }}</span>
+                <span v-if="updatedSummonerInfo[player.puuid]" class="tag-line"
+                  >#{{ updatedSummonerInfo[player.puuid].tagLine }}</span
+                >
+              </StreamerModeMaskedText>
             </div>
           </div>
         </div>
@@ -157,6 +166,8 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
+import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -172,8 +183,6 @@ import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NPopover, useMessage } from 'naive-ui'
 import { computed, ref, shallowRef, watch } from 'vue'
-
-import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 
 import IndicatorPulse from './IndicatorPulse.vue'
 

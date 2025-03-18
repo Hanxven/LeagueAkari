@@ -3,9 +3,9 @@
     <NModal size="small" v-model:show="isModalShow">
       <MiscellaneousPanel :game="game" />
     </NModal>
-    <DefineSubTeam v-slot="{ participants, mode }">
+    <DefineSubTeam v-slot="{ participants, mode, index }">
       <div class="sub-team" :class="{ 'only-one-team': isOnlyOneTeam }" v-if="participants?.length">
-        <div class="player" v-for="p of participants" :key="p.participantId">
+        <div class="player" v-for="(p, innerIndex) of participants" :key="p.participantId">
           <LcuImage
             class="image"
             :src="championIconUri(p.championId)"
@@ -13,9 +13,14 @@
           />
           <div
             :title="
-              summonerName(
-                p.identity.player.gameName || p.identity.player.summonerName,
-                p.identity.player.tagLine
+              masked(
+                summonerName(
+                  p.identity.player.gameName || p.identity.player.summonerName,
+                  p.identity.player.tagLine
+                ),
+                t('common.summonerPlaceholder', {
+                  index: index * participants.length + innerIndex + 1
+                })
               )
             "
             class="name"
@@ -25,9 +30,14 @@
             @mousedown="handleMouseDown"
           >
             {{
-              summonerName(
-                p.identity.player.gameName || p.identity.player.summonerName,
-                p.identity.player.tagLine
+              masked(
+                summonerName(
+                  p.identity.player.gameName || p.identity.player.summonerName,
+                  p.identity.player.tagLine
+                ),
+                t('common.summonerPlaceholder', {
+                  index: index * participants.length + innerIndex + 1
+                })
               )
             }}
           </div>
@@ -187,21 +197,27 @@
         <template v-if="game.gameMode === 'CHERRY'">
           <div class="players-cherry" v-if="isDetailed">
             <template v-if="teams.placement0?.length">
-              <SubTeam :mode="game.gameMode" :participants="teams.placement0.slice(0, 4)" />
-              <SubTeam :mode="game.gameMode" :participants="teams.placement0.slice(4)" />
+              <SubTeam
+                :index="0"
+                :mode="game.gameMode"
+                :participants="teams.placement0.slice(0, 4)"
+              />
+              <SubTeam :index="1" :mode="game.gameMode" :participants="teams.placement0.slice(4)" />
             </template>
             <template v-else>
               <div>
-                <SubTeam :mode="game.gameMode" :participants="teams.placement1" />
+                <SubTeam :index="0" :mode="game.gameMode" :participants="teams.placement1" />
                 <SubTeam
+                  :index="1"
                   :mode="game.gameMode"
                   :participants="teams.placement2"
                   style="margin-top: 8px"
                 />
               </div>
               <div>
-                <SubTeam :mode="game.gameMode" :participants="teams.placement3" />
+                <SubTeam :index="2" :mode="game.gameMode" :participants="teams.placement3" />
                 <SubTeam
+                  :index="3"
                   :mode="game.gameMode"
                   :participants="teams.placement4"
                   style="margin-top: 8px"
@@ -212,8 +228,8 @@
         </template>
         <template v-else>
           <div class="players-normal" v-if="isDetailed">
-            <SubTeam :mode="game.gameMode" :participants="teams.team1" />
-            <SubTeam :mode="game.gameMode" :participants="teams.team2" />
+            <SubTeam :index="0" :mode="game.gameMode" :participants="teams.team1" />
+            <SubTeam :index="1" :mode="game.gameMode" :participants="teams.team2" />
           </div>
         </template>
       </div>
@@ -279,6 +295,7 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
@@ -316,9 +333,12 @@ const emits = defineEmits<{
 const [DefineSubTeam, SubTeam] = createReusableTemplate<{
   participants: (typeof teams.value)[keyof typeof teams.value]
   mode: string
+  index: number
 }>({ inheritAttrs: true })
 
 const as = useAppCommonStore()
+
+const { masked } = useStreamerModeMaskedText()
 
 // 定期更新相对时间
 const formattedGameCreationRelativeTime = ref('')

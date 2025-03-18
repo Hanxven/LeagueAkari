@@ -486,6 +486,9 @@ TaggedPlayers:
   editButton: Edit
   deleteButton: Delete
 
+  streamerModeWarning: Some sensitive information will be exposed
+  showButton: Show
+
   deletePopconfirmContent: Confirm deletion? This operation cannot be undone
   updated: Updated
   updateFailed: Update failed {{reason}}
@@ -718,6 +721,8 @@ SideBarFixed:
   noClientTitle: No Available Client
   noClient: No available client, please start the game
   settings: Settings
+  connectedClient: Connected Client
+  launchedClientPlaceholder: Launched Client {{index}}
 
   respawnTimer:
     timeLeft: Respawn in {{seconds}} s
@@ -779,6 +784,7 @@ MatchHistoryTabsTitle:
   closeOthers: Close Others
   closeToTheRight: Close to the Right
   screenshot: Screenshot Tab
+  searchButtonStreamerModeWarning: Searching for players will expose sensitive information, continue?
 
 SearchSummonerModal:
   title: Summoner Search
@@ -2016,6 +2022,9 @@ common:
   no: no
   confirm: Confirm
   na: N/A
+
+  summonerPlaceholder: Summoner {{index}}
+  summoner: Summoner
 
   lanes:
     all: None

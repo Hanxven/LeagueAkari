@@ -1,6 +1,6 @@
 <template>
   <div class="detailed-game-card">
-    <DefineDetailedTable v-slot="{ participants, aggregateTeamStats }">
+    <DefineDetailedTable v-slot="{ participants, aggregateTeamStats, index }">
       <table
         class="team"
         :class="{
@@ -29,7 +29,7 @@
           <tr
             class="participant"
             :class="{ self: p.isSelf }"
-            v-for="p of participants"
+            v-for="(p, innerIndex) of participants"
             :key="p.identity.player.puuid"
           >
             <td style="min-width: 100px">
@@ -45,9 +45,14 @@
                 <div class="name-and-rank">
                   <div
                     :title="
-                      summonerName(
-                        p.identity.player.gameName || p.identity.player.summonerName,
-                        p.identity.player.tagLine
+                      masked(
+                        summonerName(
+                          p.identity.player.gameName || p.identity.player.summonerName,
+                          p.identity.player.tagLine
+                        ),
+                        t('common.summonerPlaceholder', {
+                          index: index * participants.length + innerIndex + 1
+                        })
                       )
                     "
                     class="name"
@@ -57,9 +62,14 @@
                   >
                     {{ p.identity.player.puuid === EMPTY_PUUID ? `(${t('DetailedGame.bot')}) ` : ''
                     }}{{
-                      summonerName(
-                        p.identity.player.gameName || p.identity.player.summonerName,
-                        p.identity.player.tagLine
+                      masked(
+                        summonerName(
+                          p.identity.player.gameName || p.identity.player.summonerName,
+                          p.identity.player.tagLine
+                        ),
+                        t('common.summonerPlaceholder', {
+                          index: index * participants.length + innerIndex + 1
+                        })
                       )
                     }}
                   </div>
@@ -131,18 +141,20 @@
       </table>
     </DefineDetailedTable>
     <template v-if="match.teams.placement0.length === 0">
-      <template v-for="i of match.maxPlacement">
+      <template v-for="(place, index0) of match.maxPlacement">
         <DetailedTable
-          :participants="match.teams[`placement${i}`]"
-          :aggregate-team-stats="match.aggregateStats[`placement${i}`]"
+          :participants="match.teams[`placement${place}`]"
+          :aggregate-team-stats="match.aggregateStats[`placement${place}`]"
+          :index="index0"
         />
-        <div class="divider" v-if="i !== match.maxPlacement"></div>
+        <div class="divider" v-if="place !== match.maxPlacement"></div>
       </template>
     </template>
     <template v-else>
       <DetailedTable
         :participants="match.teams.placement0"
         :aggregate-team-stats="match.aggregateStats.placement0"
+        :index="0"
       />
     </template>
   </div>
@@ -153,6 +165,7 @@ import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { EMPTY_PUUID } from '@shared/constants/common'
@@ -171,6 +184,7 @@ const as = useAppCommonStore()
 const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
   participants: typeof match.value.teams.placement1
   aggregateTeamStats: typeof match.value.aggregateStats.placement1
+  index: number
 }>({ inheritAttrs: false })
 
 const props = defineProps<{
@@ -271,6 +285,8 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
     emits('toSummoner', puuid, false)
   }
 }
+
+const { masked } = useStreamerModeMaskedText()
 </script>
 
 <style lang="less" scoped>

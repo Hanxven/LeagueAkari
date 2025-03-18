@@ -7,7 +7,10 @@
       <div class="summoner-info">
         <LcuImage class="image" :src="profileIconUri(summoner.profileIconId)" />
         <span class="name">{{
-          summonerName(summoner.gameName || summoner.displayName, summoner.tagLine)
+          masked(
+            summonerName(summoner?.gameName || summoner?.displayName, summoner?.tagLine, puuid),
+            t('common.summoner')
+          )
         }}</span>
       </div>
     </template>
@@ -19,10 +22,9 @@
         v-model:value="text"
         :placeholder="
           t('PlayerTagEditModal.placeholder', {
-            name: summonerName(
-              summoner?.gameName || summoner?.displayName,
-              summoner?.tagLine,
-              puuid
+            name: masked(
+              summonerName(summoner?.gameName || summoner?.displayName, summoner?.tagLine, puuid),
+              t('common.summoner')
             )
           })
         "
@@ -42,6 +44,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { PlayerTagDto } from '@renderer-shared/shards/saved-player'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
@@ -65,6 +68,8 @@ const { summoner, tags } = defineProps<{
   summoner?: SummonerInfo | null
   tags?: PlayerTagDto[]
 }>()
+
+const { masked } = useStreamerModeMaskedText()
 
 const selfTagged = computed(() => {
   return tags?.find((t) => t.markedBySelf)

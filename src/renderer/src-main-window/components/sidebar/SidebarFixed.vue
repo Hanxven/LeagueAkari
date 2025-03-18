@@ -50,10 +50,17 @@
         </div>
       </template>
       <div class="menu-item-popover" ref="popover-connection-body">
-        <div class="summoner-name" v-if="lcs.summoner.me">
-          <span class="game-name-line">{{ lcs.summoner.me.gameName }}</span>
-          <span class="tag-line">#{{ lcs.summoner.me.tagLine }}</span>
-        </div>
+        <StreamerModeMaskedText>
+          <template #masked>
+            <div class="summoner-name" v-if="lcs.summoner.me">
+              <span class="game-name-line">{{ t('common.summoner') }}</span>
+            </div>
+          </template>
+          <div class="summoner-name" v-if="lcs.summoner.me">
+            <span class="game-name-line">{{ lcs.summoner.me.gameName }}</span>
+            <span class="tag-line">#{{ lcs.summoner.me.tagLine }}</span>
+          </div>
+        </StreamerModeMaskedText>
         <template v-if="clients.current">
           <div class="separator" v-if="lcs.summoner.me"></div>
           <div class="title-label">
@@ -61,15 +68,20 @@
             <span>{{ t('SideBarFixed.currentConnected') }}</span>
           </div>
           <div class="client">
-            <div class="region-name">
-              {{ REGION_NAME[clients.current.region] || clients.current.region }}
-            </div>
-            <div class="rso-name" v-if="clients.current.rsoPlatformId">
-              {{
-                TENCENT_RSO_PLATFORM_NAME[clients.current.rsoPlatformId] ||
-                clients.current.rsoPlatformId
-              }}
-            </div>
+            <StreamerModeMaskedText>
+              <template #masked>
+                <div class="region-name">{{ t('SideBarFixed.connectedClient') }}</div>
+              </template>
+              <div class="region-name">
+                {{ REGION_NAME[clients.current.region] || clients.current.region }}
+              </div>
+              <div class="rso-name" v-if="clients.current.rsoPlatformId">
+                {{
+                  TENCENT_RSO_PLATFORM_NAME[clients.current.rsoPlatformId] ||
+                  clients.current.rsoPlatformId
+                }}
+              </div>
+            </StreamerModeMaskedText>
             <div class="pid">(PID: {{ clients.current.pid }})</div>
           </div>
         </template>
@@ -82,20 +94,31 @@
             </div>
             <NScrollbar style="max-height: 180px">
               <div
-                v-for="client of clients.others"
+                v-for="(client, index) of clients.others"
                 class="client"
                 :class="{
                   connectable: !client.isConnecting
                 }"
                 @click="handleConnectToLeagueClient(client)"
               >
-                <div class="region-name">
-                  {{ REGION_NAME[client.region] || client.region }}
-                </div>
-                <div class="rso-name" v-if="!client.rsoPlatformId">
-                  {{ TENCENT_RSO_PLATFORM_NAME[client.rsoPlatformId] || client.rsoPlatformId }}
-                </div>
-                <div class="pid">(PID: {{ client.pid }})</div>
+                <StreamerModeMaskedText>
+                  <template #masked>
+                    <div class="region-name">
+                      {{
+                        t('SideBarFixed.launchedClientPlaceholder', {
+                          index: index + 1
+                        })
+                      }}
+                    </div>
+                  </template>
+                  <div class="region-name">
+                    {{ REGION_NAME[client.region] || client.region }}
+                  </div>
+                  <div class="rso-name" v-if="!client.rsoPlatformId">
+                    {{ TENCENT_RSO_PLATFORM_NAME[client.rsoPlatformId] || client.rsoPlatformId }}
+                  </div>
+                  <div class="pid">(PID: {{ client.pid }})</div>
+                </StreamerModeMaskedText>
                 <NSpin v-if="client.isConnecting" class="loading" :size="12" />
               </div>
             </NScrollbar>
@@ -127,6 +150,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
@@ -137,9 +161,9 @@ import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import { BareMetalServer as BareMetalServerIcon } from '@vicons/carbon'
 import {
+  PlugDisconnected20Filled as PlugDisconnected20FilledIcon,
   PlugDisconnected24Filled as PlugDisconnected24FilledIcon,
-  Settings28Filled as Settings28FilledIcon,
-  PlugDisconnected20Filled as PlugDisconnected20FilledIcon
+  Settings28Filled as Settings28FilledIcon
 } from '@vicons/fluent'
 import { Hourglass as HourglassIcon } from '@vicons/ionicons5'
 import { useElementSize } from '@vueuse/core'

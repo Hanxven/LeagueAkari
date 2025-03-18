@@ -90,12 +90,21 @@
             </div>
             <div class="profile-name">
               <div class="game-name-line">
-                <CopyableText
-                  class="game-name"
-                  :class="{ 'long-name': tab.summoner && tab.summoner.gameName.length >= 12 }"
-                  :text="summonerName(tab.summoner?.gameName, tab.summoner?.tagLine, '-')"
-                  >{{ tab.summoner?.gameName || '-' }}</CopyableText
-                >
+                <StreamerModeMaskedText>
+                  <template #masked>
+                    <span class="game-name">{{
+                      t('common.summonerPlaceholder', {
+                        index: index + 1
+                      })
+                    }}</span>
+                  </template>
+                  <CopyableText
+                    class="game-name"
+                    :class="{ 'long-name': tab.summoner && tab.summoner.gameName.length >= 12 }"
+                    :text="summonerName(tab.summoner?.gameName, tab.summoner?.tagLine, '-')"
+                    >{{ tab.summoner?.gameName || '-' }}</CopyableText
+                  >
+                </StreamerModeMaskedText>
                 <NPopover v-if="tab.spectatorData && isSmallScreen" display-directive="show">
                   <template #trigger>
                     <IndicatorPulse />
@@ -112,7 +121,12 @@
                   </div>
                 </NPopover>
               </div>
-              <span class="tag-line">#{{ tab.summoner?.tagLine || '-' }}</span>
+              <StreamerModeMaskedText>
+                <template #masked>
+                  <span class="tag-line">#####</span>
+                </template>
+                <span class="tag-line">#{{ tab.summoner?.tagLine || '-' }}</span>
+              </StreamerModeMaskedText>
             </div>
           </div>
           <div class="header-ranked" v-if="tab.rankedStats">
@@ -472,7 +486,7 @@
               <div class="left-content-item-content">
                 <div
                   class="recently-played-item"
-                  v-for="p of recentlyPlayers.teammates"
+                  v-for="(p, index) of recentlyPlayers.teammates"
                   :key="p.targetPuuid"
                 >
                   <LcuImage
@@ -485,8 +499,17 @@
                     @mouseup.prevent="(event) => handleMouseUp(event, p.targetPuuid)"
                     @mousedown="handleMouseDown"
                   >
-                    <span class="game-name-line">{{ p.targetGameName }}</span>
-                    <span class="tag-line">#{{ p.targetTagLine }}</span>
+                    <StreamerModeMaskedText>
+                      <template #masked>
+                        <span class="game-name-line">{{
+                          t('common.summonerPlaceholder', {
+                            index: index + 1
+                          })
+                        }}</span>
+                      </template>
+                      <span class="game-name-line">{{ p.targetGameName }}</span>
+                      <span class="tag-line">#{{ p.targetTagLine }}</span>
+                    </StreamerModeMaskedText>
                   </div>
                   <span class="win-or-lose"
                     >{{ p.win }} {{ t('MatchHistoryTab.recentPlayers.win') }} {{ p.lose }}
@@ -502,7 +525,7 @@
               <div class="left-content-item-content">
                 <div
                   class="recently-played-item"
-                  v-for="p of recentlyPlayers.opponents"
+                  v-for="(p, index) of recentlyPlayers.opponents"
                   :key="p.targetPuuid"
                 >
                   <LcuImage
@@ -515,8 +538,17 @@
                     @mouseup.prevent="(event) => handleMouseUp(event, p.targetPuuid)"
                     @mousedown="handleMouseDown"
                   >
-                    <span class="game-name-line">{{ p.targetGameName }}</span>
-                    <span class="tag-line">#{{ p.targetTagLine }}</span>
+                    <StreamerModeMaskedText>
+                      <template #masked>
+                        <span class="game-name-line">{{
+                          t('common.summonerPlaceholder', {
+                            index: index + 1
+                          })
+                        }}</span>
+                      </template>
+                      <span class="game-name-line">{{ p.targetGameName }}</span>
+                      <span class="tag-line">#{{ p.targetTagLine }}</span>
+                    </StreamerModeMaskedText>
                   </div>
                   <span class="win-or-lose"
                     >{{ p.win }} {{ t('MatchHistoryTab.recentPlayers.win') }} {{ p.lose }}
@@ -558,6 +590,7 @@
 import CopyableText from '@renderer-shared/components/CopyableText.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import MatchHistoryCard from '@renderer-shared/components/match-history-card/MatchHistoryCard.vue'
 import { useInstance } from '@renderer-shared/shards'
@@ -622,8 +655,9 @@ import IndicatorPulse from './widgets/IndicatorPulse.vue'
 import RankedDisplay from './widgets/RankedDisplay.vue'
 import SpectateStatus from './widgets/SpectateStatus.vue'
 
-const { tab } = defineProps<{
+const { tab, index = 0 } = defineProps<{
   tab: TabState
+  index?: number
 }>()
 
 const { t } = useTranslation()

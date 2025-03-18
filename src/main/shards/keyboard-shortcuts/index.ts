@@ -240,6 +240,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   async onInit() {
     if (this._app.state.isAdministrator) {
       this._log.info('监听键盘事件')
+      input.instance.install()
       input.instance.on('keyEvent', (key) => {
         this._handleNativeKeyEvent(key)
       })

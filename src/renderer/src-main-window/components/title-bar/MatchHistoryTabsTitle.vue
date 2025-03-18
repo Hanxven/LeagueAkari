@@ -24,7 +24,7 @@
         <div class="mh-tabs">
           <NPopover
             :disabled="true || contextMenuState.show"
-            v-for="tab of mhs.tabs"
+            v-for="(tab, index) of mhs.tabs"
             :key="tab.id"
             ref="tabs-ref"
             :delay="1000"
@@ -75,10 +75,19 @@
                   {{ sgps.availability.sgpServers.servers[tab.sgpServerId].name }}
                 </div>
                 <template v-if="tab.summoner">
-                  <div class="summoner-name">
-                    <span class="game-name-line">{{ tab.summoner.gameName }}</span>
-                    <span class="tag-line"> #{{ tab.summoner.tagLine }}</span>
-                  </div>
+                  <StreamerModeMaskedText>
+                    <template #masked>
+                      <div class="summoner-name">
+                        <span class="game-name-line">{{
+                          t('common.summonerPlaceholder', { index: index + 1 })
+                        }}</span>
+                      </div>
+                    </template>
+                    <div class="summoner-name">
+                      <span class="game-name-line">{{ tab.summoner.gameName }}</span>
+                      <span class="tag-line"> #{{ tab.summoner.tagLine }}</span>
+                    </div>
+                  </StreamerModeMaskedText>
                 </template>
                 <template v-else-if="tabLoadingStateMap[tab.id]">
                   <span class="empty-placeholder-text"
@@ -97,18 +106,41 @@
         </div>
       </NScrollbar>
       <div class="divider" />
-      <div class="search-area" @click="searchSummonerModalShow = true">
-        <NIcon class="search-icon"><SearchIcon /></NIcon>
-        <span class="search-label">{{ t('MatchHistoryTabsTitle.search') }}</span>
-      </div>
+      <NPopconfirm
+        :disabled="!as.frontendSettings.streamerMode || warningShown"
+        @positive-click="handleShowSearchSummonerModalInPopconfirm"
+        :positive-button-props="{
+          type: 'warning',
+          size: 'tiny'
+        }"
+        :negative-button-props="{
+          size: 'tiny'
+        }"
+      >
+        <template #trigger>
+          <div
+            class="search-area"
+            @click="
+              (!as.frontendSettings.streamerMode || warningShown) &&
+              (searchSummonerModalShow = true)
+            "
+          >
+            <NIcon class="search-icon"><SearchIcon /></NIcon>
+            <span class="search-label">{{ t('MatchHistoryTabsTitle.search') }}</span>
+          </div>
+        </template>
+        {{ t('MatchHistoryTabsTitle.searchButtonStreamerModeWarning') }}
+      </NPopconfirm>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
@@ -117,7 +149,7 @@ import { Close as CloseIcon, Search as SearchIcon } from '@vicons/carbon'
 import { Screenshot20Regular as Screenshot20RegularIcon } from '@vicons/fluent'
 import { CloseRound as CloseRoundIcon, RefreshRound as RefreshRoundIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NBadge, NDropdown, NIcon, NPopover, NScrollbar, NSpin } from 'naive-ui'
+import { NBadge, NDropdown, NIcon, NPopconfirm, NPopover, NScrollbar, NSpin } from 'naive-ui'
 import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
 import { computed, h, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 
@@ -133,6 +165,7 @@ const sgps = useSgpStore()
 const ogs = useOngoingGameStore()
 const lcs = useLeagueClientStore()
 const mh = useInstance(MatchHistoryTabsRenderer)
+const as = useAppCommonStore()
 
 const scrollBarEl = useTemplateRef('scrollbar')
 const handleWheel = (e: WheelEvent) => {
@@ -391,6 +424,12 @@ const handleToSummoner = (puuid: string, sgpServerId: string, setCurrent = true)
     // 先路由
     mh.createTab(puuid, sgpServerId, false)
   }
+}
+
+let warningShown = false
+const handleShowSearchSummonerModalInPopconfirm = () => {
+  searchSummonerModalShow.value = true
+  warningShown = true
 }
 </script>
 

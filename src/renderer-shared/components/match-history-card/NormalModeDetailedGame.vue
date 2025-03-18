@@ -1,6 +1,6 @@
 <template>
   <div class="detailed-game-card">
-    <DefineDetailedTable v-slot="{ participants, aggregateTeamStats, teamId }">
+    <DefineDetailedTable v-slot="{ participants, aggregateTeamStats, teamId, index }">
       <table
         class="team"
         :class="{
@@ -30,7 +30,7 @@
           <tr
             class="participant"
             :class="{ self: p.isSelf }"
-            v-for="p of participants"
+            v-for="(p, innerIndex) of participants"
             :key="p.identity.player.puuid"
           >
             <td style="min-width: 100px">
@@ -58,9 +58,14 @@
                       @mouseup.prevent="(event) => handleMouseUp(event, p.identity.player.puuid)"
                       @mousedown="handleMouseDown"
                       :title="
-                        summonerName(
-                          p.identity.player.gameName || p.identity.player.summonerName,
-                          p.identity.player.tagLine
+                        masked(
+                          summonerName(
+                            p.identity.player.gameName || p.identity.player.summonerName,
+                            p.identity.player.tagLine
+                          ),
+                          t('common.summonerPlaceholder', {
+                            index: index * participants.length + innerIndex + 1
+                          })
                         )
                       "
                       >{{
@@ -68,9 +73,14 @@
                           ? `(${t('DetailedGame.bot')}) `
                           : ''
                       }}{{
-                        summonerName(
-                          p.identity.player.gameName || p.identity.player.summonerName,
-                          p.identity.player.tagLine
+                        masked(
+                          summonerName(
+                            p.identity.player.gameName || p.identity.player.summonerName,
+                            p.identity.player.tagLine
+                          ),
+                          t('common.summonerPlaceholder', {
+                            index: index * participants.length + innerIndex + 1
+                          })
                         )
                       }}</span
                     >
@@ -188,6 +198,7 @@
       :aggregate-team-stats="match.aggregateStats.team1"
       :team-id="100"
       :participants="match.teams.team1"
+      :index="0"
     />
     <div v-if="match.teams.team1.length > 0 && match.teams.team2.length" class="divider"></div>
     <DetailedTable
@@ -196,6 +207,7 @@
       :aggregate-team-stats="match.aggregateStats.team2"
       :team-id="200"
       :participants="match.teams.team2"
+      :index="1"
     />
   </div>
 </template>
@@ -206,6 +218,7 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game, ParticipantIdentity } from '@shared/types/league-client/match-history'
@@ -222,6 +235,7 @@ const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
   participants: (typeof match.value.teams)[keyof typeof match.value.teams]
   aggregateTeamStats: (typeof match.value.aggregateStats)[keyof typeof match.value.aggregateStats]
   teamId: number
+  index: number
 }>({ inheritAttrs: false })
 
 const props = defineProps<{
@@ -309,6 +323,8 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
     emits('toSummoner', puuid, false)
   }
 }
+
+const { masked } = useStreamerModeMaskedText()
 </script>
 
 <style lang="less" scoped>

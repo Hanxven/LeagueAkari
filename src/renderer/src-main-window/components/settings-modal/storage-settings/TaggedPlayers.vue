@@ -45,25 +45,37 @@
           {{ t('TaggedPlayers.onlyCurrentAccountCheckbox') }}
         </NCheckbox>
       </div>
-      <NDataTable
-        size="small"
-        remote
-        :data="tableData"
-        :single-line="false"
-        :columns="columns"
-        :loading="isLoading"
-        :pagination="pagination"
-        style="height: 100%"
-        flex-height
-      />
+      <MaskedComponent :show-mask="showMask">
+        <template #mask>
+          <div class="streamer-mode-mask">
+            <span>{{ t('TaggedPlayers.streamerModeWarning') }}</span>
+            <NButton type="warning" size="small" @click="showMask = false">{{
+              t('TaggedPlayers.showButton')
+            }}</NButton>
+          </div>
+        </template>
+        <NDataTable
+          size="small"
+          remote
+          :data="tableData"
+          :single-line="false"
+          :columns="columns"
+          :loading="isLoading"
+          :pagination="pagination"
+          style="height: 100%"
+          flex-height
+        />
+      </MaskedComponent>
     </div>
   </NCard>
 </template>
 
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import MaskedComponent from '@renderer-shared/components/MaskedComponent.vue'
 import { useInteroperableSgpServers } from '@renderer-shared/compositions/useInteroperableSgpServers'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
@@ -73,7 +85,6 @@ import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { getSgpServerId, isTencentServer } from '@shared/data-sources/sgp/utils'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import {
   DataTableColumns,
@@ -125,6 +136,7 @@ const mh = useInstance(MatchHistoryTabsRenderer)
 const sgp = useInstance(SgpRenderer)
 const rc = useInstance(RiotClientRenderer)
 
+const as = useAppCommonStore()
 const lcs = useLeagueClientStore()
 
 const { navigateToTabByPuuidAndSgpServerId } = mh.useNavigateToTab()
@@ -233,24 +245,6 @@ const renderLinedText = (text: string) => {
         },
         text
       )
-  )
-}
-
-const renderDate = (date: string | number | Date) => {
-  return dayjs(date).format('YYYY-MM-DD HH:mm:ss')
-}
-
-const renderEmpty = (text: string | null | undefined) => {
-  if (text) {
-    return text
-  }
-
-  return h(
-    'span',
-    {
-      class: styles['empty']
-    },
-    t('TaggedPlayers.empty')
   )
 }
 
@@ -489,6 +483,18 @@ const inputEl = useTemplateRef('input')
 const currentEditing = shallowRef<MappedRecordType | null>(null)
 const showEditModal = ref(false)
 const currentEditingTag = ref('')
+
+const showMask = ref(false)
+
+watch(
+  () => as.frontendSettings.streamerMode,
+  (value) => {
+    showMask.value = value
+  },
+  {
+    immediate: true
+  }
+)
 </script>
 
 <style lang="less" scoped>
@@ -503,6 +509,16 @@ const currentEditingTag = ref('')
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.streamer-mode-mask {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 </style>
 

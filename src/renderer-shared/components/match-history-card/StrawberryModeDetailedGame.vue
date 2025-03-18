@@ -1,6 +1,6 @@
 <template>
   <div class="detailed-game-card">
-    <DefineDetailedTable v-slot="{ participants }">
+    <DefineDetailedTable v-slot="{ participants, index }">
       <table
         class="team"
         :class="{
@@ -24,7 +24,7 @@
           <tr
             class="participant"
             :class="{ self: p.isSelf }"
-            v-for="p of participants"
+            v-for="(p, innerIndex) of participants"
             :key="p.identity.player.puuid"
           >
             <td style="min-width: 100px">
@@ -36,9 +36,14 @@
                 <div class="name-and-rank">
                   <div
                     :title="
-                      summonerName(
-                        p.identity.player.gameName || p.identity.player.summonerName,
-                        p.identity.player.tagLine
+                      masked(
+                        summonerName(
+                          p.identity.player.gameName || p.identity.player.summonerName,
+                          p.identity.player.tagLine
+                        ),
+                        t('common.summonerPlaceholder', {
+                          index: index * participants.length + innerIndex + 1
+                        })
                       )
                     "
                     class="name"
@@ -48,9 +53,14 @@
                   >
                     {{ p.identity.player.puuid === EMPTY_PUUID ? `(${t('DetailedGame.bot')}) ` : ''
                     }}{{
-                      summonerName(
-                        p.identity.player.gameName || p.identity.player.summonerName,
-                        p.identity.player.tagLine
+                      masked(
+                        summonerName(
+                          p.identity.player.gameName || p.identity.player.summonerName,
+                          p.identity.player.tagLine
+                        ),
+                        t('common.summonerPlaceholder', {
+                          index: index * participants.length + innerIndex + 1
+                        })
                       )
                     }}
                   </div>
@@ -108,7 +118,7 @@
         </tbody>
       </table>
     </DefineDetailedTable>
-    <DetailedTable :participants="match.team" />
+    <DetailedTable :index="0" :participants="match.team" />
   </div>
 </template>
 
@@ -116,6 +126,7 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game, Participant, ParticipantIdentity } from '@shared/types/league-client/match-history'
@@ -130,6 +141,7 @@ const { t } = useTranslation()
 
 const [DefineDetailedTable, DetailedTable] = createReusableTemplate<{
   participants: ParticipantWithIdentity[]
+  index: number
 }>({ inheritAttrs: false })
 
 const props = defineProps<{
@@ -188,6 +200,8 @@ const handleMouseUp = (event: MouseEvent, puuid: string) => {
     emits('toSummoner', puuid, false)
   }
 }
+
+const { masked } = useStreamerModeMaskedText()
 </script>
 
 <style lang="less" scoped>

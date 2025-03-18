@@ -47,9 +47,16 @@
                       ? PREMADE_TEAM_COLORS[premadeTeamId]?.foregroundColor
                       : undefined
                   }"
-                  >{{ summoner?.gameName || summoner?.displayName || '—' }}</span
+                  >{{
+                    masked(
+                      summoner?.gameName || summoner?.displayName || '—',
+                      lcs.gameData.champions[championId || -1]?.name || '—'
+                    )
+                  }}</span
                 >
-                <span class="tag-line">#{{ summoner?.tagLine || '—' }}</span>
+                <span class="tag-line" v-if="!as.frontendSettings.streamerMode"
+                  >#{{ summoner?.tagLine || '—' }}</span
+                >
               </div>
             </template>
             <div class="popover-text">
@@ -414,6 +421,7 @@
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
@@ -780,6 +788,8 @@ const matches = computed(() => {
     gameId: game.game.gameId
   }))
 })
+
+const { masked } = useStreamerModeMaskedText()
 </script>
 
 <style lang="less" scoped>

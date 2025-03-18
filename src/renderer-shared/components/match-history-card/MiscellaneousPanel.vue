@@ -1,23 +1,40 @@
 <template>
   <div class="standalone-card-wrapper">
     <div class="meta">
-      <CopyableText :text="game.gameId">{{
-        t('MiscellaneousPanel.gameId', { gameId: game.gameId })
-      }}</CopyableText>
+      <StreamerModeMaskedText>
+        <template #masked>
+          <CopyableText :text="game.gameId">{{
+            t('MiscellaneousPanel.gameId', { gameId: '******' })
+          }}</CopyableText>
+        </template>
+        <CopyableText :text="game.gameId">{{
+          t('MiscellaneousPanel.gameId', { gameId: game.gameId })
+        }}</CopyableText>
+      </StreamerModeMaskedText>
       <span>{{
         t('MiscellaneousPanel.gameDate', {
           date: dayjs(game.gameCreation).format('YYYY-MM-DD HH:mm:ss')
         })
       }}</span>
-      <span>{{
-        t('MiscellaneousPanel.server', {
-          server: TENCENT_RSO_PLATFORM_NAME[game.platformId]
-            ? `${TENCENT_RSO_PLATFORM_NAME[game.platformId]} (${game.platformId}) (TENCENT)`
-            : REGION_NAME[game.platformId]
-              ? `${REGION_NAME[game.platformId]} (${game.platformId})`
-              : game.platformId
-        })
-      }}</span>
+
+      <StreamerModeMaskedText>
+        <template #masked>
+          <span>{{
+            t('MiscellaneousPanel.server', {
+              server: '******'
+            })
+          }}</span>
+        </template>
+        <span>{{
+          t('MiscellaneousPanel.server', {
+            server: TENCENT_RSO_PLATFORM_NAME[game.platformId]
+              ? `${TENCENT_RSO_PLATFORM_NAME[game.platformId]} (${game.platformId}) (TENCENT)`
+              : REGION_NAME[game.platformId]
+                ? `${REGION_NAME[game.platformId]} (${game.platformId})`
+                : game.platformId
+          })
+        }}</span>
+      </StreamerModeMaskedText>
     </div>
     <div v-if="hasBan" class="bans">
       <span style="margin-right: 12px; font-weight: bold; columns: #fff">{{
@@ -55,6 +72,7 @@ import ItemDisplay from '@renderer-shared/components/widgets/ItemDisplay.vue'
 import PerkDisplay from '@renderer-shared/components/widgets/PerkDisplay.vue'
 import PerkstyleDisplay from '@renderer-shared/components/widgets/PerkstyleDisplay.vue'
 import SummonerSpellDisplay from '@renderer-shared/components/widgets/SummonerSpellDisplay.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { Game, Participant, Player } from '@shared/types/league-client/match-history'
@@ -65,6 +83,8 @@ import { useTranslation } from 'i18next-vue'
 import { DataTableColumns, NDataTable } from 'naive-ui'
 import { RowData } from 'naive-ui/es/data-table/src/interface'
 import { computed, h } from 'vue'
+
+import StreamerModeMaskedText from '../StreamerModeMaskedText.vue'
 
 const props = defineProps<{
   game: Game
@@ -77,6 +97,8 @@ const hasBan = computed(() => {
 })
 
 const lcs = useLeagueClientStore()
+
+const { masked } = useStreamerModeMaskedText()
 
 const RESERVED_COLUMN_WIDTH = 120
 
@@ -113,7 +135,9 @@ const perkstyleDisplay = (perkstyleId: number) => h(PerkstyleDisplay, { size: 20
 
 const augmentDisplay = (augmentId: number) => h(AugmentDisplay, { size: 20, augmentId })
 
-const platformDisplay = (platformId: string) => TENCENT_RSO_PLATFORM_NAME[platformId] || platformId
+const platformDisplay = (platformId: string) => {
+  return masked(TENCENT_RSO_PLATFORM_NAME[platformId] || platformId, '******')
+}
 
 const formatTeam = (id: number) => {
   if (id === 100) {
@@ -313,7 +337,7 @@ const columns = computed(() => {
     render: (data) => h('span', { style: { 'font-weight': '700' } }, data.propName as string)
   })
 
-  props.game.participants.forEach((p) => {
+  props.game.participants.forEach((p, index) => {
     c.push({
       key: p.participantId,
       maxWidth: RESERVED_COLUMN_WIDTH,
@@ -327,10 +351,14 @@ const columns = computed(() => {
           h(
             'span',
             { style: { 'margin-left': '2px' } },
-            summonerName(
-              participantInfoMap.value[p.participantId].gameName ||
-                participantInfoMap.value[p.participantId].summonerName,
-              participantInfoMap.value[p.participantId].tagLine
+
+            masked(
+              summonerName(
+                participantInfoMap.value[p.participantId].gameName ||
+                  participantInfoMap.value[p.participantId].summonerName,
+                participantInfoMap.value[p.participantId].tagLine
+              ),
+              t('common.summonerPlaceholder', { index: index + 1 })
             )
           )
         ])

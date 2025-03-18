@@ -489,6 +489,9 @@ TaggedPlayers:
   editButton: 编辑
   deleteButton: 删除
 
+  streamerModeWarning: 将暴露敏感信息
+  showButton: 显示
+
   deletePopconfirmContent: 确认删除？此操作无法恢复
   updated: 已更新
   updateFailed: 更新失败 {{reason}}
@@ -718,9 +721,11 @@ SideBarMenu:
 SideBarFixed:
   currentConnected: 当前已连接
   launchedClients: 已启动的客户端
+  launchedClientPlaceholder: 已启动的客户端 {{index}}
   noClientTitle: 无可用客户端
   noClient: 当前无可用客户端，请启动游戏
   settings: 设置
+  connectedClient: 已连接的客户端
 
   respawnTimer:
     timeLeft: 距离重生还有 {{seconds}} s
@@ -782,6 +787,7 @@ MatchHistoryTabsTitle:
   closeOthers: 关闭其他页面
   closeToTheRight: 关闭右侧页面
   screenshot: 截图当前页面
+  searchButtonStreamerModeWarning: 搜索玩家将暴露敏感信息，是否继续？
 
 SearchSummonerModal:
   title: 召唤师搜索
@@ -2026,6 +2032,9 @@ common:
   no: 否
   confirm: 确认
   na: N/A
+
+  summonerPlaceholder: 召唤师 {{index}}
+  summoner: 召唤师
 
   lanes:
     all: 无

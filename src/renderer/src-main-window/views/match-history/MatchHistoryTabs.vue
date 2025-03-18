@@ -2,9 +2,10 @@
   <div class="tabs-wrapper" ref="tabs-wrapper">
     <template v-if="mhs.currentTabId">
       <MatchHistoryTab
-        v-for="tab of mhs.tabs"
+        v-for="(tab, index0) of mhs.tabs"
         :key="tab.id"
         :tab="tab"
+        :index="index0"
         :sgpServerId="tab.sgpServerId"
         v-show="tab.id === mhs.currentTab?.id"
         ref="tabs-ref"
@@ -24,8 +25,14 @@
               class="shortcut-profile-icon"
               :src="profileIconUri(lcs.summoner.me.profileIconId)"
             />
-            <span class="shortcut-game-name">{{ lcs.summoner.me.gameName }}</span>
-            <span class="shortcut-tag-line">#{{ lcs.summoner.me.tagLine }}</span>
+            <StreamerModeMaskedText>
+              <template #masked>
+                <span class="shortcut-game-name">{{ t('common.summoner') }}</span>
+                <span class="shortcut-tag-line">#####</span>
+              </template>
+              <span class="shortcut-game-name">{{ lcs.summoner.me.gameName }}</span>
+              <span class="shortcut-tag-line">#{{ lcs.summoner.me.tagLine }}</span>
+            </StreamerModeMaskedText>
           </div>
         </template>
       </div>
@@ -42,6 +49,7 @@
 import EasyToLaunch from '@renderer-shared/components/EasyToLaunch.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
+import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
