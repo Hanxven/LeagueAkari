@@ -94,12 +94,15 @@ export class LolFandomWikiApi {
   private async _fetchScriptRawString() {
     const res = await this._http.get<string>('/wiki/Module:ChampionData/data')
 
-    const tagStart = "<pre class='mw-code mw-script' dir='ltr'>"
-    const tagEnd = '</pre>'
-    const startIndex = res.data.indexOf(tagStart) + tagStart.length
-    const endIndex = res.data.indexOf(tagEnd, startIndex)
+    const regex =
+      /<pre\b(?=[^>]*?\bclass=['"]mw-code mw-script['"])(?=[^>]*?\bdir=['"]ltr['"])[^>]*?>([\s\S]*?)<\/pre>/
 
-    const raw = res.data.substring(startIndex, endIndex) as string
+    const match = res.data.match(regex)
+    if (!match) {
+      throw new Error('未找到符合条件的 <pre> 标签')
+    }
+
+    const raw = match[1]
     const purified = raw
       .replace(/\&quot\;/g, '"')
       .replace(/\&lt\;/g, '<')

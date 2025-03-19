@@ -4,22 +4,17 @@ import { useOpggStore } from './store'
 
 export class OpggRenderer {
   static id = 'opgg-renderer'
-  static dependencies = ['setting-utils-renderer']
+  static dependencies = [SettingUtilsRenderer.id]
 
   private readonly _setting: SettingUtilsRenderer
 
   constructor(deps: any) {
-    this._setting = deps['setting-utils-renderer']
+    this._setting = deps[SettingUtilsRenderer.id]
   }
 
   async onInit() {
     const store = useOpggStore()
 
-    this._setting.savedGetterVue(
-      OpggRenderer.id,
-      'autoApply',
-      () => store.frontendSettings.autoApply,
-      (v) => (store.frontendSettings.autoApply = v)
-    )
+    await this._setting.savedPropVue(OpggRenderer.id, store.frontendSettings, 'autoApply')
   }
 }

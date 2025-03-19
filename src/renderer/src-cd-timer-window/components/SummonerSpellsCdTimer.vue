@@ -336,7 +336,7 @@ const sendInGameText = (
   transform: translate(-50%, -50%);
   width: 80px;
   height: 40px;
-  background-color: rgba(0, 0, 0, 0.35);
+  background-color: rgba(0, 0, 0, 0.65);
   pointer-events: none;
   display: flex;
   justify-content: center;

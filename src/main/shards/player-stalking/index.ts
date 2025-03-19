@@ -12,6 +12,8 @@ import { SgpMain } from '../sgp'
 import { PlayerStalkingSettings, PlayerStalkingState, StalkedPlayer } from './state'
 
 /**
+ * 暂未启用此特性
+ *
  * 观察给定的玩家列表, 当目标进入游戏时或变更状态时, 进行通知
  *
  * - 进入游戏通知, 游戏结束通知 (需要 SGP)
