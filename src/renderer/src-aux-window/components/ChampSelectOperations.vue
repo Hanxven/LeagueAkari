@@ -63,10 +63,6 @@
         @update:value="(val) => as.setBenchModeEnabled(val)"
       />
     </NFlex>
-    <NFlex align="center" class="control-item">
-      <span class="label" style="flex: 1">{{ '我要创建一个没有勇者的世界' }}</span>
-      <NButton size="tiny" type="warning" @click="handleBan_3">懦夫模式</NButton>
-    </NFlex>
   </NCard>
 </template>
 
@@ -145,7 +141,11 @@ watchEffect(() => {
   }
 })
 
-const handleBan_3 = async () => {
+/**
+ * @deprecated
+ * used to ban -3 (bravery)
+ */
+const _handleBan_3 = async () => {
   if (!lcs.champSelect.session) {
     return
   }

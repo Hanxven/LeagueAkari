@@ -14,7 +14,12 @@
     <NIcon class="arrow-icon">
       <ChevronRight16FilledIcon />
     </NIcon>
-    <div class="summoner-spell" @click="$emit('spell1Click', spell1Id, timerType)" ref="spell1">
+    <div
+      class="summoner-spell"
+      @click="$emit('spell1Click', spell1Id, timerType)"
+      @wheel="($event) => $emit('spell1Wheel', spell1Id, $event.deltaY)"
+      ref="spell1"
+    >
       <NIcon class="timer-icon timer" v-if="championId === null">
         <Timer16FilledIcon />
       </NIcon>
@@ -29,7 +34,12 @@
       <div class="click-indicator" :class="{ highlight: spell1Pressed }"></div>
     </div>
     <div class="spacer"></div>
-    <div class="summoner-spell" @click="$emit('spell2Click', spell2Id, timerType)" ref="spell2">
+    <div
+      class="summoner-spell"
+      @click="$emit('spell2Click', spell2Id, timerType)"
+      @wheel="($event) => $emit('spell2Wheel', spell2Id, $event.deltaY)"
+      ref="spell2"
+    >
       <NIcon class="timer-icon timer" v-if="championId === null">
         <Timer16FilledIcon />
       </NIcon>
@@ -64,6 +74,8 @@ const emits = defineEmits<{
   spell2Click: [spellId: number, type: 'countdown' | 'countup']
   spell1DoubleRightClick: [spellId: number, type: 'countdown' | 'countup']
   spell2DoubleRightClick: [spellId: number, type: 'countdown' | 'countup']
+  spell1Wheel: [spellId: number, deltaY: number]
+  spell2Wheel: [spellId: number, deltaY: number]
 }>()
 
 const {

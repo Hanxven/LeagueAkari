@@ -21,8 +21,10 @@
           item.spell2Id
         )
       "
-      :spell1-base-timestamp="timers[item.timer1Id]"
-      :spell2-base-timestamp="timers[item.timer2Id]"
+      :spell1-base-timestamp="timers[item.timer1Id]?.[1]"
+      :spell2-base-timestamp="timers[item.timer2Id]?.[1]"
+      @spell1-wheel="(_, deltaY) => adjustTimer(item.timer1Id, deltaY)"
+      @spell2-wheel="(_, deltaY) => adjustTimer(item.timer2Id, deltaY)"
       @spell1-double-right-click="
         () =>
           sendInGameText(
@@ -45,6 +47,16 @@
       v-for="item of items"
       :key="item.id"
     />
+    <div
+      class="adjustment-indicator"
+      :class="{
+        'opacity-show': currentShowingIndicator
+      }"
+    >
+      <template v-if="currentShowingIndicator">
+        {{ formatDeltaMs(currentShowingIndicator.deltaMs, currentShowingIndicator.type) }}
+      </template>
+    </div>
   </div>
 </template>
 
@@ -54,7 +66,8 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useCdTimerWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
-import { computed, shallowReactive, watch } from 'vue'
+import { useTimeoutFn } from '@vueuse/core'
+import { computed, shallowReactive, shallowRef, watch } from 'vue'
 
 import TimerItem from './TimerItem.vue'
 
@@ -75,7 +88,7 @@ const createEmptyTimer = (count: number) => {
   }))
 }
 
-const timers: Record<string, number | null> = shallowReactive({})
+const timers: Record<string, ['countup' | 'countdown', number] | null> = shallowReactive({})
 
 const setTimer = (id: string, timerType: string, _championId: number | null, spellId: number) => {
   const record = timers[id] || null
@@ -94,11 +107,78 @@ const setTimer = (id: string, timerType: string, _championId: number | null, spe
 
     if (spell && modeInfo) {
       const multiplier = 100 / (100 + modeInfo.abilityHaste)
-      timers[id] = Date.now() + spell.cooldown * multiplier * 1000
+      timers[id] = [timerType, Date.now() + spell.cooldown * multiplier * 1000]
     }
   } else if (timerType === 'countup') {
-    timers[id] = Date.now()
+    timers[id] = [timerType, Date.now()]
     return
+  }
+}
+
+const { start } = useTimeoutFn(
+  () => {
+    currentShowingIndicator.value = null
+  },
+  500,
+  { immediate: false }
+)
+const currentShowingIndicator = shallowRef<{
+  timerId: string
+  type: 'countup' | 'countdown'
+  deltaMs: number
+} | null>(null)
+
+const updateIndicator = (id: string, deltaMs: number, type: 'countup' | 'countdown') => {
+  if (currentShowingIndicator.value && currentShowingIndicator.value.timerId === id) {
+    currentShowingIndicator.value = {
+      timerId: id,
+      type,
+      deltaMs: currentShowingIndicator.value.deltaMs + deltaMs
+    }
+  } else {
+    currentShowingIndicator.value = { timerId: id, type, deltaMs }
+  }
+
+  start()
+}
+
+const formatDeltaMs = (deltaMs: number, type: 'countup' | 'countdown') => {
+  if (type === 'countup') {
+    if (deltaMs > 0) {
+      return `- ${(deltaMs / 1000).toFixed()} s`
+    } else if (deltaMs < 0) {
+      return `+ ${Math.abs(deltaMs / 1000).toFixed()} s`
+    }
+  } else if (type === 'countdown') {
+    if (deltaMs > 0) {
+      return `+ ${(deltaMs / 1000).toFixed()} s`
+    } else if (deltaMs < 0) {
+      return `- ${Math.abs(deltaMs / 1000).toFixed()} s`
+    }
+  }
+
+  return '= 0 s'
+}
+
+const adjustTimer = (id: string, deltaY: number) => {
+  const record = timers[id] || null
+
+  if (record === null) {
+    return
+  }
+
+  const timeDelta = deltaY * 50 // 50 is a suitable value, up -> negative, down -> positive
+  const currentBaseTime = record[1]
+
+  // 对于countup，不允许调整时间导致其小于基准时间
+  if (record[0] === 'countup') {
+    const adjusted = Math.min(currentBaseTime + timeDelta, Date.now())
+    timers[id] = [record[0], adjusted]
+    updateIndicator(id, adjusted - currentBaseTime, 'countup')
+  } else if (record[0] === 'countdown') {
+    const adjusted = Math.max(currentBaseTime + timeDelta, Date.now())
+    timers[id] = [record[0], adjusted]
+    updateIndicator(id, timeDelta, 'countdown')
   }
 }
 
@@ -219,7 +299,7 @@ const sendInGameText = (
     return
   }
 
-  const relativeMs = record - Date.now() + ctws.gameTime * 1000
+  const relativeMs = record[1] - Date.now() + ctws.gameTime * 1000
   const minutes = Math.floor(relativeMs / 60000)
   const seconds = Math.floor((relativeMs % 60000) / 1000)
 
@@ -238,12 +318,37 @@ const sendInGameText = (
 
 <style lang="less" scoped>
 .spells-cd-timer {
+  position: relative;
   padding: 8px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+}
+
+.adjustment-indicator {
+  position: absolute;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  transition: opacity 0.2s;
+  opacity: 0;
+
+  &.opacity-show {
+    opacity: 1;
+  }
 }
 
 .item-margin:not(:last-child) {

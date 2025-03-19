@@ -91,6 +91,7 @@ function getNames(locale: string) {
   const result: string[] = []
   for (let i = 0; i < names.length; i++) {
     for (let j = 0; j < names.length; j++) {
+      // chinese name normally don't have space
       if (locale === 'zh-CN') {
         result.push(`${names[i]}${names[j]}`)
       } else {
