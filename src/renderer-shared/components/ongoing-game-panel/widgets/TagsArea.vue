@@ -103,7 +103,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in encounteredGames" :key="item.gameId">
+            <tr v-for="(item, index) in encounteredGames" :key="item.gameId">
               <td
                 class="game-id-td"
                 @click="
@@ -116,7 +116,10 @@
                 <div class="game-id-tag">
                   {{
                     t('PlayerInfoCard.metPopover.inspectByGameId', {
-                      gameId: item.gameId
+                      gameId: masked(
+                        item.gameId.toString(),
+                        (index + 1).toString().padStart(6, '●')
+                      )
                     })
                   }}
                 </div>
@@ -539,6 +542,8 @@
 
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
+import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { SavedInfo, useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
@@ -550,8 +555,6 @@ import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
-
-import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 
 import { PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
 
@@ -738,6 +741,8 @@ const truncateTailingZeros = (num: number, precision = 1) => {
   const trimmed = str.replace(/\.?0+$/, '')
   return trimmed
 }
+
+const { masked } = useStreamerModeMaskedText()
 
 onDeactivated(() => {
   if (premadeTeamId) {

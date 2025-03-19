@@ -4,7 +4,7 @@
       <StreamerModeMaskedText>
         <template #masked>
           <CopyableText :text="game.gameId">{{
-            t('MiscellaneousPanel.gameId', { gameId: '******' })
+            t('MiscellaneousPanel.gameId', { gameId: '●●●●●●' })
           }}</CopyableText>
         </template>
         <CopyableText :text="game.gameId">{{
@@ -21,7 +21,7 @@
         <template #masked>
           <span>{{
             t('MiscellaneousPanel.server', {
-              server: '******'
+              server: '●●●●●●'
             })
           }}</span>
         </template>
@@ -136,7 +136,7 @@ const perkstyleDisplay = (perkstyleId: number) => h(PerkstyleDisplay, { size: 20
 const augmentDisplay = (augmentId: number) => h(AugmentDisplay, { size: 20, augmentId })
 
 const platformDisplay = (platformId: string) => {
-  return masked(TENCENT_RSO_PLATFORM_NAME[platformId] || platformId, '******')
+  return masked(TENCENT_RSO_PLATFORM_NAME[platformId] || platformId, '●●●●●●')
 }
 
 const formatTeam = (id: number) => {

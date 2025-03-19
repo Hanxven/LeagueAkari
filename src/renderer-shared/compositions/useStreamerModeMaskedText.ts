@@ -27,7 +27,7 @@ export function useStreamerModeMaskedText() {
       } else if (typeof replacer === 'string') {
         return replacer
       } else {
-        return '******'
+        return '●●●●●●'
       }
     } else {
       return sensitiveText
