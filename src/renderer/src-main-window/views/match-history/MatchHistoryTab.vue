@@ -151,7 +151,7 @@
             </div>
           </div>
           <div class="buttons-container">
-            <NButton
+            <!-- <NButton
               secondary
               :type="isBeingStalked ? 'primary' : 'default'"
               class="square-button"
@@ -165,7 +165,7 @@
                   <Star24RegularIcon v-else />
                 </NIcon>
               </template>
-            </NButton>
+            </NButton> -->
             <NButton
               secondary
               class="square-button"
@@ -597,7 +597,6 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
-import { PlayerStalkingRenderer } from '@renderer-shared/shards/player-stalking'
 import { usePlayerStalkingStore } from '@renderer-shared/shards/player-stalking/store'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
@@ -1469,21 +1468,6 @@ const handleScreenshot = async () => {
     }
   } finally {
     tab.isTakingScreenshot = false
-  }
-}
-
-const ps = useInstance(PlayerStalkingRenderer)
-const pss = usePlayerStalkingStore()
-
-const isBeingStalked = computed(() => {
-  return pss.settings.playersToStalk.some((p) => p.puuid === tab.puuid)
-})
-
-const handleStalk = () => {
-  if (isBeingStalked.value) {
-    ps.removePlayer(tab.puuid)
-  } else {
-    ps.addPlayer(tab.puuid, tab.sgpServerId)
   }
 }
 
