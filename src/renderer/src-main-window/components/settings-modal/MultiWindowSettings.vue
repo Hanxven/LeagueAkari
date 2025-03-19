@@ -204,6 +204,27 @@
             : t('MultiWindowSettings.cdTimerWindow.titleRequireAdmin')
         }}</span>
       </template>
+      <div class="control-item-margin cd-timer-window-description">
+        <div class="line-a">{{ t('MultiWindowSettings.cdTimerWindow.description.lineA') }}</div>
+        <div class="line-b indent">
+          <span class="emphasize">{{
+            t('MultiWindowSettings.cdTimerWindow.description.leftClick1')
+          }}</span
+          >{{ t('MultiWindowSettings.cdTimerWindow.description.leftClick2') }}
+        </div>
+        <div class="line-b indent">
+          <span class="emphasize">{{
+            t('MultiWindowSettings.cdTimerWindow.description.rightDoubleClick1')
+          }}</span
+          >{{ t('MultiWindowSettings.cdTimerWindow.description.rightDoubleClick2') }}
+        </div>
+        <div class="line-b indent">
+          <span class="emphasize">{{
+            t('MultiWindowSettings.cdTimerWindow.description.wheel1')
+          }}</span
+          >{{ t('MultiWindowSettings.cdTimerWindow.description.wheel2') }}
+        </div>
+      </div>
       <ControlItem
         class="control-item-margin"
         :label="t('MultiWindowSettings.cdTimerWindow.enabled.label')"
@@ -258,7 +279,11 @@ import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { AkariCdTimerWindow, AkariOpggWindow, WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
+import {
+  AkariCdTimerWindow,
+  AkariOpggWindow,
+  WindowManagerRenderer
+} from '@renderer-shared/shards/window-manager'
 import { AkariOngoingGameWindow } from '@renderer-shared/shards/window-manager'
 import {
   useAuxWindowStore,
@@ -294,11 +319,39 @@ const wm = useInstance(WindowManagerRenderer)
   .inline-icon {
     color: #fff;
   }
+
+  .cd-timer-window-description {
+    border: 1px solid #fff1;
+  }
 }
 
 [data-theme='light'] {
   .inline-icon {
     color: #000;
+  }
+
+  .cd-timer-window-description {
+    border: 1px solid #0001;
+  }
+}
+
+.cd-timer-window-description {
+  border-radius: 4px;
+  font-size: 13px;
+  padding: 8px;
+  box-sizing: border-box;
+
+  .line-a {
+    margin-bottom: 8px;
+  }
+
+  .line-a,
+  .emphasize {
+    font-weight: bold;
+  }
+
+  .line-b.indent {
+    margin-left: 16px;
   }
 }
 </style>

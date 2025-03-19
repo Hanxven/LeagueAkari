@@ -321,6 +321,15 @@ MultiWindowSettings:
     title: 计时器叠加窗口
     titleRequireAdmin: 计时器叠加窗口 (管理员权限)
 
+    description:
+      lineA: 标记敌方英雄召唤师计时器仅当当前模式受支持时可用
+      leftClick1: · 左键
+      leftClick2: ' - 开始或关闭此计时器'
+      rightDoubleClick1: · 右键双击
+      rightDoubleClick2: ' - 若此计时器为已开始的英雄技能计时器，模拟输入发送到聊天框中'
+      wheel1: · 滑轮
+      wheel2: ' - 调整已开始计时器的时间'
+
     enabled:
       label: 启用计时器窗口
       description: 在游戏中时，通过叠加窗口提供便捷计时器。若无法正常显示，需启用游戏的无边框或窗口模式

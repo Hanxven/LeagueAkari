@@ -314,24 +314,33 @@ MultiWindowSettings:
       label: Show Shortcut
       description: Hold the shortcut key to show the overlay window during the game
 
-    cdTimerWindow:
-      title: Timer Overlay Window
-      titleRequireAdmin: Timer Overlay Window (Admin Required)
+  cdTimerWindow:
+    title: Timer Overlay Window
+    titleRequireAdmin: Timer Overlay Window (Admin Required)
 
-      enabled:
-        label: Enable Timer Window
-        description: Display an overlay window during the game to show timers. This feature requires the game client to be in windowed or borderless mode.
+    description:
+      lineA: Marking the enemy champion summoner spell timer is only available when the current mode is supported
+      leftClick1: · Left Click
+      leftClick2: ' - Start or stop this timer'
+      rightDoubleClick1: · Right Double Click
+      rightDoubleClick2: ' - If this timer is a started champion spell timer, simulate input sent to the in-game chat'
+      wheel1: · Wheel
+      wheel2: ' - Adjust the time of the started timer'
 
-      showShortcut:
-        label: Show Shortcut
-        description: Use the shortcut key to show or hide the overlay window
+    enabled:
+      label: Enable Timer Window
+      description: Display an overlay window during the game to show timers. This feature requires the game client to be in windowed or borderless mode.
 
-      timerType:
-        label: Timer Type
-        description: Select the type of timer. The countdown mode will use the preset summoner spell time (has errors), while the count-up mode will start from 0. Note that the custom timers are always in countup mode.
-        options:
-          countdown: Countdown Mode
-          countup: Count-Up Mode
+    showShortcut:
+      label: Show Shortcut
+      description: Use the shortcut key to show or hide the overlay window
+
+    timerType:
+      label: Timer Type
+      description: Select the type of timer. The countdown mode will use the preset summoner spell time (has errors), while the count-up mode will start from 0. Note that the custom timers are always in countup mode.
+      options:
+        countdown: Countdown Mode
+        countup: Count-Up Mode
 
 MiscSettings:
   title: Misc
