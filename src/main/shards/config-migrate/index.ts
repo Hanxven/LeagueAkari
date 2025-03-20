@@ -77,39 +77,39 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     )
     await this._do(
       manager,
-      'auto-gameflomanager, w/autoMatchmakingEnabled',
-      'auto-gameflomanager, w-main/autoMatchmakingEnabled'
-    ),
-      await this._do(
-        manager,
-        'auto-gameflomanager, w/autoMatchmakingDelaySeconds',
-        'auto-gameflomanager, w-main/autoMatchmakingDelaySeconds'
-      ),
-      await this._do(
-        manager,
-        'auto-gameflomanager, w/autoMatchmakingMinimumMembers',
-        'auto-gameflomanager, w-main/autoMatchmakingMinimumMembers'
-      ),
-      await this._do(
-        manager,
-        'auto-gameflomanager, w/autoMatchmakingWaitForInvitees',
-        'auto-gameflomanager, w-main/autoMatchmakingWaitForInvitees'
-      ),
-      await this._do(
-        manager,
-        'auto-gameflomanager, w/autoMatchmakingRematchStrategy',
-        'auto-gameflomanager, w-main/autoMatchmakingRematchStrategy'
-      ),
-      await this._do(
-        manager,
-        'auto-gameflomanager, w/autoMatchmakingRematchFixedDuration',
-        'auto-gameflomanager, w-main/autoMatchmakingRematchFixedDuration'
-      ),
-      await this._do(
-        manager,
-        'app/showFreeSoftwareDeclaration',
-        'app-common-main/showFreeSoftwareDeclaration'
-      )
+      'auto-gameflow/autoMatchmakingEnabled',
+      'auto-gameflow-main/autoMatchmakingEnabled'
+    )
+    await this._do(
+      manager,
+      'auto-gameflow/autoMatchmakingDelaySeconds',
+      'auto-gameflow-main/autoMatchmakingDelaySeconds'
+    )
+    await this._do(
+      manager,
+      'auto-gameflow/autoMatchmakingMinimumMembers',
+      'auto-gameflow-main/autoMatchmakingMinimumMembers'
+    )
+    await this._do(
+      manager,
+      'auto-gameflow/autoMatchmakingWaitForInvitees',
+      'auto-gameflow-main/autoMatchmakingWaitForInvitees'
+    )
+    await this._do(
+      manager,
+      'auto-gameflow/autoMatchmakingRematchStrategy',
+      'auto-gameflow-main/autoMatchmakingRematchStrategy'
+    )
+    await this._do(
+      manager,
+      'auto-gameflow/autoMatchmakingRematchFixedDuration',
+      'auto-gameflow-main/autoMatchmakingRematchFixedDuration'
+    )
+    await this._do(
+      manager,
+      'app/showFreeSoftwareDeclaration',
+      'app-common-main/showFreeSoftwareDeclaration'
+    )
     await this._do(manager, 'app/useWmic', 'league-client-ux-main/useWmic')
     await this._do(manager, 'app/isInKyokoMode', 'app-common-main/isInKyokoMode')
     await this._do(manager, 'auto-update/autoCheckUpdates', 'self-update-main/autoCheckUpdates')
@@ -125,10 +125,10 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     await this._do(manager, 'auto-select/expectedChampions', 'auto-select-main/expectedChampions')
     await this._do(
       manager,
-      'auto-select/manager, selectTeammateIntendedChampion',
-      'auto-select-manager, main/selectTeammateIntendedChampion'
-    ),
-      await this._do(manager, 'auto-select/showIntent', 'auto-select-main/showIntent')
+      'auto-select/selectTeammateIntendedChampion',
+      'auto-select-main/selectTeammateIntendedChampion'
+    )
+    await this._do(manager, 'auto-select/showIntent', 'auto-select-main/showIntent')
     await this._do(manager, 'auto-select/benchModeEnabled', 'auto-select-main/benchModeEnabled')
     await this._do(
       manager,

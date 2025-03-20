@@ -27,6 +27,9 @@ import { RemedyHttpApi } from './remedy'
 import { RiotClientHttpApi } from './riotclient'
 import { SpectatorHttpApi } from './spectator'
 import { SummonerHttpApi } from './summoner'
+import { EventHubHttpApi } from './event-hub'
+import { RewardsHttpApi } from './rewards'
+import { RewardTrackHttpApi } from './reward-track'
 
 /**
  * 基于 Axios 封装的调用
@@ -59,6 +62,9 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly endOfGame: EndOfGameHttpApi
   public readonly remedy: RemedyHttpApi
   public readonly preEndOfGame: PreEndOfGameHttpApi
+  public readonly eventHub: EventHubHttpApi
+  public readonly rewards: RewardsHttpApi
+  public readonly rewardTrack: RewardTrackHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -88,5 +94,8 @@ export class LeagueClientHttpApiAxiosHelper {
     this.endOfGame = new EndOfGameHttpApi(this._http)
     this.remedy = new RemedyHttpApi(this._http)
     this.preEndOfGame = new PreEndOfGameHttpApi(this._http)
+    this.eventHub = new EventHubHttpApi(this._http)
+    this.rewards = new RewardsHttpApi(this._http)
+    this.rewardTrack = new RewardTrackHttpApi(this._http)
   }
 }
