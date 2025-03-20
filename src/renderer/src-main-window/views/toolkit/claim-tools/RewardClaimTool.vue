@@ -33,6 +33,10 @@
       </NButton>
     </div>
     <NDataTable
+      :theme-overrides="{
+        thColor: '#0005',
+        tdColor: '#0004'
+      }"
       :loading="isLoading"
       size="small"
       :single-line="false"
