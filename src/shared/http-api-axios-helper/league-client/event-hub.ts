@@ -1,5 +1,5 @@
 import {
-  EventBusEvents,
+  EventHubEvents,
   EventChapters,
   EventDetailsData,
   EventInfo,
@@ -8,7 +8,7 @@ import {
   EventPassBundle2,
   EventProgressInfoData,
   EventProgressionPurchaseData,
-  EventRewardTrackBonusItems,
+  EventRewardTrackBonusItem,
   EventRewardTrackBonusProgress,
   EventRewardTrackItem,
   EventRewardTrackUnclaimedRewards,
@@ -20,7 +20,7 @@ export class EventHubHttpApi {
   constructor(private _http: AxiosInstance) {}
 
   getEvents() {
-    return this._http.get<EventBusEvents[]>('/lol-event-hub/v1/events')
+    return this._http.get<EventHubEvents[]>('/lol-event-hub/v1/events')
   }
 
   getChapters(eventId: string) {
@@ -76,7 +76,7 @@ export class EventHubHttpApi {
   }
 
   getRewardTrackBonusItems(eventId: string) {
-    return this._http.get<EventRewardTrackBonusItems>(
+    return this._http.get<EventRewardTrackBonusItem[]>(
       `/lol-event-hub/v1/events/${eventId}/reward-track/bonus-items`
     )
   }

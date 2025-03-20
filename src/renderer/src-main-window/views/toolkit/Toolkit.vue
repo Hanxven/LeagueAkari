@@ -25,6 +25,9 @@
         <NTab name="misc" class="tab-name">
           <span class="tab-name">{{ t('Toolkit.misc') }}</span>
         </NTab>
+        <NTab name="claim-tools" class="tab-name">
+          <span class="tab-name">{{ '领取中心' }}</span>
+        </NTab>
       </NTabs>
     </div>
     <div class="contents">
@@ -35,6 +38,7 @@
           <InProcess v-else-if="currentTab === 'in-process'" />
           <Lobby v-else-if="currentTab === 'lobby'" />
           <Misc v-else-if="currentTab === 'misc'" />
+          <ClaimTools v-else-if="currentTab === 'claim-tools'" />
         </KeepAlive>
       </Transition>
     </div>
@@ -47,6 +51,7 @@ import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
 import { ref } from 'vue'
 
+import ClaimTools from './claim-tools/ClaimTools.vue'
 import Client from './client/Client.vue'
 import InGameSend from './in-game-send/InGameSend.vue'
 import InProcess from './in-process/InProcess.vue'

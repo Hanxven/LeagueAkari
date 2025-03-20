@@ -1,4 +1,4 @@
-export interface EventBusEvents {
+export interface EventHubEvents {
   eventId: string
   eventInfo: EventInfo
 }
@@ -123,7 +123,7 @@ interface RewardOption {
   thumbIconPath: string
 }
 
-export interface EventRewardTrackBonusItems {
+export interface EventRewardTrackBonusItem {
   progressRequired: number
   rewardOptions: RewardOption[]
   rewardTags: any[]
