@@ -3,8 +3,8 @@
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
         <RewardClaimTool />
-        <EventHubClaimTool style="margin-top: 8px" />
         <MissionClaimTool style="margin-top: 8px" />
+        <EventHubClaimTool style="margin-top: 8px" />
       </div>
     </NScrollbar>
   </div>
