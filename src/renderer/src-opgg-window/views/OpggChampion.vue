@@ -312,7 +312,7 @@
           </template>
           <NTabPane name="silver" v-if="augments && augments[1]">
             <template #tab>
-              <span class="augments-tab-title">{{ t('OpggChampion.augmentGold') }}</span>
+              <span class="augments-tab-title">{{ t('OpggChampion.augmentSilver') }}</span>
             </template>
             <div
               class="augments-group"
