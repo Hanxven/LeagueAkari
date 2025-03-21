@@ -946,6 +946,7 @@ Toolkit:
   in-game-send: In-Game Send
   lobby: Lobby Tools
   misc: Misc
+  claim-tools: Claim Tools
 
 ChampionBench:
   title: Champion Bench
@@ -1963,6 +1964,38 @@ BenchChampionTracker:
   useReroll: '{{player}} used a reroll'
   tradeWithPlayer: '{{player1}} traded with {{player2}}'
   swapFromBench: '{{player}} swapped from the bench'
+
+RewardClaimTool: &CommonClaimTool
+  title: Rewards
+
+  columns:
+    rewardList: Claimable Items
+
+  refreshButton: Refresh
+  claimButton: Claim
+  claimButtonC: Claim ({{countV}})
+  cancelButton: Cancel
+
+  refreshSuccess: Refreshed
+  refreshFailed: Failed to fetch {{reason}}
+  claimFailed: Failed to claim {{reason}}
+  claimed: Claimed {{item}}
+
+EventHubClaimTool:
+  title: Event Hub
+
+  hint: Items in this column may overlap with some items in "Rewards". Claiming any one of them is sufficient.
+
+  <<: *CommonClaimTool
+
+MissionClaimTool:
+  <<: *CommonClaimTool
+
+  title: Missions
+  hint: Completing missions in advance may cause data inconsistency. Please use with caution.
+
+ClaimableItem:
+  untranslatedC: Unnamed Group ({{countV}})
 
 useLiveStreamingHints:
   dismiss: Dismiss

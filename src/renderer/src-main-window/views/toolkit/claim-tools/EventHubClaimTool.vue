@@ -1,8 +1,11 @@
 <template>
   <NCard size="small">
     <template #header>
-      <span class="card-header-title">{{ '事件中心' }}</span>
+      <span class="card-header-title">{{ t('EventHubClaimTool.title') }}</span>
     </template>
+    <div class="hint">
+      <span>{{ t('EventHubClaimTool.hint') }}</span>
+    </div>
     <div class="button-group">
       <NButton
         :disabled="isLoading || !selectedEventIds.length || !lcs.isConnected"
@@ -11,8 +14,12 @@
         secondary
         @click="claim"
       >
-        <template v-if="selectedEventIds.length">领取选中 ({{ selectedEventIds.length }})</template>
-        <template v-else>领取选中</template>
+        <template v-if="selectedEventIds.length">{{
+          t('EventHubClaimTool.claimButtonC', { countV: selectedEventIds.length })
+        }}</template>
+        <template v-else>
+          {{ t('EventHubClaimTool.claimButton') }}
+        </template>
       </NButton>
       <NButton
         v-show="isClaiming"
@@ -21,7 +28,7 @@
         secondary
         @click="isClaiming = false"
       >
-        取消
+        {{ t('EventHubClaimTool.cancelButton') }}
       </NButton>
       <NButton
         :disabled="isLoading || !lcs.isConnected"
@@ -29,7 +36,7 @@
         secondary
         @click="updateClaimableEventHubEvents(true)"
       >
-        刷新
+        {{ t('EventHubClaimTool.refreshButton') }}
       </NButton>
     </div>
     <NDataTable
@@ -39,7 +46,6 @@
       }"
       :loading="isLoading"
       size="small"
-      :single-line="false"
       :columns="columns"
       :data="events"
       :row-key="(row) => row.eventId"
@@ -59,7 +65,7 @@ import { useTranslation } from 'i18next-vue'
 import { DataTableColumns, NButton, NCard, NDataTable, useMessage } from 'naive-ui'
 import { computed, h, markRaw, onMounted, ref, shallowRef, watch } from 'vue'
 
-import RewardItem from './RewardItem.vue'
+import ClaimableItem from './ClaimableItem.vue'
 
 const REWARD_STATE_UNSELECTED = 'Unselected'
 
@@ -90,37 +96,21 @@ const columns = computed<DataTableColumns<EventHubEvents>>(() => [
     type: 'selection'
   },
   {
-    title: '事件名称',
-    key: 'eventInfo.eventName'
-  },
-  {
-    title: '可领取数量',
-    key: 'eventInfo.unclaimedRewardCount'
-  },
-  {
-    title: '可领取物品',
+    title: () => t('EventHubClaimTool.columns.rewardList'),
     key: 'rewardList',
     render: (row) => {
-      if (cachedEventHubRewardGroups.value[row.eventId]) {
-        return h(
-          'div',
-          {
-            style: {
-              display: 'flex',
-              gap: '4px',
-              flexWrap: 'wrap'
-            }
-          },
-          cachedEventHubRewardGroups.value[row.eventId].map((reward) => {
-            return h(RewardItem, {
-              iconUrl: reward.thumbIconPath,
-              name: reward.rewardName
-            })
-          })
-        )
-      } else {
-        return h('div', '-')
-      }
+      const items = (cachedEventHubRewardGroups.value[row.eventId] || []).map((reward) => {
+        return {
+          id: reward.rewardGroupId,
+          iconUrl: reward.thumbIconPath,
+          name: reward.rewardName
+        }
+      })
+
+      return h(ClaimableItem, {
+        title: row.eventInfo.eventName,
+        items
+      })
     }
   }
 ])
@@ -135,10 +125,13 @@ const updateClaimableEventHubEvents = async (manually = false) => {
 
     const { data } = await lc.api.eventHub.getEvents()
     events.value = data.filter((event) => event.eventInfo.unclaimedRewardCount)
-    selectedEventIds.value = []
+
+    selectedEventIds.value = selectedEventIds.value.filter((id) =>
+      events.value.some((event) => event.eventId === id)
+    )
 
     if (manually) {
-      message.success(() => '已刷新')
+      message.success(() => t('EventHubClaimTool.refreshSuccess'))
     }
 
     if (!events.value.length) {
@@ -164,7 +157,7 @@ const updateClaimableEventHubEvents = async (manually = false) => {
 
     Promise.allSettled(events.value.map((event) => updateTrackItems(event.eventId)))
   } catch (error: any) {
-    message.warning(() => t('Toolkit.misc.error', { reason: error.message }))
+    message.warning(() => t('EventHubClaimTool.refreshFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
   }
@@ -189,17 +182,19 @@ const claim = async () => {
       const eventInfo = events.value.find((event) => event.eventId === eventId)
 
       if (eventInfo) {
-        message.success(() => `领取了 ${eventInfo.eventInfo.eventName}`)
+        message.success(() =>
+          t('EventHubClaimTool.claimed', { item: eventInfo.eventInfo.eventName })
+        )
       }
     }
   } catch (error: any) {
-    message.warning(() => t('Toolkit.misc.error', { reason: error.message }))
+    message.warning(() => t('EventHubClaimTool.claimFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
     isClaiming.value = false
   }
 
-  await sleep(500) // 可能会更新不及时, 这里在后面再刷新一次
+  await sleep(2000) // 可能会更新不及时, 这里在后面再刷新一次
   await updateClaimableEventHubEvents().catch(() => {})
 }
 
@@ -221,10 +216,10 @@ watch(
   margin-bottom: 8px;
 }
 
-.event-hub-item {
-  display: flex;
-  align-items: center;
-  height: 48px;
-  background-color: #0002;
+.hint {
+  color: #fff8;
+  font-style: italic;
+  font-size: 13px;
+  margin-bottom: 12px;
 }
 </style>

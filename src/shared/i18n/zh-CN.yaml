@@ -949,6 +949,7 @@ Toolkit:
   in-game-send: 游戏内发送
   lobby: 房间工具
   misc: 百宝箱
+  claim-tools: 领取工具
 
 ChampionBench:
   title: 英雄选择台
@@ -1967,6 +1968,37 @@ BenchChampionTracker:
   useReroll: '{{player}} 使用了一个骰子'
   tradeWithPlayer: '{{player1}} 与 {{player2}} 交换'
   swapFromBench: '{{player}} 从备选区拿取'
+
+RewardClaimTool: &CommonClaimTool
+  title: 奖励
+
+  columns:
+    rewardList: 可领取物品
+
+  refreshButton: 刷新
+  claimButton: 领取
+  claimButtonC: 领取 ({{countV}})
+  cancelButton: 取消
+
+  refreshSuccess: 已刷新
+  refreshFailed: 拉取失败 {{reason}}
+  claimFailed: 领取失败 {{reason}}
+  claimed: 已领取 {{item}}
+
+EventHubClaimTool:
+  <<: *CommonClaimTool
+
+  title: 事件中心
+  hint: 此栏目中的可领取条目可能与 “奖励” 中部分条目重叠，任意领取其一即可。
+
+MissionClaimTool:
+  <<: *CommonClaimTool
+
+  title: 任务
+  hint: 提前完成任务可能会导致数据不同步，使用时请斟酌可能的风险。
+
+ClaimableItem:
+  untranslatedC: 未命名奖励组 ({{countV}})
 
 useLiveStreamingHints:
   dismiss: 关闭

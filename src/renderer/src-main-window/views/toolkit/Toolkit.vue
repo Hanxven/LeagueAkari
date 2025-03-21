@@ -26,7 +26,7 @@
           <span class="tab-name">{{ t('Toolkit.misc') }}</span>
         </NTab>
         <NTab name="claim-tools" class="tab-name">
-          <span class="tab-name">{{ '领取中心' }}</span>
+          <span class="tab-name">{{ t('Toolkit.claim-tools') }}</span>
         </NTab>
       </NTabs>
     </div>

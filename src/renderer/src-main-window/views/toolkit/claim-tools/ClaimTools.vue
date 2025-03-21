@@ -2,8 +2,9 @@
   <div class="single-root">
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
-        <EventHubClaimTool />
-        <RewardClaimTool style="margin-top: 8px" />
+        <RewardClaimTool />
+        <EventHubClaimTool style="margin-top: 8px" />
+        <MissionClaimTool style="margin-top: 8px" />
       </div>
     </NScrollbar>
   </div>
@@ -14,6 +15,7 @@ import { NScrollbar } from 'naive-ui'
 
 import EventHubClaimTool from './EventHubClaimTool.vue'
 import RewardClaimTool from './RewardClaimTool.vue'
+import MissionClaimTool from './MissionClaimTool.vue'
 </script>
 
 <style lang="less" scoped>

@@ -1,7 +1,7 @@
 <template>
   <NCard size="small">
     <template #header>
-      <span class="card-header-title">{{ '领取' }}</span>
+      <span class="card-header-title">{{ t('RewardClaimTool.title') }}</span>
     </template>
     <div class="button-group">
       <NButton
@@ -11,8 +11,12 @@
         secondary
         @click="claim"
       >
-        <template v-if="selectedGrantIds.length">领取选中 ({{ selectedGrantIds.length }})</template>
-        <template v-else>领取选中</template>
+        <template v-if="selectedGrantIds.length">
+          {{ t('RewardClaimTool.claimButtonC', { countV: selectedGrantIds.length }) }}
+        </template>
+        <template v-else>
+          {{ t('RewardClaimTool.claimButton') }}
+        </template>
       </NButton>
       <NButton
         v-show="isClaiming"
@@ -21,7 +25,7 @@
         secondary
         @click="isClaiming = false"
       >
-        取消
+        {{ t('RewardClaimTool.cancelButton') }}
       </NButton>
       <NButton
         :disabled="isLoading || !lcs.isConnected"
@@ -29,7 +33,7 @@
         secondary
         @click="updateClaimableRewardGrants(true)"
       >
-        刷新
+        {{ t('RewardClaimTool.refreshButton') }}
       </NButton>
     </div>
     <NDataTable
@@ -39,7 +43,6 @@
       }"
       :loading="isLoading"
       size="small"
-      :single-line="false"
       :columns="columns"
       :data="grants"
       :row-key="(row) => row.info.id"
@@ -60,7 +63,7 @@ import { useTranslation } from 'i18next-vue'
 import { DataTableColumns, NButton, NCard, NDataTable, useMessage } from 'naive-ui'
 import { computed, h, ref, shallowRef, watch } from 'vue'
 
-import RewardItem from './RewardItem.vue'
+import ClaimableItem from './ClaimableItem.vue'
 
 const TARGET_REWARD_GRANT_STATUS = 'PENDING_SELECTION'
 
@@ -80,24 +83,23 @@ const columns = computed<DataTableColumns<RewardsGrant>>(() => [
   {
     type: 'selection'
   },
+
   {
-    title: '奖励名称',
-    key: 'rewardGroup.localizations.title'
-  },
-  {
-    title: '可领取物品',
+    title: () => t('RewardClaimTool.columns.rewardList'),
     key: 'rewardList',
     render: (row) => {
-      return h(
-        'div',
-        { class: 'reward-list' },
-        row.rewardGroup.rewards.map((reward) => {
-          return h(RewardItem, {
-            iconUrl: reward.media.iconUrl,
-            name: reward.localizations.title
-          })
-        })
-      )
+      const items = row.rewardGroup.rewards.map((reward) => {
+        return {
+          id: reward.id,
+          iconUrl: reward.media.iconUrl,
+          name: reward.localizations.title
+        }
+      })
+
+      return h(ClaimableItem, {
+        items,
+        title: row.rewardGroup.localizations.title
+      })
     }
   }
 ])
@@ -112,13 +114,16 @@ const updateClaimableRewardGrants = async (manually = false) => {
 
     const { data } = await lc.api.rewards.getGrants(TARGET_REWARD_GRANT_STATUS)
     grants.value = data
-    selectedGrantIds.value = []
+
+    selectedGrantIds.value = selectedGrantIds.value.filter((id) =>
+      data.some((grant) => grant.info.id === id)
+    )
 
     if (manually) {
-      message.success(() => '已刷新')
+      message.success(() => t('RewardClaimTool.refreshSuccess'))
     }
   } catch (error: any) {
-    message.warning(() => t('Toolkit.misc.error', { reason: error.message }))
+    message.warning(() => t('RewardClaimTool.refreshFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
   }
@@ -154,17 +159,21 @@ const claim = async () => {
           selections: chosen.map((c) => c.id)
         })
 
-        message.success(() => `领取了 ${chosen.map((c) => c.localizations.title).join(', ')}`)
+        message.success(() =>
+          t('RewardClaimTool.claimed', {
+            item: chosen.map((c) => c.localizations.title).join(', ')
+          })
+        )
       }
     }
   } catch (error: any) {
-    message.warning(() => t('Toolkit.misc.error', { reason: error.message }))
+    message.warning(() => t('RewardClaimTool.claimFailed', { reason: error.message }))
   } finally {
     isLoading.value = false
     isClaiming.value = false
   }
 
-  await sleep(500)
+  await sleep(2000)
   await updateClaimableRewardGrants().catch(() => {})
 }
 
@@ -184,12 +193,5 @@ watch(
   display: flex;
   gap: 4px;
   margin-bottom: 8px;
-}
-
-.event-hub-item {
-  display: flex;
-  align-items: center;
-  height: 48px;
-  background-color: #0002;
 }
 </style>

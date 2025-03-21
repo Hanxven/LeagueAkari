@@ -1,12 +1,33 @@
 <template>
-  <div class="reward-item">
-    <LcuImage class="icon" :src="iconUrl" />
-    <div class="caption">{{ name }}</div>
-  </div>
+  <NPopover placement="right-end" :delay="500">
+    <template #trigger>
+      <div class="reward-item">
+        <LcuImage class="icon" :src="iconUrl" />
+        <div class="caption">{{ name }}</div>
+      </div>
+    </template>
+    <div>
+      <LcuImage
+        :style="{
+          width: '128px',
+          marginBottom: '4px'
+        }"
+        :src="iconUrl"
+      />
+      <div
+        :style="{
+          textAlign: 'center'
+        }"
+      >
+        {{ name }}
+      </div>
+    </div>
+  </NPopover>
 </template>
 
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { NPopover } from 'naive-ui'
 
 const { name = '' } = defineProps<{
   iconUrl?: string
@@ -22,7 +43,7 @@ const { name = '' } = defineProps<{
   width: 64px;
 
   .icon {
-    width: 36px;
+    width: 32px;
     aspect-ratio: 1;
     object-fit: cover;
     align-self: center;
