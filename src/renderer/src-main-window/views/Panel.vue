@@ -40,6 +40,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import SidebarFixed from '@main-window/components/sidebar/SidebarFixed.vue'
 import SidebarMenu from '@main-window/components/sidebar/SidebarMenu.vue'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
@@ -47,6 +48,7 @@ const renderIcon = (icon: ComponentC) => {
 
 const { t } = useTranslation()
 
+const as = useAppCommonStore()
 const ogs = useOngoingGameStore()
 const router = useRouter()
 const route = useRoute()
@@ -106,7 +108,7 @@ const menu = computed(() => {
       key: 'test',
       icon: renderIcon(TicketSharpIcon),
       name: t('SideBarMenu.test'),
-      show: import.meta.env.DEV
+      show: import.meta.env.DEV || as.version.includes('rabi')
     }
   ]
 })

@@ -35,7 +35,7 @@ export class LeagueClientRenderer {
   private readonly _pm: PiniaMobxUtilsRenderer
   private readonly _setting: SettingUtilsRenderer
 
-  private readonly _http = axios.create({ baseURL: 'akari://league-client', adapter: 'fetch' })
+  public readonly _http = axios.create({ baseURL: 'akari://league-client', adapter: 'fetch' })
 
   public readonly api: LeagueClientHttpApiAxiosHelper
 

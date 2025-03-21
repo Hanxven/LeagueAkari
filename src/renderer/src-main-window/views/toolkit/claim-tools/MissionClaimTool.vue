@@ -68,6 +68,8 @@ import { computed, h, ref, shallowRef } from 'vue'
 
 import ClaimableItem from './ClaimableItem.vue'
 
+// 虽然是 SELECT_REWARDS, 但很多任务只是一个前置触发器
+// 实际上的奖励领取是再此任务完成后, 自动触发的另一个任务
 const TARGET_MISSION_STATUS = 'SELECT_REWARDS'
 
 const { t } = useTranslation()
@@ -103,8 +105,8 @@ const columns = computed<DataTableColumns<Mission>>(() => [
     }
   }
 ])
-const missions = shallowRef<Mission[]>([])
 
+const missions = shallowRef<Mission[]>([])
 const selectedMissionIds = ref<string[]>([])
 
 const updateClaimableMissions = async (manually = false) => {

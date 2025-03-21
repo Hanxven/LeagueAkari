@@ -63,7 +63,7 @@ import { EventHubEvents } from '@shared/types/league-client/event-hub'
 import { sleep } from '@shared/utils/sleep'
 import { useTranslation } from 'i18next-vue'
 import { DataTableColumns, NButton, NCard, NDataTable, useMessage } from 'naive-ui'
-import { computed, h, markRaw, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, h, markRaw, ref, shallowRef, watch } from 'vue'
 
 import ClaimableItem from './ClaimableItem.vue'
 
