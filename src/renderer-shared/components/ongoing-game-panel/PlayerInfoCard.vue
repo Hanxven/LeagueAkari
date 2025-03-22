@@ -67,7 +67,22 @@
         <NPopover :keep-alive-on-hover="false" :delay="50">
           <template #trigger>
             <div class="ranked">
-              <template v-if="queueType !== 'CHERRY'">
+              <template v-if="queueType === 'CHERRY' && rankedSoloFlex.cherry">
+                <div
+                  class="ranked-item cherry"
+                  v-if="rankedSoloFlex.cherry && rankedSoloFlex.cherry.ratedRating"
+                >
+                  <span class="text"
+                    >{{ t('common.queueTypes.CHERRY') }}
+                    <span style="font-weight: bold">{{ rankedSoloFlex.cherry.ratedRating }}</span>
+                    Pt</span
+                  >
+                </div>
+                <div class="ranked-item unranked cherry" v-else>
+                  <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
+                </div>
+              </template>
+              <template v-else>
                 <div
                   class="ranked-item"
                   v-if="
@@ -90,21 +105,6 @@
                   <span class="text">{{ rankedSoloFlex.flex.text }}</span>
                 </div>
                 <div class="ranked-item unranked" v-else>
-                  <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
-                </div>
-              </template>
-              <template v-else>
-                <div
-                  class="ranked-item cherry"
-                  v-if="rankedSoloFlex.cherry && rankedSoloFlex.cherry.ratedRating"
-                >
-                  <span class="text"
-                    >{{ t('common.queueTypes.CHERRY') }}
-                    <span style="font-weight: bold">{{ rankedSoloFlex.cherry.ratedRating }}</span>
-                    Pt</span
-                  >
-                </div>
-                <div class="ranked-item unranked cherry" v-else>
                   <span class="text">{{ t('common.shortTiers.UNRANKED') }}</span>
                 </div>
               </template>
@@ -421,6 +421,7 @@
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useChampionInfo } from '@renderer-shared/compositions/useChampionInfo'
 import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -454,7 +455,6 @@ import {
   RANKED_MEDAL_MAP
 } from './ongoing-game-utils'
 import TagsArea from './widgets/TagsArea.vue'
-import { useChampionInfo } from '@renderer-shared/compositions/useChampionInfo'
 
 const {
   puuid,
