@@ -121,7 +121,7 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
 
   private async _getChampionSkinUrl(skinId: number) {
     if (this._urlCache.has(skinId)) {
-      return this._lc.url(this._urlCache.get(skinId)!)
+      return LeagueClientRenderer.url(this._urlCache.get(skinId)!)
     }
 
     const championId = skinId.toString().slice(0, -3)
@@ -130,14 +130,14 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     for (const skin of data.skins) {
       if (skin.id === skinId) {
         this._urlCache.set(skinId, skin.splashPath)
-        return this._lc.url(skin.splashPath)
+        return LeagueClientRenderer.url(skin.splashPath)
       }
 
       if (skin.questSkinInfo) {
         for (const tier of skin.questSkinInfo.tiers) {
           if (tier.id === skinId) {
             this._urlCache.set(skinId, tier.splashPath)
-            return this._lc.url(tier.splashPath)
+            return LeagueClientRenderer.url(tier.splashPath)
           }
         }
       }

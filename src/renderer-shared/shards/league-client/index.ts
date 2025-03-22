@@ -1,6 +1,10 @@
+import { RadixEventEmitter } from '@shared/event-emitter'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
+import { LcuEvent } from '@shared/types/league-client/event'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
+import { unsubscribe } from 'diagnostics_channel'
+import { getCurrentScope, onScopeDispose } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -35,8 +39,10 @@ export class LeagueClientRenderer {
   private readonly _pm: PiniaMobxUtilsRenderer
   private readonly _setting: SettingUtilsRenderer
 
-  public readonly _http = axios.create({ baseURL: 'akari://league-client', adapter: 'fetch' })
+  /** 这里只用于当作一个普通的静态事件分发器 */
+  private readonly _emitter = new RadixEventEmitter()
 
+  public readonly _http = axios.create({ baseURL: 'akari://league-client', adapter: 'fetch' })
   public readonly api: LeagueClientHttpApiAxiosHelper
 
   async onInit() {
@@ -92,6 +98,8 @@ export class LeagueClientRenderer {
     if (summoner) {
       await this._pm.sync(MAIN_SHARD_NAMESPACE, 'summoner', store.summoner)
     }
+
+    this._handleSubscribedLcuEventDispatch()
   }
 
   constructor(
@@ -116,7 +124,66 @@ export class LeagueClientRenderer {
     this.api = new LeagueClientHttpApiAxiosHelper(this._http)
   }
 
-  url(uri: string) {
+  private async _internalSubscribe(uri: string) {
+    const subId = await this._ipc.call<string>(MAIN_SHARD_NAMESPACE, 'subscribeLcuEndpoint', uri)
+
+    return {
+      subId,
+      unsubscribe: () => {
+        return this._ipc.call<boolean>(MAIN_SHARD_NAMESPACE, 'unsubscribeLcuEndpoint', subId)
+      }
+    }
+  }
+
+  private _handleSubscribedLcuEventDispatch() {
+    this._ipc.onEvent(
+      MAIN_SHARD_NAMESPACE,
+      'extra-lcu-event',
+      (subId: string, event: LcuEvent, params) => {
+        this._emitter.emit(subId, { event, params })
+      }
+    )
+  }
+
+  onLcuEventVue<T = any, P = Record<string, any>>(
+    uri: string,
+    listener: (data: LcuEvent<T>, params: P) => void
+  ) {
+    let disposed = false
+    let unsubscribeFn: (() => Promise<boolean>) | null = null
+    let offFn: (() => void) | null = null
+
+    this._internalSubscribe(uri).then(({ subId, unsubscribe }) => {
+      if (disposed) {
+        unsubscribe()
+        return
+      }
+
+      unsubscribeFn = unsubscribe
+      offFn = this._emitter.on(subId, ({ event, params }) => listener(event, params))
+    })
+
+    const dispose = () => {
+      if (disposed) {
+        return
+      }
+
+      if (offFn) {
+        offFn()
+      }
+
+      if (unsubscribeFn) {
+        unsubscribeFn().catch(console.error)
+      }
+
+      disposed = true
+    }
+
+    getCurrentScope() && onScopeDispose(() => dispose())
+    return dispose
+  }
+
+  static url(uri: string) {
     return new URL(uri, 'akari://league-client').href
   }
 

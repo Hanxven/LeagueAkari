@@ -172,10 +172,14 @@ const claim = async () => {
     isLoading.value = false
     isClaiming.value = false
   }
-
-  await sleep(2000)
-  await updateClaimableRewardGrants().catch(() => {})
 }
+
+lc.onLcuEventVue<RewardsGrant[]>('/lol-rewards/v1/grants', ({ data }) => {
+  grants.value = data.filter((grant) => grant.info.status === TARGET_REWARD_GRANT_STATUS)
+  selectedGrantIds.value = selectedGrantIds.value.filter((id) =>
+    grants.value.some((grant) => grant.info.id === id)
+  )
+})
 
 watch(
   () => lcs.isConnected,

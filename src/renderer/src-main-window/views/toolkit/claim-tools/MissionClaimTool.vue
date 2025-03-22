@@ -64,7 +64,7 @@ import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { sleep } from '@shared/utils/sleep'
 import { useTranslation } from 'i18next-vue'
 import { DataTableColumns, NButton, NCard, NDataTable, useMessage } from 'naive-ui'
-import { computed, h, ref, shallowRef } from 'vue'
+import { computed, h, ref, shallowRef, watch } from 'vue'
 
 import ClaimableItem from './ClaimableItem.vue'
 
@@ -181,6 +181,23 @@ const claim = async () => {
   await sleep(2000)
   await updateClaimableMissions().catch(() => {})
 }
+
+lc.onLcuEventVue<Mission[]>('/lol-missions/v1/missions', ({ data }) => {
+  missions.value = data.filter((mission) => mission.status === TARGET_MISSION_STATUS)
+  selectedMissionIds.value = selectedMissionIds.value.filter((id) =>
+    missions.value.some((mission) => mission.id === id)
+  )
+})
+
+watch(
+  () => lcs.isConnected,
+  (isConnected) => {
+    if (isConnected) {
+      updateClaimableMissions()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="less" scoped>

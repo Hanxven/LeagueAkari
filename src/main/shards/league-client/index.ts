@@ -78,6 +78,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
   private _eventBus = new RadixEventEmitter()
 
+  private _rendererSubIncrement = 1
+  private readonly _rendererSubMap = new Map<string, () => void>()
+
   private _assetLimiter = new PQueue({ concurrency: 8 })
 
   private _manuallyDisconnected = false
@@ -247,6 +250,32 @@ export class LeagueClientMain implements IAkariShardInitDispose {
 
     this._ipc.onCall(LeagueClientMain.id, 'fixWindowMethodA', async (_, config) => {
       await this.fixWindowMethodA(config)
+    })
+
+    this._ipc.onCall(LeagueClientMain.id, 'subscribeLcuEndpoint', async (_, uri: string) => {
+      const newId = `__${this._rendererSubIncrement++}`
+      const dispose = this._eventBus.on(uri, (data, params) => {
+        this._ipc.sendEvent(LeagueClientMain.id, 'extra-lcu-event', newId, data, params)
+      })
+      this._rendererSubMap.set(newId, dispose)
+
+      this._log.debug(`渲染进程订阅 LCU 事件 ${uri}，ID: ${newId}`)
+
+      return newId
+    })
+
+    this._ipc.onCall(LeagueClientMain.id, 'unsubscribeLcuEndpoint', async (_, subId: string) => {
+      const dispose = this._rendererSubMap.get(subId)
+      if (dispose) {
+        dispose()
+        this._rendererSubMap.delete(subId)
+
+        this._log.debug(`渲染进程取消订阅 LCU 事件，ID: ${subId}`)
+
+        return true
+      }
+
+      return false
     })
   }
 
