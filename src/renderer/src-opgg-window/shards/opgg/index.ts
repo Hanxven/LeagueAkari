@@ -15,6 +15,8 @@ export class OpggRenderer {
   async onInit() {
     const store = useOpggStore()
 
-    await this._setting.savedPropVue(OpggRenderer.id, store.frontendSettings, 'autoApply')
+    await this._setting.savedPropVue(OpggRenderer.id, store.frontendSettings, 'autoApplyItems')
+    await this._setting.savedPropVue(OpggRenderer.id, store.frontendSettings, 'autoApplyRunes')
+    await this._setting.savedPropVue(OpggRenderer.id, store.frontendSettings, 'autoApplySpells')
   }
 }

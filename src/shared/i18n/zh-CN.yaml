@@ -1725,9 +1725,18 @@ Opgg:
         d: 闪现位置默认在 D
         f: 闪现位置默认在 F
         auto: 根据当前闪现的位置决定
-    autoApply:
-      label: 自动应用
+
+    autoApplyRunes:
+      label: 自动应用符文
       description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
+
+    autoApplySpells:
+      label: 自动应用召唤师技能
+      description: 若英雄数据匹配当前模式，自动应用最高出场率的召唤师技能和符文。仅当 OP.GG 窗口启用且窗口可见时生效
+
+    autoApplyItems:
+      label: 自动应用装备方案
+      description: 若英雄数据匹配当前模式，自动应用装备方案。仅当 OP.GG 窗口启用且窗口可见时生效
 
   success: '请求已发送: {{reason}}'
   summonerSpells: 召唤师技能

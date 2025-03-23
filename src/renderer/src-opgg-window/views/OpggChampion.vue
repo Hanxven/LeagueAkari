@@ -499,7 +499,7 @@
                 size="tiny"
                 type="primary"
                 secondary
-                @click="handleAddToItemSet"
+                @click="emits('addToItemSet')"
                 :disabled="lcs.connectionState !== 'connected'"
                 >{{ t('OpggChampion.apply') }}</NButton
               >
@@ -767,6 +767,7 @@ const props = defineProps<{
   loading?: boolean
   champion?: any
   data?: any
+  isAbleToAddToItemSet?: boolean
 }>()
 
 const emits = defineEmits<{
@@ -781,13 +782,12 @@ const emits = defineEmits<{
       stat_mod_ids: number[]
     }
   ]
+  addToItemSet: []
 }>()
 
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
-const lc = useInstance(LeagueClientRenderer)
-const log = useInstance(LoggerRenderer)
 
 const info = computed(() => {
   if (!props.champion) {
@@ -911,180 +911,6 @@ if (import.meta.env.DEV) {
   watchEffect(() => {
     console.debug('OPGG Component: Info', info.value)
   })
-}
-
-const message = useMessage()
-
-const isAbleToAddToItemSet = computed(() => {
-  if (!props.data) {
-    return false
-  }
-
-  let result = false
-
-  if (props.data.data.boots && props.data.data.boots.length) {
-    result = true
-  }
-
-  if (props.data.data.starter_items && props.data.data.starter_items.length) {
-    result = true
-  }
-
-  if (props.data.data.core_items && props.data.data.core_items.length) {
-    result = true
-  }
-
-  if (props.data.data.last_items && props.data.data.last_items.length) {
-    result = true
-  }
-
-  if (props.data.data.prism_items && props.data.data.prism_items.length) {
-    result = true
-  }
-
-  return result
-})
-
-// 防止添加一大堆重复内容
-// akari1 用于标记为本软件生成的装备集
-const toItemSetsUid = (traits: {
-  championId: number
-  mode?: string
-  region?: string
-  tier?: string
-  position?: string
-  version?: string
-}) => {
-  return `akari1-${traits.championId}-${traits.mode || '_'}-${traits.region || '_'}-${traits.tier || '_'}-${traits.position || '_'}-${traits.version || '_'}`
-}
-
-// 11 - SR, 12 - HA, 30 - RoW, 21 - NB
-const mapIds = {
-  ranked: 11,
-  aram: 12,
-  arena: 30,
-  nexus_blitz: 21,
-  urf: 11
-}
-
-// 写文件的方案还是通过 LCU API 的 custom
-const ADDING_STRATEGY: 'write-to-file' | 'lcu-api' = 'write-to-file'
-
-const handleAddToItemSet = async () => {
-  if (!props.data) {
-    return
-  }
-
-  try {
-    const itemGroups: Array<{ title: string; items: number[] }> = []
-    const positionName =
-      props.position && props.position !== 'none' ? t(`Opgg.positions.${props.position}`) || '' : ''
-
-    const newUid = toItemSetsUid({
-      championId: props.champion.id,
-      mode: props.mode,
-      region: props.region,
-      tier: props.tier,
-      position: props.position,
-      version: props.version
-    })
-
-    if (props.data.data.starter_items && props.data.data.starter_items.length) {
-      props.data.data.starter_items.slice(0, 3).forEach((s: any, i: number) => {
-        itemGroups.push({
-          title: t('OpggChampion.starterItem', {
-            index: i + 1,
-            pickRate: (s.pick_rate * 100).toFixed(2)
-          }),
-          items: s.ids
-        })
-      })
-    }
-
-    if (props.data.data.boots && props.data.data.boots.length) {
-      itemGroups.push({
-        title: t('OpggChampion.bootsDesc'),
-        items: props.data.data.boots.reduce((acc: number[], cur: any) => {
-          acc.push(...cur.ids)
-          return acc
-        }, [])
-      })
-    }
-
-    if (props.data.data.prism_items && props.data.data.prism_items.length) {
-      itemGroups.push({
-        title: t('OpggChampion.prismItemsDesc'),
-        items: props.data.data.prism_items.reduce((acc: number[], cur: any) => {
-          acc.push(...cur.ids)
-          return acc
-        }, [])
-      })
-    }
-
-    if (props.data.data.core_items && props.data.data.core_items.length) {
-      props.data.data.core_items.slice(0, 4).forEach((s: any, i: number) => {
-        itemGroups.push({
-          title: t('OpggChampion.coreItem', {
-            index: i + 1,
-            pickRate: (s.pick_rate * 100).toFixed(2)
-          }),
-          items: s.ids
-        })
-      })
-    }
-
-    if (props.data.data.last_items && props.data.data.last_items.length) {
-      itemGroups.push({
-        title: t('OpggChampion.itemsDesc'),
-        items: props.data.data.last_items.reduce((acc: number[], cur: any) => {
-          acc.push(...cur.ids)
-          return acc
-        }, [])
-      })
-    }
-
-    await lc.writeItemSetsToDisk([
-      {
-        uid: newUid,
-        title: `[OP.GG] ${lcs.gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${props.mode === 'arena' || props.mode === 'nexus_blitz' ? ` ${t(`Opgg.modes.${props.position}`)}` : ''}`,
-        sortrank: 0,
-        type: 'global',
-        map: 'any',
-        mode: 'any',
-        blocks: itemGroups.map((g) => ({
-          type: g.title,
-          items: g.items.map((i) => ({
-            id: i.toString(),
-            count: 1
-          }))
-        })),
-        associatedChampions: [],
-        associatedMaps: [],
-        preferredItemSlots: []
-      }
-    ])
-
-    message.success(t('OpggChampion.writtenToDisk'))
-
-    if (lcs.chat.conversations.championSelect) {
-      lc.api.chat
-        .chatSend(
-          lcs.chat.conversations.championSelect.id,
-          t('OpggChampion.writeToDisk', {
-            name: `[OP.GG] ${lcs.gameData.champions[info.value?.id]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`
-          }),
-          'celebration'
-        )
-        .catch(() => {})
-    }
-  } catch (error) {
-    log.warn('view:OpggChampion', `[OP.GG] 添加到物品集失败: ${(error as any).message}`, error)
-    message.warning(
-      t('OpggChampion.writeFileFailedMessage', {
-        error: (error as any).message
-      })
-    )
-  }
 }
 </script>
 

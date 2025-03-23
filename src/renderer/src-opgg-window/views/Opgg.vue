@@ -119,9 +119,11 @@
         :tier="tier"
         :mode="mode"
         :version="version || undefined"
+        :is-able-to-add-to-item-set="isAbleToAddToItemSet"
         @set-runes="setRunes"
         @set-spells="setSummonerSpells"
         @set-summoner-spells="setSummonerSpells"
+        @add-to-item-set="handleAddToItemSet"
       />
     </div>
     <Transition name="fade">
@@ -150,15 +152,32 @@
               </NFlex>
             </NRadioGroup>
           </ControlItem>
-          <!-- TODO: i18n -->
           <ControlItem
             class="control-item-margin"
             style="justify-content: space-between"
-            :label="t('Opgg.settings.autoApply.label')"
-            :label-description="t('Opgg.settings.autoApply.description')"
+            :label="t('Opgg.settings.autoApplyRunes.label')"
+            :label-description="t('Opgg.settings.autoApplyRunes.description')"
             :label-width="300"
           >
-            <NSwitch v-model:value="os.frontendSettings.autoApply" size="small" />
+            <NSwitch v-model:value="os.frontendSettings.autoApplyRunes" size="small" />
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            style="justify-content: space-between"
+            :label="t('Opgg.settings.autoApplySpells.label')"
+            :label-description="t('Opgg.settings.autoApplySpells.description')"
+            :label-width="300"
+          >
+            <NSwitch v-model:value="os.frontendSettings.autoApplySpells" size="small" />
+          </ControlItem>
+          <ControlItem
+            class="control-item-margin"
+            style="justify-content: space-between"
+            :label="t('Opgg.settings.autoApplyItems.label')"
+            :label-description="t('Opgg.settings.autoApplyItems.description')"
+            :label-width="300"
+          >
+            <NSwitch v-model:value="os.frontendSettings.autoApplyItems" size="small" />
           </ControlItem>
         </div>
       </div>
@@ -415,7 +434,6 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
     // 这段逻辑先耦合在这里, 以后可能会被移除
     if (
       shouldAutoApply &&
-      os.frontendSettings.autoApply &&
       automation.value?.championId === championId.value &&
       isModeMatch.value &&
       ows.show
@@ -427,19 +445,18 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
       const runes = anyChampion.data.runes
 
       let spellToApply = spells?.[0]
-      let runeToApply = runes?.[0]
+      let runesToApply = runes?.[0]
 
-      // 至少有一个存在的情况下, 将走自动应用流程
-      if (spellToApply || runeToApply) {
-        message.info('将自动设置召唤师技能和符文')
+      if (os.frontendSettings.autoApplyRunes && runesToApply) {
+        await setRunes(runesToApply)
+      }
 
-        if (spellToApply) {
-          await setSummonerSpells(spellToApply.ids)
-        }
+      if (os.frontendSettings.autoApplyItems && spellToApply) {
+        await setSummonerSpells(spellToApply.ids)
+      }
 
-        if (runeToApply) {
-          await setRunes(runeToApply)
-        }
+      if (os.frontendSettings.autoApplyItems) {
+        await handleAddToItemSet()
       }
     }
   } catch (error) {
@@ -592,8 +609,6 @@ const automation = useStableComputed(() => {
     gameMode: lcs.gameflow.session.gameData.queue.gameMode
   }
 })
-
-const applyAll = async () => {}
 
 watchDebounced(
   automation,
@@ -783,6 +798,170 @@ const setRunes = async (r: {
   } catch (error) {
     log.warn('view:Opgg', `设置符文配法失败: ${(error as any).message}`, error)
     message.warning(t('Opgg.setRunesFailedMessage', { reason: (error as any).message }))
+  }
+}
+
+const isAbleToAddToItemSet = computed(() => {
+  if (!champion.value) {
+    return false
+  }
+
+  let result = false
+
+  if (champion.value.data.boots && champion.value.data.boots.length) {
+    result = true
+  }
+
+  if (champion.value.data.starter_items && champion.value.data.starter_items.length) {
+    result = true
+  }
+
+  if (champion.value.data.core_items && champion.value.data.core_items.length) {
+    result = true
+  }
+
+  if (champion.value.data.last_items && champion.value.data.last_items.length) {
+    result = true
+  }
+
+  // @ts-ignore
+  if (champion.value.data.prism_items && champion.value.data.prism_items.length) {
+    result = true
+  }
+
+  return result
+})
+
+// 防止添加一大堆重复内容
+// akari1 用于标记为本软件生成的装备集
+const toItemSetsUid = (traits: {
+  championId: number
+  mode?: string
+  region?: string
+  tier?: string
+  position?: string
+  version?: string
+}) => {
+  return `akari1-${traits.championId}-${traits.mode || '_'}-${traits.region || '_'}-${traits.tier || '_'}-${traits.position || '_'}-${traits.version || '_'}`
+}
+
+// TODO
+const handleAddToItemSet = async () => {
+  if (!champion.value || !isAbleToAddToItemSet.value) {
+    return
+  }
+
+  try {
+    const itemGroups: Array<{ title: string; items: number[] }> = []
+    const positionName =
+      position.value && position.value !== 'none' ? t(`Opgg.positions.${position.value}`) || '' : ''
+
+    const newUid = toItemSetsUid({
+      championId: championItem.value?.id || -1,
+      mode: mode.value,
+      region: region.value,
+      tier: tier.value,
+      position: position.value,
+      version: version.value || '0'
+    })
+
+    if (champion.value.data.starter_items && champion.value.data.starter_items.length) {
+      champion.value.data.starter_items.slice(0, 3).forEach((s: any, i: number) => {
+        itemGroups.push({
+          title: t('OpggChampion.starterItem', {
+            index: i + 1,
+            pickRate: (s.pick_rate * 100).toFixed(2)
+          }),
+          items: s.ids
+        })
+      })
+    }
+
+    if (champion.value.data.boots && champion.value.data.boots.length) {
+      itemGroups.push({
+        title: t('OpggChampion.bootsDesc'),
+        items: champion.value.data.boots.reduce((acc: number[], cur: any) => {
+          acc.push(...cur.ids)
+          return acc
+        }, [])
+      })
+    }
+
+    // @ts-ignore
+    if (champion.value.data?.prism_items && champion.value.data?.prism_items.length) {
+      itemGroups.push({
+        title: t('OpggChampion.prismItemsDesc'),
+        // @ts-ignore
+        items: champion.value.data?.prism_items.reduce((acc: number[], cur: any) => {
+          acc.push(...cur.ids)
+          return acc
+        }, [])
+      })
+    }
+
+    if (champion.value.data.core_items && champion.value.data.core_items.length) {
+      champion.value.data.core_items.slice(0, 4).forEach((s: any, i: number) => {
+        itemGroups.push({
+          title: t('OpggChampion.coreItem', {
+            index: i + 1,
+            pickRate: (s.pick_rate * 100).toFixed(2)
+          }),
+          items: s.ids
+        })
+      })
+    }
+
+    if (champion.value.data.last_items && champion.value.data.last_items.length) {
+      itemGroups.push({
+        title: t('OpggChampion.itemsDesc'),
+        items: champion.value.data.last_items.reduce((acc: number[], cur: any) => {
+          acc.push(...cur.ids)
+          return acc
+        }, [])
+      })
+    }
+
+    await lc.writeItemSetsToDisk([
+      {
+        uid: newUid,
+        title: `[OP.GG] ${lcs.gameData.champions[championItem.value?.id || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}${mode.value === 'arena' || mode.value === 'nexus_blitz' ? ` ${t(`Opgg.modes.${position.value}`)}` : ''}`,
+        sortrank: 0,
+        type: 'global',
+        map: 'any',
+        mode: 'any',
+        blocks: itemGroups.map((g) => ({
+          type: g.title,
+          items: g.items.map((i) => ({
+            id: i.toString(),
+            count: 1
+          }))
+        })),
+        associatedChampions: [],
+        associatedMaps: [],
+        preferredItemSlots: []
+      }
+    ])
+
+    message.success(t('OpggChampion.writtenToDisk'))
+
+    if (lcs.chat.conversations.championSelect) {
+      lc.api.chat
+        .chatSend(
+          lcs.chat.conversations.championSelect.id,
+          t('OpggChampion.writeToDisk', {
+            name: `[OP.GG] ${lcs.gameData.champions[championItem.value?.id || -1]?.name || '-'}${positionName ? ` - ${positionName}` : ''}`
+          }),
+          'celebration'
+        )
+        .catch(() => {})
+    }
+  } catch (error) {
+    log.warn('view:OpggChampion', `[OP.GG] 添加到物品集失败: ${(error as any).message}`, error)
+    message.warning(
+      t('OpggChampion.writeFileFailedMessage', {
+        error: (error as any).message
+      })
+    )
   }
 }
 
