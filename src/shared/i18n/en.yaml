@@ -1978,6 +1978,8 @@ BenchChampionTracker:
 RewardClaimTool: &CommonClaimTool
   title: Rewards
 
+  hint: To find something forgotten.
+
   columns:
     rewardList: Claimable Items
 

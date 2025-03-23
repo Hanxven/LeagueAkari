@@ -2,7 +2,7 @@
   <div class="single-root">
     <NScrollbar class="outer-wrapper">
       <div style="margin-bottom: 12px">
-        This page is reserved for testing scenarios. Shows in DEV or .rabi versions only.
+        此页面被用于测试功能，仅在开发环境或 .rabi 版本中可见。
       </div>
       <NButton tertiary type="primary" @click="stubGetHomeHub"
         >恶魔手契成为三体人 (请先过新手教程)</NButton
@@ -44,7 +44,7 @@ const stubGetHomeHub = async () => {
             currency: 114514,
             runBonusStats: {
               BonusBaseCardDamage: 999999999,
-              BonusCritChance: 0,
+              BonusCritChance: 100,
               BonusMaxHp: 0
             }
           }

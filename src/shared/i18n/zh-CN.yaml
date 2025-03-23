@@ -1982,6 +1982,8 @@ BenchChampionTracker:
 RewardClaimTool: &CommonClaimTool
   title: 奖励
 
+  hint: 找回一些遗忘的东西。
+
   columns:
     rewardList: 可领取物品
 

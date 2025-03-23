@@ -3,6 +3,9 @@
     <template #header>
       <span class="card-header-title">{{ t('RewardClaimTool.title') }}</span>
     </template>
+    <div class="hint">
+      <span>{{ t('RewardClaimTool.hint') }}</span>
+    </div>
     <div class="button-group">
       <NButton
         :disabled="isLoading || !selectedGrantIds.length || !lcs.isConnected"
@@ -197,5 +200,12 @@ watch(
   display: flex;
   gap: 4px;
   margin-bottom: 8px;
+}
+
+.hint {
+  color: #fff8;
+  font-style: italic;
+  font-size: 13px;
+  margin-bottom: 12px;
 }
 </style>
