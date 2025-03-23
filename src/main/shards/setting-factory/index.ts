@@ -114,8 +114,18 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     return results.map((v) => v.value)
   }
 
-  async _setJsonValue(namespace: string, key: string, path: string, value: any) {
+  async _setJsonValue(namespace: string, key: string, path: string, value: any, defaultJson?: any) {
     const key2 = `${namespace}/${key}`
+
+    const jsonExists = await this._hasKeyInStorage(namespace, key)
+
+    if (!jsonExists) {
+      if (defaultJson === undefined) {
+        throw new Error(`key ${key2} does not exist`)
+      }
+
+      await this._saveToStorage(namespace, key, defaultJson)
+    }
 
     const result = await this._storage.dataSource.manager
       .createQueryBuilder()
