@@ -1755,6 +1755,7 @@ Opgg:
     arena: '斗魂竞技场'
     nexus_blitz: '极限闪击'
     urf: '无限火力'
+    none: '无'
 
   positions:
     top: '上单'

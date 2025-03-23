@@ -28,6 +28,14 @@ export class SetterSettingService {
     return this._ins._saveToStorage(this._namespace, key, value)
   }
 
+  _getValuesFromStorage(key: string) {
+    return this._ins._getValuesFromStorage(this._namespace, key)
+  }
+
+  _setJsonValue(key: string, path: string, value: any) {
+    return this._ins._setJsonValue(this._namespace, key, path, value)
+  }
+
   /**
    * 获取所有设置项
    */

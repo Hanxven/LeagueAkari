@@ -9,6 +9,7 @@ import { Paths } from '@shared/utils/types'
 import { app, dialog } from 'electron'
 import fs from 'node:original-fs'
 import path from 'node:path'
+import { Like } from 'typeorm'
 
 import { AkariIpcError, AkariIpcMain } from '../ipc'
 import { StorageMain } from '../storage'
@@ -101,6 +102,32 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     }
 
     return v.value
+  }
+
+  async _getValuesFromStorage(namespace: string, keyPrefix: string) {
+    const prefix = `${namespace}/${keyPrefix}`
+
+    const results = await this._storage.dataSource.manager.findBy(Setting, {
+      key: Like(`${prefix}%`)
+    })
+
+    return results.map((v) => v.value)
+  }
+
+  async _setJsonValue(namespace: string, key: string, path: string, value: any) {
+    const key2 = `${namespace}/${key}`
+
+    const result = await this._storage.dataSource.manager
+      .createQueryBuilder()
+      .update()
+      .set({
+        value: () => `json_set(value, '$.${path}', :jsonValue)`
+      })
+      .where('key = :key', { key2 })
+      .setParameter('jsonValue', JSON.stringify(value))
+      .execute()
+
+    return result.affected || 0
   }
 
   /**

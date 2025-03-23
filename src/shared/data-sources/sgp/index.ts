@@ -52,6 +52,7 @@ export interface AvailableServersMap {
 
 export class SgpApi {
   static USER_AGENT = 'LeagueOfLegendsClient/14.13.596.7996 (rcp-be-lol-match-history)'
+  static REQUEST_TIMEOUT = 12500
 
   private _availableSgpServers: AvailableServersMap = {
     servers: {},
@@ -68,7 +69,8 @@ export class SgpApi {
   private _http = axios.create({
     headers: {
       'User-Agent': SgpApi.USER_AGENT
-    }
+    },
+    timeout: SgpApi.REQUEST_TIMEOUT
   })
 
   get http() {

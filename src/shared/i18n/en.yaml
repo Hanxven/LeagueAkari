@@ -1749,6 +1749,7 @@ Opgg:
     arena: 'Arena'
     nexus_blitz: 'Nexus Blitz'
     urf: 'URF'
+    none: 'None'
 
   positions:
     top: 'Top'
