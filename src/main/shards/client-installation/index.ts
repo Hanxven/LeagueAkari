@@ -10,8 +10,6 @@ import RES_POSITIONER from '../../../../resources/AKARI?asset&asarUnpack'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
-import { SettingFactoryMain } from '../setting-factory'
-import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { ClientInstallationState } from './state'
 
 const execAsync = util.promisify(cp.exec)

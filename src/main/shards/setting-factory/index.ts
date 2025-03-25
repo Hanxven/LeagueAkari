@@ -127,17 +127,36 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
       await this._saveToStorage(namespace, key, defaultJson)
     }
 
+    const ph = path.startsWith('[') ? path : `$.${path}`
+
     const result = await this._storage.dataSource.manager
       .createQueryBuilder()
       .update()
       .set({
-        value: () => `json_set(value, '$.${path}', :jsonValue)`
+        value: () => `json_set(value, '${ph}', :jsonValue)`
       })
-      .where('key = :key', { key2 })
+      .where('key = :key2', { key2 })
       .setParameter('jsonValue', JSON.stringify(value))
       .execute()
 
     return result.affected || 0
+  }
+
+  async _removeJsonValue(namespace: string, key: string, path: string) {
+    const key2 = `${namespace}/${key}`
+
+    const ph = path.startsWith('[') ? path : `$.${path}`
+
+    const result = await this._storage.dataSource.manager
+      .createQueryBuilder()
+      .update()
+      .set({
+        value: () => `json_remove(value, '${ph}')`
+      })
+      .where('key = :key2', { key2 })
+      .execute()
+
+    return result.affected
   }
 
   /**

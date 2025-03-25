@@ -8,10 +8,12 @@ import { Eta } from 'eta'
 import { TemplateFunction } from 'eta/dist/types/compile'
 import { toJS } from 'mobx'
 import fs from 'node:fs'
+import vm from 'node:vm'
 
 import { AppCommonMain } from '../app-common'
 import { GameClientMain } from '../game-client'
 import { AkariIpcMain } from '../ipc'
+import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -19,8 +21,8 @@ import { OngoingGameMain } from '../ongoing-game'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import defaultTemplate from './default-template.ejs?asset'
-import { CustomSend, InGameSendSettings, InGameSendState } from './state'
-import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
+import { JS_TEMPLATE_CHECK_RESULT, checkContextV1 } from './js-template'
+import { CustomSend, InGameSendSettings, InGameSendState, TemplateDef } from './state'
 
 /**
  * 用于在游戏中模拟发送的相关功能
@@ -32,14 +34,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
   static id = 'in-game-send-main'
   static dependencies = [
     SHARED_GLOBAL_ID,
-    'akari-ipc-main',
-    'mobx-utils-main',
-    'league-client-main',
-    'logger-factory-main',
-    'setting-factory-main',
-    'keyboard-shortcuts-main',
-    'ongoing-game-main',
-    'app-common-main'
+    AkariIpcMain,
+    MobxUtilsMain.id,
+    LeagueClientMain.id,
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id,
+    KeyboardShortcutsMain.id,
+    OngoingGameMain.id,
+    AppCommonMain.id
   ]
 
   /**
@@ -67,8 +69,6 @@ export class InGameSendMain implements IAkariShardInitDispose {
   private readonly _eta = new Eta()
   private _customCompiledFn: TemplateFunction | null = null
   private _defaultCompliedFn: TemplateFunction | null = null
-
-  private _data: Record<string, any> = {}
 
   /** 用以记录发送状态, 正在进行中将会被取消 */
   private _currentSendingInfo: {
@@ -277,11 +277,11 @@ export class InGameSendMain implements IAkariShardInitDispose {
       rsoPlatformId: this._lc.state.auth?.rsoPlatformId,
       selfPuuid: this._lc.data.summoner.me?.puuid,
       selfTeamId,
-      gameData: toJS(this._lc.data.gameData),
       allyMembers: allyMembers,
       enemyMembers: enemyMembers,
       allMembers: allMembers,
       targetMembers: targetMembers,
+      gameData: toJS(this._lc.data.gameData),
       settings: InGameSendMain.mapNonFunctionObject(this._og.settings),
       teams: toJS(this._og.state.teams),
       matchHistory: toJS(this._og.state.matchHistory),
@@ -295,8 +295,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       playerStats: toJS(this._og.state.playerStats),
       gameTimeline: toJS(this._og.state.additionalGame),
       premadeTeams: toJS(this._og.state.premadeTeams),
-      additionalGame: toJS(this._og.state.additionalGame),
-      data: this._data
+      additionalGame: toJS(this._og.state.additionalGame)
     }
   }
 
@@ -792,5 +791,168 @@ export class InGameSendMain implements IAkariShardInitDispose {
     await this._initTemplateCompilation()
     this._initShortcuts()
     this._handleIpcCall()
+  }
+
+  // ---
+
+  private _vmContexts: Record<string, vm.Context> = {}
+
+  private _handleIpcCall2() {
+    this._ipc.onCall(
+      InGameSendMain.id,
+      'createJsTemplate',
+      (_, name: string, code: string = '') => {
+        const id = crypto.randomUUID()
+
+        this._vmContexts[id] = vm.createContext({
+          require
+        })
+
+        const obj = {
+          id,
+          name,
+          code,
+          isValid: false
+        }
+      }
+    )
+
+    this._ipc.onCall(
+      InGameSendMain.id,
+      'updateJsTemplate',
+      (_, id: string, data: Partial<Omit<TemplateDef, 'id'>>) => {
+        const that = this.settings.templates.find((item) => item.id === id)
+
+        if (!that) {
+          return
+        }
+      }
+    )
+
+    this._ipc.onCall(InGameSendMain.id, 'removeJsTemplate', (_, id: string) => {
+      const obj = this.settings.templates.find((item) => item.id === id)
+
+      if (!obj) {
+        return
+      }
+
+      const newArr = this.settings.templates.filter((item) => item.id !== id)
+      delete this._vmContexts[id]
+
+      this._setting.set('jsTemplates', newArr)
+    })
+  }
+
+  private _updateTemplate(id: string, data: Partial<Omit<TemplateDef, 'id' | 'isValid'>>) {
+    const that = this.settings.templates.find((item) => item.id === id)
+
+    if (!that) {
+      return
+    }
+
+    if (data.content !== undefined) {
+      that.content = data.content
+    }
+
+    if (data.name !== undefined) {
+      that.name = data.name
+    }
+
+    if (data.shortcut !== undefined) {
+      const targetId = `${InGameSendMain.id}/template-send/${id}`
+
+      if (data.shortcut !== null) {
+        try {
+          this._kbd.register(targetId, data.shortcut, 'last-active', () => {
+            // TODO!
+          })
+          that.shortcut = data.shortcut // or null
+        } catch (error) {
+          that.shortcut = null
+          this._log.warn('注册快捷键失败', error)
+        }
+      } else {
+        if (this._kbd.unregisterByTargetId(targetId)) {
+          this._log.info(`已删除快捷键 ${targetId}`)
+        }
+      }
+    }
+
+    if (data.isJsTemplate !== undefined) {
+      if (data.isJsTemplate && !that.isJsTemplate) {
+        if (!this._vmContexts[id]) {
+          this._vmContexts[id] = vm.createContext({ ...this._getAkariContext() })
+        }
+
+        try {
+          const script = new vm.Script(that.content)
+          script.runInContext(this._vmContexts[id])
+
+          const checkResult = checkContextV1(this._vmContexts[id])
+          if (checkResult !== JS_TEMPLATE_CHECK_RESULT.VALID) {
+            that.isValid = false
+            this._log.warn('脚本验证失败', checkResult)
+          }
+        } catch (error) {
+          that.isValid = false
+          this._log.warn('脚本编译失败', error)
+        }
+      } else if (!data.isJsTemplate && that.isJsTemplate) {
+        if (this._vmContexts[id]) {
+          delete this._vmContexts[id]
+        }
+
+        that.isValid = true
+      }
+
+      that.isJsTemplate = data.isJsTemplate
+    }
+
+    this._setting.set('templates', this.settings.templates)
+  }
+
+  private _removeTemplate(id: string) {
+    const index = this.settings.templates.findIndex((item) => item.id === id)
+
+    if (index === -1) {
+      return
+    }
+
+    const that = this.settings.templates[index]
+    if (that.isJsTemplate) {
+      if (this._vmContexts[id]) {
+        delete this._vmContexts[id]
+      }
+    }
+
+    if (that.shortcut) {
+      this._kbd.unregisterByTargetId(`${InGameSendMain.id}/template-send/${id}`)
+    }
+
+    const removed = this.settings.templates.splice(index, 1)
+    this._setting.set('templates', removed)
+  }
+
+  private _createEmptyTemplate(name?: string) {
+    const id = crypto.randomUUID()
+
+    const obj = {
+      id,
+      name: name || '', // 这里应该提供一个默认名称 (如果为空)
+      shortcut: null,
+      isJsTemplate: false,
+      content: '',
+      isValid: true // 不是 jsTemplate，那么就是有效的
+    }
+
+    this._setting.set('templates', [...this.settings.templates, obj])
+  }
+
+  private _getAkariContext() {
+    return {
+      // at the discretion of the user. We believe that the user will can well handle it
+      require: require,
+      akariManager: this._shared.manager
+    }
   }
 }

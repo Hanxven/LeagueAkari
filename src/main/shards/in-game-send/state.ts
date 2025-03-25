@@ -8,6 +8,15 @@ export interface CustomSend {
   shortcut: string | null
 }
 
+export interface TemplateDef {
+  id: string
+  name: string
+  shortcut: string | null
+  isJsTemplate: boolean
+  content: string
+  isValid: boolean
+}
+
 export class InGameSendSettings {
   customSend: CustomSend[] = []
 
@@ -24,6 +33,9 @@ export class InGameSendSettings {
   cancelShortcut: string | null = null
 
   sendInterval: number = 65
+
+  // experimental feature
+  templates: TemplateDef[] = []
 
   setSendStatsEnabled(enabled: boolean) {
     this.sendStatsEnabled = enabled
@@ -67,7 +79,8 @@ export class InGameSendSettings {
   constructor() {
     makeAutoObservable(this, {
       customSend: observable.ref,
-      sendStatsTemplate: observable.ref
+      sendStatsTemplate: observable.ref,
+      templates: observable.ref
     })
   }
 }

@@ -664,7 +664,11 @@ watchDebounced(
 
     await loadAll()
 
-    if (atm.championId && !lcs.champSelect.disabledChampionIds.has(atm.championId)) {
+    if (
+      atm.championId &&
+      atm.championId !== -3 &&
+      !lcs.champSelect.disabledChampionIds.has(atm.championId)
+    ) {
       await handleToChampion(atm.championId, true)
     }
   },

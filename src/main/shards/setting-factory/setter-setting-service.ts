@@ -36,6 +36,10 @@ export class SetterSettingService {
     return this._ins._setJsonValue(this._namespace, key, path, value)
   }
 
+  _removeJsonValue(key: string, path: string) {
+    return this._ins._removeJsonValue(this._namespace, key, path)
+  }
+
   /**
    * 获取所有设置项
    */
@@ -95,7 +99,7 @@ export class SetterSettingService {
   }
 
   /**
-   * 设置设置项的新值, 并更新状态
+   * 设置设置项的新值, 并**更新状态**
    * @param key
    * @param newValue
    */
