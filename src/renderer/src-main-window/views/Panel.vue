@@ -1,14 +1,7 @@
 <template>
   <div class="panel">
-    <div class="left-side-content" v-if="!isOverlay">
-      <SidebarMenu
-        class="sidebar-menu"
-        :items="menu"
-        :current="currentMenu"
-        @update:current="(key) => handleMenuChange(key)"
-      />
-      <div class="padding-zone"></div>
-      <SidebarFixed />
+    <div class="left-side-content">
+      <Sidebar />
     </div>
     <div class="right-side-content">
       <RouterView v-slot="{ Component }">
@@ -23,123 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
-import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
-import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
-import {
-  AiStatus as AiStatusIcon,
-  Layers as LayersIcon,
-  ToolKit as ToolkitIcon
-} from '@vicons/carbon'
-import { Games24Filled as Games24FilledIcon } from '@vicons/fluent'
-import { TicketSharp as TicketSharpIcon } from '@vicons/ionicons5'
-import { useTranslation } from 'i18next-vue'
-import { NIcon } from 'naive-ui'
-import { Component as ComponentC, computed, h, ref, watch, watchEffect } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
-import SidebarFixed from '@main-window/components/sidebar/SidebarFixed.vue'
-import SidebarMenu from '@main-window/components/sidebar/SidebarMenu.vue'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-
-const renderIcon = (icon: ComponentC) => {
-  return () => h(NIcon, null, () => h(icon))
-}
-
-const { t } = useTranslation()
-
-const as = useAppCommonStore()
-const ogs = useOngoingGameStore()
-const router = useRouter()
-const route = useRoute()
-
-const shouldShowOngoingGameBadge = ref(false)
-const isInOngoingStage = computed(() => {
-  return ogs.queryStage.phase !== 'unavailable'
-})
-
-watch(
-  () => isInOngoingStage.value,
-  (yes) => {
-    if (yes && currentMenu.value !== 'ongoing-game') {
-      shouldShowOngoingGameBadge.value = true
-    } else {
-      shouldShowOngoingGameBadge.value = false
-    }
-  }
-)
-
-const isOverlay = computed(() => {
-  if (route.name !== 'ongoing-game') {
-    return false
-  }
-  const mode = route.params.mode as string
-  if (!mode) {
-    return false
-  }
-  return true
-})
-
-const currentMenu = ref('match-history')
-const menu = computed(() => {
-  return [
-    {
-      key: 'match-history',
-      icon: renderIcon(LayersIcon),
-      name: t('SideBarMenu.match-history')
-    },
-    {
-      key: 'ongoing-game',
-      icon: renderIcon(Games24FilledIcon),
-      name: t('SideBarMenu.ongoing-game'),
-      inProgress: shouldShowOngoingGameBadge.value
-    },
-    {
-      key: 'automation',
-      icon: renderIcon(AiStatusIcon),
-      name: t('SideBarMenu.automation')
-    },
-    {
-      key: 'toolkit',
-      icon: renderIcon(ToolkitIcon),
-      name: t('SideBarMenu.toolkit')
-    },
-    {
-      key: 'test',
-      icon: renderIcon(TicketSharpIcon),
-      name: t('SideBarMenu.test'),
-      show: import.meta.env.DEV || as.version.includes('rabi')
-    }
-  ]
-})
-
-watchEffect(() => {
-  currentMenu.value = route.name as string
-
-  if (route.name === 'ongoing-game') {
-    shouldShowOngoingGameBadge.value = false
-  }
-})
-
-const handleMenuChange = async (val: string | undefined) => {
-  try {
-    await router.replace({ name: val })
-  } catch (error) {
-    console.error('routing', error)
-  }
-}
-
-const lcs = useLeagueClientStore()
-const lcuxs = useLeagueClientUxStore()
-
-const isClientsPreviewShow = ref(false)
-
-// 善意的提醒，以防用户一直在等
-watchEffect(() => {
-  if (lcs.connectionState === 'disconnected' && lcuxs.launchedClients.length > 1) {
-    isClientsPreviewShow.value = true
-  }
-})
+import Sidebar from '@main-window/components/sidebar/Sidebar.vue'
 </script>
 
 <style lang="less" scoped>
@@ -155,12 +32,6 @@ watchEffect(() => {
   .fixed-buttons {
     height: 96px;
     background-color: rgba(167, 37, 37, 0.518);
-  }
-
-  .left-side-content {
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .right-side-content {

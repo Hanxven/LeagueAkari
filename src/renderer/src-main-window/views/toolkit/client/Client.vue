@@ -371,6 +371,8 @@ const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
 </script>
 
 <style lang="less" scoped>
+@import '../toolkit-styles.less';
+
 .outer-wrapper {
   position: relative;
   height: 100%;
@@ -385,10 +387,6 @@ const handleSetSettingsFileMode = async (mode: 'readonly' | 'writable') => {
   :deep(.n-card) {
     background-color: transparent;
   }
-}
-
-.single-root {
-  height: 100%;
 }
 
 .settings-file-mode-indicator {

@@ -10,28 +10,13 @@
         :theme-overrides="{ tabGapMediumBar: '18px' }"
         size="medium"
       >
-        <NTab name="client">
-          <span class="tab-name">{{ t('Toolkit.client') }}</span>
-        </NTab>
-        <NTab name="in-game-send" class="tab-name">
-          <span class="tab-name">{{ t('Toolkit.in-game-send') }}</span>
-        </NTab>
-        <NTab name="in-process" class="tab-name">
-          <span class="tab-name">{{ t('Toolkit.in-process') }}</span>
-        </NTab>
-        <NTab name="lobby" class="tab-name">
-          <span class="tab-name">{{ t('Toolkit.lobby') }}</span>
-        </NTab>
-        <NTab name="misc" class="tab-name">
-          <span class="tab-name">{{ t('Toolkit.misc') }}</span>
-        </NTab>
-        <NTab name="claim-tools" class="tab-name">
-          <span class="tab-name">{{ t('Toolkit.claim-tools') }}</span>
+        <NTab v-for="tab in tabs" :key="tab.key" :name="tab.key" :tab="tab.name">
+          <span class="tab-name">{{ tab.name }}</span>
         </NTab>
       </NTabs>
     </div>
     <div class="contents">
-      <Transition name="move-fade">
+      <Transition :name="transitionType">
         <KeepAlive>
           <Client v-if="currentTab === 'client'" />
           <InGameSend v-else-if="currentTab === 'in-game-send'" />
@@ -49,7 +34,7 @@
 import { ToolKit as ToolkitIcon } from '@vicons/carbon'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import ClaimTools from './claim-tools/ClaimTools.vue'
 import Client from './client/Client.vue'
@@ -61,9 +46,59 @@ import Misc from './misc/Misc.vue'
 const { t } = useTranslation()
 
 const currentTab = ref('client')
+
+const tabs = computed(() => [
+  {
+    key: 'client',
+    name: t('Toolkit.client')
+  },
+  {
+    key: 'in-game-send',
+    name: t('Toolkit.in-game-send')
+  },
+  {
+    key: 'in-process',
+    name: t('Toolkit.in-process')
+  },
+  {
+    key: 'lobby',
+    name: t('Toolkit.lobby')
+  },
+  {
+    key: 'misc',
+    name: t('Toolkit.misc')
+  },
+  {
+    key: 'claim-tools',
+    name: t('Toolkit.claim-tools')
+  }
+])
+
+const transitionType = ref<'move-right-fade' | 'move-left-fade'>('move-left-fade')
+watch(
+  () => currentTab.value,
+  (cur, prev) => {
+    if (!prev) {
+      transitionType.value = 'move-left-fade'
+      return
+    }
+
+    const curIndex = tabs.value.findIndex((tab) => tab.key === cur)
+    const prevIndex = tabs.value.findIndex((tab) => tab.key === prev)
+
+    if (curIndex > prevIndex) {
+      transitionType.value = 'move-left-fade'
+    } else {
+      transitionType.value = 'move-right-fade'
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="less" scoped>
+@import './toolkit-styles.less';
+
 .toolkit-page {
   display: flex;
   flex-direction: column;
@@ -77,6 +112,7 @@ const currentTab = ref('client')
   }
 
   .contents {
+    position: relative;
     flex: 1;
     height: 0;
   }

@@ -23,6 +23,8 @@ const as = useAppCommonStore()
 </script>
 
 <style lang="less" scoped>
+@import '../toolkit-styles.less';
+
 .outer-wrapper {
   position: relative;
   height: 100%;
@@ -37,10 +39,6 @@ const as = useAppCommonStore()
   :deep(.n-card) {
     background-color: transparent;
   }
-}
-
-.single-root {
-  height: 100%;
 }
 
 .settings-file-mode-indicator {

@@ -37,9 +37,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.sendAllyShortcut"
-              @update:shortcut-id="
-                (id) => ig.setSendAllyShortcut(id)
-              "
+              @update:shortcut-id="(id) => ig.setSendAllyShortcut(id)"
             />
           </ControlItem>
           <ControlItem
@@ -53,9 +51,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ENEMY"
               :shortcut-id="igs.settings.sendEnemyShortcut"
-              @update:shortcut-id="
-                (id) => ig.setSendEnemyShortcut(id)
-              "
+              @update:shortcut-id="(id) => ig.setSendEnemyShortcut(id)"
             />
           </ControlItem>
           <ControlItem
@@ -69,9 +65,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALL_ALLIES"
               :shortcut-id="igs.settings.sendAllAlliesShortcut"
-              @update:shortcut-id="
-                (id) => ig.setSendAllAlliesShortcut(id)
-              "
+              @update:shortcut-id="(id) => ig.setSendAllAlliesShortcut(id)"
             />
           </ControlItem>
           <ControlItem
@@ -85,9 +79,7 @@
               :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALL_ENEMIES"
               :shortcut-id="igs.settings.sendAllEnemiesShortcut"
-              @update:shortcut-id="
-                (id) => ig.setSendAllEnemiesShortcut(id)
-              "
+              @update:shortcut-id="(id) => ig.setSendAllEnemiesShortcut(id)"
             />
           </ControlItem>
           <ControlItem
@@ -385,7 +377,6 @@ import {
 import { h, reactive, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
-import { identity } from '@vueuse/core'
 
 const { t } = useTranslation()
 
@@ -517,25 +508,7 @@ watch(
 </script>
 
 <style lang="less" scoped>
-.outer-wrapper {
-  position: relative;
-  height: 100%;
-  max-width: 100%;
-}
-
-.inner-wrapper {
-  padding: 24px;
-  margin: 0 auto;
-  max-width: 800px;
-
-  :deep(.n-card) {
-    background-color: transparent;
-  }
-}
-
-.single-root {
-  height: 100%;
-}
+@import '../toolkit-styles.less';
 
 .padding {
   padding: 8px 12px;
