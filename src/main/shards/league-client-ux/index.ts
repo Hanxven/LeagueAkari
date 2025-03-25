@@ -15,11 +15,11 @@ import { LeagueClientUxSettings, LeagueClientUxState } from './state'
 export class LeagueClientUxMain implements IAkariShardInitDispose {
   static id = 'league-client-ux-main'
   static dependencies = [
-    'akari-ipc-main',
-    'mobx-utils-main',
-    'app-common-main',
-    'logger-factory-main',
-    'setting-factory-main'
+    AkariIpcMain.id,
+    MobxUtilsMain.id,
+    AppCommonMain.id,
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id
   ]
 
   static UX_PROCESS_NAME = 'LeagueClientUx.exe'

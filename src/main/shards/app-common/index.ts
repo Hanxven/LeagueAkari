@@ -16,12 +16,7 @@ import { AppCommonSettings, AppCommonState } from './state'
  */
 export class AppCommonMain implements IAkariShardInitDispose {
   static id = 'app-common-main'
-  static dependencies = [
-    SHARED_GLOBAL_ID,
-    'akari-ipc-main',
-    'mobx-utils-main',
-    'setting-factory-main'
-  ]
+  static dependencies = [SHARED_GLOBAL_ID, AkariIpcMain.id, MobxUtilsMain.id, SettingFactoryMain.id]
 
   public readonly state = new AppCommonState()
   public readonly settings = new AppCommonSettings()

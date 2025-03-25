@@ -20,7 +20,7 @@ interface RegisteredState {
  */
 export class MobxUtilsMain implements IAkariShardInitDispose {
   static id = 'mobx-utils-main'
-  static dependencies = ['akari-ipc-main']
+  static dependencies = [AkariIpcMain.id]
 
   private readonly _ipc: AkariIpcMain
 

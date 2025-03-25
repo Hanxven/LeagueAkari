@@ -16,11 +16,11 @@ import { AutoSelectSettings, AutoSelectState } from './state'
 export class AutoSelectMain implements IAkariShardInitDispose {
   static id = 'auto-select-main'
   static dependencies = [
-    'logger-factory-main',
-    'setting-factory-main',
-    'league-client-main',
-    'akari-ipc-main',
-    'mobx-utils-main'
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id,
+    LeagueClientMain.id,
+    AkariIpcMain.id,
+    MobxUtilsMain.id
   ]
 
   private readonly _loggerFactory: LoggerFactoryMain

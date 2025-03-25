@@ -1,7 +1,7 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { EntityManager, Equal } from 'typeorm'
 
-import { AkariLogger } from '../logger-factory'
+import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { StorageMain } from '../storage'
 import { Setting } from '../storage/entities/Settings'
 
@@ -16,7 +16,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
    */
   static priority = 2992
 
-  static dependencies = ['storage-main', 'logger-factory-main']
+  static dependencies = [StorageMain.id, LoggerFactoryMain.id]
 
   static MIGRATION_FROM_126 = 'akari-migration-from-1.2.6_patch2'
   static MIGRATION_FROM_134 = 'akari-migration-from-1.3.4_patch1'

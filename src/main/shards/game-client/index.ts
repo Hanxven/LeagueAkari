@@ -9,13 +9,13 @@ import path from 'node:path'
 
 import { ClientInstallationMain } from '../client-installation'
 import { AkariIpcMain } from '../ipc'
+import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { GameClientSettings } from './state'
-import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 
 export interface LaunchSpectatorConfig {
   locale?: string
@@ -33,13 +33,13 @@ export interface LaunchSpectatorConfig {
 export class GameClientMain implements IAkariShardInitDispose {
   static id = 'game-client-main'
   static dependencies = [
-    'akari-ipc-main',
-    'logger-factory-main',
-    'setting-factory-main',
-    'league-client-main',
-    'mobx-utils-main',
-    'keyboard-shortcuts-main',
-    'client-installation-main'
+    AkariIpcMain.id,
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id,
+    LeagueClientMain.id,
+    MobxUtilsMain.id,
+    KeyboardShortcutsMain.id,
+    ClientInstallationMain.id
   ]
 
   static GAME_CLIENT_PROCESS_NAME = 'League of Legends.exe'

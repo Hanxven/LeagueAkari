@@ -84,12 +84,12 @@ const SCHEMA = {
 export class SgpMain implements IAkariShardInitDispose {
   static id = 'sgp-main'
   static dependencies = [
-    'app-common-main',
-    'logger-factory-main',
-    'setting-factory-main',
-    'mobx-utils-main',
-    'league-client-main',
-    'akari-ipc-main'
+    AppCommonMain.id,
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id,
+    MobxUtilsMain.id,
+    LeagueClientMain.id,
+    AkariIpcMain.id
   ]
 
   static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v9.json'

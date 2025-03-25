@@ -30,13 +30,13 @@ import { OngoingGameSettings, OngoingGameState } from './state'
 export class OngoingGameMain implements IAkariShardInitDispose {
   static id = 'ongoing-game-main'
   static dependencies = [
-    'logger-factory-main',
-    'setting-factory-main',
-    'league-client-main',
-    'akari-ipc-main',
-    'mobx-utils-main',
-    'sgp-main',
-    'saved-player-main'
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id,
+    LeagueClientMain.id,
+    AkariIpcMain.id,
+    MobxUtilsMain.id,
+    SgpMain.id,
+    SavedPlayerMain.id
   ]
 
   static LOADING_PRIORITY = {

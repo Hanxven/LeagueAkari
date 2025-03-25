@@ -19,7 +19,7 @@ import { v15_LA1_2_2Upgrade } from './upgrades/version-15'
  */
 export class StorageMain implements IAkariShardInitDispose {
   static id = 'storage-main'
-  static dependencies = ['logger-factory-main']
+  static dependencies = [LoggerFactoryMain.id]
 
   private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger

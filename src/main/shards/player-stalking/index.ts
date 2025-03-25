@@ -20,13 +20,14 @@ import { PlayerStalkingSettings, PlayerStalkingState, StalkedPlayer } from './st
  */
 export class PlayerStalkingMain implements IAkariShardInitDispose {
   static id = 'player-stalking-main'
+
   static dependencies = [
-    'akari-ipc-main',
-    'mobx-utils-main',
-    'setting-factory-main',
-    'sgp-main',
-    'riot-client-main',
-    'logger-factory-main'
+    AkariIpcMain.id,
+    MobxUtilsMain.id,
+    SettingFactoryMain.id,
+    SgpMain.id,
+    RiotClientMain.id,
+    LoggerFactoryMain.id
   ]
 
   public readonly state: PlayerStalkingState

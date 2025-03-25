@@ -38,11 +38,11 @@ import { SelfUpdateSettings, SelfUpdateState } from './state'
 export class SelfUpdateMain implements IAkariShardInitDispose {
   static id = 'self-update-main'
   static dependencies = [
-    'app-common-main',
-    'akari-ipc-main',
-    'mobx-utils-main',
-    'logger-factory-main',
-    'setting-factory-main'
+    AppCommonMain.id,
+    AkariIpcMain.id,
+    MobxUtilsMain.id,
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id
   ]
 
   static UPDATES_CHECK_INTERVAL = 7.2e6 // 2 hours

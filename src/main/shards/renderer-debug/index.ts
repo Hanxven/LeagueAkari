@@ -9,10 +9,10 @@ import { RendererDebugState } from './state'
 export class RendererDebugMain {
   static id = 'renderer-debug-main'
   static dependencies = [
-    'akari-ipc-main',
-    'league-client-main',
-    'mobx-utils-main',
-    'logger-factory-main'
+    AkariIpcMain.id,
+    LeagueClientMain.id,
+    MobxUtilsMain.id,
+    LoggerFactoryMain.id
   ]
 
   public readonly state = new RendererDebugState()

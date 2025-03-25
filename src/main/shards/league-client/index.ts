@@ -16,6 +16,7 @@ import PQueue from 'p-queue'
 import WebSocket from 'ws'
 
 import { AkariProtocolMain } from '../akari-protocol'
+import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientUxMain } from '../league-client-ux'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -43,13 +44,13 @@ export class LeagueClientLcuUninitializedError extends Error {
 export class LeagueClientMain implements IAkariShardInitDispose {
   static id = 'league-client-main'
   static dependencies = [
-    'akari-ipc-main',
-    'app-common-main',
-    'logger-factory-main',
-    'mobx-utils-main',
-    'league-client-ux-main',
-    'setting-factory-main',
-    'akari-protocol-main'
+    AkariIpcMain.id,
+    AppCommonMain.id,
+    LoggerFactoryMain.id,
+    MobxUtilsMain.id,
+    LeagueClientUxMain.id,
+    SettingFactoryMain.id,
+    AkariProtocolMain.id
   ]
 
   static INTERNAL_TIMEOUT = 12500

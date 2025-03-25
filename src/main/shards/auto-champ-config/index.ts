@@ -15,11 +15,11 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
   static id = 'auto-champ-config-main'
 
   static dependencies = [
-    'akari-ipc-main',
-    'logger-factory-main',
-    'setting-factory-main',
-    'league-client-main',
-    'mobx-utils-main'
+    AkariIpcMain.id,
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id,
+    LeagueClientMain.id,
+    MobxUtilsMain.id
   ]
 
   static GAME_MODE_TYPE_MAP = {

@@ -48,7 +48,7 @@ export type SettingSchema<T extends object> = Partial<Record<Paths<T>, SettingCo
  */
 export class SettingFactoryMain implements IAkariShardInitDispose {
   static id = 'setting-factory-main'
-  static dependencies = ['storage-main', 'akari-ipc-main', SHARED_GLOBAL_ID]
+  static dependencies = [StorageMain.id, AkariIpcMain.id, SHARED_GLOBAL_ID]
 
   private readonly _ipc: AkariIpcMain
   private readonly _storage: StorageMain

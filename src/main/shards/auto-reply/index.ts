@@ -17,11 +17,11 @@ import { AutoReplySettings } from './state'
 export class AutoReplyMain implements IAkariShardInitDispose {
   static id = 'auto-reply-main'
   static dependencies = [
-    'logger-factory-main',
-    'setting-factory-main',
-    'league-client-main',
-    'akari-ipc-main',
-    'mobx-utils-main'
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id,
+    LeagueClientMain.id,
+    AkariIpcMain.id,
+    MobxUtilsMain.id
   ]
 
   public readonly settings = new AutoReplySettings()

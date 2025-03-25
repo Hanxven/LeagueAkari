@@ -20,11 +20,11 @@ import { AutoGameflowSettings, AutoGameflowState } from './state'
 export class AutoGameflowMain implements IAkariShardInitDispose {
   static id = 'auto-gameflow-main'
   static dependencies = [
-    'logger-factory-main',
-    'setting-factory-main',
-    'league-client-main',
-    'akari-ipc-main',
-    'mobx-utils-main'
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id,
+    LeagueClientMain.id,
+    AkariIpcMain.id,
+    MobxUtilsMain.id
   ]
 
   public readonly settings = new AutoGameflowSettings()

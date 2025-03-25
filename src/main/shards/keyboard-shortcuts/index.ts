@@ -20,7 +20,7 @@ interface ShortcutDetails {
  */
 export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   static id = 'keyboard-shortcuts-main'
-  static dependencies = ['app-common-main', 'akari-ipc-main', 'logger-factory-main']
+  static dependencies = [AppCommonMain.id, AkariIpcMain.id, LoggerFactoryMain.id]
 
   private readonly _app: AppCommonMain
   private readonly _ipc: AkariIpcMain

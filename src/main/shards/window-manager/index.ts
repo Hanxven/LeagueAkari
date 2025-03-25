@@ -7,6 +7,7 @@ import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
 import { GameClientMain } from '../game-client'
 import { AkariIpcMain } from '../ipc'
+import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -18,7 +19,6 @@ import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
 import { WindowManagerSettings, WindowManagerState } from './state'
-import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 
 export interface WindowManagerMainContext {
   namespace: string
@@ -41,15 +41,15 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   static id = 'window-manager-main'
   static dependencies = [
     SHARED_GLOBAL_ID,
-    'akari-ipc-main',
-    'mobx-utils-main',
-    'logger-factory-main',
-    'setting-factory-main',
-    'league-client-main',
-    'game-client-main',
-    'akari-protocol-main',
-    'keyboard-shortcuts-main',
-    'app-common-main'
+    AkariIpcMain.id,
+    MobxUtilsMain.id,
+    LoggerFactoryMain.id,
+    SettingFactoryMain.id,
+    LeagueClientMain.id,
+    GameClientMain.id,
+    AkariProtocolMain.id,
+    KeyboardShortcutsMain.id,
+    AppCommonMain.id
   ]
 
   public overlay: Overlay | null = null

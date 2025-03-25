@@ -13,7 +13,7 @@ import { ExtraAssetsStateFandom, ExtraAssetsStateGtimg } from './state'
  */
 export class ExtraAssetsMain implements IAkariShardInitDispose {
   static id = 'extra-assets-main'
-  static dependencies = ['app-common-main', 'mobx-utils-main', 'logger-factory-main']
+  static dependencies = [AppCommonMain.id, MobxUtilsMain.id, LoggerFactoryMain.id]
 
   private readonly _app: AppCommonMain
   private readonly _loggerFactory: LoggerFactoryMain

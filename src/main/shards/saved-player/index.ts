@@ -22,7 +22,7 @@ import {
  */
 export class SavedPlayerMain implements IAkariShardInitDispose {
   static id = 'saved-player-main'
-  static dependencies = ['akari-ipc-main', 'storage-main']
+  static dependencies = [AkariIpcMain.id, StorageMain.id]
 
   static ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = 40
 

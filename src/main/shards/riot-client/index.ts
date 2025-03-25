@@ -20,11 +20,11 @@ export class RiotClientRcuUninitializedError extends Error {
 export class RiotClientMain implements IAkariShardInitDispose {
   static id = 'riot-client-main'
   static dependencies = [
-    'akari-ipc-main',
-    'logger-factory-main',
-    'mobx-utils-main',
-    'league-client-main', // 引入此依赖的原因是, 需要获取其使用的是哪个客户端 (考虑到客户端多开的情况)
-    'akari-protocol-main'
+    AkariIpcMain.id,
+    LoggerFactoryMain.id,
+    MobxUtilsMain.id,
+    LeagueClientMain.id, // 引入此依赖的原因是, 需要获取其使用的是哪个客户端 (考虑到客户端多开的情况)
+    AkariProtocolMain.id
   ]
 
   static REQUEST_TIMEOUT_MS = 12500

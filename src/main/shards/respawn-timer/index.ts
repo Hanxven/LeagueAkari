@@ -13,11 +13,11 @@ import { RespawnTimerSettings, RespawnTimerState } from './state'
 export class RespawnTimerMain implements IAkariShardInitDispose {
   static id = 'respawn-timer-main'
   static dependencies = [
-    'game-client-main',
-    'logger-factory-main',
-    'league-client-main',
-    'setting-factory-main',
-    'mobx-utils-main'
+    GameClientMain.id,
+    LoggerFactoryMain.id,
+    LeagueClientMain.id,
+    MobxUtilsMain.id,
+    SettingFactoryMain.id
   ]
 
   static POLL_INTERVAL = 1000

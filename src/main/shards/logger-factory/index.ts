@@ -35,7 +35,7 @@ export class AkariLogger {
  */
 export class LoggerFactoryMain implements IAkariShardInitDispose {
   static id = 'logger-factory-main'
-  static dependencies = [SHARED_GLOBAL_ID, 'akari-ipc-main']
+  static dependencies = [SHARED_GLOBAL_ID, AkariIpcMain.id]
 
   // 从全局注入的 logger 实例
   private readonly _logger: Logger
