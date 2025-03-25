@@ -1,61 +1,61 @@
 @offset: 24px;
 
-.move-left-fade-enter-active {
+.move-from-left-fade-enter-active {
   position: relative;
   transition:
     opacity 0.3s ease,
     right 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.move-left-fade-leave-active {
+.move-from-left-fade-leave-active {
   position: absolute;
   transition:
     opacity 0.3s ease,
     right 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.move-left-fade-enter-from {
+.move-from-left-fade-enter-from {
   right: @offset;
   opacity: 0;
 }
 
-.move-left-fade-leave-to {
+.move-from-left-fade-leave-to {
   right: -@offset;
   opacity: 0;
 }
 
-.move-left-fade-enter-to,
-.move-left-fade-leave-from {
+.move-from-left-fade-enter-to,
+.move-from-left-fade-leave-from {
   right: 0;
   opacity: 1;
 }
 
-.move-right-fade-enter-active {
+.move-from-right-fade-enter-active {
   position: relative;
   transition:
     opacity 0.3s ease,
     left 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.move-right-fade-leave-active {
+.move-from-right-fade-leave-active {
   position: absolute;
   transition:
     opacity 0.3s ease,
     left 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.move-right-fade-enter-from {
+.move-from-right-fade-enter-from {
   left: @offset;
   opacity: 0;
 }
 
-.move-right-fade-leave-to {
+.move-from-right-fade-leave-to {
   left: -@offset;
   opacity: 0;
 }
 
-.move-right-fade-enter-to,
-.move-right-fade-leave-from {
+.move-from-right-fade-enter-to,
+.move-from-right-fade-leave-from {
   left: 0;
   opacity: 1;
 }

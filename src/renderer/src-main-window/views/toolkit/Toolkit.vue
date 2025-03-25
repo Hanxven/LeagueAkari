@@ -74,12 +74,12 @@ const tabs = computed(() => [
   }
 ])
 
-const transitionType = ref<'move-right-fade' | 'move-left-fade'>('move-left-fade')
+const transitionType = ref<'move-from-right-fade' | 'move-from-left-fade'>('move-from-left-fade')
 watch(
   () => currentTab.value,
   (cur, prev) => {
     if (!prev) {
-      transitionType.value = 'move-left-fade'
+      transitionType.value = 'move-from-right-fade'
       return
     }
 
@@ -87,9 +87,9 @@ watch(
     const prevIndex = tabs.value.findIndex((tab) => tab.key === prev)
 
     if (curIndex > prevIndex) {
-      transitionType.value = 'move-left-fade'
+      transitionType.value = 'move-from-right-fade'
     } else {
-      transitionType.value = 'move-right-fade'
+      transitionType.value = 'move-from-left-fade'
     }
   },
   { immediate: true }
