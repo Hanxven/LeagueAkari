@@ -45,11 +45,11 @@ export class RiotClientMain implements IAkariShardInitDispose {
   // private _eventBus = new RadixEventEmitter()
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-main']
-    this._mobx = deps['mobx-utils-main']
-    this._lc = deps['league-client-main']
-    this._loggerFactory = deps['logger-factory-main']
-    this._protocol = deps['akari-protocol-main']
+    this._ipc = deps[AkariIpcMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._lc = deps[LeagueClientMain.id]
+    this._loggerFactory = deps[LoggerFactoryMain.id]
+    this._protocol = deps[AkariProtocolMain.id]
     this._log = this._loggerFactory.create(RiotClientMain.id)
 
     this._handleProtocol()

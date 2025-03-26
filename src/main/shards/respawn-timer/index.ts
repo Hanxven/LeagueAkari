@@ -37,12 +37,12 @@ export class RespawnTimerMain implements IAkariShardInitDispose {
   private _isStarted = false
 
   constructor(deps: any) {
-    this._gameClient = deps['game-client-main']
-    this._loggerFactory = deps['logger-factory-main']
+    this._gameClient = deps[GameClientMain.id]
+    this._loggerFactory = deps[LoggerFactoryMain.id]
     this._log = this._loggerFactory.create(RespawnTimerMain.id)
-    this._lc = deps['league-client-main']
-    this._mobx = deps['mobx-utils-main']
-    this._settingFactory = deps['setting-factory-main']
+    this._lc = deps[LeagueClientMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._settingFactory = deps[SettingFactoryMain.id]
     this._setting = this._settingFactory.register(
       RespawnTimerMain.id,
       {

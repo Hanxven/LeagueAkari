@@ -9,16 +9,16 @@ const MAIN_SHARD_NAMESPACE = 'client-installation-main'
 
 export class ClientInstallationRenderer implements IAkariShardInitDispose {
   static id = 'client-installation-renderer'
-  static dependencies = ['akari-ipc-renderer', 'logger-renderer', 'pinia-mobx-utils-renderer']
+  static dependencies = [AkariIpcRenderer.id, LoggerRenderer.id, PiniaMobxUtilsRenderer.id]
 
   private readonly _ipc: AkariIpcRenderer
   private readonly _log: LoggerRenderer
   private readonly _pm: PiniaMobxUtilsRenderer
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
-    this._log = deps['logger-renderer']
-    this._pm = deps['pinia-mobx-utils-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
+    this._log = deps[LoggerRenderer.id]
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
   }
 
   async onInit() {

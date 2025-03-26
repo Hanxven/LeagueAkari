@@ -41,9 +41,9 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
   private readonly _rc: RiotClientMain
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-main']
-    this._mobx = deps['mobx-utils-main']
-    this._setting = (deps['setting-factory-main'] as SettingFactoryMain).register(
+    this._ipc = deps[AkariIpcMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._setting = (deps[SettingFactoryMain.id] as SettingFactoryMain).register(
       PlayerStalkingMain.id,
       {
         enabled: { default: this.settings.enabled },
@@ -52,9 +52,9 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
       },
       this.settings
     )
-    this._sgp = deps['sgp-main']
-    this._log = (deps['logger-factory-main'] as LoggerFactoryMain).create(PlayerStalkingMain.id)
-    this._rc = deps['riot-client-main']
+    this._sgp = deps[SgpMain.id]
+    this._log = (deps[LoggerFactoryMain.id] as LoggerFactoryMain).create(PlayerStalkingMain.id)
+    this._rc = deps[RiotClientMain.id]
     this.state = new PlayerStalkingState(this._sgp.state)
   }
 

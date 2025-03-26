@@ -30,8 +30,8 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
   private readonly _storage: StorageMain
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-main']
-    this._storage = deps['storage-main']
+    this._ipc = deps[AkariIpcMain.id]
+    this._storage = deps[StorageMain.id]
   }
 
   async onInit() {

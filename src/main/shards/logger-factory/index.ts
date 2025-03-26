@@ -50,7 +50,7 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
     this._logsDir = path.join(this._appDir, 'logs')
     this._shared = deps[SHARED_GLOBAL_ID]
     this._logger = this._shared.global.logger
-    this._ipc = deps['akari-ipc-main']
+    this._ipc = deps[AkariIpcMain.id]
   }
 
   private _objectsToString(...args: any[]) {

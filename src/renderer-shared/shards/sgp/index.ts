@@ -12,14 +12,14 @@ const MAIN_SHARD_NAMESPACE = 'sgp-main'
 
 export class SgpRenderer implements IAkariShardInitDispose {
   static id = 'sgp-renderer'
-  static dependencies = ['akari-ipc-renderer', 'pinia-mobx-utils-renderer']
+  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id]
 
   private readonly _ipc: AkariIpcRenderer
   private readonly _pm: PiniaMobxUtilsRenderer
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
-    this._pm = deps['pinia-mobx-utils-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
   }
 
   getSupportedSgpServers() {

@@ -7,12 +7,12 @@ const MAIN_SHARD_NAMESPACE = 'extra-assets-main'
 
 export class ExtraAssetsRenderer implements IAkariShardInitDispose {
   static id = 'extra-assets-renderer'
-  static dependencies = ['pinia-mobx-utils-renderer']
+  static dependencies = [PiniaMobxUtilsRenderer.id]
 
   private readonly _pm: PiniaMobxUtilsRenderer
 
   constructor(deps: any) {
-    this._pm = deps['pinia-mobx-utils-renderer']
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
   }
 
   async onInit() {

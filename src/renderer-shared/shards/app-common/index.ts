@@ -11,11 +11,7 @@ const MAIN_SHARD_NAMESPACE = 'app-common-main'
 
 export class AppCommonRenderer implements IAkariShardInitDispose {
   static id = 'app-common-renderer'
-  static dependencies = [
-    'akari-ipc-renderer',
-    'setting-utils-renderer',
-    'pinia-mobx-utils-renderer'
-  ]
+  static dependencies = [AkariIpcRenderer.id, SettingUtilsRenderer.id, PiniaMobxUtilsRenderer.id]
 
   private readonly _ipc: AkariIpcRenderer
   private readonly _pm: PiniaMobxUtilsRenderer
@@ -24,9 +20,9 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
   private readonly _scope = effectScope()
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
-    this._pm = deps['pinia-mobx-utils-renderer']
-    this._setting = deps['setting-utils-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
+    this._setting = deps[SettingUtilsRenderer.id]
 
     this._scope.run(() => {
       const store = useAppCommonStore()

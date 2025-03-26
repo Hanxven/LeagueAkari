@@ -108,12 +108,12 @@ export class SgpMain implements IAkariShardInitDispose {
   private readonly _sgp = new SgpApi()
 
   constructor(deps: any) {
-    this._app = deps['app-common-main']
-    this._loggerFactory = deps['logger-factory-main']
-    this._settingFactory = deps['setting-factory-main']
-    this._mobx = deps['mobx-utils-main']
-    this._lc = deps['league-client-main']
-    this._ipc = deps['akari-ipc-main']
+    this._app = deps[AppCommonMain.id]
+    this._loggerFactory = deps[LoggerFactoryMain.id]
+    this._settingFactory = deps[SettingFactoryMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._lc = deps[LeagueClientMain.id]
+    this._ipc = deps[AkariIpcMain.id]
     this._log = this._loggerFactory.create(SgpMain.id)
     this._setting = this._settingFactory.register(SgpMain.id, {}, {})
 

@@ -42,7 +42,7 @@ interface UpdateTagDto {
 
 export class SavedPlayerRenderer {
   static id = 'saved-player-renderer'
-  static dependencies = ['akari-ipc-renderer']
+  static dependencies = [AkariIpcRenderer.id]
 
   private readonly _ipc: AkariIpcRenderer
 
@@ -51,7 +51,7 @@ export class SavedPlayerRenderer {
   })
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
   }
 
   querySavedPlayerWithGames(dto: SavedPlayerQueryDto) {

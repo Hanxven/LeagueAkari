@@ -12,12 +12,12 @@ export const MAIN_SHARD_NAMESPACE = 'mobx-utils-main'
  */
 export class PiniaMobxUtilsRenderer implements IAkariShardInitDispose {
   static id = 'pinia-mobx-utils-renderer'
-  static dependencies = ['akari-ipc-renderer']
+  static dependencies = [AkariIpcRenderer.id]
 
   private readonly _ipc: AkariIpcRenderer
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
   }
 
   async sync(namespace: string, stateId: string, store: any) {

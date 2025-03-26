@@ -57,8 +57,8 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
   private readonly _settings: Map<string, SetterSettingService> = new Map()
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-main']
-    this._storage = deps['storage-main']
+    this._ipc = deps[AkariIpcMain.id]
+    this._storage = deps[StorageMain.id]
     this._shared = deps[SHARED_GLOBAL_ID]
   }
 

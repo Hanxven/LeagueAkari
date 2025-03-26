@@ -94,9 +94,9 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   private _targetIdMap = new Map<string, string>()
 
   constructor(deps: any) {
-    this._app = deps['app-common-main']
-    this._ipc = deps['akari-ipc-main']
-    this._loggerFactory = deps['logger-factory-main']
+    this._app = deps[AppCommonMain.id]
+    this._ipc = deps[AkariIpcMain.id]
+    this._loggerFactory = deps[LoggerFactoryMain.id]
     this._log = this._loggerFactory.create(KeyboardShortcutsMain.id)
   }
 

@@ -9,14 +9,14 @@ export const MAIN_SHARD_NAMESPACE = 'setting-factory-main'
 
 export class SettingUtilsRenderer implements IAkariShardInitDispose {
   static id = 'setting-utils-renderer'
-  static dependencies = ['akari-ipc-renderer']
+  static dependencies = [AkariIpcRenderer.id]
 
   private _ipc: AkariIpcRenderer
 
   private _stopHandles = new Set<Function>()
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
   }
 
   set(namespace: string, key: string, value: any) {

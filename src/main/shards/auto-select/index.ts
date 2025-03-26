@@ -42,12 +42,12 @@ export class AutoSelectMain implements IAkariShardInitDispose {
   private _aramTracker = new AramTracker()
 
   constructor(deps: any) {
-    this._loggerFactory = deps['logger-factory-main']
+    this._loggerFactory = deps[LoggerFactoryMain.id]
     this._log = this._loggerFactory.create(AutoSelectMain.id)
-    this._lc = deps['league-client-main']
-    this._mobx = deps['mobx-utils-main']
-    this._ipc = deps['akari-ipc-main']
-    this._settingFactory = deps['setting-factory-main']
+    this._lc = deps[LeagueClientMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._ipc = deps[AkariIpcMain.id]
+    this._settingFactory = deps[SettingFactoryMain.id]
     this.state = new AutoSelectState(this._lc.data, this.settings)
     this._setting = this._settingFactory.register(
       AutoSelectMain.id,

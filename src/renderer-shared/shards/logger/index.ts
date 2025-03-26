@@ -7,12 +7,12 @@ export const MAIN_SHARD_NAMESPACE = 'logger-factory-main'
 
 export class LoggerRenderer {
   static id = 'logger-renderer'
-  static dependencies = ['akari-ipc-renderer']
+  static dependencies = [AkariIpcRenderer.id]
 
   private readonly _ipc: AkariIpcRenderer
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
   }
 
   // same as main shard

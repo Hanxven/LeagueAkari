@@ -111,14 +111,14 @@ export class OngoingGameMain implements IAkariShardInitDispose {
   private _debouncedUpdateMatchHistoryFn = _.debounce(() => this._updateMatchHistory(), 250)
 
   constructor(deps: any) {
-    this._loggerFactory = deps['logger-factory-main']
+    this._loggerFactory = deps[LoggerFactoryMain.id]
     this._log = this._loggerFactory.create(OngoingGameMain.id)
-    this._lc = deps['league-client-main']
-    this._mobx = deps['mobx-utils-main']
-    this._ipc = deps['akari-ipc-main']
-    this._settingFactory = deps['setting-factory-main']
-    this._sgp = deps['sgp-main']
-    this._saved = deps['saved-player-main']
+    this._lc = deps[LeagueClientMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._ipc = deps[AkariIpcMain.id]
+    this._settingFactory = deps[SettingFactoryMain.id]
+    this._sgp = deps[SgpMain.id]
+    this._saved = deps[SavedPlayerMain.id]
     this._setting = this._settingFactory.register(
       OngoingGameMain.id,
       {

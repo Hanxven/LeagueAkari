@@ -8,14 +8,14 @@ const MAIN_SHARD_NAMESPACE = 'respawn-timer-main'
 
 export class RespawnTimerRenderer implements IAkariShardInitDispose {
   static id = 'respawn-timer-renderer'
-  static dependencies = ['pinia-mobx-utils-renderer', 'setting-utils-renderer']
+  static dependencies = [PiniaMobxUtilsRenderer.id, SettingUtilsRenderer.id]
 
   private _pm: PiniaMobxUtilsRenderer
   private _setting: SettingUtilsRenderer
 
   constructor(deps: any) {
-    this._pm = deps['pinia-mobx-utils-renderer']
-    this._setting = deps['setting-utils-renderer']
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
+    this._setting = deps[SettingUtilsRenderer.id]
   }
 
   async onInit() {

@@ -21,14 +21,14 @@ interface ShortcutDetails {
  */
 export class KeyboardShortcutsRenderer implements IAkariShardInitDispose {
   static id = 'keyboard-shortcuts-renderer'
-  static dependencies = ['akari-ipc-renderer']
+  static dependencies = [AkariIpcRenderer.id]
 
   static DISABLED_KEYS_TARGET_ID = 'akari-disabled-keys'
 
   private readonly _ipc: AkariIpcRenderer
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
   }
 
   onShortcut(fn: (event: ShortcutDetails) => void) {

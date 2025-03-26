@@ -27,9 +27,9 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
   private _fandomApi = new LolFandomWikiApi()
 
   constructor(deps: any) {
-    this._app = deps['app-common-main']
-    this._mobx = deps['mobx-utils-main']
-    this._loggerFactory = deps['logger-factory-main']
+    this._app = deps[AppCommonMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._loggerFactory = deps[LoggerFactoryMain.id]
     this._log = this._loggerFactory.create(ExtraAssetsMain.id)
   }
 

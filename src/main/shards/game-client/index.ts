@@ -71,15 +71,15 @@ export class GameClientMain implements IAkariShardInitDispose {
   private _gcCachedRunningPids: number[] = []
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-main']
-    this._loggerFactory = deps['logger-factory-main']
+    this._ipc = deps[AkariIpcMain.id]
+    this._loggerFactory = deps[LoggerFactoryMain.id]
     this._log = this._loggerFactory.create(GameClientMain.id)
-    this._settingFactory = deps['setting-factory-main']
+    this._settingFactory = deps[SettingFactoryMain.id]
     this._api = new GameClientHttpApiAxiosHelper(this._http)
-    this._lc = deps['league-client-main']
-    this._kbd = deps['keyboard-shortcuts-main']
-    this._mobx = deps['mobx-utils-main']
-    this._ci = deps['client-installation-main']
+    this._lc = deps[LeagueClientMain.id]
+    this._kbd = deps[KeyboardShortcutsMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._ci = deps[ClientInstallationMain.id]
 
     this._setting = this._settingFactory.register(
       GameClientMain.id,

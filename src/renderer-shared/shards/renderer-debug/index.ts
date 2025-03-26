@@ -13,7 +13,7 @@ const MAIN_SHARD_NAMESPACE = 'renderer-debug-main'
 
 export class RendererDebugRenderer implements IAkariShardInitDispose {
   static id = 'renderer-debug-renderer'
-  static dependencies = ['akari-ipc-renderer', 'pinia-mobx-utils-renderer', 'logger-renderer']
+  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id, LoggerRenderer.id]
 
   private readonly _ipc: AkariIpcRenderer
   private readonly _pm: PiniaMobxUtilsRenderer
@@ -23,9 +23,9 @@ export class RendererDebugRenderer implements IAkariShardInitDispose {
   private readonly _scope = effectScope()
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
-    this._pm = deps['pinia-mobx-utils-renderer']
-    this._log = deps['logger-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
+    this._log = deps[LoggerRenderer.id]
   }
 
   async onInit() {

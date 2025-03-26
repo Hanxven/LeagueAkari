@@ -111,11 +111,11 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   }
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-main']
-    this._mobx = deps['mobx-utils-main']
-    this._ux = deps['league-client-ux-main']
-    this._loggerFactory = deps['logger-factory-main']
-    this._protocol = deps['akari-protocol-main']
+    this._ipc = deps[AkariIpcMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._ux = deps[LeagueClientUxMain.id]
+    this._loggerFactory = deps[LoggerFactoryMain.id]
+    this._protocol = deps[AkariProtocolMain.id]
     this._log = this._loggerFactory.create(LeagueClientMain.id)
 
     this._data = new LeagueClientSyncedData(this, LeagueClientMain, {
@@ -123,7 +123,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       ipc: this._ipc,
       mobx: this._mobx
     })
-    this._settingFactory = deps['setting-factory-main']
+    this._settingFactory = deps[SettingFactoryMain.id]
     this._setting = this._settingFactory.register(
       LeagueClientMain.id,
       {

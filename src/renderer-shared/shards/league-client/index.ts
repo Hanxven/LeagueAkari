@@ -29,11 +29,7 @@ export interface LeagueClientRendererConfig {
 
 export class LeagueClientRenderer {
   static id = 'league-client-renderer'
-  static dependencies = [
-    'pinia-mobx-utils-renderer',
-    'akari-ipc-renderer',
-    'setting-utils-renderer'
-  ]
+  static dependencies = [PiniaMobxUtilsRenderer.id, AkariIpcRenderer.id, SettingUtilsRenderer.id]
 
   private readonly _ipc: AkariIpcRenderer
   private readonly _pm: PiniaMobxUtilsRenderer
@@ -106,9 +102,9 @@ export class LeagueClientRenderer {
     deps: any,
     private _config: LeagueClientRendererConfig
   ) {
-    this._pm = deps['pinia-mobx-utils-renderer']
-    this._ipc = deps['akari-ipc-renderer']
-    this._setting = deps['setting-utils-renderer']
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
+    this._ipc = deps[AkariIpcRenderer.id]
+    this._setting = deps[SettingUtilsRenderer.id]
 
     axiosRetry(this._http, {
       retries: 2,

@@ -34,7 +34,7 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
   private readonly _rendererSubscription = new Map<string, Set<number>>()
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-main']
+    this._ipc = deps[AkariIpcMain.id]
   }
 
   async onInit() {

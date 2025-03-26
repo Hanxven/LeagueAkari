@@ -36,7 +36,7 @@ export class StorageMain implements IAkariShardInitDispose {
   }
 
   constructor(deps: any) {
-    this._loggerFactory = deps['logger-factory-main']
+    this._loggerFactory = deps[LoggerFactoryMain.id]
     this._log = this._loggerFactory.create(StorageMain.id)
 
     this._dataSource = new DataSource({

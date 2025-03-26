@@ -28,10 +28,10 @@ export class AppCommonMain implements IAkariShardInitDispose {
 
   constructor(deps: any) {
     this._shared = deps[SHARED_GLOBAL_ID]
-    this._ipc = deps['akari-ipc-main']
-    this._mobx = deps['mobx-utils-main']
+    this._ipc = deps[AkariIpcMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
 
-    this._setting = (deps['setting-factory-main'] as SettingFactoryMain).register(
+    this._setting = (deps[SettingFactoryMain.id] as SettingFactoryMain).register(
       AppCommonMain.id,
       {
         isInKyokoMode: { default: this.settings.isInKyokoMode },

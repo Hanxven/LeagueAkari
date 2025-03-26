@@ -32,9 +32,9 @@ export class TrayMain implements IAkariShardInitDispose {
   private _contextMenu: Menu
 
   constructor(deps: any) {
-    this._wm = deps['window-manager-main']
-    this._mobx = deps['mobx-utils-main']
-    this._app = deps['app-common-main']
+    this._wm = deps[WindowManagerMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._app = deps[AppCommonMain.id]
   }
 
   private _buildTray() {

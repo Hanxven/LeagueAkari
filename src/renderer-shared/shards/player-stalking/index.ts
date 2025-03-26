@@ -9,20 +9,16 @@ const MAIN_SHARD_NAMESPACE = 'player-stalking-main'
 
 export class PlayerStalkingRenderer implements IAkariShardInitDispose {
   static id = 'player-stalking-renderer'
-  static dependencies = [
-    'akari-ipc-renderer',
-    'pinia-mobx-utils-renderer',
-    'setting-utils-renderer'
-  ]
+  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id, SettingUtilsRenderer.id]
 
   private readonly _ipc: AkariIpcRenderer
   private readonly _pm: PiniaMobxUtilsRenderer
   private readonly _setting: SettingUtilsRenderer
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
-    this._pm = deps['pinia-mobx-utils-renderer']
-    this._setting = deps['setting-utils-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
+    this._setting = deps[SettingUtilsRenderer.id]
   }
 
   setEnabled(enabled: boolean) {

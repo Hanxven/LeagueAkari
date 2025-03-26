@@ -8,14 +8,14 @@ const MAIN_SHARD_NAMESPACE = 'auto-select-main'
 
 export class AutoSelectRenderer implements IAkariShardInitDispose {
   static id = 'auto-select-renderer'
-  static dependencies = ['setting-utils-renderer', 'pinia-mobx-utils-renderer']
+  static dependencies = [SettingUtilsRenderer.id, PiniaMobxUtilsRenderer.id]
 
   private readonly _pm: PiniaMobxUtilsRenderer
   private readonly _setting: SettingUtilsRenderer
 
   constructor(deps: any) {
-    this._pm = deps['pinia-mobx-utils-renderer']
-    this._setting = deps['setting-utils-renderer']
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
+    this._setting = deps[SettingUtilsRenderer.id]
   }
 
   setNormalModeEnabled(enabled: boolean) {

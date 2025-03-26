@@ -6,7 +6,7 @@ import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 
 export class RiotClientRenderer implements IAkariShardInitDispose {
   static id = 'riot-client-renderer'
-  static dependencies = ['pinia-mobx-utils-renderer']
+  static dependencies = [PiniaMobxUtilsRenderer.id]
 
   private readonly _pm: PiniaMobxUtilsRenderer
 
@@ -22,6 +22,6 @@ export class RiotClientRenderer implements IAkariShardInitDispose {
   }
 
   constructor(deps: any) {
-    this._pm = deps['pinia-mobx-utils-renderer']
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
   }
 }

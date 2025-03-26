@@ -77,12 +77,12 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   public readonly cdTimerWindow: AkariCdTimerWindow
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-main']
-    this._mobx = deps['mobx-utils-main']
+    this._ipc = deps[AkariIpcMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
     this._shared = deps[SHARED_GLOBAL_ID]
-    this._loggerFactory = deps['logger-factory-main']
+    this._loggerFactory = deps[LoggerFactoryMain.id]
     this._log = this._loggerFactory.create(WindowManagerMain.id)
-    this._settingFactory = deps['setting-factory-main']
+    this._settingFactory = deps[SettingFactoryMain.id]
     this._setting = this._settingFactory.register(
       WindowManagerMain.id,
       {
@@ -90,11 +90,11 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       },
       this.settings
     )
-    this._lc = deps['league-client-main']
-    this._protocol = deps['akari-protocol-main']
-    this._kbd = deps['keyboard-shortcuts-main']
-    this._app = deps['app-common-main']
-    this._gc = deps['game-client-main']
+    this._lc = deps[LeagueClientMain.id]
+    this._protocol = deps[AkariProtocolMain.id]
+    this._kbd = deps[KeyboardShortcutsMain.id]
+    this._app = deps[AppCommonMain.id]
+    this._gc = deps[GameClientMain.id]
 
     const wContext = this.getContext()
     this.mainWindow = new AkariMainWindow(wContext)

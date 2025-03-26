@@ -9,11 +9,7 @@ const MAIN_SHARD_NAMESPACE = 'in-game-send-main'
 
 export class InGameSendRenderer implements IAkariShardInitDispose {
   static id = 'in-game-send-renderer'
-  static dependencies = [
-    'akari-ipc-renderer',
-    'pinia-mobx-utils-renderer',
-    'setting-utils-renderer'
-  ]
+  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id, SettingUtilsRenderer.id]
 
   static SHORTCUT_ID_SEND_ALLY = `${MAIN_SHARD_NAMESPACE}/send-ally`
   static SHORTCUT_ID_SEND_ENEMY = `${MAIN_SHARD_NAMESPACE}/send-enemy`
@@ -26,9 +22,9 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   private readonly _setting: SettingUtilsRenderer
 
   constructor(deps: any) {
-    this._ipc = deps['akari-ipc-renderer']
-    this._pm = deps['pinia-mobx-utils-renderer']
-    this._setting = deps['setting-utils-renderer']
+    this._ipc = deps[AkariIpcRenderer.id]
+    this._pm = deps[PiniaMobxUtilsRenderer.id]
+    this._setting = deps[SettingUtilsRenderer.id]
   }
 
   async onInit() {

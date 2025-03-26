@@ -79,15 +79,15 @@ export class InGameSendMain implements IAkariShardInitDispose {
   } | null = null
 
   constructor(deps: any) {
-    this._loggerFactory = deps['logger-factory-main']
-    this._settingFactory = deps['setting-factory-main']
-    this._mobx = deps['mobx-utils-main']
-    this._ipc = deps['akari-ipc-main']
-    this._kbd = deps['keyboard-shortcuts-main']
-    this._og = deps['ongoing-game-main']
-    this._lc = deps['league-client-main']
+    this._loggerFactory = deps[LoggerFactoryMain.id]
+    this._settingFactory = deps[SettingFactoryMain.id]
+    this._mobx = deps[MobxUtilsMain.id]
+    this._ipc = deps[AkariIpcMain.id]
+    this._kbd = deps[KeyboardShortcutsMain.id]
+    this._og = deps[OngoingGameMain.id]
+    this._lc = deps[LeagueClientMain.id]
     this._shared = deps[SHARED_GLOBAL_ID]
-    this._app = deps['app-common-main']
+    this._app = deps[AppCommonMain.id]
     this._log = this._loggerFactory.create(InGameSendMain.id)
     this._setting = this._settingFactory.register(
       InGameSendMain.id,

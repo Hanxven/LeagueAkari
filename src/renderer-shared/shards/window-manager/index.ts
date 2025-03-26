@@ -1,6 +1,7 @@
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 
 import { AkariIpcRenderer } from '../ipc'
+import { LoggerRenderer } from '../logger'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { BaseAkariWindowRenderer } from './base-akari-window'
@@ -170,10 +171,10 @@ export class AkariCdTimerWindow extends BaseAkariWindowRenderer<
 export class WindowManagerRenderer implements IAkariShardInitDispose {
   static id = 'window-manager-renderer'
   static dependencies = [
-    'setting-utils-renderer',
-    'akari-ipc-renderer',
-    'pinia-mobx-utils-renderer',
-    'logger-renderer'
+    SettingUtilsRenderer.id,
+    AkariIpcRenderer.id,
+    PiniaMobxUtilsRenderer.id,
+    LoggerRenderer.id
   ]
 
   private context: WindowManagerRendererContext
@@ -186,9 +187,9 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
 
   constructor(deps: any) {
     this.context = {
-      setting: deps['setting-utils-renderer'],
-      ipc: deps['akari-ipc-renderer'],
-      pm: deps['pinia-mobx-utils-renderer']
+      setting: deps[SettingUtilsRenderer.id],
+      ipc: deps[AkariIpcRenderer.id],
+      pm: deps[PiniaMobxUtilsRenderer.id]
     }
 
     this.mainWindow = new AkariMainWindow(this.context)

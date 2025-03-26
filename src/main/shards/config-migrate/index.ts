@@ -25,8 +25,8 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
 
   constructor(deps: any) {
-    this._st = deps['storage-main']
-    this._log = deps['logger-factory-main'].create(ConfigMigrateMain.id)
+    this._st = deps[StorageMain.id]
+    this._log = deps[LoggerFactoryMain.id].create(ConfigMigrateMain.id)
   }
 
   private async _do(manager: EntityManager, from: string, to: string) {
