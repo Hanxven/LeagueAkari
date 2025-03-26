@@ -7,6 +7,7 @@ import { usePlayerStalkingStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'player-stalking-main'
 
+// not used for now
 export class PlayerStalkingRenderer implements IAkariShardInitDispose {
   static id = 'player-stalking-renderer'
   static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id, SettingUtilsRenderer.id]

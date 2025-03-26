@@ -1,11 +1,11 @@
 import { input } from '@hanxven/league-akari-addons'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
+import icon from '@resources/LA_ICON.ico?asset'
 import { sleep } from '@shared/utils/sleep'
 import { comparer, computed } from 'mobx'
 
-import { WindowManagerMain, type WindowManagerMainContext } from '..'
-import icon from '../../../../../resources/LA_ICON.ico?asset'
+import { type WindowManagerMainContext } from '..'
 import { BaseAkariWindow } from '../base-akari-window'
 import { CdTimerWindowSettings, CdTimerWindowState } from './state'
 

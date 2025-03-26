@@ -3,7 +3,7 @@ import { Menu, MenuItem, Tray } from 'electron'
 import i18next from 'i18next'
 import { comparer } from 'mobx'
 
-import icon from '../../../../resources/LA_ICON.ico?asset'
+import icon from '@resources/LA_ICON.ico?asset'
 import { AppCommonMain } from '../app-common'
 import { MobxUtilsMain } from '../mobx-utils'
 import { WindowManagerMain } from '../window-manager'

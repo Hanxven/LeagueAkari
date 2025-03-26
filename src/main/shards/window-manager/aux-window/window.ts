@@ -3,7 +3,7 @@ import { Notification } from 'electron'
 import { comparer, computed } from 'mobx'
 
 import { WindowManagerMainContext } from '..'
-import icon from '../../../../../resources/LA_ICON.ico?asset'
+import icon from '@resources/LA_ICON.ico?asset'
 import { BaseAkariWindow } from '../base-akari-window'
 import { AuxWindowSettings, AuxWindowState } from './state'
 

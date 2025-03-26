@@ -6,7 +6,7 @@ import path from 'node:path'
 import util from 'node:util'
 import regedit from 'regedit'
 
-import RES_POSITIONER from '../../../../resources/AKARI?asset&asarUnpack'
+import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'

@@ -2,7 +2,7 @@ import { Event } from 'electron'
 import { comparer } from 'mobx'
 
 import type { WindowManagerMainContext } from '..'
-import icon from '../../../../../resources/LA_ICON.ico?asset'
+import icon from '@resources/LA_ICON.ico?asset'
 import { BaseAkariWindow } from '../base-akari-window'
 import { MainWindowSettings, MainWindowState } from './state'
 
