@@ -46,7 +46,7 @@ const SCHEMA = {
           }
         },
         required: ['name'],
-        additionalProperties: false
+        additionalProperties: true
       }
     },
     tencentServerMatchHistoryInteroperability: {
@@ -66,6 +66,13 @@ const SCHEMA = {
       items: {
         type: 'string'
       }
+    },
+    serverNames: {
+      type: 'object',
+      additionalProperties: {
+        type: 'object',
+        additionalProperties: { type: 'string' }
+      }
     }
   },
   required: [
@@ -74,7 +81,7 @@ const SCHEMA = {
     'tencentServerSpectatorInteroperability',
     'tencentServerSummonerInteroperability'
   ],
-  additionalProperties: false
+  additionalProperties: true
 } as const
 
 /**
@@ -92,7 +99,7 @@ export class SgpMain implements IAkariShardInitDispose {
     AkariIpcMain.id
   ]
 
-  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v9.json'
+  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v10.json'
 
   public readonly state: SgpState
 

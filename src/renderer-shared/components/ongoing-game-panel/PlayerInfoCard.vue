@@ -409,8 +409,9 @@
           <span>{{ t('PlayerInfoCard.loadingMatchHistory') }}</span>
         </div>
       </div>
-      <div class="placeholder" v-else-if="matchHistoryLoading === 'error'">
-        {{ t('PlayerInfoCard.errorLoadingMatchHistory') }}
+      <div class="placeholder error-loading" v-else-if="matchHistoryLoading === 'error'">
+        <NIcon><WarningIcon /></NIcon>
+        <span>{{ t('PlayerInfoCard.errorLoadingMatchHistory') }}</span>
       </div>
       <div class="placeholder" v-else>{{ t('PlayerInfoCard.empty') }}</div>
     </div>
@@ -442,11 +443,12 @@ import {
   withSelfParticipantMatchHistory
 } from '@shared/utils/analysis'
 import { ParsedRole } from '@shared/utils/ranked'
+import { Warning as WarningIcon } from '@vicons/ionicons5'
 import { StarRound as StarRoundIcon } from '@vicons/material'
 import { useElementHover } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
-import { NPopover, NSpin, NVirtualList } from 'naive-ui'
+import { NIcon, NPopover, NSpin, NVirtualList } from 'naive-ui'
 import { computed, onDeactivated, useTemplateRef, watch } from 'vue'
 
 import {
@@ -1177,11 +1179,18 @@ const { name } = useChampionInfo()
     height: 100%;
     font-size: 12px;
     color: #ffffffa0;
+    gap: 4px;
 
     .loading {
       display: flex;
       align-items: center;
       gap: 4px;
+    }
+
+    &.error-loading {
+      position: relative;
+      left: -4px;
+      color: #ff8a3c;
     }
   }
 }

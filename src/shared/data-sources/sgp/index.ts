@@ -34,6 +34,12 @@ export interface AvailableServersMap {
     }
   }
 
+  serverNames: {
+    [locale: string]: {
+      [server: string]: string
+    }
+  }
+
   /**
    * 腾讯服务器中，以下服务器可以使用同一个 jwt token 实现战绩查询
    */
@@ -56,6 +62,7 @@ export class SgpApi {
 
   private _availableSgpServers: AvailableServersMap = {
     servers: {},
+    serverNames: {},
     tencentServerMatchHistoryInteroperability: [],
     tencentServerSpectatorInteroperability: [],
     tencentServerSummonerInteroperability: []

@@ -73,13 +73,7 @@
                 <div class="region-name">{{ t('SideBarFixed.connectedClient') }}</div>
               </template>
               <div class="region-name">
-                {{ REGION_NAME[clients.current.region] || clients.current.region }}
-              </div>
-              <div class="rso-name" v-if="clients.current.rsoPlatformId">
-                {{
-                  TENCENT_RSO_PLATFORM_NAME[clients.current.rsoPlatformId] ||
-                  clients.current.rsoPlatformId
-                }}
+                {{ clients.current.name }}
               </div>
             </StreamerModeMaskedText>
             <div class="pid">(PID: {{ clients.current.pid }})</div>
@@ -112,11 +106,9 @@
                     </div>
                   </template>
                   <div class="region-name">
-                    {{ REGION_NAME[client.region] || client.region }}
+                    {{ client.name }}
                   </div>
-                  <div class="rso-name" v-if="!client.rsoPlatformId">
-                    {{ TENCENT_RSO_PLATFORM_NAME[client.rsoPlatformId] || client.rsoPlatformId }}
-                  </div>
+
                   <div class="pid">(PID: {{ client.pid }})</div>
                 </StreamerModeMaskedText>
                 <NSpin v-if="client.isConnecting" class="loading" :size="12" />
@@ -152,13 +144,15 @@
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { UxCommandLine, useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
+import { useSgpStore } from '@renderer-shared/shards/sgp/store'
+import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
-import { REGION_NAME, TENCENT_RSO_PLATFORM_NAME } from '@shared/utils/platform-names'
 import { BareMetalServer as BareMetalServerIcon } from '@vicons/carbon'
 import {
   PlugDisconnected20Filled as PlugDisconnected20FilledIcon,
@@ -178,6 +172,8 @@ const { t } = useTranslation()
 const lcs = useLeagueClientStore()
 const lcuxs = useLeagueClientUxStore()
 const rts = useRespawnTimerStore()
+const sgps = useSgpStore()
+const as = useAppCommonStore()
 
 const lc = useInstance(LeagueClientRenderer)
 const mh = useInstance(MatchHistoryTabsRenderer)
@@ -199,13 +195,25 @@ const handleOpenSettingsModal = () => {
 }
 
 const clients = computed(() => {
-  const current = lcs.auth
+  let current: (UxCommandLine & { name: string }) | null = null
+  if (lcs.auth) {
+    const sgpServerId = getSgpServerId(lcs.auth.region, lcs.auth.rsoPlatformId)
+    current = {
+      ...lcs.auth,
+      name:
+        sgps.availability.sgpServers.serverNames[as.settings.locale]?.[sgpServerId] || sgpServerId
+    }
+  }
+
   const others = lcuxs.launchedClients
     .filter((c) => c.pid !== current?.pid)
     .map((c) => {
+      const sgpServerId = getSgpServerId(c.region, c.rsoPlatformId)
       return {
         ...c,
-        isConnecting: c.pid === lcs.connectingClient?.pid
+        isConnecting: c.pid === lcs.connectingClient?.pid,
+        name:
+          sgps.availability.sgpServers.serverNames[as.settings.locale]?.[sgpServerId] || sgpServerId
       }
     })
 
@@ -316,20 +324,6 @@ watch(
   }
 }
 
-.region {
-  display: flex;
-  align-items: flex-end;
-
-  .region-name {
-    font-size: 12px;
-  }
-
-  .rso-name {
-    margin-left: 4px;
-    font-size: 12px;
-  }
-}
-
 .separator {
   margin: 8px 0;
   width: 100%;
@@ -366,10 +360,6 @@ watch(
   .region-name {
     font-size: 12px;
     font-weight: bold;
-  }
-
-  .rso-name {
-    font-size: 12px;
   }
 
   .pid {
@@ -425,10 +415,6 @@ watch(
 
   .region {
     .region-name {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    .rso-name {
       color: rgba(255, 255, 255, 0.8);
     }
   }
@@ -501,10 +487,6 @@ watch(
 
   .region {
     .region-name {
-      color: rgba(0, 0, 0, 0.8);
-    }
-
-    .rso-name {
       color: rgba(0, 0, 0, 0.8);
     }
   }

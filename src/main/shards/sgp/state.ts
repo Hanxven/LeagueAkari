@@ -1,8 +1,6 @@
 import { AvailableServersMap } from '@shared/data-sources/sgp'
 import { makeAutoObservable } from 'mobx'
 
-import { LeagueClientSyncedData } from '../league-client/lc-state'
-
 export class SgpState {
   availability = {
     region: '',
@@ -14,6 +12,7 @@ export class SgpState {
     },
     sgpServers: {
       servers: {},
+      serverNames: {},
       tencentServerMatchHistoryInteroperability: [],
       tencentServerSpectatorInteroperability: [],
       tencentServerSummonerInteroperability: []

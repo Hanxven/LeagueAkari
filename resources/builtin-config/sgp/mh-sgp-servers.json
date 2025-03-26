@@ -108,5 +108,41 @@
     "TENCENT_TJ101",
     "TENCENT_BGP2",
     "TENCENT_PBE"
-  ]
+  ],
+  "serverNames": {
+    "en": {
+      "TENCENT_HN1": "Ionia",
+      "TENCENT_HN10": "Black Rose",
+      "TENCENT_TJ100": "League 4",
+      "TENCENT_TJ101": "League 5",
+      "TENCENT_NJ100": "League 1",
+      "TENCENT_GZ100": "League 2",
+      "TENCENT_CQ100": "League 3",
+      "TENCENT_BGP2": "Rift's Summit",
+      "TENCENT_PBE": "PBE (Tencent)",
+      "TW2": "Taiwan",
+      "SG2": "Singapore",
+      "PH2": "Philippines",
+      "VN2": "Vietnam",
+      "PBE": "PBE",
+      "EUW": "EUW"
+    },
+    "zh-CN": {
+      "TENCENT_HN1": "艾欧尼亚",
+      "TENCENT_HN10": "黑色玫瑰",
+      "TENCENT_TJ100": "联盟四区",
+      "TENCENT_TJ101": "联盟五区",
+      "TENCENT_NJ100": "联盟一区",
+      "TENCENT_GZ100": "联盟二区",
+      "TENCENT_CQ100": "联盟三区",
+      "TENCENT_BGP2": "峡谷之巅",
+      "TENCENT_PBE": "PBE (腾讯)",
+      "TW2": "台湾",
+      "SG2": "新加坡",
+      "PH2": "菲律宾",
+      "VN2": "越南",
+      "PBE": "PBE",
+      "EUW": "EUW"
+    }
+  }
 }
