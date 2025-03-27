@@ -6,7 +6,6 @@ import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NotificationReactive, useNotification } from 'naive-ui'
 import { CSSProperties, h, inject, watch } from 'vue'
-import { useRouter } from 'vue-router'
 
 /**
  * 偶尔会出现在主窗口的周期性通知
@@ -70,8 +69,7 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
         }
 
         inst = notification.info({
-          title: () =>
-            t('main-window-notifications-renderer.liveStreamingHints.liveStreamingDetected.title'),
+          title: () => t('main-window-notifications-renderer.liveStreamingHints.detected.title'),
           content: () => {
             return h(
               'div',
@@ -85,9 +83,7 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
               [
                 h(
                   'span',
-                  t(
-                    'main-window-notifications-renderer.liveStreamingHints.liveStreamingDetected.hintToStreamerModeSettings'
-                  )
+                  t('main-window-notifications-renderer.liveStreamingHints.detected.toSettings')
                 ),
                 h(
                   'div',
@@ -172,14 +168,8 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
-  /**
-   * 别忘了领取奖励
-   */
-  _setupRewardClaimNotifications() {}
-
   setupMainWindowNotifications() {
     this._setupStreamerModeNotifications()
-    this._setupRewardClaimNotifications()
   }
 
   async onInit() {}

@@ -2015,9 +2015,9 @@ main-window-notifications-renderer:
     neverShowAgain: Never Show Again
     toSettings: To Settings
 
-    liveStreamingDetected:
+    detected:
       title: Are you live streaming?
-      hintToStreamerModeSettings: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
+      toSettings: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
 
 champions:
   bravery: Bravery
