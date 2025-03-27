@@ -2009,14 +2009,15 @@ MissionClaimTool:
 ClaimableItem:
   untranslatedC: Unnamed Group ({{countV}})
 
-useLiveStreamingHints:
-  dismiss: Dismiss
-  neverShowAgain: Never Show Again
-  toSettings: To Settings
+main-window-notifications-renderer:
+  liveStreamingHints:
+    dismiss: Dismiss
+    neverShowAgain: Never Show Again
+    toSettings: To Settings
 
-  liveStreamingDetected:
-    title: Are you live streaming?
-    hintToStreamerModeSettings: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
+    liveStreamingDetected:
+      title: Are you live streaming?
+      hintToStreamerModeSettings: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
 
 champions:
   bravery: Bravery

@@ -1,5 +1,6 @@
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
+import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { createEventBus } from '@renderer-shared/utils/events'
 import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
@@ -28,7 +29,7 @@ export interface SearchHistoryItem {
  */
 export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   static id = 'match-history-tabs-renderer'
-  static dependencies = ['setting-utils-renderer', 'sgp-renderer']
+  static dependencies = [SettingUtilsRenderer.id, SgpRenderer.id]
 
   static SEARCH_HISTORY_KEY = 'searchHistory'
   static SEARCH_HISTORY_MAX_LENGTH = 20
@@ -39,7 +40,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   private readonly _events = createEventBus()
 
   constructor(deps: any) {
-    this._setting = deps['setting-utils-renderer']
+    this._setting = deps[SettingUtilsRenderer.id]
   }
 
   async onInit() {

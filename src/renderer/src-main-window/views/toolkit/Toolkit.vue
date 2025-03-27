@@ -34,7 +34,8 @@
 import { ToolKit as ToolkitIcon } from '@vicons/carbon'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
-import { computed, ref, watch } from 'vue'
+import { computed, onActivated, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import ClaimTools from './claim-tools/ClaimTools.vue'
 import Client from './client/Client.vue'
@@ -91,6 +92,34 @@ watch(
     } else {
       transitionType.value = 'move-from-left-fade'
     }
+  },
+  { immediate: true }
+)
+
+const route = useRoute()
+const router = useRouter()
+
+onActivated(() => {
+  router.replace({ name: 'toolkit', params: { section: currentTab.value } })
+})
+
+watch(
+  () => currentTab.value,
+  (cur) => {
+    router.replace({ name: 'toolkit', params: { section: cur } })
+  },
+  { immediate: true }
+)
+
+// route to section
+watch(
+  () => route.params.section,
+  (section) => {
+    if (route.name !== 'toolkit' || !section) {
+      return
+    }
+
+    currentTab.value = section as string
   },
   { immediate: true }
 )

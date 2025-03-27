@@ -24,6 +24,7 @@
     "@hanxven/league-akari-addons": "^1.0.0",
     "@leaguetavern/electron-overlay-win": "^1.0.1",
     "@types/luaparse": "^0.2.12",
+    "@vueuse/router": "^13.0.0",
     "ajv": "^8.17.1",
     "axios": "^1.8.4",
     "axios-retry": "^4.5.0",

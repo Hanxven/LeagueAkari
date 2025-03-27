@@ -2012,14 +2012,15 @@ MissionClaimTool:
 ClaimableItem:
   untranslatedC: 未命名奖励组 ({{countV}})
 
-useLiveStreamingHints:
-  dismiss: 关闭
-  neverShowAgain: 不再显示
-  toSettings: 到设置项
+main-window-notifications-renderer:
+  liveStreamingHints:
+    dismiss: 关闭
+    neverShowAgain: 不再显示
+    toSettings: 到设置项
 
-  liveStreamingDetected:
-    title: 在直播吗？
-    hintToStreamerModeSettings: League Akari 检测到一个或多个直播工具正在运行。您可以启用主播模式以隐藏敏感信息
+    liveStreamingDetected:
+      title: 在直播吗？
+      hintToStreamerModeSettings: League Akari 检测到一个或多个直播工具正在运行。您可以启用主播模式以隐藏敏感信息
 
 champions:
   bravery: 勇敢举动

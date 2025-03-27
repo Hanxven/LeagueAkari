@@ -21,18 +21,17 @@ const router = createRouter({
         },
         {
           name: 'ongoing-game',
-          path: '/ongoing-game/:mode?',
+          path: '/ongoing-game',
           component: () => import('@main-window/views/ongoing-game/OngoingGame.vue')
         },
         {
           name: 'toolkit',
-          path: '/toolkit',
+          path: '/toolkit/:section?',
           component: () => import('@main-window/views/toolkit/Toolkit.vue')
         },
         {
           name: 'automation',
-          path: '/automation',
-
+          path: '/automation/:section?',
           component: () => import('@main-window/views/automation/Automation.vue')
         },
         {

@@ -12,6 +12,7 @@
       v-model:show="isShowingFreeSoftwareDeclaration"
       @confirm="handleConfirmation"
     />
+    <MainWindowNotifications />
     <Transition name="bg-fade">
       <div
         v-if="!preferMica"
@@ -50,8 +51,8 @@ import DeclarationModal from './components/DeclarationModal.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
-import { useLiveStreamingHints } from './compositions/useLiveStreamingHints'
 import { useMicaAvailability } from './compositions/useMicaAvailability'
+import MainWindowNotifications from './shards/main-window-notifications/MainWindowNotifications.vue'
 import { useMainWindowUiStore } from './shards/main-window-ui/store'
 
 const muis = useMainWindowUiStore()
@@ -67,7 +68,7 @@ const { t } = useTranslation()
 
 greeting(as.version)
 
-const appInject = {
+const appProvide = {
   openSettingsModal: (tabName?: string) => {
     isShowingSettingModal.value = true
     if (tabName) {
@@ -87,7 +88,7 @@ const appInject = {
   }
 }
 
-provide('app', appInject)
+provide('app', appProvide)
 
 const notification = useNotification()
 
@@ -191,12 +192,6 @@ useKeyboardCombo('AKARI', {
 const preferMica = useMicaAvailability()
 
 og.setupAutoRouteWhenGameStarts()
-
-useLiveStreamingHints({
-  onToSettings: () => {
-    appInject.openSettingsModal('misc')
-  }
-})
 </script>
 
 <style lang="less">

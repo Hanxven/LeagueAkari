@@ -1908,6 +1908,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vueuse/router@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "@vueuse/router@npm:13.0.0"
+  dependencies:
+    "@vueuse/shared": "npm:13.0.0"
+  peerDependencies:
+    vue: ^3.5.0
+    vue-router: ^4.0.0
+  checksum: 10c0/676ac0d4c9cb04d2a20c468581fb2826ccc08ed73fca87d95b2d540fc0de1d975d5ba086eade9117544468279f14259322f673c8cf45c2d5477d588dd6618620
+  languageName: node
+  linkType: hard
+
 "@vueuse/shared@npm:13.0.0":
   version: 13.0.0
   resolution: "@vueuse/shared@npm:13.0.0"
@@ -4492,6 +4504,7 @@ __metadata:
     "@vitejs/plugin-vue-jsx": "npm:^4.1.2"
     "@vueuse/components": "npm:^13.0.0"
     "@vueuse/core": "npm:^13.0.0"
+    "@vueuse/router": "npm:^13.0.0"
     ajv: "npm:^8.17.1"
     axios: "npm:^1.8.4"
     axios-retry: "npm:^4.5.0"

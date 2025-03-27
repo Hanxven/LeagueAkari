@@ -399,30 +399,12 @@ const handleChangeInvitationStrategy = (queueType: string, strategy: string) => 
 </script>
 
 <style lang="less" scoped>
+@import './automation-styles.less';
+
 .divider {
   margin-top: 12px;
   margin-bottom: 12px;
   height: 1px;
   background-color: rgba(255, 255, 255, 0.084);
-}
-
-.outer-wrapper {
-  position: relative;
-  height: 100%;
-  max-width: 100%;
-}
-
-.inner-wrapper {
-  padding: 16px;
-  margin: 0 auto;
-  max-width: 800px;
-
-  :deep(.n-card) {
-    background-color: transparent;
-  }
-}
-
-.single-root {
-  height: 100%;
 }
 </style>

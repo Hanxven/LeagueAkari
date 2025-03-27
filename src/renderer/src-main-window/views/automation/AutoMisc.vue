@@ -82,23 +82,5 @@ watchEffect(() => {
 </script>
 
 <style lang="less" scoped>
-.outer-wrapper {
-  position: relative;
-  height: 100%;
-  max-width: 100%;
-}
-
-.inner-wrapper {
-  padding: 16px;
-  margin: 0 auto;
-  max-width: 800px;
-
-  :deep(.n-card) {
-    background-color: transparent;
-  }
-}
-
-.single-root {
-  height: 100%;
-}
+@import './automation-styles.less';
 </style>

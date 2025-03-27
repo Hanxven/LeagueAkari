@@ -14,7 +14,7 @@ import { useMainWindowUiStore } from './store'
 
 export class MainWindowUiRenderer implements IAkariShardInitDispose {
   static id = 'main-window-ui-renderer'
-  static dependencies = ['setting-utils-renderer', 'league-client-renderer', 'logger-renderer']
+  static dependencies = [SettingUtilsRenderer.id, LeagueClientRenderer.id, LoggerRenderer.id]
 
   private readonly _setting: SettingUtilsRenderer
   private readonly _lc: LeagueClientRenderer
@@ -24,9 +24,9 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
   private readonly _urlCache = new Map<number, string>()
 
   constructor(deps: any) {
-    this._setting = deps['setting-utils-renderer']
-    this._lc = deps['league-client-renderer']
-    this._log = deps['logger-renderer']
+    this._setting = deps[SettingUtilsRenderer.id]
+    this._lc = deps[LeagueClientRenderer.id]
+    this._log = deps[LoggerRenderer.id]
   }
 
   async onInit() {

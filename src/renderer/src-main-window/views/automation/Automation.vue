@@ -6,27 +6,17 @@
         <span class="session-label">{{ t('Automation.title') }}</span>
       </div>
       <NTabs
-        ref="tabs"
         v-model:value="currentTab"
         :theme-overrides="{ tabGapMediumBar: '18px' }"
         size="medium"
       >
-        <NTab name="auto-gameflow">
-          <span class="tab-name">{{ t('Automation.autoGameflow') }}</span>
-        </NTab>
-        <NTab name="auto-select" class="tab-name">
-          <span class="tab-name">{{ t('Automation.autoSelect') }}</span>
-        </NTab>
-        <NTab name="auto-champ-config" class="tab-name">
-          <span class="tab-name">{{ t('Automation.autoChampConfig') }}</span>
-        </NTab>
-        <NTab name="misc" class="tab-name">
-          <span class="tab-name">{{ t('Automation.autoMisc') }}</span>
+        <NTab v-for="tab in tabs" :key="tab.key" :name="tab.key" :tab="tab.name">
+          <span class="tab-name">{{ tab.name }}</span>
         </NTab>
       </NTabs>
     </div>
     <div class="contents">
-      <Transition name="move-fade">
+      <Transition :name="transitionType">
         <KeepAlive>
           <AutoGameflow v-if="currentTab === 'auto-gameflow'" />
           <AutoSelect v-else-if="currentTab === 'auto-select'" />
@@ -42,16 +32,90 @@
 import { AiStatus as AiStatusIcon } from '@vicons/carbon'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NTab, NTabs } from 'naive-ui'
-import { ref } from 'vue'
+import { computed, onActivated, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import AutoChampConfig from './AutoChampConfig.vue'
 import AutoGameflow from './AutoGameflow.vue'
 import AutoMisc from './AutoMisc.vue'
 import AutoSelect from './AutoSelect.vue'
 
-const currentTab = ref('auto-gameflow')
+/**
+ * 此文件逻辑于 Toolkit.vue 完全相同，甚至属于是一个文件的两份复制
+ * TODO: 合并此逻辑
+ */
 
 const { t } = useTranslation()
+
+const currentTab = ref('auto-gameflow')
+
+const tabs = computed(() => [
+  {
+    key: 'auto-gameflow',
+    name: t('Automation.autoGameflow')
+  },
+  {
+    key: 'auto-select',
+    name: t('Automation.autoSelect')
+  },
+  {
+    key: 'auto-champ-config',
+    name: t('Automation.autoChampConfig')
+  },
+  {
+    key: 'misc',
+    name: t('Automation.autoMisc')
+  }
+])
+
+const transitionType = ref<'move-from-right-fade' | 'move-from-left-fade'>('move-from-left-fade')
+watch(
+  () => currentTab.value,
+  (cur, prev) => {
+    if (!prev) {
+      transitionType.value = 'move-from-right-fade'
+      return
+    }
+
+    const curIndex = tabs.value.findIndex((tab) => tab.key === cur)
+    const prevIndex = tabs.value.findIndex((tab) => tab.key === prev)
+
+    if (curIndex > prevIndex) {
+      transitionType.value = 'move-from-right-fade'
+    } else {
+      transitionType.value = 'move-from-left-fade'
+    }
+  },
+  { immediate: true }
+)
+
+const route = useRoute()
+const router = useRouter()
+
+onActivated(() => {
+  router.replace({ name: 'automation', params: { section: currentTab.value } })
+})
+
+watch(
+  () => currentTab.value,
+  (cur) => {
+    router.replace({ name: 'automation', params: { section: cur } })
+  },
+  { immediate: true }
+)
+
+// route to section
+watch(
+  [() => route.name, () => route.params.section],
+  ([name, section]) => {
+    if (name !== 'automation' || !section) {
+      return
+    }
+
+    currentTab.value = section as string
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="less" scoped>
@@ -68,6 +132,7 @@ const { t } = useTranslation()
   }
 
   .contents {
+    position: relative;
     flex: 1;
     height: 0;
   }

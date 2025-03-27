@@ -199,9 +199,7 @@
             <OrderedChampionList
               type="pick"
               :champions="store.settings.benchExpectedChampions"
-              @update:champions="
-                (list) => as.setBenchExpectedChampions(list)
-              "
+              @update:champions="(list) => as.setBenchExpectedChampions(list)"
             />
           </ControlItem>
         </NCard>
@@ -318,27 +316,13 @@ const roles = computed(() => {
 </script>
 
 <style lang="less" scoped>
+@import './automation-styles.less';
+
 .divider {
   margin-top: 12px;
   margin-bottom: 12px;
   height: 1px;
   background-color: rgba(255, 255, 255, 0.084);
-}
-
-.outer-wrapper {
-  position: relative;
-  height: 100%;
-  max-width: 100%;
-}
-
-.inner-wrapper {
-  padding: 16px;
-  margin: 0 auto;
-  max-width: 800px;
-
-  :deep(.n-card) {
-    background-color: transparent;
-  }
 }
 
 .expected-champion-groups {
@@ -363,9 +347,5 @@ const roles = computed(() => {
   .label.current {
     color: #88f6d1;
   }
-}
-
-.single-root {
-  height: 100%;
 }
 </style>
