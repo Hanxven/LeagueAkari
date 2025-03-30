@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -7,20 +7,15 @@ import { useSelfUpdateStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'self-update-main'
 
+@Shard(SelfUpdateRenderer.id)
 export class SelfUpdateRenderer implements IAkariShardInitDispose {
   static id = 'self-update-renderer'
 
-  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id, SettingUtilsRenderer.id]
-
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _setting: SettingUtilsRenderer
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+  ) {
     // @ts-ignore
     window.selfUpdateShard = this
   }

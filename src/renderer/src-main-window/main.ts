@@ -1,3 +1,5 @@
+import 'reflect-metadata'
+
 import '@renderer-shared/assets/css/base-styles.less'
 import '@renderer-shared/assets/css/lol-view.less'
 import { i18next } from '@renderer-shared/i18n'

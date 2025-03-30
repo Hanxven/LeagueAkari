@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import _ from 'lodash'
 import { markRaw } from 'vue'
 
@@ -10,15 +10,11 @@ export const MAIN_SHARD_NAMESPACE = 'mobx-utils-main'
 /**
  * 对应主进程模块, 适用于 Pinia 的状态同步器
  */
+@Shard(PiniaMobxUtilsRenderer.id)
 export class PiniaMobxUtilsRenderer implements IAkariShardInitDispose {
   static id = 'pinia-mobx-utils-renderer'
-  static dependencies = [AkariIpcRenderer.id]
 
-  private readonly _ipc: AkariIpcRenderer
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-  }
+  constructor(@Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer) {}
 
   async sync(namespace: string, stateId: string, store: any) {
     this._ipc.onEvent(

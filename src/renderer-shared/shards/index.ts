@@ -1,4 +1,4 @@
-import { AkariManager, AkariShardConstructor } from '@shared/akari-shard/manager'
+import { AkariManager, Constructor } from '@shared/akari-shard'
 import { App, getCurrentInstance } from 'vue'
 
 import { LoggerRenderer } from './logger'
@@ -26,7 +26,7 @@ export function createManager() {
     install: (app: App) => {
       app.config.globalProperties.$akariManager = akariManager
       app.config.errorHandler = (err, _instance, info) => {
-        const logger = akariManager.getInstance<LoggerRenderer>('logger-renderer')
+        const logger = akariManager.getInstance('logger-renderer') as LoggerRenderer
         logger?.error('Vue', err, info)
       }
 
@@ -34,7 +34,7 @@ export function createManager() {
     },
     setup: () => akariManager.setup(),
     getInstance: (id: string) => akariManager.getInstance(id),
-    use: (shard: AkariShardConstructor, config?: object) => akariManager.use(shard, config)
+    use: (shard: Constructor, config?: object) => akariManager.use(shard, config)
   }
 }
 

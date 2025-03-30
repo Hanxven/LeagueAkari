@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { LEAGUE_AKARI_DB_CURRENT_VERSION, LEAGUE_AKARI_DB_FILENAME } from '@shared/constants/common'
 import dayjs from 'dayjs'
 import { app } from 'electron'
@@ -17,11 +17,10 @@ import { v15_LA1_2_2Upgrade } from './upgrades/version-15'
 /**
  * 任何持久性存储的逻辑集成
  */
+@Shard(StorageMain.id)
 export class StorageMain implements IAkariShardInitDispose {
   static id = 'storage-main'
-  static dependencies = [LoggerFactoryMain.id]
 
-  private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger
 
   private readonly _dataSource: DataSource
@@ -35,9 +34,8 @@ export class StorageMain implements IAkariShardInitDispose {
     return this._dataSource
   }
 
-  constructor(deps: any) {
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(StorageMain.id)
+  constructor(private readonly _loggerFactory: LoggerFactoryMain) {
+    this._log = _loggerFactory.create(StorageMain.id)
 
     this._dataSource = new DataSource({
       type: 'sqlite',

@@ -1,3 +1,4 @@
+import { Config, Dep, Shard } from '@shared/akari-shard'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
 import { LcuEvent } from '@shared/types/league-client/event'
@@ -27,13 +28,9 @@ export interface LeagueClientRendererConfig {
   }
 }
 
+@Shard(LeagueClientRenderer.id)
 export class LeagueClientRenderer {
   static id = 'league-client-renderer'
-  static dependencies = [PiniaMobxUtilsRenderer.id, AkariIpcRenderer.id, SettingUtilsRenderer.id]
-
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _setting: SettingUtilsRenderer
 
   /** 这里只用于当作一个普通的静态事件分发器 */
   private readonly _emitter = new RadixEventEmitter()
@@ -54,7 +51,7 @@ export class LeagueClientRenderer {
       lobby = true,
       login = true,
       summoner = true
-    } = this._config.subscribeState || {}
+    } = this._config?.subscribeState || {}
 
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
@@ -99,13 +96,11 @@ export class LeagueClientRenderer {
   }
 
   constructor(
-    deps: any,
-    private _config: LeagueClientRendererConfig
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Config() private _config?: LeagueClientRendererConfig
   ) {
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-
     axiosRetry(this._http, {
       retries: 2,
       retryCondition: (error) => {

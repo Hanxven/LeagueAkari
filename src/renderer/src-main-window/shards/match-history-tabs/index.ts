@@ -3,7 +3,7 @@ import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { createEventBus } from '@renderer-shared/utils/events'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { effectScope, markRaw, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -27,21 +27,18 @@ export interface SearchHistoryItem {
 /**
  * 仅适用于主窗口战绩页面的渲染端模块
  */
+@Shard(MatchHistoryTabsRenderer.id)
 export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   static id = 'match-history-tabs-renderer'
-  static dependencies = [SettingUtilsRenderer.id, SgpRenderer.id]
 
   static SEARCH_HISTORY_KEY = 'searchHistory'
   static SEARCH_HISTORY_MAX_LENGTH = 20
 
-  private readonly _setting: SettingUtilsRenderer
   private readonly _scope = effectScope()
 
   private readonly _events = createEventBus()
 
-  constructor(deps: any) {
-    this._setting = deps[SettingUtilsRenderer.id]
-  }
+  constructor(@Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer) {}
 
   async onInit() {
     await this._handleSettings()

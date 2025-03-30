@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { isAxiosError } from 'axios'
 import { IpcMainInvokeEvent, WebContents, ipcMain, webContents } from 'electron'
 
@@ -28,6 +28,7 @@ export type IpcMainDataType<T = any> = IpcMainSuccessDataType<T> | IpcMainErrorD
 /**
  * League Akari 的 IPC 主进程实现
  */
+@Shard(AkariIpcMain.id)
 export class AkariIpcMain implements IAkariShardInitDispose {
   static id = 'akari-ipc-main'
 

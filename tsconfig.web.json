@@ -35,6 +35,8 @@
       "@renderer-shared/*": ["src/renderer-shared/*"]
     },
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   }
 }

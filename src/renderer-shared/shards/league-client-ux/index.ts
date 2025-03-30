@@ -1,24 +1,21 @@
+import { Dep, Shard } from '@shared/akari-shard'
+
 import { AkariIpcRenderer } from '../ipc'
-import { LoggerRenderer } from '../logger'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
 import { useLeagueClientUxStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'league-client-ux-main'
 
+@Shard(LeagueClientUxRenderer.id)
 export class LeagueClientUxRenderer {
   static id = 'league-client-ux-renderer'
-  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id, SettingUtilsRenderer.id]
 
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _setting: SettingUtilsRenderer
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-  }
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+  ) {}
 
   setUseWmic(enabled: boolean) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'useWmic', enabled)

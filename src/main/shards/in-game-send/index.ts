@@ -1,6 +1,5 @@
 import { input } from '@hanxven/league-akari-addons'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
+import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { isBotQueue } from '@shared/types/league-client/game-data'
 import { isPveQueue } from '@shared/types/league-client/match-history'
 import { sleep } from '@shared/utils/sleep'
@@ -30,19 +29,9 @@ import { CustomSend, InGameSendSettings, InGameSendState, TemplateDef } from './
  *  - 英雄选择阶段发送消息
  *  - 一些其他的发送场景
  */
+@Shard(InGameSendMain.id)
 export class InGameSendMain implements IAkariShardInitDispose {
   static id = 'in-game-send-main'
-  static dependencies = [
-    SHARED_GLOBAL_ID,
-    AkariIpcMain,
-    MobxUtilsMain.id,
-    LeagueClientMain.id,
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id,
-    KeyboardShortcutsMain.id,
-    OngoingGameMain.id,
-    AppCommonMain.id
-  ]
 
   /**
    * 还是需要限制一下
@@ -54,17 +43,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
   public readonly settings = new InGameSendSettings()
   public readonly state = new InGameSendState()
 
-  private _loggerFactory: LoggerFactoryMain
-  private _settingFactory: SettingFactoryMain
   private _log: AkariLogger
-  private _mobx: MobxUtilsMain
-  private _ipc: AkariIpcMain
   private _setting: SetterSettingService
-  private _kbd: KeyboardShortcutsMain
-  private _og: OngoingGameMain
-  private _lc: LeagueClientMain
-  private _shared: AkariSharedGlobalShard
-  private _app: AppCommonMain
 
   private readonly _eta = new Eta()
   private _customCompiledFn: TemplateFunction | null = null
@@ -78,18 +58,19 @@ export class InGameSendMain implements IAkariShardInitDispose {
     cancel: () => void
   } | null = null
 
-  constructor(deps: any) {
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._settingFactory = deps[SettingFactoryMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._ipc = deps[AkariIpcMain.id]
-    this._kbd = deps[KeyboardShortcutsMain.id]
-    this._og = deps[OngoingGameMain.id]
-    this._lc = deps[LeagueClientMain.id]
-    this._shared = deps[SHARED_GLOBAL_ID]
-    this._app = deps[AppCommonMain.id]
-    this._log = this._loggerFactory.create(InGameSendMain.id)
-    this._setting = this._settingFactory.register(
+  constructor(
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _ipc: AkariIpcMain,
+    private readonly _kbd: KeyboardShortcutsMain,
+    private readonly _og: OngoingGameMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _shared: SharedGlobalShard,
+    private readonly _app: AppCommonMain
+  ) {
+    this._log = _loggerFactory.create(InGameSendMain.id)
+    this._setting = _settingFactory.register(
       InGameSendMain.id,
       {
         customSend: { default: this.settings.customSend },

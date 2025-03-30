@@ -1,6 +1,6 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Game } from '@shared/types/league-client/match-history'
-import { computed, effectScope, markRaw, toRaw, watch } from 'vue'
+import { computed, markRaw, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { AkariIpcRenderer } from '../ipc'
@@ -15,19 +15,16 @@ import {
 } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'ongoing-game-main'
+
+@Shard(OngoingGameRenderer.id)
 export class OngoingGameRenderer implements IAkariShardInitDispose {
   static id = 'ongoing-game-renderer'
-  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id, SettingUtilsRenderer.id]
 
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _setting: SettingUtilsRenderer
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-  }
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+  ) {}
 
   setConcurrency(value: number) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'concurrency', value)

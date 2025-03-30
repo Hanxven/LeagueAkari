@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { isTencentServer } from '@shared/data-sources/sgp/utils'
 import { comparer } from 'mobx'
 
@@ -18,32 +18,25 @@ import { PlayerStalkingSettings, PlayerStalkingState, StalkedPlayer } from './st
  *
  * - 进入游戏通知, 游戏结束通知 (需要 SGP)
  */
+@Shard(PlayerStalkingMain.id)
 export class PlayerStalkingMain implements IAkariShardInitDispose {
   static id = 'player-stalking-main'
-
-  static dependencies = [
-    AkariIpcMain.id,
-    MobxUtilsMain.id,
-    SettingFactoryMain.id,
-    SgpMain.id,
-    RiotClientMain.id,
-    LoggerFactoryMain.id
-  ]
 
   public readonly state: PlayerStalkingState
   public readonly settings = new PlayerStalkingSettings()
 
-  private readonly _ipc: AkariIpcMain
-  private readonly _mobx: MobxUtilsMain
   private readonly _setting: SetterSettingService
   private readonly _log: AkariLogger
-  private readonly _sgp: SgpMain
-  private readonly _rc: RiotClientMain
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._setting = (deps[SettingFactoryMain.id] as SettingFactoryMain).register(
+  constructor(
+    private readonly _ipc: AkariIpcMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _sgp: SgpMain,
+    private readonly _rc: RiotClientMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _loggerFactory: LoggerFactoryMain
+  ) {
+    this._setting = _settingFactory.register(
       PlayerStalkingMain.id,
       {
         enabled: { default: this.settings.enabled },
@@ -52,9 +45,7 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
       },
       this.settings
     )
-    this._sgp = deps[SgpMain.id]
-    this._log = (deps[LoggerFactoryMain.id] as LoggerFactoryMain).create(PlayerStalkingMain.id)
-    this._rc = deps[RiotClientMain.id]
+    this._log = _loggerFactory.create(PlayerStalkingMain.id)
     this.state = new PlayerStalkingState(this._sgp.state)
   }
 

@@ -1,6 +1,6 @@
 import { i18next } from '@main/i18n'
 import { TimeoutTask } from '@main/utils/timer'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatError, formatErrorMessage } from '@shared/utils/errors'
 import { comparer, computed } from 'mobx'
 
@@ -13,23 +13,12 @@ import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AramTracker } from './aram-tracker'
 import { AutoSelectSettings, AutoSelectState } from './state'
 
+@Shard(AutoSelectMain.id)
 export class AutoSelectMain implements IAkariShardInitDispose {
   static id = 'auto-select-main'
-  static dependencies = [
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id,
-    LeagueClientMain.id,
-    AkariIpcMain.id,
-    MobxUtilsMain.id
-  ]
 
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _log: AkariLogger
-  private readonly _lc: LeagueClientMain
   private readonly _setting: SetterSettingService
-  private readonly _mobx: MobxUtilsMain
-  private readonly _ipc: AkariIpcMain
 
   public readonly settings = new AutoSelectSettings()
   public readonly state: AutoSelectState
@@ -41,15 +30,16 @@ export class AutoSelectMain implements IAkariShardInitDispose {
 
   private _aramTracker = new AramTracker()
 
-  constructor(deps: any) {
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(AutoSelectMain.id)
-    this._lc = deps[LeagueClientMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._ipc = deps[AkariIpcMain.id]
-    this._settingFactory = deps[SettingFactoryMain.id]
+  constructor(
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _ipc: AkariIpcMain
+  ) {
+    this._log = _loggerFactory.create(AutoSelectMain.id)
     this.state = new AutoSelectState(this._lc.data, this.settings)
-    this._setting = this._settingFactory.register(
+    this._setting = _settingFactory.register(
       AutoSelectMain.id,
       {
         benchExpectedChampions: { default: this.settings.benchExpectedChampions },

@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -18,21 +18,17 @@ interface LaunchSpectatorConfig {
 
 const MAIN_SHARD_NAMESPACE = 'game-client-main'
 
+@Shard(GameClientRenderer.id)
 export class GameClientRenderer implements IAkariShardInitDispose {
   static id = 'game-client-renderer'
-  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id, SettingUtilsRenderer.id]
-
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _setting: SettingUtilsRenderer
 
   static SHORTCUT_ID_TERMINATE_GAME_CLIENT = `${MAIN_SHARD_NAMESPACE}/terminate-game-client`
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-  }
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+  ) {}
 
   async onInit() {
     const store = useGameClientStore()

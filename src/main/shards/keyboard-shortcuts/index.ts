@@ -1,5 +1,5 @@
 import { input } from '@hanxven/league-akari-addons'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import EventEmitter from 'node:events'
 
 import { AppCommonMain } from '../app-common'
@@ -18,13 +18,10 @@ interface ShortcutDetails {
  * 管理员权限下, 处理全局范围的键盘快捷键的模块
  * 提供订阅和事件分发服务
  */
+@Shard(KeyboardShortcutsMain.id)
 export class KeyboardShortcutsMain implements IAkariShardInitDispose {
   static id = 'keyboard-shortcuts-main'
-  static dependencies = [AppCommonMain.id, AkariIpcMain.id, LoggerFactoryMain.id]
 
-  private readonly _app: AppCommonMain
-  private readonly _ipc: AkariIpcMain
-  private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger
 
   /** 除了修饰键之外的其他按键 */
@@ -93,11 +90,12 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
   private _targetIdMap = new Map<string, string>()
 
-  constructor(deps: any) {
-    this._app = deps[AppCommonMain.id]
-    this._ipc = deps[AkariIpcMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(KeyboardShortcutsMain.id)
+  constructor(
+    private readonly _app: AppCommonMain,
+    private readonly _ipc: AkariIpcMain,
+    private readonly _loggerFactory: LoggerFactoryMain
+  ) {
+    this._log = _loggerFactory.create(KeyboardShortcutsMain.id)
   }
 
   // fast equal for two arrays (shallow)

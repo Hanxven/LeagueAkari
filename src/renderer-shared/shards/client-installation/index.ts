@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { AkariIpcRenderer } from '../ipc'
 import { LoggerRenderer } from '../logger'
@@ -7,19 +7,15 @@ import { useClientInstallationStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'client-installation-main'
 
+@Shard(ClientInstallationRenderer.id)
 export class ClientInstallationRenderer implements IAkariShardInitDispose {
   static id = 'client-installation-renderer'
-  static dependencies = [AkariIpcRenderer.id, LoggerRenderer.id, PiniaMobxUtilsRenderer.id]
 
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _log: LoggerRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._log = deps[LoggerRenderer.id]
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-  }
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(LoggerRenderer) private readonly _log: LoggerRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer
+  ) {}
 
   async onInit() {
     const store = useClientInstallationStore()

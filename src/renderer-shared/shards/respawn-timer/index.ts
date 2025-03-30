@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
@@ -6,17 +6,14 @@ import { useRespawnTimerStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'respawn-timer-main'
 
+@Shard(RespawnTimerRenderer.id)
 export class RespawnTimerRenderer implements IAkariShardInitDispose {
   static id = 'respawn-timer-renderer'
-  static dependencies = [PiniaMobxUtilsRenderer.id, SettingUtilsRenderer.id]
 
-  private _pm: PiniaMobxUtilsRenderer
-  private _setting: SettingUtilsRenderer
-
-  constructor(deps: any) {
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-  }
+  constructor(
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+  ) {}
 
   async onInit() {
     const store = useRespawnTimerStore()

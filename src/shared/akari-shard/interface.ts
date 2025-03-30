@@ -17,3 +17,5 @@ export interface IAkariShardInitDispose {
    */
   onFinish?(): Promise<void>
 }
+
+export interface AkariSharedGlobal {}

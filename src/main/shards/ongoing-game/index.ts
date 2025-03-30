@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game, GameTimeline } from '@shared/types/league-client/match-history'
 import {
@@ -27,17 +27,9 @@ import { OngoingGameSettings, OngoingGameState } from './state'
 /**
  * 用于游戏过程中的对局分析, 包括在此期间的战绩查询, 计算等
  */
+@Shard(OngoingGameMain.id)
 export class OngoingGameMain implements IAkariShardInitDispose {
   static id = 'ongoing-game-main'
-  static dependencies = [
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id,
-    LeagueClientMain.id,
-    AkariIpcMain.id,
-    MobxUtilsMain.id,
-    SgpMain.id,
-    SavedPlayerMain.id
-  ]
 
   static LOADING_PRIORITY = {
     SUMMONER: 6,
@@ -64,15 +56,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     `q_1900`
   ])
 
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _log: AkariLogger
-  private readonly _lc: LeagueClientMain
   private readonly _setting: SetterSettingService
-  private readonly _mobx: MobxUtilsMain
-  private readonly _ipc: AkariIpcMain
-  private readonly _sgp: SgpMain
-  private readonly _saved: SavedPlayerMain
 
   public readonly settings = new OngoingGameSettings()
   public readonly state: OngoingGameState
@@ -110,16 +95,17 @@ export class OngoingGameMain implements IAkariShardInitDispose {
 
   private _debouncedUpdateMatchHistoryFn = _.debounce(() => this._updateMatchHistory(), 250)
 
-  constructor(deps: any) {
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(OngoingGameMain.id)
-    this._lc = deps[LeagueClientMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._ipc = deps[AkariIpcMain.id]
-    this._settingFactory = deps[SettingFactoryMain.id]
-    this._sgp = deps[SgpMain.id]
-    this._saved = deps[SavedPlayerMain.id]
-    this._setting = this._settingFactory.register(
+  constructor(
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _ipc: AkariIpcMain,
+    private readonly _sgp: SgpMain,
+    private readonly _saved: SavedPlayerMain
+  ) {
+    this._log = _loggerFactory.create(OngoingGameMain.id)
+    this._setting = _settingFactory.register(
       OngoingGameMain.id,
       {
         concurrency: { default: this.settings.concurrency },

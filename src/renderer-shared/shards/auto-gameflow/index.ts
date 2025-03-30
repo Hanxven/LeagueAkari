@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -7,19 +7,15 @@ import { useAutoGameflowStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'auto-gameflow-main'
 
+@Shard(AutoGameflowRenderer.id)
 export class AutoGameflowRenderer implements IAkariShardInitDispose {
   static id = 'auto-gameflow-renderer'
-  static dependencies = [AkariIpcRenderer.id, SettingUtilsRenderer.id, PiniaMobxUtilsRenderer.id]
 
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _setting: SettingUtilsRenderer
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-  }
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+  ) {}
 
   cancelAutoAccept() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'cancelAutoAccept')

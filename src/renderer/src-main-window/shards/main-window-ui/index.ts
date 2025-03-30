@@ -2,8 +2,7 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
-import { useWindowManagerStore } from '@renderer-shared/shards/window-manager/store'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { computed, effectScope, watch } from 'vue'
 
 import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
@@ -12,22 +11,19 @@ import { router } from '@main-window/routes'
 import { useMatchHistoryTabsStore } from '../match-history-tabs/store'
 import { useMainWindowUiStore } from './store'
 
+@Shard(MainWindowUiRenderer.id)
 export class MainWindowUiRenderer implements IAkariShardInitDispose {
   static id = 'main-window-ui-renderer'
-  static dependencies = [SettingUtilsRenderer.id, LeagueClientRenderer.id, LoggerRenderer.id]
 
-  private readonly _setting: SettingUtilsRenderer
-  private readonly _lc: LeagueClientRenderer
-  private readonly _log: LoggerRenderer
   private readonly _scope = effectScope()
 
   private readonly _urlCache = new Map<number, string>()
 
-  constructor(deps: any) {
-    this._setting = deps[SettingUtilsRenderer.id]
-    this._lc = deps[LeagueClientRenderer.id]
-    this._log = deps[LoggerRenderer.id]
-  }
+  constructor(
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(LeagueClientRenderer) private readonly _lc: LeagueClientRenderer,
+    @Dep(LoggerRenderer) private readonly _log: LoggerRenderer
+  ) {}
 
   async onInit() {
     await this._handleSettings()

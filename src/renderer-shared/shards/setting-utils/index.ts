@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Paths } from '@shared/utils/types'
 import _ from 'lodash'
 import { WatchOptions, toRaw, watch } from 'vue'
@@ -7,17 +7,13 @@ import { AkariIpcRenderer } from '../ipc'
 
 export const MAIN_SHARD_NAMESPACE = 'setting-factory-main'
 
+@Shard(SettingUtilsRenderer.id)
 export class SettingUtilsRenderer implements IAkariShardInitDispose {
   static id = 'setting-utils-renderer'
-  static dependencies = [AkariIpcRenderer.id]
-
-  private _ipc: AkariIpcRenderer
 
   private _stopHandles = new Set<Function>()
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-  }
+  constructor(@Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer) {}
 
   set(namespace: string, key: string, value: any) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'set', namespace, key, value)

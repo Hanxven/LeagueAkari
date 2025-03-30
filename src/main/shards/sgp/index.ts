@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { AvailableServersMap, SgpApi } from '@shared/data-sources/sgp'
 import {
   SgpGameDetailsLol,
@@ -88,41 +88,29 @@ const SCHEMA = {
  * Service Gateway Proxy
  * 处理任何跨区相关逻辑, 提供 API 调用或数据转换
  */
+@Shard(SgpMain.id)
 export class SgpMain implements IAkariShardInitDispose {
   static id = 'sgp-main'
-  static dependencies = [
-    AppCommonMain.id,
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id,
-    MobxUtilsMain.id,
-    LeagueClientMain.id,
-    AkariIpcMain.id
-  ]
 
   static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v10.json'
 
   public readonly state: SgpState
 
-  private readonly _app: AppCommonMain
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
-  private readonly _mobx: MobxUtilsMain
-  private readonly _lc: LeagueClientMain
-  private readonly _ipc: AkariIpcMain
 
   private readonly _sgp = new SgpApi()
 
-  constructor(deps: any) {
-    this._app = deps[AppCommonMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._settingFactory = deps[SettingFactoryMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._lc = deps[LeagueClientMain.id]
-    this._ipc = deps[AkariIpcMain.id]
-    this._log = this._loggerFactory.create(SgpMain.id)
-    this._setting = this._settingFactory.register(SgpMain.id, {}, {})
+  constructor(
+    private readonly _app: AppCommonMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _ipc: AkariIpcMain
+  ) {
+    this._log = _loggerFactory.create(SgpMain.id)
+    this._setting = _settingFactory.register(SgpMain.id, {}, {})
 
     this.state = new SgpState()
   }

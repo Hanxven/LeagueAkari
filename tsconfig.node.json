@@ -19,8 +19,8 @@
     },
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "strictPropertyInitialization": false,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "strictPropertyInitialization": false
+    "emitDecoratorMetadata": true
   }
 }

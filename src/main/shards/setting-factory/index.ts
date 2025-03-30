@@ -1,9 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import {
-  AkariSharedGlobal,
-  AkariSharedGlobalShard,
-  SHARED_GLOBAL_ID
-} from '@shared/akari-shard/manager'
+import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { LEAGUE_AKARI_DB_CURRENT_VERSION } from '@shared/constants/common'
 import { Paths } from '@shared/utils/types'
 import { app, dialog } from 'electron'
@@ -46,21 +41,17 @@ export type SettingSchema<T extends object> = Partial<Record<Paths<T>, SettingCo
  * 创建日志记录器的工厂, 供给其他模块使用
  * 在原有状态同步的基础上, 现在将会读取设置项以及接管设置项的变更
  */
+@Shard(SettingFactoryMain.id)
 export class SettingFactoryMain implements IAkariShardInitDispose {
   static id = 'setting-factory-main'
-  static dependencies = [StorageMain.id, AkariIpcMain.id, SHARED_GLOBAL_ID]
-
-  private readonly _ipc: AkariIpcMain
-  private readonly _storage: StorageMain
-  private readonly _shared: AkariSharedGlobalShard
 
   private readonly _settings: Map<string, SetterSettingService> = new Map()
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-    this._storage = deps[StorageMain.id]
-    this._shared = deps[SHARED_GLOBAL_ID]
-  }
+  constructor(
+    private readonly _ipc: AkariIpcMain,
+    private readonly _storage: StorageMain,
+    private readonly _shared: SharedGlobalShard
+  ) {}
 
   register<T extends object = any>(namespace: string, schema: SettingSchema<T>, obj: T) {
     if (this._settings.has(namespace)) {
@@ -276,7 +267,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(SettingFactoryMain.id, 'exportSettingsToJsonFile', async () => {
-      const w = this._shared.manager.getInstance<WindowManagerMain>('window-manager-main')
+      const w = this._shared.manager.getInstance('window-manager-main') as WindowManagerMain
 
       if (!w || !w.mainWindow.window) {
         throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
@@ -296,7 +287,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(SettingFactoryMain.id, 'importSettingsFromJsonFile', async () => {
-      const w = this._shared.manager.getInstance<WindowManagerMain>('window-manager-main')
+      const w = this._shared.manager.getInstance('window-manager-main') as WindowManagerMain
 
       if (!w || !w.mainWindow.window) {
         throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')

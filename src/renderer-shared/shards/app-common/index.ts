@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import i18next from 'i18next'
 import { effectScope, watch } from 'vue'
 
@@ -9,21 +9,17 @@ import { HttpProxySetting, useAppCommonStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'app-common-main'
 
+@Shard(AppCommonRenderer.id)
 export class AppCommonRenderer implements IAkariShardInitDispose {
   static id = 'app-common-renderer'
-  static dependencies = [AkariIpcRenderer.id, SettingUtilsRenderer.id, PiniaMobxUtilsRenderer.id]
-
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _setting: SettingUtilsRenderer
 
   private readonly _scope = effectScope()
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+  ) {
     this._scope.run(() => {
       const store = useAppCommonStore()
 

@@ -1,6 +1,5 @@
 import { Overlay } from '@leaguetavern/electron-overlay-win'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
+import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { BrowserWindow } from 'electron'
 
 import { AkariProtocolMain } from '../akari-protocol'
@@ -37,35 +36,14 @@ export interface WindowManagerMainContext {
   keyboardShortcuts: KeyboardShortcutsMain
 }
 
+@Shard(WindowManagerMain.id)
 export class WindowManagerMain implements IAkariShardInitDispose {
   static id = 'window-manager-main'
-  static dependencies = [
-    SHARED_GLOBAL_ID,
-    AkariIpcMain.id,
-    MobxUtilsMain.id,
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id,
-    LeagueClientMain.id,
-    GameClientMain.id,
-    AkariProtocolMain.id,
-    KeyboardShortcutsMain.id,
-    AppCommonMain.id
-  ]
 
   public overlay: Overlay | null = null
 
-  private readonly _ipc: AkariIpcMain
-  private readonly _mobx: MobxUtilsMain
-  private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _setting: SetterSettingService
-  private readonly _lc: LeagueClientMain
-  private readonly _shared: AkariSharedGlobalShard
-  private readonly _protocol: AkariProtocolMain
-  private readonly _kbd: KeyboardShortcutsMain
-  private readonly _app: AppCommonMain
-  private readonly _gc: GameClientMain
 
   public readonly settings = new WindowManagerSettings()
   public readonly state = new WindowManagerState()
@@ -76,25 +54,26 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   public readonly ongoingGameWindow: AkariOngoingGameWindow
   public readonly cdTimerWindow: AkariCdTimerWindow
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._shared = deps[SHARED_GLOBAL_ID]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(WindowManagerMain.id)
-    this._settingFactory = deps[SettingFactoryMain.id]
-    this._setting = this._settingFactory.register(
+  constructor(
+    private readonly _ipc: AkariIpcMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _shared: SharedGlobalShard,
+    private readonly _protocol: AkariProtocolMain,
+    private readonly _kbd: KeyboardShortcutsMain,
+    private readonly _app: AppCommonMain,
+    private readonly _gc: GameClientMain
+  ) {
+    this._log = _loggerFactory.create(WindowManagerMain.id)
+    this._setting = _settingFactory.register(
       WindowManagerMain.id,
       {
         backgroundMaterial: { default: this.settings.backgroundMaterial }
       },
       this.settings
     )
-    this._lc = deps[LeagueClientMain.id]
-    this._protocol = deps[AkariProtocolMain.id]
-    this._kbd = deps[KeyboardShortcutsMain.id]
-    this._app = deps[AppCommonMain.id]
-    this._gc = deps[GameClientMain.id]
 
     const wContext = this.getContext()
     this.mainWindow = new AkariMainWindow(wContext)
@@ -103,6 +82,7 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this.ongoingGameWindow = new AkariOngoingGameWindow(wContext)
     this.cdTimerWindow = new AkariCdTimerWindow(wContext)
   }
+
 
   getContext(): WindowManagerMainContext {
     return {

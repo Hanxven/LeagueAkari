@@ -1,7 +1,7 @@
 import { optimizer } from '@electron-toolkit/utils'
+import { tools } from '@hanxven/league-akari-addons'
 import '@main/i18n'
 import { initAppLogger } from '@main/logger'
-import { tools } from '@hanxven/league-akari-addons'
 import { AkariProtocolMain } from '@main/shards/akari-protocol'
 import { AppCommonMain } from '@main/shards/app-common'
 import { AutoChampionConfigMain } from '@main/shards/auto-champ-config'
@@ -30,7 +30,7 @@ import { SgpMain } from '@main/shards/sgp'
 import { StorageMain } from '@main/shards/storage'
 import { TrayMain } from '@main/shards/tray'
 import { WindowManagerMain } from '@main/shards/window-manager'
-import { AkariManager } from '@shared/akari-shard/manager'
+import { AkariManager } from '@shared/akari-shard'
 import { formatError } from '@shared/utils/errors'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
@@ -48,7 +48,7 @@ interface AkariAppEventMap {
   'second-instance': [commandLine: string[], workingDirectory: string]
 }
 
-declare module '@shared/akari-shard/manager' {
+declare module '@shared/akari-shard' {
   interface AkariSharedGlobal {
     /**
      * 应用日志记录对象

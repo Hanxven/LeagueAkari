@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { AkariIpcRenderer } from '../ipc'
 import { LoggerRenderer } from '../logger'
@@ -168,14 +168,9 @@ export class AkariCdTimerWindow extends BaseAkariWindowRenderer<
   }
 }
 
+@Shard(WindowManagerRenderer.id)
 export class WindowManagerRenderer implements IAkariShardInitDispose {
   static id = 'window-manager-renderer'
-  static dependencies = [
-    SettingUtilsRenderer.id,
-    AkariIpcRenderer.id,
-    PiniaMobxUtilsRenderer.id,
-    LoggerRenderer.id
-  ]
 
   private context: WindowManagerRendererContext
 
@@ -185,11 +180,16 @@ export class WindowManagerRenderer implements IAkariShardInitDispose {
   public ongoingGameWindow: AkariOngoingGameWindow
   public cdTimerWindow: AkariCdTimerWindow
 
-  constructor(deps: any) {
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(LoggerRenderer) private readonly _logger: LoggerRenderer
+  ) {
     this.context = {
-      setting: deps[SettingUtilsRenderer.id],
-      ipc: deps[AkariIpcRenderer.id],
-      pm: deps[PiniaMobxUtilsRenderer.id]
+      setting: this._setting,
+      ipc: this._ipc,
+      pm: this._pm
     }
 
     this.mainWindow = new AkariMainWindow(this.context)

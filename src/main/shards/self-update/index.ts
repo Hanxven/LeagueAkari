@@ -1,5 +1,8 @@
 import { i18next } from '@main/i18n'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import sevenBinPath from '@resources/7za.exe?asset'
+import icon from '@resources/LA_ICON.ico?asset'
+import updateExecutablePath from '@resources/akari-updater.exe?asset'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import {
   LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL,
   LEAGUE_AKARI_GITEE_CHECK_UPDATES_URL,
@@ -20,9 +23,6 @@ import path from 'node:path'
 import { Readable, pipeline } from 'node:stream'
 import { gte, lt, valid } from 'semver'
 
-import sevenBinPath from '@resources/7za.exe?asset'
-import icon from '@resources/LA_ICON.ico?asset'
-import updateExecutablePath from '@resources/akari-updater.exe?asset'
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -35,15 +35,9 @@ import { SelfUpdateSettings, SelfUpdateState } from './state'
  * 自我更新逻辑, 包括拉取最新版本, 下载最新版本, 以及在下一次启动
  * 也同时集成了公告功能, 会定期拉取新的公告
  */
+@Shard(SelfUpdateMain.id)
 export class SelfUpdateMain implements IAkariShardInitDispose {
   static id = 'self-update-main'
-  static dependencies = [
-    AppCommonMain.id,
-    AkariIpcMain.id,
-    MobxUtilsMain.id,
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id
-  ]
 
   static UPDATES_CHECK_INTERVAL = 7.2e6 // 2 hours
   static ANNOUNCEMENT_CHECK_INTERVAL = 7.2e6 // 2 hours
@@ -62,11 +56,6 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   public readonly settings = new SelfUpdateSettings()
   public readonly state = new SelfUpdateState()
 
-  private readonly _app: AppCommonMain
-  private readonly _ipc: AkariIpcMain
-  private readonly _mobx: MobxUtilsMain
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
@@ -80,15 +69,15 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   private _updateOnQuitFn: (() => void) | null = null
   private _currentUpdateTaskCanceler: (() => void) | null = null
 
-  constructor(deps: any) {
-    this._app = deps[AppCommonMain.id]
-    this._ipc = deps[AkariIpcMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._settingFactory = deps[SettingFactoryMain.id]
-
-    this._log = this._loggerFactory.create(SelfUpdateMain.id)
-    this._setting = this._settingFactory.register(
+  constructor(
+    private readonly _app: AppCommonMain,
+    private readonly _ipc: AkariIpcMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain
+  ) {
+    this._log = _loggerFactory.create(SelfUpdateMain.id)
+    this._setting = _settingFactory.register(
       SelfUpdateMain.id,
       {
         autoCheckUpdates: { default: this.settings.autoCheckUpdates },

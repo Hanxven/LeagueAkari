@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { AkariIpcRenderer } from '../ipc'
 
@@ -19,17 +19,13 @@ interface ShortcutDetails {
 /**
  * 连接到主进程的快捷键服务
  */
+@Shard(KeyboardShortcutsRenderer.id)
 export class KeyboardShortcutsRenderer implements IAkariShardInitDispose {
   static id = 'keyboard-shortcuts-renderer'
-  static dependencies = [AkariIpcRenderer.id]
 
   static DISABLED_KEYS_TARGET_ID = 'akari-disabled-keys'
 
-  private readonly _ipc: AkariIpcRenderer
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-  }
+  constructor(@Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer) {}
 
   onShortcut(fn: (event: ShortcutDetails) => void) {
     return this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'shortcut', fn)

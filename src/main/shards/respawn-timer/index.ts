@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { riotId, summonerName } from '@shared/utils/name'
 import { comparer, runInAction } from 'mobx'
 
@@ -10,40 +10,30 @@ import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { RespawnTimerSettings, RespawnTimerState } from './state'
 
+@Shard(RespawnTimerMain.id)
 export class RespawnTimerMain implements IAkariShardInitDispose {
   static id = 'respawn-timer-main'
-  static dependencies = [
-    GameClientMain.id,
-    LoggerFactoryMain.id,
-    LeagueClientMain.id,
-    MobxUtilsMain.id,
-    SettingFactoryMain.id
-  ]
 
   static POLL_INTERVAL = 1000
 
   public readonly settings = new RespawnTimerSettings()
   public readonly state: RespawnTimerState
 
-  private readonly _gameClient: GameClientMain
-  private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger
-  private readonly _lc: LeagueClientMain
-  private readonly _mobx: MobxUtilsMain
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _setting: SetterSettingService
 
   private _timer: NodeJS.Timeout
   private _isStarted = false
 
-  constructor(deps: any) {
-    this._gameClient = deps[GameClientMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(RespawnTimerMain.id)
-    this._lc = deps[LeagueClientMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._settingFactory = deps[SettingFactoryMain.id]
-    this._setting = this._settingFactory.register(
+  constructor(
+    private readonly _gameClient: GameClientMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _settingFactory: SettingFactoryMain
+  ) {
+    this._log = _loggerFactory.create(RespawnTimerMain.id)
+    this._setting = _settingFactory.register(
       RespawnTimerMain.id,
       {
         enabled: { default: false }

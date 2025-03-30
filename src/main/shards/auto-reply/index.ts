@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { ChatMessage } from '@shared/types/league-client/chat'
 import { LcuEvent } from '@shared/types/league-client/event'
 import { formatError } from '@shared/utils/errors'
@@ -14,34 +14,24 @@ import { AutoReplySettings } from './state'
 /**
  * 聊天自动回复相关功能
  */
+@Shard(AutoReplyMain.id)
 export class AutoReplyMain implements IAkariShardInitDispose {
   static id = 'auto-reply-main'
-  static dependencies = [
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id,
-    LeagueClientMain.id,
-    AkariIpcMain.id,
-    MobxUtilsMain.id
-  ]
 
   public readonly settings = new AutoReplySettings()
 
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _log: AkariLogger
-  private readonly _lc: LeagueClientMain
   private readonly _setting: SetterSettingService
-  private readonly _mobx: MobxUtilsMain
-  private readonly _ipc: AkariIpcMain
 
-  constructor(deps: any) {
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(AutoReplyMain.id)
-    this._lc = deps[LeagueClientMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._ipc = deps[AkariIpcMain.id]
-    this._settingFactory = deps[SettingFactoryMain.id]
-    this._setting = this._settingFactory.register(
+  constructor(
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _ipc: AkariIpcMain
+  ) {
+    this._log = _loggerFactory.create(AutoReplyMain.id)
+    this._setting = _settingFactory.register(
       AutoReplyMain.id,
       {
         enabled: { default: this.settings.enabled },

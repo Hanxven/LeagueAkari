@@ -1,5 +1,5 @@
 import { UxCommandLine } from '@main/utils/ux-cmd'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { RiotClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/riot-client'
 import axios, { AxiosInstance, AxiosRequestConfig, isAxiosError } from 'axios'
 import https from 'https'
@@ -17,24 +17,13 @@ export class RiotClientRcuUninitializedError extends Error {
 /**
  * Riot Client 相关封装
  */
+@Shard(RiotClientMain.id)
 export class RiotClientMain implements IAkariShardInitDispose {
   static id = 'riot-client-main'
-  static dependencies = [
-    AkariIpcMain.id,
-    LoggerFactoryMain.id,
-    MobxUtilsMain.id,
-    LeagueClientMain.id, // 引入此依赖的原因是, 需要获取其使用的是哪个客户端 (考虑到客户端多开的情况)
-    AkariProtocolMain.id
-  ]
 
   static REQUEST_TIMEOUT_MS = 12500
 
-  private readonly _ipc: AkariIpcMain
-  private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger
-  private readonly _mobx: MobxUtilsMain
-  private readonly _lc: LeagueClientMain
-  private readonly _protocol: AkariProtocolMain
 
   private _api: RiotClientHttpApiAxiosHelper | null = null
 
@@ -44,13 +33,14 @@ export class RiotClientMain implements IAkariShardInitDispose {
   // private _ws: WebSocket | null = null
   // private _eventBus = new RadixEventEmitter()
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._lc = deps[LeagueClientMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._protocol = deps[AkariProtocolMain.id]
-    this._log = this._loggerFactory.create(RiotClientMain.id)
+  constructor(
+    private readonly _ipc: AkariIpcMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _protocol: AkariProtocolMain
+  ) {
+    this._log = _loggerFactory.create(RiotClientMain.id)
 
     this._handleProtocol()
   }

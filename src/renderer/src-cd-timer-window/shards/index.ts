@@ -1,5 +1,4 @@
 import { createManager } from '@renderer-shared/shards'
-import { ExtraAssetsRenderer } from '@renderer-shared/shards/extra-assets'
 import { AkariIpcRenderer } from '@renderer-shared/shards/ipc'
 import {
   LeagueClientRenderer,

@@ -1,12 +1,12 @@
 import { tools } from '@hanxven/league-akari-addons'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import cp from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import util from 'node:util'
 import regedit from 'regedit'
 
-import RES_POSITIONER from '@resources/AKARI?asset&asarUnpack'
 import { AkariIpcMain } from '../ipc'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
@@ -19,9 +19,9 @@ regedit.setExternalVBSLocation(path.resolve(RES_POSITIONER, '..', 'regedit-vbs')
 /**
  * 情报搜集模块
  */
+@Shard(ClientInstallationMain.id)
 export class ClientInstallationMain implements IAkariShardInitDispose {
   static id = 'client-installation-main'
-  static dependencies = [AkariIpcMain.id, LoggerFactoryMain.id, MobxUtilsMain.id]
 
   static readonly TENCENT_REG_INSTALL_PATH = 'HKCU\\Software\\Tencent\\LOL'
   static readonly TENCENT_REG_INSTALL_VALUE = 'InstallPath'
@@ -45,18 +45,16 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
 
   public readonly state = new ClientInstallationState()
 
-  private readonly _ipc: AkariIpcMain
-  private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger
-  private readonly _mobx: MobxUtilsMain
 
   private _liveStreamingTimer: NodeJS.Timeout | null = null
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(ClientInstallationMain.id)
-    this._mobx = deps[MobxUtilsMain.id]
+  constructor(
+    private readonly _ipc: AkariIpcMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _mobx: MobxUtilsMain
+  ) {
+    this._log = _loggerFactory.create(ClientInstallationMain.id)
   }
 
   async onInit() {

@@ -1,3 +1,4 @@
+import { Shard } from '@shared/akari-shard'
 import { LcuEvent } from '@shared/types/league-client/event'
 
 import { AkariIpcMain } from '../ipc'
@@ -6,29 +7,21 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { RendererDebugState } from './state'
 
+@Shard(RendererDebugMain.id)
 export class RendererDebugMain {
   static id = 'renderer-debug-main'
-  static dependencies = [
-    AkariIpcMain.id,
-    LeagueClientMain.id,
-    MobxUtilsMain.id,
-    LoggerFactoryMain.id
-  ]
 
   public readonly state = new RendererDebugState()
 
-  private readonly _ipc: AkariIpcMain
-  private readonly _lc: LeagueClientMain
-  private readonly _mobx: MobxUtilsMain
-  private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-    this._lc = deps[LeagueClientMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(RendererDebugMain.id)
+  constructor(
+    private readonly _ipc: AkariIpcMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _loggerFactory: LoggerFactoryMain
+  ) {
+    this._log = _loggerFactory.create(RendererDebugMain.id)
   }
 
   async onInit() {

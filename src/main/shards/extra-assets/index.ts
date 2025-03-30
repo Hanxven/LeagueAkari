@@ -1,5 +1,5 @@
 import { TimeoutTask } from '@main/utils/timer'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { LolFandomWikiApi } from '@shared/data-sources/fandom'
 import { GtimgApi } from '@shared/data-sources/gtimg'
 
@@ -11,13 +11,10 @@ import { ExtraAssetsStateFandom, ExtraAssetsStateGtimg } from './state'
 /**
  * 一些额外资源的拉取, 通常不属于 Akari 的一部分, 不影响核心逻辑, 可有可无
  */
+@Shard(ExtraAssetsMain.id)
 export class ExtraAssetsMain implements IAkariShardInitDispose {
   static id = 'extra-assets-main'
-  static dependencies = [AppCommonMain.id, MobxUtilsMain.id, LoggerFactoryMain.id]
 
-  private readonly _app: AppCommonMain
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _mobx: MobxUtilsMain
   private readonly _log: AkariLogger
 
   public readonly gtimg = new ExtraAssetsStateGtimg()
@@ -26,11 +23,12 @@ export class ExtraAssetsMain implements IAkariShardInitDispose {
   private _gtimgApi = new GtimgApi()
   private _fandomApi = new LolFandomWikiApi()
 
-  constructor(deps: any) {
-    this._app = deps[AppCommonMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(ExtraAssetsMain.id)
+  constructor(
+    private readonly _app: AppCommonMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _mobx: MobxUtilsMain
+  ) {
+    this._log = _loggerFactory.create(ExtraAssetsMain.id)
   }
 
   static GTIMG_HERO_LIST_UPDATE_INTERVAL = 3.6e6 // 1 hour

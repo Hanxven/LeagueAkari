@@ -1,16 +1,13 @@
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
+import { Dep, Shard } from '@shared/akari-shard'
 
 import { useOpggStore } from './store'
 
+@Shard(OpggRenderer.id)
 export class OpggRenderer {
   static id = 'opgg-renderer'
-  static dependencies = [SettingUtilsRenderer.id]
 
-  private readonly _setting: SettingUtilsRenderer
-
-  constructor(deps: any) {
-    this._setting = deps[SettingUtilsRenderer.id]
-  }
+  constructor(@Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer) {}
 
   async onInit() {
     const store = useOpggStore()

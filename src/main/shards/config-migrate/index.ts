@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { EntityManager, Equal } from 'typeorm'
 
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
@@ -8,25 +8,24 @@ import { Setting } from '../storage/entities/Settings'
 /**
  * 将旧的设置项重新设置, 并设置数据
  */
+@Shard(ConfigMigrateMain.id, 2992)
 export class ConfigMigrateMain implements IAkariShardInitDispose {
   static id = 'config-migrate-main'
 
   /**
    * 设置较高优先级, 以优先加载
    */
-  static priority = 2992
-
-  static dependencies = [StorageMain.id, LoggerFactoryMain.id]
 
   static MIGRATION_FROM_126 = 'akari-migration-from-1.2.6_patch2'
   static MIGRATION_FROM_134 = 'akari-migration-from-1.3.4_patch1'
 
-  private readonly _st: StorageMain
   private readonly _log: AkariLogger
 
-  constructor(deps: any) {
-    this._st = deps[StorageMain.id]
-    this._log = deps[LoggerFactoryMain.id].create(ConfigMigrateMain.id)
+  constructor(
+    private readonly _st: StorageMain,
+    private readonly _loggerFactory: LoggerFactoryMain
+  ) {
+    this._log = _loggerFactory.create(ConfigMigrateMain.id)
   }
 
   private async _do(manager: EntityManager, from: string, to: string) {

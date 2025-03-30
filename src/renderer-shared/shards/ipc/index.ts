@@ -1,6 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
+import { Dep, IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { IpcRendererEvent } from 'electron'
 import { getCurrentScope, onScopeDispose } from 'vue'
 
@@ -30,11 +29,9 @@ export type IpcMainDataType<T = any> = IpcMainSuccessDataType<T> | IpcMainErrorD
 /**
  * 渲染进程 IPC 工具, 同时杂糅了一点 Vue 的支持
  */
+@Shard(AkariIpcRenderer.id)
 export class AkariIpcRenderer implements IAkariShardInitDispose {
   static id = 'akari-ipc-renderer'
-  static dependencies = [SHARED_GLOBAL_ID]
-
-  private readonly _shared: AkariSharedGlobalShard
 
   private _eventMap = new Map<string, Set<Function>>()
   private _cancelFn: (() => void) | null = null
@@ -90,7 +87,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
       }
 
       // for lazy loading
-      const logger = this._shared.manager.getInstance<LoggerRenderer>(LOGGER_SHARD_NAMESPACE)
+      const logger = this._shared.manager.getInstance(LOGGER_SHARD_NAMESPACE) as LoggerRenderer
       logger?.warn(`IpcCall:${namespace}`, fnName, args, result.error)
       throw result.error
     }
@@ -141,8 +138,7 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
     }
   }
 
-  constructor(deps: any) {
-    this._shared = deps[SHARED_GLOBAL_ID]
+  constructor(@Dep(SharedGlobalShard) private readonly _shared: SharedGlobalShard) {
     this._dispatchEvent = this._dispatchEvent.bind(this)
   }
 }

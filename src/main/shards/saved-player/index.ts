@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Equal, FindOptionsOrder, FindOptionsWhere, IsNull, Not } from 'typeorm'
 
 import { AkariIpcMain } from '../ipc'
@@ -20,19 +20,17 @@ import {
 /**
  * 记录的玩家信息查询
  */
+@Shard(SavedPlayerMain.id)
 export class SavedPlayerMain implements IAkariShardInitDispose {
   static id = 'saved-player-main'
   static dependencies = [AkariIpcMain.id, StorageMain.id]
 
   static ENCOUNTERED_GAME_QUERY_DEFAULT_PAGE_SIZE = 40
 
-  private readonly _ipc: AkariIpcMain
-  private readonly _storage: StorageMain
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-    this._storage = deps[StorageMain.id]
-  }
+  constructor(
+    private readonly _ipc: AkariIpcMain,
+    private readonly _storage: StorageMain
+  ) {}
 
   async onInit() {
     this._handleIpcCall()

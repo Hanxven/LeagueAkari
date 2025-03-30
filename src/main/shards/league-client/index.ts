@@ -1,6 +1,6 @@
 import { tools } from '@hanxven/league-akari-addons'
 import { UxCommandLine } from '@main/utils/ux-cmd'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { SUBSCRIBED_LCU_ENDPOINTS } from '@shared/constants/subscribed-lcu-endpoints'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
@@ -41,17 +41,9 @@ export class LeagueClientLcuUninitializedError extends Error {
 /**
  * League Client 相关功能, 包括与 LeagueClient.exe 的连接, 封装的 HTTP 请求, 以及 WebSocket 通信
  */
+@Shard(LeagueClientMain.id)
 export class LeagueClientMain implements IAkariShardInitDispose {
   static id = 'league-client-main'
-  static dependencies = [
-    AkariIpcMain.id,
-    AppCommonMain.id,
-    LoggerFactoryMain.id,
-    MobxUtilsMain.id,
-    LeagueClientUxMain.id,
-    SettingFactoryMain.id,
-    AkariProtocolMain.id
-  ]
 
   static INTERNAL_TIMEOUT = 12500
   static CONNECT_TO_LC_RETRY_INTERVAL = 2000
@@ -62,14 +54,8 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   public readonly settings = new LeagueClientSettings()
   public readonly state = new LeagueClientState()
 
-  private readonly _ipc: AkariIpcMain
-  private readonly _loggerFactory: LoggerFactoryMain
   private readonly _log: AkariLogger
-  private readonly _mobx: MobxUtilsMain
-  private readonly _ux: LeagueClientUxMain
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _setting: SetterSettingService
-  private readonly _protocol: AkariProtocolMain
 
   private _http: AxiosInstance | null = null
   private _ws: WebSocket | null = null
@@ -110,27 +96,28 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     return this._eventBus
   }
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._ux = deps[LeagueClientUxMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._protocol = deps[AkariProtocolMain.id]
-    this._log = this._loggerFactory.create(LeagueClientMain.id)
-
-    this._data = new LeagueClientSyncedData(this, LeagueClientMain, {
-      log: this._log,
-      ipc: this._ipc,
-      mobx: this._mobx
-    })
-    this._settingFactory = deps[SettingFactoryMain.id]
-    this._setting = this._settingFactory.register(
+  constructor(
+    private readonly _ipc: AkariIpcMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _ux: LeagueClientUxMain,
+    private readonly _protocol: AkariProtocolMain
+  ) {
+    this._log = _loggerFactory.create(LeagueClientMain.id)
+    this._setting = _settingFactory.register(
       LeagueClientMain.id,
       {
         autoConnect: { default: this.settings.autoConnect }
       },
       this.settings
     )
+
+    this._data = new LeagueClientSyncedData(this, LeagueClientMain, {
+      log: this._log,
+      ipc: this._ipc,
+      mobx: this._mobx
+    })
 
     this._handleProtocol()
   }

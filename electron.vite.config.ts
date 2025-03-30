@@ -82,7 +82,6 @@ export default defineConfig({
       }
     },
     plugins: [
-      swcPlugin(),
       yaml(),
       vue({
         template: { compilerOptions: { isCustomElement: (tag) => LC_CUSTOM_TAGS.has(tag) } }

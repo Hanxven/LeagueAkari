@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { LcuEvent } from '@shared/types/league-client/event'
 import dayjs from 'dayjs'
@@ -11,22 +11,18 @@ import { useRendererDebugStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'renderer-debug-main'
 
+@Shard(RendererDebugRenderer.id)
 export class RendererDebugRenderer implements IAkariShardInitDispose {
   static id = 'renderer-debug-renderer'
-  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id, LoggerRenderer.id]
-
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _log: LoggerRenderer
 
   private readonly _matcher = new RadixEventEmitter()
   private readonly _scope = effectScope()
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._log = deps[LoggerRenderer.id]
-  }
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(LoggerRenderer) private readonly _log: LoggerRenderer
+  ) {}
 
   async onInit() {
     const store = useRendererDebugStore()

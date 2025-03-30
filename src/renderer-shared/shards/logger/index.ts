@@ -1,3 +1,4 @@
+import { Dep, Shard } from '@shared/akari-shard'
 import { formatError } from '@shared/utils/errors'
 import dayjs from 'dayjs'
 
@@ -5,15 +6,11 @@ import { AkariIpcRenderer } from '../ipc'
 
 export const MAIN_SHARD_NAMESPACE = 'logger-factory-main'
 
+@Shard(LoggerRenderer.id)
 export class LoggerRenderer {
   static id = 'logger-renderer'
-  static dependencies = [AkariIpcRenderer.id]
 
-  private readonly _ipc: AkariIpcRenderer
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-  }
+  constructor(@Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer) {}
 
   // same as main shard
   private _objectsToString(...args: any[]) {

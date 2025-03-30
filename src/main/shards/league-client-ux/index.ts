@@ -1,5 +1,5 @@
 import { queryUxCommandLine, queryUxCommandLineNative } from '@main/utils/ux-cmd'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
@@ -12,15 +12,9 @@ import { LeagueClientUxSettings, LeagueClientUxState } from './state'
 /**
  * 对于 League Client Ux 进程的相关工具集, 比如检测命令行
  */
+@Shard(LeagueClientUxMain.id)
 export class LeagueClientUxMain implements IAkariShardInitDispose {
   static id = 'league-client-ux-main'
-  static dependencies = [
-    AkariIpcMain.id,
-    MobxUtilsMain.id,
-    AppCommonMain.id,
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id
-  ]
 
   static UX_PROCESS_NAME = 'LeagueClientUx.exe'
   static CLIENT_CMD_DEFAULT_POLL_INTERVAL = 2000
@@ -31,24 +25,20 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
   public readonly settings = new LeagueClientUxSettings()
   public readonly state = new LeagueClientUxState()
 
-  private readonly _ipc: AkariIpcMain
-  private readonly _common: AppCommonMain
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _log: AkariLogger
-  private readonly _mobx: MobxUtilsMain
   private readonly _setting: SetterSettingService
 
   private _pollTimerId: NodeJS.Timeout | null = null
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-    this._common = deps[AppCommonMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._settingFactory = deps[SettingFactoryMain.id]
-    this._log = this._loggerFactory.create(LeagueClientUxMain.id)
-    this._setting = this._settingFactory.register(
+  constructor(
+    private readonly _ipc: AkariIpcMain,
+    private readonly _common: AppCommonMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _mobx: MobxUtilsMain
+  ) {
+    this._log = _loggerFactory.create(LeagueClientUxMain.id)
+    this._setting = _settingFactory.register(
       LeagueClientUxMain.id,
       {
         useWmic: { default: this.settings.useWmic }

@@ -1,3 +1,4 @@
+import { Dep, Shard } from '@shared/akari-shard'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import LRUMap from 'quick-lru'
 
@@ -40,19 +41,15 @@ interface UpdateTagDto {
   tag: string | null
 }
 
+@Shard(SavedPlayerRenderer.id)
 export class SavedPlayerRenderer {
   static id = 'saved-player-renderer'
-  static dependencies = [AkariIpcRenderer.id]
-
-  private readonly _ipc: AkariIpcRenderer
 
   public readonly summonerLruMap = new LRUMap<string, SummonerInfo>({
     maxSize: 200
   })
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-  }
+  constructor(@Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer) {}
 
   querySavedPlayerWithGames(dto: SavedPlayerQueryDto) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'querySavedPlayerWithGames', dto)

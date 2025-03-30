@@ -1,6 +1,6 @@
 import { i18next } from '@main/i18n'
 import { TimeoutTask } from '@main/utils/timer'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { ChoiceMaker } from '@shared/utils/choice-maker'
 import { formatError, formatErrorMessage } from '@shared/utils/errors'
 import { randomInt } from '@shared/utils/random'
@@ -17,26 +17,15 @@ import { AutoGameflowSettings, AutoGameflowState } from './state'
 /**
  * 自动游戏流程相关功能
  */
+@Shard(AutoGameflowMain.id)
 export class AutoGameflowMain implements IAkariShardInitDispose {
   static id = 'auto-gameflow-main'
-  static dependencies = [
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id,
-    LeagueClientMain.id,
-    AkariIpcMain.id,
-    MobxUtilsMain.id
-  ]
 
   public readonly settings = new AutoGameflowSettings()
   public readonly state: AutoGameflowState
 
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _log: AkariLogger
-  private readonly _lc: LeagueClientMain
   private readonly _setting: SetterSettingService
-  private readonly _mobx: MobxUtilsMain
-  private readonly _ipc: AkariIpcMain
 
   private _autoAcceptTimerId: NodeJS.Timeout | null = null
   private _autoSearchMatchTimerId: NodeJS.Timeout | null = null
@@ -52,15 +41,16 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
   static PLAY_AGAIN_WAIT_FOR_STATS_TIMEOUT = 10000
   static PLAY_AGAIN_BUFFER_TIMEOUT = 1575
 
-  constructor(deps: any) {
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._settingFactory = deps[SettingFactoryMain.id]
-    this._log = this._loggerFactory.create(AutoGameflowMain.id)
-    this._lc = deps[LeagueClientMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._ipc = deps[AkariIpcMain.id]
+  constructor(
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _ipc: AkariIpcMain
+  ) {
+    this._log = _loggerFactory.create(AutoGameflowMain.id)
     this.state = new AutoGameflowState(this._lc.data, this.settings)
-    this._setting = this._settingFactory.register(
+    this._setting = _settingFactory.register(
       AutoGameflowMain.id,
       {
         autoAcceptDelaySeconds: { default: this.settings.autoAcceptDelaySeconds },

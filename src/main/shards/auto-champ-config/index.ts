@@ -1,5 +1,5 @@
 import { i18next } from '@main/i18n'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { formatError } from '@shared/utils/errors'
 import { comparer } from 'mobx'
 
@@ -11,16 +11,9 @@ import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AutoChampConfigSettings, ChampionRunesConfig, SummonerSpellsConfig } from './state'
 
+@Shard(AutoChampionConfigMain.id)
 export class AutoChampionConfigMain implements IAkariShardInitDispose {
   static id = 'auto-champ-config-main'
-
-  static dependencies = [
-    AkariIpcMain.id,
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id,
-    LeagueClientMain.id,
-    MobxUtilsMain.id
-  ]
 
   static GAME_MODE_TYPE_MAP = {
     CLASSIC: 'normal',
@@ -30,24 +23,20 @@ export class AutoChampionConfigMain implements IAkariShardInitDispose {
     ULTBOOK: 'ultbook'
   }
 
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _settingFactory: SettingFactoryMain
-  private readonly _log: AkariLogger
-  private readonly _lc: LeagueClientMain
-  private readonly _setting: SetterSettingService
-  private readonly _mobx: MobxUtilsMain
-  private readonly _ipc: AkariIpcMain
-
   public readonly settings = new AutoChampConfigSettings()
 
-  constructor(deps: any) {
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._settingFactory = deps[SettingFactoryMain.id]
-    this._log = this._loggerFactory.create(AutoChampionConfigMain.id)
-    this._lc = deps[LeagueClientMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._ipc = deps[AkariIpcMain.id]
-    this._setting = this._settingFactory.register(
+  private readonly _log: AkariLogger
+
+  constructor(
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _setting: SetterSettingService,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _ipc: AkariIpcMain
+  ) {
+    this._log = _loggerFactory.create(AutoChampionConfigMain.id)
+    this._setting = _settingFactory.register(
       AutoChampionConfigMain.id,
       {
         enabled: { default: this.settings.enabled },

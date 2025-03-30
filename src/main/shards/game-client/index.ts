@@ -1,5 +1,5 @@
 import { tools } from '@hanxven/league-akari-addons'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { GameClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/game-client'
 import axios from 'axios'
 import cp from 'child_process'
@@ -30,30 +30,15 @@ export interface LaunchSpectatorConfig {
 /**
  * 处理游戏端相关的功能
  */
+@Shard(GameClientMain.id)
 export class GameClientMain implements IAkariShardInitDispose {
   static id = 'game-client-main'
-  static dependencies = [
-    AkariIpcMain.id,
-    LoggerFactoryMain.id,
-    SettingFactoryMain.id,
-    LeagueClientMain.id,
-    MobxUtilsMain.id,
-    KeyboardShortcutsMain.id,
-    ClientInstallationMain.id
-  ]
 
   static GAME_CLIENT_PROCESS_NAME = 'League of Legends.exe'
   static GAME_CLIENT_BASE_URL = 'https://127.0.0.1:2999'
 
-  private readonly _ipc: AkariIpcMain
-  private readonly _loggerFactory: LoggerFactoryMain
-  private readonly _settingFactory: SettingFactoryMain
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
-  private readonly _lc: LeagueClientMain
-  private readonly _kbd: KeyboardShortcutsMain
-  private readonly _mobx: MobxUtilsMain
-  private readonly _ci: ClientInstallationMain
 
   private readonly _http = axios.create({
     baseURL: GameClientMain.GAME_CLIENT_BASE_URL,
@@ -70,18 +55,19 @@ export class GameClientMain implements IAkariShardInitDispose {
 
   private _gcCachedRunningPids: number[] = []
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-    this._loggerFactory = deps[LoggerFactoryMain.id]
-    this._log = this._loggerFactory.create(GameClientMain.id)
-    this._settingFactory = deps[SettingFactoryMain.id]
+  constructor(
+    private readonly _ipc: AkariIpcMain,
+    private readonly _loggerFactory: LoggerFactoryMain,
+    private readonly _settingFactory: SettingFactoryMain,
+    private readonly _lc: LeagueClientMain,
+    private readonly _kbd: KeyboardShortcutsMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _ci: ClientInstallationMain
+  ) {
+    this._log = _loggerFactory.create(GameClientMain.id)
     this._api = new GameClientHttpApiAxiosHelper(this._http)
-    this._lc = deps[LeagueClientMain.id]
-    this._kbd = deps[KeyboardShortcutsMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._ci = deps[ClientInstallationMain.id]
 
-    this._setting = this._settingFactory.register(
+    this._setting = _settingFactory.register(
       GameClientMain.id,
       {
         terminateGameClientWithShortcut: { default: this.settings.terminateGameClientWithShortcut },

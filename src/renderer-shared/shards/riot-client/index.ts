@@ -1,14 +1,12 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { RiotClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/riot-client'
 import axios from 'axios'
 
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 
+@Shard(RiotClientRenderer.id)
 export class RiotClientRenderer implements IAkariShardInitDispose {
   static id = 'riot-client-renderer'
-  static dependencies = [PiniaMobxUtilsRenderer.id]
-
-  private readonly _pm: PiniaMobxUtilsRenderer
 
   public readonly api = new RiotClientHttpApiAxiosHelper(
     axios.create({
@@ -21,7 +19,5 @@ export class RiotClientRenderer implements IAkariShardInitDispose {
     // await this._pm.sync('league-client-main')
   }
 
-  constructor(deps: any) {
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-  }
+  constructor(@Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer) {}
 }

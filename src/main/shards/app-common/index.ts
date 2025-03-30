@@ -1,6 +1,5 @@
 import { i18next } from '@main/i18n'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
+import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { app, nativeImage, nativeTheme, shell } from 'electron'
 import { clipboard } from 'electron'
 import os from 'node:os'
@@ -14,24 +13,22 @@ import { AppCommonSettings, AppCommonState } from './state'
 /**
  * 一些不知道如何分类的通用功能, 可以放到这里
  */
+@Shard(AppCommonMain.id)
 export class AppCommonMain implements IAkariShardInitDispose {
   static id = 'app-common-main'
-  static dependencies = [SHARED_GLOBAL_ID, AkariIpcMain.id, MobxUtilsMain.id, SettingFactoryMain.id]
 
   public readonly state = new AppCommonState()
   public readonly settings = new AppCommonSettings()
 
-  private _shared: AkariSharedGlobalShard
-  private _ipc: AkariIpcMain
-  private _mobx: MobxUtilsMain
-  private _setting: SetterSettingService
+  private readonly _setting: SetterSettingService
 
-  constructor(deps: any) {
-    this._shared = deps[SHARED_GLOBAL_ID]
-    this._ipc = deps[AkariIpcMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-
-    this._setting = (deps[SettingFactoryMain.id] as SettingFactoryMain).register(
+  constructor(
+    private readonly _shared: SharedGlobalShard,
+    private readonly _ipc: AkariIpcMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _settingFactory: SettingFactoryMain
+  ) {
+    this._setting = _settingFactory.register(
       AppCommonMain.id,
       {
         isInKyokoMode: { default: this.settings.isInKyokoMode },

@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
@@ -7,9 +7,9 @@ import { CustomSend, useInGameSendStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'in-game-send-main'
 
+@Shard(InGameSendRenderer.id)
 export class InGameSendRenderer implements IAkariShardInitDispose {
   static id = 'in-game-send-renderer'
-  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id, SettingUtilsRenderer.id]
 
   static SHORTCUT_ID_SEND_ALLY = `${MAIN_SHARD_NAMESPACE}/send-ally`
   static SHORTCUT_ID_SEND_ENEMY = `${MAIN_SHARD_NAMESPACE}/send-enemy`
@@ -17,15 +17,11 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
   static SHORTCUT_ID_SEND_ALL_ENEMIES = `${MAIN_SHARD_NAMESPACE}/send-all-enemies`
   static SHORTCUT_ID_CANCEL = `${MAIN_SHARD_NAMESPACE}/cancel`
 
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _setting: SettingUtilsRenderer
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-  }
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+  ) {}
 
   async onInit() {
     const store = useInGameSendStore()

@@ -2,7 +2,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NotificationReactive, useNotification } from 'naive-ui'
 import { CSSProperties, h, inject, watch } from 'vue'
@@ -10,20 +10,17 @@ import { CSSProperties, h, inject, watch } from 'vue'
 /**
  * 偶尔会出现在主窗口的周期性通知
  */
+@Shard(MainWindowNotificationsRenderer.id)
 export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
   static id = 'main-window-notifications-renderer'
-  static dependencies = [ClientInstallationRenderer.id, SettingUtilsRenderer.id]
 
   static NEVER_SHOW_SETTING_KEY = 'neverShowLiveStreamingStreamerMode'
   static LAST_DISMISS_SETTING_KEY = 'lastDismissLiveStreamingStreamerMode'
 
-  private readonly _installation: ClientInstallationRenderer
-  private readonly _setting: SettingUtilsRenderer
-
-  constructor(deps: any) {
-    this._installation = deps[ClientInstallationRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-  }
+  constructor(
+    @Dep(ClientInstallationRenderer) private readonly _installation: ClientInstallationRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+  ) {}
 
   _setupStreamerModeNotifications() {
     const { t } = useTranslation()

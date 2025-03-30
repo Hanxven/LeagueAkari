@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Paths } from '@shared/utils/types'
 import _ from 'lodash'
 import { IReactionOptions, IReactionPublic, isObservable, reaction, toJS } from 'mobx'
@@ -18,11 +18,9 @@ interface RegisteredState {
 /**
  * 封装的 Mobx 工具方法, 负责状态同步
  */
+@Shard(MobxUtilsMain.id)
 export class MobxUtilsMain implements IAkariShardInitDispose {
   static id = 'mobx-utils-main'
-  static dependencies = [AkariIpcMain.id]
-
-  private readonly _ipc: AkariIpcMain
 
   private readonly _disposables = new Set<Function>()
   protected readonly _registeredStates = new Map<string, RegisteredState>()
@@ -33,9 +31,7 @@ export class MobxUtilsMain implements IAkariShardInitDispose {
    */
   private readonly _rendererSubscription = new Map<string, Set<number>>()
 
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcMain.id]
-  }
+  constructor(private readonly _ipc: AkariIpcMain) {}
 
   async onInit() {
     // 用于渲染进程获取初始定义的状态列表

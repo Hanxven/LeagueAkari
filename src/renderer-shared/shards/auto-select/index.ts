@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
@@ -6,17 +6,14 @@ import { useAutoSelectStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'auto-select-main'
 
+@Shard(AutoSelectRenderer.id)
 export class AutoSelectRenderer implements IAkariShardInitDispose {
   static id = 'auto-select-renderer'
-  static dependencies = [SettingUtilsRenderer.id, PiniaMobxUtilsRenderer.id]
 
-  private readonly _pm: PiniaMobxUtilsRenderer
-  private readonly _setting: SettingUtilsRenderer
-
-  constructor(deps: any) {
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-    this._setting = deps[SettingUtilsRenderer.id]
-  }
+  constructor(
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+  ) {}
 
   setNormalModeEnabled(enabled: boolean) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'normalModeEnabled', enabled)

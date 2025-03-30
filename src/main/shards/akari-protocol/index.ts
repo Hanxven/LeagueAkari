@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { protocol, session } from 'electron'
 import { Readable } from 'node:stream'
 
@@ -7,6 +7,7 @@ import { Readable } from 'node:stream'
  * akari://league-client/* 代理到 LeagueClient 的 HTTP 服务
  * akari://riot-client/* 代理到 RiotClient 的 HTTP 服务
  */
+@Shard(AkariProtocolMain.id)
 export class AkariProtocolMain implements IAkariShardInitDispose {
   static id = 'akari-protocol-main'
 

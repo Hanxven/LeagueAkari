@@ -1,5 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
-import { AkariSharedGlobalShard, SHARED_GLOBAL_ID } from '@shared/akari-shard/manager'
+import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { formatError } from '@shared/utils/errors'
 import { app, shell } from 'electron'
 import path from 'node:path'
@@ -33,24 +32,22 @@ export class AkariLogger {
 /**
  * 创建日志记录器的工厂, 供给其他模块使用
  */
+@Shard(LoggerFactoryMain.id)
 export class LoggerFactoryMain implements IAkariShardInitDispose {
   static id = 'logger-factory-main'
-  static dependencies = [SHARED_GLOBAL_ID, AkariIpcMain.id]
 
   // 从全局注入的 logger 实例
   private readonly _logger: Logger
   private readonly _logsDir: string
   private readonly _appDir: string
-  private readonly _ipc: AkariIpcMain
 
-  private readonly _shared: AkariSharedGlobalShard
-
-  constructor(deps: any) {
+  constructor(
+    private readonly _shared: SharedGlobalShard,
+    private readonly _ipc: AkariIpcMain
+  ) {
     this._appDir = path.join(app.getPath('exe'), '..')
     this._logsDir = path.join(this._appDir, 'logs')
-    this._shared = deps[SHARED_GLOBAL_ID]
     this._logger = this._shared.global.logger
-    this._ipc = deps[AkariIpcMain.id]
   }
 
   private _objectsToString(...args: any[]) {

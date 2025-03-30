@@ -1,9 +1,9 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import icon from '@resources/LA_ICON.ico?asset'
+import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { Menu, MenuItem, Tray } from 'electron'
 import i18next from 'i18next'
 import { comparer } from 'mobx'
 
-import icon from '@resources/LA_ICON.ico?asset'
 import { AppCommonMain } from '../app-common'
 import { MobxUtilsMain } from '../mobx-utils'
 import { WindowManagerMain } from '../window-manager'
@@ -11,14 +11,9 @@ import { WindowManagerMain } from '../window-manager'
 /**
  * 有关托盘区那里的逻辑
  */
+@Shard(TrayMain.id)
 export class TrayMain implements IAkariShardInitDispose {
   static id = 'tray-main'
-  static dependencies = [WindowManagerMain.id, MobxUtilsMain.id, AppCommonMain.id]
-
-  private readonly _wm: WindowManagerMain
-  private readonly _mobx: MobxUtilsMain
-
-  private readonly _app: AppCommonMain
 
   private _tray: Tray | null = null
   private _mainWindowDevTrayItem: MenuItem
@@ -31,11 +26,11 @@ export class TrayMain implements IAkariShardInitDispose {
   private _quitTrayItem: MenuItem
   private _contextMenu: Menu
 
-  constructor(deps: any) {
-    this._wm = deps[WindowManagerMain.id]
-    this._mobx = deps[MobxUtilsMain.id]
-    this._app = deps[AppCommonMain.id]
-  }
+  constructor(
+    private readonly _wm: WindowManagerMain,
+    private readonly _mobx: MobxUtilsMain,
+    private readonly _app: AppCommonMain
+  ) {}
 
   private _buildTray() {
     this._tray = new Tray(icon)

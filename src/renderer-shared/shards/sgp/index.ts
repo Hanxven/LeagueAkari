@@ -1,4 +1,4 @@
-import { IAkariShardInitDispose } from '@shared/akari-shard/interface'
+import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { AvailableServersMap } from '@shared/data-sources/sgp'
 import { SpectatorData } from '@shared/data-sources/sgp/types'
 import { Game, MatchHistory } from '@shared/types/league-client/match-history'
@@ -10,17 +10,14 @@ import { useSgpStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'sgp-main'
 
+@Shard(SgpRenderer.id)
 export class SgpRenderer implements IAkariShardInitDispose {
   static id = 'sgp-renderer'
-  static dependencies = [AkariIpcRenderer.id, PiniaMobxUtilsRenderer.id]
 
-  private readonly _ipc: AkariIpcRenderer
-  private readonly _pm: PiniaMobxUtilsRenderer
-
-  constructor(deps: any) {
-    this._ipc = deps[AkariIpcRenderer.id]
-    this._pm = deps[PiniaMobxUtilsRenderer.id]
-  }
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer
+  ) {}
 
   getSupportedSgpServers() {
     return this._ipc.call<AvailableServersMap>(MAIN_SHARD_NAMESPACE, 'getSupportedSgpServers')
