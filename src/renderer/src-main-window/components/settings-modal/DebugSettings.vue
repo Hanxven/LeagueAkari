@@ -25,31 +25,6 @@
         :status="editRuleValid ? 'success' : 'error'"
       />
     </NModal>
-    <NCard size="small">
-      <template #header>
-        <span class="card-header-title">{{ t('DebugSettings.electron.title') }}</span>
-      </template>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('DebugSettings.electron.devTools.label')"
-        :label-description="t('DebugSettings.electron.devTools.description')"
-        :label-width="400"
-      >
-        <NButton size="small" secondary type="primary" @click="handleToggleDevtools">{{
-          t('DebugSettings.electron.devTools.button')
-        }}</NButton>
-      </ControlItem>
-      <ControlItem
-        class="control-item-margin"
-        :label="t('DebugSettings.electron.reload.label')"
-        :label-description="t('DebugSettings.electron.reload.description')"
-        :label-width="400"
-      >
-        <NButton size="small" secondary type="primary" @click="handleReload">
-          {{ t('DebugSettings.electron.reload.button') }}
-        </NButton>
-      </ControlItem>
-    </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header>
         <span class="card-header-title">{{ t('DebugSettings.files.title') }}</span>
@@ -73,7 +48,7 @@
           {{ t('DebugSettings.files.appData.description.part1') }}
           <NPopover :delay="50">
             <template #trigger>
-              <span style="font-weight: bold; color: #fff; cursor: pointer">
+              <span style="font-weight: bold; color: #fff">
                 {{ t('DebugSettings.files.appData.popoverTrigger') }}
               </span>
             </template>

@@ -216,6 +216,11 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
 
     this._log.info('开始迁移设置项', ConfigMigrateMain.MIGRATION_FROM_134)
 
+    await manager.save(
+      Setting,
+      Setting.create('app-common-main/showFreeSoftwareDeclaration', false)
+    )
+
     await this._do(
       manager,
       'window-manager-main/auxWindowPinned',
