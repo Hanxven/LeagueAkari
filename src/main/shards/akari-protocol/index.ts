@@ -1,14 +1,17 @@
-import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { Shard } from '@shared/akari-shard'
 import { protocol, session } from 'electron'
+import ofs from 'node:original-fs'
+import path from 'node:path'
 import { Readable } from 'node:stream'
 
 /**
  * 实现 `akari://` 协议, 用户特殊资源的代理
+ * akari://local/* 代理到本地文件系统
  * akari://league-client/* 代理到 LeagueClient 的 HTTP 服务
  * akari://riot-client/* 代理到 RiotClient 的 HTTP 服务
  */
 @Shard(AkariProtocolMain.id)
-export class AkariProtocolMain implements IAkariShardInitDispose {
+export class AkariProtocolMain {
   static id = 'akari-protocol-main'
 
   static AKARI_PROXY_PROTOCOL = 'akari'
@@ -20,9 +23,61 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
 
   private readonly _partitionRegistry = new Set<string>()
 
-  async onInit() {}
+  onInit() {
+    const mime = require('mime-types')
 
-  async onDispose() {}
+    this.registerDomain('local', async (uri: string, _req: Request) => {
+      const filePath = decodeURIComponent(uri)
+      try {
+        await ofs.promises.access(filePath, ofs.constants.R_OK)
+        const stream = ofs.createReadStream(path.normalize(filePath))
+        const contentType = mime.lookup(filePath) || 'application/octet-stream'
+        return new Response(stream, {
+          status: 200,
+          headers: { 'Content-Type': contentType }
+        })
+      } catch (error: any) {
+        switch (error.code) {
+          case 'ENOENT':
+            return new Response(
+              JSON.stringify({
+                error: error.message,
+                filepath: filePath
+              }),
+              {
+                statusText: 'Not Found',
+                headers: { 'Content-Type': 'application/json' },
+                status: 404
+              }
+            )
+          case 'EACCES':
+            return new Response(
+              JSON.stringify({
+                error: error.message,
+                filepath: filePath
+              }),
+              {
+                statusText: 'Forbidden',
+                headers: { 'Content-Type': 'application/json' },
+                status: 403
+              }
+            )
+          default:
+            return new Response(
+              JSON.stringify({
+                error: error.message,
+                filepath: filePath
+              }),
+              {
+                statusText: 'Internal Server Error',
+                headers: { 'Content-Type': 'application/json' },
+                status: 500
+              }
+            )
+        }
+      }
+    })
+  }
 
   private _unhandlePartitionAkariProtocol(partition: string) {
     session.fromPartition(partition).protocol.unhandle(AkariProtocolMain.AKARI_PROXY_PROTOCOL)
@@ -50,7 +105,7 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
       })
   }
 
-  static convertWebStreamToNodeStream(readableStream: ReadableStream) {
+  static convertWebStreamToNodeStream(readableStream: ReadableStream): Readable {
     const reader = readableStream.getReader()
 
     const nodeStream = Readable.from({
@@ -68,6 +123,19 @@ export class AkariProtocolMain implements IAkariShardInitDispose {
     })
 
     return nodeStream
+  }
+
+  static convertNodeStreamToWebStream(nodeStream: Readable): ReadableStream {
+    return new ReadableStream({
+      start(controller) {
+        nodeStream.on('data', (chunk) => controller.enqueue(chunk))
+        nodeStream.on('end', () => controller.close())
+        nodeStream.on('error', (err) => controller.error(err))
+      },
+      cancel(reason) {
+        nodeStream.destroy(reason)
+      }
+    })
   }
 
   registerPartition(partition: string) {

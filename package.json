@@ -71,6 +71,7 @@
     "i18next-vue": "^5.2.0",
     "less": "^4.2.2",
     "markdown-it": "^14.1.0",
+    "mime-types": "^3.0.1",
     "naive-ui": "^2.41.0",
     "p-queue": "^8.1.0",
     "pinia": "^3.0.1",
