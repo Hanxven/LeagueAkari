@@ -169,6 +169,12 @@ export class AppCommonMain implements IAkariShardInitDispose {
       { fireImmediately: true }
     )
 
+    this.state.setShouldUseDarkColors(nativeTheme.shouldUseDarkColors)
+
+    nativeTheme.on('updated', () => {
+      this.state.setShouldUseDarkColors(nativeTheme.shouldUseDarkColors)
+    })
+
     this._ipc.onCall(AppCommonMain.id, 'setDisableHardwareAcceleration', (_, s: boolean) => {
       this._setDisableHardwareAccelerationAndRelaunch(s)
     })

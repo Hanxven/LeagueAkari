@@ -9,7 +9,9 @@ export class AppCommonState {
    */
   disableHardwareAcceleration: boolean = false
 
-  baseConfig: BaseConfig | null
+  baseConfig: BaseConfig | null = null
+
+  shouldUseDarkColors: boolean = false
 
   setAdministrator(s: boolean) {
     this.isAdministrator = s
@@ -21,6 +23,10 @@ export class AppCommonState {
 
   setBaseConfig(s: BaseConfig | null) {
     this.baseConfig = s
+  }
+
+  setShouldUseDarkColors(s: boolean) {
+    this.shouldUseDarkColors = s
   }
 
   constructor() {

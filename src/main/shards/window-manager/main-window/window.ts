@@ -1,8 +1,8 @@
+import icon from '@resources/LA_ICON.ico?asset'
 import { Event } from 'electron'
 import { comparer } from 'mobx'
 
 import type { WindowManagerMainContext } from '..'
-import icon from '@resources/LA_ICON.ico?asset'
 import { BaseAkariWindow } from '../base-akari-window'
 import { MainWindowSettings, MainWindowState } from './state'
 
@@ -14,6 +14,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
   static readonly BASE_HEIGHT = 860
   static readonly MIN_WIDTH = 840
   static readonly MIN_HEIGHT = 600
+  static readonly PRESET_TITLE_BAR_HEIGHT = 36 // 应该和渲染进程中定义的高度一致
 
   private _nextCloseAction: string | null = null
 
@@ -38,7 +39,13 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         show: false,
         frame: false,
         fullscreenable: true,
-        maximizable: true
+        maximizable: true,
+        titleBarOverlay: {
+          height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
+          color: '#00000000',
+          symbolColor: '#ffffff'
+        },
+        titleBarStyle: 'hidden'
       }
     })
   }
@@ -63,6 +70,22 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         }
       },
       { fireImmediately: true, equals: comparer.shallow }
+    )
+
+    this._mobx.reaction(
+      () => [this._app.state.shouldUseDarkColors, this.state.ready],
+      ([should, ready]) => {
+        if (!ready) {
+          return
+        }
+
+        this._window?.setTitleBarOverlay({
+          height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
+          color: should ? '#00000000' : '#ffffff00',
+          symbolColor: should ? '#ffffff' : '#000000'
+        })
+      },
+      { fireImmediately: true }
     )
   }
 

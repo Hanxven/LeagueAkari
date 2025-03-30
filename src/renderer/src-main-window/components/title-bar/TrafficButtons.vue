@@ -40,27 +40,6 @@
         </NFlex>
       </NFlex>
     </NModal>
-    <div
-      :title="t('TrafficButtons.minimize')"
-      class="traffic-button minimize"
-      @click="handleMinimize"
-    >
-      <NIcon style="transform: rotate(90deg)"><DividerShort20RegularIcon /></NIcon>
-    </div>
-    <div
-      :title="mws.status === 'normal' ? t('TrafficButtons.maximize') : t('TrafficButtons.restore')"
-      class="traffic-button maximize"
-      @click="handleMaximize"
-    >
-      <NIcon
-        ><Maximize20RegularIcon v-if="mws.status === 'normal'" /><WindowMultiple16FilledIcon
-          v-else
-        />
-      </NIcon>
-    </div>
-    <div :title="t('TrafficButtons.close')" class="traffic-button close" @click="handleClose">
-      <NIcon><CloseOutlinedIcon /></NIcon>
-    </div>
   </div>
 </template>
 
@@ -71,14 +50,8 @@ import {
   MainWindowCloseAction,
   useMainWindowStore
 } from '@renderer-shared/shards/window-manager/store'
-import { WindowMultiple16Filled as WindowMultiple16FilledIcon } from '@vicons/fluent'
-import {
-  DividerShort20Regular as DividerShort20RegularIcon,
-  Maximize20Regular as Maximize20RegularIcon
-} from '@vicons/fluent'
-import { CloseOutlined as CloseOutlinedIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
+import { NButton, NCheckbox, NFlex, NModal, NRadio, NRadioGroup } from 'naive-ui'
 import { ref, watch } from 'vue'
 
 const { t } = useTranslation()
@@ -87,25 +60,9 @@ const { t } = useTranslation()
 const mws = useMainWindowStore()
 const wm = useInstance(WindowManagerRenderer)
 
-const handleMinimize = async () => {
-  await wm.mainWindow.minimize()
-}
-
-const handleMaximize = async () => {
-  if (mws.status === 'normal') {
-    await wm.mainWindow.maximize()
-  } else {
-    await wm.mainWindow.unmaximize()
-  }
-}
-
 const isCloseConfirmationModelShow = ref(false)
 const closeStrategy = ref<MainWindowCloseAction>('minimize-to-tray')
 const isRememberCloseStrategy = ref<boolean>(false)
-
-const handleClose = async () => {
-  await wm.mainWindow.close()
-}
 
 wm.mainWindow.onAskClose(() => {
   isCloseConfirmationModelShow.value = true
@@ -135,9 +92,12 @@ watch(
 
 <style lang="less" scoped>
 .traffic-buttons {
+  --zoom-factor: 1; // 目前逻辑上锁定恒定为 1
+
   height: 100%;
   display: flex;
   z-index: 10000000;
+  min-width: calc(138px / var(--zoom-factor, 1));
 
   &.blurred {
     filter: brightness(0.8);
