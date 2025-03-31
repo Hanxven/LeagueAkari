@@ -46,12 +46,12 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     watch(
       [
         () => lcs.summoner.profile,
-        () => mui.settings.useProfileSkinAsBackground,
+        () => mui.frontendSettings.useProfileSkinAsBackground,
         () => preferMica.value
       ],
       async ([profile, enabled, preferMica]) => {
         if (!enabled || preferMica) {
-          mui.backgroundSkinUrl = ''
+          mui.backgroundSkinUrl = null
           return
         }
 
@@ -90,25 +90,25 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
     // 获取当前页面的皮肤, 需要注意的是, 如果目标用户没有设置皮肤, 则 backgroundSkinId 不存在
     // 此时在其主页展示的内容为默认成就最高的英雄
     watch(
-      [() => currentTabProfileSkinId.value, () => mui.settings.useProfileSkinAsBackground],
+      [() => currentTabProfileSkinId.value, () => mui.frontendSettings.useProfileSkinAsBackground],
       async ([skinId, enabled]) => {
         if (skinId && enabled) {
           try {
             const url = await this._getChampionSkinUrl(skinId)
 
             if (url === null) {
-              mui.tabBackgroundSkinUrl = '' // tab 的皮肤 url 强同步
+              mui.tabBackgroundSkinUrl = null // tab 的皮肤 url 强同步
               this._log.warn(MainWindowUiRenderer.id, `Skin ${skinId} not found`)
               return
             }
 
             mui.tabBackgroundSkinUrl = url
           } catch (error) {
-            mui.tabBackgroundSkinUrl = ''
+            mui.tabBackgroundSkinUrl = null
             this._log.warn(MainWindowUiRenderer.id, 'Failed to get skin details', error)
           }
         } else {
-          mui.tabBackgroundSkinUrl = ''
+          mui.tabBackgroundSkinUrl = null
         }
       },
       { immediate: true }
@@ -145,18 +145,35 @@ export class MainWindowUiRenderer implements IAkariShardInitDispose {
   private async _handleSettings() {
     const store = useMainWindowUiStore()
 
-    await this._setting.savedGetterVue(
+    await this._setting.savedPropVue(
       MainWindowUiRenderer.id,
-      'useProfileSkinAsBackground',
-      () => store.settings.useProfileSkinAsBackground,
-      (v) => (store.settings.useProfileSkinAsBackground = v)
+      store.frontendSettings,
+      'useProfileSkinAsBackground'
     )
+  }
 
-    await this._setting.savedGetterVue(
-      MainWindowUiRenderer.id,
-      'customBackgroundSkinPath',
-      () => store.settings.customBackgroundSkinPath,
-      (v) => (store.settings.customBackgroundSkinPath = v)
-    )
+  usePreferredBackgroundImageUrl() {
+    const store = useMainWindowUiStore()
+    const preferMica = useMicaAvailability()
+
+    const backgroundImageUrl = computed(() => {
+      if (preferMica.value) {
+        return null
+      }
+
+      if (store.frontendSettings.useProfileSkinAsBackground) {
+        if (store.tabBackgroundSkinUrl) {
+          return LeagueClientRenderer.url(store.tabBackgroundSkinUrl)
+        }
+
+        if (store.backgroundSkinUrl) {
+          return LeagueClientRenderer.url(store.backgroundSkinUrl)
+        }
+      }
+
+      return null
+    })
+
+    return backgroundImageUrl
   }
 }

@@ -2,16 +2,15 @@ import { defineStore } from 'pinia'
 import { ref, shallowReactive } from 'vue'
 
 export const useMainWindowUiStore = defineStore('shard:main-window-ui-renderer', () => {
-  const settings = shallowReactive({
-    useProfileSkinAsBackground: true,
-    customBackgroundSkinPath: ''
+  const frontendSettings = shallowReactive({
+    useProfileSkinAsBackground: true
   })
 
-  const backgroundSkinUrl = ref('')
-  const tabBackgroundSkinUrl = ref('')
+  const backgroundSkinUrl = ref<string | null>(null)
+  const tabBackgroundSkinUrl = ref<string | null>(null)
 
   return {
-    settings,
+    frontendSettings,
     backgroundSkinUrl,
     tabBackgroundSkinUrl
   }

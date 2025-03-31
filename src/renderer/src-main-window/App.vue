@@ -2,7 +2,7 @@
   <div
     id="app-frame"
     :class="{
-      'use-plain-bg': !preferMica
+      'use-plain-bg': backgroundImageUrl
     }"
   >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
@@ -15,14 +15,14 @@
     <MainWindowNotifications />
     <Transition name="bg-fade">
       <div
-        v-if="!preferMica"
-        :key="muis.tabBackgroundSkinUrl || muis.backgroundSkinUrl"
+        v-if="backgroundImageUrl"
+        :key="backgroundImageUrl"
         class="background-wallpaper"
         :class="{
-          'no-image': !muis.backgroundSkinUrl && !muis.tabBackgroundSkinUrl
+          'no-image': !backgroundImageUrl
         }"
         :style="{
-          backgroundImage: `url('${muis.tabBackgroundSkinUrl || muis.backgroundSkinUrl}')`
+          backgroundImage: `url('${backgroundImageUrl}')`
         }"
       ></div>
     </Transition>
@@ -53,9 +53,11 @@ import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
 import { useMicaAvailability } from './compositions/useMicaAvailability'
 import MainWindowNotifications from './shards/main-window-notifications/MainWindowNotifications.vue'
+import { MainWindowUiRenderer } from './shards/main-window-ui'
 import { useMainWindowUiStore } from './shards/main-window-ui/store'
 
 const muis = useMainWindowUiStore()
+const mui = useInstance(MainWindowUiRenderer)
 
 const sus = useSelfUpdateStore()
 const as = useAppCommonStore()
@@ -189,7 +191,7 @@ useKeyboardCombo('AKARI', {
   timeout: 250
 })
 
-const preferMica = useMicaAvailability()
+const backgroundImageUrl = mui.usePreferredBackgroundImageUrl()
 
 og.setupAutoRouteWhenGameStarts()
 </script>

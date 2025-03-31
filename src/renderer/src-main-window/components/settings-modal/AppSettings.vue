@@ -137,7 +137,7 @@
         <NSwitch
           :disabled="preferMica"
           size="small"
-          v-model:value="muis.settings.useProfileSkinAsBackground"
+          v-model:value="muis.frontendSettings.useProfileSkinAsBackground"
         />
       </ControlItem>
     </NCard>
@@ -258,6 +258,7 @@ import {
 } from '@renderer-shared/shards/window-manager/store'
 import { useTranslation } from 'i18next-vue'
 import {
+  NButton,
   NCard,
   NCollapseTransition,
   NFlex,
