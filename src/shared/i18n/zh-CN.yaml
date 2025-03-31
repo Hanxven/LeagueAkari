@@ -2094,6 +2094,9 @@ window-manager-main:
       title: 不需要小窗?
       body: 可以在设置项中 (设置 > 多窗口) 永久禁用小窗口
 
+ongoing-game-main:
+  taggedPlayer: 已标记的玩家
+
 common:
   appName: League Akari
   default: 默认

@@ -1,3 +1,4 @@
+import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { Game, GameTimeline } from '@shared/types/league-client/match-history'
@@ -156,6 +157,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this._handleIpcCall()
     this._handleCalculation()
     this._handleEndOfGameSave()
+    this._handleRemindTaggedPlayers()
 
     this._handleLoad()
 
@@ -1151,6 +1153,85 @@ export class OngoingGameMain implements IAkariShardInitDispose {
             })
             this._log.info(`保存了玩家信息: ${player}`)
           }
+        }
+      }
+    )
+  }
+
+  /**
+   * 或许有人需要这个
+   */
+  private _handleRemindTaggedPlayers() {
+    let reminded: string[] = []
+
+    const itsTimeToSend = computed(() => {
+      if (!this._lc.data.chat.conversations.championSelect) {
+        return null
+      }
+
+      return this._lc.data.chat.conversations.championSelect.id
+    })
+
+    const playersToSend = computed(
+      () => {
+        return Object.entries(this.state.savedInfo)
+          .map(([puuid, info]) => {
+            if (!info.tag) {
+              return null
+            }
+
+            const summoner = this.state.summoner[puuid]
+            if (!summoner) {
+              return null
+            }
+
+            return {
+              puuid,
+              name: `${summoner.data.gameName}#${summoner.data.tagLine}`,
+              tag: info.tag
+            }
+          })
+          .filter((p) => p !== null)
+      },
+      {
+        equals: (a, b) => {
+          const aPuuids = a.map((p) => p.puuid)
+          const bPuuids = b.map((p) => p.puuid)
+          return comparer.shallow(aPuuids, bPuuids)
+        }
+      }
+    )
+
+    this._mobx.reaction(
+      () => itsTimeToSend.get(),
+      (id) => {
+        if (!id) {
+          reminded = []
+          return
+        }
+      }
+    )
+
+    this._mobx.reaction(
+      () => [playersToSend.get(), itsTimeToSend.get()] as const,
+      ([players, roomId]) => {
+        if (!roomId) {
+          return
+        }
+
+        for (const player of players) {
+          if (reminded.includes(player.puuid)) {
+            continue
+          }
+
+          this._lc.api.chat
+            .chatSend(
+              roomId,
+              `[${i18next.t('ongoing-game-main.taggedPlayer')}: ${player.name}]: \n${player.tag}`,
+              'celebration'
+            )
+            .catch(() => {})
+          reminded.push(player.puuid)
         }
       }
     )

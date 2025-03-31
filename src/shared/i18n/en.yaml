@@ -2085,6 +2085,15 @@ auto-champ-config-main:
   auto-config-enabled-no-champion: Auto configuration enabled, but no champion has been configured
   auto-config-enabled: 'Auto configuration enabled, configured champions: {{names}}'
 
+window-manager-main:
+  aux-window:
+    quickClose:
+      title: Don't want mini window?
+      body: You can permanently disable the mini window in the settings (Settings > Multi-window)
+
+ongoing-game-main:
+  taggedPlayer: Tagged Player
+
 common:
   appName: League Akari
   default: Default
