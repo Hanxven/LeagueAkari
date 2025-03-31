@@ -2,7 +2,7 @@
   <div
     id="app-frame"
     :class="{
-      'use-plain-bg': backgroundImageUrl
+      'use-plain-bg': !backgroundImageUrl
     }"
   >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
