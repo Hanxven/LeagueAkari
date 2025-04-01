@@ -10,7 +10,8 @@
         :render-source-label="renderSourceLabel"
         :render-target-label="renderTargetLabel"
         :source-filter-placeholder="t('OrderedChampionList.searchForChampion')"
-        :filter="(a, b) => isNameMatch(a, b.label as string, b.value as number)"
+        :filter="(a, b) => filterChampions(a, b as any)"
+        :source-title="renderPositionFilter"
         source-filterable
       />
     </NModal>
@@ -53,9 +54,12 @@ import {
   TransferRenderSourceLabel,
   TransferRenderTargetLabel
 } from 'naive-ui'
-import { computed, h, ref, useCssModule } from 'vue'
+import { computed, h, ref, useCssModule, watch } from 'vue'
 
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
+import { useRecommendedChampionPositions } from '@main-window/compositions/useRecommendedChampionPositions'
+
+import PositionFilter from './PositionFilter.vue'
 
 const { t } = useTranslation()
 
@@ -255,6 +259,38 @@ const handleDrop = (id: number) => {
 
   dragging.value = null
 }
+
+const renderPositionFilter = () => {
+  return h(PositionFilter, {
+    position: selectedPosition.value,
+    'onUpdate:position': (value: string | null) => {
+      selectedPosition.value = value
+    }
+  })
+}
+
+const selectedPosition = ref<string | null>(null)
+const { positionMap } = useRecommendedChampionPositions()
+
+const filterChampions = (a: string, b: { label: string; value: number }) => {
+  if (positionMap.value && selectedPosition.value) {
+    const position = positionMap.value[selectedPosition.value]
+    if (position && !position.has(b.value)) {
+      return false
+    }
+  }
+
+  return isNameMatch(a, b.label, b.value)
+}
+
+watch(
+  () => show.value,
+  (show) => {
+    if (show) {
+      selectedPosition.value = null
+    }
+  }
+)
 </script>
 
 <style lang="less" scoped>

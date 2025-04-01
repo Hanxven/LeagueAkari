@@ -43,7 +43,9 @@ export interface PerkInventory {
 }
 
 export interface RecommendPositions {
-  [key: string]: string[]
+  [key: number]: {
+    recommendedPositions: string[]
+  }
 }
 
 export interface RecommendPage {

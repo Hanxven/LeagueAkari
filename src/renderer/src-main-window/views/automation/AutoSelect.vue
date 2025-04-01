@@ -296,7 +296,7 @@ import { useTranslation } from 'i18next-vue'
 import { NCard, NInputNumber, NRadio, NRadioGroup, NScrollbar, NSwitch, NTooltip } from 'naive-ui'
 import { computed } from 'vue'
 
-import OrderedChampionList from '@main-window/components/OrderedChampionList.vue'
+import OrderedChampionList from '@main-window/components/ordered-champion-list/OrderedChampionList.vue'
 
 const { t } = useTranslation()
 
