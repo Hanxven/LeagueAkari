@@ -2,7 +2,7 @@ import { Rectangle } from 'electron'
 import { makeAutoObservable, observable } from 'mobx'
 
 export class CdTimerWindowSettings {
-  enabled: boolean = true
+  enabled: boolean = false
 
   pinned: boolean = true
 
