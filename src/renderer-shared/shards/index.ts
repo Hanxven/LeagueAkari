@@ -43,9 +43,9 @@ export function createManager() {
  * @param id
  * @returns
  */
-export function useInstance<T>(id: string): T
+export function useInstance(id: string): any
 export function useInstance<T extends new (...args: any[]) => any>(Ctor: T): InstanceType<T>
-export function useInstance<T>(idOrCtor: string | (new (...args: any[]) => T)): T {
+export function useInstance(idOrCtor: any): any {
   const ctx = getCurrentInstance()
 
   if (!ctx) {
@@ -56,22 +56,11 @@ export function useInstance<T>(idOrCtor: string | (new (...args: any[]) => T)): 
     throw new Error('AkariManager not found in app context')
   }
 
-  let id: string
-
-  if (typeof idOrCtor === 'string') {
-    id = idOrCtor
-  } else {
-    if (!('id' in idOrCtor)) {
-      throw new Error('Constructor must have a static "id" field')
-    }
-    id = (idOrCtor as any).id
-  }
-
-  const ins = ctx.appContext.config.globalProperties.$akariManager.getInstance(id)
+  const ins = ctx.appContext.config.globalProperties.$akariManager.getInstance(idOrCtor)
 
   if (!ins) {
-    throw new Error(`Shard with id "${id}" not instantiated`)
+    throw new Error(`Shard with id (or constructor) "${idOrCtor}" not instantiated`)
   }
 
-  return ins as T
+  return ins
 }
