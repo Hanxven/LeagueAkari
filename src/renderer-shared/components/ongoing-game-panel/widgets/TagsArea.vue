@@ -136,6 +136,13 @@
                       t(`PlayerInfoCard.metPopover.winResult.${item.gameStats.selfWinResult}`)
                     }}</span>
                     <span
+                      v-if="item.gameStats.myPlacement"
+                      class="win-result"
+                      :class="item.gameStats.selfWinResult"
+                    >
+                      ({{ formatI18nOrdinal(item.gameStats.myPlacement, as.settings.locale) }})
+                    </span>
+                    <span
                       class="team"
                       :class="{
                         teammate: item.gameStats.sameTeam,
@@ -164,6 +171,13 @@
                       <span>{{ item.gameStats.selfKda.a }}</span>
                     </div>
                     <div class="divider"></div>
+                    <span
+                      v-if="item.gameStats.opponentPlacement"
+                      class="win-result"
+                      :class="item.gameStats.selfWinResult"
+                    >
+                      ({{ formatI18nOrdinal(item.gameStats.opponentPlacement, as.settings.locale) }})
+                    </span>
                     <PositionIcon
                       class="position-icon"
                       v-if="item.gameStats.opponentPosition"
@@ -547,6 +561,7 @@ import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStre
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { SavedInfo, useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { formatI18nOrdinal } from '@shared/i18n'
 import { Game } from '@shared/types/league-client/match-history'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { MatchHistoryGameWithState, MatchHistoryGamesAnalysisAll } from '@shared/utils/analysis'
@@ -727,7 +742,9 @@ const encounteredGames = computed(() => {
         opponentKda,
         sameTeam,
         date,
-        mode: game.gameMode
+        mode: game.gameMode,
+        myPlacement: s.stats.subteamPlacement,
+        opponentPlacement: h.stats.subteamPlacement
       },
       ...record
     }
