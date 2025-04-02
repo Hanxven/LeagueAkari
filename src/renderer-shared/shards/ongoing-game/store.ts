@@ -185,6 +185,8 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   const rankedStatsLoadingState = ref<Record<string, string>>({}) // 未实装
   const championMasteryLoadingState = ref<Record<string, string>>({}) // 未实装
 
+  const teamParticipantGroups = shallowRef<Record<string, string[]>>({})
+
   return {
     settings,
     frontendSettings,
@@ -211,6 +213,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     summonerLoadingState,
     savedInfoLoadingState,
     rankedStatsLoadingState,
-    championMasteryLoadingState
+    championMasteryLoadingState,
+    teamParticipantGroups
   }
 })

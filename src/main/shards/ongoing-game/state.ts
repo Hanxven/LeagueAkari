@@ -14,7 +14,7 @@ import { SavedPlayer } from '../storage/entities/SavedPlayers'
 
 export class OngoingGameSettings {
   enabled: boolean = true
-  premadeTeamThreshold: number = 3
+  premadeTeamThreshold: number = 6
   matchHistoryLoadCount: number = 20
 
   /**
@@ -345,6 +345,31 @@ export class OngoingGameState {
   }
 
   /**
+   * teamParticipantId -> puuids
+   *
+   * 更加精准的队伍预测
+   */
+  get teamParticipantGroups() {
+    if (!this._lcData.gameflow.session) {
+      return {}
+    }
+
+    const groups: Record<string, string[]> = {}
+    for (const p of [
+      ...this._lcData.gameflow.session.gameData.teamOne,
+      ...this._lcData.gameflow.session.gameData.teamTwo
+    ]) {
+      if (!groups[p.teamParticipantId]) {
+        groups[p.teamParticipantId] = []
+      }
+
+      groups[p.teamParticipantId].push(p.puuid)
+    }
+
+    return groups
+  }
+
+  /**
    * 计算出来的预设队伍
    */
   premadeTeams: Record<string, string[][]> = {}
@@ -541,7 +566,8 @@ export class OngoingGameState {
       teams: computed.struct,
       premadeTeams: observable.struct,
       playerStats: observable.struct,
-      queryStage: computed.struct
+      queryStage: computed.struct,
+      teamParticipantGroups: computed.struct
     })
   }
 }

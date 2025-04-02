@@ -146,7 +146,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'summonerLoadingState',
       'savedInfoLoadingState',
       'rankedStatsLoadingState',
-      'championMasteryLoadingState'
+      'championMasteryLoadingState',
+      'teamParticipantGroups'
     ])
   }
 

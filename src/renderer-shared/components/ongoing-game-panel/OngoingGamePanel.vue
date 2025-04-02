@@ -94,7 +94,7 @@ import { Game } from '@shared/types/league-client/match-history'
 import { findOutliersByIqr } from '@shared/utils/analysis'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NScrollbar, NButton } from 'naive-ui'
+import { NButton, NScrollbar } from 'naive-ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import PlayerInfoCard from './PlayerInfoCard.vue'
@@ -215,8 +215,25 @@ const premadeTeamInfo = computed(() => {
   }
 
   let groupIndex = 0
-  Object.entries(ogs.premadeTeams || {}).forEach(([_, groups]) => {
+  Object.entries(ogs.teamParticipantGroups).forEach(([_, groups]) => {
+    if (groups.length < 2) {
+      return
+    }
+
+    const groupId = PREMADE_TEAMS[groupIndex++]
+    playerMap.groups[groupId] = groups
+    groups.forEach((p) => {
+      playerMap.players[p] = groupId
+    })
+  })
+
+  // 组队信息以 teamParticipantGroups 为准, 推断性的信息则仅仅作补充
+  Object.entries(ogs.premadeTeams).forEach(([_, groups]) => {
     groups.forEach((g) => {
+      if (g.some((p) => playerMap.players[p])) {
+        return
+      }
+
       const groupId = PREMADE_TEAMS[groupIndex++]
       playerMap.groups[groupId] = g
 

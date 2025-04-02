@@ -168,7 +168,7 @@ OngoingGameSettings:
 
   premadeTeamThreshold:
     label: 预组队判定阈值
-    description: 目标玩家群体出现在同一阵营超过 {{threshold}} 次时，则判定为预组队
+    description: 当需要进行推测时，如果目标玩家群体出现在同一阵营超过 {{threshold}} 次时，则判定为预组队
 
   concurrency:
     label: 并发请求数量
