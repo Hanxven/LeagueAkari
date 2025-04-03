@@ -174,9 +174,11 @@
                     <span
                       v-if="item.gameStats.opponentPlacement"
                       class="win-result"
-                      :class="item.gameStats.selfWinResult"
+                      :class="item.gameStats.opponentWinResult"
                     >
-                      ({{ formatI18nOrdinal(item.gameStats.opponentPlacement, as.settings.locale) }})
+                      ({{
+                        formatI18nOrdinal(item.gameStats.opponentPlacement, as.settings.locale)
+                      }})
                     </span>
                     <PositionIcon
                       class="position-icon"
@@ -718,6 +720,15 @@ const encounteredGames = computed(() => {
       selfWinResult = s.stats.win ? 'win' : 'lose'
     }
 
+    let opponentWinResult: string
+    if (game.endOfGameResult === 'Abort_AntiCheatExit') {
+      opponentWinResult = 'abort'
+    } else if (h.stats.gameEndedInEarlySurrender) {
+      opponentWinResult = 'remake'
+    } else {
+      opponentWinResult = h.stats.win ? 'win' : 'lose'
+    }
+
     const selfChampionId = s.championId
     const opponentChampionId = h.championId
 
@@ -738,6 +749,7 @@ const encounteredGames = computed(() => {
         selfPosition,
         opponentPosition,
         selfWinResult,
+        opponentWinResult,
         selfKda,
         opponentKda,
         sameTeam,
