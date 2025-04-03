@@ -50,6 +50,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     `q_430`,
     `q_440`,
     `q_450`, // ARAM
+    `q_480`, // SWIFTPLAY
     `q_490`,
     `q_900`, // URF
     `q_1400`, // ULTBOOK

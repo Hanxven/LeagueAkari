@@ -123,7 +123,10 @@ const sgpTagOptions = computed(() => {
       label: lcs.gameData.queues[450]?.name || t('common.sgpMatchHistoryTags.q_450', 'q_450'),
       value: `q_450`
     },
-
+    {
+      label: lcs.gameData.queues[480]?.name || t('common.sgpMatchHistoryTags.q_480', 'q_480'),
+      value: `q_480`
+    },
     {
       label: lcs.gameData.queues[1700]?.name || t('common.sgpMatchHistoryTags.q_1700', 'q_1700'),
       value: 'q_1700'

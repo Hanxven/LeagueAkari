@@ -2172,6 +2172,7 @@ common:
     q_430: Normal SR
     q_440: Ranked Flex
     q_450: ARAM
+    q_480: Swiftplay
     q_490: Quickplay
     q_900: ARURF
     q_1700: Arena
