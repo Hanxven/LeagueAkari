@@ -101,12 +101,14 @@
                   >
                     <NTooltip
                       placement="bottom"
-                      :disabled="!tab.summoner || !tab.summoner.gameName"
+                      :disabled="!tab.summoner || !tab.summoner.displayName"
                     >
                       <template #trigger>
                         {{ tab.summoner?.gameName || '-' }}
                       </template>
-                      {{ t('MatchHistoryTab.previousName', { name: tab.summoner?.displayName }) }}
+                      <CopyableText :text="tab.summoner?.displayName">
+                        {{ t('MatchHistoryTab.previousName', { name: tab.summoner?.displayName }) }}
+                      </CopyableText>
                     </NTooltip>
                   </CopyableText>
                 </StreamerModeMaskedText>
