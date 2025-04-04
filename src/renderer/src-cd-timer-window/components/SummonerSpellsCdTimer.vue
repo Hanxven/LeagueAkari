@@ -67,9 +67,12 @@ import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useCdTimerWindowStore } from '@renderer-shared/shards/window-manager/store'
 import { EMPTY_PUUID } from '@shared/constants/common'
 import { useTimeoutFn } from '@vueuse/core'
+import { useTranslation } from 'i18next-vue'
 import { computed, shallowReactive, shallowRef, watch } from 'vue'
 
 import TimerItem from './TimerItem.vue'
+
+const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
 const ctws = useCdTimerWindowStore()
@@ -305,9 +308,19 @@ const sendInGameText = (
 
   let text: string | null = null
   if (timerType === 'countdown') {
-    text = `${lcs.gameData.champions[championId].name} ${spell.name} ${minutes}分${seconds.toString().padStart(2, '0')}秒时就绪`
+    text = t('SummonerSpellsCdTimer.countdown', {
+      championName: lcs.gameData.champions[championId]?.name || championId,
+      spellName: spell.name,
+      minutes,
+      seconds: seconds.toString().padStart(2, '0')
+    })
   } else if (timerType === 'countup') {
-    text = `${lcs.gameData.champions[championId].name} ${spell.name} ${minutes}分${seconds.toString().padStart(2, '0')}秒时已使用`
+    text = t('SummonerSpellsCdTimer.countup', {
+      championName: lcs.gameData.champions[championId]?.name || championId,
+      spellName: spell.name,
+      minutes,
+      seconds: seconds.toString().padStart(2, '0')
+    })
   }
 
   if (text) {

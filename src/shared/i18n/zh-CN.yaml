@@ -2012,6 +2012,10 @@ MissionClaimTool:
 ClaimableItem:
   untranslatedC: 未命名奖励组 ({{countV}})
 
+SummonerSpellsCdTimer:
+  countdown: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时就绪'
+  countup: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时已使用'
+
 main-window-notifications-renderer:
   liveStreamingHints:
     dismiss: 关闭
