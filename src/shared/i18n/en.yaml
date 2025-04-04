@@ -1226,6 +1226,7 @@ MatchHistoryTab:
   rankedMore: More
   tagPlayer: Tag Player
   itemPerPage: '{{countV}}'
+  previousName: 'Previously Used Name: {{name}}'
 
   private:
     title: Profile Hidden

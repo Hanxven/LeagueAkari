@@ -98,8 +98,17 @@
                     class="game-name"
                     :class="{ 'long-name': tab.summoner && tab.summoner.gameName.length >= 12 }"
                     :text="summonerName(tab.summoner?.gameName, tab.summoner?.tagLine, '-')"
-                    >{{ tab.summoner?.gameName || '-' }}</CopyableText
                   >
+                    <NTooltip
+                      placement="bottom"
+                      :disabled="!tab.summoner || !tab.summoner.gameName"
+                    >
+                      <template #trigger>
+                        {{ tab.summoner?.gameName || '-' }}
+                      </template>
+                      {{ t('MatchHistoryTab.previousName', { name: tab.summoner?.displayName }) }}
+                    </NTooltip>
+                  </CopyableText>
                 </StreamerModeMaskedText>
                 <NPopover v-if="tab.spectatorData && isSmallScreen" display-directive="show">
                   <template #trigger>
@@ -633,6 +642,7 @@ import {
   NScrollbar,
   NSelect,
   NSpin,
+  NTooltip,
   useMessage,
   useNotification
 } from 'naive-ui'

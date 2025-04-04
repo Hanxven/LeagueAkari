@@ -5,7 +5,7 @@ export interface SummonerInfo {
   internalName: string
   nameChangeFlag: boolean
   percentCompleteForNextLevel: number
-  privacy: 'PUBLIC' | 'PRIVATE' | string
+  privacy: 'PUBLIC' | 'PRIVATE' | (string & {})
   profileIconId: number
   puuid: string
   rerollPoints: RerollPoints

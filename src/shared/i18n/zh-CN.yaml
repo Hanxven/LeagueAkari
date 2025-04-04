@@ -1232,6 +1232,7 @@ MatchHistoryTab:
   rankedMore: 更多
   tagPlayer: 标记玩家
   itemPerPage: '{{countV}} 项'
+  previousName: '曾使用的名字: {{name}}'
 
   private:
     title: 生涯隐藏
