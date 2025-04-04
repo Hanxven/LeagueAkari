@@ -11,9 +11,13 @@ export interface CustomSend {
 export interface TemplateDef {
   id: string
   name: string
-  shortcut: string | null
-  isJsTemplate: boolean
+  sendShortcut: string | null
+  sendAllyShortcut: string | null
+  sendEnemyShortcut: string | null
+  sendAllyWithAllPrefix: string | null // '/all' or something else
+  sendEnemyWithAllPrefix: string | null
   content: string
+  isJsTemplate: boolean
   isValid: boolean
 }
 

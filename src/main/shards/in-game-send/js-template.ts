@@ -1,3 +1,5 @@
+import { AkariManager } from '@shared/akari-shard'
+
 const JS_TEMPLATE_VERSION_SUPPORT = 10
 
 export const enum JS_TEMPLATE_CHECK_RESULT {
@@ -7,6 +9,14 @@ export const enum JS_TEMPLATE_CHECK_RESULT {
   NO_METADATA = 'no-metadata',
   UNSUPPORTED_VERSION = 'unsupported-version',
   NO_GET_LINES = 'no-getLines'
+}
+
+export interface JSContextV1 {
+  require: NodeJS.Require
+  akariManager: AkariManager
+
+  getMetadata: () => { version: number }
+  getLines: (env: any) => string[]
 }
 
 export function checkContextV1(ctx: any): JS_TEMPLATE_CHECK_RESULT {

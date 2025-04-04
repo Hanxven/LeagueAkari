@@ -20,7 +20,7 @@ import { OngoingGameMain } from '../ongoing-game'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import defaultTemplate from './default-template.ejs?asset'
-import { JS_TEMPLATE_CHECK_RESULT, checkContextV1 } from './js-template'
+import { JSContextV1, JS_TEMPLATE_CHECK_RESULT, checkContextV1 } from './js-template'
 import { CustomSend, InGameSendSettings, InGameSendState, TemplateDef } from './state'
 
 /**
@@ -36,7 +36,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
   /**
    * 还是需要限制一下
    */
-  static MAX_CUSTOM_SEND = 20
+  static MAX_CUSTOM_SEND = 100
   static ENTER_KEY_CODE = 13
   static ENTER_KEY_INTERNAL_DELAY = 20
 
@@ -45,6 +45,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
   private _log: AkariLogger
   private _setting: SetterSettingService
+
+  private _vmContexts: Record<string, vm.Context> = {}
 
   private readonly _eta = new Eta()
   private _customCompiledFn: TemplateFunction | null = null
@@ -119,7 +121,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
    */
   private async _sendSeparatedStringLines(
     messages: string[],
-    type: 'champ-select-chat' | 'keyboard' = 'keyboard', // 选人界面发送 or 键盘模拟游戏中发送
+    type: 'champ-select-chat' | 'send-input' = 'send-input', // 选人界面发送 or 键盘模拟游戏中发送
     identifier: string | null = null
   ) {
     const tasks: (() => Promise<void>)[] = []
@@ -206,7 +208,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
     this._log.info('将模拟发送如下信息', messages)
 
-    await this._sendSeparatedStringLines(messages, 'keyboard', s.id)
+    await this._sendSeparatedStringLines(messages, 'send-input', s.id)
   }
 
   static mapNonFunctionObject<T extends Record<string, any>>(obj: T) {
@@ -299,9 +301,9 @@ export class InGameSendMain implements IAkariShardInitDispose {
     }
 
     const sendType =
-      this._og.state.queryStage.phase === 'champ-select' ? 'champ-select-chat' : 'keyboard'
+      this._og.state.queryStage.phase === 'champ-select' ? 'champ-select-chat' : 'send-input'
 
-    if (sendType === 'keyboard' && !GameClientMain.isGameClientForeground()) {
+    if (sendType === 'send-input' && !GameClientMain.isGameClientForeground()) {
       this._log.warn('游戏当前未在前台')
       return
     }
@@ -318,7 +320,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
         )
           .split('\n')
           .filter((m) => m.trim().length > 0)
-          .map((m) => (options.prefix && sendType === 'keyboard' ? `${options.prefix} ${m}` : m))
+          .map((m) => (options.prefix && sendType === 'send-input' ? `${options.prefix} ${m}` : m))
 
         if (messages.length === 0) {
           this._log.warn('没有消息可以发送')
@@ -774,91 +776,125 @@ export class InGameSendMain implements IAkariShardInitDispose {
     this._handleIpcCall()
   }
 
-  // ---
+  // --- 以下施工中, 未实装 ---
 
-  private _vmContexts: Record<string, vm.Context> = {}
-
-  private _handleIpcCall2() {
-    this._ipc.onCall(
-      InGameSendMain.id,
-      'createJsTemplate',
-      (_, name: string, code: string = '') => {
-        const id = crypto.randomUUID()
-
-        this._vmContexts[id] = vm.createContext({
-          require
-        })
-
-        const obj = {
-          id,
-          name,
-          code,
-          isValid: false
-        }
-      }
-    )
+  private _handleIpcCall_extra() {
+    this._ipc.onCall(InGameSendMain.id, 'createJsTemplate', (_, name: string) => {
+      this._createEmptyTemplate(name)
+    })
 
     this._ipc.onCall(
       InGameSendMain.id,
       'updateJsTemplate',
       (_, id: string, data: Partial<Omit<TemplateDef, 'id'>>) => {
-        const that = this.settings.templates.find((item) => item.id === id)
-
-        if (!that) {
-          return
-        }
+        this._updateTemplate(id, data)
       }
     )
 
     this._ipc.onCall(InGameSendMain.id, 'removeJsTemplate', (_, id: string) => {
-      const obj = this.settings.templates.find((item) => item.id === id)
-
-      if (!obj) {
-        return
-      }
-
-      const newArr = this.settings.templates.filter((item) => item.id !== id)
-      delete this._vmContexts[id]
-
-      this._setting.set('jsTemplates', newArr)
+      this._removeTemplate(id)
     })
+  }
+
+  private _initShortcuts_extra() {
+    let shouldApply = false
+    for (const template of this.settings.templates) {
+      for (const { dataKey, targetType } of InGameSendMain.SHORTCUT_CONFIGS) {
+        if (template[dataKey]) {
+          const targetId = `${InGameSendMain.id}/template-send/${targetType}/${template.id}`
+
+          try {
+            this._kbd.register(
+              targetId,
+              template[dataKey]!,
+              'last-active',
+              this._createShortcutSendHandler(template.id, targetType)
+            )
+          } catch (error) {
+            this._log.warn('注册快捷键失败', error)
+            template[dataKey] = null
+            shouldApply = true
+          }
+        }
+      }
+    }
+
+    // 一旦变更过数据, 立即重新设置状态
+    if (shouldApply) {
+      this._setting.set('templates', this.settings.templates)
+    }
+  }
+
+  static SHORTCUT_CONFIGS: {
+    dataKey: keyof Omit<TemplateDef, 'id' | 'isValid' | 'content' | 'name' | 'isJsTemplate'>
+    targetType: string
+  }[] = [
+    { dataKey: 'sendShortcut', targetType: 'send' },
+    { dataKey: 'sendAllyShortcut', targetType: 'send-ally' },
+    { dataKey: 'sendEnemyShortcut', targetType: 'send-enemy' },
+    { dataKey: 'sendAllyWithAllPrefix', targetType: 'send-ally-with-all-prefix' },
+    { dataKey: 'sendEnemyWithAllPrefix', targetType: 'send-enemy-with-all-prefix' }
+  ]
+
+  private _createShortcutSendHandler(id: string, type: string) {
+    switch (type) {
+      case 'send':
+        return () => this._performTemplateSend(id, { target: 'all' })
+      case 'send-ally':
+        return () => this._performTemplateSend(id, { target: 'ally' })
+      case 'send-enemy':
+        return () => this._performTemplateSend(id, { target: 'enemy' })
+      case 'send-ally-with-all-prefix':
+        return () => this._performTemplateSend(id, { prefix: '/all', target: 'ally' })
+      case 'send-enemy-with-all-prefix':
+        return () => this._performTemplateSend(id, { prefix: '/all', target: 'enemy' })
+    }
+
+    return () => {
+      throw new Error('Invalid shortcut type')
+    }
   }
 
   private _updateTemplate(id: string, data: Partial<Omit<TemplateDef, 'id' | 'isValid'>>) {
     const that = this.settings.templates.find((item) => item.id === id)
-
     if (!that) {
       return
     }
 
+    // 更新普通属性
     if (data.content !== undefined) {
       that.content = data.content
     }
-
     if (data.name !== undefined) {
       that.name = data.name
     }
 
-    if (data.shortcut !== undefined) {
-      const targetId = `${InGameSendMain.id}/template-send/${id}`
-
-      if (data.shortcut !== null) {
-        try {
-          this._kbd.register(targetId, data.shortcut, 'last-active', () => {
-            // TODO!
-          })
-          that.shortcut = data.shortcut // or null
-        } catch (error) {
-          that.shortcut = null
-          this._log.warn('注册快捷键失败', error)
-        }
-      } else {
-        if (this._kbd.unregisterByTargetId(targetId)) {
-          this._log.info(`已删除快捷键 ${targetId}`)
+    // 统一处理各快捷键的注册与注销
+    for (const { dataKey, targetType } of InGameSendMain.SHORTCUT_CONFIGS) {
+      if (data[dataKey] !== undefined) {
+        const targetId = `${InGameSendMain.id}/template-send/${targetType}/${id}`
+        if (data[dataKey] !== null) {
+          try {
+            this._kbd.register(
+              targetId,
+              data[dataKey]!,
+              'last-active',
+              this._createShortcutSendHandler(id, targetType)
+            )
+            that[dataKey] = data[dataKey]
+          } catch (error) {
+            that[dataKey] = null
+            this._log.warn('注册快捷键失败', error)
+          }
+        } else {
+          if (this._kbd.unregisterByTargetId(targetId)) {
+            this._log.info(`已删除快捷键 ${targetId}`)
+          }
         }
       }
     }
 
+    // 处理JS模板相关的逻辑
     if (data.isJsTemplate !== undefined) {
       if (data.isJsTemplate && !that.isJsTemplate) {
         if (!this._vmContexts[id]) {
@@ -868,7 +904,6 @@ export class InGameSendMain implements IAkariShardInitDispose {
         try {
           const script = new vm.Script(that.content)
           script.runInContext(this._vmContexts[id])
-
           const checkResult = checkContextV1(this._vmContexts[id])
           if (checkResult !== JS_TEMPLATE_CHECK_RESULT.VALID) {
             that.isValid = false
@@ -882,10 +917,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
         if (this._vmContexts[id]) {
           delete this._vmContexts[id]
         }
-
         that.isValid = true
       }
-
       that.isJsTemplate = data.isJsTemplate
     }
 
@@ -894,27 +927,35 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
   private _removeTemplate(id: string) {
     const index = this.settings.templates.findIndex((item) => item.id === id)
-
     if (index === -1) {
       return
     }
 
-    const that = this.settings.templates[index]
-    if (that.isJsTemplate) {
-      if (this._vmContexts[id]) {
-        delete this._vmContexts[id]
+    const template = this.settings.templates[index]
+
+    // 如果是 JS 模板，清理对应的上下文
+    if (template.isJsTemplate && this._vmContexts[id]) {
+      delete this._vmContexts[id]
+    }
+
+    // 统一注销各快捷键
+    for (const { dataKey, targetType } of InGameSendMain.SHORTCUT_CONFIGS) {
+      if (template[dataKey]) {
+        const targetId = `${InGameSendMain.id}/template-send/${targetType}/${id}`
+        this._kbd.unregisterByTargetId(targetId)
       }
     }
 
-    if (that.shortcut) {
-      this._kbd.unregisterByTargetId(`${InGameSendMain.id}/template-send/${id}`)
-    }
-
-    const removed = this.settings.templates.splice(index, 1)
-    this._setting.set('templates', removed)
+    // 从模板数组中移除该模板，并更新设置
+    this.settings.templates.splice(index, 1)
+    this._setting.set('templates', this.settings.templates)
   }
 
   private _createEmptyTemplate(name?: string) {
+    if (this.settings.templates.length >= InGameSendMain.MAX_CUSTOM_SEND) {
+      return
+    }
+
     const id = crypto.randomUUID()
 
     const obj = {
@@ -927,6 +968,70 @@ export class InGameSendMain implements IAkariShardInitDispose {
     }
 
     this._setting.set('templates', [...this.settings.templates, obj])
+  }
+
+  private async _performTemplateSend(
+    id: string,
+    options: {
+      prefix?: string
+      target: 'ally' | 'enemy' | 'all'
+    }
+  ) {
+    if (this._currentSendingInfo && !this._currentSendingInfo.isEnd()) {
+      this._currentSendingInfo.cancel()
+    }
+
+    if (!this.settings.sendStatsEnabled || this._og.state.queryStage.phase === 'unavailable') {
+      this._log.warn(
+        '当前不在可发送阶段',
+        this._og.state.queryStage.phase,
+        this.settings.sendStatsEnabled
+      )
+      return
+    }
+
+    const sendType =
+      this._og.state.queryStage.phase === 'champ-select' ? 'champ-select-chat' : 'send-input'
+
+    if (sendType === 'send-input' && !GameClientMain.isGameClientForeground()) {
+      this._log.warn('游戏当前未在前台')
+      return
+    }
+
+    const item = this.settings.templates.find((item) => item.id === id)
+
+    if (!item) {
+      this._log.warn(`目标模板不存在`, id)
+      return
+    }
+
+    if (item.isJsTemplate) {
+      const vmCtx = this._vmContexts[id] as JSContextV1
+
+      if (!vmCtx) {
+        this._log.warn('模板上下文不存在，无法发送')
+        return
+      }
+
+      try {
+        const lines = vmCtx
+          .getLines({ target: options.target })
+          .map((m) => (options.prefix && sendType === 'send-input' ? `${options.prefix} ${m}` : m))
+
+        if (lines.length === 0) {
+          this._log.warn('没有消息可以发送')
+          return
+        }
+
+        this._log.info('将模拟发送如下信息', lines)
+
+        await this._sendSeparatedStringLines(lines, sendType)
+      } catch (error) {
+        this._log.warn('发送时模板发生错误', error)
+      }
+    } else {
+      await this._sendSeparatedStringLines(item.content.split('\n'), sendType)
+    }
   }
 
   private _getAkariContext() {
