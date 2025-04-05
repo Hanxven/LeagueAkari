@@ -36,7 +36,8 @@ export class AutoReplyMain implements IAkariShardInitDispose {
       {
         enabled: { default: this.settings.enabled },
         enableOnAway: { default: this.settings.enableOnAway },
-        text: { default: this.settings.text }
+        text: { default: this.settings.text },
+        lockOfflineStatus: { default: this.settings.lockOfflineStatus }
       },
       this.settings
     )
@@ -47,7 +48,8 @@ export class AutoReplyMain implements IAkariShardInitDispose {
     this._mobx.propSync(AutoReplyMain.id, 'settings', this.settings, [
       'enabled',
       'enableOnAway',
-      'text'
+      'text',
+      'lockOfflineStatus'
     ])
 
     // 原始人的方法！
@@ -75,6 +77,20 @@ export class AutoReplyMain implements IAkariShardInitDispose {
             })
             this._log.warn(`尝试自动回复时出现错误`, formatError(error))
           }
+        }
+      }
+    )
+
+    this._mobx.reaction(
+      () => this._lc.data.chat.me?.availability,
+      (availability, prev) => {
+        if (!availability || !this.settings.lockOfflineStatus) {
+          return
+        }
+
+        if (prev === 'offline' && availability === 'away') {
+          this._log.debug('纠正为离线状态')
+          this._lc.api.chat.changeAvailability('offline').catch(() => {})
         }
       }
     )

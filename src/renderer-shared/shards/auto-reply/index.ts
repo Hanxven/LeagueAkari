@@ -29,6 +29,10 @@ export class AutoReplyRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'enableOnAway', enabled)
   }
 
+  setLockOfflineStatus(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'lockOfflineStatus', enabled)
+  }
+
   async onInit() {
     const store = useAutoReplyStore()
 

@@ -31,26 +31,46 @@
         </NFlex>
       </NRadioGroup>
     </ControlItem>
+    <ControlItem
+      class="control-item-margin"
+      :label="t('ChatAvailability.lockOfflineStatus.label')"
+      :label-description="t('ChatAvailability.lockOfflineStatus.description')"
+      :label-width="260"
+    >
+      <NSwitch
+        size="small"
+        :value="ars.settings.lockOfflineStatus"
+        @update:value="(val) => ar.setLockOfflineStatus(val)"
+      />
+    </ControlItem>
   </NCard>
 </template>
 
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { AutoReplyRenderer } from '@renderer-shared/shards/auto-reply'
+import { useAutoReplyStore } from '@renderer-shared/shards/auto-reply/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { AvailabilityType } from '@shared/http-api-axios-helper/league-client/chat'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NFlex, NRadio, NRadioGroup, useNotification } from 'naive-ui'
+import { NCard, NFlex, NRadio, NRadioGroup, NSwitch, useNotification } from 'naive-ui'
 
 const { t } = useTranslation()
 
 const lcs = useLeagueClientStore()
+const ars = useAutoReplyStore()
 const lc = useInstance(LeagueClientRenderer)
+const ar = useInstance(AutoReplyRenderer)
 
 const notification = useNotification()
 
 const handleChangeAvailability = async (availability: string) => {
+  if (availability === 'away' && ars.settings.lockOfflineStatus) {
+    await ar.setLockOfflineStatus(false)
+  }
+
   try {
     await lc.api.chat.changeAvailability(availability as AvailabilityType)
   } catch (error) {

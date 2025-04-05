@@ -1085,6 +1085,11 @@ ChatAvailability:
       title: Set Chat Status
       description: 'Failed to set chat status: {{reason}}'
 
+  lockOfflineStatus:
+    label: Try Locking Offline Status
+    description: Set the offline status and try to correct the client's automatic away status.
+    button: Set
+
 ChatStatusMessage:
   title: Chat Status Message
 

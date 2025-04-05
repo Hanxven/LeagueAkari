@@ -1088,6 +1088,10 @@ ChatAvailability:
       title: 设置聊天状态
       description: 设置聊天状态失败 {{reason}}
 
+  lockOfflineStatus:
+    label: 尝试锁定离线状态
+    description: 设置离线状态后，尝试纠正客户端自动设置的离开状态
+
 ChatStatusMessage:
   title: 聊天签名
 

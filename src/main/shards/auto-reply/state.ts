@@ -13,6 +13,8 @@ export class AutoReplySettings {
    */
   text: string = ''
 
+  lockOfflineStatus: boolean = false
+
   setText(text: string) {
     this.text = text
   }
@@ -23,6 +25,10 @@ export class AutoReplySettings {
 
   setEnabled(enabled: boolean) {
     this.enabled = enabled
+  }
+
+  setLockOfflineStatus(yes: boolean) {
+    this.lockOfflineStatus = yes
   }
 
   constructor() {

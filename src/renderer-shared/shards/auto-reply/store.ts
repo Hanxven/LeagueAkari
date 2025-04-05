@@ -5,7 +5,8 @@ export const useAutoReplyStore = defineStore('shard:auto-reply-renderer', () => 
   const settings = shallowReactive({
     enabled: false,
     text: '',
-    enableOnAway: false
+    enableOnAway: false,
+    lockOfflineStatus: false
   })
 
   return {
