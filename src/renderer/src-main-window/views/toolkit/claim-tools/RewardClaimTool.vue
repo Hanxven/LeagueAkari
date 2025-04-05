@@ -56,6 +56,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useActivated } from '@renderer-shared/compositions/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -80,6 +81,8 @@ const isLoading = ref(false)
 const isClaiming = ref(false)
 const selectedGrantIds = ref<string[]>([])
 const grants = shallowRef<RewardsGrant[]>([])
+
+const isActivated = useActivated()
 
 const columns = computed<DataTableColumns<RewardsGrant>>(() => [
   {
@@ -183,10 +186,14 @@ lc.onLcuEventVue<RewardsGrant[]>('/lol-rewards/v1/grants', ({ data }) => {
   )
 })
 
+const shouldReload = computed(() => {
+  return isActivated.value && lcs.isConnected
+})
+
 watch(
-  () => lcs.isConnected,
-  (isConnected) => {
-    if (isConnected) {
+  () => shouldReload.value,
+  (should) => {
+    if (should) {
       updateClaimableRewardGrants()
     }
   },

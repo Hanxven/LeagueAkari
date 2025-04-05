@@ -56,6 +56,7 @@
 </template>
 
 <script setup lang="ts">
+import { useActivated } from '@renderer-shared/compositions/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
@@ -80,6 +81,8 @@ const message = useMessage()
 
 const isClaiming = ref(false)
 const isLoading = ref(false)
+
+const isActivated = useActivated()
 
 const columns = computed<DataTableColumns<Mission>>(() => [
   {
@@ -185,10 +188,14 @@ lc.onLcuEventVue<Mission[]>('/lol-missions/v1/missions', ({ data }) => {
   )
 })
 
+const shouldReload = computed(() => {
+  return isActivated.value && lcs.isConnected
+})
+
 watch(
-  () => lcs.isConnected,
-  (isConnected) => {
-    if (isConnected) {
+  () => shouldReload.value,
+  (should) => {
+    if (should) {
       updateClaimableMissions()
     }
   },
