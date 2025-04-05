@@ -2030,6 +2030,7 @@ FriendTools:
   deletePopconfirm: This will perform a deletion operation and cannot be undone
   refreshSuccess: Refreshed
   neverPlayed: No match data
+  unknown: Unknown
 
   groupNames:
     '**Default': General
@@ -2037,6 +2038,7 @@ FriendTools:
   columns:
     groupName: Friend Group
     lastGameDate: Last Game Date
+    friendSince: Friend Since
 
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s until ready'

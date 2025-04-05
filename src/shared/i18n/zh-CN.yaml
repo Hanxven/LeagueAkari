@@ -2032,6 +2032,7 @@ FriendTools:
   deletePopconfirm: 这将执行删除操作，且不可恢复
   refreshSuccess: 已刷新
   neverPlayed: 无对局数据
+  unknown: 未知
 
   groupNames:
     '**Default': 综合
@@ -2039,6 +2040,7 @@ FriendTools:
   columns:
     groupName: 好友分组
     lastGameDate: 最后对局日期
+    friendSince: 成为好友时间
 
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时就绪'

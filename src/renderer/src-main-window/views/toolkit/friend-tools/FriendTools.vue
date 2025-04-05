@@ -91,6 +91,7 @@ import {
   NButton,
   NCard,
   NDataTable,
+  NEllipsis,
   NPopconfirm,
   NScrollbar,
   useMessage
@@ -119,10 +120,63 @@ const extraInfoMap = ref<
   Record<
     string,
     {
-      lastGameDate: number
+      lastGameDate?: number
+      friendsSince?: number
     }
   >
 >({})
+
+const renderFormattedDate = (date: number) => {
+  return h('span', { style: { fontSize: '12px' } }, [
+    dayjs(date).locale(as.settings.locale.toLowerCase()).format('YYYY-MM-DD HH:mm:ss'),
+    ' ',
+    h('span', { style: { color: '#fff8' } }, [
+      '(',
+      dayjs(date).locale(as.settings.locale.toLowerCase()).fromNow(),
+      ')'
+    ])
+  ])
+}
+
+const renderDateField = (
+  row: any,
+  field: 'lastGameDate' | 'friendsSince',
+  fallbackText: string
+) => {
+  if (row.children) return undefined
+
+  const extraInfo = extraInfoMap.value[row.puuid]
+  if (extraInfo && extraInfo[field]) {
+    return renderFormattedDate(extraInfo[field])
+  }
+
+  return h('span', { style: { color: '#fff6', fontSize: '12px' } }, fallbackText)
+}
+
+const renderGroupName = (row: any) => {
+  if (row.children) {
+    return h('span', { style: { fontWeight: 'bold' } }, row.name)
+  }
+
+  return h(
+    'div',
+    {
+      style: {
+        display: 'inline-flex',
+        gap: '4px',
+        fontSize: '14px',
+        alignItems: 'center'
+      }
+    },
+    [
+      h(LcuImage, {
+        style: { width: '18px', height: '18px' },
+        src: profileIconUri(row.icon)
+      }),
+      h(NEllipsis, { style: { maxWidth: '160px' } }, () => row.name)
+    ]
+  )
+}
 
 const columns = computed<DataTableColumns<any>>(() => [
   {
@@ -131,95 +185,17 @@ const columns = computed<DataTableColumns<any>>(() => [
   {
     title: () => t('FriendTools.columns.groupName'),
     key: 'name',
-    render: (row) => {
-      if (row.children) {
-        return h(
-          'span',
-          {
-            style: {
-              fontWeight: 'bold'
-            }
-          },
-          row.name
-        )
-      }
-
-      return h(
-        'div',
-        {
-          style: {
-            display: 'inline-flex',
-            gap: '4px',
-            fontSize: '14px',
-            alignItems: 'center'
-          }
-        },
-        [
-          h(LcuImage, {
-            style: {
-              width: '18px',
-              height: '18px'
-            },
-            src: profileIconUri(row.icon)
-          }),
-          h('span', row.name)
-        ]
-      )
-    }
+    render: (row) => renderGroupName(row)
   },
   {
     title: () => t('FriendTools.columns.lastGameDate'),
     key: 'lastGameDate',
-    render: (row) => {
-      if (row.children) {
-        return undefined
-      }
-
-      if (row.puuid in extraInfoMap.value) {
-        const extraInfo = extraInfoMap.value[row.puuid]
-        if (extraInfo.lastGameDate) {
-          return h('span', [
-            dayjs(extraInfo.lastGameDate)
-              .locale(as.settings.locale.toLowerCase())
-              .format('YYYY-MM-DD HH:mm:ss'),
-            ' ',
-            h(
-              'span',
-              {
-                style: {
-                  color: '#fff8'
-                }
-              },
-              [
-                '(',
-                dayjs(extraInfo.lastGameDate).locale(as.settings.locale.toLowerCase()).fromNow(),
-                ')'
-              ]
-            )
-          ])
-        } else {
-          return h(
-            'span',
-            {
-              style: {
-                color: '#fff6'
-              }
-            },
-            t('FriendTools.neverPlayed')
-          )
-        }
-      }
-
-      return h(
-        'span',
-        {
-          style: {
-            color: '#fff6'
-          }
-        },
-        t('FriendTools.neverPlayed')
-      )
-    }
+    render: (row) => renderDateField(row, 'lastGameDate', t('FriendTools.neverPlayed'))
+  },
+  {
+    title: () => t('FriendTools.columns.friendSince'),
+    key: 'friendSince',
+    render: (row) => renderDateField(row, 'friendsSince', t('FriendTools.unknown'))
   }
 ])
 
@@ -238,14 +214,14 @@ const tableData = computed(() => {
           }
         })
         .toSorted((a, b) => {
-          if (a.puuid in extraInfoMap.value && b.puuid in extraInfoMap.value) {
-            return (
-              (extraInfoMap.value[b.puuid].lastGameDate || 0) -
-              (extraInfoMap.value[a.puuid].lastGameDate || 0)
-            )
-          } else if (a.puuid in extraInfoMap.value) {
+          const aSince = extraInfoMap.value[a.puuid]?.friendsSince
+          const bSince = extraInfoMap.value[b.puuid]?.friendsSince
+
+          if (aSince && bSince) {
+            return aSince - bSince
+          } else if (aSince) {
             return -1
-          } else if (b.puuid in extraInfoMap.value) {
+          } else if (bSince) {
             return 1
           } else {
             return 0
@@ -290,20 +266,44 @@ const combinedGroups = computed(() => {
     .toSorted((a, b) => b.priority - a.priority)
 })
 
-const updateExtraInfo = async (puuid: string) => {
+const updateLastGameDate = async (puuid: string) => {
   if (sgps.availability.serversSupported.common && sgps.isTokenReady) {
     const data = await sgp.getSummoner(puuid)
     if (data) {
-      extraInfoMap.value[puuid] = {
-        lastGameDate: data.lastGameDate
+      if (!extraInfoMap.value[puuid]) {
+        extraInfoMap.value[puuid] = {}
       }
+
+      extraInfoMap.value[puuid].lastGameDate = data.lastGameDate
     }
   } else {
     const { data } = await lc.api.matchHistory.getMatchHistory(puuid, 0, 0)
     if (data.games.games.length) {
-      extraInfoMap.value[puuid] = {
-        lastGameDate: data.games.games[0].gameCreation
+      if (!extraInfoMap.value[puuid]) {
+        extraInfoMap.value[puuid] = {}
       }
+
+      extraInfoMap.value[puuid].lastGameDate = data.games.games[0].gameCreation
+    }
+  }
+}
+
+const updateFriendSince = async () => {
+  const { data } = await lc.api.store.getGiftableFriends()
+
+  const puuidMap: Record<number, string> = {}
+  friends.value.forEach((friend) => {
+    puuidMap[friend.summonerId] = friend.puuid
+  })
+
+  for (const f of data) {
+    const puuid = puuidMap[f.summonerId]
+    if (puuid) {
+      if (!extraInfoMap.value[puuid]) {
+        extraInfoMap.value[puuid] = {}
+      }
+
+      extraInfoMap.value[puuid].friendsSince = new Date(f.friendsSince).getTime()
     }
   }
 }
@@ -327,12 +327,13 @@ const updateFriends = async (manually = false) => {
     const _updateExtraInfo = async () => {
       for (const friend of friendsD) {
         try {
-          await updateExtraInfo(friend.puuid)
+          await updateLastGameDate(friend.puuid)
         } catch {}
       }
     }
 
     _updateExtraInfo()
+    updateFriendSince().catch(() => {})
 
     if (manually) {
       message.success(() => t('FriendTools.refreshSuccess'))

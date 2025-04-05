@@ -30,6 +30,7 @@ import { SummonerHttpApi } from './summoner'
 import { EventHubHttpApi } from './event-hub'
 import { RewardsHttpApi } from './rewards'
 import { RewardTrackHttpApi } from './reward-track'
+import { StoreHttpApi } from './store'
 
 /**
  * 基于 Axios 封装的调用
@@ -65,6 +66,7 @@ export class LeagueClientHttpApiAxiosHelper {
   public readonly eventHub: EventHubHttpApi
   public readonly rewards: RewardsHttpApi
   public readonly rewardTrack: RewardTrackHttpApi
+  public readonly store: StoreHttpApi
 
   constructor(private _http: AxiosInstance) {
     this.champSelect = new ChampSelectHttpApi(this._http)
@@ -97,5 +99,6 @@ export class LeagueClientHttpApiAxiosHelper {
     this.eventHub = new EventHubHttpApi(this._http)
     this.rewards = new RewardsHttpApi(this._http)
     this.rewardTrack = new RewardTrackHttpApi(this._http)
+    this.store = new StoreHttpApi(this._http)
   }
 }
