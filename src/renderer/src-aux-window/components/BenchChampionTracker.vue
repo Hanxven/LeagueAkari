@@ -1,17 +1,25 @@
 <template>
   <NCard size="small" v-if="translatedEvents.events.length">
-    <div class="dice-usage" v-if="translatedEvents.diceUsage.length">
-      <div class="player-dice-usage" v-for="p of translatedEvents.diceUsage" :key="p.cellId">
-        <span class="label">{{
-          t('BenchChampionTracker.position', {
-            count: cellIdToFloor[p.cellId],
-            ordinal: true
-          })
-        }}</span>
-        <NIcon class="icon"><DiceIcon /></NIcon>
-        <span class="count">{{ p.diceUsage.length }}</span>
+    <NPopover v-if="translatedEvents.diceUsage.length">
+      <template #trigger>
+        <div class="dice-usage">
+          <div class="player-dice-usage" v-for="p of translatedEvents.diceUsage" :key="p.cellId">
+            <span class="label">{{
+              t('BenchChampionTracker.position', {
+                count: cellIdToFloor[p.cellId],
+                ordinal: true
+              })
+            }}</span>
+            <NIcon class="icon"><DiceIcon /></NIcon>
+            <span class="count">{{ p.diceUsage.length }}</span>
+          </div>
+        </div>
+      </template>
+      <div class="send-to-chat-pair">
+        <span>{{ t('BenchChampionTracker.sendDiceUsageToChat') }}</span>
+        <NButton @click="sendToChat" size="tiny" primary>发送</NButton>
       </div>
-    </div>
+    </NPopover>
     <NScrollbar style="height: 200px" ref="scrollbar">
       <NTimeline>
         <NTimelineItem v-for="e of translatedEvents.events" type="info">
@@ -21,8 +29,8 @@
             </NIcon>
           </template>
           <template #header>
-            <span class="action"
-              >{{ formatEventTypeText(e) }}
+            <span class="action">
+              {{ formatEventTypeText(e) }}
               <span class="time">({{ dayjs(e.timestamp).format('HH:mm:ss:SSS') }})</span></span
             >
           </template>
@@ -77,7 +85,9 @@
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { useInstance } from '@renderer-shared/shards'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import {
   CircleRegular as CircleRegularIcon,
@@ -88,13 +98,26 @@ import { ArrowCurveDownLeft24Filled as ArrowCurveDownLeft24FilledIcon } from '@v
 import { useScroll } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NIcon, NScrollbar, NTimeline, NTimelineItem } from 'naive-ui'
+import {
+  NButton,
+  NCard,
+  NIcon,
+  NPopover,
+  NScrollbar,
+  NTimeline,
+  NTimelineItem,
+  useMessage
+} from 'naive-ui'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 const { t } = useTranslation()
 
+const lc = useInstance(LeagueClientRenderer)
+
 const lcs = useLeagueClientStore()
 const as2 = useAutoSelectStore()
+
+const message = useMessage()
 
 type TranslatedEvent =
   | {
@@ -275,6 +298,42 @@ watch(
     }
   }
 )
+
+const sendToChat = async () => {
+  const chatRoomId = lcs.chat.conversations.championSelect?.id
+
+  if (!chatRoomId) {
+    return
+  }
+
+  const usage = translatedEvents.value.diceUsage.map((m) => ({
+    floor: cellIdToFloor.value[m.cellId],
+    usage: m.diceUsage
+  }))
+
+  const messages = usage.map((u) => {
+    const champions = u.usage
+      .map((t) => t.championId)
+      .map((c) => lcs.gameData.champions[c]?.name || c.toString())
+
+    return t('BenchChampionTracker.diceUsage', {
+      player: t('BenchChampionTracker.position', {
+        count: u.floor,
+        ordinal: true
+      }),
+      countV: u.usage.length,
+      champions: champions.join(', ')
+    })
+  })
+
+  messages.unshift(t('BenchChampionTracker.diceUsageTitle'))
+
+  try {
+    await lc.api.chat.chatSend(chatRoomId, messages.join('\n'))
+  } catch (error: any) {
+    message.warning(() => error.message)
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -335,5 +394,12 @@ watch(
       color: #fff;
     }
   }
+}
+
+.send-to-chat-pair {
+  display: flex;
+  font-size: 12px;
+  align-items: center;
+  gap: 16px;
 }
 </style>

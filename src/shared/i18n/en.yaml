@@ -1981,6 +1981,9 @@ BenchChampionTracker:
   useReroll: '{{player}} used a reroll'
   tradeWithPlayer: '{{player1}} traded with {{player2}}'
   swapFromBench: '{{player}} swapped from the bench'
+  sendDiceUsageToChat: Send Dice Usage to Chat
+  diceUsageTitle: 'Dice Usage:'
+  diceUsage: '{{player}} used {{countV}} dice ({{champions}})'
 
 RewardClaimTool: &CommonClaimTool
   title: Rewards

@@ -1984,6 +1984,9 @@ BenchChampionTracker:
   useReroll: '{{player}} 使用了一个骰子'
   tradeWithPlayer: '{{player1}} 与 {{player2}} 交换'
   swapFromBench: '{{player}} 从备选区拿取'
+  sendDiceUsageToChat: 发送骰子使用情况到聊天
+  diceUsageTitle: '骰子使用情况:'
+  diceUsage: '{{player}} 使用 {{countV}} 个骰子 ({{champions}})'
 
 RewardClaimTool: &CommonClaimTool
   title: 奖励
