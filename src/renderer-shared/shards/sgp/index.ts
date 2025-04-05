@@ -1,6 +1,6 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { AvailableServersMap } from '@shared/data-sources/sgp'
-import { SpectatorData } from '@shared/data-sources/sgp/types'
+import { SgpSummoner, SpectatorData } from '@shared/data-sources/sgp/types'
 import { Game, MatchHistory } from '@shared/types/league-client/match-history'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
 
@@ -66,6 +66,10 @@ export class SgpRenderer implements IAkariShardInitDispose {
       puuid,
       sgpServerId
     )
+  }
+
+  getSummoner(puuid: string, sgpServerId?: string): Promise<SgpSummoner | null> {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'getSummoner', puuid, sgpServerId)
   }
 
   async onInit() {

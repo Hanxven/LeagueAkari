@@ -947,6 +947,7 @@ Toolkit:
   lobby: Lobby Tools
   misc: Misc
   claim-tools: Claim Tools
+  friend-tools: Friend Tools
 
 ChampionBench:
   title: Champion Bench
@@ -2009,6 +2010,25 @@ MissionClaimTool:
 
 ClaimableItem:
   untranslatedC: Unnamed Group ({{countV}})
+
+FriendTools:
+  title: Friends
+
+  deleteButtonC: Delete ({{countV}})
+  deleteButton: Delete
+  cancelButton: Cancel
+  refreshButton: Refresh
+  deleteSuccess: Deleted {{countV}} friends
+  deletePopconfirm: This will perform a deletion operation and cannot be undone
+  refreshSuccess: Refreshed
+  neverPlayed: No match data
+
+  groupNames:
+    '**Default': General
+
+  columns:
+    groupName: Friend Group
+    lastGameDate: Last Game Date
 
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s until ready'

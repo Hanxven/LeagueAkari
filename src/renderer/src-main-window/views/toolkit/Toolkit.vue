@@ -24,6 +24,7 @@
           <Lobby v-else-if="currentTab === 'lobby'" />
           <Misc v-else-if="currentTab === 'misc'" />
           <ClaimTools v-else-if="currentTab === 'claim-tools'" />
+          <FriendTools v-else-if="currentTab === 'friend-tools'" />
         </KeepAlive>
       </Transition>
     </div>
@@ -39,6 +40,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ClaimTools from './claim-tools/ClaimTools.vue'
 import Client from './client/Client.vue'
+import FriendTools from './friend-tools/FriendTools.vue'
 import InGameSend from './in-game-send/InGameSend.vue'
 import InProcess from './in-process/InProcess.vue'
 import Lobby from './lobby/Lobby.vue'
@@ -72,6 +74,10 @@ const tabs = computed(() => [
   {
     key: 'claim-tools',
     name: t('Toolkit.claim-tools')
+  },
+  {
+    key: 'friend-tools',
+    name: t('Toolkit.friend-tools')
   }
 ])
 

@@ -173,3 +173,12 @@ interface Lol {
   skinname: string
   timeStamp: string
 }
+
+export interface FriendGroup {
+  collapsed: boolean
+  id: number
+  isLocalized: boolean
+  isMetaGroup: boolean
+  name: string
+  priority: number
+}

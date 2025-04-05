@@ -1,4 +1,10 @@
-import { ChatMessage, ChatPerson, Conversation, Friend } from '@shared/types/league-client/chat'
+import {
+  ChatMessage,
+  ChatPerson,
+  Conversation,
+  Friend,
+  FriendGroup
+} from '@shared/types/league-client/chat'
 import { AxiosInstance } from 'axios'
 
 export type AvailabilityType =
@@ -15,6 +21,14 @@ export class ChatHttpApi {
 
   getFriends() {
     return this._http.get<Friend[]>('/lol-chat/v1/friends')
+  }
+
+  deleteFriend(id: string) {
+    return this._http.delete(`/lol-chat/v1/friends/${id}`)
+  }
+
+  getFriendGroups() {
+    return this._http.get<FriendGroup[]>('/lol-chat/v1/friend-groups')
   }
 
   getMe() {

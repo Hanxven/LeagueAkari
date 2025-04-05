@@ -950,6 +950,7 @@ Toolkit:
   lobby: 房间工具
   misc: 百宝箱
   claim-tools: 领取工具
+  friend-tools: 好友工具
 
 ChampionBench:
   title: 英雄选择台
@@ -2012,6 +2013,25 @@ MissionClaimTool:
 
 ClaimableItem:
   untranslatedC: 未命名奖励组 ({{countV}})
+
+FriendTools:
+  title: 好友
+
+  deleteButtonC: 删除 ({{countV}})
+  deleteButton: 删除
+  cancelButton: 取消
+  refreshButton: 刷新
+  deleteSuccess: 删除了 {{countV}} 个好友
+  deletePopconfirm: 这将执行删除操作，且不可恢复
+  refreshSuccess: 已刷新
+  neverPlayed: 无对局数据
+
+  groupNames:
+    '**Default': 综合
+
+  columns:
+    groupName: 好友分组
+    lastGameDate: 最后对局日期
 
 SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时就绪'
