@@ -1982,6 +1982,7 @@ BenchChampionTracker:
   tradeWithPlayer: '{{player1}} traded with {{player2}}'
   swapFromBench: '{{player}} swapped from the bench'
   sendDiceUsageToChat: Send Dice Usage to Chat
+  sendButton: Send
   diceUsageTitle: 'Dice Usage:'
   diceUsage: '{{player}} used {{countV}} dice ({{champions}})'
 

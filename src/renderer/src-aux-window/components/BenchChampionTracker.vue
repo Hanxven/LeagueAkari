@@ -17,7 +17,9 @@
       </template>
       <div class="send-to-chat-pair">
         <span>{{ t('BenchChampionTracker.sendDiceUsageToChat') }}</span>
-        <NButton @click="sendToChat" size="tiny" primary>发送</NButton>
+        <NButton @click="sendToChat" size="tiny" primary>{{
+          t('BenchChampionTracker.send')
+        }}</NButton>
       </div>
     </NPopover>
     <NScrollbar style="height: 200px" ref="scrollbar">
