@@ -75,10 +75,12 @@
 </template>
 
 <script setup lang="ts">
+import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { Friend, FriendGroup } from '@shared/types/league-client/chat'
@@ -128,7 +130,42 @@ const columns = computed<DataTableColumns<any>>(() => [
   },
   {
     title: () => t('FriendTools.columns.groupName'),
-    key: 'name'
+    key: 'name',
+    render: (row) => {
+      if (row.children) {
+        return h(
+          'span',
+          {
+            style: {
+              fontWeight: 'bold'
+            }
+          },
+          row.name
+        )
+      }
+
+      return h(
+        'div',
+        {
+          style: {
+            display: 'inline-flex',
+            gap: '4px',
+            fontSize: '14px',
+            alignItems: 'center'
+          }
+        },
+        [
+          h(LcuImage, {
+            style: {
+              width: '18px',
+              height: '18px'
+            },
+            src: profileIconUri(row.icon)
+          }),
+          h('span', row.name)
+        ]
+      )
+    }
   },
   {
     title: () => t('FriendTools.columns.lastGameDate'),
@@ -196,6 +233,7 @@ const tableData = computed(() => {
           return {
             id: friend.id,
             puuid: friend.puuid,
+            icon: friend.icon,
             name: `${friend.gameName}#${friend.gameTag}`
           }
         })
