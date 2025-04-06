@@ -49,9 +49,12 @@ export class AkariOngoingGameWindow extends BaseAkariWindow<
         minimizable: false,
         fullscreenable: false,
         transparent: true,
+        hasShadow: false,
+        thickFrame: false,
+        roundedCorners: false,
         skipTaskbar: true,
         autoHideMenuBar: true,
-        // backgroundColor: '#00000000',
+        backgroundColor: '#00000000',
         webPreferences: {
           backgroundThrottling: true // focusable 和 backgroundThrottling 一起使用, 会出现莫名其妙的 BUG
         }

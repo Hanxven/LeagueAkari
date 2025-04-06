@@ -56,6 +56,8 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
         fullscreenable: false,
         transparent: true,
         skipTaskbar: true,
+        roundedCorners: false,
+        hasShadow: false,
         autoHideMenuBar: true,
         backgroundColor: '#00000000',
         webPreferences: {

@@ -3166,7 +3166,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^35.1.4":
+"electron@npm:35.1.4":
   version: 35.1.4
   resolution: "electron@npm:35.1.4"
   dependencies:
@@ -4548,7 +4548,7 @@ __metadata:
     axios: "npm:^1.8.4"
     axios-retry: "npm:^4.5.0"
     dayjs: "npm:^1.11.13"
-    electron: "npm:^35.1.4"
+    electron: "npm:35.1.4"
     electron-builder: "npm:26.0.12"
     electron-vite: "npm:^3.1.0"
     eta: "npm:^3.5.0"
