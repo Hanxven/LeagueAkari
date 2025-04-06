@@ -104,11 +104,23 @@
             />
             <LcuImage v-else class="champion-icon" :src="championIconUri(player.championId)" />
             <div
+              v-if="premadeInfo[player.puuid]"
+              class="premade-team-name"
+              :style="{
+                color: premadeInfo[player.puuid].color.foregroundColor
+              }"
+            >
+              {{ premadeInfo[player.puuid]?.teamName }}
+            </div>
+            <div
               class="player-name"
               @click="() => emits('toSummoner', player.puuid)"
               @mouseup.prevent="(event) => handleMouseUp(event, player.puuid)"
               @mousedown="handleMouseDown"
               :class="{ self: player.puuid === puuid }"
+              :style="{
+                color: premadeInfo[player.puuid]?.color.foregroundColor || '#fffd'
+              }"
             >
               <StreamerModeMaskedText>
                 <template #masked>
@@ -156,7 +168,7 @@
       :id="200"
     />
   </div>
-  <div class="placeholder" v-else>无进行中对局</div>
+  <div class="placeholder" v-else>No Data</div>
 </template>
 
 <script setup lang="ts">
@@ -164,6 +176,10 @@ import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
+import {
+  PREMADE_TEAMS,
+  PREMADE_TEAM_COLORS
+} from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
 import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -367,6 +383,51 @@ const handleCopyToken = () => {
 }
 
 const { summonerName } = useStreamerModeMaskedText()
+
+const premadeInfo = computed(() => {
+  if (!data) {
+    return {}
+  }
+
+  let index = 0
+  const teams: Record<number, string[]> = {}
+  ;[...data.game.teamOne, ...data.game.teamTwo].forEach((player) => {
+    if (!teams[player.teamParticipantId]) {
+      teams[player.teamParticipantId] = []
+    }
+    teams[player.teamParticipantId].push(player.puuid)
+  })
+
+  return Object.entries(teams).reduce(
+    (prev, cur) => {
+      const [_teamId, puuids] = cur
+
+      if (puuids.length < 2) {
+        return prev
+      }
+
+      const teamName = PREMADE_TEAMS[index++]
+      const color = PREMADE_TEAM_COLORS[teamName]
+      puuids.forEach((puuid) => {
+        prev[puuid] = {
+          color,
+          teamName
+        }
+      })
+
+      return prev
+    },
+    {} as Record<string, any>
+  )
+})
+
+watch(
+  premadeInfo,
+  (c) => {
+    console.log(c)
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="less" scoped>
@@ -445,6 +506,18 @@ const { summonerName } = useStreamerModeMaskedText()
   display: flex;
   align-items: center;
 
+  .premade-team-name {
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 11px;
+    padding: 2px;
+    border-radius: 2px;
+    background-color: #ffffff20;
+    min-width: 12px;
+    text-align: center;
+    margin-left: 4px;
+  }
+
   .position-icon {
     font-size: 18px;
     color: rgba(255, 255, 255, 0.8);
@@ -452,41 +525,24 @@ const { summonerName } = useStreamerModeMaskedText()
   }
 
   .player-name {
-    margin-left: 4px;
+    margin-left: 2px;
     font-size: 12px;
     cursor: pointer;
-
-    .name {
-      color: rgba(255, 255, 255, 0.8);
-      transition: color 0.3s;
-    }
+    transition: background-color 0.3s;
+    padding: 0 2px;
+    border-radius: 2px;
 
     .tag-line {
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.6);
       margin-left: 2px;
-      transition: color 0.3s;
     }
 
-    &.self {
-      .name {
-        font-weight: bold;
-        color: rgba(255, 255, 255, 1);
-      }
-
-      .tag-line {
-        color: rgba(255, 255, 255, 0.8);
-      }
+    .name {
+      font-weight: bold;
     }
 
     &:hover {
-      .name {
-        color: rgba(255, 255, 255, 1);
-      }
-
-      .tag-line {
-        color: rgba(255, 255, 255, 0.8);
-      }
+      background-color: #ffffff20;
     }
   }
 }

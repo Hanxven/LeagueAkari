@@ -1,6 +1,7 @@
 import { Overlay } from '@leaguetavern/electron-overlay-win'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { BrowserWindow } from 'electron'
+import { Worker } from 'node:worker_threads'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
@@ -18,6 +19,7 @@ import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
 import { WindowManagerSettings, WindowManagerState } from './state'
+import overlayWorker from './workers/lt?modulePath'
 
 export interface WindowManagerMainContext {
   namespace: string
@@ -82,7 +84,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     this.ongoingGameWindow = new AkariOngoingGameWindow(wContext)
     this.cdTimerWindow = new AkariCdTimerWindow(wContext)
   }
-
 
   getContext(): WindowManagerMainContext {
     return {

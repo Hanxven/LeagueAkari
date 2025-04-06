@@ -17,8 +17,8 @@
       </template>
       <div class="send-to-chat-pair">
         <span>{{ t('BenchChampionTracker.sendDiceUsageToChat') }}</span>
-        <NButton @click="sendToChat" size="tiny" primary>{{
-          t('BenchChampionTracker.send')
+        <NButton @click="sendToChat" size="tiny" type="primary">{{
+          t('BenchChampionTracker.sendButton')
         }}</NButton>
       </div>
     </NPopover>
