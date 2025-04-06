@@ -618,6 +618,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     if (this._currentUpdateTaskCanceler) {
       try {
         this._currentUpdateTaskCanceler()
+        this.state.setUpdateProgressInfo(null)
+        this.state.setNewUpdates(null)
       } catch (error) {
         this._ipc.sendEvent(SelfUpdateMain.id, 'error-cancel-update', formatError(error))
         this._log.warn(`尝试取消更新任务时发生错误`, error)
