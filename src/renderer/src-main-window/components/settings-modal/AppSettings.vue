@@ -36,7 +36,7 @@
         v-if="as.settings.isInKyokoMode"
         class="control-item-margin"
         label="Theme Color (experimental)"
-        label-description="Theme color for League Akari"
+        label-description="Theme color for League Akari (!!DEBUG ONLY!!)"
         :label-width="400"
       >
         <NSelect
@@ -48,7 +48,7 @@
         />
       </ControlItem>
       <ControlItem
-        v-if="as.settings.isInKyokoMode"
+        v-if="false && as.settings.isInKyokoMode"
         class="control-item-margin"
         :label="t('AppSettings.basic.backgroundMaterial.label')"
         :label-description="t('AppSettings.basic.backgroundMaterial.description')"
