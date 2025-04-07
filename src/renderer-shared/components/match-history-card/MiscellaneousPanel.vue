@@ -139,6 +139,10 @@ const platformDisplay = (platformId: string) => {
   return masked(TENCENT_RSO_PLATFORM_NAME[platformId] || platformId, '●●●●●●')
 }
 
+const maskedTextDisplay = (text: string) => {
+  return masked(text, '●●●●●●')
+}
+
 const formatTeam = (id: number) => {
   if (id === 100) {
     return t('common.teams.100')
@@ -289,7 +293,12 @@ const statsConfigMap = computed(() => {
       name: t('MiscellaneousPanel.stats.currentPlatformId'),
       render: platformDisplay
     },
-    platformId: { name: t('MiscellaneousPanel.stats.platformId'), render: platformDisplay }
+    platformId: { name: t('MiscellaneousPanel.stats.platformId'), render: platformDisplay },
+    puuid: { render: maskedTextDisplay },
+    riotIdGameName: { render: maskedTextDisplay },
+    riotIdTagline: { render: maskedTextDisplay },
+    summonerId: { render: maskedTextDisplay },
+    summonerName: { render: maskedTextDisplay },
   }
 })
 
