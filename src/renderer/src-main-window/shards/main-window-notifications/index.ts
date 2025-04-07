@@ -1,11 +1,14 @@
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
+import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { ShopTwoOutlined } from '@vicons/material'
+import { lchown } from 'fs'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NotificationReactive, useNotification } from 'naive-ui'
-import { CSSProperties, h, inject, watch } from 'vue'
+import { CSSProperties, VNode, VNodeChild, computed, h, inject, ref, watch } from 'vue'
 
 /**
  * 偶尔会出现在主窗口的周期性通知
@@ -19,7 +22,8 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
 
   constructor(
     @Dep(ClientInstallationRenderer) private readonly _installation: ClientInstallationRenderer,
-    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer
+    @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(LeagueClientRenderer) private readonly _client: LeagueClientRenderer
   ) {}
 
   _setupStreamerModeNotifications() {
@@ -28,6 +32,98 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
     const installation = useClientInstallationStore()
     const app = useAppCommonStore()
     const appInject = inject('app') as any
+
+    const createNotification = (title: () => VNodeChild, reason: () => VNodeChild) => {
+      return notification.info({
+        title,
+        content: () => {
+          return h(
+            'div',
+            {
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              } as CSSProperties
+            },
+            [
+              reason(),
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    gap: '4px',
+                    flexWrap: 'wrap'
+                  } as CSSProperties
+                },
+                [
+                  h(
+                    NButton,
+                    {
+                      size: 'tiny',
+                      secondary: true,
+                      onClick: () => {
+                        close()
+                        this._setting.set(
+                          MainWindowNotificationsRenderer.id,
+                          MainWindowNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
+                          Date.now()
+                        )
+                      }
+                    },
+                    () => t('main-window-notifications-renderer.liveStreamingHints.dismiss')
+                  ),
+                  h(
+                    NButton,
+                    {
+                      size: 'tiny',
+                      type: 'warning',
+                      secondary: true,
+                      onClick: () => {
+                        close()
+                        this._setting.set(
+                          MainWindowNotificationsRenderer.id,
+                          MainWindowNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
+                          true
+                        )
+                      }
+                    },
+                    () => t('main-window-notifications-renderer.liveStreamingHints.neverShowAgain')
+                  ),
+                  h(
+                    NButton,
+                    {
+                      size: 'tiny',
+                      type: 'primary',
+                      onClick: () => {
+                        close()
+
+                        appInject.openSettingsModal('misc')
+                        this._setting.set(
+                          MainWindowNotificationsRenderer.id,
+                          MainWindowNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
+                          true
+                        )
+                      }
+                    },
+                    () => t('main-window-notifications-renderer.liveStreamingHints.toSettings')
+                  )
+                ]
+              )
+            ]
+          )
+        },
+        onClose: () => {
+          this._setting.set(
+            MainWindowNotificationsRenderer.id,
+            MainWindowNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
+            Date.now()
+          )
+        }
+      })
+    }
 
     let inst: NotificationReactive | null = null
 
@@ -38,10 +134,53 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
       }
     }
 
+    const leagueClientStreamerModeEnabled = ref(false)
+
+    const checkStreamerModeInSettings = async () => {
+      const { data } = await this._client._http.get(
+        '/lol-settings/v2/account/GamePreferences/game-settings'
+      )
+
+      if (data?.data?.['HUD']?.['HidePlayerNames'] === true) {
+        leagueClientStreamerModeEnabled.value = true
+      } else {
+        leagueClientStreamerModeEnabled.value = false
+      }
+    }
+
+    this._client.onLcuEventVue(
+      '/lol-settings/v2/account/GamePreferences/game-settings',
+      ({ data }) => {
+        if (data?.data?.['HUD']?.['HidePlayerNames'] === true) {
+          leagueClientStreamerModeEnabled.value = true
+        } else {
+          leagueClientStreamerModeEnabled.value = false
+        }
+      }
+    )
+
+    checkStreamerModeInSettings().catch(() => {})
+
+    const shouldRemind = computed(() => {
+      if (inst || app.frontendSettings.streamerMode) {
+        return false
+      }
+
+      if (installation.detectedLiveStreamingClients.length) {
+        return 'live-tools'
+      }
+
+      if (leagueClientStreamerModeEnabled.value) {
+        return 'client-settings'
+      }
+
+      return false
+    })
+
     watch(
-      () => installation.detectedLiveStreamingClients,
-      async (clients) => {
-        if (!clients.length || inst || app.frontendSettings.streamerMode) {
+      () => shouldRemind.value,
+      async (should) => {
+        if (!should) {
           return
         }
 
@@ -65,99 +204,25 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
           return
         }
 
-        inst = notification.info({
-          title: () => t('main-window-notifications-renderer.liveStreamingHints.detected.title'),
-          content: () => {
-            return h(
-              'div',
-              {
-                style: {
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px'
-                } as CSSProperties
-              },
-              [
-                h(
-                  'span',
-                  t('main-window-notifications-renderer.liveStreamingHints.detected.toSettings')
-                ),
-                h(
-                  'div',
-                  {
-                    style: {
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      gap: '4px',
-                      flexWrap: 'wrap'
-                    } as CSSProperties
-                  },
-                  [
-                    h(
-                      NButton,
-                      {
-                        size: 'tiny',
-                        secondary: true,
-                        onClick: () => {
-                          close()
-                          this._setting.set(
-                            MainWindowNotificationsRenderer.id,
-                            MainWindowNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
-                            Date.now()
-                          )
-                        }
-                      },
-                      () => t('main-window-notifications-renderer.liveStreamingHints.dismiss')
-                    ),
-                    h(
-                      NButton,
-                      {
-                        size: 'tiny',
-                        type: 'warning',
-                        secondary: true,
-                        onClick: () => {
-                          close()
-                          this._setting.set(
-                            MainWindowNotificationsRenderer.id,
-                            MainWindowNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
-                            true
-                          )
-                        }
-                      },
-                      () =>
-                        t('main-window-notifications-renderer.liveStreamingHints.neverShowAgain')
-                    ),
-                    h(
-                      NButton,
-                      {
-                        size: 'tiny',
-                        type: 'primary',
-                        onClick: () => {
-                          close()
-
-                          appInject.openSettingsModal('misc')
-                          this._setting.set(
-                            MainWindowNotificationsRenderer.id,
-                            MainWindowNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
-                            true
-                          )
-                        }
-                      },
-                      () => t('main-window-notifications-renderer.liveStreamingHints.toSettings')
-                    )
-                  ]
-                )
-              ]
-            )
-          },
-          onClose: () => {
-            this._setting.set(
-              MainWindowNotificationsRenderer.id,
-              MainWindowNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
-              Date.now()
-            )
-          }
-        })
+        if (should === 'live-tools') {
+          inst = createNotification(
+            () => t('main-window-notifications-renderer.liveStreamingHints.detected.title'),
+            () =>
+              h(
+                'span',
+                t('main-window-notifications-renderer.liveStreamingHints.detected.liveTools')
+              )
+          )
+        } else {
+          inst = createNotification(
+            () => t('main-window-notifications-renderer.liveStreamingHints.detected.title'),
+            () =>
+              h(
+                'span',
+                t('main-window-notifications-renderer.liveStreamingHints.detected.bySettings')
+              )
+          )
+        }
       },
       {
         immediate: true
