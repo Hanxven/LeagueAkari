@@ -156,10 +156,6 @@ export class AppCommonMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => this.settings.theme,
       (theme) => {
-        if (process.env['NODE_ENV'] !== 'development') {
-          theme = 'default'
-        }
-
         if (theme === 'default') {
           nativeTheme.themeSource = 'system'
         } else {
@@ -169,11 +165,11 @@ export class AppCommonMain implements IAkariShardInitDispose {
       { fireImmediately: true }
     )
 
-    this.state.setShouldUseDarkColors(nativeTheme.shouldUseDarkColors)
-
     nativeTheme.on('updated', () => {
       this.state.setShouldUseDarkColors(nativeTheme.shouldUseDarkColors)
     })
+
+    this.state.setShouldUseDarkColors(nativeTheme.shouldUseDarkColors)
 
     this._ipc.onCall(AppCommonMain.id, 'setDisableHardwareAcceleration', (_, s: boolean) => {
       this._setDisableHardwareAccelerationAndRelaunch(s)

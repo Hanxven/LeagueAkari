@@ -79,10 +79,12 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
           return
         }
 
+        this._log.info(`标题栏 overlay 样式: ${should ? '深色' : '浅色'}`)
+
         this._window?.setTitleBarOverlay({
           height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
-          color: should ? '#00000000' : '#ffffff00',
-          symbolColor: should ? '#ffffff' : '#000000'
+          color: '#00000000',
+          symbolColor: should ? '#ffffffff' : '#000000ff'
         })
       },
       { fireImmediately: true }

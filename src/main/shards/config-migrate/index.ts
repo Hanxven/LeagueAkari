@@ -218,7 +218,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
 
     await manager.save(
       Setting,
-      Setting.create('app-common-main/showFreeSoftwareDeclaration', false)
+      Setting.create('app-common-main/showFreeSoftwareDeclaration', true)
     )
 
     await this._do(
