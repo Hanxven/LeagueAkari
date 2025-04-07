@@ -92,17 +92,7 @@ export class SelfUpdateState {
   isCheckingUpdates: boolean = false
   lastCheckAt: Date | null = null
   newUpdatesV = observable.box<NewUpdates | null>(null, {
-    equals: (a, b) => {
-      if (a === null && b === null) {
-        return true
-      }
-
-      if (a === null || b === null) {
-        return false
-      }
-
-      return a.currentVersion === b.currentVersion && a.releaseVersion === b.releaseVersion
-    }
+    equals: (a, b) => this._versionCompare(a, b)
   })
 
   get newUpdates() {
@@ -114,6 +104,18 @@ export class SelfUpdateState {
   currentAnnouncement: CurrentAnnouncement | null
 
   lastUpdateResult: LastUpdateResult | null = null
+
+  private _versionCompare(a: NewUpdates, b: NewUpdates) {
+    if (a === null && b === null) {
+      return true
+    }
+
+    if (a === null || b === null) {
+      return false
+    }
+
+    return a.currentVersion === b.currentVersion && a.releaseVersion === b.releaseVersion
+  }
 
   constructor() {
     makeAutoObservable(this, {
