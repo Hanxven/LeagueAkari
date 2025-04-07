@@ -1580,12 +1580,14 @@ AuxWindowTitleBar:
   indicatorTitle: League Akari 的小型辅助功能窗口
   pin: 置顶
   unpin: 取消置顶
+  repositionToAlignLeagueClientUx: 贴附到客户端
 
 OpggWindowTitleBar:
   close: 关闭
   minimize: 最小化
   pin: 置顶
   unpin: 取消置顶
+  repositionToAlignLeagueClientUx: 贴附到客户端
 
 BenchChampionsMini:
   reroll: '重随 (剩余: {{countV}})'

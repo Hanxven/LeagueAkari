@@ -5,6 +5,13 @@
     </div>
     <div class="traffic">
       <div
+        :title="t('OpggWindowTitleBar.repositionToAlignLeagueClientUx')"
+        class="traffic-button align"
+        @click="handleRepositionToAlignLeagueClientUx"
+      >
+        <NIcon><ArrowBarToRightIcon /></NIcon>
+      </div>
+      <div
         :title="ws.settings.pinned ? t('OpggWindowTitleBar.unpin') : t('OpggWindowTitleBar.pin')"
         class="traffic-button pin"
         :class="{ pinned: ws.settings.pinned }"
@@ -33,6 +40,7 @@ import { useOpggWindowStore } from '@renderer-shared/shards/window-manager/store
 import { PinFilled as PinFilledIcon } from '@vicons/carbon'
 import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/fluent'
 import { Close as CloseIcon } from '@vicons/ionicons5'
+import { ArrowBarToRight as ArrowBarToRightIcon } from '@vicons/tabler'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
 
@@ -51,6 +59,10 @@ const handleMinimize = () => {
 
 const handlePin = (b: boolean) => {
   return wm.opggWindow.setPinned(b)
+}
+
+const handleRepositionToAlignLeagueClientUx = () => {
+  wm.opggWindow.repositionToAlignLeagueClientUx()
 }
 </script>
 
@@ -116,6 +128,7 @@ const handlePin = (b: boolean) => {
     }
   }
 
+  .traffic-button.align,
   .traffic-button.pin,
   .traffic-button.minimize {
     &.pinned {

@@ -59,6 +59,7 @@
     "@vicons/fluent": "^0.13.0",
     "@vicons/ionicons5": "^0.13.0",
     "@vicons/material": "^0.13.0",
+    "@vicons/tabler": "^0.13.0",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitejs/plugin-vue-jsx": "^4.1.2",
     "@vueuse/components": "^13.0.0",

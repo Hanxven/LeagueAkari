@@ -77,6 +77,14 @@ class AkariAuxWindow extends BaseAkariWindowRenderer<
   setShowSkinSelector(value: boolean) {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_AUX_WINDOW, 'showSkinSelector', value)
   }
+
+  repositionToAlignLeagueClientUx() {
+    return this._context.ipc.call(
+      MAIN_SHARD_NAMESPACE_AUX_WINDOW,
+      'repositionToAlignLeagueClientUx',
+      'top-right'
+    )
+  }
 }
 
 export class AkariOpggWindow extends BaseAkariWindowRenderer<
@@ -104,6 +112,14 @@ export class AkariOpggWindow extends BaseAkariWindowRenderer<
 
   setShowShortcut(value: string | null) {
     return this._context.setting.set(MAIN_SHARD_NAMESPACE_OPGG_WINDOW, 'showShortcut', value)
+  }
+
+  repositionToAlignLeagueClientUx() {
+    return this._context.ipc.call(
+      MAIN_SHARD_NAMESPACE_OPGG_WINDOW,
+      'repositionToAlignLeagueClientUx',
+      'top-left'
+    )
   }
 }
 

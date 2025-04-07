@@ -1634,6 +1634,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vicons/tabler@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "@vicons/tabler@npm:0.13.0"
+  checksum: 10c0/3d426fc83189e8bf91dea56974331d494eb09f3123a971bd668697f89fea0e9b7698a585d33d0fd8dcbb3f0ca9c6b3e5c548c6f1dae319fa43d1f73a09eaf5b3
+  languageName: node
+  linkType: hard
+
 "@vitejs/plugin-vue-jsx@npm:^4.1.2":
   version: 4.1.2
   resolution: "@vitejs/plugin-vue-jsx@npm:4.1.2"
@@ -4539,6 +4546,7 @@ __metadata:
     "@vicons/fluent": "npm:^0.13.0"
     "@vicons/ionicons5": "npm:^0.13.0"
     "@vicons/material": "npm:^0.13.0"
+    "@vicons/tabler": "npm:^0.13.0"
     "@vitejs/plugin-vue": "npm:^5.2.3"
     "@vitejs/plugin-vue-jsx": "npm:^4.1.2"
     "@vueuse/components": "npm:^13.0.0"

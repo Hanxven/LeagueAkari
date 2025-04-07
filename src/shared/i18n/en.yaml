@@ -1574,12 +1574,14 @@ AuxWindowTitleBar:
   indicatorTitle: Auxiliary Window of League Akari
   pin: Pin
   unpin: Unpin
+  repositionToAlignLeagueClientUx: Align with League Client UX
 
 OpggWindowTitleBar:
   close: Close
   minimize: Minimize
   pin: Pin
   unpin: Unpin
+  repositionToAlignLeagueClientUx: Align with League Client UX
 
 BenchChampionsMini:
   title: Champion Bench
