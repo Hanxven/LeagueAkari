@@ -4,7 +4,7 @@ import { makeAutoObservable, observable } from 'mobx'
 export class OpggWindowSettings {
   enabled: boolean = true
   autoShow: boolean = true
-  opacity: number = 0.9
+  opacity: number = 1
   pinned: boolean = true
   showShortcut: string | null = null
 
