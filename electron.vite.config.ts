@@ -1,9 +1,11 @@
 import yaml from '@modyfi/vite-plugin-yaml'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import { defineConfig, externalizeDepsPlugin, swcPlugin } from 'electron-vite'
+import { bytecodePlugin, defineConfig, externalizeDepsPlugin, swcPlugin } from 'electron-vite'
 import { resolve } from 'path'
 import vueDevTools from 'vite-plugin-vue-devtools'
+
+const SHOULD_COMPILE_TO_BYTECODE = false
 
 const minify = process.env.NODE_ENV === 'production'
 
@@ -42,11 +44,13 @@ const LC_CUSTOM_TAGS = new Set([
   'keywordMajor' // 关键词护卫
 ])
 
+const mainPlugins = [swcPlugin(), yaml(), externalizeDepsPlugin()]
+
 export default defineConfig({
   main: {
-    plugins: [swcPlugin(), yaml(), externalizeDepsPlugin()],
+    plugins: SHOULD_COMPILE_TO_BYTECODE ? [bytecodePlugin(), ...mainPlugins] : mainPlugins,
     build: {
-      minify: false
+      minify
     },
     resolve: {
       alias: {
