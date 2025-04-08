@@ -2,6 +2,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { ClientInstallationRenderer } from '@renderer-shared/shards/client-installation'
 import { useClientInstallationStore } from '@renderer-shared/shards/client-installation/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
+import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { ShopTwoOutlined } from '@vicons/material'
@@ -32,6 +33,7 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
     const installation = useClientInstallationStore()
     const app = useAppCommonStore()
     const appInject = inject('app') as any
+    const lcs = useLeagueClientStore()
 
     const createNotification = (title: () => VNodeChild, reason: () => VNodeChild) => {
       return notification.info({
@@ -159,7 +161,17 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
       }
     )
 
-    checkStreamerModeInSettings().catch(() => {})
+    watch(
+      () => lcs.isConnected,
+      (connected) => {
+        if (connected) {
+          checkStreamerModeInSettings()
+        }
+      },
+      {
+        immediate: true
+      }
+    )
 
     const shouldRemind = computed(() => {
       if (inst || app.frontendSettings.streamerMode) {
