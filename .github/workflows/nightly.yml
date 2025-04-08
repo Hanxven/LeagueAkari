@@ -50,18 +50,6 @@ jobs:
         with:
           cmd: install
 
-      - name: Install node-gyp
-        run: npm i node-gyp -g
-
-      - name: Build C++ addons
-        run: |
-          Write-Host "Processing addon: .\addons"
-          Set-Location addons
-          node-gyp configure
-          node-gyp build
-          Set-Location ..
-          Copy-Item -Path "addons\build\Release\*.node" -Destination .\src\main\native -Force
-
       - name: Run yarn build:win
         uses: borales/actions-yarn@v5.0.0
         with:
