@@ -18,7 +18,6 @@ files:
 
 asarUnpack:
   - resources/**
-afterSign: build/notarize.js
 win:
   target:
     - 7z
