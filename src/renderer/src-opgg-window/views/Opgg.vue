@@ -451,7 +451,7 @@ const loadChampionData = async (shouldAutoApply: boolean) => {
         await setRunes(runesToApply)
       }
 
-      if (os.frontendSettings.autoApplyItems && spellToApply) {
+      if (os.frontendSettings.autoApplySpells && spellToApply) {
         await setSummonerSpells(spellToApply.ids)
       }
 
