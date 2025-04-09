@@ -13,7 +13,6 @@ files:
   - '!docs'
   - '!images'
   - '!pictures'
-  - '!addons'
   - '!akari-updater'
 
 asarUnpack:
