@@ -70,7 +70,22 @@ A valid GitHub PAT is required to install private packages.
 
 `NODE_AUTH_TOKEN` must be set to the PAT value.
 
-# 4. Disclaimer
+## 4. References
+
+The development of **League Akari** has been greatly inspired by several outstanding open-source projects. These projects provided valuable insights and guidance for various modules of the software. We would like to extend our sincere appreciation to the authors and maintainers of the following resources:
+
+| Project                                                                                            | Description                                                                          |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [Pengu Loader](https://github.com/PenguLoader/PenguLoader)                                         | The ultimate JavaScript plugin loader, build your unmatched LoL Client.              |
+| [League of Legends LCU and Riot Client API Docs](https://github.com/KebsCS/lcu-and-riotclient-api) | League of Legends LCU and Riot Client API Docs                                       |
+| [Community Dragon](https://www.communitydragon.org/documentation/assets)                           | Resource management and asset documentation reference.                               |
+| [Seraphine](https://github.com/Zzaphkiel/Seraphine)                                                | Provided integration approaches and insights into combining multiple tools.          |
+| [fix-lcu-window](https://github.com/LeagueTavern/fix-lcu-window)                                   | Resolved the issue with abnormal window size of the League of Legends client.        |
+| [Joi](https://github.com/watchingfun/Joi)                                                          | A League of Legends assistant. tool                                                  |
+| [vscode-league-respawn-timer](https://github.com/Coooookies/vscode-league-respawn-timer)           | An extension to display League of Legends player respawn time in Visual Studio Code. |
+| [LeaguePrank](https://github.com/LeagueTavern/LeaguePrank)                                         | Provided inspiration for playful and humorous features.                              |
+
+# 5. Disclaimer
 
 This software is a tool developed based on Riot's League Client Update (LCU) API. It does not use intrusive techniques and theoretically does not directly interfere with or modify game data. However, please be aware of potential compatibility issues or risks associated with game updates or anti-cheat systems.
 
