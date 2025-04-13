@@ -1,18 +1,24 @@
 <template>
   <div class="ongoing-game-title">
     <template v-if="ogs.queryStage.phase !== 'unavailable' && !isCsSpectateWait">
-      <LcuImage v-if="intelligence.mapIconUri" :src="intelligence.mapIconUri" class="map-icon" />
-      <span class="ongoing-title-map-name" v-if="intelligence.modeName">{{
-        intelligence.modeName
-      }}</span>
-      <span class="dot-separator" v-if="intelligence.modeName && intelligence.mapName">·</span>
-      <span class="ongoing-title-map-name" v-if="intelligence.mapName">{{
-        intelligence.mapName
-      }}</span>
-      <span class="dot-separator" v-if="intelligence.mapName && intelligence.teamName">·</span>
-      <span class="ongoing-title-side" v-if="intelligence.teamName">
-        {{ intelligence.teamName }}</span
+      <div
+        class="labels"
+        ref="labels"
+        :style="{ visibility: horizontalOverflow ? 'hidden' : 'visible' }"
       >
+        <LcuImage v-if="intelligence.mapIconUri" :src="intelligence.mapIconUri" class="map-icon" />
+        <span class="ongoing-title-map-name" v-if="intelligence.modeName">{{
+          intelligence.modeName
+        }}</span>
+        <span class="dot-separator" v-if="intelligence.modeName && intelligence.mapName">·</span>
+        <span class="ongoing-title-map-name" v-if="intelligence.mapName">{{
+          intelligence.mapName
+        }}</span>
+        <span class="dot-separator" v-if="intelligence.mapName && intelligence.teamName">·</span>
+        <span class="ongoing-title-side" v-if="intelligence.teamName">
+          {{ intelligence.teamName }}</span
+        >
+      </div>
       <div class="action-controls">
         <NSelect
           class="order-select"
@@ -47,6 +53,10 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import {
+  useOverflow,
+  useOverflowDetection
+} from '@renderer-shared/compositions/useOverflowDetection'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
@@ -54,7 +64,7 @@ import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { RefreshRound as RefreshIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NSelect, NTooltip } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, useTemplateRef, watchEffect } from 'vue'
 
 const { t } = useTranslation()
 
@@ -63,6 +73,9 @@ const TITLE_BAR_TOOLTIP_Z_INDEX = 75000
 const ogs = useOngoingGameStore()
 const og = useInstance(OngoingGameRenderer)
 const lcs = useLeagueClientStore()
+
+const labelsEl = useTemplateRef('labels')
+const { horizontal: horizontalOverflow } = useOverflow(labelsEl)
 
 const isCsSpectateWait = computed(() => {
   return (
@@ -184,6 +197,15 @@ const intelligence = computed(() => {
   gap: 8px;
 }
 
+.labels {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  height: 100%;
+  flex: 1;
+  overflow: hidden;
+}
+
 .order-select {
   width: 160px;
   -webkit-app-region: no-drag;
@@ -206,11 +228,13 @@ const intelligence = computed(() => {
 .ongoing-title-map-name {
   font-size: 14px;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .ongoing-title-side {
   font-size: 14px;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .action-controls {
@@ -219,7 +243,6 @@ const intelligence = computed(() => {
   height: 100%;
   align-items: center;
   box-sizing: border-box;
-  margin-left: auto;
 }
 
 [data-theme='dark'] {
