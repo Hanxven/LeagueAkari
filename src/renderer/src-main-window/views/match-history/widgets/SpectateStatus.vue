@@ -420,14 +420,6 @@ const premadeInfo = computed(() => {
     {} as Record<string, any>
   )
 })
-
-watch(
-  premadeInfo,
-  (c) => {
-    console.log(c)
-  },
-  { immediate: true }
-)
 </script>
 
 <style lang="less" scoped>

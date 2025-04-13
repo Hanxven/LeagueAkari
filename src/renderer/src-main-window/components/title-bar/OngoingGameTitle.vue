@@ -53,10 +53,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
-import {
-  useOverflow,
-  useOverflowDetection
-} from '@renderer-shared/compositions/useOverflowDetection'
+import { useOverflow } from '@renderer-shared/compositions/useOverflowDetection'
 import { useInstance } from '@renderer-shared/shards'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
@@ -64,7 +61,7 @@ import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { RefreshRound as RefreshIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NSelect, NTooltip } from 'naive-ui'
-import { computed, useTemplateRef, watchEffect } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 
 const { t } = useTranslation()
 
