@@ -1,29 +1,19 @@
-## 公告 (2025-01-28 16:46)
+## (2025-04-14 12:00)
 
-### 灵蛇启瑞，祥兆盈门
+### v1.3.5
 
-金蛇狂舞迎新岁，祥瑞相伴庆团圆。愿幸福围绕，万事如意，蛇年大吉。
+v1.3.5 released. More new features and bug fixes.
 
-### v1.3.4
-
-此版本为修复版本，修复在 v1.3.3 中：
-
-- 在未开启英雄配置时，仍在聊天框进行提示的问题
-
-- 在对局页面中，概率出现召唤师名称不显示的问题
-
-### v1.3.3
-
-v1.3.3 已于 2025-01-28 发布。若无法自动更新，请于 [Gitee](https://gitee.com/Hanxven/LeagueAkari/releases/download/v1.3.3/League%20Akari-1.3.3-win.7z) 或 [GitHub](https://github.com/Hanxven/LeagueAkari/releases/download/v1.3.3/League.Akari-1.3.3-win.7z) 手动下载新版本。
+If automatic update fails, please download the new version manually from Gitee [Gitee](https://gitee.com/Hanxven/LeagueAkari/releases/download/v1.3.5/League%20Akari-1.3.5-win.7z) or [GitHub](https://github.com/Hanxven/LeagueAkari/releases/download/v1.3.5/League.Akari-1.3.5-win.7z).
 
 ### League Akari
 
-QQ 群聊 (1)：[301157623](https://qm.qq.com/q/F1Xv85etlm) (密码：akari)
+QQ Group：[301157623](https://qm.qq.com/q/F1Xv85etlm) (Passcode：akari)
 
-QQ 群聊 (2)：[1021970497](https://qm.qq.com/q/SWfPsyeyKy) (密码：akari)
+Telegram: [@LeagueAkari](https://t.me/leagueakari)
 
-League Akari 是开源软件，遵循 GPL-3.0 协议。
+League Akari is open-source software licensed under the GPL-3.0.
 
-League Akari 为**免费软件**，无付费项目。若您从任何渠道购买了本软件，请立即退款。
+League Akari is completely free with no paid features. If you purchased this software through any channel, please request a refund immediately.
 
-支持此软件请 [Star](https://github.com/Hanxven/LeagueAkari) 本项目 ❤️。
+If you support this project, please give it a Star on GitHub ❤️.
