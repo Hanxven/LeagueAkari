@@ -38,7 +38,7 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         icon: icon,
         show: false,
         frame: false,
-        fullscreenable: true,
+        fullscreenable: false,
         maximizable: true,
         titleBarOverlay: {
           height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,

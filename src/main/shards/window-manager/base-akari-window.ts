@@ -283,6 +283,7 @@ export abstract class BaseAkariWindow<
       height: this._config.baseHeight,
       minWidth: this._config.minWidth,
       minHeight: this._config.minHeight,
+      fullscreenable: false,
       webPreferences: {
         preload: path.join(__dirname, '../preload/index.js'),
         sandbox: false,
