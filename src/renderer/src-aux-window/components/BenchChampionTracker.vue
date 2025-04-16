@@ -91,6 +91,7 @@ import { useInstance } from '@renderer-shared/shards'
 import { useAutoSelectStore } from '@renderer-shared/shards/auto-select/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { defaultReplacer } from '@shared/utils/text-replacer'
 import {
   CircleRegular as CircleRegularIcon,
   Dice as DiceIcon,
@@ -331,7 +332,7 @@ const sendToChat = async () => {
   messages.unshift(t('BenchChampionTracker.diceUsageTitle'))
 
   try {
-    await lc.api.chat.chatSend(chatRoomId, messages.join('\n'))
+    await lc.api.chat.chatSend(chatRoomId, defaultReplacer.replace(messages.join('\n')))
   } catch (error: any) {
     message.warning(() => error.message)
   }
