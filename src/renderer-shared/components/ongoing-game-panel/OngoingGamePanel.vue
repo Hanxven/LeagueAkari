@@ -4,24 +4,13 @@
       <div class="team-wrapper">
         <div class="team-stats-header">
           <span class="title">{{ formatTeamText(team).name }}</span>
-          <div class="analysis" v-if="ogs.playerStats?.teams[team] && players.length >= 1">
-            <span
-              :title="t('OngoingGame.avgTeamWinRate')"
-              class="win-rate"
-              :class="{
-                'gte-50': ogs.playerStats.teams[team].averageWinRate >= 0.5,
-                'lt-50': ogs.playerStats.teams[team].averageWinRate < 0.5
-              }"
-              >{{ (ogs.playerStats.teams[team].averageWinRate * 100).toFixed() }}%</span
-            >
-            <span :title="t('OngoingGame.avgTeamKda')">{{
-              ogs.playerStats?.teams[team].averageKda.toFixed(2)
-            }}</span>
-            <span title="Akari Score" style="color: #ff65ce" v-if="as.settings.isInKyokoMode"
-              >Avg: {{ ogs.playerStats.teams[team].averageAkariScore.toFixed(2) }} | Team:
-              {{ ogs.playerStats.teams[team].akariScoreBsi.toFixed(2) }}</span
-            >
-          </div>
+          <TeamTagsArea
+            v-if="players.length >= 1"
+            :side-id="team"
+            :analysis="mapAnalysisTeamData(team)"
+            :premade-info="mapPremadePlayers(team)"
+            :champion-selections="ogs.championSelections"
+          />
         </div>
         <div class="team-members">
           <PlayerInfoCard
@@ -40,7 +29,7 @@
             :champion-mastery="ogs.championMastery[player]?.data"
             :analysis="ogs.playerStats?.players[player]"
             :position="ogs.positionAssignments?.[player]"
-            :premade-team-id="premadeTeamInfo.players[player]"
+            :premade-team-id="premadeTeamInfo.premadeTeamIdMap[player]"
             :currentHighlightingPremadeTeamId="currentHighlightingPremadeTeamIdD"
             :kda-iqr="kdaOutliers?.[player]"
             :query-stage="ogs.queryStage"
@@ -91,10 +80,10 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { Game } from '@shared/types/league-client/match-history'
-import { findOutliersByIqr } from '@shared/utils/analysis'
+import { MatchHistoryGamesAnalysisAll, findOutliersByIqr } from '@shared/utils/analysis'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NScrollbar } from 'naive-ui'
+import { NScrollbar } from 'naive-ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import PlayerInfoCard from './PlayerInfoCard.vue'
@@ -105,6 +94,7 @@ import {
   TeamMeta,
   useIdleState
 } from './ongoing-game-utils'
+import TeamTagsArea from './widgets/TeamTagsArea.vue'
 
 const { showEasyToLaunch = true } = defineProps<{
   showEasyToLaunch?: boolean
@@ -155,8 +145,8 @@ const sortedTeams = computed(() => {
       }
 
       if (ogs.settings.orderPlayerBy === 'premade-team') {
-        const teamA = premadeTeamInfo.value.players[a]
-        const teamB = premadeTeamInfo.value.players[b]
+        const teamA = premadeTeamInfo.value.premadeTeamIdMap[a]
+        const teamB = premadeTeamInfo.value.premadeTeamIdMap[b]
 
         if (teamA && teamB) {
           if (teamA !== teamB) {
@@ -207,11 +197,11 @@ const sortedTeams = computed(() => {
 
 const premadeTeamInfo = computed(() => {
   const playerMap: {
-    groups: Record<string, string[]>
-    players: Record<string, string>
+    groups: Record<string, string[]> // premadeId, puuids
+    premadeTeamIdMap: Record<string, string> // puuid, premadeId (A, B, C, ...)
   } = {
     groups: {},
-    players: {}
+    premadeTeamIdMap: {}
   }
 
   let groupIndex = 0
@@ -223,14 +213,14 @@ const premadeTeamInfo = computed(() => {
     const groupId = PREMADE_TEAMS[groupIndex++]
     playerMap.groups[groupId] = groups
     groups.forEach((p) => {
-      playerMap.players[p] = groupId
+      playerMap.premadeTeamIdMap[p] = groupId
     })
   })
 
   // 组队信息以 teamParticipantGroups 为准, 推断性的信息则仅仅作补充
-  Object.entries(ogs.premadeTeams).forEach(([_, groups]) => {
+  Object.entries(ogs.inferredPremadeTeams).forEach(([_, groups]) => {
     groups.forEach((g) => {
-      if (g.some((p) => playerMap.players[p])) {
+      if (g.some((p) => playerMap.premadeTeamIdMap[p])) {
         return
       }
 
@@ -238,7 +228,7 @@ const premadeTeamInfo = computed(() => {
       playerMap.groups[groupId] = g
 
       g.forEach((p) => {
-        playerMap.players[p] = groupId
+        playerMap.premadeTeamIdMap[p] = groupId
       })
     })
   })
@@ -307,6 +297,53 @@ const kdaOutliers = computed(() => {
 
   return result
 })
+
+const mapAnalysisTeamData = (team: string) => {
+  if (!ogs.playerStats) {
+    return null
+  }
+
+  const members = ogs.teams[team]
+  const teamAnalysis = ogs.playerStats.teams[team]
+
+  if (members && teamAnalysis) {
+    return {
+      players: members.reduce(
+        (prev, puuid) => {
+          prev[puuid] = ogs.playerStats!.players[puuid]
+          return prev
+        },
+        {} as Record<string, MatchHistoryGamesAnalysisAll>
+      ),
+      team: ogs.playerStats.teams[team]
+    }
+  }
+
+  return null
+}
+
+const mapPremadePlayers = (team: string) => {
+  const t = ogs.teams[team]
+  if (!t) {
+    return null
+  }
+
+  const thisTeamGroups: Record<string, string[]> = {}
+  const thisTeamPremadeIds: Record<string, string> = {}
+  Object.entries(premadeTeamInfo.value.groups).forEach(([premadeId, puuids]) => {
+    if (puuids.every((p) => t.includes(p))) {
+      thisTeamGroups[premadeId] = puuids
+      puuids.forEach((p) => {
+        thisTeamPremadeIds[p] = premadeId
+      })
+    }
+  })
+
+  return {
+    groups: thisTeamGroups,
+    premadeTeamIdMap: thisTeamPremadeIds
+  }
+}
 
 const { width } = useElementSize(useTemplateRef('og-view-container'))
 const columnsNeed = computed(() => {

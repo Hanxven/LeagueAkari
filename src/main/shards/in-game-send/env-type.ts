@@ -121,7 +121,7 @@ interface PlayerStatsEnv {
   teams: Record<string, MatchHistoryGamesAnalysisTeamSide>
 }
 
-interface PremadeTeamsEnv {
+interface InferredPremadeTeamsEnv {
   [key: string]: string[][]
 }
 
@@ -258,7 +258,7 @@ export type TemplateEnv = {
   /**
    * Premade teams
    */
-  premadeTeams: PremadeTeamsEnv
+  premadeTeams: InferredPremadeTeamsEnv
 
   /**
    * Game timeline environment including game timeline data for a certain count of games.

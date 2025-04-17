@@ -139,7 +139,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
       'gameInfo',
       'positionAssignments',
       'playerStats',
-      'premadeTeams',
+      'inferredPremadeTeams',
       'queryStage',
       'teams',
       'matchHistoryTag',
@@ -1100,7 +1100,7 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     this._mobx.reaction(
       () => [Object.values(this.state.matchHistory), this.settings.premadeTeamThreshold] as const,
       ([_changedV, _threshold]) => {
-        this.state.setPremadeTeams(this._calcTeamUp() || {})
+        this.state.setInferredPremadeTeams(this._calcTeamUp() || {})
       },
       { delay: 200, equals: comparer.shallow }
     )

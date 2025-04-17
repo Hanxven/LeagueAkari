@@ -372,10 +372,10 @@ export class OngoingGameState {
   /**
    * 计算出来的预设队伍
    */
-  premadeTeams: Record<string, string[][]> = {}
+  inferredPremadeTeams: Record<string, string[][]> = {}
 
-  setPremadeTeams(value: Record<string, string[][]>) {
-    this.premadeTeams = value
+  setInferredPremadeTeams(value: Record<string, string[][]>) {
+    this.inferredPremadeTeams = value
   }
 
   /**
@@ -525,7 +525,7 @@ export class OngoingGameState {
 
   clear() {
     this.playerStats = null
-    this.premadeTeams = {}
+    this.inferredPremadeTeams = {}
     this.matchHistory = {}
     this.summoner = {}
     this.savedInfo = {}
@@ -564,7 +564,7 @@ export class OngoingGameState {
       gameInfo: computed.struct,
       positionAssignments: computed.struct,
       teams: computed.struct,
-      premadeTeams: observable.struct,
+      inferredPremadeTeams: observable.struct,
       playerStats: observable.struct,
       queryStage: computed.struct,
       teamParticipantGroups: computed.struct

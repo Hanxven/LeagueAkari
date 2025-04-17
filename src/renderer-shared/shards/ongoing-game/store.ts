@@ -161,7 +161,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
   // untyped
   const queryStage = shallowRef<QueryStage>({ phase: 'unavailable', gameInfo: null })
   const isInEog = shallowRef(false)
-  const premadeTeams = shallowRef<Record<string, string[][]>>({})
+  const inferredPremadeTeams = shallowRef<Record<string, string[][]>>({})
 
   const playerStats = shallowRef<{
     players: Record<string, MatchHistoryGamesAnalysisAll>
@@ -197,7 +197,7 @@ export const useOngoingGameStore = defineStore('shard:ongoing-game-renderer', ()
     teams,
     queryStage,
     isInEog,
-    premadeTeams,
+    inferredPremadeTeams,
     playerStats,
     matchHistoryTag,
 

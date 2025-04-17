@@ -1485,6 +1485,7 @@ SummonerSpellDisplay:
   cooldown: 冷却时间：{{time}} 秒
   levelRequirement: 等级需求：{{level}}
 
+# 这个命名空间下的很多条目对应了拆分后的组件
 PlayerInfoCard:
   empty: 无内容
   loadingMatchHistory: 加载中...
@@ -1499,7 +1500,7 @@ PlayerInfoCard:
   cherryWinRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%。其中，斗魂竞技场的 {{cherryCount}} 场对局中，该玩家的首位率是 {{top1Rate}}%
   winRatePopover: 在近期 {{countV}} 场对局中，该玩家的胜率为 {{winRate}}%，{{wins}} 胜 {{losses}} 负
   kdaPopover: 在近期 {{countV}} 场对局中，该玩家的平均 KDA 是 {{kda}} ({{kills}} / {{deaths}} / {{assists}})
-  premadePopover: 这些玩家在数场对局中都位于同一个阵营，推测他们可能是一支固定的小队。为了区分，将其命名为小队 {{team}}
+  premadePopover: 这些玩家是预组队玩家，标记为小队 {{team}}
   highWinRatePopover: 该玩家的胜率高到不可置信。在近期 {{countV}} 场的对局中，赢了 {{winCount}} 场
   teamDamageShare: 伤害 {{rate}}%
   teamDamageSharePopover: 在最近的 {{countV}} 场对局中，该玩家的平均队伍伤害占比为 {{rate}}%
@@ -1562,6 +1563,11 @@ PlayerInfoCard:
   private: 生涯隐藏
   winningStreak: '{{countV}} 连胜'
   losingStreak: '{{countV}} 连败'
+
+TeamTagsArea:
+  winRateTeam: 胜率队 {{team}}
+  loseRateTeam: 败率队 {{team}}
+  premade: '{{countV}} 黑'
 
 OngoingGame:
   disconnected: 未连接到客户端

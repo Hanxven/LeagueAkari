@@ -296,7 +296,7 @@
         </div>
       </NPopover>
     </div>
-    <TagsArea
+    <PlayerCardTagsArea
       :analysis="analysis"
       :puuid="puuid"
       :is-self="isSelf"
@@ -456,7 +456,7 @@ import {
   PREMADE_TEAM_COLORS,
   RANKED_MEDAL_MAP
 } from './ongoing-game-utils'
-import TagsArea from './widgets/TagsArea.vue'
+import PlayerCardTagsArea from './widgets/PlayerCardTagsArea.vue'
 
 const {
   puuid,

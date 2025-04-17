@@ -277,7 +277,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       positionAssignments: toJS(this._og.state.positionAssignments),
       playerStats: toJS(this._og.state.playerStats),
       gameTimeline: toJS(this._og.state.additionalGame),
-      premadeTeams: toJS(this._og.state.premadeTeams),
+      inferredPremadeTeams: toJS(this._og.state.inferredPremadeTeams),
       additionalGame: toJS(this._og.state.additionalGame)
     }
   }
