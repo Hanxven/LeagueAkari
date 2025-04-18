@@ -53,6 +53,7 @@
     "@types/node": "^22.14.1",
     "@types/node-7z": "^2.1.10",
     "@types/semver": "^7.7.0",
+    "@types/stream-json": "^1",
     "@types/ws": "^8.18.1",
     "@vicons/carbon": "^0.13.0",
     "@vicons/fa": "^0.13.0",

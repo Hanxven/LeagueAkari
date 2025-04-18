@@ -79,4 +79,12 @@ export class SavedPlayerRenderer {
   }> {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'queryAllSavedPlayers', dto)
   }
+
+  exportTaggedPlayersToJsonFile() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'exportTaggedPlayersToJsonFile')
+  }
+
+  importTaggedPlayersFromJsonFile() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'importTaggedPlayersFromJsonFile')
+  }
 }

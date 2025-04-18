@@ -1,10 +1,14 @@
-import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
+import { LEAGUE_AKARI_DB_CURRENT_VERSION } from '@shared/constants/common'
+import { dialog } from 'electron'
+import fs from 'node:fs'
 import { Equal, FindOptionsOrder, FindOptionsWhere, IsNull, Not } from 'typeorm'
 
-import { AkariIpcMain } from '../ipc'
+import { AkariIpcError, AkariIpcMain } from '../ipc'
 import { StorageMain } from '../storage'
 import { EncounteredGame } from '../storage/entities/EncounteredGame'
 import { SavedPlayer } from '../storage/entities/SavedPlayers'
+import { WindowManagerMain } from '../window-manager'
 import {
   EncounteredGameQueryDto,
   EncounteredGameSaveDto,
@@ -29,7 +33,8 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _ipc: AkariIpcMain,
-    private readonly _storage: StorageMain
+    private readonly _storage: StorageMain,
+    private readonly _shared: SharedGlobalShard
   ) {}
 
   async onInit() {
@@ -266,6 +271,85 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     }
   }
 
+  private async _writeTaggedPlayersToJsonFile(path: string) {
+    const all = await this._storage.dataSource.manager.find(SavedPlayer, {
+      where: {
+        tag: Not(IsNull())
+      }
+    })
+
+    const jsonContent = {
+      databaseVersion: LEAGUE_AKARI_DB_CURRENT_VERSION,
+      type: 'league-akari-tagged-players',
+      data: all.map((record) => ({
+        puuid: record.puuid,
+        selfPuuid: record.selfPuuid,
+        region: record.region,
+        rsoPlatformId: record.rsoPlatformId,
+        tag: record.tag
+      }))
+    }
+
+    await fs.promises.writeFile(path, JSON.stringify(jsonContent), 'utf-8')
+
+    return path
+  }
+
+  private async _readTaggedPlayersFromJsonFile(path: string) {
+    await fs.promises.access(path, fs.constants.F_OK)
+
+    const content = JSON.parse(await fs.promises.readFile(path, 'utf-8'))
+
+    if (content.type !== 'league-akari-tagged-players') {
+      throw new AkariIpcError(
+        `The file is not a valid tagged players file`,
+        'InvalidTaggedPlayersFile'
+      )
+    }
+
+    if (content.databaseVersion > LEAGUE_AKARI_DB_CURRENT_VERSION) {
+      throw new AkariIpcError(
+        `The file is from a newer version of the application, please update the application first`,
+        'InvalidDatabaseVersion'
+      )
+    }
+
+    if (
+      !Array.isArray(content.data) &&
+      content.data.every((v: any) => {
+        return (
+          typeof v === 'object' &&
+          typeof v.puuid === 'string' &&
+          typeof v.selfPuuid === 'string' &&
+          typeof v.region === 'string' &&
+          typeof v.rsoPlatformId === 'string' &&
+          typeof v.tag === 'string'
+        )
+      })
+    ) {
+      throw new AkariIpcError(
+        `The file is not a valid tagged players file`,
+        'InvalidTaggedPlayersData'
+      )
+    }
+
+    await this._storage.dataSource.manager.save(
+      SavedPlayer,
+      content.data.map((record: any) => {
+        return {
+          puuid: record.puuid,
+          selfPuuid: record.selfPuuid,
+          region: record.region,
+          rsoPlatformId: record.rsoPlatformId,
+          tag: record.tag,
+          updateAt: new Date()
+        }
+      })
+    )
+
+    return path
+  }
+
   private _handleIpcCall() {
     this._ipc.onCall(SavedPlayerMain.id, 'querySavedPlayer', (_, query: SavedPlayerQueryDto) => {
       return this.querySavedPlayer(query)
@@ -326,5 +410,45 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
         return this.getAllPlayerTags(query)
       }
     )
+
+    this._ipc.onCall(SavedPlayerMain.id, 'exportTaggedPlayersToJsonFile', async () => {
+      const w = this._shared.manager.getInstance('window-manager-main') as WindowManagerMain
+
+      if (!w || !w.mainWindow.window) {
+        throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
+      }
+
+      const result = await dialog.showSaveDialog(w.mainWindow.window, {
+        defaultPath: 'league-akari-tagged-players.json',
+        filters: [{ name: 'JSON', extensions: ['json'] }]
+      })
+
+      if (result.canceled) {
+        return
+      }
+
+      const filePath = result.filePath
+      return await this._writeTaggedPlayersToJsonFile(filePath)
+    })
+
+    this._ipc.onCall(SavedPlayerMain.id, 'importTaggedPlayersFromJsonFile', async () => {
+      const w = this._shared.manager.getInstance('window-manager-main') as WindowManagerMain
+
+      if (!w || !w.mainWindow.window) {
+        throw new AkariIpcError('WindowManagerMain not found', 'WindowManagerMainNotFound')
+      }
+
+      const result = await dialog.showOpenDialog(w.mainWindow.window, {
+        defaultPath: 'league-akari-tagged-players.json',
+        filters: [{ name: 'JSON', extensions: ['json'] }]
+      })
+
+      if (result.canceled) {
+        return
+      }
+
+      const filePath = result.filePaths[0]
+      return await this._readTaggedPlayersFromJsonFile(filePath)
+    })
   }
 }

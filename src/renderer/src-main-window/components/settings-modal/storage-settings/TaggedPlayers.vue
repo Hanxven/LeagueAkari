@@ -34,6 +34,12 @@
     </NModal>
     <div class="flex-content">
       <div class="operations">
+        <NButton size="small" type="primary" secondary @click="handleExportTaggedPlayers">
+          {{ t('TaggedPlayers.exportButton') }}
+        </NButton>
+        <NButton size="small" secondary @click="handleImportTaggedPlayers">
+          {{ t('TaggedPlayers.importButton') }}
+        </NButton>
         <NButton
           type="primary"
           size="small"
@@ -495,6 +501,43 @@ watch(
     immediate: true
   }
 )
+
+const handleExportTaggedPlayers = async () => {
+  try {
+    const exportPath = await sp.exportTaggedPlayersToJsonFile()
+
+    if (exportPath) {
+      message.success(() => t('TaggedPlayers.exported', { path: exportPath }))
+    }
+  } catch (error: any) {
+    message.error(() => t('TaggedPlayers.errorExport', { reason: error.message }))
+  }
+}
+
+const handleImportTaggedPlayers = async () => {
+  try {
+    const importPath = await sp.importTaggedPlayersFromJsonFile()
+    await loadPage(pagination.page || 1, pagination.pageSize || 20)
+    message.success(() => t('TaggedPlayers.imported', { path: importPath }))
+  } catch (error: any) {
+    if (error.code) {
+      switch (error.code) {
+        case 'InvalidTaggedPlayersFile':
+        case 'InvalidTaggedPlayersData':
+          message.error(() => t('TaggedPlayers.errorCode.InvalidTaggedPlayersFile'))
+          break
+        case 'InvalidDatabaseVersion':
+          message.error(() => t('TaggedPlayers.errorCode.InvalidDatabaseVersion'))
+          break
+        default:
+          message.error(() => t('TaggedPlayers.errorCode.importDefault', { reason: error.message }))
+          break
+      }
+    } else {
+      message.error(() => t('TaggedPlayers.errorCode.importDefault', { reason: error.message }))
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>

@@ -498,6 +498,8 @@ TaggedPlayers:
   cancelButton: Cancel
   editButton: Edit
   deleteButton: Delete
+  importButton: Import
+  exportButton: Export
 
   streamerModeWarning: Some sensitive information will be exposed
   showButton: Show
@@ -505,6 +507,15 @@ TaggedPlayers:
   deletePopconfirmContent: Confirm deletion? This operation cannot be undone
   updated: Updated
   updateFailed: Update failed {{reason}}
+
+  errorCode:
+    InvalidTaggedPlayersFile: Invalid file
+    InvalidDatabaseVersion: The target version of the file is not supported
+    importDefault: 'Failed to import tagged players: {{reason}}'
+
+  exported: 'Exported tagged players: {{path}}'
+  imported : 'Imported tagged players: {{path}}'
+  errorExport: 'Failed to export tagged players: {{reason}}'
 
 AboutPane:
   title: About

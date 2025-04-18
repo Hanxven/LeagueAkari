@@ -501,6 +501,8 @@ TaggedPlayers:
   cancelButton: 取消
   editButton: 编辑
   deleteButton: 删除
+  importButton: 导入
+  exportButton: 导出
 
   streamerModeWarning: 当前位于直播模式，将暴露敏感信息
   showButton: 显示
@@ -508,6 +510,15 @@ TaggedPlayers:
   deletePopconfirmContent: 确认删除？此操作无法恢复
   updated: 已更新
   updateFailed: 更新失败 {{reason}}
+
+  errorCode:
+    InvalidTaggedPlayersFile: 无效的文件
+    InvalidDatabaseVersion: 目标版本的文件不受支持
+    importDefault: 无法导入标记的玩家：{{reason}}
+
+  exported: 已导出被标记的玩家：{{path}}
+  imported: 已导入被标记的玩家：{{path}}
+  errorExport: 导出被标记玩家失败：{{reason}}
 
 AboutPane:
   title: 关于

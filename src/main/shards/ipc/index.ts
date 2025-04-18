@@ -169,15 +169,6 @@ export class AkariIpcMain implements IAkariShardInitDispose {
         isAxiosError: true,
         error: errorWithResponse
       }
-    } else if (error instanceof Error) {
-      return {
-        success: false,
-        error: {
-          message: error.message,
-          stack: error.stack,
-          name: error.name
-        }
-      }
     } else if (error instanceof AkariIpcError) {
       return {
         success: false,
@@ -186,6 +177,15 @@ export class AkariIpcMain implements IAkariShardInitDispose {
           stack: error.stack,
           name: error.name,
           code: error.code
+        }
+      }
+    } else if (error instanceof Error) {
+      return {
+        success: false,
+        error: {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
         }
       }
     }
