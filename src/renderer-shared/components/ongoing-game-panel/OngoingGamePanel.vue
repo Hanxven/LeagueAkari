@@ -9,6 +9,7 @@
             :side-id="team"
             :analysis="mapAnalysisTeamData(team)"
             :premade-info="mapPremadePlayers(team)"
+            :summoners="mapSummoners(team)"
             :champion-selections="ogs.championSelections"
           />
         </div>
@@ -76,10 +77,10 @@
 <script setup lang="ts">
 import EasyToLaunch from '@renderer-shared/components/EasyToLaunch.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { Game } from '@shared/types/league-client/match-history'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import { MatchHistoryGamesAnalysisAll, findOutliersByIqr } from '@shared/utils/analysis'
 import { createReusableTemplate, refDebounced, useElementSize } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
@@ -107,7 +108,6 @@ const emits = defineEmits<{
 }>()
 
 const lcs = useLeagueClientStore()
-const as = useAppCommonStore()
 
 const { t } = useTranslation()
 
@@ -300,7 +300,7 @@ const kdaOutliers = computed(() => {
 
 const mapAnalysisTeamData = (team: string) => {
   if (!ogs.playerStats) {
-    return null
+    return undefined
   }
 
   const members = ogs.teams[team]
@@ -319,13 +319,13 @@ const mapAnalysisTeamData = (team: string) => {
     }
   }
 
-  return null
+  return undefined
 }
 
 const mapPremadePlayers = (team: string) => {
   const t = ogs.teams[team]
   if (!t) {
-    return null
+    return undefined
   }
 
   const thisTeamGroups: Record<string, string[]> = {}
@@ -343,6 +343,22 @@ const mapPremadePlayers = (team: string) => {
     groups: thisTeamGroups,
     premadeTeamIdMap: thisTeamPremadeIds
   }
+}
+
+const mapSummoners = (team: string) => {
+  const t = ogs.teams[team]
+  if (!t) {
+    return undefined
+  }
+
+  const thisTeamSummoners: Record<string, SummonerInfo> = {}
+  Object.entries(ogs.summoner).forEach(([puuid, summoner]) => {
+    if (t.includes(puuid)) {
+      thisTeamSummoners[puuid] = summoner.data
+    }
+  })
+
+  return thisTeamSummoners
 }
 
 const { width } = useElementSize(useTemplateRef('og-view-container'))

@@ -16,7 +16,7 @@
       </div>
     </template>
     <div class="divider" v-if="hasTags"></div>
-    <NPopover v-for="p of premadeCountSorted">
+    <NPopover v-for="p of teamPremadeTeams">
       <template #trigger>
         <div
           class="tag"
@@ -34,64 +34,70 @@
           }}
         </div>
       </template>
-      <div class="premade-team-champions">
-        <ChampionIcon
-          class="premade-team-champion"
-          round
-          ring
-          v-for="m of p.players"
-          :champion-id="championSelections[m] || -1"
-        />
-      </div>
+      <TinyPlayerChampionList :list="p.players" />
     </NPopover>
-    <div class="tag win-rate-team" v-for="te of winRateTeams.winRateTeams">
-      {{
-        t('TeamTagsArea.winRateTeam', {
-          team: `(${te.players.length})`
-        })
-      }}
-    </div>
-    <div class="tag lose-rate-team" v-for="te of winRateTeams.loseRateTeams">
-      {{
-        t('TeamTagsArea.loseRateTeam', {
-          team: `(${te.players.length})`
-        })
-      }}
-    </div>
+    <NPopover v-for="te of winRateTeams.winRateTeams">
+      <template #trigger>
+        <div class="tag win-rate-team">
+          {{
+            t('TeamTagsArea.winRateTeam', {
+              team: `(${te.players.length})`
+            })
+          }}
+        </div>
+      </template>
+      <TinyPlayerChampionList :list="te.players" />
+    </NPopover>
+    <NPopover v-for="te of winRateTeams.loseRateTeams">
+      <template #trigger>
+        <div class="tag lose-rate-team">
+          {{
+            t('TeamTagsArea.loseRateTeam', {
+              team: `(${te.players.length})`
+            })
+          }}
+        </div>
+      </template>
+      <TinyPlayerChampionList :list="te.players" />
+    </NPopover>
   </div>
 </template>
 
 <script setup lang="ts">
-import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
+import { SummonerInfo } from '@shared/types/league-client/summoner'
 import {
   MatchHistoryGamesAnalysisAll,
   MatchHistoryGamesAnalysisTeamSide
 } from '@shared/utils/analysis'
 import { useTranslation } from 'i18next-vue'
 import { NPopover } from 'naive-ui'
-import { computed, watchEffect } from 'vue'
+import { computed } from 'vue'
 
 import { PREMADE_TEAMS, PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
+import TinyPlayerChampionList from './TinyPlayerChampionList.vue'
 
-const WIN_RATE_TEAM_MIN_AVG_MATCHES = 12
+const WIN_RATE_TEAM_MIN_MATCHES = 10
 const WIN_RATE_TEAM_MIN_SIZE = 3
-const WIN_RATE_TEAM_MIN_WIN_RATE = 85
-const LOSE_RATE_TEAM_MAX_WIN_RATE = 25
+const LOST_RATE_TEAM_MIN_SIZE = 2
+const WIN_RATE_TEAM_MIN_WIN_RATE = 0.85
+const LOSE_RATE_TEAM_MAX_WIN_RATE = 0.25
 
 const {
   analysis,
   premadeInfo,
-  championSelections = {}
+  championSelections = {},
+  summoners = {}
 } = defineProps<{
   sideId: string
-  analysis: {
+  analysis?: {
     players: Record<string, MatchHistoryGamesAnalysisAll>
     team: MatchHistoryGamesAnalysisTeamSide
-  } | null
+  }
   premadeInfo?: {
     groups: Record<string, string[]>
     premadeTeamIdMap: Record<string, string>
-  } | null
+  }
+  summoners?: Record<string, SummonerInfo>
   championSelections?: Record<string, number>
 }>()
 
@@ -115,7 +121,7 @@ const winRateTeams = computed(() => {
   const result: WinRateTeamInfo[] = []
 
   Object.values(premadeInfo.groups).forEach((players) => {
-    if (players.length < WIN_RATE_TEAM_MIN_SIZE) {
+    if (players.length < WIN_RATE_TEAM_MIN_SIZE && players.length > LOST_RATE_TEAM_MIN_SIZE) {
       return
     }
 
@@ -136,14 +142,14 @@ const winRateTeams = computed(() => {
       }
 
       if (
-        a.summary.count < WIN_RATE_TEAM_MIN_AVG_MATCHES ||
+        a.summary.count < WIN_RATE_TEAM_MIN_MATCHES ||
         a.summary.winRate < WIN_RATE_TEAM_MIN_WIN_RATE
       ) {
         winRateQualified = false
       }
 
       if (
-        a.summary.count < WIN_RATE_TEAM_MIN_AVG_MATCHES ||
+        a.summary.count < LOST_RATE_TEAM_MIN_SIZE ||
         a.summary.winRate > LOSE_RATE_TEAM_MAX_WIN_RATE
       ) {
         loseRateQualified = false
@@ -167,13 +173,29 @@ const winRateTeams = computed(() => {
     }
   })
 
+  const detailed = result.map((t) => {
+    const players = t.players.map((p) => {
+      return {
+        puuid: p,
+        championId: championSelections[p] || -1,
+        gameName: summoners[p]?.gameName,
+        tagLine: summoners[p]?.tagLine
+      }
+    })
+
+    return {
+      ...t,
+      players
+    }
+  })
+
   return {
-    winRateTeams: result.filter((t) => t.type === 'win-rate-team'),
-    loseRateTeams: result.filter((t) => t.type === 'lose-rate-team')
+    winRateTeams: detailed.filter((t) => t.type === 'win-rate-team'),
+    loseRateTeams: detailed.filter((t) => t.type === 'lose-rate-team')
   }
 })
 
-const premadeCountSorted = computed(() => {
+const teamPremadeTeams = computed(() => {
   if (!premadeInfo) {
     return []
   }
@@ -182,7 +204,14 @@ const premadeCountSorted = computed(() => {
     .map(([premadeId, players]) => {
       return {
         premadeId,
-        players
+        players: players.map((p) => {
+          return {
+            puuid: p,
+            championId: championSelections[p] || -1,
+            gameName: summoners[p]?.gameName,
+            tagLine: summoners[p]?.tagLine
+          }
+        })
       }
     })
     .toSorted((a, b) => {
@@ -190,13 +219,9 @@ const premadeCountSorted = computed(() => {
     })
 })
 
-watchEffect(() => {
-  // console.log(premade)
-})
-
 const hasTags = computed(() => {
   return (
-    premadeCountSorted.value.length > 0 ||
+    teamPremadeTeams.value.length > 0 ||
     winRateTeams.value.winRateTeams.length > 0 ||
     winRateTeams.value.loseRateTeams.length > 0
   )
@@ -243,16 +268,6 @@ const hasTags = computed(() => {
   box-sizing: border-box;
   margin: 0 8px;
   align-self: center;
-}
-
-.premade-team-champions {
-  display: flex;
-  gap: 2px;
-
-  .premade-team-champion {
-    width: 32px;
-    height: 32px;
-  }
 }
 
 [data-theme='dark'] {
