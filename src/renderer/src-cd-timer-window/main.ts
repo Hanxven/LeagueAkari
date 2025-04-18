@@ -9,7 +9,6 @@ import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import I18nextVue from 'i18next-vue'
 import { createPinia } from 'pinia'
-import 'vfonts/Lato.css'
 import { createApp } from 'vue'
 
 import NaiveUIProviderApp from './NaiveUIProviderApp.vue'
