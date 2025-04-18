@@ -35,10 +35,10 @@ export class ClientInstallationMain implements IAkariShardInitDispose {
     'obs.exe',
     'xsplit.core.exe',
     'livehime.exe',
-    'pandatool.exe',
     'yymixer.exe',
     'douyutool.exe',
-    'huomaotool.exe'
+    'huomaotool.exe',
+    'AliceInCradle.exe' // for test
   ]
 
   static readonly LIVE_STREAMING_CLIENT_POLL_INTERVAL = 20 * 60 * 1000

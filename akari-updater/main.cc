@@ -1,6 +1,5 @@
 #include <windows.h>
 #include <tlhelp32.h>
-#include <shlwapi.h>
 #include <iostream>
 #include <string>
 #include <filesystem>
