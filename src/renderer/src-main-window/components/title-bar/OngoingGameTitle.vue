@@ -1,11 +1,7 @@
 <template>
   <div class="ongoing-game-title">
     <template v-if="ogs.queryStage.phase !== 'unavailable' && !isCsSpectateWait">
-      <div
-        class="labels"
-        ref="labels"
-        :style="{ visibility: horizontalOverflow ? 'hidden' : 'visible' }"
-      >
+      <div class="labels" ref="labels" :style="{ opacity: horizontalOverflow ? 0 : 1 }">
         <LcuImage v-if="intelligence.mapIconUri" :src="intelligence.mapIconUri" class="map-icon" />
         <span class="ongoing-title-map-name" v-if="intelligence.modeName">{{
           intelligence.modeName
@@ -201,6 +197,7 @@ const intelligence = computed(() => {
   height: 100%;
   flex: 1;
   overflow: hidden;
+  transition: opacity 0.2s;
 }
 
 .order-select {
