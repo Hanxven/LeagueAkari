@@ -1572,6 +1572,8 @@ TeamTagsArea:
   winRateTeam: Win-Rate Team {{team}}
   loseRateTeam: Lose-Rate Team {{team}}
   premade: 'Premade {{countV}}-stack'
+  winRate: 'Win Rate {{rate}}%'
+  kda: 'KDA {{kda}}'
 
 OngoingGame:
   disconnected: Not connected to the client

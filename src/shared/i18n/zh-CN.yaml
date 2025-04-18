@@ -1579,6 +1579,8 @@ TeamTagsArea:
   winRateTeam: 胜率队 {{team}}
   loseRateTeam: 败率队 {{team}}
   premade: '{{countV}} 黑'
+  winRate: 胜率 {{rate}}%
+  kda: KDA {{kda}}
 
 OngoingGame:
   disconnected: 未连接到客户端

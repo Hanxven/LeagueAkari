@@ -1,19 +1,37 @@
 <template>
   <div class="team-tags">
     <template v-if="analysis">
-      <div
-        class="normal-text win-rate"
-        :class="{
-          'gte-50': analysis.team.averageWinRate >= 0.5,
-          'lt-50': analysis.team.averageWinRate < 0.5
-        }"
-      >
-        {{ (analysis.team.averageWinRate * 100).toFixed() }}%
-      </div>
+      <NPopover>
+        <template #trigger>
+          <div
+            class="normal-text win-rate"
+            :class="{
+              'gte-50': analysis.team.averageWinRate >= 0.5,
+              'lt-50': analysis.team.averageWinRate < 0.5
+            }"
+          >
+            {{ (analysis.team.averageWinRate * 100).toFixed() }}%
+          </div>
+        </template>
+        {{
+          t('TeamTagsArea.winRate', {
+            rate: (analysis.team.averageWinRate * 100).toFixed(4)
+          })
+        }}
+      </NPopover>
       <div class="divider"></div>
-      <div class="normal-text">
-        {{ analysis.team.averageKda.toFixed(2) }}
-      </div>
+      <NPopover>
+        <template #trigger>
+          <div class="normal-text">
+            {{ analysis.team.averageKda.toFixed(2) }}
+          </div>
+        </template>
+        {{
+          t('TeamTagsArea.kda', {
+            kda: analysis.team.averageKda.toFixed(4)
+          })
+        }}
+      </NPopover>
     </template>
     <div class="divider" v-if="hasTags"></div>
     <NPopover v-for="p of teamPremadeTeams">
