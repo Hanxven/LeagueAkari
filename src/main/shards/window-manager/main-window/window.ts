@@ -16,6 +16,29 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
   static readonly MIN_HEIGHT = 600
   static readonly PRESET_TITLE_BAR_HEIGHT = 36 // 应该和渲染进程中定义的高度一致
 
+  static readonly TITLE_BAR_OVERLAY_PRESET = {
+    dark: {
+      height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
+      color: '#00000000',
+      symbolColor: '#ffffff'
+    },
+    light: {
+      height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
+      color: '#00000000',
+      symbolColor: '#000000'
+    },
+    darkBlur: {
+      height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
+      color: '#00000000',
+      symbolColor: '#c2c2c2'
+    },
+    lightBlur: {
+      height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
+      color: '#00000000',
+      symbolColor: '#6b6b6b'
+    }
+  } as const
+
   private _nextCloseAction: string | null = null
 
   constructor(_context: WindowManagerMainContext) {
@@ -73,19 +96,25 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
     )
 
     this._mobx.reaction(
-      () => [this._app.state.shouldUseDarkColors, this.state.ready],
-      ([should, ready]) => {
+      () => [this._app.state.shouldUseDarkColors, this.state.focus, this.state.ready],
+      ([should, focus, ready]) => {
         if (!ready) {
           return
         }
 
-        this._log.info(`标题栏 overlay 样式: ${should ? '深色' : '浅色'}`)
-
-        this._window?.setTitleBarOverlay({
-          height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
-          color: '#00000000',
-          symbolColor: should ? '#ffffffff' : '#000000ff'
-        })
+        if (should) {
+          if (focus === 'blurred') {
+            this._window?.setTitleBarOverlay(AkariMainWindow.TITLE_BAR_OVERLAY_PRESET.darkBlur)
+          } else {
+            this._window?.setTitleBarOverlay(AkariMainWindow.TITLE_BAR_OVERLAY_PRESET.dark)
+          }
+        } else {
+          if (focus === 'blurred') {
+            this._window?.setTitleBarOverlay(AkariMainWindow.TITLE_BAR_OVERLAY_PRESET.lightBlur)
+          } else {
+            this._window?.setTitleBarOverlay(AkariMainWindow.TITLE_BAR_OVERLAY_PRESET.light)
+          }
+        }
       },
       { fireImmediately: true }
     )
