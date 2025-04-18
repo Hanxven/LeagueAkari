@@ -1,6 +1,7 @@
 import { makeAutoObservable, observable } from 'mobx'
 
-interface NewUpdates {
+interface CurrentRelease {
+  isNew: boolean
   source: 'gitee' | 'github'
   currentVersion: string
   releaseVersion: string
@@ -91,12 +92,12 @@ export class SelfUpdateSettings {
 export class SelfUpdateState {
   isCheckingUpdates: boolean = false
   lastCheckAt: Date | null = null
-  newUpdatesV = observable.box<NewUpdates | null>(null, {
+  currentReleaseV = observable.box<CurrentRelease | null>(null, {
     equals: (a, b) => this._versionCompare(a, b)
   })
 
-  get newUpdates() {
-    return this.newUpdatesV.get()
+  get currentRelease() {
+    return this.currentReleaseV.get()
   }
 
   updateProgressInfo: UpdateProgressInfo | null = null
@@ -105,7 +106,7 @@ export class SelfUpdateState {
 
   lastUpdateResult: LastUpdateResult | null = null
 
-  private _versionCompare(a: NewUpdates, b: NewUpdates) {
+  private _versionCompare(a: CurrentRelease, b: CurrentRelease) {
     if (a === null && b === null) {
       return true
     }
@@ -129,8 +130,8 @@ export class SelfUpdateState {
     this.isCheckingUpdates = isCheckingUpdates
   }
 
-  setNewUpdates(updates: NewUpdates | null) {
-    this.newUpdatesV.set(updates)
+  setCurrentRelease(updates: CurrentRelease | null) {
+    this.currentReleaseV.set(updates)
   }
 
   setCurrentAnnouncement(announcement: CurrentAnnouncement | null) {

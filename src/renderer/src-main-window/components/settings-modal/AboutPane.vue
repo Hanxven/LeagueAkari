@@ -62,11 +62,17 @@
             >
             <NButton
               size="small"
-              v-if="sus.newUpdates"
+              v-if="sus.currentRelease"
               secondary
               @click="() => handleShowUpdateModal()"
-              >{{ t('AboutPane.newUpdates') }}</NButton
             >
+              <template v-if="sus.currentRelease.isNew">
+                {{ t('AboutPane.newRelease') }}
+              </template>
+              <template v-else>
+                {{ t('AboutPane.currentRelease') }}
+              </template>
+            </NButton>
             <span v-if="sus.lastCheckAt" style="font-size: 12px"
               >{{ t('AboutPane.lastCheckAt') }}
               {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span

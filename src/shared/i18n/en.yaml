@@ -4,6 +4,7 @@ SettingModal:
 AnnouncementModal:
   title: Announcement
   close: Close
+  read: I have read
 
 DeclarationModal:
   title: Declaration
@@ -525,7 +526,8 @@ AboutPane:
 
   checkFrom: Check updates from download source ({{source}})
   checkUpdates: Check Updates
-  newUpdates: New Version
+  currentRelease: Current Version
+  newRelease: New Version
   lastCheckAt: Last Check at
 
   updateProgress:

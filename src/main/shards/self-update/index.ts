@@ -93,7 +93,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
     this._mobx.propSync(SelfUpdateMain.id, 'state', this.state, [
       'isCheckingUpdates',
-      'newUpdates',
+      'currentRelease',
       'updateProgressInfo',
       'lastCheckAt',
       'currentAnnouncement',
@@ -127,10 +127,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     )
 
     this._mobx.reaction(
-      () => [this.settings.autoDownloadUpdates, this.state.newUpdates] as const,
-      ([yes, newUpdates]) => {
-        if (yes && newUpdates) {
-          this._startUpdateProcess(newUpdates.downloadUrl, newUpdates.filename)
+      () => [this.settings.autoDownloadUpdates, this.state.currentRelease] as const,
+      ([yes, currentRelease]) => {
+        if (yes && currentRelease && currentRelease.isNew) {
+          this._startUpdateProcess(currentRelease.downloadUrl, currentRelease.filename)
         }
       },
       { equals: comparer.shallow }
@@ -172,38 +172,32 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     const currentVersion = app.getVersion()
     const versionString = data.tag_name
 
-    if (debug || lt(currentVersion, versionString)) {
-      let archiveFile = data.assets.find((a) => {
-        return a.content_type === 'application/x-compressed'
-      })
+    const isNewVersion = lt(currentVersion, versionString) || debug
 
-      if (archiveFile) {
-        return { ...data, archiveFile }
-      }
+    let archiveFile = data.assets.find((a) => {
+      return a.content_type === 'application/x-compressed'
+    })
 
-      archiveFile = data.assets.find((a) => {
-        // 你要知道 Gitee 现在没有 content_type 字段
-        return (
-          a.browser_download_url.endsWith('win.7z') || a.browser_download_url.endsWith('win.zip')
-        )
-      })
-
-      if (archiveFile) {
-        this._log.info(
-          `有可下载的新版本, 当前版本 ${app.getVersion()}, 远程版本 ${versionString}, 从 ${gitLikeUrl} 检查`
-        )
-        return { ...data, archiveFile }
-      }
-
-      this._log.warn(
-        `版本不附带可下载文件, 当前版本 ${app.getVersion()}, 远程版本 ${versionString}, 从 ${gitLikeUrl} 检查`
-      )
-      return null
+    if (archiveFile) {
+      return { ...data, archiveFile, isNew: isNewVersion }
     }
 
-    this._log.info(
-      `没有检查到新版本, 当前版本 ${app.getVersion()}, 远程版本 ${versionString}, 从 ${gitLikeUrl} 检查`
+    archiveFile = data.assets.find((a) => {
+      // 你要知道 Gitee 现在没有 content_type 字段
+      return a.browser_download_url.endsWith('win.7z') || a.browser_download_url.endsWith('win.zip')
+    })
+
+    if (archiveFile) {
+      this._log.info(
+        `当前版本 ${app.getVersion()}, 远程版本 ${versionString}, 从 ${gitLikeUrl} 检查`
+      )
+      return { ...data, archiveFile, isNew: isNewVersion }
+    }
+
+    this._log.warn(
+      `版本不附带可下载文件, 当前版本 ${app.getVersion()}, 远程版本 ${versionString}, 从 ${gitLikeUrl} 检查`
     )
+
     return null
   }
 
@@ -232,7 +226,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         }
       }
 
-      this.state.setNewUpdates({
+      this.state.setCurrentRelease({
+        isNew: release.isNew,
         source: this.settings.downloadSource,
         currentVersion: app.getVersion(),
         releaseNotes: release.body,
@@ -248,6 +243,12 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           this._updateReleaseUpdatesInfo()
         }, SelfUpdateMain.UPDATES_CHECK_INTERVAL)
       }
+
+      if (release.isNew) {
+        return { result: 'new-updates' }
+      } else {
+        return { result: 'no-updates' }
+      }
     } catch (error: any) {
       this._log.warn(`尝试检查时更新失败`, error)
       return {
@@ -256,10 +257,6 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       }
     } finally {
       this.state.setCheckingUpdates(false)
-    }
-
-    return {
-      result: 'new-updates'
     }
   }
 
@@ -353,7 +350,6 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
           if (error.name === 'Canceled') {
             this.state.setUpdateProgressInfo(null)
             this._ipc.sendEvent(SelfUpdateMain.id, 'cancel-download-update')
-            this._log.info(`取消下载更新包 ${downloadPath}`)
           } else {
             this.state.setUpdateProgressInfo({
               phase: 'download-failed',
@@ -544,7 +540,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
       ofs.writeFileSync(
         path.join(app.getPath('userData'), SelfUpdateMain.NEW_VERSION_FLAG),
-        JSON.stringify(this.state.newUpdates?.releaseVersion || '')
+        JSON.stringify(this.state.currentRelease?.releaseVersion || '')
       )
     }
 
@@ -618,13 +614,14 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     if (this._currentUpdateTaskCanceler) {
       try {
         this._currentUpdateTaskCanceler()
-        this.state.setUpdateProgressInfo(null)
-        this.state.setNewUpdates(null)
       } catch (error) {
         this._ipc.sendEvent(SelfUpdateMain.id, 'error-cancel-update', formatError(error))
         this._log.warn(`尝试取消更新任务时发生错误`, error)
       }
     }
+
+    this.state.setUpdateProgressInfo(null)
+    this.state.setCurrentRelease(null)
   }
 
   private _handleIpcCall() {
@@ -637,10 +634,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(SelfUpdateMain.id, 'startUpdate', async () => {
-      if (this.state.newUpdates) {
+      if (this.state.currentRelease) {
         await this._startUpdateProcess(
-          this.state.newUpdates.downloadUrl,
-          this.state.newUpdates.filename
+          this.state.currentRelease.downloadUrl,
+          this.state.currentRelease.filename
         )
       }
     })

@@ -25,7 +25,8 @@ interface CurrentAnnouncement {
 }
 
 // copied from main shard
-interface NewUpdates {
+interface CurrentRelease {
+  isNew: boolean
   source: 'gitee' | 'github'
   currentVersion: string
   releaseVersion: string
@@ -53,7 +54,7 @@ export const useSelfUpdateStore = defineStore('shard:self-update-renderer', () =
   const lastCheckAt = ref<Date | null>(null)
   const updateProgressInfo = shallowRef<UpdateProgressInfo | null>(null)
   const currentAnnouncement = shallowRef<CurrentAnnouncement | null>(null)
-  const newUpdates = shallowRef<NewUpdates | null>(null)
+  const currentRelease = shallowRef<CurrentRelease | null>(null)
   const lastUpdateResult = shallowRef<LastUpdateResult | null>(null)
 
   return {
@@ -63,7 +64,7 @@ export const useSelfUpdateStore = defineStore('shard:self-update-renderer', () =
     lastCheckAt,
     updateProgressInfo,
     currentAnnouncement,
-    newUpdates,
+    currentRelease,
     lastUpdateResult
   }
 })

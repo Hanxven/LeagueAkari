@@ -6,7 +6,7 @@
     }"
   >
     <SettingsModal v-model:show="isShowingSettingModal" v-model:tab-name="settingModelTab" />
-    <UpdateModal v-model:show="isShowingNewUpdateModal" :showing-new-update="isShowingNewUpdate" />
+    <UpdateModal v-model:show="isShowingNewUpdateModal" />
     <AnnouncementModal v-model:show="isShowingAnnouncementModal" />
     <DeclarationModal
       v-model:show="isShowingFreeSoftwareDeclaration"
@@ -51,7 +51,6 @@ import DeclarationModal from './components/DeclarationModal.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
-import { useMicaAvailability } from './compositions/useMicaAvailability'
 import MainWindowNotifications from './shards/main-window-notifications/MainWindowNotifications.vue'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
 import { useMainWindowUiStore } from './shards/main-window-ui/store'
@@ -79,11 +78,6 @@ const appProvide = {
   },
   openUpdateModal: () => {
     isShowingNewUpdateModal.value = true
-    if (sus.newUpdates) {
-      isShowingNewUpdate.value = true
-    } else {
-      isShowingNewUpdate.value = false
-    }
   },
   openAnnouncementModal: () => {
     isShowingAnnouncementModal.value = true
@@ -123,7 +117,7 @@ su.onStartUpdate(() => {
 })
 
 watchEffect(() => {
-  if (sus.newUpdates) {
+  if (sus.currentRelease && sus.currentRelease.isNew) {
     isShowingNewUpdateModal.value = true
     isShowingNewUpdate.value = true
   } else {

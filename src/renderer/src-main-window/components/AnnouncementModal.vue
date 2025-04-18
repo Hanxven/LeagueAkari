@@ -20,11 +20,11 @@
     </template>
     <div>
       <NScrollbar
-        style="max-height: 50vh"
+        style="max-height: 60vh"
         :class="$style['markdown-text-scroll-wrapper']"
         trigger="none"
       >
-        <div class="markdown-text" v-html="markdownHtmlText"></div>
+        <div class="markdown-container markdown-body" v-html="markdownHtmlText"></div>
       </NScrollbar>
       <div style="display: flex; justify-content: flex-end">
         <NButton
@@ -34,7 +34,9 @@
           size="small"
           >{{ t('AnnouncementModal.close') }}</NButton
         >
-        <NButton type="primary" v-else @click="handleRead" size="small">已读</NButton>
+        <NButton type="primary" v-else @click="handleRead" size="small">{{
+          t('AnnouncementModal.read')
+        }}</NButton>
       </div>
     </div>
   </NModal>
@@ -78,95 +80,17 @@ const handleRead = () => {
   font-size: 13px;
 }
 
-:deep(.markdown-text) {
-  font-size: 13px;
+.markdown-container {
   user-select: text;
+  border-radius: 4px;
   padding: 4px;
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5 {
-    font-weight: bold;
-
-    &::before {
-      margin-right: 4px;
-    }
-  }
-
-  h1 {
-    font-size: 20px;
-    margin-top: 4px;
-    margin-bottom: 12px;
-  }
-
-  h2 {
-    font-size: 18px;
-    margin-top: 8px;
-    margin-bottom: 8px;
-  }
-
-  h3 {
-    font-size: 16px;
-    margin-top: 4px;
-    margin-bottom: 4px;
-  }
-
-  // ul {
-  //   margin-left: 24px;
-  // }
-
-  li::before {
-    display: inline;
-    content: '•';
-  }
-
-  li p {
-    display: inline;
-  }
-
-  code {
-    font-family: inherit;
-    background-color: rgba(32, 32, 32, 1);
-    border-radius: 2px;
-    padding: 2px 4px;
-  }
-
-  table {
-    /* 设置表格边框 */
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin: 4px 0;
-    border-radius: 8px;
-  }
-
-  th,
-  td {
-    border: 1px solid #3b3b3b;
-    padding: 4px 8px;
-  }
-
-  blockquote {
-    border-radius: 2px;
-    padding: 4px 8px;
-    background-color: rgba(0, 0, 0, 0.4);
-  }
-
-  blockquote + blockquote {
-    margin-top: 4px;
-  }
-
-  img {
-    max-width: 100%;
-  }
 }
 </style>
 
 <style lang="less" module>
 .ann-modal {
   width: 90%;
-  max-width: 768px;
+  max-width: 1024px;
 }
 
 .markdown-text-scroll-wrapper {

@@ -6,6 +6,7 @@ SettingModal:
 AnnouncementModal:
   title: 公告
   close: 关闭
+  read: 已读
 
 DeclarationModal:
   title: 声明
@@ -528,7 +529,8 @@ AboutPane:
 
   checkFrom: 从下载源中 ({{ source }}) 检查更新
   checkUpdates: 检查更新
-  newUpdates: 新版本内容
+  currentRelease: 当前版本内容
+  newRelease: 新版本内容
   lastCheckAt: 上次检查
 
   updateProgress:
