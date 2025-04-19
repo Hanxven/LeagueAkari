@@ -5,11 +5,9 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { ShopTwoOutlined } from '@vicons/material'
-import { lchown } from 'fs'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NotificationReactive, useNotification } from 'naive-ui'
-import { CSSProperties, VNode, VNodeChild, computed, h, inject, ref, watch } from 'vue'
+import { CSSProperties, VNodeChild, computed, h, inject, ref, watch } from 'vue'
 
 /**
  * 偶尔会出现在主窗口的周期性通知
