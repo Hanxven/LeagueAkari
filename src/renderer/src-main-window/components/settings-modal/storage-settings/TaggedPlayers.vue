@@ -517,8 +517,11 @@ const handleExportTaggedPlayers = async () => {
 const handleImportTaggedPlayers = async () => {
   try {
     const importPath = await sp.importTaggedPlayersFromJsonFile()
-    await loadPage(pagination.page || 1, pagination.pageSize || 20)
-    message.success(() => t('TaggedPlayers.imported', { path: importPath }))
+
+    if (importPath) {
+      message.success(() => t('TaggedPlayers.imported', { path: importPath }))
+      await loadPage(pagination.page || 1, pagination.pageSize || 20)
+    }
   } catch (error: any) {
     if (error.code) {
       switch (error.code) {
