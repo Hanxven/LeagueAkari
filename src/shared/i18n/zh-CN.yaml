@@ -532,6 +532,7 @@ AboutPane:
   currentRelease: 当前版本内容
   newRelease: 新版本内容
   lastCheckAt: 上次检查
+  cancelUpdate: 取消更新
 
   updateProgress:
     label: 更新流程

@@ -73,6 +73,14 @@
                 {{ t('AboutPane.currentRelease') }}
               </template>
             </NButton>
+            <NButton
+              size="small"
+              v-if="sus.updateProgressInfo"
+              secondary
+              type="warning"
+              @click="() => su.cancelUpdate()"
+              >{{ t('AboutPane.cancelUpdate') }}</NButton
+            >
             <span v-if="sus.lastCheckAt" style="font-size: 12px"
               >{{ t('AboutPane.lastCheckAt') }}
               {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span

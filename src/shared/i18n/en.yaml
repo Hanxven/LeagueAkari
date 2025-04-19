@@ -529,6 +529,7 @@ AboutPane:
   currentRelease: Current Version
   newRelease: New Version
   lastCheckAt: Last Check at
+  cancelUpdate: Cancel Update
 
   updateProgress:
     label: Update Process
