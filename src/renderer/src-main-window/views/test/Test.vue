@@ -97,83 +97,44 @@ const stubGetHomeHub = async () => {
   )
 }
 
-const textT = `
-\`markdown-it\` 本身是一个 Markdown 解析器，它的主要作用是把 Markdown 文本转换成 HTML。但它**不负责样式或美化**。如果你想要渲染出“好看的页面”，你需要为生成的 HTML 加上 CSS 样式，或者直接用一些现成的主题/样式包。
+const textT = `# League Akari
 
-下面是一些常见的做法：
+## League Akari
 
----
+### League Akari
 
-### ✅ 1. 使用开源的 Markdown CSS 样式库
+#### League Akari
 
-有很多现成的 CSS 样式可以让你的 Markdown 页面瞬间变得好看。
+##### League Akari
 
-#### 🔹 GitHub Markdown 样式（推荐）
-GitHub 自家的 Markdown 样式，兼容性好、样式清爽。
+###### League Akari
 
-- CSS 地址：
-  \`\`\`
-  https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css
-  \`\`\`
+**League Akari** *League Akari*
 
-- 使用方法：
-  \`\`\`html
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
-  <article class="markdown-body">
-    <!-- 这里插入 markdown-it 渲染的 HTML -->
-  </article>
-  \`\`\`
+<div style="color: orange; font-weight: bold;">League Akari</div>
 
-> ⚠️ 注意：你需要给容器加上 \`.markdown-body\` 类名。
+\`League Akari\`
 
----
+***League Akari***
 
-#### 🔹 其他 Markdown 样式库
+~~League Akari~~
 
-- [**markdown-css-themes**](https://github.com/markdowncss)：
-  - 一个专门做 Markdown 样式的项目集合
-  - 样式风格多样：简洁、报纸风、高对比、论文风等
-  - 用法都很简单，就是引入对应 CSS
-
----
-
-### ✅ 2. 使用现成的 Markdown 渲染器（集成了 markdown-it）
-
-如果你想省事，直接使用一些已经集成了 markdown-it 和样式的方案，比如：
-
-- **VuePress** / **VitePress**：Markdown + Vue/Vite 构建文档站
-- **Docsify** / **Docusaurus**：快速文档搭建方案
-- **Obsidian / Typora / VS Code Preview**：桌面端编辑器，参考其样式
-
----
-
-### ✅ 3. 自定义主题市场？（还不太成熟）
-
-目前 \`markdown-it\` 并没有一个像 “主题市场” 一样的官方生态，但你可以：
-- 去 GitHub 上找一些项目，比如 \`markdown-css\`、\`markdown-themes\`
-- 或者自己写 SCSS / Tailwind 配合自定义渲染样式（比如给代码块加暗色主题）
-
----
-
-### 💡 小结：最简单推荐方案
-
-\`\`\`html
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css" />
-<article class="markdown-body">
-  <!-- markdown-it 渲染出的内容放在这里 -->
-</article>
+\`\`\`
+fn league_akari(rabi: &str) {
+    println!("Hello, {}!", rabi);
+}
 \`\`\`
 
-✨ 然后你可以根据自己的需求继续美化，比如加上代码高亮（highlight.js）或者适配暗色主题。
+1. ✅ League
+2. ✅ Akari
+    - ✅ League
+        - League
+        - Akari
+    - ✅ Akari
+        - League
+        - Akari
 
-
-| 项目编号 | 项目名称             | 负责人     | 状态       | 开始日期   | 结束日期   | 进度      | 备注                     |
-|----------|----------------------|------------|------------|------------|------------|-----------|--------------------------|
-| 001      | 数据平台升级         | 张伟       | ✅ 已完成  | 2025-01-15 | 2025-03-10 | \`100%\`    | - 提前完成<br>- 无延期   |
-| 002      | 移动端重构           | 李静       | 🔄 进行中  | 2025-02-01 | 2025-05-30 | \`65%\`     | - 后端API对接中          |
-| 003      | 市场调研 - 日本地区 | 陈晓       | ⏸️ 暂停    | 2025-03-01 | -          | \`20%\`     | - 因预算冻结<br>- 待重新排期 |
-| 004      | 客户关系管理系统     | 王磊       | 🆕 未开始  | 2025-04-20 | 2025-08-15 | \`0%\`      | - 待产品确认功能清单     |
-`
+> League Akari`
 
 const markdownHtmlText = computed(() => {
   return markdownIt.render(textT)

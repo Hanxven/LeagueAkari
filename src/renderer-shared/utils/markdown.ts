@@ -1,6 +1,8 @@
 import MarkdownIt from 'markdown-it'
 
-export const markdownIt = new MarkdownIt()
+export const markdownIt = new MarkdownIt({
+  html: true
+})
 
 const defaultRender =
   markdownIt.renderer.rules.link_open ||

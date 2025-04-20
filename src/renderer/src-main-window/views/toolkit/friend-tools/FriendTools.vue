@@ -62,6 +62,7 @@
             :loading="isLoading"
             :columns="columns"
             :data="tableData"
+            :virtual-scroll="shouldUseVirtualScroll"
             :row-key="(row) => row.id"
             v-model:checked-row-keys="selectedItems"
             v-model:expanded-row-keys="expandedRowKeys"
@@ -76,6 +77,7 @@
 
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import { useActivated } from '@renderer-shared/compositions/useActivated'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
@@ -96,7 +98,7 @@ import {
   NScrollbar,
   useMessage
 } from 'naive-ui'
-import { computed, h, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, h, ref, shallowRef, watch } from 'vue'
 
 const { t } = useTranslation()
 
@@ -266,6 +268,15 @@ const combinedGroups = computed(() => {
     .toSorted((a, b) => b.priority - a.priority)
 })
 
+const shouldUseVirtualScroll = computed(() => {
+  let friendsCount = 0
+  for (const group of combinedGroups.value) {
+    friendsCount += group.friends.length
+  }
+
+  return friendsCount > 48
+})
+
 const updateLastGameDate = async (puuid: string) => {
   if (sgps.availability.serversSupported.common && sgps.isTokenReady) {
     const data = await sgp.getSummoner(puuid)
@@ -386,10 +397,12 @@ lc.onLcuEventVue<Friend>('/lol-chat/v1/friends/:id', ({ eventType, data }, { id 
   }
 })
 
+const isActivated = useActivated()
+
 watch(
-  () => lcs.isConnected,
-  (isConnected) => {
-    if (isConnected) {
+  [() => lcs.isConnected, () => isActivated.value],
+  ([isConnected, isActivated]) => {
+    if (isConnected && isActivated) {
       updateFriends()
     }
   },
