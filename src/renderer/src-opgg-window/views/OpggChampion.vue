@@ -2,11 +2,8 @@
   <div class="opgg-champion-wrapper">
     <!-- 真的想不出一点容易组织的结构, 就这样复制粘贴吧 -->
     <NSpin description="Loading ..." v-if="loading" class="spin-mask"></NSpin>
-    <NCheckbox
-            size="small"
-            v-model:checked="isOrderByWinRate"
-            >{{ t('Order By Win Rate') }}</NCheckbox
-          >
+    <NCheckbox size="small" v-model:checked="isOrderByWinRate"
+    >{{ t('Order By Win Rate') }}</NCheckbox>
     <NScrollbar>
       <div class="card-area" v-if="info">
         <div class="card-content">
@@ -138,24 +135,18 @@
         <div class="card-title">
           {{ t('OpggChampion.spells') }}
           <NCheckbox size="small" v-model:checked="isSummonerSpellsExpanded">
-            {{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+            {{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
-            <div
-          class="summoner-spells-group"
-          v-for="(s, i) in (isOrderByWinRate 
-            ? data.data.summoner_spells.slice(
-              0,
-              isSummonerSpellsExpanded ? Infinity : 2
-            )
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : data.data.summoner_spells.slice(
-              0,
-              isSummonerSpellsExpanded ? Infinity : 2
-            ))"
-          :key="i"
-        >
+          <div
+            class="summoner-spells-group"
+            v-for="(s, i) in isOrderByWinRate
+              ? data.data.summoner_spells
+                  .slice(0, isSummonerSpellsExpanded ? Infinity : 2)
+                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+              : data.data.summoner_spells.slice(0, isSummonerSpellsExpanded ? Infinity : 2)"
+            :key="i"
+          >
             <div class="index">#{{ i + 1 }}</div>
             <div class="spells">
               <SummonerSpellDisplay :size="28" :spell-id="spell" v-for="spell of s.ids" />
@@ -163,7 +154,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="pick-play" :title="t('OpggChampion.plays')">
                   {{
@@ -184,8 +175,8 @@
                   secondary
                   :disabled="lcs.gameflow.phase !== 'ChampSelect'"
                 >
-                  {{ t('OpggChampion.apply') }}</NButton
-                >
+                  {{ t('OpggChampion.apply') }}
+                </NButton>
               </div>
             </div>
           </div>
@@ -193,20 +184,20 @@
       </div>
       <div class="card-area" v-if="data && data.data.runes && data.data.runes.length">
         <div class="card-title">
-          {{ t('OpggChampion.runes')
-          }}<NCheckbox size="small" v-model:checked="isRunesExpanded">
-            {{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          {{ t('OpggChampion.runes') }}
+          <NCheckbox size="small" v-model:checked="isRunesExpanded">
+            {{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
-            <div
-          class="runes-group"
-          v-for="(r, i) in (isOrderByWinRate 
-            ?data.data.runes.slice(0, isRunesExpanded ? Infinity : 2)
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : data.data.runes.slice(0, isRunesExpanded ? Infinity : 2))"
-          :key="i"
-        >
+          <div
+            class="runes-group"
+            v-for="(r, i) in isOrderByWinRate
+              ? data.data.runes
+                  .slice(0, isRunesExpanded ? Infinity : 2)
+                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+              : data.data.runes.slice(0, isRunesExpanded ? Infinity : 2)"
+            :key="i"
+          >
             <div class="index">#{{ i + 1 }}</div>
             <div>
               <div class="primary">
@@ -242,7 +233,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (r.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (r.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="pick-play" :title="t('OpggChampion.plays')">
                   {{
@@ -262,8 +253,8 @@
                   type="primary"
                   :disabled="lcs.connectionState !== 'connected'"
                   secondary
-                  >{{ t('OpggChampion.apply') }}</NButton
-                >
+                >{{ t('OpggChampion.apply') }}
+                </NButton>
               </div>
             </div>
           </div>
@@ -271,21 +262,20 @@
       </div>
       <div class="card-area" v-if="data && data.data.synergies && data.data.synergies.length">
         <div class="card-title">
-          {{ t('OpggChampion.synergies')
-          }}<NCheckbox size="small" v-model:checked="isSynergiesExpanded">{{
-            t('OpggChampion.showAll')
-          }}</NCheckbox>
+          {{ t('OpggChampion.synergies') }}
+          <NCheckbox size="small" v-model:checked="isSynergiesExpanded"
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div
-          class="synergies-group"
-          v-for="(s, i) in (isOrderByWinRate 
-            ? data.data.synergies
-                .slice(0, isSynergiesExpanded ? Infinity : 4)
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : data.data.synergies.slice(0, isSynergiesExpanded ? Infinity : 4))"
-          :key="i"
-        >
+            class="synergies-group"
+            v-for="(s, i) in isOrderByWinRate
+              ? data.data.synergies
+                  .slice(0, isSynergiesExpanded ? Infinity : 4)
+                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+              : data.data.synergies.slice(0, isSynergiesExpanded ? Infinity : 4)"
+            :key="i"
+          >
             <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
             <div class="image-name" @click="() => emits('showChampion', s.champion_id)">
               <LcuImage class="image" :src="championIconUri(s.champion_id)" />
@@ -302,7 +292,7 @@
               </div>
               <div class="value-text">
                 <span class="value" :title="t('OpggChampion.pickRate')"
-                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="text" :title="t('OpggChampion.plays')">
                   {{
@@ -314,11 +304,11 @@
               </div>
               <div class="value-text">
                 <span class="value" :title="t('OpggChampion.winRate')"
-                  >{{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%</span
+                >{{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%</span
                 >
                 <span class="text" :title="t('OpggChampion.winRate')">{{
-                  t('OpggChampion.winRate')
-                }}</span>
+                    t('OpggChampion.winRate')
+                  }}</span>
               </div>
             </div>
           </div>
@@ -327,22 +317,22 @@
       <div class="card-area" v-if="augments && Object.keys(augments).length">
         <NTabs v-model:value="augmentTab" size="small" :animated="false">
           <template #suffix>
-            <NCheckbox size="small" v-model:checked="isAugmentsExpanded">{{
-              t('OpggChampion.showAll')
-            }}</NCheckbox>
+            <NCheckbox size="small" v-model:checked="isAugmentsExpanded"
+            >{{ t('OpggChampion.showAll') }}</NCheckbox>
           </template>
           <NTabPane name="silver" v-if="augments && augments[1]">
             <template #tab>
               <span class="augments-tab-title">{{ t('OpggChampion.augmentSilver') }}</span>
             </template>
-              <div
-          class="augments-group"
-          v-for="(a, i) in (isOrderByWinRate 
-            ? augments[1].augments.slice(0, isAugmentsExpanded ? Infinity : 4)
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : augments[1].augments.slice(0, isAugmentsExpanded ? Infinity : 4))"
-          :key="i"
-        >
+            <div
+              class="augments-group"
+              v-for="(a, i) in isOrderByWinRate
+                ? augments[1].augments
+                    .slice(0, isAugmentsExpanded ? Infinity : 4)
+                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+                : augments[1].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+              :key="i"
+            >
               <div class="index">#{{ i + 1 }}</div>
               <div class="image-name">
                 <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
@@ -351,7 +341,7 @@
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')">
                     {{
@@ -371,14 +361,15 @@
             <template #tab>
               <span class="augments-tab-title">{{ t('OpggChampion.augmentGold') }}</span>
             </template>
-              <div
-         class="augments-group"
-          v-for="(a, i) in (isOrderByWinRate 
-            ? augments[4].augments.slice(0, isAugmentsExpanded ? Infinity : 4)
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : augments[4].augments.slice(0, isAugmentsExpanded ? Infinity : 4))"
-          :key="i"
-        >
+            <div
+              class="augments-group"
+              v-for="(a, i) in isOrderByWinRate
+                ? augments[4].augments
+                    .slice(0, isAugmentsExpanded ? Infinity : 4)
+                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+                : augments[4].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+              :key="i"
+            >
               <div class="index">#{{ i + 1 }}</div>
               <div class="image-name">
                 <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
@@ -387,7 +378,7 @@
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')">
                     {{
@@ -407,14 +398,15 @@
             <template #tab>
               <span class="augments-tab-title">{{ t('OpggChampion.augmentPrism') }}</span>
             </template>
-              <div
-          class="augments-group"
-          v-for="(a, i) in (isOrderByWinRate 
-            ? augments[8].augments.slice(0, isAugmentsExpanded ? Infinity : 4)
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : augments[8].augments.slice(0, isAugmentsExpanded ? Infinity : 4))"
-          :key="i"
-        >
+            <div
+              class="augments-group"
+              v-for="(a, i) in isOrderByWinRate
+                ? augments[8].augments
+                    .slice(0, isAugmentsExpanded ? Infinity : 4)
+                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+                : augments[8].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+              :key="i"
+            >
               <div class="index">#{{ i + 1 }}</div>
               <div class="image-name">
                 <AugmentDisplay :size="24" :augment-id="a.id" style="margin-right: 4px" />
@@ -423,7 +415,7 @@
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (a.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (a.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')">
                     {{
@@ -446,29 +438,23 @@
         v-if="data && data.data.skill_masteries && data.data.skill_masteries.length"
       >
         <div class="card-title">
-          {{ t('OpggChampion.abilityBuild')
-          }}<NCheckbox
+          {{ t('OpggChampion.abilityBuild') }}
+          <NCheckbox
             v-if="data.data.skill_masteries.length > 2"
             size="small"
             v-model:checked="isSkillMasteriesExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
-            <div
-          class="skills-group"
-          v-for="(m, i) in (isOrderByWinRate 
-            ? data.data.skill_masteries.slice(
-              0,
-              isSkillMasteriesExpanded ? Infinity : 2
-            )
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : data.data.skill_masteries.slice(
-              0,
-              isSkillMasteriesExpanded ? Infinity : 2
-            ))"
-          :key="i"
-        >
+          <div
+            class="skills-group"
+            v-for="(m, i) in isOrderByWinRate
+              ? data.data.skill_masteries
+                  .slice(0, isSkillMasteriesExpanded ? Infinity : 2)
+                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+              : data.data.skill_masteries.slice(0, isSkillMasteriesExpanded ? Infinity : 2)"
+            :key="i"
+          >
             <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
             <div>
               <div class="skill-route">
@@ -508,7 +494,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (m.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (m.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="pick-play" :title="t('OpggChampion.plays')">
                   {{
@@ -540,8 +526,8 @@
                 secondary
                 @click="emits('addToItemSet')"
                 :disabled="lcs.connectionState !== 'connected'"
-                >{{ t('OpggChampion.apply') }}</NButton
-              >
+              >{{ t('OpggChampion.apply') }}
+              </NButton>
             </div>
           </div>
         </div>
@@ -551,24 +537,23 @@
         v-if="data && data.data.starter_items && data.data.starter_items.length"
       >
         <div class="card-title">
-          {{ t('OpggChampion.starterItemText')
-          }}<NCheckbox
+          {{ t('OpggChampion.starterItemText') }}
+          <NCheckbox
             v-if="data.data.starter_items.length > 4"
             size="small"
             v-model:checked="isStarterItemsExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div
-          class="items-group"
-          v-for="(s, i) in (isOrderByWinRate 
-            ? data.data.starter_items
-                .slice(0, isStarterItemsExpanded ? Infinity : 4)
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : data.data.starter_items.slice(0, isStarterItemsExpanded ? Infinity : 4))"
-          :key="i"
-        >
+            class="items-group"
+            v-for="(s, i) in isOrderByWinRate
+              ? data.data.starter_items
+                  .slice(0, isStarterItemsExpanded ? Infinity : 4)
+                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+              : data.data.starter_items.slice(0, isStarterItemsExpanded ? Infinity : 4)"
+            :key="i"
+          >
             <div class="index">#{{ i + 1 }}</div>
             <template v-for="(ss, i) of s.ids">
               <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
@@ -579,7 +564,7 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="pick-play" :title="t('OpggChampion.plays')">
                   {{
@@ -598,23 +583,24 @@
       </div>
       <div class="card-area" v-if="data && data.data.starter_items && data.data.boots.length">
         <div class="card-title">
-          鞋子<NCheckbox
+          鞋子
+          <NCheckbox
             v-if="data.data.boots.length > 4"
             size="small"
             v-model:checked="isBootsExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div class="double-columns">
-              <div
-          class="items-group"
-          v-for="(s, i) in (isOrderByWinRate 
-            ? data.data.boots.slice(0, isBootsExpanded ? Infinity : 4)
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : data.data.boots.slice(0, isBootsExpanded ? Infinity : 4))"
-          :key="i"
-        >
+            <div
+              class="items-group"
+              v-for="(s, i) in isOrderByWinRate
+                ? data.data.boots
+                    .slice(0, isBootsExpanded ? Infinity : 4)
+                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+                : data.data.boots.slice(0, isBootsExpanded ? Infinity : 4)"
+              :key="i"
+            >
               <div class="index">#{{ i + 1 }}</div>
               <template v-for="(ss, i) of s.ids">
                 <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
@@ -625,7 +611,7 @@
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')">
                     {{
@@ -645,24 +631,24 @@
       </div>
       <div class="card-area" v-if="data && data.data.prism_items && data.data.prism_items.length">
         <div class="card-title">
-          {{ t('OpggChampion.prismItemText')
-          }}<NCheckbox
+          {{ t('OpggChampion.prismItemText') }}
+          <NCheckbox
             v-if="data.data.prism_items.length > 4"
             size="small"
             v-model:checked="isPrismItemsExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div class="double-columns">
-              <div
-          class="items-group"
-          v-for="(s, i) in (isOrderByWinRate 
-            ? data.data.prism_items.slice(0, isPrismItemsExpanded ? Infinity : 4)
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : data.data.prism_items.slice(0, isPrismItemsExpanded ? Infinity : 4))"
-          :key="i"
-        >
+            <div
+              class="items-group"
+              v-for="(s, i) in isOrderByWinRate
+                ? data.data.prism_items
+                    .slice(0, isPrismItemsExpanded ? Infinity : 4)
+                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+                : data.data.prism_items.slice(0, isPrismItemsExpanded ? Infinity : 4)"
+              :key="i"
+            >
               <div class="index">#{{ i + 1 }}</div>
               <template v-for="(ss, i) of s.ids">
                 <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
@@ -673,7 +659,7 @@
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')">
                     {{
@@ -693,23 +679,23 @@
       </div>
       <div class="card-area" v-if="data && data.data.starter_items && data.data.core_items.length">
         <div class="card-title">
-          {{ t('OpggChampion.coreItemText')
-          }}<NCheckbox
+          {{ t('OpggChampion.coreItemText') }}
+          <NCheckbox
             v-if="data.data.core_items.length > 4"
             size="small"
             v-model:checked="isCoreItemsExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
-            <div
-          class="items-group"
-          v-for="(s, i) in (isOrderByWinRate 
-            ? data.data.core_items.slice(0, isCoreItemsExpanded ? Infinity : 4)
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : data.data.core_items.slice(0, isCoreItemsExpanded ? Infinity : 4))"
-          :key="i"
-        >
+          <div
+            class="items-group"
+            v-for="(s, i) in isOrderByWinRate
+              ? data.data.core_items
+                  .slice(0, isCoreItemsExpanded ? Infinity : 4)
+                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+              : data.data.core_items.slice(0, isCoreItemsExpanded ? Infinity : 4)"
+            :key="i"
+          >
             <div class="index">#{{ i + 1 }}</div>
             <template v-for="(ss, i) of s.ids">
               <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
@@ -720,13 +706,13 @@
             <div class="desc">
               <div class="pick">
                 <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                 >
                 <span class="pick-play" :title="t('OpggChampion.plays')">{{
-                  t('OpggChampion.times', {
-                    times: s.play.toLocaleString()
-                  })
-                }}</span>
+                    t('OpggChampion.times', {
+                      times: s.play.toLocaleString()
+                    })
+                  }}</span>
               </div>
               <div class="win-rate" :title="t('OpggChampion.winRate')">
                 {{ ((s.win / (s.play || 1)) * 100).toFixed(2) }}%
@@ -737,24 +723,24 @@
       </div>
       <div class="card-area" v-if="data && data.data.starter_items && data.data.last_items.length">
         <div class="card-title">
-          {{ t('OpggChampion.itemText')
-          }}<NCheckbox
+          {{ t('OpggChampion.itemText') }}
+          <NCheckbox
             v-if="data.data.last_items.length > 8"
             size="small"
             v-model:checked="isLastItemsExpanded"
-            >{{ t('OpggChampion.showAll') }}</NCheckbox
-          >
+          >{{ t('OpggChampion.showAll') }}</NCheckbox>
         </div>
         <div class="card-content">
           <div class="double-columns">
-              <div
-          class="items-group"
-          v-for="(s, i) in (isOrderByWinRate 
-            ? data.data.last_items.slice(0, isLastItemsExpanded ? Infinity : 8)
-                .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-            : data.data.last_items.slice(0, isLastItemsExpanded ? Infinity : 8))"
-          :key="i"
-        >
+            <div
+              class="items-group"
+              v-for="(s, i) in isOrderByWinRate
+                ? data.data.last_items
+                    .slice(0, isLastItemsExpanded ? Infinity : 8)
+                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
+                : data.data.last_items.slice(0, isLastItemsExpanded ? Infinity : 8)"
+              :key="i"
+            >
               <div class="index">#{{ i + 1 }}</div>
               <template v-for="(ss, i) of s.ids">
                 <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
@@ -765,10 +751,10 @@
               <div class="desc">
                 <div class="pick">
                   <span class="pick-rate" :title="t('OpggChampion.pickRate')"
-                    >{{ (s.pick_rate * 100).toFixed(2) }}%</span
+                  >{{ (s.pick_rate * 100).toFixed(2) }}%</span
                   >
                   <span class="pick-play" :title="t('OpggChampion.plays')"
-                    >{{
+                  >{{
                       t('OpggChampion.times', {
                         times: s.play.toLocaleString()
                       })
