@@ -2,8 +2,21 @@
   <div class="opgg-champion-wrapper">
     <!-- 真的想不出一点容易组织的结构, 就这样复制粘贴吧 -->
     <NSpin description="Loading ..." v-if="loading" class="spin-mask"></NSpin>
-    <NCheckbox size="small" v-model:checked="isOrderByWinRate"
-    >{{ t('Order By Win Rate') }}</NCheckbox>
+    <div class="sorting-controls">
+      <ControlItem class="control-item-margin" :label="t('排序')" :label-width="100">
+        <NRadioGroup size="small" v-model:value="opggChampionSortBy">
+          <NFlex style="gap: 4px" :vertical="isSmallWidth">
+            <NRadio value="default" :title="t('默认')">默认</NRadio>
+            <NRadio value="pickRate" :title="t('OpggChampion.pickRate')">{{
+                t('OpggChampion.pickRate')
+              }}</NRadio>
+            <NRadio value="winRate" :title="t('OpggChampion.winRate')">
+              {{ t('OpggChampion.winRate') }}
+            </NRadio>
+          </NFlex>
+        </NRadioGroup>
+      </ControlItem>
+    </div>
     <NScrollbar>
       <div class="card-area" v-if="info">
         <div class="card-content">
@@ -140,11 +153,7 @@
         <div class="card-content">
           <div
             class="summoner-spells-group"
-            v-for="(s, i) in isOrderByWinRate
-              ? data.data.summoner_spells
-                  .slice(0, isSummonerSpellsExpanded ? Infinity : 2)
-                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-              : data.data.summoner_spells.slice(0, isSummonerSpellsExpanded ? Infinity : 2)"
+            v-for="(s, i) in sortedData('summoner_spells', isSummonerSpellsExpanded, 2)"
             :key="i"
           >
             <div class="index">#{{ i + 1 }}</div>
@@ -191,11 +200,7 @@
         <div class="card-content">
           <div
             class="runes-group"
-            v-for="(r, i) in isOrderByWinRate
-              ? data.data.runes
-                  .slice(0, isRunesExpanded ? Infinity : 2)
-                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-              : data.data.runes.slice(0, isRunesExpanded ? Infinity : 2)"
+            v-for="(r, i) in sortedData('runes', isRunesExpanded, 2)"
             :key="i"
           >
             <div class="index">#{{ i + 1 }}</div>
@@ -269,11 +274,7 @@
         <div class="card-content">
           <div
             class="synergies-group"
-            v-for="(s, i) in isOrderByWinRate
-              ? data.data.synergies
-                  .slice(0, isSynergiesExpanded ? Infinity : 4)
-                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-              : data.data.synergies.slice(0, isSynergiesExpanded ? Infinity : 4)"
+            v-for="(s, i) in sortedData('synergies', isSynergiesExpanded, 4)"
             :key="i"
           >
             <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
@@ -326,11 +327,7 @@
             </template>
             <div
               class="augments-group"
-              v-for="(a, i) in isOrderByWinRate
-                ? augments[1].augments
-                    .slice(0, isAugmentsExpanded ? Infinity : 4)
-                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-                : augments[1].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+              v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[1].augments)"
               :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
@@ -363,11 +360,7 @@
             </template>
             <div
               class="augments-group"
-              v-for="(a, i) in isOrderByWinRate
-                ? augments[4].augments
-                    .slice(0, isAugmentsExpanded ? Infinity : 4)
-                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-                : augments[4].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+              v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[4].augments)"
               :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
@@ -400,11 +393,7 @@
             </template>
             <div
               class="augments-group"
-              v-for="(a, i) in isOrderByWinRate
-                ? augments[8].augments
-                    .slice(0, isAugmentsExpanded ? Infinity : 4)
-                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-                : augments[8].augments.slice(0, isAugmentsExpanded ? Infinity : 4)"
+              v-for="(a, i) in sortedData('augments', isAugmentsExpanded, 4, augments[8].augments)"
               :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
@@ -448,11 +437,7 @@
         <div class="card-content">
           <div
             class="skills-group"
-            v-for="(m, i) in isOrderByWinRate
-              ? data.data.skill_masteries
-                  .slice(0, isSkillMasteriesExpanded ? Infinity : 2)
-                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-              : data.data.skill_masteries.slice(0, isSkillMasteriesExpanded ? Infinity : 2)"
+            v-for="(m, i) in sortedData('skill_masteries', isSkillMasteriesExpanded, 2)"
             :key="i"
           >
             <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
@@ -547,11 +532,7 @@
         <div class="card-content">
           <div
             class="items-group"
-            v-for="(s, i) in isOrderByWinRate
-              ? data.data.starter_items
-                  .slice(0, isStarterItemsExpanded ? Infinity : 4)
-                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-              : data.data.starter_items.slice(0, isStarterItemsExpanded ? Infinity : 4)"
+            v-for="(s, i) in sortedData('starter_items', isStarterItemsExpanded, 4)"
             :key="i"
           >
             <div class="index">#{{ i + 1 }}</div>
@@ -594,11 +575,7 @@
           <div class="double-columns">
             <div
               class="items-group"
-              v-for="(s, i) in isOrderByWinRate
-                ? data.data.boots
-                    .slice(0, isBootsExpanded ? Infinity : 4)
-                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-                : data.data.boots.slice(0, isBootsExpanded ? Infinity : 4)"
+              v-for="(s, i) in sortedData('boots', isBootsExpanded, 4)"
               :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
@@ -642,11 +619,7 @@
           <div class="double-columns">
             <div
               class="items-group"
-              v-for="(s, i) in isOrderByWinRate
-                ? data.data.prism_items
-                    .slice(0, isPrismItemsExpanded ? Infinity : 4)
-                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-                : data.data.prism_items.slice(0, isPrismItemsExpanded ? Infinity : 4)"
+              v-for="(s, i) in sortedData('prism_items', isPrismItemsExpanded, 4)"
               :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
@@ -689,11 +662,7 @@
         <div class="card-content">
           <div
             class="items-group"
-            v-for="(s, i) in isOrderByWinRate
-              ? data.data.core_items
-                  .slice(0, isCoreItemsExpanded ? Infinity : 4)
-                  .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-              : data.data.core_items.slice(0, isCoreItemsExpanded ? Infinity : 4)"
+            v-for="(s, i) in sortedData('core_items', isCoreItemsExpanded, 4)"
             :key="i"
           >
             <div class="index">#{{ i + 1 }}</div>
@@ -734,11 +703,7 @@
           <div class="double-columns">
             <div
               class="items-group"
-              v-for="(s, i) in isOrderByWinRate
-                ? data.data.last_items
-                    .slice(0, isLastItemsExpanded ? Infinity : 8)
-                    .toSorted((a: any, b: any) => b.win / (b.play || 1) - a.win / (a.play || 1))
-                : data.data.last_items.slice(0, isLastItemsExpanded ? Infinity : 8)"
+              v-for="(s, i) in sortedData('last_items', isLastItemsExpanded, 8)"
               :key="i"
             >
               <div class="index">#{{ i + 1 }}</div>
@@ -774,6 +739,7 @@
 </template>
 
 <script setup lang="ts">
+import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import AugmentDisplay from '@renderer-shared/components/widgets/AugmentDisplay.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
@@ -787,11 +753,15 @@ import { useLeagueClientStore } from '@renderer-shared/shards/league-client/stor
 import { championIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
 import { ArrowForwardIosOutlined as ArrowForwardIosOutlinedIcon } from '@vicons/material'
+import { useLocalStorage } from '@vueuse/core'
 import { useTranslation } from 'i18next-vue'
 import {
   NButton,
   NCheckbox,
+  NFlex,
   NIcon,
+  NRadio,
+  NRadioGroup,
   NScrollbar,
   NSpin,
   NSwitch,
@@ -911,7 +881,8 @@ const isBootsExpanded = ref(false)
 const isPrismItemsExpanded = ref(false)
 const isCoreItemsExpanded = ref(false)
 const isLastItemsExpanded = ref(false)
-const isOrderByWinRate = ref(false)
+
+const opggChampionSortBy = useLocalStorage('opgg-sort-by', 'default')
 
 watchEffect(() => {
   if (!props.data) {
@@ -926,9 +897,39 @@ watchEffect(() => {
     isCoreItemsExpanded.value = false
     isLastItemsExpanded.value = false
     isCountersExpanded.value = false
-    isOrderByWinRate.value = false
   }
 })
+
+// Helper function to sort and slice the data without modifying original data
+const sortedData = (key: string, isExpanded: boolean, limit: number, customData: any[] = []) => {
+  const data = customData.length ? customData : props.data.data[key]
+
+  // Create a shallow copy of the data to preserve the original array
+  let sortedItems = [...data]
+
+  // Apply sorting based on a selected criterion
+  if (opggChampionSortBy.value !== 'default') {
+    sortedItems.sort((a: any, b: any) => {
+      switch (opggChampionSortBy.value) {
+        case 'pickRate': {
+          const pickRateA = a.pick_rate || 0
+          const pickRateB = b.pick_rate || 0
+          return pickRateB - pickRateA // Sort by pick rate in descending order
+        }
+        case 'winRate': {
+          const winRateA = a.win / (a.play || 1)
+          const winRateB = b.win / (b.play || 1)
+          return winRateB - winRateA // Sort by win rate in descending order
+        }
+        default:
+          return 0
+      }
+    })
+  }
+
+  // Slice the sorted array to get the first `limit` elements (or all if expanded)
+  return sortedItems.slice(0, isExpanded ? Infinity : limit)
+}
 
 const tierText = computed(() => {
   if (!info.value) {
@@ -973,6 +974,10 @@ if (import.meta.env.DEV) {
     z-index: 10;
     background-color: rgba(0, 0, 0, 0.5);
   }
+}
+
+.sorting-controls {
+  text-align: right;
 }
 
 .card-area {
