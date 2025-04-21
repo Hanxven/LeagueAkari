@@ -34,50 +34,55 @@
       </NPopover>
     </template>
     <div class="divider" v-if="hasTags"></div>
-    <NPopover v-for="p of teamPremadeTeams">
-      <template #trigger>
-        <div
-          class="tag"
-          :style="{
-            backgroundColor: p.premadeId
-              ? PREMADE_TEAM_COLORS[p.premadeId]?.foregroundColor
-              : '#ffffff40',
-            color: PREMADE_TEAM_COLORS[p.premadeId]?.color || '#fff'
-          }"
-        >
-          {{
-            t('TeamTagsArea.premade', {
-              countV: p.players.length
-            })
-          }}
-        </div>
-      </template>
-      <TinyPlayerChampionList :list="p.players" />
-    </NPopover>
-    <NPopover v-for="te of winRateTeams.winRateTeams">
-      <template #trigger>
-        <div class="tag win-rate-team">
-          {{
-            t('TeamTagsArea.winRateTeam', {
-              team: `(${te.players.length})`
-            })
-          }}
-        </div>
-      </template>
-      <TinyPlayerChampionList :list="te.players" />
-    </NPopover>
-    <NPopover v-for="te of winRateTeams.loseRateTeams">
-      <template #trigger>
-        <div class="tag lose-rate-team">
-          {{
-            t('TeamTagsArea.loseRateTeam', {
-              team: `(${te.players.length})`
-            })
-          }}
-        </div>
-      </template>
-      <TinyPlayerChampionList :list="te.players" />
-    </NPopover>
+    <div class="tags-container">
+      <NPopover v-for="p of teamPremadeTeams">
+        <template #trigger>
+          <template v-if="p.winRateTeamInfo">
+            <div class="combined-tag">
+              <div
+                class="tag"
+                :style="{
+                  backgroundColor: p.premadeId
+                    ? PREMADE_TEAM_COLORS[p.premadeId]?.foregroundColor
+                    : '#ffffff40',
+                  color: PREMADE_TEAM_COLORS[p.premadeId]?.color || '#fff'
+                }"
+              >
+                {{
+                  t('TeamTagsArea.premade', {
+                    countV: p.players.length
+                  })
+                }}
+              </div>
+              <div class="tag win-rate-team" v-if="p.winRateTeamInfo.type === 'win-rate-team'">
+                {{ t('TeamTagsArea.winRateTeam') }}
+              </div>
+              <div class="tag lose-rate-team" v-else>
+                {{ t('TeamTagsArea.loseRateTeam') }}
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div
+              class="tag"
+              :style="{
+                backgroundColor: p.premadeId
+                  ? PREMADE_TEAM_COLORS[p.premadeId]?.foregroundColor
+                  : '#ffffff40',
+                color: PREMADE_TEAM_COLORS[p.premadeId]?.color || '#fff'
+              }"
+            >
+              {{
+                t('TeamTagsArea.premade', {
+                  countV: p.players.length
+                })
+              }}
+            </div>
+          </template>
+        </template>
+        <TinyPlayerChampionList :list="p.players" />
+      </NPopover>
+    </div>
   </div>
 </template>
 
@@ -94,10 +99,11 @@ import { computed } from 'vue'
 import { PREMADE_TEAMS, PREMADE_TEAM_COLORS } from '../ongoing-game-utils'
 import TinyPlayerChampionList from './TinyPlayerChampionList.vue'
 
-const WIN_RATE_TEAM_MIN_MATCHES = 10
+const WIN_RATE_TEAM_MIN_MATCHES = 13
+const WIN_RATE_TEAM_OTHER_MEMBER_WIN_STREAK = 4
 const WIN_RATE_TEAM_MIN_SIZE = 3
 const LOST_RATE_TEAM_MIN_SIZE = 2
-const WIN_RATE_TEAM_MIN_WIN_RATE = 0.85
+const WIN_RATE_TEAM_MIN_WIN_RATE = 0.9
 const LOSE_RATE_TEAM_MAX_WIN_RATE = 0.25
 
 const {
@@ -120,19 +126,23 @@ const {
 }>()
 
 interface WinRateTeamInfo {
-  name: string
+  premadeId: string
   players: string[]
   type: 'win-rate-team' | 'lose-rate-team'
 }
 
 const { t } = useTranslation()
 
+// ## 胜率队
+// 1. 3 人以上的预组队队伍
+// 2. 存在任意一名高胜率玩家
+// 3. 其他成员的近期连胜平均值超过预设场次
+// ## 败率队 (偏娱乐)
+// 1. 2 人以上的预组队队伍
+// 2. 玩家胜率均低于特定值
 const winRateTeams = computed(() => {
   if (!analysis || !premadeInfo) {
-    return {
-      winRateTeams: [],
-      loseRateTeams: []
-    }
+    return {}
   }
 
   let index = 0
@@ -143,74 +153,76 @@ const winRateTeams = computed(() => {
       return
     }
 
-    let winRateQualified = true
-    let loseRateQualified = true
+    let hasOneHighWinRateMember = false
+    let otherMembersWinTotalStreak = 0
 
     for (const p of players) {
       const a = analysis.players[p]
 
       if (!a) {
-        winRateQualified = false
-        loseRateQualified = false
-        break
-      }
-
-      if (!winRateQualified && !loseRateQualified) {
         break
       }
 
       if (
-        a.summary.count < WIN_RATE_TEAM_MIN_MATCHES ||
-        a.summary.winRate < WIN_RATE_TEAM_MIN_WIN_RATE
+        !hasOneHighWinRateMember &&
+        a.summary.winRate >= WIN_RATE_TEAM_MIN_WIN_RATE &&
+        a.summary.count >= WIN_RATE_TEAM_MIN_MATCHES
       ) {
-        winRateQualified = false
+        hasOneHighWinRateMember = true
+      } else {
+        otherMembersWinTotalStreak += a.summary.winningStreak
+      }
+    }
+
+    if (
+      hasOneHighWinRateMember &&
+      otherMembersWinTotalStreak / (players.length - 1) >= WIN_RATE_TEAM_OTHER_MEMBER_WIN_STREAK
+    ) {
+      result.push({
+        premadeId: PREMADE_TEAMS[index++],
+        players,
+        type: 'win-rate-team'
+      })
+    }
+
+    let loseRateTeamQualified = true
+
+    for (const p of players) {
+      const a = analysis.players[p]
+
+      if (!a) {
+        loseRateTeamQualified = false
+        break
+      }
+
+      if (!loseRateTeamQualified) {
+        break
       }
 
       if (
         a.summary.count < LOST_RATE_TEAM_MIN_SIZE ||
         a.summary.winRate > LOSE_RATE_TEAM_MAX_WIN_RATE
       ) {
-        loseRateQualified = false
+        loseRateTeamQualified = false
       }
     }
 
-    if (winRateQualified) {
+    if (loseRateTeamQualified) {
       result.push({
-        name: PREMADE_TEAMS[index++],
-        players,
-        type: 'win-rate-team'
-      })
-    }
-
-    if (loseRateQualified) {
-      result.push({
-        name: PREMADE_TEAMS[index++],
+        premadeId: PREMADE_TEAMS[index++],
         players,
         type: 'lose-rate-team'
       })
     }
   })
 
-  const detailed = result.map((t) => {
-    const players = t.players.map((p) => {
-      return {
-        puuid: p,
-        championId: championSelections[p] || -1,
-        gameName: summoners[p]?.gameName,
-        tagLine: summoners[p]?.tagLine
-      }
-    })
-
-    return {
-      ...t,
-      players
-    }
-  })
-
-  return {
-    winRateTeams: detailed.filter((t) => t.type === 'win-rate-team'),
-    loseRateTeams: detailed.filter((t) => t.type === 'lose-rate-team')
-  }
+  return result.reduce(
+    (acc, cur) => {
+      acc[cur.premadeId] = cur
+      return acc
+    },
+    {} as Record<string, WinRateTeamInfo>
+  )
 })
 
 const teamPremadeTeams = computed(() => {
@@ -222,6 +234,7 @@ const teamPremadeTeams = computed(() => {
     .map(([premadeId, players]) => {
       return {
         premadeId,
+        winRateTeamInfo: winRateTeams.value[premadeId],
         players: players.map((p) => {
           return {
             puuid: p,
@@ -238,11 +251,7 @@ const teamPremadeTeams = computed(() => {
 })
 
 const hasTags = computed(() => {
-  return (
-    teamPremadeTeams.value.length > 0 ||
-    winRateTeams.value.winRateTeams.length > 0 ||
-    winRateTeams.value.loseRateTeams.length > 0
-  )
+  return teamPremadeTeams.value.length > 0
 })
 </script>
 
@@ -250,6 +259,22 @@ const hasTags = computed(() => {
 .team-tags {
   display: flex;
   align-items: flex-end;
+}
+
+.tags-container {
+  display: flex;
+  gap: 8px;
+}
+
+.combined-tag {
+  display: flex;
+  align-items: center;
+  border-radius: 2px;
+  overflow: hidden;
+
+  .tag {
+    border-radius: 0px;
+  }
 }
 
 .tag {
@@ -266,10 +291,6 @@ const hasTags = computed(() => {
   &.lose-rate-team {
     background-color: #893b3b;
   }
-}
-
-.tag:not(:last-child) {
-  margin-right: 8px;
 }
 
 .normal-text {

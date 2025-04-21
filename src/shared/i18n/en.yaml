@@ -515,7 +515,7 @@ TaggedPlayers:
     importDefault: 'Failed to import tagged players: {{reason}}'
 
   exported: 'Exported tagged players: {{path}}'
-  imported : 'Imported tagged players: {{path}}'
+  imported: 'Imported tagged players: {{path}}'
   errorExport: 'Failed to export tagged players: {{reason}}'
 
 AboutPane:
@@ -1572,8 +1572,8 @@ PlayerInfoCard:
   losingStreak: '{{countV}} Losses'
 
 TeamTagsArea:
-  winRateTeam: Win-Rate Team {{team}}
-  loseRateTeam: Lose-Rate Team {{team}}
+  winRateTeam: Win-Rate Team
+  loseRateTeam: Lose-Rate Team
   premade: 'Premade {{countV}}-stack'
   winRate: 'Win Rate {{rate}}%'
   kda: 'KDA {{kda}}'
