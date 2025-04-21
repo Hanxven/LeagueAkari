@@ -6,7 +6,7 @@
       <ControlItem class="control-item-margin" :label="t('排序')" :label-width="100">
         <NRadioGroup size="small" v-model:value="opggChampionSortBy">
           <NFlex style="gap: 4px" :vertical="isSmallWidth">
-            <NRadio value="default" :title="t('默认')">默认</NRadio>
+            <NRadio value="default" :title="t('common.default')">{{ t('common.default') }}</NRadio>
             <NRadio value="pickRate" :title="t('OpggChampion.pickRate')">{{
                 t('OpggChampion.pickRate')
               }}</NRadio>
