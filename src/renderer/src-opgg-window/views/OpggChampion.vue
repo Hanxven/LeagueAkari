@@ -522,12 +522,10 @@
         </div>
         <div class="card-content">
           <div
-            class="items-group"
-            v-for="(s, i) of data.data.starter_items.slice(
-              0,
-              isStarterItemsExpanded ? Infinity : 4
-            )"
-          >
+  class="items-group"
+  v-for="(s, i) of sortedStarterItems.slice(0, isStarterItemsExpanded ? Infinity : 4)"
+  :key="i"
+>
             <div class="index">#{{ i + 1 }}</div>
             <template v-for="(ss, i) of s.ids">
               <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
@@ -838,6 +836,41 @@ const augments = computed(() => {
     return acc
   }, {})
 })
+
+const sortedStarterItems = computed(() => {
+  if (!props.data || !props.data.starter_items) return [];
+  return props.data.starter_items.slice().sort((a, b) => {
+    return (b.win / (b.play || 1)) - (a.win / (a.play || 1));
+  });
+});
+
+const sortedBoots = computed(() => {
+  if (!props.data || !props.data.boots) return [];
+  return props.data.boots.slice().sort((a, b) => {
+    return (b.win / (b.play || 1)) - (a.win / (a.play || 1));
+  });
+});
+
+const sortedPrismItems = computed(() => {
+  if (!props.data || !props.data.prism_items) return [];
+  return props.data.prism_items.slice().sort((a, b) => {
+    return (b.win / (b.play || 1)) - (a.win / (a.play || 1));
+  });
+});
+
+const sortedCoreItems = computed(() => {
+  if (!props.data || !props.data.core_items) return [];
+  return props.data.core_items.slice().sort((a, b) => {
+    return (b.win / (b.play || 1)) - (a.win / (a.play || 1));
+  });
+});
+
+const sortedLastItems = computed(() => {
+  if (!props.data || !props.data.last_items) return [];
+  return props.data.last_items.slice().sort((a, b) => {
+    return (b.win / (b.play || 1)) - (a.win / (a.play || 1));
+  });
+});
 
 const augmentTab = ref<string | undefined>('silver')
 watchEffect(() => {
