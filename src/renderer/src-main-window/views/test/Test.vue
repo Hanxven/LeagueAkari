@@ -2,102 +2,46 @@
   <div class="single-root">
     <NScrollbar class="outer-wrapper">
       <div style="margin-bottom: 12px">此页面被用于测试功能，仅在开发环境或 .rabi 版本中可见。</div>
-      <NButton tertiary type="primary" @click="stubGetHomeHub"
-        >恶魔手契成为三体人 (请先过新手教程)</NButton
-      >
+      <div style="margin-bottom: 12px">
+        This page is reserved for testing scenarios, can only be seen in dev or .rabi mode.
+      </div>
+      <div style="width: 100%; height: 1px; background: #fff4"></div>
+      <div class="colors-container">
+        <div
+          class="card"
+          v-for="(team, key) in teams"
+          :key="key"
+          :style="{
+            backgroundColor: team.foregroundColor,
+            color: team.color,
+            border: '4px solid ' + team.borderColor
+          }"
+        >
+          <div class="title">Team {{ key }}</div>
+          <div class="info">foregroundColor: {{ team.foregroundColor }}</div>
+          <div class="info">text color: {{ team.color }}</div>
+          <div class="info">borderColor: {{ team.borderColor }}</div>
+        </div>
+      </div>
       <div class="markdown-text markdown-body" v-html="markdownHtmlText"></div>
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
+import { PREMADE_TEAM_COLORS } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { markdownIt } from '@renderer-shared/utils/markdown'
-import { NButton, NScrollbar, useMessage } from 'naive-ui'
-import { computed, h } from 'vue'
-
-import { initialState } from './boba-minigame'
+import { NScrollbar, useMessage } from 'naive-ui'
+import { computed } from 'vue'
+import { reactive } from 'vue'
 
 const lc = useInstance(LeagueClientRenderer)
 
 const message = useMessage()
 
-const stubGetHomeHub = async () => {
-  const { data } = await lc._http.request({
-    method: 'GET',
-    url: '/lol-settings/v2/account/LCUPreferences/lol-home-hubs'
-  })
-
-  const prevState = data?.data?.['boba-minigame']
-
-  if (prevState) {
-    await lc._http.request({
-      method: 'PATCH',
-      url: '/lol-settings/v2/account/LCUPreferences/lol-home-hubs',
-      data: {
-        data: {
-          'boba-minigame': {
-            ...prevState,
-            hp: 100,
-            currency: 114514,
-            runBonusStats: {
-              BonusBaseCardDamage: 999999999,
-              BonusCritChance: 100,
-              BonusMaxHp: 0
-            }
-          }
-        },
-        schemaVersion: 1
-      }
-    })
-  } else {
-    await lc._http.request({
-      method: 'PATCH',
-      url: '/lol-settings/v2/account/LCUPreferences/lol-home-hubs',
-      data: {
-        data: {
-          'boba-minigame': {
-            ...initialState,
-            hp: 100,
-            currency: 114514,
-            runBonusStats: {
-              BonusBaseCardDamage: 999999999,
-              BonusCritChance: 0,
-              BonusMaxHp: 0
-            }
-          }
-        },
-        schemaVersion: 1
-      }
-    })
-  }
-
-  message.success(
-    () =>
-      h(
-        'div',
-        {
-          style: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }
-        },
-        [
-          h('span', '修改成功。请重启游戏客户端以生效'),
-          h(
-            NButton,
-            { type: 'primary', size: 'tiny', onClick: () => lc.api.riotclient.restartUx() },
-            '-> 重启 UX'
-          )
-        ]
-      ),
-    { duration: 10000, closable: true }
-  )
-}
-
-const textT = `# League Akari
+const textT = `# League Akari Markdown Test
 
 ## League Akari
 
@@ -139,6 +83,8 @@ fn league_akari(rabi: &str) {
 const markdownHtmlText = computed(() => {
   return markdownIt.render(textT)
 })
+
+const teams = reactive(PREMADE_TEAM_COLORS)
 </script>
 
 <style lang="less" scoped>
@@ -150,5 +96,29 @@ const markdownHtmlText = computed(() => {
   user-select: text;
 
   max-width: 800px;
+}
+
+.colors-container {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+
+  .card {
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .info {
+    font-size: 0.9em;
+    margin-bottom: 4px;
+  }
 }
 </style>
