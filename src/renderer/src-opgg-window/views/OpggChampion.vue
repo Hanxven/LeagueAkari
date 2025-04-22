@@ -670,7 +670,7 @@
         <div class="card-content">
           <div
             class="items-group"
-            v-for="(s, i) in sortedData('core_items', isCoreItemsExpanded, 4)"
+            v-for="(s, i) in sortedData('core_items', isCoreItemsExpanded, 5)"
             :key="i"
           >
             <div class="index">#{{ i + 1 }}</div>
