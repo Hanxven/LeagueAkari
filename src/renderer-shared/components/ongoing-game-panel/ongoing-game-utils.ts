@@ -82,7 +82,7 @@ export const PREMADE_TEAM_COLORS = {
   B: { foregroundColor: '#628aff', color: '#000', borderColor: '#628affd0' },
   C: { foregroundColor: '#d4de17', color: '#000', borderColor: '#d4de17d0' },
   D: { foregroundColor: '#2eda3e', color: '#000', borderColor: '#2eda3ed0' },
-  E: { foregroundColor: '#2ec7da', color: '#000', borderColor: '#2ec7dad0' },
+  E: { foregroundColor: '#ff9f1c', color: '#000', borderColor: '#ff9f1cd0' },
   F: { foregroundColor: '#da4e2e', color: '#fff', borderColor: '#da4e2ed0' },
   G: { foregroundColor: '#bc2ebc', color: '#fff', borderColor: '#bc2ebcd0' },
   H: { foregroundColor: '#fa4e80', color: '#000', borderColor: '#fa4e80d0' }
