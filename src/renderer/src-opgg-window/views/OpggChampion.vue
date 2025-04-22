@@ -861,7 +861,7 @@ const augments = computed(() => {
   }, {})
 })
 
-const augmentTab = ref<string | undefined>('silver')
+const augmentTab = ref<string | undefined>('gold')
 watchEffect(() => {
   if (!augments.value) {
     augmentTab.value = undefined
