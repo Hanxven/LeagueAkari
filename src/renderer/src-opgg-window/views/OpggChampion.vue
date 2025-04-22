@@ -3,9 +3,8 @@
     <!-- 真的想不出一点容易组织的结构, 就这样复制粘贴吧 -->
     <NSpin description="Loading ..." v-if="loading" class="spin-mask"></NSpin>
     <div class="sorting-controls">
-      <ControlItem class="control-item-margin" :label="t('排序')" :label-width="100">
         <NRadioGroup size="small" v-model:value="opggChampionSortBy">
-          <NFlex style="gap: 4px" :vertical="isSmallWidth">
+          <NFlex style="gap: 4px">
             <NRadio value="default" :title="t('common.default')">{{ t('common.default') }}</NRadio>
             <NRadio value="pickRate" :title="t('OpggChampion.pickRate')">{{
                 t('OpggChampion.pickRate')
@@ -15,7 +14,6 @@
             </NRadio>
           </NFlex>
         </NRadioGroup>
-      </ControlItem>
     </div>
     <NScrollbar>
       <div class="card-area" v-if="info">
@@ -64,8 +62,13 @@
           </div>
         </div>
       </div>
+      <NTabs class="tabs" v-model:value="opggCurrentTab" type="segment" size="small">
+        <NTab name="build" :tab="t('OpggChampion.build')" />
+        <NTab name="items" :tab="t('OpggChampion.itemText')" />
+      </NTabs>
       <div
         class="card-area"
+        v-show="opggCurrentTab === 'build'"
         v-if="
           (info && info.position && info.position.counters?.length) ||
           (data && data.data.counters && data.data.counters.length)
@@ -143,6 +146,7 @@
       </div>
       <div
         class="card-area"
+        v-show="opggCurrentTab === 'build'"
         v-if="data && data.data.summoner_spells && data.data.summoner_spells.length"
       >
         <div class="card-title">
@@ -191,7 +195,7 @@
           </div>
         </div>
       </div>
-      <div class="card-area" v-if="data && data.data.runes && data.data.runes.length">
+      <div class="card-area" v-show="opggCurrentTab === 'build'" v-if="data && data.data.runes && data.data.runes.length">
         <div class="card-title">
           {{ t('OpggChampion.runes') }}
           <NCheckbox size="small" v-model:checked="isRunesExpanded">
@@ -265,7 +269,7 @@
           </div>
         </div>
       </div>
-      <div class="card-area" v-if="data && data.data.synergies && data.data.synergies.length">
+      <div class="card-area" v-show="opggCurrentTab === 'build'" v-if="data && data.data.synergies && data.data.synergies.length">
         <div class="card-title">
           {{ t('OpggChampion.synergies') }}
           <NCheckbox size="small" v-model:checked="isSynergiesExpanded"
@@ -315,7 +319,7 @@
           </div>
         </div>
       </div>
-      <div class="card-area" v-if="augments && Object.keys(augments).length">
+      <div class="card-area" v-show="opggCurrentTab === 'build'" v-if="augments && Object.keys(augments).length">
         <NTabs v-model:value="augmentTab" size="small" :animated="false">
           <template #suffix>
             <NCheckbox size="small" v-model:checked="isAugmentsExpanded"
@@ -424,6 +428,7 @@
       </div>
       <div
         class="card-area"
+        v-show="opggCurrentTab === 'build'"
         v-if="data && data.data.skill_masteries && data.data.skill_masteries.length"
       >
         <div class="card-title">
@@ -497,7 +502,7 @@
         </div>
       </div>
       <!-- inline styled :( -->
-      <div class="card-area" v-if="isAbleToAddToItemSet">
+      <div class="card-area" v-show="opggCurrentTab === 'build'" v-if="isAbleToAddToItemSet">
         <div class="card-title">{{ t('OpggChampion.applyRunesText') }}</div>
         <div class="card-content">
           <div
@@ -584,6 +589,7 @@
                 <NIcon v-if="i < s.ids.length - 1" class="separator">
                   <ArrowForwardIosOutlinedIcon />
                 </NIcon>
+                <span v-if="s.ids.length === 1" class="items-title">{{ lcs.gameData.items[ss]?.name || ss }}</span>
               </template>
               <div class="desc">
                 <div class="pick">
@@ -628,6 +634,7 @@
                 <NIcon v-if="i < s.ids.length - 1" class="separator">
                   <ArrowForwardIosOutlinedIcon />
                 </NIcon>
+                <span v-if="s.ids.length === 1" class="items-title">{{ lcs.gameData.items[ss]?.name || ss }}</span>
               </template>
               <div class="desc">
                 <div class="pick">
@@ -712,6 +719,7 @@
                 <NIcon v-if="i < s.ids.length - 1" class="separator">
                   <ArrowForwardIosOutlinedIcon />
                 </NIcon>
+                <span v-if="s.ids.length === 1" class="items-title">{{ lcs.gameData.items[ss]?.name || ss }}</span>
               </template>
               <div class="desc">
                 <div class="pick">
@@ -764,7 +772,7 @@ import {
   NRadioGroup,
   NScrollbar,
   NSpin,
-  NSwitch,
+  NSwitch, NTab,
   NTabPane,
   NTabs,
   useMessage
@@ -881,6 +889,7 @@ const isBootsExpanded = ref(false)
 const isPrismItemsExpanded = ref(false)
 const isCoreItemsExpanded = ref(false)
 const isLastItemsExpanded = ref(false)
+const opggCurrentTab = ref('build')
 
 const opggChampionSortBy = useLocalStorage('opgg-sort-by', 'default')
 
@@ -1483,6 +1492,13 @@ if (import.meta.env.DEV) {
 .augments-tab-title {
   font-size: 12px;
   font-weight: bold;
+}
+
+.items-title {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--gray-light);
+  margin-left: 0.5rem;
 }
 
 .augments-group {
