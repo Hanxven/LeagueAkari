@@ -546,6 +546,7 @@
               <NIcon v-if="i < s.ids.length - 1" class="separator">
                 <ArrowForwardIosOutlinedIcon />
               </NIcon>
+              <span v-if="s.ids.length === 1" class="items-title">{{ lcs.gameData.items[ss]?.name || ss }}</span>
             </template>
             <div class="desc">
               <div class="pick">
