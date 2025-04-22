@@ -868,10 +868,11 @@ watchEffect(() => {
     return
   }
 
-  if (augments.value[1]) {
-    augmentTab.value = 'silver'
-  } else if (augments.value[4]) {
+  if (augments.value[4]) {
     augmentTab.value = 'gold'
+  }
+  else if (augments.value[1]) {
+    augmentTab.value = 'silver'
   } else if (augments.value[8]) {
     augmentTab.value = 'prism'
   } else {
