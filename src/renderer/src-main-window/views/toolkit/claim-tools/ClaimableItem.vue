@@ -10,12 +10,12 @@
 </template>
 
 <script lang="ts" setup>
+import { useTranslation } from 'i18next-vue'
 import { computed } from 'vue'
 
 import RewardItem from './RewardItem.vue'
-import { useTranslation } from 'i18next-vue';
 
-const {t} = useTranslation()
+const { t } = useTranslation()
 
 const { items = [], title = '' } = defineProps<{
   title?: string
@@ -29,7 +29,7 @@ const { items = [], title = '' } = defineProps<{
 const translatedTitle = computed(() => {
   // "Placeholder Name for Reward Group DO NOT TRANSLATE"
   if (title.includes('DO NOT TRANSLATE')) {
-    return  t('ClaimableItem.untranslatedC', {
+    return t('ClaimableItem.untranslatedC', {
       countV: items.length
     })
   }

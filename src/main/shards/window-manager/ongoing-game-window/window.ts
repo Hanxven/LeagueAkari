@@ -1,10 +1,10 @@
 import { is } from '@electron-toolkit/utils'
 import { GameClientMain } from '@main/shards/game-client'
 import { AkariIpcError } from '@main/shards/ipc'
+import icon from '@resources/LA_ICON.ico?asset'
 import { comparer } from 'mobx'
 
 import { type WindowManagerMainContext } from '..'
-import icon from '@resources/LA_ICON.ico?asset'
 import { BaseAkariWindow } from '../base-akari-window'
 import { OngoingGameWindowSettings, OngoingGameWindowState } from './state'
 

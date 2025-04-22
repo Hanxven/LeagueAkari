@@ -298,7 +298,7 @@ const statsConfigMap = computed(() => {
     riotIdGameName: { render: maskedTextDisplay },
     riotIdTagline: { render: maskedTextDisplay },
     summonerId: { render: maskedTextDisplay },
-    summonerName: { render: maskedTextDisplay },
+    summonerName: { render: maskedTextDisplay }
   }
 })
 

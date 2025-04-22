@@ -387,6 +387,7 @@
 
 <script lang="ts" setup>
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
+import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { AutoChampConfigRenderer } from '@renderer-shared/shards/auto-champ-config'
 import {
@@ -421,7 +422,6 @@ import { computed, ref, toRaw, watch } from 'vue'
 import { useChampionNameMatch } from '@main-window/compositions/useChampionNameMatch'
 import { useMapAssets } from '@main-window/compositions/useMapAssets'
 
-import PositionIcon from '@renderer-shared/components/icons/position-icons/PositionIcon.vue'
 import RuneV2Edit from './RuneV2Edit.vue'
 import SummonerSpellEdit from './SummonerSpellEdit.vue'
 import { useValidatedRunes } from './utils'

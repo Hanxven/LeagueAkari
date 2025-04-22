@@ -146,69 +146,69 @@ interface RewardOption {
 }
 
 export interface EventPassBundle2 {
-  bundledItems: BundledItem[];
-  details: BundledItem;
-  discountPercentage: number;
-  finalPrice: number;
-  futureBalance: number;
-  initialPrice: number;
-  isPurchasable: boolean;
+  bundledItems: BundledItem[]
+  details: BundledItem
+  discountPercentage: number
+  finalPrice: number
+  futureBalance: number
+  initialPrice: number
+  isPurchasable: boolean
 }
 
 interface BundledItem {
-  decoratorBadgeURL: string;
-  description: string;
-  inventoryType: string;
-  itemId: number;
-  name: string;
-  owned: boolean;
-  quantity: number;
-  splashImage: string;
-  subInventoryType: string;
+  decoratorBadgeURL: string
+  description: string
+  inventoryType: string
+  itemId: number
+  name: string
+  owned: boolean
+  quantity: number
+  splashImage: string
+  subInventoryType: string
 }
 
 export interface EventProgressInfoData {
-  eventPassBundlesCatalogEntry: EventPassBundlesCatalogEntry[];
-  passPurchased: boolean;
-  tokenImage: string;
+  eventPassBundlesCatalogEntry: EventPassBundlesCatalogEntry[]
+  passPurchased: boolean
+  tokenImage: string
 }
 
 interface EventPassBundlesCatalogEntry {
-  contentId: string;
-  itemId: number;
-  offerId: string;
-  typeId: string;
+  contentId: string
+  itemId: number
+  offerId: string
+  typeId: string
 }
 
 export interface EventRewardTrackBonusProgress {
-  currentLevelXP: number;
-  futureLevelProgress: number;
-  iteration: number;
-  level: number;
-  levelProgress: number;
-  passProgress: number;
-  totalLevelXP: number;
-  totalLevels: number;
+  currentLevelXP: number
+  futureLevelProgress: number
+  iteration: number
+  level: number
+  levelProgress: number
+  passProgress: number
+  totalLevelXP: number
+  totalLevels: number
 }
 
 export interface EventProgressionPurchaseData {
-  offerId: string;
-  pricePerLevel: number;
-  rpBalance: number;
+  offerId: string
+  pricePerLevel: number
+  rpBalance: number
 }
 
 export interface EventRewardTrackXP {
-  currentLevel: number;
-  currentLevelXP: number;
-  isBonusPhase: boolean;
-  iteration: number;
-  totalLevelXP: number;
+  currentLevel: number
+  currentLevelXP: number
+  isBonusPhase: boolean
+  iteration: number
+  totalLevelXP: number
 }
 
 export interface EventNarrativeButtonData {
-  activeEventId: string;
-  eventName: string;
-  iconPath: string;
-  showGlow: boolean;
-  showPip: boolean;
+  activeEventId: string
+  eventName: string
+  iconPath: string
+  showGlow: boolean
+  showPip: boolean
 }

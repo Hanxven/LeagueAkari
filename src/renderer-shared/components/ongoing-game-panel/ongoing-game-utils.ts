@@ -77,7 +77,6 @@ export const PREMADE_TEAMS = [
   'Z'
 ]
 
-
 export const PREMADE_TEAM_COLORS = {
   A: { foregroundColor: '#48e5db', color: '#000', borderColor: '#48e5dbd0' },
   B: { foregroundColor: '#628aff', color: '#000', borderColor: '#628affd0' },

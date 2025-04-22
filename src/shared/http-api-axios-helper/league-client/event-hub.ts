@@ -1,7 +1,7 @@
 import {
-  EventHubEvents,
   EventChapters,
   EventDetailsData,
+  EventHubEvents,
   EventInfo,
   EventNarrativeButtonData,
   EventObjectivesBanner,
@@ -62,7 +62,9 @@ export class EventHubHttpApi {
   }
 
   getProgressInfoData(eventId: string) {
-    return this._http.get<EventProgressInfoData>(`/lol-event-hub/v1/events/${eventId}/progress-info-data`)
+    return this._http.get<EventProgressInfoData>(
+      `/lol-event-hub/v1/events/${eventId}/progress-info-data`
+    )
   }
 
   getProgressionPurchaseData(eventId: string) {

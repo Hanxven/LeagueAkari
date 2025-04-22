@@ -60,7 +60,7 @@ export class ClientInstallationState {
   constructor() {
     makeAutoObservable(this, {
       leagueClientExecutablePaths: observable.struct,
-      detectedLiveStreamingClients: observable.struct,
+      detectedLiveStreamingClients: observable.struct
     })
   }
 }

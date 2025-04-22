@@ -69,9 +69,6 @@
 </template>
 
 <script lang="ts" setup>
-import { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
-import { useTranslation } from 'i18next-vue'
-
 import BronzeMedal from '@renderer-shared/assets/ranked-icons/bronze.png'
 import ChallengerMedal from '@renderer-shared/assets/ranked-icons/challenger.png'
 import DiamondMedal from '@renderer-shared/assets/ranked-icons/diamond.png'
@@ -82,6 +79,8 @@ import IronMedal from '@renderer-shared/assets/ranked-icons/iron.png'
 import MasterMedal from '@renderer-shared/assets/ranked-icons/master.png'
 import PlatinumMedal from '@renderer-shared/assets/ranked-icons/platinum.png'
 import SilverMedal from '@renderer-shared/assets/ranked-icons/silver.png'
+import { RankedEntry, RankedStats } from '@shared/types/league-client/ranked'
+import { useTranslation } from 'i18next-vue'
 
 const { rankedStats } = defineProps<{
   rankedStats: RankedStats
