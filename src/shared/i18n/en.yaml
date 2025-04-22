@@ -1848,6 +1848,7 @@ OpggChampion:
   bootsDesc: Boots (sorted by pick rate)
   prismItemsDesc: Prism Tier Items (sorted by pick rate)
   itemsDesc: Items (sorted by pick rate)
+  build: Build
   coreItem: 'Core Item #{{index}} | Pick Rate {{pickRate}}%'
   starterItem: 'Starting Item #{{index}} | Pick Rate {{pickRate}}%'
 
