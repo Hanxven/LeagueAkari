@@ -1853,6 +1853,7 @@ OpggChampion:
   bootsDesc: 鞋子 (按出场率排序)
   prismItemsDesc: 棱彩阶装备 (按出场率排序)
   itemsDesc: 装备 (按出场率排序)
+  build: 阵容
   coreItem: '核心装备 #{{index}} | 出场率 {{pickRate}}%'
   starterItem: '初始装备 #{{index}} | 出场率 {{pickRate}}%'
 
