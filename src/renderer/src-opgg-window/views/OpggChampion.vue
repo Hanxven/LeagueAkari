@@ -217,7 +217,7 @@
                 />
                 <PerkDisplay
                   :max-width="280"
-                  :size="18"
+                  :size="28"
                   v-for="p of r.primary_rune_ids"
                   :perk-id="p"
                 />
@@ -542,7 +542,7 @@
           >
             <div class="index">#{{ i + 1 }}</div>
             <template v-for="(ss, i) of s.ids">
-              <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+              <ItemDisplay :size="32" :item-id="ss" :max-width="300" />
               <NIcon v-if="i < s.ids.length - 1" class="separator">
                 <ArrowForwardIosOutlinedIcon />
               </NIcon>
@@ -586,7 +586,7 @@
             >
               <div class="index">#{{ i + 1 }}</div>
               <template v-for="(ss, i) of s.ids">
-                <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+                <ItemDisplay :size="32" :item-id="ss" :max-width="300" />
                 <NIcon v-if="i < s.ids.length - 1" class="separator">
                   <ArrowForwardIosOutlinedIcon />
                 </NIcon>
@@ -631,7 +631,7 @@
             >
               <div class="index">#{{ i + 1 }}</div>
               <template v-for="(ss, i) of s.ids">
-                <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+                <ItemDisplay :size="32" :item-id="ss" :max-width="300" />
                 <NIcon v-if="i < s.ids.length - 1" class="separator">
                   <ArrowForwardIosOutlinedIcon />
                 </NIcon>
@@ -675,7 +675,7 @@
           >
             <div class="index">#{{ i + 1 }}</div>
             <template v-for="(ss, i) of s.ids">
-              <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+              <ItemDisplay :size="32" :item-id="ss" :max-width="300" />
               <NIcon v-if="i < s.ids.length - 1" class="separator">
                 <ArrowForwardIosOutlinedIcon />
               </NIcon>
@@ -716,7 +716,7 @@
             >
               <div class="index">#{{ i + 1 }}</div>
               <template v-for="(ss, i) of s.ids">
-                <ItemDisplay :size="24" :item-id="ss" :max-width="300" />
+                <ItemDisplay :size="32" :item-id="ss" :max-width="300" />
                 <NIcon v-if="i < s.ids.length - 1" class="separator">
                   <ArrowForwardIosOutlinedIcon />
                 </NIcon>
@@ -972,6 +972,8 @@ if (import.meta.env.DEV) {
 
 <style lang="less" scoped>
 .opgg-champion-wrapper {
+  display: flex;
+  flex-direction: column;
   position: relative;
   height: 100%;
 
