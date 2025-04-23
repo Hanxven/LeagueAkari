@@ -530,6 +530,7 @@ AboutPane:
   checkFrom: 从下载源中 ({{ source }}) 检查更新
   checkUpdates: 检查更新
   currentRelease: 当前版本内容
+  downloadRelease: 下载更新包
   newRelease: 新版本内容
   lastCheckAt: 上次检查
   cancelUpdate: 取消更新

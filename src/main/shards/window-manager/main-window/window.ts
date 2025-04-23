@@ -118,6 +118,38 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
       },
       { fireImmediately: true }
     )
+
+    this._mobx.reaction(
+      () => this._context.selfUpdate.state.updateProgressInfo,
+      (info) => {
+        if (!this._window) {
+          return
+        }
+
+        if (!info) {
+          this._window.setProgressBar(-1)
+          return
+        }
+
+        switch (info.phase) {
+          case 'downloading':
+            this._window.setProgressBar(info.downloadingProgress)
+            break
+          case 'download-failed':
+            this._window.setProgressBar(info.downloadingProgress, { mode: 'error' })
+            break
+          case 'unpacking':
+            this._window.setProgressBar(info.unpackingProgress)
+            break
+          case 'unpack-failed':
+            this._window.setProgressBar(info.unpackingProgress, { mode: 'error' })
+            break
+
+          default:
+            this._window.setProgressBar(-1)
+        }
+      }
+    )
   }
 
   private _handleMainWindowIpcCall() {

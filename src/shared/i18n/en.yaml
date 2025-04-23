@@ -526,8 +526,9 @@ AboutPane:
 
   checkFrom: Check updates from download source ({{source}})
   checkUpdates: Check Updates
-  currentRelease: Current Version
-  newRelease: New Version
+  currentRelease: Current Release
+  downloadRelease: Download Release
+  newRelease: New Release
   lastCheckAt: Last Check at
   cancelUpdate: Cancel Update
 

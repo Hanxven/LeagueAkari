@@ -227,7 +227,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       }
 
       this.state.setCurrentRelease({
-        isNew: release.isNew,
+        isNew: debug || release.isNew,
         source: this.settings.downloadSource,
         currentVersion: app.getVersion(),
         releaseNotes: release.body,
@@ -244,7 +244,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         }, SelfUpdateMain.UPDATES_CHECK_INTERVAL)
       }
 
-      if (release.isNew) {
+      if (debug || release.isNew) {
         return { result: 'new-updates' }
       } else {
         return { result: 'no-updates' }
@@ -634,7 +634,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     })
 
     this._ipc.onCall(SelfUpdateMain.id, 'startUpdate', async () => {
-      if (this.state.currentRelease) {
+      if (this.state.currentRelease && this.state.currentRelease.isNew) {
         await this._startUpdateProcess(
           this.state.currentRelease.downloadUrl,
           this.state.currentRelease.filename

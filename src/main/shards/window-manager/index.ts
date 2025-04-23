@@ -11,6 +11,7 @@ import { KeyboardShortcutsMain } from '../keyboard-shortcuts'
 import { LeagueClientMain } from '../league-client'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
+import { SelfUpdateMain } from '../self-update'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { AkariAuxWindow } from './aux-window/window'
@@ -36,6 +37,7 @@ export interface WindowManagerMainContext {
   log: AkariLogger
   gameClient: GameClientMain
   keyboardShortcuts: KeyboardShortcutsMain
+  selfUpdate: SelfUpdateMain
 }
 
 @Shard(WindowManagerMain.id)
@@ -66,7 +68,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     private readonly _protocol: AkariProtocolMain,
     private readonly _kbd: KeyboardShortcutsMain,
     private readonly _app: AppCommonMain,
-    private readonly _gc: GameClientMain
+    private readonly _gc: GameClientMain,
+    private readonly _selfUpdate: SelfUpdateMain
   ) {
     this._log = _loggerFactory.create(WindowManagerMain.id)
     this._setting = _settingFactory.register(
@@ -100,7 +103,8 @@ export class WindowManagerMain implements IAkariShardInitDispose {
       mobx: this._mobx,
       log: this._log,
       gameClient: this._gc,
-      keyboardShortcuts: this._kbd
+      keyboardShortcuts: this._kbd,
+      selfUpdate: this._selfUpdate
     }
   }
 

@@ -115,6 +115,10 @@ export class SelfUpdateState {
       return false
     }
 
+    if (a.isNew !== b.isNew) {
+      return false
+    }
+
     return a.currentVersion === b.currentVersion && a.releaseVersion === b.releaseVersion
   }
 

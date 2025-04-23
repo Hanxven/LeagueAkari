@@ -75,6 +75,15 @@
             </NButton>
             <NButton
               size="small"
+              v-if="sus.currentRelease && sus.currentRelease.isNew"
+              :disabled="sus.updateProgressInfo !== null"
+              secondary
+              @click="() => su.startUpdate()"
+            >
+              {{ t('AboutPane.downloadRelease') }}
+            </NButton>
+            <NButton
+              size="small"
               v-if="sus.updateProgressInfo"
               secondary
               type="warning"
