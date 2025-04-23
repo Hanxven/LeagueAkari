@@ -1574,7 +1574,7 @@ PlayerInfoCard:
 TeamTagsArea:
   winRateTeam: Win-Rate Team
   loseRateTeam: Lose-Rate Team
-  premade: 'Premade {{countV}}-stack'
+  premade: 'Premade {{countV}}'
   winRate: 'Win Rate {{rate}}%'
   kda: 'KDA {{kda}}'
 

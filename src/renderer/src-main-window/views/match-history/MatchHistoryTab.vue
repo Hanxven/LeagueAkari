@@ -912,15 +912,9 @@ const loadMatchHistory = async (page?: number, pageSize?: number, tag?: string) 
     notification.warning({
       title: () => t('MatchHistoryTab.failedToLoadTitle'),
       content: () => {
-        if (tab.sgpServerId === 'TENCENT_HN1') {
-          return t('MatchHistoryTab.failedToLoadMatchHistoryHN1', {
-            reason: error.message
-          })
-        } else {
-          return t('MatchHistoryTab.failedToLoadMatchHistory', {
-            reason: error.message
-          })
-        }
+        return t('MatchHistoryTab.failedToLoadMatchHistory', {
+          reason: error.message
+        })
       },
       duration: 6000
     })
@@ -1453,10 +1447,7 @@ const handleScreenshot = async () => {
     const blob = await toBlob(innerContainerEl.value, {
       style: {
         margin: '0',
-        backgroundColor:
-          getComputedStyle(document.documentElement).getPropertyValue(
-            '--background-color-primary'
-          ) || '#000'
+        background: 'linear-gradient(135deg, #151522, #2b0a2e, #4a223d)'
       }
     })
 
