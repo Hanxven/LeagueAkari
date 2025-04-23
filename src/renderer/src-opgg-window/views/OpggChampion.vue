@@ -284,7 +284,7 @@
             <div class="index" style="margin-right: 4px">#{{ i + 1 }}</div>
             <div class="image-name" @click="() => emits('showChampion', s.champion_id)">
               <LcuImage class="image" :src="championIconUri(s.champion_id)" />
-              <span>{{ lcs.gameData.champions[s.champion_id]?.name || s.champion_id }}</span>
+              <span class="name">{{ lcs.gameData.champions[s.champion_id]?.name || s.champion_id }}</span>
             </div>
             <div class="desc">
               <div class="value-text">
@@ -900,14 +900,15 @@ watchEffect(() => {
     isSummonerSpellsExpanded.value = false
     isRunesExpanded.value = false
     isSynergiesExpanded.value = false
-    isAugmentsExpanded.value = false
+    isAugmentsExpanded.value = true
     isSkillMasteriesExpanded.value = false
     isStarterItemsExpanded.value = false
     isBootsExpanded.value = false
-    isPrismItemsExpanded.value = false
+    isPrismItemsExpanded.value = true
     isCoreItemsExpanded.value = false
     isLastItemsExpanded.value = false
     isCountersExpanded.value = false
+    opggCurrentTab.value = 'build'
   }
 })
 
@@ -1454,6 +1455,13 @@ if (import.meta.env.DEV) {
       width: 24px;
       height: 24px;
     }
+
+    .name {
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: var(--gray-light);
+      margin-left: 0.5rem;
+    }
   }
 
   .desc {
@@ -1517,7 +1525,10 @@ if (import.meta.env.DEV) {
     gap: 4px;
 
     .name {
-      font-size: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: var(--gray-light);
+      margin-left: 0.5rem;
     }
   }
 
