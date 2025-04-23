@@ -1,5 +1,5 @@
 <template>
-  <div class="control-item" :class="{ [`align-${align}`]: align }">
+  <div class="control-item" :class="{ [`align-${align}`]: align, highlight: isHighlighting }">
     <div class="label-area" :style="{ width: labelWidth ? `${labelWidth}px` : 'unset' }">
       <div v-if="$slots.label" class="label">
         <slot name="label" :disabled="disabled"></slot>
@@ -17,6 +17,9 @@
 </template>
 
 <script setup lang="ts">
+import { useTimeoutFn } from '@vueuse/core'
+import { ref } from 'vue'
+
 const { align = 'center' } = defineProps<{
   labelWidth?: number
   align?: 'center' | 'start'
@@ -24,6 +27,20 @@ const { align = 'center' } = defineProps<{
   labelDescription?: string
   disabled?: boolean
 }>()
+
+const isHighlighting = ref(false)
+const highlight = () => {
+  isHighlighting.value = true
+  start()
+}
+
+const { start } = useTimeoutFn(() => {
+  isHighlighting.value = false
+}, 2500)
+
+defineExpose({
+  highlight
+})
 
 defineOptions({
   __akari_isControlItem: true
@@ -35,6 +52,7 @@ defineOptions({
   display: flex;
   width: fit-content;
   width: 100%;
+  transition: background-color 0.3s ease;
 
   &.align-center {
     align-items: center;
@@ -82,6 +100,11 @@ defineOptions({
   .label-description.disabled {
     color: #fff8;
   }
+
+  .control-item.highlight {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
 }
 
 [data-theme='light'] {
@@ -99,6 +122,11 @@ defineOptions({
 
   .label-description.disabled {
     color: #0008;
+  }
+
+  .control-item.highlight {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
   }
 }
 </style>
