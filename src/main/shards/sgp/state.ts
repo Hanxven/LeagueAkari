@@ -1,26 +1,49 @@
-import { AvailableServersMap } from '@shared/data-sources/sgp'
-import { makeAutoObservable } from 'mobx'
+import { LeagueSgpApi, SgpServersConfig } from '@shared/data-sources/sgp'
+import { getSgpServerId } from '@shared/data-sources/sgp/utils'
+import { makeAutoObservable, observable } from 'mobx'
+
+import { LeagueClientState } from '../league-client/state'
 
 export class SgpState {
-  availability = {
-    region: '',
-    rsoPlatform: '',
-    sgpServerId: '',
-    serversSupported: {
-      matchHistory: false,
-      common: false
-    },
-    sgpServers: {
-      servers: {},
-      serverNames: {},
-      tencentServerMatchHistoryInteroperability: [],
-      tencentServerSpectatorInteroperability: [],
-      tencentServerSummonerInteroperability: []
-    } as AvailableServersMap
+  sgpServerConfig: SgpServersConfig = {
+    version: 0,
+    lastUpdate: 0,
+    servers: {},
+    serverNames: {},
+    tencentServerMatchHistoryInteroperability: [],
+    tencentServerSpectatorInteroperability: [],
+    tencentServerSummonerInteroperability: []
   }
 
-  isEntitlementsTokenSet = false
+  get availability() {
+    if (!this._lcState.auth) {
+      return {
+        region: '',
+        rsoPlatform: '',
+        sgpServerId: '',
+        serversSupported: {
+          matchHistory: false,
+          common: false
+        }
+      }
+    }
 
+    const sgpServerId = getSgpServerId(this._lcState.auth.region, this._lcState.auth.rsoPlatformId)
+    const supported = this._api.supportsSgpServer(sgpServerId)
+
+    return {
+      region: this._lcState.auth.region,
+      rsoPlatform: this._lcState.auth.rsoPlatformId,
+      sgpServerId,
+      serversSupported: {
+        matchHistory: supported.matchHistory,
+        common: supported.common
+      }
+    }
+  }
+
+  // 用一个标记位来延迟更新
+  isEntitlementsTokenSet = false
   isLeagueSessionTokenSet = false
 
   setEntitlementsTokenSet(value: boolean) {
@@ -31,30 +54,20 @@ export class SgpState {
     this.isLeagueSessionTokenSet = value
   }
 
-  setAvailability(
-    region: string,
-    rsoPlatform: string,
-    sgpServerId: string,
-    serversSupported: {
-      matchHistory: boolean
-      common: boolean
-    },
-    sgpServers: AvailableServersMap
-  ) {
-    this.availability = {
-      region,
-      rsoPlatform,
-      sgpServerId,
-      serversSupported,
-      sgpServers
-    }
+  setSgpServerConfig(value: SgpServersConfig) {
+    this.sgpServerConfig = value
   }
 
   get isTokenReady() {
     return this.isEntitlementsTokenSet && this.isLeagueSessionTokenSet
   }
 
-  constructor() {
-    makeAutoObservable(this)
+  constructor(
+    private _lcState: LeagueClientState,
+    private _api: LeagueSgpApi
+  ) {
+    makeAutoObservable(this, {
+      sgpServerConfig: observable.ref
+    })
   }
 }

@@ -105,3 +105,95 @@ export class TimeoutTask {
     }
   }
 }
+
+export class IntervalTask {
+  private _intervalId: NodeJS.Timeout | null = null
+  private _isStarted = false
+  private _callback?: () => void
+  private _interval: number
+
+  /**
+   * @param callback 回调函数
+   * @param interval 间隔时间（毫秒）
+   * @param autoStart 构造后是否立即启动
+   * @param runImmediately 启动时是否立即先执行一次回调
+   */
+  constructor(callback?: () => void, interval = 0, autoStart = false, runImmediately = false) {
+    this._callback = callback
+    this._interval = interval
+    if (autoStart) {
+      this.start(runImmediately, interval)
+    }
+  }
+
+  /** 是否已经启动 */
+  get isStarted(): boolean {
+    return this._isStarted
+  }
+
+  /** 取消周期任务 */
+  cancel(): boolean {
+    if (!this._isStarted || !this._intervalId) return false
+    clearInterval(this._intervalId)
+    this._intervalId = null
+    this._isStarted = false
+    return true
+  }
+
+  /**
+   * 启动周期任务
+   * @param runImmediately 是否在启动时立即执行一次
+   * @param interval 可选新的间隔时间
+   */
+  start(runImmediately = false, interval?: number): void {
+    if (interval !== undefined) this._interval = interval
+    if (!this._callback) return
+
+    this.cancel() // 避免重复
+
+    if (runImmediately) {
+      this._callback?.()
+    }
+
+    this._isStarted = true
+    this._intervalId = setInterval(() => {
+      this._callback?.()
+    }, this._interval)
+  }
+
+  /**
+   * 设置新的回调函数，并根据 autoStart 决定是否立即启动
+   * @param callback 回调函数
+   * @param autoStart 是否自动启动
+   * @param runImmediately 是否在启动时立即执行一次
+   * @param interval 可选新的间隔时间
+   */
+  setTask(
+    callback: () => void,
+    autoStart = false,
+    runImmediately = false,
+    interval?: number
+  ): void {
+    this._callback = callback
+    this.cancel()
+    if (autoStart) {
+      this.start(runImmediately, interval)
+    }
+  }
+
+  /**
+   * 更新间隔时间；如果任务正在执行，则立即生效
+   * @param newInterval 新的间隔时间
+   */
+  updateTime(newInterval: number): void {
+    this._interval = newInterval
+    if (this._isStarted) {
+      this.start(false, this._interval) // 重启以应用新间隔
+    }
+  }
+
+  /** 手动触发一次回调（不影响定时器状态） */
+  triggerOnce(): void {
+    this._callback?.()
+  }
+}

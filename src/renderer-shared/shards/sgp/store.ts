@@ -1,4 +1,4 @@
-import { AvailableServersMap } from '@shared/data-sources/sgp'
+import { SgpServersConfig } from '@shared/data-sources/sgp'
 import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
 
@@ -11,7 +11,6 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
       matchHistory: boolean
       common: boolean
     }
-    sgpServers: AvailableServersMap
   }>({
     region: '',
     rsoPlatform: '',
@@ -19,20 +18,24 @@ export const useSgpStore = defineStore('shard:sgp-renderer', () => {
     serversSupported: {
       matchHistory: false,
       common: false
-    },
-    sgpServers: {
-      servers: {},
-      serverNames: {},
-      tencentServerMatchHistoryInteroperability: [],
-      tencentServerSpectatorInteroperability: [],
-      tencentServerSummonerInteroperability: []
     }
+  })
+
+  const sgpServerConfig = shallowRef<SgpServersConfig>({
+    version: 0,
+    lastUpdate: 0,
+    servers: {},
+    serverNames: {},
+    tencentServerMatchHistoryInteroperability: [],
+    tencentServerSpectatorInteroperability: [],
+    tencentServerSummonerInteroperability: []
   })
 
   const isTokenReady = ref(false)
 
   return {
     availability,
-    isTokenReady
+    isTokenReady,
+    sgpServerConfig
   }
 })

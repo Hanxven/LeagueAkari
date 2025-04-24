@@ -1,20 +1,12 @@
+import { IntervalTask } from '@main/utils/timer'
+import builtinSgpServersJson from '@resources/builtin-config/sgp/league-servers.json?commonjs-external&asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { AvailableServersMap, SgpApi } from '@shared/data-sources/sgp'
-import {
-  SgpGameDetailsLol,
-  SgpGameSummaryLol,
-  SgpMatchHistoryLol,
-  SgpSummoner
-} from '@shared/data-sources/sgp/types'
-import { getSgpServerId } from '@shared/data-sources/sgp/utils'
-import { Game, GameTimeline, MatchHistory } from '@shared/types/league-client/match-history'
-import { SummonerInfo } from '@shared/types/league-client/summoner'
+import { LeagueSgpApi } from '@shared/data-sources/sgp'
+import { GithubFile } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
-import Ajv from 'ajv'
-import { isAxiosError } from 'axios'
-import fs from 'node:fs'
+import axios, { isAxiosError } from 'axios'
+import ofs from 'node:original-fs'
 
-import builtinSgpServersJson from '../../../../resources/builtin-config/sgp/mh-sgp-servers.json?commonjs-external&asset'
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientMain } from '../league-client'
@@ -22,7 +14,13 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { SCHEMA } from './config-schema'
+import { validateSchema } from './config-validation'
+import {
+  mapSgpGameDetailsToLcu0Format,
+  mapSgpGameSummaryToLcu0Format,
+  mapSgpMatchHistoryToLcu0Format,
+  mapSgpSummonerToLcu0Format
+} from './data-mapper'
 import { SgpState } from './state'
 
 /**
@@ -33,14 +31,26 @@ import { SgpState } from './state'
 export class SgpMain implements IAkariShardInitDispose {
   static id = 'sgp-main'
 
-  static MH_SGP_SERVERS_JSON = 'mh-sgp-servers_v10.json'
+  static LEAGUE_SGP_SERVERS_JSON = 'league-servers.json'
+  static CONFIG_SCHEMA_VERSION = 1
+  static SGP_SERVERS_CONFIG_GITHUB_URL =
+    '/repos/Hanxven/LeagueAkari-Config/contents/configs/sgp/league-servers.json?ref=main'
 
   public readonly state: SgpState
 
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
-  private readonly _sgp = new SgpApi()
+  private readonly _http = axios.create({
+    baseURL: 'https://api.github.com'
+  })
+
+  private readonly _api = new LeagueSgpApi()
+
+  private _updateConfigTask = new IntervalTask(
+    () => this._fetchAndUpdateSgpServers(),
+    1000 * 60 * 20
+  )
 
   constructor(
     private readonly _app: AppCommonMain,
@@ -53,98 +63,105 @@ export class SgpMain implements IAkariShardInitDispose {
     this._log = _loggerFactory.create(SgpMain.id)
     this._setting = _settingFactory.register(SgpMain.id, {}, {})
 
-    this.state = new SgpState()
+    this.state = new SgpState(this._lc.state, this._api)
   }
 
   async onInit() {
-    await this._loadAvailableServersFromLocalFile()
+    await this._loadSgpServerConfigFromLocalFile()
 
-    this._mobx.propSync(SgpMain.id, 'state', this.state, ['availability', 'isTokenReady'])
+    this._mobx.propSync(SgpMain.id, 'state', this.state, [
+      'availability',
+      'isTokenReady',
+      'sgpServerConfig'
+    ])
 
     this._handleIpcCall()
     this._handleUpdateHttpProxy()
-    this._handleUpdateSupportedInfo()
+    this._handleUpdateConfig()
     this._maintainEntitlementsToken()
     this._maintainLeagueSessionToken()
+
+    this._updateConfigTask.start(true)
   }
 
-  private async _loadAvailableServersFromLocalFile() {
+  private async _loadSgpServerConfigFromLocalFile() {
     try {
-      if (!(await this._setting.jsonConfigFileExists(SgpMain.MH_SGP_SERVERS_JSON))) {
-        if (fs.existsSync(builtinSgpServersJson)) {
-          this._log.info('配置文件目录不存在，将使用内置的 SGP 服务器配置文件')
-          const data = await fs.promises.readFile(builtinSgpServersJson, 'utf-8')
-          await this._setting.writeToJsonConfigFile(SgpMain.MH_SGP_SERVERS_JSON, JSON.parse(data))
+      // 不存在配置文件则先尝试创建一个本地的版本
+      if (!(await this._setting.jsonConfigFileExists(SgpMain.LEAGUE_SGP_SERVERS_JSON))) {
+        if (ofs.existsSync(builtinSgpServersJson)) {
+          this._log.info('无已保存的配置文件，将使用内置的 SGP 服务器配置文件')
+          const data = await ofs.promises.readFile(builtinSgpServersJson, 'utf-8')
+          await this._setting.writeToJsonConfigFile(
+            SgpMain.LEAGUE_SGP_SERVERS_JSON,
+            JSON.parse(data)
+          )
         } else {
           this._log.warn('未找到内置的 SGP 服务器配置文件')
           return
         }
       }
 
-      this._log.info('加载到本地 SGP 服务器配置文件')
-      const json = await this._setting.readFromJsonConfigFile(SgpMain.MH_SGP_SERVERS_JSON)
-
-      const ajv = new Ajv()
-      const validate = ajv.compile<AvailableServersMap>(SCHEMA)
-      const valid = validate(json)
-
-      if (!valid) {
-        this._log.warn(`SGP 服务器配置文件格式错误: ${validate.errors?.map((e) => formatError(e))}`)
-        return
-      }
-
-      this._sgp.setAvailableSgpServers(json)
-      this.state.setAvailability(
-        '',
-        '',
-        '',
-        {
-          common: false,
-          matchHistory: false
-        },
-        json
-      )
+      const json = await this._setting.readFromJsonConfigFile(SgpMain.LEAGUE_SGP_SERVERS_JSON)
+      this._validateAndApplyConfig(json)
     } catch (error) {
       this._log.warn(`加载 SGP 服务器配置文件时发生错误: ${formatError(error)}`)
     }
   }
 
-  private _handleUpdateSupportedInfo() {
+  private _validateAndApplyConfig(json: any) {
+    const { valid, errors } = validateSchema(json)
+
+    if (!valid) {
+      this._log.warn(`SGP 服务器配置文件格式错误: ${errors?.map((e) => formatError(e))}`)
+      return
+    }
+
+    // support only the exact version
+    if (json.version !== SgpMain.CONFIG_SCHEMA_VERSION) {
+      this._log.warn(
+        `SGP 服务器配置文件版本不匹配, 当前版本: ${SgpMain.CONFIG_SCHEMA_VERSION}, 远程版本: ${json.version}`
+      )
+      return
+    }
+
+    // use the newer config
+    if (json.lastUpdate > this.state.sgpServerConfig.lastUpdate) {
+      this.state.setSgpServerConfig(json)
+      this._setting.writeToJsonConfigFile(SgpMain.LEAGUE_SGP_SERVERS_JSON, json).catch(() => {})
+      this._log.info('更新 SGP 服务器配置文件', new Date(json.lastUpdate).toISOString())
+    }
+  }
+
+  private _handleUpdateConfig() {
     this._mobx.reaction(
-      () => this._lc.state.auth,
-      async (auth) => {
-        if (!auth) {
-          this.state.setAvailability(
-            '',
-            '',
-            '',
-            {
-              common: false,
-              matchHistory: false
-            },
-            this.state.availability.sgpServers
-          )
-          return
-        }
-
-        const sgpServerId = getSgpServerId(auth.region, auth.rsoPlatformId)
-
-        const supported = this._sgp.supportsSgpServer(sgpServerId)
-        const sgpServers = this._sgp.sgpServers()
-
-        this.state.setAvailability(
-          auth.region,
-          auth.rsoPlatformId,
-          sgpServerId,
-          {
-            common: supported.common,
-            matchHistory: supported.matchHistory
-          },
-          sgpServers
-        )
+      () => this.state.sgpServerConfig,
+      (config) => {
+        this._api.setSgpServerConfig(config)
       },
       { fireImmediately: true }
     )
+  }
+
+  private async _fetchAndUpdateSgpServers() {
+    this._log.info('检查远程 SGP 服务器配置文件')
+
+    try {
+      const { data } = await this._http.get<GithubFile>(SgpMain.SGP_SERVERS_CONFIG_GITHUB_URL)
+
+      const { content, encoding } = data
+
+      if (encoding !== 'base64') {
+        this._log.warn('检查远程 SGP 配置文件时, 遇到不支持的编码格式:', encoding)
+        return
+      }
+
+      const raw = Buffer.from(content, 'base64').toString('utf-8')
+      const json = JSON.parse(raw)
+
+      this._validateAndApplyConfig(json)
+    } catch (error) {
+      this._log.warn(`更新 SGP 服务器配置文件时发生错误:`, error)
+    }
   }
 
   async getSummoner(puuid: string, sgpServerId?: string) {
@@ -152,7 +169,7 @@ export class SgpMain implements IAkariShardInitDispose {
       sgpServerId = this.state.availability.sgpServerId
     }
 
-    const { data } = await this._sgp.getSummonerByPuuid(sgpServerId, puuid)
+    const { data } = await this._api.getSummonerByPuuid(sgpServerId, puuid)
 
     if (!data || data.length === 0) {
       return null
@@ -181,11 +198,11 @@ export class SgpMain implements IAkariShardInitDispose {
     }
 
     if (tag) {
-      const { data } = await this._sgp.getMatchHistory(sgpServerId, playerPuuid, start, count, tag)
+      const { data } = await this._api.getMatchHistory(sgpServerId, playerPuuid, start, count, tag)
       return data
     }
 
-    const { data } = await this._sgp.getMatchHistory(sgpServerId, playerPuuid, start, count)
+    const { data } = await this._api.getMatchHistory(sgpServerId, playerPuuid, start, count)
     return data
   }
 
@@ -194,7 +211,7 @@ export class SgpMain implements IAkariShardInitDispose {
       sgpServerId = this.state.availability.sgpServerId
     }
 
-    const { data } = await this._sgp.getGameSummary(sgpServerId, gameId)
+    const { data } = await this._api.getGameSummary(sgpServerId, gameId)
 
     return data
   }
@@ -204,7 +221,7 @@ export class SgpMain implements IAkariShardInitDispose {
       sgpServerId = this.state.availability.sgpServerId
     }
 
-    const { data } = await this._sgp.getGameDetails(sgpServerId, gameId)
+    const { data } = await this._api.getGameDetails(sgpServerId, gameId)
 
     return data
   }
@@ -219,7 +236,7 @@ export class SgpMain implements IAkariShardInitDispose {
     const result = await this.getMatchHistory(playerPuuid, start, count, tag, sgpServerId)
 
     try {
-      return this.parseSgpMatchHistoryToLcu0Format(result, start, count)
+      return mapSgpMatchHistoryToLcu0Format(result, start, count)
     } catch (error) {
       this._log.warn(`转换战绩数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${playerPuuid}`)
       throw error
@@ -230,7 +247,7 @@ export class SgpMain implements IAkariShardInitDispose {
     const result = await this.getGameSummary(gameId, sgpServerId)
 
     try {
-      return this.parseSgpGameSummaryToLcu0Format(result)
+      return mapSgpGameSummaryToLcu0Format(result)
     } catch (error) {
       this._log.warn(`转换对局数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${gameId}`)
       throw error
@@ -244,7 +261,7 @@ export class SgpMain implements IAkariShardInitDispose {
     }
 
     try {
-      return this.parseSgpSummonerToLcu0Format(result)
+      return mapSgpSummonerToLcu0Format(result)
     } catch (error) {
       this._log.warn(`转换召唤师数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${playerPuuid}`)
       throw error
@@ -255,269 +272,10 @@ export class SgpMain implements IAkariShardInitDispose {
     const result = await this.getGameDetails(gameId, sgpServerId)
 
     try {
-      return this.parseSgpGameDetailsToLcu0Format(result)
+      return mapSgpGameDetailsToLcu0Format(result)
     } catch (error) {
       this._log.warn(`转换时间线数据 SGP 到 LCU 时发生错误: ${formatError(error)}, ${gameId}`)
       throw error
-    }
-  }
-
-  parseSgpGameSummaryToLcu0Format(game: SgpGameSummaryLol): Game | null {
-    // 有些时候没有这个 json 字段, 只有 metadata 字段
-    if (!game.json) {
-      return null
-    }
-
-    const { participants, teams, ...rest } = game.json
-
-    const participantIdentities = participants.map((p) => {
-      return {
-        participantId: p.participantId,
-        player: {
-          accountId: 0,
-          currentAccountId: 0,
-          currentPlatformId: rest.platformId,
-          matchHistoryUri: '',
-          platformId: rest.platformId,
-          profileIcon: p.profileIcon,
-          puuid: p.puuid,
-          summonerId: p.summonerId,
-          summonerName: p.summonerName,
-          tagLine: p.riotIdTagline,
-          gameName: p.riotIdGameName
-        }
-      }
-    })
-
-    const p2s = participants.map((p) => {
-      const perkInfo: {
-        perkPrimaryStyle: number
-        perkSubStyle: number
-        perk0: number
-        perk0Var1: number
-        perk0Var2: number
-        perk0Var3: number
-        perk1: number
-        perk1Var1: number
-        perk1Var2: number
-        perk1Var3: number
-        perk2: number
-        perk2Var1: number
-        perk2Var2: number
-        perk2Var3: number
-        perk3: number
-        perk3Var1: number
-        perk3Var2: number
-        perk3Var3: number
-        perk4: number
-        perk4Var1: number
-        perk4Var2: number
-        perk4Var3: number
-        perk5: number
-        perk5Var1: number
-        perk5Var2: number
-        perk5Var3: number
-      } = {} as any
-
-      p.perks.styles.forEach((style) => {
-        if (style.description === 'primaryStyle') {
-          perkInfo.perkPrimaryStyle = style.style
-        } else if (style.description === 'subStyle') {
-          perkInfo.perkSubStyle = style.style
-        }
-      })
-
-      let perkIndex = 0
-      p.perks.styles
-        .map((v) => v.selections)
-        .forEach((selections) => {
-          selections.forEach((selection) => {
-            const key = `perk${perkIndex++}`
-            perkInfo[key] = selection.perk
-
-            perkInfo[`${key}Var1`] = selection.var1
-            perkInfo[`${key}Var2`] = selection.var2
-            perkInfo[`${key}Var3`] = selection.var3
-          })
-        })
-
-      return {
-        championId: p.championId,
-        highestAchievedSeasonTier: '',
-        participantId: p.participantId,
-        spell1Id: p.spell1Id,
-        spell2Id: p.spell2Id,
-        teamId: p.teamId,
-        stats: {
-          earlySurrenderAccomplice: false,
-          causedEarlySurrender: false,
-          firstInhibitorAssist: false, // 默认值
-          firstInhibitorKill: false, // 默认值
-          combatPlayerScore: 0, // 默认值
-          playerScore0: 0, // 默认值
-          playerScore1: 0, // 默认值
-          playerScore2: 0, // 默认值
-          playerScore3: 0, // 默认值
-          playerScore4: 0, // 默认值
-          playerScore5: 0, // 默认值
-          playerScore6: 0, // 默认值
-          playerScore7: 0, // 默认值
-          playerScore8: 0, // 默认值
-          playerScore9: 0, // 默认值
-          totalPlayerScore: 0, // 默认值
-          totalScoreRank: 0, // 默认值
-          objectivePlayerScore: 0, // 默认值
-          magicalDamageTaken: p.magicDamageTaken,
-          neutralMinionsKilledEnemyJungle: p.totalEnemyJungleMinionsKilled,
-          neutralMinionsKilledTeamJungle: p.totalAllyJungleMinionsKilled,
-          totalTimeCrowdControlDealt: p.totalTimeCCDealt,
-          ...perkInfo,
-          ...p
-        },
-        timeline: {
-          creepsPerMinDeltas: {},
-          csDiffPerMinDeltas: {},
-          damageTakenDiffPerMinDeltas: {},
-          damageTakenPerMinDeltas: {},
-          goldPerMinDeltas: {},
-          lane: p.lane,
-          participantId: p.participantId,
-          role: p.role,
-          xpDiffPerMinDeltas: {},
-          xpPerMinDeltas: {}
-        }
-      }
-    })
-
-    // first blood teamId
-    const firstBloodTeamId = participants.find((p) => p.firstBloodKill)?.teamId
-
-    const t2s = teams.map((t) => {
-      const { win, objectives, bans, teamId } = t
-
-      return {
-        teamId,
-        bans,
-        baronKills: objectives.baron?.kills || 0,
-        dragonKills: objectives.dragon?.kills || 0,
-        firstBaron: objectives.baron?.first || false,
-        firstBlood: firstBloodTeamId === t.teamId,
-        firstDargon: objectives.dragon?.first || false, // LCU 接口中的 Dragon 拼写就是如此，不确定是否是有意为之
-        firstInhibitor: objectives.inhibitor?.first || false,
-        firstTower: objectives.tower?.first || false,
-        hordeKills: objectives.horde?.kills || 0,
-        inhibitorKills: objectives.inhibitor?.kills || 0,
-        riftHeraldKills: objectives.riftHerald?.kills || 0,
-        vilemawKills: 0, // 默认值
-        dominionVictoryScore: 0, // 默认值
-        towerKills: objectives.tower?.kills || 0,
-        win: win ? 'Win' : 'Fail'
-      }
-    })
-
-    return {
-      ...rest,
-      gameCreationDate: new Date(rest.gameCreation).toISOString(),
-      participantIdentities,
-      participants: p2s,
-      teams: t2s
-    }
-  }
-
-  /**
-   * 始终是 detailed 的，但只有部分属性
-   * 不是很优雅
-   */
-  parseSgpMatchHistoryToLcu0Format(sgpMh: SgpMatchHistoryLol, start = 0, count = 20): MatchHistory {
-    const jsonArr = sgpMh.games.map((game) => this.parseSgpGameSummaryToLcu0Format(game))
-
-    const gamePage = {
-      gameBeginDate: '', // 默认值
-      gameCount: count,
-      gameEndDate: '', // 默认值
-      gameIndexBegin: start,
-      gameIndexEnd: start + count - 1,
-      games: jsonArr.filter((g) => g !== null) as Game[]
-    }
-
-    return {
-      accountId: 0, // 默认值
-      games: gamePage,
-      platformId: '' // 默认值
-    }
-  }
-
-  parseSgpSummonerToLcu0Format(sgpSummoner: SgpSummoner): SummonerInfo {
-    return {
-      accountId: sgpSummoner.accountId,
-      displayName: sgpSummoner.name,
-      gameName: '',
-      internalName: sgpSummoner.internalName,
-      nameChangeFlag: sgpSummoner.nameChangeFlag,
-      percentCompleteForNextLevel: Math.round(
-        (sgpSummoner.expPoints / sgpSummoner.expToNextLevel) * 100
-      ),
-      privacy: sgpSummoner.privacy as 'PUBLIC' | 'PRIVATE' | string, // 强制转换以匹配类型
-      profileIconId: sgpSummoner.profileIconId,
-      puuid: sgpSummoner.puuid,
-
-      // 默认留空
-      rerollPoints: {
-        currentPoints: 0,
-        maxRolls: 0,
-        pointsToReroll: 0,
-        numberOfRolls: 0,
-        pointsCostToRoll: 0
-      },
-      tagLine: '',
-      summonerId: sgpSummoner.id,
-      summonerLevel: sgpSummoner.level,
-      unnamed: sgpSummoner.unnamed,
-      xpSinceLastLevel: sgpSummoner.expPoints,
-      xpUntilNextLevel: sgpSummoner.expToNextLevel - sgpSummoner.expPoints
-    }
-  }
-
-  parseSgpGameDetailsToLcu0Format(bData: SgpGameDetailsLol): GameTimeline {
-    return {
-      frames: bData.json.frames.map((frame) => ({
-        timestamp: frame.timestamp,
-        events: frame.events.map((event) => ({
-          // A 的 Event 字段：
-          assistingParticipantIds: event.assistingParticipantIds ?? [],
-          buildingType: event.buildingType ?? '',
-          itemId: event.itemId ?? 0,
-          killerId: event.killerId ?? 0,
-          laneType: event.laneType ?? '',
-          monsterSubType: event.monsterSubType ?? '',
-          monsterType: event.monsterType ?? '',
-          participantId: event.participantId ?? 0,
-          position: event.position ?? { x: 0, y: 0 },
-          skillSlot: event.skillSlot ?? 0,
-          teamId: event.teamId ?? 0,
-          timestamp: event.timestamp,
-          towerType: event.towerType ?? '',
-          type: event.type ?? '',
-          victimId: event.victimId ?? 0
-        })),
-        participantFrames: Object.fromEntries(
-          Object.values(frame.participantFrames).map((pf) => [
-            pf.participantId,
-            {
-              currentGold: pf.currentGold ?? 0,
-              dominionScore: 0, // B 中无对应数据，设为默认值
-              jungleMinionsKilled: pf.jungleMinionsKilled ?? 0,
-              level: pf.level ?? 0,
-              minionsKilled: pf.minionsKilled ?? 0,
-              participantId: pf.participantId,
-              position: pf.position ?? { x: 0, y: 0 },
-              teamScore: 0, // B 中无对应数据，设为默认值
-              totalGold: pf.totalGold ?? 0,
-              xp: pf.xp ?? 0
-            }
-          ])
-        )
-      }))
     }
   }
 
@@ -527,7 +285,7 @@ export class SgpMain implements IAkariShardInitDispose {
     }
 
     try {
-      const { data } = await this._sgp.getRankedStats(sgpServerId, puuid)
+      const { data } = await this._api.getRankedStats(sgpServerId, puuid)
       return data
     } catch (error) {
       this._log.warn(`获取排位信息失败: ${formatError(error)}`)
@@ -541,7 +299,7 @@ export class SgpMain implements IAkariShardInitDispose {
     }
 
     try {
-      const { data } = await this._sgp.getSpectatorGameflowByPuuid(sgpServerId, puuid)
+      const { data } = await this._api.getSpectatorGameflowByPuuid(sgpServerId, puuid)
 
       return data
     } catch (error) {
@@ -554,10 +312,6 @@ export class SgpMain implements IAkariShardInitDispose {
   }
 
   private _handleIpcCall() {
-    this._ipc.onCall(SgpMain.id, 'getSupportedSgpServers', () => {
-      return this._sgp.sgpServers()
-    })
-
     this._ipc.onCall(
       SgpMain.id,
       'getMatchHistoryLcuFormat',
@@ -638,7 +392,7 @@ export class SgpMain implements IAkariShardInitDispose {
       () => this._lc.data.entitlements.token,
       (token) => {
         if (!token) {
-          this._sgp.setEntitlementsToken(null)
+          this._api.setEntitlementsToken(null)
           this.state.setEntitlementsTokenSet(false)
           return
         }
@@ -650,7 +404,7 @@ export class SgpMain implements IAkariShardInitDispose {
 
         this._log.info(`更新 Entitlements Token: ${JSON.stringify(copiedToken)}`)
 
-        this._sgp.setEntitlementsToken(token.accessToken)
+        this._api.setEntitlementsToken(token.accessToken)
         this.state.setEntitlementsTokenSet(true)
       },
       { fireImmediately: true }
@@ -662,7 +416,7 @@ export class SgpMain implements IAkariShardInitDispose {
       () => this._lc.data.leagueSession.token,
       (token) => {
         if (!token) {
-          this._sgp.setLeagueSessionToken(null)
+          this._api.setLeagueSessionToken(null)
           this.state.setLeagueSessionTokenSet(false)
           return
         }
@@ -671,7 +425,7 @@ export class SgpMain implements IAkariShardInitDispose {
 
         this._log.info(`更新 Lol League Session Token: ${copied}`)
 
-        this._sgp.setLeagueSessionToken(token)
+        this._api.setLeagueSessionToken(token)
         this.state.setLeagueSessionTokenSet(true)
       },
       { fireImmediately: true }
@@ -683,17 +437,21 @@ export class SgpMain implements IAkariShardInitDispose {
       () => this._app.settings.httpProxy,
       (httpProxy) => {
         if (httpProxy.strategy === 'force') {
-          this._sgp.http.defaults.proxy = {
+          this._api.http.defaults.proxy = {
             host: httpProxy.host,
             port: httpProxy.port
           }
         } else if (httpProxy.strategy === 'auto') {
-          this._sgp.http.defaults.proxy = undefined
+          this._api.http.defaults.proxy = undefined
         } else if (httpProxy.strategy === 'disable') {
-          this._sgp.http.defaults.proxy = false
+          this._api.http.defaults.proxy = false
         }
       },
       { fireImmediately: true }
     )
+  }
+
+  async onDispose() {
+    this._updateConfigTask.cancel()
   }
 }

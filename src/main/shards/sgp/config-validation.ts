@@ -1,4 +1,7 @@
-export const SCHEMA = {
+import { SgpServersConfig } from '@shared/data-sources/sgp'
+import Ajv from 'ajv'
+
+export const LEAGUE_SGP_SERVERS_CONFIG_SCHEMA = {
   type: 'object',
   properties: {
     servers: {
@@ -6,9 +9,6 @@ export const SCHEMA = {
       additionalProperties: {
         type: 'object',
         properties: {
-          name: {
-            type: 'string'
-          },
           matchHistory: {
             type: ['string', 'null']
           },
@@ -16,7 +16,7 @@ export const SCHEMA = {
             type: ['string', 'null']
           }
         },
-        required: ['name'],
+        required: ['matchHistory', 'common'],
         additionalProperties: true
       }
     },
@@ -44,13 +44,32 @@ export const SCHEMA = {
         type: 'object',
         additionalProperties: { type: 'string' }
       }
+    },
+    version: {
+      type: 'number'
+    },
+    lastUpdate: {
+      type: 'number'
     }
   },
   required: [
     'servers',
+    'serverNames',
+    'version',
+    'lastUpdate',
     'tencentServerMatchHistoryInteroperability',
     'tencentServerSpectatorInteroperability',
     'tencentServerSummonerInteroperability'
   ],
   additionalProperties: true
 } as const
+
+const ajv = new Ajv()
+const validateSchemaFn = ajv.compile<SgpServersConfig>(LEAGUE_SGP_SERVERS_CONFIG_SCHEMA)
+
+export function validateSchema(obj: unknown) {
+  return {
+    valid: validateSchemaFn(obj),
+    errors: validateSchemaFn.errors
+  }
+}

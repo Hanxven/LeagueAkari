@@ -14,7 +14,11 @@ import {
 // can only be imported like this
 const axiosRetry = require('axios-retry').default as AxiosRetry
 
-export interface AvailableServersMap {
+export interface SgpServersConfig {
+  version: number
+
+  lastUpdate: number
+
   servers: {
     [region: string]: {
       /**
@@ -25,12 +29,12 @@ export interface AvailableServersMap {
       /**
        * 用于战绩查询的服务器地址
        */
-      matchHistory: string
+      matchHistory: string | null
 
       /**
        * 其他通用查询服务器地址
        */
-      common: string
+      common: string | null
     }
   }
 
@@ -56,11 +60,14 @@ export interface AvailableServersMap {
   tencentServerSummonerInteroperability: string[]
 }
 
-export class SgpApi {
+export class LeagueSgpApi {
   static USER_AGENT = 'LeagueOfLegendsClient/14.13.596.7996 (rcp-be-lol-match-history)'
   static REQUEST_TIMEOUT = 12500
 
-  private _availableSgpServers: AvailableServersMap = {
+  // default
+  private _sgpServerConfig: SgpServersConfig = {
+    version: 0,
+    lastUpdate: 0,
     servers: {},
     serverNames: {},
     tencentServerMatchHistoryInteroperability: [],
@@ -75,9 +82,9 @@ export class SgpApi {
   private _leagueSessionToken: string | null = null
   private _http = axios.create({
     headers: {
-      'User-Agent': SgpApi.USER_AGENT
+      'User-Agent': LeagueSgpApi.USER_AGENT
     },
-    timeout: SgpApi.REQUEST_TIMEOUT
+    timeout: LeagueSgpApi.REQUEST_TIMEOUT
   })
 
   get http() {
@@ -94,12 +101,12 @@ export class SgpApi {
     })
   }
 
-  setAvailableSgpServers(servers: AvailableServersMap) {
-    this._availableSgpServers = servers
+  setSgpServerConfig(config: SgpServersConfig) {
+    this._sgpServerConfig = config
   }
 
   supportsSgpServer(sgpServerId: string) {
-    const server = this._availableSgpServers.servers[sgpServerId.toUpperCase()]
+    const server = this._sgpServerConfig.servers[sgpServerId.toUpperCase()]
 
     if (!server) {
       return {
@@ -115,7 +122,7 @@ export class SgpApi {
   }
 
   sgpServers() {
-    return this._availableSgpServers
+    return this._sgpServerConfig
   }
 
   hasEntitlementsToken() {
@@ -135,7 +142,7 @@ export class SgpApi {
   }
 
   private _getSgpServer(sgpServerId: string) {
-    const sgpServer = this._availableSgpServers.servers[sgpServerId.toUpperCase()]
+    const sgpServer = this._sgpServerConfig.servers[sgpServerId.toUpperCase()]
     if (!sgpServer) {
       throw new Error(`unknown sgpServerId: ${sgpServerId}`)
     }
@@ -169,6 +176,10 @@ export class SgpApi {
 
     const sgpServer = this._getSgpServer(sgpServerId)
 
+    if (!sgpServer.matchHistory) {
+      throw new Error(`match history server not found for ${sgpServerId}`)
+    }
+
     return this._http.get<SgpMatchHistoryLol>(
       `/match-history-query/v1/products/lol/player/${playerPuuid}/SUMMARY`,
       {
@@ -192,6 +203,10 @@ export class SgpApi {
 
     const sgpServer = this._getSgpServer(sgpServerId)
 
+    if (!sgpServer.matchHistory) {
+      throw new Error(`match history server not found for ${sgpServerId}`)
+    }
+
     const subId = this._getSubId(sgpServerId)
 
     return this._http.get<SgpGameSummaryLol>(
@@ -211,6 +226,10 @@ export class SgpApi {
     }
 
     const sgpServer = this._getSgpServer(sgpServerId)
+
+    if (!sgpServer.matchHistory) {
+      throw new Error(`match history server not found for ${sgpServerId}`)
+    }
 
     const subId = this._getSubId(sgpServerId)
 
@@ -232,6 +251,10 @@ export class SgpApi {
 
     const sgpServer = this._getSgpServer(platformId)
 
+    if (!sgpServer.common) {
+      throw new Error(`common server not found for ${platformId}`)
+    }
+
     return this._http.get<SgpRankedStats>(`/leagues-ledge/v2/rankedStats/puuid/${puuid}`, {
       baseURL: sgpServer.common,
       headers: {
@@ -246,6 +269,10 @@ export class SgpApi {
     }
 
     const sgpServer = this._getSgpServer(sgpServerId)
+
+    if (!sgpServer.common) {
+      throw new Error(`common server not found for ${sgpServerId}`)
+    }
 
     const subId = this._getSubId(sgpServerId)
 
@@ -268,6 +295,10 @@ export class SgpApi {
 
     const sgpServer = this._getSgpServer(sgpServerId)
 
+    if (!sgpServer.common) {
+      throw new Error(`common server not found for ${sgpServerId}`)
+    }
+
     const subId = this._getSubId(sgpServerId)
 
     return this._http.get<SpectatorData>(`/gsm/v1/ledge/spectator/region/${subId}/puuid/${puuid}`, {
@@ -284,6 +315,10 @@ export class SgpApi {
     }
 
     const sgpServer = this._getSgpServer(sgpServerId)
+
+    if (!sgpServer.matchHistory) {
+      throw new Error(`match history server not found for ${sgpServerId}`)
+    }
 
     const subId = this._getSubId(sgpServerId)
 
@@ -306,6 +341,10 @@ export class SgpApi {
     }
 
     const sgpServer = this._getSgpServer(sgpServerId)
+
+    if (!sgpServer.common) {
+      throw new Error(`common server not found for ${sgpServerId}`)
+    }
 
     const subId = this._getSubId(sgpServerId)
 

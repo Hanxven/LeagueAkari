@@ -687,9 +687,7 @@ const notification = useNotification()
 const VIEW_NAMESPACE = 'view:MatchHistoryTab'
 
 const currentSgpServerSupported = computed(() => {
-  return (
-    sgps.availability.sgpServers.servers[tab.sgpServerId] || { common: false, matchHistory: false }
-  )
+  return sgps.sgpServerConfig.servers[tab.sgpServerId] || { common: false, matchHistory: false }
 })
 
 const isOnSelfSgpServer = computed(() => {

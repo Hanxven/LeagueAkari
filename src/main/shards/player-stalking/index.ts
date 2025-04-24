@@ -139,7 +139,7 @@ export class PlayerStalkingMain implements IAkariShardInitDispose {
       }
 
       if (isTencentServer(this._sgp.state.availability.sgpServerId)) {
-        return this._sgp.state.availability.sgpServers.tencentServerSpectatorInteroperability.includes(
+        return this._sgp.state.sgpServerConfig.tencentServerSpectatorInteroperability.includes(
           p.sgpServerId
         )
       }

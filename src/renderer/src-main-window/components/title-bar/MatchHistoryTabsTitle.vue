@@ -72,7 +72,7 @@
                   </Transition>
                 </NBadge>
                 <div class="sgp-server" v-if="isNeedToShowSgpServer">
-                  {{ sgps.availability.sgpServers.servers[tab.sgpServerId].name }}
+                  {{ sgps.sgpServerConfig.servers[tab.sgpServerId].name }}
                 </div>
                 <template v-if="tab.summoner">
                   <StreamerModeMaskedText>

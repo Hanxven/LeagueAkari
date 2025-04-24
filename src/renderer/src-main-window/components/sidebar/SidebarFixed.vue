@@ -200,8 +200,7 @@ const clients = computed(() => {
     const sgpServerId = getSgpServerId(lcs.auth.region, lcs.auth.rsoPlatformId)
     current = {
       ...lcs.auth,
-      name:
-        sgps.availability.sgpServers.serverNames[as.settings.locale]?.[sgpServerId] || sgpServerId
+      name: sgps.sgpServerConfig.serverNames[as.settings.locale]?.[sgpServerId] || sgpServerId
     }
   }
 
@@ -212,8 +211,7 @@ const clients = computed(() => {
       return {
         ...c,
         isConnecting: c.pid === lcs.connectingClient?.pid,
-        name:
-          sgps.availability.sgpServers.serverNames[as.settings.locale]?.[sgpServerId] || sgpServerId
+        name: sgps.sgpServerConfig.serverNames[as.settings.locale]?.[sgpServerId] || sgpServerId
       }
     })
 

@@ -11,12 +11,9 @@ export function useInteroperableSgpServers(sgpServerId?: MaybeRefOrGetter<string
   const getInteroperability = (sgpServerId: string) => {
     if (isTencentServer(sgps.availability.sgpServerId)) {
       return {
-        common:
-          sgps.availability.sgpServers.tencentServerSummonerInteroperability.includes(sgpServerId),
+        common: sgps.sgpServerConfig.tencentServerSummonerInteroperability.includes(sgpServerId),
         matchHistory:
-          sgps.availability.sgpServers.tencentServerMatchHistoryInteroperability.includes(
-            sgpServerId
-          )
+          sgps.sgpServerConfig.tencentServerMatchHistoryInteroperability.includes(sgpServerId)
       }
     } else {
       const isSameSgpServer = sgps.availability.sgpServerId === sgpServerId

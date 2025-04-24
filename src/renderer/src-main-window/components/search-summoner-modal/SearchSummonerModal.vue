@@ -111,7 +111,7 @@
             @mouseup.prevent="handleSearchHistoryMouseUp($event, s)"
           >
             <div class="sgp-server" v-if="isSearchHistoryNeedToShowSgpServer">
-              {{ sgps.availability.sgpServers.servers[s.sgpServerId]?.name || s.sgpServerId }}
+              {{ sgps.sgpServerConfig.servers[s.sgpServerId]?.name || s.sgpServerId }}
             </div>
             <div class="game-name-line">{{ s.summoner.gameName }}</div>
             <div class="tag-line">#{{ s.summoner.tagLine }}</div>
@@ -265,7 +265,7 @@ const searchHistory = shallowRef<SearchHistoryItem[]>([])
 const filteredSearchHistory = computed(() => {
   if (sgps.availability.region === 'TENCENT') {
     return searchHistory.value.filter((item) => {
-      return sgps.availability.sgpServers.tencentServerMatchHistoryInteroperability.includes(
+      return sgps.sgpServerConfig.tencentServerMatchHistoryInteroperability.includes(
         item.sgpServerId
       )
     })
@@ -321,9 +321,9 @@ const tencentServers = computed(() => {
   }
 
   // 出于硬编码, 这里仅仅使用 match-history 的互操作性预定义表
-  return sgps.availability.sgpServers.tencentServerMatchHistoryInteroperability.map((serverId) => {
+  return sgps.sgpServerConfig.tencentServerMatchHistoryInteroperability.map((serverId) => {
     return {
-      label: sgps.availability.sgpServers.servers[serverId].name,
+      label: sgps.sgpServerConfig.servers[serverId].name,
       value: serverId
     }
   })
