@@ -1,5 +1,4 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { SgpServersConfig } from '@shared/data-sources/sgp'
 import { SgpSummoner, SpectatorData } from '@shared/data-sources/sgp/types'
 import { Game, MatchHistory } from '@shared/types/league-client/match-history'
 import { SummonerInfo } from '@shared/types/league-client/summoner'
