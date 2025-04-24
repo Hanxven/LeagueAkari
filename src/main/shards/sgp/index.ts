@@ -5,6 +5,7 @@ import { LeagueSgpApi } from '@shared/data-sources/sgp'
 import { GithubFile } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
 import axios, { isAxiosError } from 'axios'
+import dayjs from 'dayjs'
 import ofs from 'node:original-fs'
 
 import { AppCommonMain } from '../app-common'
@@ -84,12 +85,17 @@ export class SgpMain implements IAkariShardInitDispose {
     this._updateConfigTask.start(true)
   }
 
+  /**
+   * 从本地的配置区加载配置文件. 若不存在, 则从应用内置的配置文件中加载, 并复制到本地配置区
+   */
   private async _loadSgpServerConfigFromLocalFile() {
     try {
-      // 不存在配置文件则先尝试创建一个本地的版本
-      if (!(await this._setting.jsonConfigFileExists(SgpMain.LEAGUE_SGP_SERVERS_JSON))) {
+      const exists = await this._setting.jsonConfigFileExists(SgpMain.LEAGUE_SGP_SERVERS_JSON)
+
+      if (!exists) {
+        this._log.info('无已保存的配置文件，将使用内置的 SGP 服务器配置文件')
+
         if (ofs.existsSync(builtinSgpServersJson)) {
-          this._log.info('无已保存的配置文件，将使用内置的 SGP 服务器配置文件')
           const data = await ofs.promises.readFile(builtinSgpServersJson, 'utf-8')
           await this._setting.writeToJsonConfigFile(
             SgpMain.LEAGUE_SGP_SERVERS_JSON,
@@ -102,18 +108,28 @@ export class SgpMain implements IAkariShardInitDispose {
       }
 
       const json = await this._setting.readFromJsonConfigFile(SgpMain.LEAGUE_SGP_SERVERS_JSON)
-      this._validateAndApplyConfig(json)
+
+      if (this._validateConfig(json)) {
+        this.state.setSgpServerConfig(json)
+        this._log.info(
+          '加载本地 SGP 服务器配置文件',
+          dayjs(json.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+        )
+      }
     } catch (error) {
       this._log.warn(`加载 SGP 服务器配置文件时发生错误: ${formatError(error)}`)
     }
   }
 
-  private _validateAndApplyConfig(json: any) {
+  /**
+   * 版本和格式校验
+   */
+  private _validateConfig(json: any) {
     const { valid, errors } = validateSchema(json)
 
     if (!valid) {
       this._log.warn(`SGP 服务器配置文件格式错误: ${errors?.map((e) => formatError(e))}`)
-      return
+      return false
     }
 
     // support only the exact version
@@ -121,15 +137,10 @@ export class SgpMain implements IAkariShardInitDispose {
       this._log.warn(
         `SGP 服务器配置文件版本不匹配, 当前版本: ${SgpMain.CONFIG_SCHEMA_VERSION}, 远程版本: ${json.version}`
       )
-      return
+      return false
     }
 
-    // use the newer config
-    if (json.lastUpdate > this.state.sgpServerConfig.lastUpdate) {
-      this.state.setSgpServerConfig(json)
-      this._setting.writeToJsonConfigFile(SgpMain.LEAGUE_SGP_SERVERS_JSON, json).catch(() => {})
-      this._log.info('更新 SGP 服务器配置文件', new Date(json.lastUpdate).toISOString())
-    }
+    return true
   }
 
   private _handleUpdateConfig() {
@@ -142,6 +153,9 @@ export class SgpMain implements IAkariShardInitDispose {
     )
   }
 
+  /**
+   * 如果远程的配置文件比应用内置的配置文件新, 则立即覆盖本地配置区的配置文件
+   */
   private async _fetchAndUpdateSgpServers() {
     this._log.info('检查远程 SGP 服务器配置文件')
 
@@ -158,7 +172,21 @@ export class SgpMain implements IAkariShardInitDispose {
       const raw = Buffer.from(content, 'base64').toString('utf-8')
       const json = JSON.parse(raw)
 
-      this._validateAndApplyConfig(json)
+      if (this._validateConfig(json)) {
+        if (json.lastUpdate > this.state.sgpServerConfig.lastUpdate) {
+          this.state.setSgpServerConfig(json)
+          await this._setting.writeToJsonConfigFile(SgpMain.LEAGUE_SGP_SERVERS_JSON, json)
+          this._log.info(
+            '更新本地 SGP 服务器配置文件',
+            dayjs(json.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
+        } else {
+          this._log.info(
+            '远程 SGP 服务器配置文件没有更新',
+            dayjs(json.lastUpdate).format('YYYY-MM-DD HH:mm:ss')
+          )
+        }
+      }
     } catch (error) {
       this._log.warn(`更新 SGP 服务器配置文件时发生错误:`, error)
     }

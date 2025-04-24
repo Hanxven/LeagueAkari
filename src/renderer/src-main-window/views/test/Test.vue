@@ -37,51 +37,16 @@ import { NScrollbar, useMessage } from 'naive-ui'
 import { computed } from 'vue'
 import { reactive } from 'vue'
 
+import { useMarkdownTest } from './markdown-test'
+
 const lc = useInstance(LeagueClientRenderer)
 
 const message = useMessage()
 
-const textT = `# League Akari Markdown Test
-
-## League Akari
-
-### League Akari
-
-#### League Akari
-
-##### League Akari
-
-###### League Akari
-
-**League Akari** *League Akari*
-
-<div style="color: orange; font-weight: bold;">League Akari</div>
-
-\`League Akari\`
-
-***League Akari***
-
-~~League Akari~~
-
-\`\`\`
-fn league_akari(rabi: &str) {
-    println!("Hello, {}!", rabi);
-}
-\`\`\`
-
-1. ✅ League
-2. ✅ Akari
-    - ✅ League
-        - League
-        - Akari
-    - ✅ Akari
-        - League
-        - Akari
-
-> League Akari`
+const textT = useMarkdownTest()
 
 const markdownHtmlText = computed(() => {
-  return markdownIt.render(textT)
+  return markdownIt.render(textT.value)
 })
 
 const teams = reactive(PREMADE_TEAM_COLORS)

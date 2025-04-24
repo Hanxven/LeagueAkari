@@ -111,7 +111,9 @@
             @mouseup.prevent="handleSearchHistoryMouseUp($event, s)"
           >
             <div class="sgp-server" v-if="isSearchHistoryNeedToShowSgpServer">
-              {{ sgps.sgpServerConfig.servers[s.sgpServerId]?.name || s.sgpServerId }}
+              {{
+                sgps.sgpServerConfig.serverNames[as.settings.locale][s.sgpServerId] || s.sgpServerId
+              }}
             </div>
             <div class="game-name-line">{{ s.summoner.gameName }}</div>
             <div class="tag-line">#{{ s.summoner.tagLine }}</div>
@@ -174,6 +176,7 @@
 <script setup lang="ts">
 import LcuImage from '@renderer-shared/components/LcuImage.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
@@ -208,6 +211,7 @@ const sgp = useInstance(SgpRenderer)
 
 const mh = useInstance(MatchHistoryTabsRenderer)
 
+const as = useAppCommonStore()
 const sgps = useSgpStore()
 
 const message = useMessage()

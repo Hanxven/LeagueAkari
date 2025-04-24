@@ -1,4 +1,5 @@
 import { i18next } from '@main/i18n'
+import { IntervalTask } from '@main/utils/timer'
 import sevenBinPath from '@resources/7za.exe?asset'
 import icon from '@resources/LA_ICON.ico?asset'
 import updateExecutablePath from '@resources/akari-updater.exe?asset'
@@ -58,11 +59,15 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
 
+  private readonly _checkUpdateTask = new IntervalTask(
+    () => this._updateReleaseUpdatesInfo(),
+    7.2e6
+  )
+
   private _http = axios.create({
     headers: { 'User-Agent': SelfUpdateMain.USER_AGENT }
   })
 
-  private _checkUpdateTimerId: NodeJS.Timeout | null = null
   private _checkAnnouncementTimerId: NodeJS.Timeout | null = null
 
   private _updateOnQuitFn: (() => void) | null = null
@@ -72,8 +77,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     private readonly _app: AppCommonMain,
     private readonly _ipc: AkariIpcMain,
     private readonly _mobx: MobxUtilsMain,
-    private readonly _loggerFactory: LoggerFactoryMain,
-    private readonly _settingFactory: SettingFactoryMain
+    _loggerFactory: LoggerFactoryMain,
+    _settingFactory: SettingFactoryMain
   ) {
     this._log = _loggerFactory.create(SelfUpdateMain.id)
     this._setting = _settingFactory.register(
@@ -111,15 +116,9 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       () => this.settings.autoCheckUpdates,
       (sure) => {
         if (sure) {
-          this._updateReleaseUpdatesInfo()
-          this._checkUpdateTimerId = setInterval(() => {
-            this._updateReleaseUpdatesInfo()
-          }, SelfUpdateMain.UPDATES_CHECK_INTERVAL)
+          this._checkUpdateTask.start(true)
         } else {
-          if (this._checkUpdateTimerId) {
-            clearInterval(this._checkUpdateTimerId)
-            this._checkUpdateTimerId = null
-          }
+          this._checkUpdateTask.cancel()
         }
       },
       { fireImmediately: true, delay: 3500 }
@@ -236,12 +235,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         filename: release.archiveFile.name
       })
 
-      if (this._checkUpdateTimerId) {
-        clearInterval(this._checkUpdateTimerId)
-        this._checkUpdateTimerId = setInterval(() => {
-          this._updateReleaseUpdatesInfo()
-        }, SelfUpdateMain.UPDATES_CHECK_INTERVAL)
-      }
+      this._checkUpdateTask.start()
 
       if (debug || release.isNew) {
         return { result: 'new-updates' }
@@ -675,7 +669,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       this._cancelUpdateProcess()
     }
 
-    this._checkUpdateTimerId && clearInterval(this._checkUpdateTimerId)
+    this._checkUpdateTask.cancel()
     this._checkAnnouncementTimerId && clearInterval(this._checkAnnouncementTimerId)
   }
 

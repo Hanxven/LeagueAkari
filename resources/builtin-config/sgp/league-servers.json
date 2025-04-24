@@ -1,6 +1,7 @@
 {
   "version": 1,
-  "lastUpdate": 1745477402390,
+  "lastUpdate": 1745477200000,
+  "from": "builtin",
   "servers": {
     "TENCENT_HN1": {
       "matchHistory": "https://hn1-k8s-sgp.lol.qq.com:21019",
