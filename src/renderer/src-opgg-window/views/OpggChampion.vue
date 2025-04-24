@@ -15,7 +15,7 @@
           </NFlex>
         </NRadioGroup>
     </div>
-    <NScrollbar>
+    <NScrollbar x-scrollable ref="scroll"  @scroll="(e) => handleOpggContentScroll(e)">
       <div class="card-area" v-if="info">
         <div class="card-content">
           <div class="first-line" :title="info.id === 893 ? t('OpggChampion.adorableRabi') : ''">
@@ -66,6 +66,14 @@
         <NTab name="build" :tab="t('OpggChampion.build')" />
         <NTab name="items" :tab="t('OpggChampion.itemText')" />
       </NTabs>
+      <Transition name="bi-fade">
+        <div class="opgg-tabs-header" v-if="shouldShowTinyHeader">
+          <NTabs class="tabs" v-model:value="opggCurrentTab" type="segment" size="small" @update:value="onTabChange">
+            <NTab name="build" :tab="t('OpggChampion.build')" />
+            <NTab name="items" :tab="t('OpggChampion.itemText')" />
+          </NTabs>
+        </div>
+      </Transition>
       <div
         class="card-area"
         v-show="opggCurrentTab === 'build'"
@@ -778,7 +786,7 @@ import {
   NTabs,
   useMessage
 } from 'naive-ui'
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, useTemplateRef, watchEffect } from 'vue'
 
 const props = defineProps<{
   region?: string
@@ -894,6 +902,19 @@ const isLastItemsExpanded = ref(false)
 const opggCurrentTab = ref('build')
 
 const opggChampionSortBy = useLocalStorage('opgg-sort-by', 'default')
+
+const scrollEl = useTemplateRef('scroll')
+const SHOW_TINY_HEADER_THRESHOLD = 160
+const opggContentScrollTop = ref(0)
+const handleOpggContentScroll = (e: Event) => {
+  opggContentScrollTop.value = (e.target as HTMLElement).scrollTop
+}
+const shouldShowTinyHeader = computed(() => opggContentScrollTop.value > SHOW_TINY_HEADER_THRESHOLD)
+
+const onTabChange = () => {
+  scrollEl.value?.scrollTo({ top: 0 })
+}
+
 
 watchEffect(() => {
   if (!props.data) {
@@ -1222,6 +1243,32 @@ if (import.meta.env.DEV) {
   &.tier-6 {
     color: rgb(85, 34, 83);
   }
+}
+
+.opgg-tabs-header {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 1;
+  background-color: rgba(#000, 0.6);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.bi-fade-enter-from,
+.bi-fade-leave-to {
+  opacity: 0;
+}
+
+.bi-fade-enter-active,
+.bi-fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.bi-fade-enter-to,
+.bi-fade-leave-from {
+  opacity: 1;
 }
 
 .card-content {
