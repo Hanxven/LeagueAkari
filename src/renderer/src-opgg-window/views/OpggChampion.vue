@@ -906,7 +906,7 @@ watchEffect(() => {
     isBootsExpanded.value = false
     isPrismItemsExpanded.value = true
     isCoreItemsExpanded.value = false
-    isLastItemsExpanded.value = false
+    isLastItemsExpanded.value = true
     isCountersExpanded.value = false
     opggCurrentTab.value = 'build'
   }
