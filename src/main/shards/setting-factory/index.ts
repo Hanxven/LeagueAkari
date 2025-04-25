@@ -1,5 +1,4 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
-import { LEAGUE_AKARI_DB_CURRENT_VERSION } from '@shared/constants/common'
 import { Paths } from '@shared/utils/types'
 import { app, dialog } from 'electron'
 import fs from 'node:original-fs'
@@ -311,7 +310,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     const all = await this._storage.dataSource.manager.find(Setting)
 
     const jsonContent = {
-      databaseVersion: LEAGUE_AKARI_DB_CURRENT_VERSION,
+      databaseVersion: StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION,
       type: 'league-akari-settings',
       data: all
     }
@@ -332,7 +331,7 @@ export class SettingFactoryMain implements IAkariShardInitDispose {
     }
 
     // 检查数据库版本
-    if (content.databaseVersion > LEAGUE_AKARI_DB_CURRENT_VERSION) {
+    if (content.databaseVersion > StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION) {
       throw new AkariIpcError(
         `The file is from a newer version of the application, please update the application first`,
         'InvalidDatabaseVersion'

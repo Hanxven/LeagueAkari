@@ -901,16 +901,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@leaguetavern/electron-overlay-win@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@leaguetavern/electron-overlay-win@npm:1.0.1::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40leaguetavern%2Felectron-overlay-win%2F1.0.1%2F11d9215d729d05693d3d972206297b6fdecaa0e0"
-  dependencies:
-    cmake-js: "npm:^7.3.0"
-    node-addon-api: "npm:^1.0.0"
-  checksum: 10c0/a878d10988049d9d9c705dbb6c3d7e1b9ac4c0b4c4210d74ac14872b05fe23d2172cf107fab5921a8a3f4170d094d154c43465423dbc53b223b4be0417fe6712
-  languageName: node
-  linkType: hard
-
 "@malept/cross-spawn-promise@npm:^2.0.0":
   version: 2.0.0
   resolution: "@malept/cross-spawn-promise@npm:2.0.0"
@@ -2284,7 +2274,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.5, axios@npm:^1.8.4":
+"axios@npm:^1.8.4":
   version: 1.8.4
   resolution: "axios@npm:1.8.4"
   dependencies:
@@ -2684,29 +2674,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cmake-js@npm:^7.3.0":
-  version: 7.3.0
-  resolution: "cmake-js@npm:7.3.0"
-  dependencies:
-    axios: "npm:^1.6.5"
-    debug: "npm:^4"
-    fs-extra: "npm:^11.2.0"
-    lodash.isplainobject: "npm:^4.0.6"
-    memory-stream: "npm:^1.0.0"
-    node-api-headers: "npm:^1.1.0"
-    npmlog: "npm:^6.0.2"
-    rc: "npm:^1.2.7"
-    semver: "npm:^7.5.4"
-    tar: "npm:^6.2.0"
-    url-join: "npm:^4.0.1"
-    which: "npm:^2.0.2"
-    yargs: "npm:^17.7.2"
-  bin:
-    cmake-js: bin/cmake-js
-  checksum: 10c0/8aa3839603578e3f40bff55a3b7cb962682223ab91bab82501289d6ee0b84246c22ecdc01381b38079a0f20fd5c6ca01068e928bf399f8054a19a7cdaab1060c
-  languageName: node
-  linkType: hard
-
 "color-convert@npm:^1.9.3":
   version: 1.9.3
   resolution: "color-convert@npm:1.9.3"
@@ -2938,7 +2905,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.3, debug@npm:^4.3.4, debug@npm:^4.3.7, debug@npm:^4.4.0":
+"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.3, debug@npm:^4.3.4, debug@npm:^4.3.7, debug@npm:^4.4.0":
   version: 4.4.0
   resolution: "debug@npm:4.4.0"
   dependencies:
@@ -4570,7 +4537,6 @@ __metadata:
     "@electron-toolkit/utils": "npm:^4.0.0"
     "@electron/notarize": "npm:^3.0.1"
     "@hanxven/league-akari-addons": "npm:^1.0.0"
-    "@leaguetavern/electron-overlay-win": "npm:^1.0.1"
     "@modyfi/vite-plugin-yaml": "npm:^1.1.1"
     "@swc/core": "npm:^1.11.21"
     "@trivago/prettier-plugin-sort-imports": "npm:^5.2.2"
@@ -4752,13 +4718,6 @@ __metadata:
   version: 4.0.0
   resolution: "lodash.isnil@npm:4.0.0"
   checksum: 10c0/1a410a62eb2e797f077d038c11cbf1ea18ab36f713982849f086f86e050234d69988c76fa18d00278c0947daec67e9ecbc666326b8a06b43e36d3ece813a8120
-  languageName: node
-  linkType: hard
-
-"lodash.isplainobject@npm:^4.0.6":
-  version: 4.0.6
-  resolution: "lodash.isplainobject@npm:4.0.6"
-  checksum: 10c0/afd70b5c450d1e09f32a737bed06ff85b873ecd3d3d3400458725283e3f2e0bb6bf48e67dbe7a309eb371a822b16a26cca4a63c8c52db3fc7dc9d5f9dd324cbb
   languageName: node
   linkType: hard
 
@@ -4984,15 +4943,6 @@ __metadata:
   version: 2.0.0
   resolution: "mdurl@npm:2.0.0"
   checksum: 10c0/633db522272f75ce4788440669137c77540d74a83e9015666a9557a152c02e245b192edc20bc90ae953bbab727503994a53b236b4d9c99bdaee594d0e7dd2ce0
-  languageName: node
-  linkType: hard
-
-"memory-stream@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "memory-stream@npm:1.0.0"
-  dependencies:
-    readable-stream: "npm:^3.4.0"
-  checksum: 10c0/a2d9abd35845b228055ce5424dbdd8478711ba41325d02e6c8ef9baeba557287d4493a6e74d3db5c9849c58ea13fdc1dd445c96f469cbd02f47d22cfba930306
   languageName: node
   linkType: hard
 
@@ -5406,7 +5356,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-addon-api@npm:^1.0.0, node-addon-api@npm:^1.6.3":
+"node-addon-api@npm:^1.6.3":
   version: 1.7.2
   resolution: "node-addon-api@npm:1.7.2"
   dependencies:
@@ -5430,13 +5380,6 @@ __metadata:
   dependencies:
     node-gyp: "npm:latest"
   checksum: 10c0/e28f1c5094130ecc3a0bf882e0385e74cac9c5112d35287dbce369959551ab7ca4d1f1a69af737107c894c14b4063dd5002e2b3c16a27035d025bb06eefee058
-  languageName: node
-  linkType: hard
-
-"node-api-headers@npm:^1.1.0":
-  version: 1.5.0
-  resolution: "node-api-headers@npm:1.5.0"
-  checksum: 10c0/e8dfe99e8e3ca92cd5d37989413dfc96551e8f7883110b948917dad07e554cfbf1119130e96d0167f5cb5a05f651a4ac735402a305ff25d9ace422a2e429ae3b
   languageName: node
   linkType: hard
 
@@ -5553,7 +5496,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"npmlog@npm:^6.0.0, npmlog@npm:^6.0.2":
+"npmlog@npm:^6.0.0":
   version: 6.0.2
   resolution: "npmlog@npm:6.0.2"
   dependencies:
@@ -6279,7 +6222,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.2, semver@npm:^7.3.5, semver@npm:^7.3.8, semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.7.1":
+"semver@npm:^7.3.2, semver@npm:^7.3.5, semver@npm:^7.3.8, semver@npm:^7.5.3, semver@npm:^7.7.1":
   version: 7.7.1
   resolution: "semver@npm:7.7.1"
   bin:
@@ -6690,7 +6633,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tar@npm:^6.0.2, tar@npm:^6.0.5, tar@npm:^6.1.11, tar@npm:^6.1.12, tar@npm:^6.1.2, tar@npm:^6.2.0, tar@npm:^6.2.1":
+"tar@npm:^6.0.2, tar@npm:^6.0.5, tar@npm:^6.1.11, tar@npm:^6.1.12, tar@npm:^6.1.2, tar@npm:^6.2.1":
   version: 6.2.1
   resolution: "tar@npm:6.2.1"
   dependencies:
@@ -7048,13 +6991,6 @@ __metadata:
   dependencies:
     punycode: "npm:^2.1.0"
   checksum: 10c0/4ef57b45aa820d7ac6496e9208559986c665e49447cb072744c13b66925a362d96dd5a46c4530a6b8e203e5db5fe849369444440cb22ecfc26c679359e5dfa3c
-  languageName: node
-  linkType: hard
-
-"url-join@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "url-join@npm:4.0.1"
-  checksum: 10c0/ac65e2c7c562d7b49b68edddcf55385d3e922bc1dd5d90419ea40b53b6de1607d1e45ceb71efb9d60da02c681d13c6cb3a1aa8b13fc0c989dfc219df97ee992d
   languageName: node
   linkType: hard
 

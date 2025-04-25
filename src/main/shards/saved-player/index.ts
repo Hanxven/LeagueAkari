@@ -1,5 +1,4 @@
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
-import { LEAGUE_AKARI_DB_CURRENT_VERSION } from '@shared/constants/common'
 import { dialog } from 'electron'
 import fs from 'node:fs'
 import { Equal, FindOptionsOrder, FindOptionsWhere, IsNull, Not } from 'typeorm'
@@ -279,7 +278,7 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
     })
 
     const jsonContent = {
-      databaseVersion: LEAGUE_AKARI_DB_CURRENT_VERSION,
+      databaseVersion: StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION,
       type: 'league-akari-tagged-players',
       data: all.map((record) => ({
         puuid: record.puuid,
@@ -307,7 +306,7 @@ export class SavedPlayerMain implements IAkariShardInitDispose {
       )
     }
 
-    if (content.databaseVersion > LEAGUE_AKARI_DB_CURRENT_VERSION) {
+    if (content.databaseVersion > StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION) {
       throw new AkariIpcError(
         `The file is from a newer version of the application, please update the application first`,
         'InvalidDatabaseVersion'

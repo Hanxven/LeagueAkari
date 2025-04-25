@@ -1,5 +1,4 @@
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { LEAGUE_AKARI_DB_CURRENT_VERSION, LEAGUE_AKARI_DB_FILENAME } from '@shared/constants/common'
 import dayjs from 'dayjs'
 import { app } from 'electron'
 import { existsSync, renameSync } from 'node:fs'
@@ -21,6 +20,9 @@ import { v15_LA1_2_2Upgrade } from './upgrades/version-15'
 export class StorageMain implements IAkariShardInitDispose {
   static id = 'storage-main'
 
+  static LEAGUE_AKARI_DB_CURRENT_VERSION = 15
+  static LEAGUE_AKARI_DB_FILENAME = 'LeagueAkari.db'
+
   private readonly _log: AkariLogger
 
   private readonly _dataSource: DataSource
@@ -39,7 +41,7 @@ export class StorageMain implements IAkariShardInitDispose {
 
     this._dataSource = new DataSource({
       type: 'sqlite',
-      database: join(app.getPath('userData'), LEAGUE_AKARI_DB_FILENAME),
+      database: join(app.getPath('userData'), StorageMain.LEAGUE_AKARI_DB_FILENAME),
       synchronize: false,
       entities: [Metadata, SavedPlayer, Setting, EncounteredGame]
     })
@@ -150,11 +152,11 @@ export class StorageMain implements IAkariShardInitDispose {
         )
         if (versionResult.length) {
           currentVersion = parseInt(versionResult[0].value, 10)
-          if (currentVersion > LEAGUE_AKARI_DB_CURRENT_VERSION) {
+          if (currentVersion > StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION) {
             // version is too high and needs recreation
             needToRecreateDatabase = true
             needToPerformUpgrade = true
-          } else if (currentVersion < LEAGUE_AKARI_DB_CURRENT_VERSION) {
+          } else if (currentVersion < StorageMain.LEAGUE_AKARI_DB_CURRENT_VERSION) {
             // low version, need to upgrade
             needToPerformUpgrade = true
           }

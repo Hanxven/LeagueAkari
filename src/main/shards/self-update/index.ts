@@ -4,13 +4,7 @@ import sevenBinPath from '@resources/7za.exe?asset'
 import icon from '@resources/LA_ICON.ico?asset'
 import updateExecutablePath from '@resources/akari-updater.exe?asset'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import {
-  LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL,
-  LEAGUE_AKARI_GITEE_CHECK_UPDATES_URL,
-  LEAGUE_AKARI_GITEE_LATEST_PAGE,
-  LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL,
-  LEAGUE_AKARI_GITHUB_LATEST_PAGE
-} from '@shared/constants/common'
+import { LEAGUE_AKARI_CHECK_ANNOUNCEMENT_URL } from '@shared/constants/common'
 import { FileInfo, GithubApiLatestRelease } from '@shared/types/github'
 import { formatError } from '@shared/utils/errors'
 import axios, { AxiosResponse } from 'axios'
@@ -49,8 +43,19 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
   static USER_AGENT = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 LeagueAkari/${app.getVersion()} `
 
   static UPDATE_SOURCE = {
-    gitee: LEAGUE_AKARI_GITEE_CHECK_UPDATES_URL,
-    github: LEAGUE_AKARI_GITHUB_CHECK_UPDATES_URL
+    gitee: 'https://gitee.com/api/v5/repos/Hanxven/LeagueAkari/releases/latest',
+    github: 'https://api.github.com/repos/Hanxven/LeagueAkari/releases/latest'
+  }
+
+  static RELEASE_PAGE_SOURCE = {
+    github: 'https://github.com/Hanxven/LeagueAkari/releases/latest',
+    gitee: 'https://gitee.com/Hanxven/LeagueAkari/releases'
+  }
+
+  static ANNOUNCEMENT_SOURCE = {
+    'zh-CN':
+      'https://api.github.com/repos/Hanxven/LeagueAkari-Config/contents/announcements/zh-CN.md?ref=main',
+    en: 'https://api.github.com/repos/Hanxven/LeagueAkari-Config/contents/announcements/en.md?ref=main'
   }
 
   public readonly settings = new SelfUpdateSettings()
@@ -703,9 +708,8 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
 
       if (valid(targetVersion)) {
         const pageUrl =
-          this.settings.downloadSource == 'github'
-            ? LEAGUE_AKARI_GITHUB_LATEST_PAGE
-            : LEAGUE_AKARI_GITEE_LATEST_PAGE
+          SelfUpdateMain.RELEASE_PAGE_SOURCE[this.settings.downloadSource] ||
+          SelfUpdateMain.RELEASE_PAGE_SOURCE.github
 
         if (gte(app.getVersion(), targetVersion)) {
           this._log.info(`看来已经成功更新`, targetVersion, newVersionFlagPath)
