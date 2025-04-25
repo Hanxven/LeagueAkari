@@ -706,7 +706,7 @@
           </div>
         </div>
       </div>
-      <div class="card-area" v-if="data && data.data.starter_items && data.data.last_items.length">
+      <div class="card-area" v-show="opggCurrentTab === 'items'" v-if="data && data.data.starter_items && data.data.last_items.length">
         <div class="card-title">
           {{ t('OpggChampion.itemText') }}
           <NCheckbox
