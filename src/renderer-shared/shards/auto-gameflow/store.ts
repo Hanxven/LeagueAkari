@@ -28,6 +28,7 @@ export const useAutoGameflowStore = defineStore('shard:auto-gameflow-renderer', 
     autoMatchmakingMinimumMembers: 1,
     autoMatchmakingWaitForInvitees: true,
     autoHandleInvitationsEnabled: false,
+    autoSkipLeaderEnabled: false,
     invitationHandlingStrategies: {} as Record<string, string>,
     dodgeAtLastSecondThreshold: 2,
     rejectInvitationWhenAway: false

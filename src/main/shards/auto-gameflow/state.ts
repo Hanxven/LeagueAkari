@@ -30,6 +30,8 @@ export class AutoGameflowSettings {
   autoMatchmakingMinimumMembers = 1 // 最低满足人数
   autoMatchmakingWaitForInvitees: boolean = true // 等待邀请中的用户
 
+  autoSkipLeaderEnabled: boolean = false
+
   autoHandleInvitationsEnabled: boolean = false
   rejectInvitationWhenAway: boolean = false
 
@@ -99,6 +101,10 @@ export class AutoGameflowSettings {
 
   setInvitationHandlingStrategies(strategies: Record<string, string>) {
     this.invitationHandlingStrategies = strategies
+  }
+
+  setAutoSkipLeaderEnabled(enabled: boolean) {
+    this.autoSkipLeaderEnabled = enabled
   }
 
   constructor() {

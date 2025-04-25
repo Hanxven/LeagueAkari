@@ -615,6 +615,9 @@ AutoGameflow:
   autoReconnectEnabled:
     label: Auto Reconnect
     description: Attempts to reconnect when in a reconnectable state.
+  autoSkipLeaderEnabled:
+    label: Auto Skip Leader
+    description: When you are the lobby leader, transfer the leadership to other members in the lobby
   autoHandleInvitationsEnabled:
     label: Auto Handle Invitations
     description: Handles room invitations according to the configured strategy.
@@ -2102,6 +2105,12 @@ auto-gameflow-main:
   error-auto-honor: 'Auto honor failed: {{reason}}'
   error-accept-match: 'Auto accept match failed: {{reason}}'
   error-matchmaking: 'Auto matchmaking could not start: {{reason}}'
+  auto-matchmaking-canceled: Auto matchmaking canceled
+  auto-matchmaking-canceled-wait-for-invitees: Auto matchmaking canceled, waiting for invitees
+  auto-matchmaking-canceled-not-leader: Auto matchmaking canceled, you are not the room leader
+  auto-matchmaking-canceled-wait-for-penalty: Auto matchmaking canceled, waiting for penalty timer
+  auto-matchmaking-in: Auto matchmaking in {{seconds}} seconds
+  skip-leader: Attempting to skip becoming the leader
 
 auto-select-main:
   error-pick: 'Failed to auto select champion, target champion {{champion}}: {{reason}}'

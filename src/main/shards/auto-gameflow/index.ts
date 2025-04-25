@@ -68,6 +68,9 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         autoMatchmakingRematchFixedDuration: {
           default: this.settings.autoMatchmakingRematchFixedDuration
         },
+        autoSkipLeaderEnabled: {
+          default: this.settings.autoSkipLeaderEnabled
+        },
         autoMatchmakingRematchStrategy: { default: this.settings.autoMatchmakingRematchStrategy },
         autoMatchmakingWaitForInvitees: { default: this.settings.autoMatchmakingWaitForInvitees },
         autoHandleInvitationsEnabled: { default: this.settings.autoHandleInvitationsEnabled },
@@ -287,6 +290,65 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
           this._log.warn(`自动处理失败: ${formatError(error)}`)
         }
       }
+    )
+  }
+
+  private _handleAutoSkipLeader() {
+    const leaderInfo = computed(
+      () => {
+        const lobby = this._lc.data.lobby.lobby
+
+        if (!lobby) {
+          return null
+        }
+
+        const isLeader = lobby.localMember.isLeader
+
+        const targetMembers = lobby.members.filter(
+          (p) => p.summonerId !== lobby.localMember.summonerId && !p.isSpectator
+        )
+
+        const readyMembers = targetMembers.filter((p) => p.ready).map((p) => p.summonerId)
+        const notReadyMembers = targetMembers.filter((p) => !p.ready).map((p) => p.summonerId)
+
+        return {
+          isLeader,
+          readyMembers,
+          notReadyMembers
+        }
+      },
+      { equals: comparer.structural }
+    )
+
+    this._mobx.reaction(
+      () => leaderInfo.get(),
+      (info) => {
+        if (!this.settings.autoSkipLeaderEnabled || !info || !info.isLeader) {
+          return
+        }
+
+        if (!info.readyMembers.length && !info.notReadyMembers.length) {
+          return
+        }
+
+        // 优先从 ready 的玩家中选择
+        const fromMembers = info.readyMembers.length ? info.readyMembers : info.notReadyMembers
+        const target = fromMembers[randomInt(0, fromMembers.length - 1)]
+
+        this._log.info('更换房间领导者', target)
+
+        if (this._lc.data.chat.conversations.customGame) {
+          this._lc.api.chat.chatSend(
+            this._lc.data.chat.conversations.customGame.id,
+            i18next.t('auto-gameflow-main.skip-leader')
+          )
+        }
+
+        this._lc.api.lobby.promote(target).catch((e) => {
+          this._log.warn('尝试更换房间领导者时失败', e)
+        })
+      },
+      { fireImmediately: true }
     )
   }
 
@@ -668,6 +730,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       'autoMatchmakingRematchFixedDuration',
       'autoMatchmakingRematchStrategy',
       'autoMatchmakingWaitForInvitees',
+      'autoSkipLeaderEnabled',
       'playAgainEnabled',
       'dodgeAtLastSecondThreshold',
       'autoHandleInvitationsEnabled',
@@ -728,7 +791,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         this._lc.api.chat
           .chatSend(
             this._lc.data.chat.conversations.customGame.id,
-            `[League Akari] 自动匹配已取消`,
+            `[League Akari] ${i18next.t('auto-gameflow-main.auto-matchmaking-canceled')}`,
             'celebration'
           )
           .catch(() => {})
@@ -737,7 +800,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         this._lc.api.chat
           .chatSend(
             this._lc.data.chat.conversations.customGame.id,
-            `[League Akari] 自动匹配已取消，等待被邀请者`,
+            `[League Akari] ${i18next.t('auto-gameflow-main.auto-matchmaking-canceled-wait-for-invitees')}`,
             'celebration'
           )
           .catch(() => {})
@@ -746,7 +809,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         this._lc.api.chat
           .chatSend(
             this._lc.data.chat.conversations.customGame.id,
-            `[League Akari] 自动匹配已取消，当前不是房间房主`,
+            `[League Akari] ${i18next.t('auto-gameflow-main.auto-matchmaking-canceled-not-leader')}`,
             'celebration'
           )
           .catch(() => {})
@@ -755,7 +818,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         this._lc.api.chat
           .chatSend(
             this._lc.data.chat.conversations.customGame.id,
-            `[League Akari] 自动匹配已取消，等待秒退计时器`,
+            `[League Akari] ${i18next.t('auto-gameflow-main.auto-matchmaking-canceled-wait-for-penalty')}`,
             'celebration'
           )
           .catch(() => {})
@@ -766,7 +829,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
       this._lc.api.chat
         .chatSend(
           this._lc.data.chat.conversations.customGame.id,
-          `[League Akari] 将在 ${Math.abs(time).toFixed()} 秒后自动匹配`,
+          `[League Akari] ${i18next.t('auto-gameflow-main.auto-matchmaking-in', { seconds: Math.abs(time).toFixed() })}`,
           'celebration'
         )
         .catch(() => {})
@@ -781,6 +844,7 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
     this._handleAutoPlayAgain()
     this._handleAutoReconnect()
     this._handleAutoHandleInvitation()
+    this._handleAutoSkipLeader()
     this._handleLogging()
     this._handleLastSecondDodge()
     this._handleAutoSearchMatch()

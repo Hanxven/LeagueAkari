@@ -618,6 +618,9 @@ AutoGameflow:
   autoReconnectEnabled:
     label: 自动重新连接
     description: 当位于可重新连接状态时，尝试重新连接
+  autoSkipLeaderEnabled:
+    label: 不当房主
+    description: 当自己是房主时，将房主转交到房间内的其他成员
   autoHandleInvitationsEnabled:
     label: 自动处理房间邀请
     description: 按照设定的策略处理房间邀请
@@ -2105,6 +2108,12 @@ auto-gameflow-main:
   error-auto-honor: 自动点赞失败：{{reason}}
   error-accept-match: 自动接受对局失败：{{reason}}
   error-matchmaking: 自动匹配无法开始匹配 {{reason}}
+  auto-matchmaking-canceled: 自动匹配已取消
+  auto-matchmaking-canceled-wait-for-invitees: 自动匹配已取消，等待被邀请者
+  auto-matchmaking-canceled-not-leader: 自动匹配已取消，当前不是房间房主
+  auto-matchmaking-canceled-wait-for-penalty: 自动匹配已取消，等待秒退计时器
+  auto-matchmaking-in: 将在 {{seconds}} 秒后自动匹配
+  skip-leader: 尝试将房主转让
 
 auto-select-main:
   error-pick: 尝试自动选择英雄时失败，目标英雄 {{champion}}：{{reason}}

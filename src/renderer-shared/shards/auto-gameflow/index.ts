@@ -53,6 +53,10 @@ export class AutoGameflowRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoReconnectEnabled', enabled)
   }
 
+  setAutoSkipLeaderEnabled(enabled: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoSkipLeaderEnabled', enabled)
+  }
+
   setAutoMatchmakingEnabled(enabled: boolean) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'autoMatchmakingEnabled', enabled)
   }

@@ -189,6 +189,19 @@
           <div class="divider"></div>
           <ControlItem
             class="control-item-margin"
+            :label="t('AutoGameflow.autoSkipLeaderEnabled.label')"
+            :label-description="t('AutoGameflow.autoSkipLeaderEnabled.description')"
+            :label-width="260"
+          >
+            <NSwitch
+              :value="store.settings.autoSkipLeaderEnabled"
+              @update:value="(val) => shard.setAutoSkipLeaderEnabled(val)"
+              size="small"
+            />
+          </ControlItem>
+          <div class="divider"></div>
+          <ControlItem
+            class="control-item-margin"
             :label="t('AutoGameflow.autoHandleInvitationsEnabled.label')"
             :label-description="t('AutoGameflow.autoHandleInvitationsEnabled.description')"
             :label-width="260"
