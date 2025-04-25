@@ -1,7 +1,5 @@
-import { Overlay } from '@leaguetavern/electron-overlay-win'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { BrowserWindow } from 'electron'
-import { Worker } from 'node:worker_threads'
 
 import { AkariProtocolMain } from '../akari-protocol'
 import { AppCommonMain } from '../app-common'
@@ -20,7 +18,6 @@ import { AkariMainWindow } from './main-window/window'
 import { AkariOngoingGameWindow } from './ongoing-game-window/window'
 import { AkariOpggWindow } from './opgg-window/window'
 import { WindowManagerSettings, WindowManagerState } from './state'
-import overlayWorker from './workers/lt?modulePath'
 
 export interface WindowManagerMainContext {
   namespace: string
@@ -43,8 +40,6 @@ export interface WindowManagerMainContext {
 @Shard(WindowManagerMain.id)
 export class WindowManagerMain implements IAkariShardInitDispose {
   static id = 'window-manager-main'
-
-  public overlay: Overlay | null = null
 
   private readonly _log: AkariLogger
   private readonly _setting: SetterSettingService
@@ -111,12 +106,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
   async onInit() {
     await this._setting.applyToState()
 
-    // disabled for now
-    if (false && this._app.state.isAdministrator) {
-      const { Overlay } = await import('@leaguetavern/electron-overlay-win')
-      this.overlay = new Overlay()
-    }
-
     if (this._shared.global.isWindows11_22H2_OrHigher) {
       this.state.setSupportsMica(true)
     }
@@ -144,14 +133,6 @@ export class WindowManagerMain implements IAkariShardInitDispose {
     })
     this.state.setManagerFinishedInit(true)
     this.mainWindow.createWindow()
-  }
-
-  setAboveTheWorld(window: BrowserWindow) {
-    const result = this.overlay?.enable(window.getNativeWindowHandle()) || {
-      res: false,
-      msg: 'NotEnabled'
-    }
-    return { res: result.res, msg: result.msg }
   }
 
   /**

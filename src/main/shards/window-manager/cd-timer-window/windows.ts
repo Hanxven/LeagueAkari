@@ -101,22 +101,6 @@ export class AkariCdTimerWindow extends BaseAkariWindow<CdTimerWindowState, CdTi
     )
 
     this._mobx.reaction(
-      () => this.state.ready,
-      (ready) => {
-        if (!ready) {
-          return
-        }
-
-        // TODO DEBUG NEVER ABOVE
-        if (this._window) {
-          if (!this._windowManager.setAboveTheWorld(this._window!).res) {
-            this._log.warn('无法将 cd-timer 窗口置顶')
-          }
-        }
-      }
-    )
-
-    this._mobx.reaction(
       () => this.settings.showShortcut,
       (shortcut) => {
         if (shortcut) {
