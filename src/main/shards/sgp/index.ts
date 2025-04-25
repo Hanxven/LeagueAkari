@@ -64,7 +64,7 @@ export class SgpMain implements IAkariShardInitDispose {
     this._log = _loggerFactory.create(SgpMain.id)
     this._setting = _settingFactory.register(SgpMain.id, {}, {})
 
-    this.state = new SgpState(this._lc.state, this._api)
+    this.state = new SgpState(this._lc.state)
   }
 
   async onInit() {

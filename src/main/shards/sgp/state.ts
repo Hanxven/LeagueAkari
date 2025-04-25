@@ -29,7 +29,10 @@ export class SgpState {
     }
 
     const sgpServerId = getSgpServerId(this._lcState.auth.region, this._lcState.auth.rsoPlatformId)
-    const supported = this._api.supportsSgpServer(sgpServerId)
+    const supported = this.sgpServerConfig.servers[sgpServerId.toUpperCase()] || {
+      matchHistory: false,
+      common: false
+    }
 
     return {
       region: this._lcState.auth.region,
@@ -62,10 +65,7 @@ export class SgpState {
     return this.isEntitlementsTokenSet && this.isLeagueSessionTokenSet
   }
 
-  constructor(
-    private _lcState: LeagueClientState,
-    private _api: LeagueSgpApi
-  ) {
+  constructor(private _lcState: LeagueClientState) {
     makeAutoObservable(this, {
       sgpServerConfig: observable.ref
     })

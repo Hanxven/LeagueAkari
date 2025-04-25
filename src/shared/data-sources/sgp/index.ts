@@ -22,11 +22,6 @@ export interface SgpServersConfig {
   servers: {
     [region: string]: {
       /**
-       * 服务器名称
-       */
-      name: string
-
-      /**
        * 用于战绩查询的服务器地址
        */
       matchHistory: string | null
@@ -103,22 +98,6 @@ export class LeagueSgpApi {
 
   setSgpServerConfig(config: SgpServersConfig) {
     this._sgpServerConfig = config
-  }
-
-  supportsSgpServer(sgpServerId: string) {
-    const server = this._sgpServerConfig.servers[sgpServerId.toUpperCase()]
-
-    if (!server) {
-      return {
-        matchHistory: false,
-        common: false
-      }
-    }
-
-    return {
-      matchHistory: Boolean(server.matchHistory),
-      common: Boolean(server.common)
-    }
   }
 
   sgpServers() {
