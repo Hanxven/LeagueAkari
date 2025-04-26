@@ -1261,8 +1261,7 @@ if (import.meta.env.DEV) {
   opacity: 0;
 }
 
-.bi-fade-enter-active,
-.bi-fade-leave-active {
+.bi-fade-enter-active {
   transition: opacity 0.2s;
 }
 
