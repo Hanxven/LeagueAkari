@@ -4,7 +4,6 @@ import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/le
 import { LcuEvent } from '@shared/types/league-client/event'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import { unsubscribe } from 'diagnostics_channel'
 import { getCurrentScope, onScopeDispose } from 'vue'
 
 import { AkariIpcRenderer } from '../ipc'
@@ -55,6 +54,8 @@ export class LeagueClientRenderer {
 
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
+
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'initialization', store.initialization)
 
     if (gameData) {
       await this._pm.sync(MAIN_SHARD_NAMESPACE, 'gameData', store.gameData)

@@ -130,7 +130,7 @@ export class AkariProtocolMain {
       start(controller) {
         nodeStream.on('data', (chunk) => controller.enqueue(chunk))
         nodeStream.on('end', () => controller.close())
-        nodeStream.on('error', (err) => controller.error(err))
+        nodeStream.on('rejected', (err) => controller.error(err))
       },
       cancel(reason) {
         nodeStream.destroy(reason)

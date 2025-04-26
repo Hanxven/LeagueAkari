@@ -32,6 +32,10 @@ export class LeagueClientState {
     })
   }
 
+  get isConnected() {
+    return this.connectionState === 'connected'
+  }
+
   setConnected(auth: UxCommandLine) {
     this.connectionState = 'connected'
     this.auth = auth

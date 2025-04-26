@@ -17,7 +17,7 @@ export function checkIfPortInUse(host: string, port: number, timeout = 500): Pro
       resolve(false)
     })
 
-    socket.on('error', (err: any) => {
+    socket.on('rejected', (err: any) => {
       if (err.code === 'ECONNREFUSED') {
         resolve(false)
       } else {

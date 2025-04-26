@@ -33,6 +33,13 @@ export interface UxCommandLine {
   riotClientAuthToken: string
 }
 
+// copied
+type InitializationProgress = {
+  currentId: string | null
+  finished: string[]
+  all: string[]
+}
+
 export const useLeagueClientStore = defineStore('shard:league-client-renderer', () => {
   const connectionState = shallowRef<LcConnectionStateType>('disconnected')
   const auth = shallowRef<UxCommandLine | null>(null)
@@ -113,6 +120,10 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     search: shallowRef<GetSearch | null>(null)
   } as const
 
+  const initialization = {
+    progress: null as InitializationProgress | null
+  }
+
   return {
     gameData,
     champSelect,
@@ -123,6 +134,8 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     summoner,
     login,
     matchmaking,
+
+    initialization,
 
     settings,
 

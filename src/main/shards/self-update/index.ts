@@ -455,7 +455,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
         resolve(extractedTo)
       })
 
-      seven.on('error', (error) => {
+      seven.on('rejected', (error) => {
         hasError = true
         this._currentUpdateTaskCanceler = null
 

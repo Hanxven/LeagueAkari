@@ -16,17 +16,24 @@ import PQueue from 'p-queue'
 import WebSocket from 'ws'
 
 import { AkariProtocolMain } from '../akari-protocol'
-import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
 import { LeagueClientUxMain } from '../league-client-ux'
 import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { LeagueClientSyncedData } from './lc-state'
+import { LeagueClientData } from './lc-state-new'
 import { LeagueClientSettings, LeagueClientState } from './state'
 
 const axiosRetry = require('axios-retry').default as AxiosRetry
+
+export interface LeagueClientMainContext {
+  namespace: string
+  mobx: MobxUtilsMain
+  ipc: AkariIpcMain
+  log: AkariLogger
+  lc: LeagueClientMain
+}
 
 export interface LaunchSpectatorConfig {
   locale?: string
@@ -61,7 +68,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
   private _ws: WebSocket | null = null
 
   private _api: LeagueClientHttpApiAxiosHelper | null = null
-  private _data: LeagueClientSyncedData
+  private _data: LeagueClientData
 
   private _eventBus = new RadixEventEmitter()
 
@@ -113,10 +120,12 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       this.settings
     )
 
-    this._data = new LeagueClientSyncedData(this, LeagueClientMain, {
-      log: this._log,
+    this._data = new LeagueClientData({
       ipc: this._ipc,
-      mobx: this._mobx
+      lc: this,
+      log: this._log,
+      mobx: this._mobx,
+      namespace: LeagueClientMain.id
     })
 
     this._handleProtocol()
@@ -401,7 +410,7 @@ export class LeagueClientMain implements IAkariShardInitDispose {
         resolve(ws)
       })
 
-      ws.on('error', (err) => {
+      ws.on('rejected', (err) => {
         clearTimeout(timer)
         reject(err)
       })

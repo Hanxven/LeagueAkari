@@ -79,7 +79,7 @@ function runCommand(
       }
     })
 
-    child.on('error', (error) => {
+    child.on('rejected', (error) => {
       console.log('an error occurred on executing command: ', error, command, args)
       reject(error)
     })
