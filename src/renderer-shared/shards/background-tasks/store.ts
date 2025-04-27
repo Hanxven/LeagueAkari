@@ -1,3 +1,4 @@
+import { ButtonProps } from 'naive-ui'
 import { defineStore } from 'pinia'
 import { VNodeChild, h, ref } from 'vue'
 
@@ -11,6 +12,8 @@ export interface BackgroundTaskAction {
    * 点击这个 action 提供的回调方法
    */
   callback: () => void
+
+  buttonProps?: ButtonProps
 }
 
 export interface BackgroundTask {
@@ -28,6 +31,8 @@ export interface BackgroundTask {
    * 任务名称
    */
   name: string | (() => VNodeChild)
+
+  status: 'success' | 'error' | 'warning' | 'info' | 'default'
 
   /**
    * 任务描述
@@ -57,6 +62,7 @@ export const useBackgroundTasksStore = defineStore('shard:background-tasks-rende
       id,
       createAt: Date.now(),
       name: '',
+      status: 'default',
       description: '',
       progress: null,
       actions: [],

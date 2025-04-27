@@ -2085,9 +2085,19 @@ simple-notifications-renderer:
       bySettings: League Akari has detected that the league client live streaming mode is enabled. You can enable live streaming mode to hide sensitive information
 
 league-client-renderer:
-  initialization:
+  initialization-task:
     name: LCU Initialization
     current: Loading {{endpoint}} ({{finishedCount}}/{{allCount}})
+
+self-update-renderer:
+  self-update-task:
+    name: League Akari Update
+    downloading: Downloading archive {{progress}}% (eta {{eta}})
+    download-failed: Failed to download archive
+    unpacking: Unpacking archive {{progress}}% (eta {{eta}})
+    unpack-failed: Failed to unpack the archive file
+    waiting-for-restart: Updated applied. Restart the application to apply the update
+    cancelButton: Cancel
 
 champions:
   bravery: Bravery
@@ -2139,7 +2149,7 @@ auto-select-main:
 self-update-main:
   title: Self Update
   start-update: Starting update League Akari
-  updateOnNextStartup: Updated downloaded. Restart the application to apply the update
+  updateOnNextStartup: Updated Applied. Restart the application to apply the update
   lastUpdateFailed: The last update failed, please <a href="{{url}}" target="_blank">update the application manually</a>
   lastUpdateSuccess: Updated to {{version}}
 

@@ -1,6 +1,13 @@
 <template>
   <div class="tasks">
-    <div class="task" v-for="task of bts.tasks" :key="task.id">
+    <div
+      class="task"
+      :class="{
+        error: task.status === 'error'
+      }"
+      v-for="task of bts.tasks"
+      :key="task.id"
+    >
       <div class="task-name">
         <component :is="renderText(task.name)" />
       </div>
@@ -10,10 +17,22 @@
         type="line"
         :border-radius="2"
         :percentage="task.progress * 100"
-        >{{ (task.progress * 100).toFixed(2) }}%</NProgress
+        :status="task.status"
       >
+        {{ (task.progress * 100).toFixed(2) }}%
+      </NProgress>
       <div class="task-description">
         <component :is="renderText(task.description)" />
+      </div>
+      <div class="actions" v-if="task.actions.length">
+        <NButton
+          size="tiny"
+          v-for="action of task.actions"
+          @click="action.callback"
+          v-bind="action.buttonProps"
+        >
+          <component :is="renderText(action.label)" />
+        </NButton>
       </div>
     </div>
   </div>
@@ -21,7 +40,7 @@
 
 <script setup lang="ts">
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
-import { NProgress } from 'naive-ui'
+import { ButtonProps, NButton, NProgress } from 'naive-ui'
 import { VNodeChild, h } from 'vue'
 
 const bts = useBackgroundTasksStore()
@@ -42,11 +61,23 @@ const renderText = (node: string | (() => VNodeChild)) => {
   gap: 8px;
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
 .task {
   border: 1px solid #fff2;
   border-radius: 2px;
   padding: 8px;
   width: 320px;
+
+  &.error {
+    background-color: #ff4d4f20;
+  }
 
   .task-name {
     font-size: 14px;
@@ -59,7 +90,7 @@ const renderText = (node: string | (() => VNodeChild)) => {
 
   .task-description {
     font-size: 12px;
-    margin-top: 4px;
+    margin-top: 8px;
     color: #fffc;
   }
 }

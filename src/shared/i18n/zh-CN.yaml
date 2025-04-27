@@ -2088,9 +2088,19 @@ simple-notifications-renderer:
       bySettings: League Akari 检测到客户端直播模式已启用。您可以启用直播模式以隐藏敏感信息
 
 league-client-renderer:
-  initialization:
+  initialization-task:
     name: LCU 初始化
     current: 加载 {{endpoint}} ({{finishedCount}}/{{allCount}})
+
+self-update-renderer:
+  self-update-task:
+    name: League Akari 更新
+    downloading: 正在下载更新包 {{progress}}% (剩余 {{eta}})
+    download-failed: 下载更新包失败
+    unpacking: 正在解压更新包 {{progress}}% (剩余 {{eta}})
+    unpack-failed: 解压更新包失败
+    waiting-for-restart: 更新包解压完成，应用关闭后将自动应用更新流程
+    cancelButton: 取消
 
 champions:
   bravery: 勇敢举动

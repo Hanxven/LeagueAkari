@@ -160,13 +160,13 @@ export class LeagueClientRenderer {
 
         if (!taskStore.hasTask(taskId)) {
           taskStore.createTask(taskId, {
-            name: () => t('league-client-renderer.initialization.name')
+            name: () => t('league-client-renderer.initialization-task.name')
           })
         }
 
         taskStore.updateTask(taskId, {
           description: () =>
-            t('league-client-renderer.initialization.current', {
+            t('league-client-renderer.initialization-task.current', {
               endpoint: progress.currentId,
               finishedCount: progress.finished.length,
               allCount: progress.all.length

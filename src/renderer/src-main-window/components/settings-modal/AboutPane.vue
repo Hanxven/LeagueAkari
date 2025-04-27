@@ -123,7 +123,7 @@
               <div class="step-description" v-if="sus.updateProgressInfo.phase === 'downloading'">
                 {{
                   t('AboutPane.updateProgress.remain', {
-                    time: formatTime(sus.updateProgressInfo.downloadTimeLeft)
+                    time: formatSeconds(sus.updateProgressInfo.downloadTimeLeft, 1)
                   })
                 }}
               </div>
@@ -191,6 +191,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
+import { formatSeconds } from '@shared/utils/format'
 import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCard, NFlex, NScrollbar, NStep, NSteps, useMessage } from 'naive-ui'
@@ -235,24 +236,6 @@ const appInject = inject('app') as any
 
 const handleShowUpdateModal = async () => {
   appInject.openUpdateModal()
-}
-
-const formatTime = (seconds: number) => {
-  const hours = Math.floor(seconds / 3600)
-  const minutes = Math.floor((seconds % 3600) / 60)
-  const secs = seconds % 60
-
-  if (hours > 99) {
-    return '99+ h'
-  }
-
-  if (hours > 0) {
-    return `${hours.toFixed()} h`
-  } else if (minutes > 0) {
-    return `${minutes.toFixed()} m`
-  } else {
-    return `${secs.toFixed()} s`
-  }
 }
 
 const processStatus = computed(() => {

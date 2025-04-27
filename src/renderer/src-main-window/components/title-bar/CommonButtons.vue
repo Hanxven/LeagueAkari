@@ -38,12 +38,7 @@
       </template>
       {{ t('CommonButtons.opggWindow') }}
     </NTooltip>
-    <NPopover
-      placement="bottom-end"
-      show
-      v-if="bts.tasks.length"
-      :z-index="TITLE_BAR_TOOLTIP_Z_INDEX"
-    >
+    <NPopover placement="bottom-end" v-if="bts.tasks.length" :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
       <template #trigger>
         <div class="common-button-outer">
           <SpinningIcon
