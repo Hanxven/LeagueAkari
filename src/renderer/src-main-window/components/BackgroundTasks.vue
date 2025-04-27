@@ -1,5 +1,6 @@
 <template>
   <div class="tasks">
+    <div class="task-title">{{ t('BackgroundTasks.taskTitle', { countV: bts.tasks.length }) }}</div>
     <div
       class="task"
       :class="{
@@ -40,9 +41,11 @@
 
 <script setup lang="ts">
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
-import { ButtonProps, NButton, NProgress } from 'naive-ui'
+import { useTranslation } from 'i18next-vue'
+import { NButton, NProgress } from 'naive-ui'
 import { VNodeChild, h } from 'vue'
 
+const { t } = useTranslation()
 const bts = useBackgroundTasksStore()
 
 const renderText = (node: string | (() => VNodeChild)) => {
@@ -67,6 +70,12 @@ const renderText = (node: string | (() => VNodeChild)) => {
   gap: 4px;
   margin-top: 8px;
   justify-content: flex-end;
+}
+
+.task-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 4px;
 }
 
 .task {

@@ -2073,6 +2073,9 @@ SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s until ready'
   countup: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s used'
 
+BackgroundTasks:
+  taskTitle: Ongoing Tasks ({{countV}})
+
 simple-notifications-renderer:
   liveStreamingHints:
     dismiss: Dismiss
