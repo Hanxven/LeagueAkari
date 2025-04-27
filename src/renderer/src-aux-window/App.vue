@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import SetupInAppScope from '@renderer-shared/shards/setup-in-app-scope/SetupInAppScope.vue'
+import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 
 import AuxWindowTitleBar from './components/AuxWindowTitleBar.vue'
 </script>
