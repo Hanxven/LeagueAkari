@@ -4,6 +4,7 @@ import { useClientInstallationStore } from '@renderer-shared/shards/client-insta
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
+import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NotificationReactive, useNotification } from 'naive-ui'
@@ -22,7 +23,8 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
   constructor(
     @Dep(ClientInstallationRenderer) private readonly _installation: ClientInstallationRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
-    @Dep(LeagueClientRenderer) private readonly _client: LeagueClientRenderer
+    @Dep(LeagueClientRenderer) private readonly _client: LeagueClientRenderer,
+    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer
   ) {}
 
   _setupStreamerModeNotifications() {
@@ -234,9 +236,11 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
-  setupSimpleNotifications() {
+  private _setupSimpleNotifications() {
     this._setupStreamerModeNotifications()
   }
 
-  async onInit() {}
+  async onInit() {
+    this._setup.addSetupFn(() => this._setupSimpleNotifications())
+  }
 }

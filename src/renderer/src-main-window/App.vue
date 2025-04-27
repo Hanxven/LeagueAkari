@@ -12,7 +12,6 @@
       v-model:show="isShowingFreeSoftwareDeclaration"
       @confirm="handleConfirmation"
     />
-    <SimpleNotifications />
     <SetupInAppScope />
     <Transition name="bg-fade">
       <div
@@ -54,7 +53,6 @@ import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
-import SimpleNotifications from './shards/simple-notifications/SimpleNotifications.vue'
 
 const mui = useInstance(MainWindowUiRenderer)
 

@@ -3,7 +3,7 @@ import { Shard } from '@shared/akari-shard'
 /**
  * 用于处理作用域问题
  *
- * 必须是同步函数, 且需将组件放置于应用范围中
+ * 必须是同步函数, 且需将组件 <SetupInAppScope /> 放置于应用范围中
  */
 @Shard(SetupInAppScopeRenderer.id)
 export class SetupInAppScopeRenderer {
