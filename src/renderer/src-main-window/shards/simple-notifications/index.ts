@@ -73,7 +73,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
                         )
                       }
                     },
-                    () => t('main-window-notifications-renderer.liveStreamingHints.dismiss')
+                    () => t('simple-notifications-renderer.liveStreamingHints.dismiss')
                   ),
                   h(
                     NButton,
@@ -90,7 +90,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
                         )
                       }
                     },
-                    () => t('main-window-notifications-renderer.liveStreamingHints.neverShowAgain')
+                    () => t('simple-notifications-renderer.liveStreamingHints.neverShowAgain')
                   ),
                   h(
                     NButton,
@@ -108,7 +108,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
                         )
                       }
                     },
-                    () => t('main-window-notifications-renderer.liveStreamingHints.toSettings')
+                    () => t('simple-notifications-renderer.liveStreamingHints.toSettings')
                   )
                 ]
               )
@@ -216,21 +216,15 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
 
         if (should === 'live-tools') {
           inst = createNotification(
-            () => t('main-window-notifications-renderer.liveStreamingHints.detected.title'),
+            () => t('simple-notifications-renderer.liveStreamingHints.detected.title'),
             () =>
-              h(
-                'span',
-                t('main-window-notifications-renderer.liveStreamingHints.detected.liveTools')
-              )
+              h('span', t('simple-notifications-renderer.liveStreamingHints.detected.liveTools'))
           )
         } else {
           inst = createNotification(
-            () => t('main-window-notifications-renderer.liveStreamingHints.detected.title'),
+            () => t('simple-notifications-renderer.liveStreamingHints.detected.title'),
             () =>
-              h(
-                'span',
-                t('main-window-notifications-renderer.liveStreamingHints.detected.bySettings')
-              )
+              h('span', t('simple-notifications-renderer.liveStreamingHints.detected.bySettings'))
           )
         }
       },

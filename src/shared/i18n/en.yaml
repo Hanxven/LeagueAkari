@@ -2072,7 +2072,7 @@ SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s until ready'
   countup: '{{championName}} {{spellName}} {{minutes}}m{{seconds}}s used'
 
-main-window-notifications-renderer:
+simple-notifications-renderer:
   liveStreamingHints:
     dismiss: Dismiss
     neverShowAgain: Never Show Again

@@ -2075,7 +2075,7 @@ SummonerSpellsCdTimer:
   countdown: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时就绪'
   countup: '{{championName}} {{spellName}} {{minutes}}分{{seconds}}秒时已使用'
 
-main-window-notifications-renderer:
+simple-notifications-renderer:
   liveStreamingHints:
     dismiss: 关闭
     neverShowAgain: 不再显示
