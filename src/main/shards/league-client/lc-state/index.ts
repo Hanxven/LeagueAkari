@@ -249,7 +249,7 @@ export class LeagueClientData {
         this.summoner.setNewIdSystemEnabled(Boolean(data.tagLine))
       } catch (error) {
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-summoner')
-        this._context.log.warn(`获取召唤师信息失败`)
+        this._context.log.warn(`获取召唤师信息失败`, error)
       }
     }
 

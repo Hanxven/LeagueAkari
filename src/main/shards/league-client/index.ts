@@ -416,6 +416,11 @@ export class LeagueClientMain implements IAkariShardInitDispose {
       })
 
       ws.on('close', () => clearTimeout(timer))
+
+      ws.on('error', (err) => {
+        clearTimeout(timer)
+        reject(err)
+      })
     })
   }
 
