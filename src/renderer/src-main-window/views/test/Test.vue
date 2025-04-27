@@ -6,6 +6,10 @@
         This page is reserved for testing scenarios, can only be seen in dev or .rabi mode.
       </div>
       <div style="width: 100%; height: 1px; background: #fff4"></div>
+      <HorizontalExpand :show>
+        <div>should show me?</div>
+      </HorizontalExpand>
+      <NButton @click="show = !show">Toggle</NButton>
       <div class="colors-container">
         <div
           class="card"
@@ -24,20 +28,22 @@
         </div>
       </div>
       <div class="markdown-text markdown-body" v-html="markdownHtmlText"></div>
-      <SpinningIcon />
+      <NIcon style="font-size: 32px">
+        <SpinningIcon />
+      </NIcon>
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
 import SpinningIcon from '@renderer-shared/assets/icon/SpinningIcon.vue'
+import HorizontalExpand from '@renderer-shared/components/HorizontalExpand.vue'
 import { PREMADE_TEAM_COLORS } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { markdownIt } from '@renderer-shared/utils/markdown'
-import { NScrollbar, useMessage } from 'naive-ui'
-import { computed } from 'vue'
-import { reactive } from 'vue'
+import { NButton, NIcon, NScrollbar, useMessage } from 'naive-ui'
+import { computed, reactive, ref } from 'vue'
 
 import { useMarkdownTest } from './markdown-test'
 
@@ -52,6 +58,8 @@ const markdownHtmlText = computed(() => {
 })
 
 const teams = reactive(PREMADE_TEAM_COLORS)
+
+const show = ref(true)
 </script>
 
 <style lang="less" scoped>

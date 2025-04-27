@@ -20,41 +20,52 @@
       </template>
       {{ t('CommonButtons.github') }}
     </NTooltip>
-    <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" v-if="aws.settings.enabled">
-      <template #trigger>
-        <div class="common-button-outer" @click="handleShowAuxWindow">
-          <div class="common-button-inner">
-            <NIcon><Window24FilledIcon /></NIcon>
+    <HorizontalExpand :show="aws.settings.enabled">
+      <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
+        <template #trigger>
+          <div class="common-button-outer" @click="handleShowAuxWindow">
+            <div class="common-button-inner">
+              <NIcon><Window24FilledIcon /></NIcon>
+            </div>
           </div>
-        </div>
-      </template>
-      {{ t('CommonButtons.auxWindow') }}
-    </NTooltip>
-    <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX" v-if="ows.settings.enabled">
-      <template #trigger>
-        <div class="common-button-outer" @click="handleShowOpggWindow">
-          <OpggIcon class="common-button-inner common-button-inner-img" />
-        </div>
-      </template>
-      {{ t('CommonButtons.opggWindow') }}
-    </NTooltip>
-    <NPopover placement="bottom-end" v-if="bts.tasks.length" :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
-      <template #trigger>
-        <div class="common-button-outer">
-          <SpinningIcon
-            :count="bts.tasks.length"
-            class="common-button-inner common-button-inner-img"
-          />
-        </div>
-      </template>
-      <BackgroundTasks />
-    </NPopover>
+        </template>
+        {{ t('CommonButtons.auxWindow') }}
+      </NTooltip>
+    </HorizontalExpand>
+    <HorizontalExpand :show="ows.settings.enabled">
+      <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
+        <template #trigger>
+          <div
+            class="common-button-outer"
+            @click="handleShowOpggWindow"
+            @contextmenu="test = !test"
+          >
+            <OpggIcon class="common-button-inner common-button-inner-img" />
+          </div>
+        </template>
+        {{ t('CommonButtons.opggWindow') }}
+      </NTooltip>
+    </HorizontalExpand>
+    <HorizontalExpand :show="bts.tasks.length !== 0">
+      <NPopover placement="bottom-end" :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
+        <template #trigger>
+          <div class="common-button-outer">
+            <SpinningIcon
+              :count="bts.tasks.length"
+              class="common-button-inner common-button-inner-img"
+            />
+          </div>
+        </template>
+        <BackgroundTasks />
+      </NPopover>
+    </HorizontalExpand>
   </div>
 </template>
 
 <script setup lang="ts">
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import SpinningIcon from '@renderer-shared/assets/icon/SpinningIcon.vue'
+import HorizontalExpand from '@renderer-shared/components/HorizontalExpand.vue'
 import { useInstance } from '@renderer-shared/shards'
 import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
@@ -69,7 +80,7 @@ import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopover, NTooltip } from 'naive-ui'
-import { inject } from 'vue'
+import { inject, ref } from 'vue'
 
 import BackgroundTasks from '../BackgroundTasks.vue'
 
@@ -97,6 +108,8 @@ const handleShowOpggWindow = () => {
 const handleToGithub = () => {
   window.open(LEAGUE_AKARI_GITHUB, '_blank')
 }
+
+const test = ref(true)
 </script>
 
 <style lang="less" scoped>
