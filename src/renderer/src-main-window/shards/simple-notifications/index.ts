@@ -12,9 +12,9 @@ import { CSSProperties, VNodeChild, computed, h, inject, ref, watch } from 'vue'
 /**
  * 偶尔会出现在主窗口的周期性通知
  */
-@Shard(MainWindowNotificationsRenderer.id)
-export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
-  static id = 'main-window-notifications-renderer'
+@Shard(SimpleNotificationsRenderer.id)
+export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
+  static id = 'simple-notifications-renderer'
 
   static NEVER_SHOW_SETTING_KEY = 'neverShowLiveStreamingStreamerMode'
   static LAST_DISMISS_SETTING_KEY = 'lastDismissLiveStreamingStreamerMode'
@@ -67,8 +67,8 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
                       onClick: () => {
                         close()
                         this._setting.set(
-                          MainWindowNotificationsRenderer.id,
-                          MainWindowNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
+                          SimpleNotificationsRenderer.id,
+                          SimpleNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
                           Date.now()
                         )
                       }
@@ -84,8 +84,8 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
                       onClick: () => {
                         close()
                         this._setting.set(
-                          MainWindowNotificationsRenderer.id,
-                          MainWindowNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
+                          SimpleNotificationsRenderer.id,
+                          SimpleNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
                           true
                         )
                       }
@@ -102,8 +102,8 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
 
                         appInject.openSettingsModal('misc')
                         this._setting.set(
-                          MainWindowNotificationsRenderer.id,
-                          MainWindowNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
+                          SimpleNotificationsRenderer.id,
+                          SimpleNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
                           true
                         )
                       }
@@ -117,8 +117,8 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
         },
         onClose: () => {
           this._setting.set(
-            MainWindowNotificationsRenderer.id,
-            MainWindowNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
+            SimpleNotificationsRenderer.id,
+            SimpleNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
             Date.now()
           )
         }
@@ -195,8 +195,8 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
         }
 
         const v = await this._setting.get(
-          MainWindowNotificationsRenderer.id,
-          MainWindowNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
+          SimpleNotificationsRenderer.id,
+          SimpleNotificationsRenderer.NEVER_SHOW_SETTING_KEY,
           false
         )
 
@@ -205,8 +205,8 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
         }
 
         const l = await this._setting.get(
-          MainWindowNotificationsRenderer.id,
-          MainWindowNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
+          SimpleNotificationsRenderer.id,
+          SimpleNotificationsRenderer.LAST_DISMISS_SETTING_KEY,
           0
         )
 
@@ -240,7 +240,7 @@ export class MainWindowNotificationsRenderer implements IAkariShardInitDispose {
     )
   }
 
-  setupMainWindowNotifications() {
+  setupSimpleNotifications() {
     this._setupStreamerModeNotifications()
   }
 

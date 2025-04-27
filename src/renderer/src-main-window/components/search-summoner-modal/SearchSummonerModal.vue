@@ -327,7 +327,7 @@ const tencentServers = computed(() => {
   // 出于硬编码, 这里仅仅使用 match-history 的互操作性预定义表
   return sgps.sgpServerConfig.tencentServerMatchHistoryInteroperability.map((serverId) => {
     return {
-      label: sgps.sgpServerConfig.servers[serverId].name,
+      label: sgps.sgpServerConfig.serverNames[as.settings.locale]?.[serverId] || serverId,
       value: serverId
     }
   })

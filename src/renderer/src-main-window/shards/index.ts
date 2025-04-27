@@ -24,9 +24,9 @@ import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
-import { MainWindowNotificationsRenderer } from './main-window-notifications'
 import { MainWindowUiRenderer } from './main-window-ui'
 import { MatchHistoryTabsRenderer } from './match-history-tabs'
+import { SimpleNotificationsRenderer } from './simple-notifications'
 
 const manager = createManager()
 
@@ -55,7 +55,7 @@ manager.use(SelfUpdateRenderer)
 manager.use(SettingUtilsRenderer)
 manager.use(SgpRenderer)
 manager.use(WindowManagerRenderer)
-manager.use(MainWindowNotificationsRenderer)
+manager.use(SimpleNotificationsRenderer)
 manager.use(MainWindowUiRenderer)
 
 export { manager }

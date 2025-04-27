@@ -12,7 +12,7 @@
       v-model:show="isShowingFreeSoftwareDeclaration"
       @confirm="handleConfirmation"
     />
-    <MainWindowNotifications />
+    <SimpleNotifications />
     <Transition name="bg-fade">
       <div
         v-if="backgroundImageUrl"
@@ -51,9 +51,9 @@ import DeclarationModal from './components/DeclarationModal.vue'
 import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
-import MainWindowNotifications from './shards/main-window-notifications/MainWindowNotifications.vue'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
 import { useMainWindowUiStore } from './shards/main-window-ui/store'
+import SimpleNotifications from './shards/simple-notifications/SimpleNotifications.vue'
 
 const muis = useMainWindowUiStore()
 const mui = useInstance(MainWindowUiRenderer)
