@@ -22,7 +22,7 @@ import { AkariLogger, LoggerFactoryMain } from '../logger-factory'
 import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
-import { LeagueClientData } from './lc-state-new'
+import { LeagueClientData } from './lc-state'
 import { LeagueClientSettings, LeagueClientState } from './state'
 
 const axiosRetry = require('axios-retry').default as AxiosRetry
