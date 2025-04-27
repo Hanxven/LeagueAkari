@@ -1,5 +1,6 @@
 <template>
   <div class="cd-timer-wrapper" ref="wrapper">
+    <SetupInAppScope />
     <CdTimerWindowTitleBar />
     <SummonerSpellsCdTimer class="content" />
   </div>
@@ -7,6 +8,7 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
+import SetupInAppScope from '@renderer-shared/shards/setup-in-app-scope/SetupInAppScope.vue'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import { useElementSize } from '@vueuse/core'
 import { useTemplateRef, watch } from 'vue'

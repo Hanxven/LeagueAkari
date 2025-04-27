@@ -13,6 +13,7 @@
       @confirm="handleConfirmation"
     />
     <SimpleNotifications />
+    <SetupInAppScope />
     <Transition name="bg-fade">
       <div
         v-if="backgroundImageUrl"
@@ -39,6 +40,7 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
+import SetupInAppScope from '@renderer-shared/shards/setup-in-app-scope/SetupInAppScope.vue'
 import { greeting } from '@renderer-shared/utils/greeting'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
 import { useTranslation } from 'i18next-vue'
@@ -52,10 +54,8 @@ import UpdateModal from './components/UpdateModal.vue'
 import SettingsModal from './components/settings-modal/SettingsModal.vue'
 import MainWindowTitleBar from './components/title-bar/MainWindowTitleBar.vue'
 import { MainWindowUiRenderer } from './shards/main-window-ui'
-import { useMainWindowUiStore } from './shards/main-window-ui/store'
 import SimpleNotifications from './shards/simple-notifications/SimpleNotifications.vue'
 
-const muis = useMainWindowUiStore()
 const mui = useInstance(MainWindowUiRenderer)
 
 const sus = useSelfUpdateStore()

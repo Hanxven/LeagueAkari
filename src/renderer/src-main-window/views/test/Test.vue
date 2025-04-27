@@ -24,11 +24,13 @@
         </div>
       </div>
       <div class="markdown-text markdown-body" v-html="markdownHtmlText"></div>
+      <SpinningIcon />
     </NScrollbar>
   </div>
 </template>
 
 <script setup lang="ts">
+import SpinningIcon from '@renderer-shared/assets/icon/SpinningIcon.vue'
 import { PREMADE_TEAM_COLORS } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'

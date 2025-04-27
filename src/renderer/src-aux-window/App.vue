@@ -1,5 +1,6 @@
 <template>
   <div id="aux-window-frame">
+    <SetupInAppScope />
     <AuxWindowTitleBar />
     <div class="content">
       <RouterView v-slot="{ Component }">
@@ -12,6 +13,8 @@
 </template>
 
 <script setup lang="ts">
+import SetupInAppScope from '@renderer-shared/shards/setup-in-app-scope/SetupInAppScope.vue'
+
 import AuxWindowTitleBar from './components/AuxWindowTitleBar.vue'
 </script>
 

@@ -4,11 +4,14 @@ import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/le
 import { LcuEvent } from '@shared/types/league-client/event'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import { getCurrentScope, onScopeDispose } from 'vue'
+import { useTranslation } from 'i18next-vue'
+import { getCurrentScope, onScopeDispose, watch } from 'vue'
 
+import { useBackgroundTasksStore } from '../background-tasks/store'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
+import { SetupInAppScopeRenderer } from '../setup-in-app-scope'
 import { UxCommandLine, useLeagueClientStore } from './store'
 
 export const MAIN_SHARD_NAMESPACE = 'league-client-main'
@@ -94,12 +97,15 @@ export class LeagueClientRenderer {
     }
 
     this._handleSubscribedLcuEventDispatch()
+
+    this._setup.addSetupFn(() => this._handleInitializationProgressShow())
   }
 
   constructor(
     @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
     @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer,
     @Dep(SettingUtilsRenderer) private readonly _setting: SettingUtilsRenderer,
+    @Dep(SetupInAppScopeRenderer) private readonly _setup: SetupInAppScopeRenderer,
     @Config() private _config?: LeagueClientRendererConfig
   ) {
     axiosRetry(this._http, {
@@ -134,6 +140,41 @@ export class LeagueClientRenderer {
       (subId: string, event: LcuEvent, params) => {
         this._emitter.emit(subId, { event, params })
       }
+    )
+  }
+
+  private _handleInitializationProgressShow() {
+    const lcStore = useLeagueClientStore()
+    const taskStore = useBackgroundTasksStore()
+    const { t } = useTranslation()
+
+    const taskId = `${LeagueClientRenderer.id}/initialization`
+
+    watch(
+      () => lcStore.initialization.progress,
+      (progress) => {
+        if (!progress) {
+          taskStore.removeTask(taskId)
+          return
+        }
+
+        if (!taskStore.hasTask(taskId)) {
+          taskStore.createTask(taskId, {
+            name: () => t('league-client-renderer.initialization.name')
+          })
+        }
+
+        taskStore.updateTask(taskId, {
+          description: () =>
+            t('league-client-renderer.initialization.current', {
+              endpoint: progress.currentId,
+              finishedCount: progress.finished.length,
+              allCount: progress.all.length
+            }),
+          progress: progress.finished.length / progress.all.length
+        })
+      },
+      { immediate: true }
     )
   }
 

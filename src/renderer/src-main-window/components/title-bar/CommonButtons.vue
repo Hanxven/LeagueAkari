@@ -38,12 +38,30 @@
       </template>
       {{ t('CommonButtons.opggWindow') }}
     </NTooltip>
+    <NPopover
+      placement="bottom-end"
+      show
+      v-if="bts.tasks.length"
+      :z-index="TITLE_BAR_TOOLTIP_Z_INDEX"
+    >
+      <template #trigger>
+        <div class="common-button-outer">
+          <SpinningIcon
+            :count="bts.tasks.length"
+            class="common-button-inner common-button-inner-img"
+          />
+        </div>
+      </template>
+      <BackgroundTasks />
+    </NPopover>
   </div>
 </template>
 
 <script setup lang="ts">
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
+import SpinningIcon from '@renderer-shared/assets/icon/SpinningIcon.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { useBackgroundTasksStore } from '@renderer-shared/shards/background-tasks/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 import {
   useAuxWindowStore,
@@ -55,8 +73,10 @@ import { Notification as NotificationIcon } from '@vicons/carbon'
 import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
-import { NIcon, NTooltip } from 'naive-ui'
+import { NIcon, NPopover, NTooltip } from 'naive-ui'
 import { inject } from 'vue'
+
+import BackgroundTasks from '../BackgroundTasks.vue'
 
 const { t } = useTranslation()
 
@@ -64,6 +84,8 @@ const mws = useMainWindowStore()
 const aws = useAuxWindowStore()
 const ows = useOpggWindowStore()
 const wm = useInstance(WindowManagerRenderer)
+
+const bts = useBackgroundTasksStore()
 
 const { openAnnouncementModal } = inject('app') as any
 

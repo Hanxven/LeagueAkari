@@ -22,6 +22,7 @@ CommonButtons:
   github: 项目主页
   auxWindow: 小窗口
   opggWindow: OP.GG
+  backgroundTasks: 后台任务
 
 TrafficButtons:
   minimize: 最小化
@@ -2085,6 +2086,11 @@ simple-notifications-renderer:
       title: 在直播吗？
       liveTools: League Akari 检测到一个或多个直播工具正在运行。您可以启用直播模式以隐藏敏感信息
       bySettings: League Akari 检测到客户端直播模式已启用。您可以启用直播模式以隐藏敏感信息
+
+league-client-renderer:
+  initialization:
+    name: LCU 初始化
+    current: 加载 {{endpoint}} ({{finishedCount}}/{{allCount}})
 
 champions:
   bravery: 勇敢举动

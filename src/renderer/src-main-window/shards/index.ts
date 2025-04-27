@@ -21,6 +21,7 @@ import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
+import { SetupInAppScopeRenderer } from '@renderer-shared/shards/setup-in-app-scope'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
 
@@ -44,6 +45,7 @@ manager.use(KeyboardShortcutsRenderer)
 manager.use(LeagueClientRenderer)
 manager.use(LeagueClientUxRenderer)
 manager.use(LoggerRenderer)
+manager.use(MainWindowUiRenderer)
 manager.use(MatchHistoryTabsRenderer)
 manager.use(OngoingGameRenderer)
 manager.use(PiniaMobxUtilsRenderer)
@@ -53,9 +55,9 @@ manager.use(RiotClientRenderer)
 manager.use(SavedPlayerRenderer)
 manager.use(SelfUpdateRenderer)
 manager.use(SettingUtilsRenderer)
+manager.use(SetupInAppScopeRenderer)
 manager.use(SgpRenderer)
-manager.use(WindowManagerRenderer)
 manager.use(SimpleNotificationsRenderer)
-manager.use(MainWindowUiRenderer)
+manager.use(WindowManagerRenderer)
 
 export { manager }

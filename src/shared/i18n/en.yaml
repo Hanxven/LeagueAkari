@@ -20,6 +20,7 @@ CommonButtons:
   github: Project GitHub
   auxWindow: Auxiliary Window
   opggWindow: OP.GG
+  backgroundTasks: Background Tasks
 
 TrafficButtons:
   minimize: Minimize
@@ -2082,6 +2083,11 @@ simple-notifications-renderer:
       title: Are you live streaming?
       liveTools: League Akari has detected one or more live streaming tools running. You can enable Streamer Mode to hide sensitive information
       bySettings: League Akari has detected that the league client live streaming mode is enabled. You can enable live streaming mode to hide sensitive information
+
+league-client-renderer:
+  initialization:
+    name: LCU Initialization
+    current: Loading {{endpoint}} ({{finishedCount}}/{{allCount}})
 
 champions:
   bravery: Bravery
