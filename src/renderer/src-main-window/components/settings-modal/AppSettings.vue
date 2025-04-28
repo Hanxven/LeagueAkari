@@ -169,6 +169,16 @@
           @update:value="(val: boolean) => lcu.setUseWmic(val)"
         />
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.lcConnection.rebuildWmi.label')"
+        :label-description="t('AppSettings.lcConnection.rebuildWmi.description')"
+        :label-width="400"
+      >
+        <NButton size="small" @click="() => lcu.rebuildWmi()" type="warning">
+          {{ t('AppSettings.lcConnection.rebuildWmi.rebuildButton') }}
+        </NButton>
+      </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header>

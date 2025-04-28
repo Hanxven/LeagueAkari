@@ -105,6 +105,11 @@ AppSettings:
       label: Use WMIC
       description: Use WMIC to get client command line information instead of the default Win32 API method. Requires administrator privileges
 
+    rebuildWmi:
+      label: Rebuild WMI
+      description: If WMIC does not work properly, try this
+      rebuildButton: Rebuild WMI
+
   misc:
     title: Misc
 
@@ -321,7 +326,7 @@ MultiWindowSettings:
     titleRequireAdmin: Timer Overlay Window (Admin Required)
 
     description:
-      lineA: Marking the enemy champion summoner spell timer is only available when the current mode is supported
+      lineA: Marking the enemy champion summoner spell timer is only available when the current game mode is supported
       leftClick1: · Left Click
       leftClick2: ' - Start or stop this timer'
       rightDoubleClick1: · Right Double Click

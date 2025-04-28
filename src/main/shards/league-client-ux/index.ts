@@ -1,5 +1,9 @@
 import { queryUxCommandLine, queryUxCommandLineNative } from '@main/utils/ux-cmd'
+import elevateExecutablePath from '@resources/elevate.exe?asset&asarUnpack'
+import wmiRebuildScriptPath from '@resources/rebuild_WMI.bat?asset&asarUnpack'
 import { IAkariShardInitDispose, Shard } from '@shared/akari-shard'
+import cp from 'node:child_process'
+import util from 'node:util'
 
 import { AppCommonMain } from '../app-common'
 import { AkariIpcMain } from '../ipc'
@@ -8,6 +12,8 @@ import { MobxUtilsMain } from '../mobx-utils'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import { LeagueClientUxSettings, LeagueClientUxState } from './state'
+
+const execAsync = util.promisify(cp.exec)
 
 /**
  * 对于 League Client Ux 进程的相关工具集, 比如检测命令行
@@ -53,6 +59,8 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     await this._setting.applyToState()
     this._mobx.propSync(LeagueClientUxMain.id, 'settings', this.settings, ['useWmic'])
     this._mobx.propSync(LeagueClientUxMain.id, 'state', this.state, ['launchedClients'])
+
+    this._ipc.onCall(LeagueClientUxMain.id, 'rebuildWmi', () => this._rebuildWmi())
   }
 
   async onDispose() {
@@ -113,5 +121,11 @@ export class LeagueClientUxMain implements IAkariShardInitDispose {
     }
 
     return queryUxCommandLineNative(LeagueClientUxMain.UX_PROCESS_NAME)
+  }
+
+  private async _rebuildWmi() {
+    const cmd = `"${elevateExecutablePath}" cmd /c start cmd /k "${wmiRebuildScriptPath}"`
+    this._log.info('Rebuilding WMI...', cmd)
+    await execAsync(cmd, { shell: 'cmd', windowsHide: false })
   }
 }

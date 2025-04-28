@@ -21,6 +21,10 @@ export class LeagueClientUxRenderer {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'useWmic', enabled)
   }
 
+  rebuildWmi() {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'rebuildWmi')
+  }
+
   async onInit() {
     const store = useLeagueClientUxStore()
 

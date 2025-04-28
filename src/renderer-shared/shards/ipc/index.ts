@@ -86,9 +86,12 @@ export class AkariIpcRenderer implements IAkariShardInitDispose {
         throw result.error
       }
 
-      // for lazy loading
-      const logger = this._shared.manager.getInstance(LOGGER_SHARD_NAMESPACE) as LoggerRenderer
-      logger?.warn(`IpcCall:${namespace}`, fnName, args, result.error)
+      if (import.meta.env.DEV) {
+        // for lazy loading
+        const logger = this._shared.manager.getInstance(LOGGER_SHARD_NAMESPACE) as LoggerRenderer
+        logger?.warn(`IpcCall:${namespace}`, fnName, args, result.error)
+      }
+
       throw result.error
     }
   }

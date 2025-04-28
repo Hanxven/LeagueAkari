@@ -108,6 +108,11 @@ AppSettings:
       label: 使用 WMIC
       description: 使用 WMIC 获取客户端命令行信息，而不是默认的 Win32 API 方式。需要管理员权限
 
+    rebuildWmi:
+      label: 重建 WMI
+      description: 如果 WMIC 无法正常使用，可尝试此修复选项
+      rebuildButton: 重建 WMI
+
   misc:
     title: 其他
 
