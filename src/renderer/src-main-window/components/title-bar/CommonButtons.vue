@@ -35,11 +35,7 @@
     <HorizontalExpand :show="ows.settings.enabled">
       <NTooltip :z-index="TITLE_BAR_TOOLTIP_Z_INDEX">
         <template #trigger>
-          <div
-            class="common-button-outer"
-            @click="handleShowOpggWindow"
-            @contextmenu="test = !test"
-          >
+          <div class="common-button-outer" @click="handleShowOpggWindow">
             <OpggIcon class="common-button-inner common-button-inner-img" />
           </div>
         </template>
@@ -52,6 +48,7 @@
           <div class="common-button-outer">
             <SpinningIcon
               :count="bts.tasks.length"
+              :progress="overallProgress"
               class="common-button-inner common-button-inner-img"
             />
           </div>
@@ -80,7 +77,7 @@ import { Window24Filled as Window24FilledIcon } from '@vicons/fluent'
 import { LogoGithub } from '@vicons/ionicons5'
 import { useTranslation } from 'i18next-vue'
 import { NIcon, NPopover, NTooltip } from 'naive-ui'
-import { inject, ref } from 'vue'
+import { computed, inject } from 'vue'
 
 import BackgroundTasks from '../BackgroundTasks.vue'
 
@@ -92,6 +89,19 @@ const ows = useOpggWindowStore()
 const wm = useInstance(WindowManagerRenderer)
 
 const bts = useBackgroundTasksStore()
+
+const overallProgress = computed(() => {
+  let total = 0
+  for (const task of bts.tasks) {
+    if (task.progress) {
+      total += task.progress
+    } else {
+      total += 1
+    }
+  }
+
+  return total / bts.tasks.length
+})
 
 const { openAnnouncementModal } = inject('app') as any
 
@@ -108,8 +118,6 @@ const handleShowOpggWindow = () => {
 const handleToGithub = () => {
   window.open(LEAGUE_AKARI_GITHUB, '_blank')
 }
-
-const test = ref(true)
 </script>
 
 <style lang="less" scoped>
