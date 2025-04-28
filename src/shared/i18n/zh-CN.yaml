@@ -833,7 +833,7 @@ SearchSummonerModal:
   cancel: 取消
   search: 搜索玩家
   result: 搜索结果
-  history: 历史搜索
+  history: 近期访问
   validating: 正在验证玩家 ({{current}} / {{total}})
   validated: 验证了 {{countV}} 条可能的玩家记录，无搜索结果符合
   noResult: 无搜索结果符合

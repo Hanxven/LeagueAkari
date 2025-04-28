@@ -6,7 +6,7 @@ export function greeting(version: string) {
     instance?.appContext.config.globalProperties.$akariManager.getInstance('logger-renderer')
 
   if (logger) {
-    logger.info('greeting', `League Akari v${version}`)
+    logger.infoRenderer('greeting', `League Akari v${version}`)
   } else {
     console.log(
       `%cLeague Akari v${version}`,

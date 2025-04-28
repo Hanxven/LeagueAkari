@@ -1,6 +1,5 @@
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { SettingUtilsRenderer } from '@renderer-shared/shards/setting-utils'
-import { SgpRenderer } from '@renderer-shared/shards/sgp'
 import { useSgpStore } from '@renderer-shared/shards/sgp/store'
 import { createEventBus } from '@renderer-shared/utils/events'
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
@@ -233,7 +232,7 @@ export class MatchHistoryTabsRenderer implements IAkariShardInitDispose {
   }
 
   /** 创建一个新的 Tab, 并设置一些初始值 */
-  createTab(puuid: string, sgpServerId: string, setCurrent = true, pin = false) {
+  createTab(puuid: string, sgpServerId: string, setCurrent = true) {
     const mhs = useMatchHistoryTabsStore()
 
     if (mhs.getTab(this.toUnionId(sgpServerId, puuid))) {

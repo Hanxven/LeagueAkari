@@ -830,7 +830,7 @@ SearchSummonerModal:
   cancel: Cancel
   search: Search Player
   result: Search Results
-  history: Search History
+  history: Recent Visit
   validating: Validating players ({{current}} / {{total}})
   validated: Validated {{countV}} possible player records, no matching results found
   noResult: No matching results found

@@ -162,21 +162,6 @@
             </div>
           </div>
           <div class="buttons-container">
-            <!-- <NButton
-              secondary
-              :type="isBeingStalked ? 'primary' : 'default'"
-              class="square-button"
-              :title="`关注`"
-              v-if="!isSelfTab"
-              @click="handleStalk"
-            >
-              <template #icon>
-                <NIcon>
-                  <Star24FilledIcon v-if="isBeingStalked" />
-                  <Star24RegularIcon v-else />
-                </NIcon>
-              </template>
-            </NButton> -->
             <NButton
               secondary
               class="square-button"
@@ -608,7 +593,6 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { championIconUri, profileIconUri } from '@renderer-shared/shards/league-client/utils'
 import { LoggerRenderer } from '@renderer-shared/shards/logger'
-import { usePlayerStalkingStore } from '@renderer-shared/shards/player-stalking/store'
 import { RiotClientRenderer } from '@renderer-shared/shards/riot-client'
 import { SavedPlayerRenderer } from '@renderer-shared/shards/saved-player'
 import { SgpRenderer } from '@renderer-shared/shards/sgp'
@@ -740,10 +724,32 @@ const loadSummoner = async () => {
         data.gameName = ns.namesets[0].gnt.gameName
         data.tagLine = ns.namesets[0].gnt.tagLine
         tab.summoner = markRaw(data)
+
+        if (!isSelfTab.value) {
+          mh.saveSearchHistory({
+            puuid: tab.puuid,
+            sgpServerId: tab.sgpServerId,
+            summoner: {
+              gameName: data.gameName,
+              tagLine: data.tagLine
+            }
+          })
+        }
       }
     } else {
       const { data } = await lc.api.summoner.getSummonerByPuuid(tab.puuid)
       tab.summoner = markRaw(data)
+
+      if (!isSelfTab.value) {
+        mh.saveSearchHistory({
+          puuid: tab.puuid,
+          sgpServerId: tab.sgpServerId,
+          summoner: {
+            gameName: data.gameName,
+            tagLine: data.tagLine
+          }
+        })
+      }
     }
   } catch (error: any) {
     notification.warning({
