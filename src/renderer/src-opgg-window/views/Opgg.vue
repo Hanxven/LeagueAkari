@@ -182,6 +182,29 @@
         </div>
       </div>
     </Transition>
+    <NPopover v-if="ongoingChampions.length" raw placement="top-end" :show-arrow="false">
+      <template #trigger>
+        <ChampionIcon
+          class="champion-icon float hover-fade"
+          :champion-id="-1"
+          ring
+          ring-color="#fff8"
+          round
+        />
+      </template>
+      <div class="ongoing-champions">
+        <ChampionIcon
+          class="champion-icon"
+          v-for="c of ongoingChampions"
+          :key="c"
+          :champion-id="c"
+          ring
+          ring-color="#fff4"
+          round
+          @click="handleToChampion(c, false)"
+        />
+      </div>
+    </NPopover>
   </div>
 </template>
 
@@ -189,6 +212,7 @@
 import { useOpggStore } from '@opgg-window/shards/opgg/store'
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
+import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useStableComputed } from '@renderer-shared/compositions/useStableComputed'
 import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
@@ -220,6 +244,7 @@ import {
   NButton,
   NFlex,
   NIcon,
+  NPopover,
   NRadio,
   NRadioGroup,
   NSelect,
@@ -969,6 +994,43 @@ const handleAddToItemSet = async () => {
   }
 }
 
+const ongoingChampions = computed(() => {
+  const gSession = lcs.gameflow.session
+
+  if (!gSession) {
+    return []
+  }
+
+  if (gSession.phase === 'ChampSelect') {
+    const cSession = lcs.champSelect.session
+
+    if (!cSession) {
+      return []
+    }
+
+    const c1 = cSession.myTeam.map((t) => t.championId || t.championPickIntent).filter((c) => c > 0)
+    const c2 = cSession.theirTeam
+      .map((t) => t.championId || t.championPickIntent)
+      .filter((c) => c > 0)
+
+    return [...new Set([...c1, ...c2])]
+  } else if (
+    gSession.phase === 'GameStart' ||
+    gSession.phase === 'InProgress' ||
+    gSession.phase === 'WaitingForStats' ||
+    gSession.phase === 'PreEndOfGame' ||
+    gSession.phase === 'EndOfGame' ||
+    gSession.phase === 'Reconnect'
+  ) {
+    const c1 = gSession.gameData.teamOne.map((t) => t.championId).filter((c) => c > 0)
+    const c2 = gSession.gameData.teamTwo.map((t) => t.championId).filter((c) => c > 0)
+
+    return [...new Set([...c1, ...c2])]
+  }
+
+  return []
+})
+
 const notConnectedMessageRef = shallowRef<MessageReactive | null>(null)
 watch(
   () => lcs.isConnected,
@@ -1088,6 +1150,38 @@ watch(
   font-size: 12px;
   font-weight: bold;
   color: #62deb4;
+}
+
+.ongoing-champions {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  background-color: #202020a0;
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.float {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+.champion-icon {
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+
+  &.hover-fade {
+    opacity: 0.2;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
 }
 
 .fade-enter-active {
