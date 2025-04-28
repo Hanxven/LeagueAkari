@@ -2100,6 +2100,10 @@ league-client-renderer:
     name: LCU 初始化
     current: 加载 {{endpoint}} ({{finishedCount}}/{{allCount}})
 
+  connection-task:
+    name: 连接到 LCU
+    target: 尝试连接到 {{target}}...
+
 self-update-renderer:
   self-update-task:
     name: League Akari 更新

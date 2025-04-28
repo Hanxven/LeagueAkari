@@ -433,6 +433,9 @@ export class LeagueClientMain implements IAkariShardInitDispose {
     this._api = null
   }
 
+  /**
+   * one-time attempt
+   */
   private async _connectToLcu(cmd: UxCommandLine) {
     if (this.state.connectionState === 'connecting' || this.state.connectionState === 'connected') {
       return

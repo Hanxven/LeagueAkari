@@ -2097,6 +2097,10 @@ league-client-renderer:
     name: LCU Initialization
     current: Loading {{endpoint}} ({{finishedCount}}/{{allCount}})
 
+  connection-task:
+    name: Connect to LCU
+    target: Attempt connecting to {{target}}...
+
 self-update-renderer:
   self-update-task:
     name: League Akari Update

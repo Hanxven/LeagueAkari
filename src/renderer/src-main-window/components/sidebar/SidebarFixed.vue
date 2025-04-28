@@ -43,7 +43,12 @@
                 :src="profileIconUri(lcs.summoner.me.profileIconId)"
               />
             </NProgress>
-            <NBadge v-else dot processing :show="lcs.isDisconnected && clients.others.length > 0">
+            <NBadge
+              v-else
+              dot
+              processing
+              :show="!lcs.isInConnectionLoop && clients.others.length > 0"
+            >
               <NIcon class="menu-item-icon"><PlugDisconnected20FilledIcon /></NIcon>
             </NBadge>
           </div>

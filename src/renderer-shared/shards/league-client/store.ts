@@ -49,6 +49,10 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
   const isConnecting = computed(() => connectionState.value === 'connecting')
   const isDisconnected = computed(() => connectionState.value === 'disconnected')
 
+  const isInConnectionLoop = computed(() => {
+    return connectingClient.value && connectionState.value !== 'connected'
+  })
+
   const settings = shallowReactive({
     autoConnect: false
   })
@@ -143,6 +147,7 @@ export const useLeagueClientStore = defineStore('shard:league-client-renderer', 
     isConnected, // for convenience
     isConnecting, // for convenience
     isDisconnected, // for convenience
+    isInConnectionLoop, // for convenience
     auth,
     connectingClient
   }

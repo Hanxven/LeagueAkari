@@ -1,4 +1,5 @@
 import { Config, Dep, Shard } from '@shared/akari-shard'
+import { getSgpServerId } from '@shared/data-sources/sgp/utils'
 import { RadixEventEmitter } from '@shared/event-emitter'
 import { LeagueClientHttpApiAxiosHelper } from '@shared/http-api-axios-helper/league-client'
 import { LcuEvent } from '@shared/types/league-client/event'
@@ -148,23 +149,23 @@ export class LeagueClientRenderer {
     const taskStore = useBackgroundTasksStore()
     const { t } = useTranslation()
 
-    const taskId = `${LeagueClientRenderer.id}/initialization`
+    const initTaskId = `${LeagueClientRenderer.id}/initialization`
 
     watch(
       () => lcStore.initialization.progress,
       (progress) => {
         if (!progress) {
-          taskStore.removeTask(taskId)
+          taskStore.removeTask(initTaskId)
           return
         }
 
-        if (!taskStore.hasTask(taskId)) {
-          taskStore.createTask(taskId, {
+        if (!taskStore.hasTask(initTaskId)) {
+          taskStore.createTask(initTaskId, {
             name: () => t('league-client-renderer.initialization-task.name')
           })
         }
 
-        taskStore.updateTask(taskId, {
+        taskStore.updateTask(initTaskId, {
           description: () =>
             t('league-client-renderer.initialization-task.current', {
               endpoint: progress.currentId,
@@ -173,6 +174,29 @@ export class LeagueClientRenderer {
             }),
           progress: progress.finished.length / progress.all.length
         })
+      },
+      { immediate: true }
+    )
+
+    const connectTaskId = `${LeagueClientRenderer.id}/connection`
+
+    watch(
+      () => lcStore.connectingClient,
+      (client) => {
+        if (!client) {
+          taskStore.removeTask(connectTaskId)
+          return
+        }
+
+        if (!taskStore.hasTask(connectTaskId)) {
+          taskStore.createTask(connectTaskId, {
+            name: () => t('league-client-renderer.connection-task.name'),
+            description: () =>
+              t('league-client-renderer.connection-task.target', {
+                target: getSgpServerId(client.region, client.rsoPlatformId)
+              })
+          })
+        }
       },
       { immediate: true }
     )
