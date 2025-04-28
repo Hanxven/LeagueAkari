@@ -93,7 +93,7 @@ const bts = useBackgroundTasksStore()
 const overallProgress = computed(() => {
   let total = 0
   for (const task of bts.tasks) {
-    if (task.progress) {
+    if (task.progress !== null) {
       total += task.progress
     } else {
       total += 1

@@ -2103,7 +2103,7 @@ league-client-renderer:
 self-update-renderer:
   self-update-task:
     name: League Akari 更新
-    downloading: 正在下载更新包 {{progress}}% (剩余 {{eta}})
+    downloading: 正在下载更新包 {{progress}}% ({{avgSpeed}}/s, 剩余 {{eta}})
     download-failed: 下载更新包失败
     unpacking: 正在解压更新包 {{progress}}% (剩余 {{eta}})
     unpack-failed: 解压更新包失败

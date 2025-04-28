@@ -2100,7 +2100,7 @@ league-client-renderer:
 self-update-renderer:
   self-update-task:
     name: League Akari Update
-    downloading: Downloading archive {{progress}}% (eta {{eta}})
+    downloading: Downloading archive {{progress}}% ({{avgSpeed}}/s, eta {{eta}})
     download-failed: Failed to download archive
     unpacking: Unpacking archive {{progress}}% (eta {{eta}})
     unpack-failed: Failed to unpack the archive file

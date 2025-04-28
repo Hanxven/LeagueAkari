@@ -1,5 +1,5 @@
 import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
-import { formatSeconds } from '@shared/utils/format'
+import { formatBytes, formatSeconds } from '@shared/utils/format'
 import { useTranslation } from 'i18next-vue'
 import { watch } from 'vue'
 
@@ -65,7 +65,8 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
               description: () =>
                 t('self-update-renderer.self-update-task.downloading', {
                   progress: (info.downloadingProgress * 100).toFixed(2),
-                  eta: formatSeconds(info.downloadTimeLeft)
+                  eta: formatSeconds(info.downloadTimeLeft),
+                  avgSpeed: formatBytes(info.averageDownloadSpeed)
                 })
             })
             break
