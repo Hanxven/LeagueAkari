@@ -729,7 +729,9 @@ const { summonerName } = useStreamerModeMaskedText()
   }
 
   :global(.n-scrollbar-rail.n-scrollbar-rail--horizontal .n-scrollbar-rail__scrollbar) {
-    height: 2px;
+    position: relative;
+    bottom: -4px;
+    height: 4px;
   }
 }
 

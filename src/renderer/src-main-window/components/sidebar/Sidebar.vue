@@ -127,6 +127,7 @@ watchEffect(() => {
   flex-direction: column;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   height: 100%;
+  background-color: #0001;
 
   .padding-zone {
     flex: 1;

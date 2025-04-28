@@ -65,6 +65,7 @@ const shouldShowDivider = computed(() => {
   align-items: center;
   -webkit-app-region: drag;
   backdrop-filter: blur(8px);
+  background-color: #0001;
 }
 
 [data-theme='dark'] {
