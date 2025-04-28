@@ -9,7 +9,7 @@ import {
 import { ParsedRole, parseSelectedRole } from '@shared/utils/ranked'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
-import { LeagueClientSyncedData } from '../league-client/lc-state'
+import { LeagueClientData } from '../league-client/lc-state'
 import { SavedPlayer } from '../storage/entities/SavedPlayers'
 
 export class OngoingGameSettings {
@@ -541,7 +541,7 @@ export class OngoingGameState {
     this.additionalGame = {}
   }
 
-  constructor(private readonly _lcData: LeagueClientSyncedData) {
+  constructor(private readonly _lcData: LeagueClientData) {
     makeAutoObservable(this, {
       // shallow object
       matchHistory: observable.shallow,

@@ -1,6 +1,6 @@
 import { makeAutoObservable, observable } from 'mobx'
 
-import { LeagueClientSyncedData } from '../league-client/lc-state'
+import { LeagueClientData } from '../league-client/lc-state'
 
 export class RespawnTimerSettings {
   enabled: boolean = false
@@ -26,7 +26,7 @@ export class RespawnTimerState {
   }
 
   /**
-   * 依赖于 LeagueClientSyncedData 的计算属性
+   * 依赖于 LeagueClientData 的计算属性
    */
   get selfChampionInGameSelection() {
     if (!this._lcData.gameflow.session || !this._lcData.summoner.me) {
@@ -41,7 +41,7 @@ export class RespawnTimerState {
     return self?.championId ?? null
   }
 
-  constructor(private readonly _lcData: LeagueClientSyncedData) {
+  constructor(private readonly _lcData: LeagueClientData) {
     makeAutoObservable(this, {
       info: observable.struct
     })

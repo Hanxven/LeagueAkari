@@ -1,6 +1,6 @@
 import { makeAutoObservable, observable } from 'mobx'
 
-import { LeagueClientSyncedData } from '../league-client/lc-state'
+import { LeagueClientData } from '../league-client/lc-state'
 
 export type AutoHonorStrategy =
   | 'prefer-lobby-member' // 随机优先组队时房间内成员
@@ -226,7 +226,7 @@ export class AutoGameflowState {
   }
 
   constructor(
-    private readonly _lcData: LeagueClientSyncedData,
+    private readonly _lcData: LeagueClientData,
     private readonly settings: AutoGameflowSettings
   ) {
     makeAutoObservable(this)

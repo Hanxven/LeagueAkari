@@ -93,7 +93,7 @@ export class SelfUpdateState {
   isCheckingUpdates: boolean = false
   lastCheckAt: Date | null = null
   currentReleaseV = observable.box<CurrentRelease | null>(null, {
-    equals: (a, b) => this._versionCompare(a, b)
+    equals: SelfUpdateState._versionCompare
   })
 
   get currentRelease() {
@@ -106,7 +106,7 @@ export class SelfUpdateState {
 
   lastUpdateResult: LastUpdateResult | null = null
 
-  private _versionCompare(a: CurrentRelease, b: CurrentRelease) {
+  private static _versionCompare(a: CurrentRelease, b: CurrentRelease) {
     if (a === null && b === null) {
       return true
     }

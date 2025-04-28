@@ -1,7 +1,7 @@
 import { Action } from '@shared/types/league-client/champ-select'
 import { computed, makeAutoObservable, observable } from 'mobx'
 
-import { LeagueClientSyncedData } from '../league-client/lc-state'
+import { LeagueClientData } from '../league-client/lc-state'
 
 export type AutoPickStrategy = 'show' | 'lock-in' | 'show-and-delay-lock-in'
 
@@ -407,7 +407,7 @@ export class AutoSelectState {
   }
 
   constructor(
-    private readonly _lcData: LeagueClientSyncedData,
+    private readonly _lcData: LeagueClientData,
     private readonly _settings: AutoSelectSettings
   ) {
     makeAutoObservable(this, {
