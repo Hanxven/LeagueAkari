@@ -340,7 +340,8 @@ export class AutoGameflowMain implements IAkariShardInitDispose {
         if (this._lc.data.chat.conversations.customGame) {
           this._lc.api.chat.chatSend(
             this._lc.data.chat.conversations.customGame.id,
-            i18next.t('auto-gameflow-main.skip-leader')
+            i18next.t('auto-gameflow-main.skip-leader'),
+            'celebration'
           )
         }
 
