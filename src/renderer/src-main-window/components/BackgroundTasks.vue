@@ -1,6 +1,7 @@
 <template>
   <div class="tasks">
     <div class="task-title">{{ t('BackgroundTasks.taskTitle', { countV: bts.tasks.length }) }}</div>
+    <div class="divider"></div>
     <div
       class="task"
       :class="{
@@ -73,15 +74,19 @@ const renderText = (node: string | (() => VNodeChild)) => {
 }
 
 .task-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
-  margin-bottom: 4px;
+}
+
+.divider {
+  height: 1px;
+  background-color: #fff1;
 }
 
 .task {
-  border: 1px solid #fff2;
+  background-color: #fff1;
   border-radius: 2px;
-  padding: 8px;
+  padding: 8px 16px;
   width: 320px;
 
   &.error {
