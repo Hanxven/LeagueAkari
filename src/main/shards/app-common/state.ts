@@ -68,6 +68,10 @@ export class AppCommonSettings {
     host: '127.0.0.1'
   }
 
+  streamerMode: boolean = false
+
+  streamerModeUseAkariStyledName: boolean = false
+
   setShowFreeSoftwareDeclaration(s: boolean) {
     this.showFreeSoftwareDeclaration = s
   }
@@ -86,6 +90,14 @@ export class AppCommonSettings {
 
   setHttpProxy(s: { strategy: 'force' | 'auto' | 'disable'; port: number; host: string }) {
     this.httpProxy = s
+  }
+
+  setStreamerMode(s: boolean) {
+    this.streamerMode = s
+  }
+
+  setStreamerModeUseAkariStyledName(s: boolean) {
+    this.streamerModeUseAkariStyledName = s
   }
 
   constructor() {

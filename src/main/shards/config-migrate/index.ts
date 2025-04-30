@@ -18,6 +18,7 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
 
   static MIGRATION_FROM_126 = 'akari-migration-from-1.2.6_patch2'
   static MIGRATION_FROM_134 = 'akari-migration-from-1.3.4_patch1'
+  static MIGRATION_FROM_135 = 'akari-migration-from-1.3.5_patch1'
 
   private readonly _log: AkariLogger
 
@@ -288,11 +289,35 @@ export class ConfigMigrateMain implements IAkariShardInitDispose {
     this._log.info(`迁移完成, 到 ${ConfigMigrateMain.MIGRATION_FROM_134}`)
   }
 
+  private async _migrateFrom135(manager: EntityManager) {
+    const hasMigratedSymbol = await manager.findOneBy(Setting, {
+      key: Equal(ConfigMigrateMain.MIGRATION_FROM_135)
+    })
+
+    if (hasMigratedSymbol) {
+      return
+    }
+
+    this._log.info('开始迁移设置项', ConfigMigrateMain.MIGRATION_FROM_135)
+
+    await this._do(manager, 'app-common-renderer/streamerMode', 'app-common-main/streamerMode')
+    await this._do(
+      manager,
+      'app-common-renderer/streamerModeUseAkariStyledName',
+      'app-common-main/streamerModeUseAkariStyledName'
+    )
+
+    await manager.save(
+      Setting.create(ConfigMigrateMain.MIGRATION_FROM_135, ConfigMigrateMain.MIGRATION_FROM_135)
+    )
+  }
+
   async onInit() {
     try {
       await this._st.dataSource.transaction(async (manager) => {
         await this._migrateFrom126(manager)
         await this._migrateFrom134(manager)
+        await this._migrateFrom135(manager)
       })
     } catch (error) {
       this._log.error('迁移设置项失败', error)

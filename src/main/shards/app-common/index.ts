@@ -35,7 +35,9 @@ export class AppCommonMain implements IAkariShardInitDispose {
         showFreeSoftwareDeclaration: { default: this.settings.showFreeSoftwareDeclaration },
         locale: { default: this._getSystemLocale() },
         theme: { default: this.settings.theme },
-        httpProxy: { default: this.settings.httpProxy }
+        httpProxy: { default: this.settings.httpProxy },
+        streamerMode: { default: this.settings.streamerMode },
+        streamerModeUseAkariStyledName: { default: this.settings.streamerModeUseAkariStyledName }
       },
       this.settings
     )
@@ -128,7 +130,9 @@ export class AppCommonMain implements IAkariShardInitDispose {
       'showFreeSoftwareDeclaration',
       'locale',
       'theme',
-      'httpProxy'
+      'httpProxy',
+      'streamerMode',
+      'streamerModeUseAkariStyledName'
     ])
     this._mobx.propSync(AppCommonMain.id, 'state', this.state, [
       'isAdministrator',

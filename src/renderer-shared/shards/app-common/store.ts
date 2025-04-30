@@ -23,12 +23,9 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
       port: 0,
       host: ''
     } as HttpProxySetting,
-    forceDisableProxy: false
-  })
-
-  const frontendSettings = shallowReactive({
+    forceDisableProxy: false,
     streamerMode: false,
-    streamerModeUseAkariStyledName: false // ok, let's use this
+    streamerModeUseAkariStyledName: false
   })
 
   const version = ref('0.0.0')
@@ -54,7 +51,6 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
 
   return {
     settings,
-    frontendSettings,
     isAdministrator,
     disableHardwareAcceleration,
     version,

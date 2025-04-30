@@ -54,7 +54,7 @@
                     )
                   }}</span
                 >
-                <span class="tag-line" v-if="!as.frontendSettings.streamerMode"
+                <span class="tag-line" v-if="!as.settings.streamerMode"
                   >#{{ summoner?.tagLine || '—' }}</span
                 >
               </div>

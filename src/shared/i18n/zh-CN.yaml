@@ -2141,7 +2141,7 @@ auto-gameflow-main:
   auto-matchmaking-canceled-not-leader: 自动匹配已取消，当前不是房间房主
   auto-matchmaking-canceled-wait-for-penalty: 自动匹配已取消，等待秒退计时器
   auto-matchmaking-in: 将在 {{seconds}} 秒后自动匹配
-  skip-leader: 尝试将房主转让
+  skip-leader: '[League Akari] 尝试将房主转让'
 
 auto-select-main:
   error-pick: 尝试自动选择英雄时失败，目标英雄 {{champion}}：{{reason}}

@@ -27,9 +27,13 @@
         :label-description="t('MiscSettings.streamerMode.enabled.description')"
         :label-width="400"
       >
-        <NSwitch size="small" v-model:value="as.frontendSettings.streamerMode" />
+        <NSwitch
+          size="small"
+          :value="as.settings.streamerMode"
+          @update:value="(val) => a.setStreamerMode(val)"
+        />
       </ControlItem>
-      <NCollapseTransition :show="as.frontendSettings.streamerMode">
+      <NCollapseTransition :show="as.settings.streamerMode">
         <ControlItem
           class="control-item-margin"
           :label="t('MiscSettings.streamerMode.useAkariStyledName.label')"
@@ -38,7 +42,8 @@
         >
           <NSwitch
             size="small"
-            v-model:value="as.frontendSettings.streamerModeUseAkariStyledName"
+            :value="as.settings.streamerModeUseAkariStyledName"
+            @update:value="(val) => a.setStreamerModeUseAkariStyledName(val)"
           />
         </ControlItem>
       </NCollapseTransition>
@@ -49,6 +54,7 @@
 <script setup lang="ts">
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
+import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { RespawnTimerRenderer } from '@renderer-shared/shards/respawn-timer'
 import { useRespawnTimerStore } from '@renderer-shared/shards/respawn-timer/store'
@@ -57,6 +63,7 @@ import { NCard, NCollapseTransition, NScrollbar, NSwitch } from 'naive-ui'
 
 const { t } = useTranslation()
 
+const a = useInstance(AppCommonRenderer)
 const as = useAppCommonStore()
 const rts = useRespawnTimerStore()
 const rt = useInstance(RespawnTimerRenderer)

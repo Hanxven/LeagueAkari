@@ -174,7 +174,7 @@ export class SimpleNotificationsRenderer implements IAkariShardInitDispose {
     )
 
     const shouldRemind = computed(() => {
-      if (inst || app.frontendSettings.streamerMode) {
+      if (inst || app.settings.streamerMode) {
         return false
       }
 

@@ -108,7 +108,7 @@
       </NScrollbar>
       <div class="divider" />
       <NPopconfirm
-        :disabled="!as.frontendSettings.streamerMode || warningShown"
+        :disabled="!as.settings.streamerMode || warningShown"
         @positive-click="handleShowSearchSummonerModalInPopconfirm"
         :positive-button-props="{
           type: 'warning',
@@ -121,10 +121,7 @@
         <template #trigger>
           <div
             class="search-area"
-            @click="
-              (!as.frontendSettings.streamerMode || warningShown) &&
-              (searchSummonerModalShow = true)
-            "
+            @click="(!as.settings.streamerMode || warningShown) && (searchSummonerModalShow = true)"
           >
             <NIcon class="search-icon"><SearchIcon /></NIcon>
             <span class="search-label">{{ t('MatchHistoryTabsTitle.search') }}</span>

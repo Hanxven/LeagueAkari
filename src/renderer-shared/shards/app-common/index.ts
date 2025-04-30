@@ -69,6 +69,14 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'httpProxy', s)
   }
 
+  setStreamerMode(s: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'streamerMode', s)
+  }
+
+  setStreamerModeUseAkariStyledName(s: boolean) {
+    return this._setting.set(MAIN_SHARD_NAMESPACE, 'streamerModeUseAkariStyledName', s)
+  }
+
   readClipboardText() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'readClipboardText') as Promise<string>
   }
@@ -86,13 +94,6 @@ export class AppCommonRenderer implements IAkariShardInitDispose {
       'tempAkariSubscriptionInfo',
       () => store.tempAkariSubscriptionInfo,
       (v) => (store.tempAkariSubscriptionInfo = v)
-    )
-
-    await this._setting.savedPropVue(AppCommonRenderer.id, store.frontendSettings, 'streamerMode')
-    await this._setting.savedPropVue(
-      AppCommonRenderer.id,
-      store.frontendSettings,
-      'streamerModeUseAkariStyledName'
     )
 
     await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)

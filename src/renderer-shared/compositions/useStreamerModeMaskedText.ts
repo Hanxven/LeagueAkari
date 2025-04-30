@@ -7,7 +7,7 @@ export function useStreamerModeMaskedText() {
   const { t } = useTranslation()
 
   const summonerName = (seed: string, index: number) => {
-    if (app.frontendSettings.streamerModeUseAkariStyledName) {
+    if (app.settings.streamerModeUseAkariStyledName) {
       return getNameFromYuriyuri(seed, app.settings.locale)
     }
 
@@ -21,7 +21,7 @@ export function useStreamerModeMaskedText() {
    * @returns
    */
   const masked = (sensitiveText: string, replacer?: ((text: string) => string) | string) => {
-    if (app.frontendSettings.streamerMode) {
+    if (app.settings.streamerMode) {
       if (typeof replacer === 'function') {
         return replacer(sensitiveText)
       } else if (typeof replacer === 'string') {

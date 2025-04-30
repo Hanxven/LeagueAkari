@@ -493,7 +493,7 @@ const currentEditingTag = ref('')
 const showMask = ref(false)
 
 watch(
-  () => as.frontendSettings.streamerMode,
+  () => as.settings.streamerMode,
   (value) => {
     showMask.value = value
   },
