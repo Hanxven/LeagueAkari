@@ -105,7 +105,6 @@ const handleMenuChange = (key: string) => {
 
       .menu-item-indicator {
         background-color: #60f44db9;
-        box-shadow: 0 0 8px 0px #60f44db9;
       }
     }
   }
@@ -130,7 +129,6 @@ const handleMenuChange = (key: string) => {
 
       .menu-item-indicator {
         background-color: #1e6a14e0;
-        box-shadow: 0 0 8px 0px #1e6a14e0;
       }
     }
   }
