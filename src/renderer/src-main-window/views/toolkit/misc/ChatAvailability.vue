@@ -67,7 +67,7 @@ const ar = useInstance(AutoReplyRenderer)
 const notification = useNotification()
 
 const handleChangeAvailability = async (availability: string) => {
-  if (availability === 'away' && ars.settings.lockOfflineStatus) {
+  if ((availability === 'away' || availability === 'chat') && ars.settings.lockOfflineStatus) {
     await ar.setLockOfflineStatus(false)
   }
 

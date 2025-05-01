@@ -88,9 +88,11 @@ export class AutoReplyMain implements IAkariShardInitDispose {
           return
         }
 
-        if (prev === 'offline' && availability === 'away') {
+        if (prev === 'offline' && (availability === 'away' || availability === 'chat')) {
           this._log.debug('纠正为离线状态')
-          this._lc.api.chat.changeAvailability('offline').catch(() => {})
+          this._lc.api.chat.changeAvailability('offline').catch((error) => {
+            this._log.warn(`尝试修改状态时出现错误`, error)
+          })
         }
       }
     )
