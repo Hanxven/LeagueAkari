@@ -1,9 +1,17 @@
 <template>
-  <div class="sidebar-menu">
+  <div
+    class="sidebar-menu"
+    ref="sidebar-menu"
+    :style="{
+      '--indicator-top': `${indicatorPosition.top}px`,
+      '--indicator-rail-height': `${indicatorPosition.height}px`
+    }"
+  >
     <NTooltip v-for="item of showItems" :key="item.key" placement="right">
       <template #trigger>
         <div
           class="menu-item"
+          :data-key="item.key"
           @click="handleMenuChange(item.key)"
           :class="{ active: currentActiveItem === item.key }"
         >
@@ -12,19 +20,25 @@
               <component :is="item.icon" class="menu-item-icon" />
             </NBadge>
           </div>
-          <Transition name="menu-item-move-right-fade">
-            <div class="menu-item-indicator" v-if="currentActiveItem === item.key"></div>
-          </Transition>
         </div>
       </template>
       <span class="menu-item-popover">{{ item.name }}</span>
     </NTooltip>
+    <div class="indicator-rail"></div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { NBadge, NTooltip } from 'naive-ui'
-import { Component as ComponentC, computed, watchEffect } from 'vue'
+import {
+  Component as ComponentC,
+  computed,
+  nextTick,
+  ref,
+  useTemplateRef,
+  watch,
+  watchEffect
+} from 'vue'
 
 const { defaultValue, items = [] } = defineProps<{
   defaultValue?: string
@@ -41,6 +55,35 @@ watchEffect(() => {
 const handleMenuChange = (key: string) => {
   currentActiveItem.value = key
 }
+
+const sidebarMenu = useTemplateRef('sidebar-menu')
+const indicatorPosition = ref({
+  top: 0,
+  height: 0
+})
+const updateIndicatorPosition = () => {
+  if (!sidebarMenu.value) {
+    return
+  }
+
+  const activeItem = sidebarMenu.value.querySelector('.menu-item.active') as HTMLElement
+  if (activeItem) {
+    const { top: itemTop, height } = activeItem.getBoundingClientRect()
+    const { top: sidebarTop } = sidebarMenu.value.getBoundingClientRect()
+
+    const thatHeight = 0.4 * height
+    indicatorPosition.value.top = itemTop - sidebarTop + (height - thatHeight) / 2
+    indicatorPosition.value.height = thatHeight
+  }
+}
+
+watch(
+  () => currentActiveItem.value,
+  () => {
+    nextTick(() => updateIndicatorPosition())
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="less" scoped>
@@ -49,13 +92,44 @@ const handleMenuChange = (key: string) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .indicator-rail {
+    position: absolute;
+    top: 0;
+    left: 4px;
+    width: 4px;
+    height: 100%;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: var(--indicator-rail-height);
+      top: var(--indicator-top);
+      border-radius: 2px;
+      background-color: #61f44d;
+    }
+
+    &::before {
+      transition:
+        top 0.2s cubic-bezier(0.65, 0, 0.35, 1),
+        height 0.2s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    &::after {
+      transition:
+        top 0.16s cubic-bezier(0.65, 0, 0.35, 1),
+        height 0.16s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+  }
 }
 
 .menu-item {
   position: relative;
   height: 52px;
   width: 52px;
-  padding: 2px;
+  padding: 4px;
   box-sizing: border-box;
   cursor: pointer;
 
@@ -66,23 +140,15 @@ const handleMenuChange = (key: string) => {
     align-items: center;
     height: 100%;
     width: 100%;
-    border-radius: 2px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    overflow: hidden;
   }
 
   .menu-item-icon {
-    font-size: 24px;
+    font-size: 20px;
     transition: color 0.2s;
     left: 0px;
-  }
-
-  .menu-item-indicator {
-    position: absolute;
-    top: 50%;
-    left: -4px;
-    transform: translateY(-50%);
-    width: 10px;
-    height: 64%;
-    border-radius: 4px;
   }
 }
 
@@ -91,6 +157,10 @@ const handleMenuChange = (key: string) => {
     &:hover {
       .menu-item-icon {
         color: #fff;
+      }
+
+      .menu-item-inner {
+        background-color: #fff1;
       }
     }
 
@@ -103,8 +173,8 @@ const handleMenuChange = (key: string) => {
         color: #fff;
       }
 
-      .menu-item-indicator {
-        background-color: #60f44db9;
+      .menu-item-inner {
+        background-color: #fff1;
       }
     }
   }
@@ -126,10 +196,6 @@ const handleMenuChange = (key: string) => {
       .menu-item-icon {
         color: #000;
       }
-
-      .menu-item-indicator {
-        background-color: #1e6a14e0;
-      }
     }
   }
 }
@@ -137,22 +203,5 @@ const handleMenuChange = (key: string) => {
 .menu-item-popover {
   font-weight: bold;
   font-size: 14px;
-}
-
-.menu-item-move-right-fade-enter-active,
-.menu-item-move-right-fade-leave-active {
-  transition:
-    opacity 0.2s ease,
-    left 0.2s cubic-bezier(0.19, 1, 0.22, 1);
-}
-
-.menu-item-move-right-fade-enter-from,
-.menu-item-move-right-fade-leave-to {
-  opacity: 0;
-}
-
-.menu-item-move-right-fade-enter-to,
-.menu-item-move-right-fade-leave-from {
-  opacity: 1;
 }
 </style>
