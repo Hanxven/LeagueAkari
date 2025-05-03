@@ -13,8 +13,8 @@
         style="display: flex; justify-content: center; vertical-align: bottom; margin-bottom: 16px"
       >
         <img
-          style="height: 108px; width: 108px"
-          src="@main-window/assets/logo.png"
+          style="height: 160px; width: 160px"
+          src="@renderer-shared/assets/logo.png"
           alt="Logo of League Akari"
         />
       </div>
