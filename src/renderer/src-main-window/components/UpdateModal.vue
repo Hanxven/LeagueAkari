@@ -31,8 +31,7 @@
           v-if="sus.currentRelease.releaseNotesUrl"
           :href="sus.currentRelease.releaseNotesUrl"
         >
-          {{ t('UpdateModal.releaseNotes') }}
-          >{{ sus.currentRelease.source === 'github' ? 'GitHub' : 'Gitee' }}
+          {{ sus.currentRelease.source === 'github' ? 'GitHub' : 'Gitee' }}
           {{ t('UpdateModal.releasePage') }}</a
         >
         <a

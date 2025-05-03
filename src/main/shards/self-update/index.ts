@@ -487,7 +487,10 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     return asyncTask
   }
 
-  private _applyUpdatesOnNextStartup(newUpdateDir: string, _shouldStartNewApp: boolean = true) {
+  private async _applyUpdatesOnNextStartup(
+    newUpdateDir: string,
+    _shouldStartNewApp: boolean = true
+  ) {
     if (!ofs.existsSync(newUpdateDir)) {
       this.state.setUpdateProgressInfo(null)
       this._log.error(`更新目录不存在 ${newUpdateDir}`)
@@ -499,12 +502,16 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
       SelfUpdateMain.UPDATE_EXECUTABLE_NAME
     )
 
-    ofs.copyFileSync(
+    this._log.info(
+      '写入更新可执行文件',
       updateExecutablePath.replace('app.asar', 'app.asar.unpacked'),
       copiedExecutablePath
     )
 
-    this._log.info(`写入更新可执行文件 ${copiedExecutablePath}`)
+    await ofs.promises.copyFile(
+      updateExecutablePath.replace('app.asar', 'app.asar.unpacked'),
+      copiedExecutablePath
+    )
 
     const appExePath = app.getPath('exe')
     const appDir = path.dirname(appExePath)
@@ -604,7 +611,7 @@ export class SelfUpdateMain implements IAkariShardInitDispose {
     }
 
     try {
-      this._applyUpdatesOnNextStartup(unpackedPath, true)
+      await this._applyUpdatesOnNextStartup(unpackedPath, true)
     } catch {}
   }
 
