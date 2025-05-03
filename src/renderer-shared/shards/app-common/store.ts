@@ -29,6 +29,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
   })
 
   const version = ref('0.0.0')
+  const isRabiVersion = computed(() => version.value.includes('-rabi'))
   const isAdministrator = ref(false)
   const disableHardwareAcceleration = ref(false)
   const baseConfig = shallowRef<BaseConfig | null>(null)
@@ -54,6 +55,7 @@ export const useAppCommonStore = defineStore('shard:app-common-renderer', () => 
     isAdministrator,
     disableHardwareAcceleration,
     version,
+    isRabiVersion,
     baseConfig,
 
     colorTheme,

@@ -28,6 +28,7 @@
     </Transition>
     <MainWindowTitleBar />
     <div id="app-content"><RouterView /></div>
+    <div v-if="as.isRabiVersion" id="version-watermark">League Akari {{ as.version }}</div>
   </div>
 </template>
 
@@ -180,6 +181,7 @@ og.setupAutoRouteWhenGameStarts()
 
 <style lang="less">
 #app-frame {
+  position: relative;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -195,6 +197,16 @@ og.setupAutoRouteWhenGameStarts()
     height: 0;
     flex: 1;
     overflow: hidden;
+  }
+
+  > #version-watermark {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+    z-index: 10;
+    font-size: 12px;
+    opacity: 0.4;
+    pointer-events: none;
   }
 }
 
