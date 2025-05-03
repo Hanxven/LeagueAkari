@@ -104,11 +104,11 @@ watch(
     &::after {
       content: '';
       position: absolute;
-      width: 2px;
+      width: 4px;
       height: var(--indicator-rail-height);
       top: var(--indicator-top);
       border-radius: 2px;
-      background-color: #61f44d;
+      background-color: #26dd0e;
     }
 
     &::before {
@@ -164,6 +164,12 @@ watch(
       }
     }
 
+    &:active {
+      .menu-item-icon {
+        color: #fff8;
+      }
+    }
+
     .menu-item-icon {
       color: rgba(255, 255, 255, 0.45);
     }
@@ -185,6 +191,12 @@ watch(
     &:hover {
       .menu-item-icon {
         color: #000;
+      }
+    }
+
+    &:active {
+      .menu-item-icon {
+        color: #0008;
       }
     }
 

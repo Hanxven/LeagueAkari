@@ -16,13 +16,13 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
+import { AiStatus as AiStatusIcon } from '@vicons/carbon'
+import { Tools as ToolsIcon } from '@vicons/fa'
 import {
-  AiStatus as AiStatusIcon,
-  Layers as LayersIcon,
-  ToolKit as ToolkitIcon
-} from '@vicons/carbon'
-import { Games24Filled as Games24FilledIcon } from '@vicons/fluent'
-import { Warning20Filled as Warning20FilledIcon } from '@vicons/fluent'
+  Games24Filled as Games24FilledIcon,
+  Warning20Filled as Warning20FilledIcon
+} from '@vicons/fluent'
+import { InsertChartFilled as InsertChartFilledIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
 import { Component as ComponentC, computed, h, ref, watch, watchEffect } from 'vue'
@@ -64,7 +64,7 @@ const menu = computed(() => {
   return [
     {
       key: 'match-history',
-      icon: renderIcon(LayersIcon),
+      icon: renderIcon(InsertChartFilledIcon),
       name: t('SideBarMenu.match-history')
     },
     {
@@ -80,7 +80,7 @@ const menu = computed(() => {
     },
     {
       key: 'toolkit',
-      icon: renderIcon(ToolkitIcon),
+      icon: renderIcon(ToolsIcon),
       name: t('SideBarMenu.toolkit')
     },
     {
