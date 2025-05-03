@@ -2195,6 +2195,9 @@ window-manager-main:
 ongoing-game-main:
   taggedPlayer: 已标记的玩家
 
+app:
+  singleton: 因为 Akari 是独一无二的，所以同一时间只能有一个 Akari
+
 common:
   appName: League Akari
   default: 默认

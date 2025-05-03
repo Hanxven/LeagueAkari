@@ -28,5 +28,7 @@ try {
   await manager.setup()
   app.mount('#app')
 } catch (error) {
-  console.error('League Akari 无法正确加载：', error)
+  alert(
+    'League Akari 无法正确加载，请查看控制台以获取更多信息 / League Akari failed to load correctly, please check the console for more information'
+  )
 }

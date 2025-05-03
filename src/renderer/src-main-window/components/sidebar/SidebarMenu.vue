@@ -99,6 +99,7 @@ watch(
     left: 4px;
     width: 4px;
     height: 100%;
+    pointer-events: none;
 
     &::before,
     &::after {

@@ -2192,6 +2192,9 @@ window-manager-main:
 ongoing-game-main:
   taggedPlayer: Tagged Player
 
+app:
+  singleton: Because Akari is unique, there can only be ONE Akari at a time
+
 common:
   appName: League Akari
   default: Default

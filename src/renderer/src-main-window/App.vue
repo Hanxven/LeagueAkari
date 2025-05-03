@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import { useKeyboardCombo } from '@renderer-shared/compositions/useKeyboardCombo'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
@@ -151,7 +152,7 @@ const handleConfirmation = (notShowAgain: boolean) => {
 app.onSecondInstance(() => {
   notification.info({
     title: 'League Akari',
-    content: '因为 Akari 是独一无二的，所以同一时间只能有一个 Akari',
+    content: () => t('app.singleton'),
     duration: 10000
   })
 })
@@ -160,14 +161,7 @@ const message = useMessage()
 
 useKeyboardCombo('AKARI', {
   onFinish: () => {
-    message.info('League Akari!', {
-      duration: 100000
-    })
-    notification.success({
-      title: 'League Akari',
-      content: 'League Akari!',
-      duration: 6000
-    })
+    message.info(() => h(LeagueAkariSpan))
   },
   requireSameEl: true,
   caseSensitive: false,
