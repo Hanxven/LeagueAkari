@@ -88,6 +88,36 @@ AppSettings:
       label: Download Source
       description: Choose the update package download source
 
+    checkFrom: Check updates from download source ({{source}})
+    checkUpdates: Check Updates
+    currentRelease: Current Release
+    downloadRelease: Download Release
+    newRelease: New Release
+    lastCheckAt: Last Check at
+    cancelUpdate: Cancel Update
+
+    updateProgress:
+      label: Update Process
+      description: The ongoing update process
+      downloading: Downloading update package
+      finished: Completed {{progress}}%
+      remain: Remaining {{time}}
+      downloadFailed: Download failed
+      unpacking: Unpacking update package
+      unpackFailed: Unpack failed
+      waitingForRestart: Waiting for restart
+      waitingForRestartDescription: The auto-update process will be performed after closing the application
+
+    checkUpdatesResult:
+      no-updates: No new version available
+      new-updates: New version available
+      failed: Failed to check for updates {{reason}}
+
+    updateDir:
+      label: Update Directory
+      description: The current location of the downloaded update. If the complete auto-update process cannot be executed, manual update is required
+      open: Open
+
   mainWindowUi:
     title: Main Window UI
     useProfileSkinAsBackground:
@@ -529,36 +559,6 @@ AboutPane:
   line1: ' (联盟阿卡林, Version {{version}}) is an open-source software that focuses on providing some additional features to assist the game experience of League of Legends, almost all of its implementations rely on'
   line2: Project Reference
   copyright: © 2025 Hanxven. This software is open-source and follows the GPL-3.0 license.
-
-  checkFrom: Check updates from download source ({{source}})
-  checkUpdates: Check Updates
-  currentRelease: Current Release
-  downloadRelease: Download Release
-  newRelease: New Release
-  lastCheckAt: Last Check at
-  cancelUpdate: Cancel Update
-
-  updateProgress:
-    label: Update Process
-    description: The ongoing update process
-    downloading: Downloading update package
-    finished: Completed {{progress}}%
-    remain: Remaining {{time}}
-    downloadFailed: Download failed
-    unpacking: Unpacking update package
-    unpackFailed: Unpack failed
-    waitingForRestart: Waiting for restart
-    waitingForRestartDescription: The auto-update process will be performed after closing the application
-
-  checkUpdatesResult:
-    no-updates: No new version available
-    new-updates: New version available
-    failed: Failed to check for updates {{reason}}
-
-  updateDir:
-    label: Update Directory
-    description: The current location of the downloaded update. If the complete auto-update process cannot be executed, manual update is required
-    open: Open
 
 Automation:
   title: Automation
@@ -2106,7 +2106,7 @@ self-update-renderer:
     name: League Akari Update
     downloading: Downloading archive {{progress}}% ({{avgSpeed}}/s, eta {{eta}})
     download-failed: Failed to download archive
-    unpacking: Unpacking archive {{progress}}% (eta {{eta}})
+    unpacking: Unpacking archive {{progress}}%
     unpack-failed: Failed to unpack the archive file
     waiting-for-restart: Updated applied. Restart the application to apply the update
     cancelButton: Cancel

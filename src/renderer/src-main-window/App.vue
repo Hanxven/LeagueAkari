@@ -37,7 +37,6 @@ import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { OngoingGameRenderer } from '@renderer-shared/shards/ongoing-game'
-import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { SetupInAppScope } from '@renderer-shared/shards/setup-in-app-scope/comp'
 import { greeting } from '@renderer-shared/utils/greeting'
@@ -59,7 +58,6 @@ const mui = useInstance(MainWindowUiRenderer)
 const sus = useSelfUpdateStore()
 const as = useAppCommonStore()
 
-const su = useInstance(SelfUpdateRenderer)
 const og = useInstance(OngoingGameRenderer)
 const app = useInstance(AppCommonRenderer)
 
@@ -104,14 +102,6 @@ watchEffect(() => {
     console.log(sus.currentAnnouncement)
     isShowingAnnouncementModal.value = true
   }
-})
-
-su.onStartUpdate(() => {
-  notification.info({
-    title: 'League Akari',
-    content: t('self-update-main.start-update'),
-    duration: 4000
-  })
 })
 
 watchEffect(() => {

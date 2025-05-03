@@ -90,6 +90,36 @@ AppSettings:
       label: 下载源
       description: 选择更新包下载源
 
+    checkFrom: 从下载源中 ({{ source }}) 检查更新
+    checkUpdates: 检查更新
+    currentRelease: 当前版本内容
+    downloadRelease: 下载更新包
+    newRelease: 新版本内容
+    lastCheckAt: 上次检查
+    cancelUpdate: 取消更新
+
+    updateProgress:
+      label: 更新流程
+      description: 正在进行的更新流程
+      downloading: 下载更新包
+      finished: 已完成 {{progress}}%
+      remain: 剩余 {{time}}
+      downloadFailed: 下载出错
+      unpacking: 解压更新包
+      unpackFailed: 解压出错
+      waitingForRestart: 等待重新启动
+      waitingForRestartDescription: 关闭应用后将进行自动更新流程
+
+    checkUpdatesResult:
+      no-updates: 当前没有可用更新
+      new-updates: 发现新版本
+      failed: 检查更新失败 {{reason}}
+
+    updateDir:
+      label: 更新目录
+      description: 当前更新已下载的位置，若无法执行完整的自动更新流程，则需要手动更新
+      open: 打开
+
   mainWindowUi:
     title: 主界面
 
@@ -532,36 +562,6 @@ AboutPane:
   line1: ' (联盟阿卡林，Version {{version}}) 是开源软件，专注于提供一些额外的功能，以辅助英雄联盟的游戏体验，其几乎所有实现都依赖'
   line2: 项目参考
   copyright: © 2025 Hanxven. 本软件为开源软件，遵循 GPL-3.0 许可证。
-
-  checkFrom: 从下载源中 ({{ source }}) 检查更新
-  checkUpdates: 检查更新
-  currentRelease: 当前版本内容
-  downloadRelease: 下载更新包
-  newRelease: 新版本内容
-  lastCheckAt: 上次检查
-  cancelUpdate: 取消更新
-
-  updateProgress:
-    label: 更新流程
-    description: 正在进行的更新流程
-    downloading: 下载更新包
-    finished: 已完成 {{progress}}%
-    remain: 剩余 {{time}}
-    downloadFailed: 下载出错
-    unpacking: 解压更新包
-    unpackFailed: 解压出错
-    waitingForRestart: 等待重新启动
-    waitingForRestartDescription: 关闭应用后将进行自动更新流程
-
-  checkUpdatesResult:
-    no-updates: 当前没有可用更新
-    new-updates: 发现新版本
-    failed: 检查更新失败 {{reason}}
-
-  updateDir:
-    label: 更新目录
-    description: 当前更新已下载的位置，若无法执行完整的自动更新流程，则需要手动更新
-    open: 打开
 
 Automation:
   title: 自动化
@@ -2109,7 +2109,7 @@ self-update-renderer:
     name: League Akari 更新
     downloading: 正在下载更新包 {{progress}}% ({{avgSpeed}}/s, 剩余 {{eta}})
     download-failed: 下载更新包失败
-    unpacking: 正在解压更新包 {{progress}}% (剩余 {{eta}})
+    unpacking: 正在解压更新包 {{progress}}%
     unpack-failed: 解压更新包失败
     waiting-for-restart: 更新包解压完成，应用关闭后将自动应用更新流程
     cancelButton: 取消

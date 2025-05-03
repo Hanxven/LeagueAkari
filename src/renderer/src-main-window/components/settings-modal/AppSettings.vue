@@ -122,6 +122,141 @@
           </NTooltip>
         </NFlex>
       </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.selfUpdate.checkUpdates')"
+        :label-description="
+          t('AppSettings.selfUpdate.checkFrom', {
+            source: UPDATE_SOURCE_MAP[sus.settings.downloadSource]
+          })
+        "
+        :label-width="400"
+      >
+        <NFlex align="center">
+          <NButton
+            size="small"
+            :loading="sus.isCheckingUpdates"
+            secondary
+            type="primary"
+            @click="() => handleCheckUpdates()"
+            >{{ t('AppSettings.selfUpdate.checkUpdates') }}</NButton
+          >
+          <NButton
+            size="small"
+            v-if="sus.currentRelease"
+            secondary
+            @click="() => handleShowUpdateModal()"
+          >
+            <template v-if="sus.currentRelease.isNew">
+              {{ t('AppSettings.selfUpdate.newRelease') }}
+            </template>
+            <template v-else>
+              {{ t('AppSettings.selfUpdate.currentRelease') }}
+            </template>
+          </NButton>
+          <NButton
+            size="small"
+            v-if="sus.currentRelease && sus.currentRelease.isNew"
+            :disabled="sus.updateProgressInfo !== null"
+            secondary
+            @click="() => su.startUpdate()"
+          >
+            {{ t('AppSettings.selfUpdate.downloadRelease') }}
+          </NButton>
+          <NButton
+            size="small"
+            v-if="sus.updateProgressInfo"
+            secondary
+            type="warning"
+            @click="() => su.cancelUpdate()"
+            >{{ t('AppSettings.selfUpdate.cancelUpdate') }}</NButton
+          >
+          <span v-if="sus.lastCheckAt" style="font-size: 12px"
+            >{{ t('AppSettings.selfUpdate.lastCheckAt') }}
+            {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span
+          >
+        </NFlex>
+      </ControlItem>
+      <ControlItem
+        v-if="sus.updateProgressInfo"
+        class="control-item-margin"
+        :label="t('AppSettings.selfUpdate.updateProgress.label')"
+        :label-description="t('AppSettings.selfUpdate.updateProgress.description')"
+        :label-width="400"
+      >
+        <NSteps
+          :vertical="lessThan1024px"
+          size="small"
+          :current="processStatus.current"
+          :status="processStatus.status"
+        >
+          <NStep>
+            <template #title>
+              <span class="step-title">{{
+                t('AppSettings.selfUpdate.updateProgress.downloading')
+              }}</span>
+            </template>
+            <div class="step-description">
+              {{
+                t('AppSettings.selfUpdate.updateProgress.finished', {
+                  progress: (sus.updateProgressInfo.downloadingProgress * 100).toFixed()
+                })
+              }}
+            </div>
+            <div class="step-description" v-if="sus.updateProgressInfo.phase === 'downloading'">
+              {{
+                t('AppSettings.selfUpdate.updateProgress.remain', {
+                  time: formatSeconds(sus.updateProgressInfo.downloadTimeLeft, 1)
+                })
+              }}
+            </div>
+            <div class="step-description" v-if="sus.updateProgressInfo.phase === 'download-failed'">
+              {{ t('AppSettings.selfUpdate.updateProgress.downloadFailed') }}
+            </div>
+          </NStep>
+          <NStep>
+            <template #title>
+              <span class="step-title">{{
+                t('AppSettings.selfUpdate.updateProgress.unpacking')
+              }}</span>
+            </template>
+            <div class="step-description">
+              {{
+                t('AppSettings.selfUpdate.updateProgress.finished', {
+                  progress: (sus.updateProgressInfo.unpackingProgress * 100).toFixed()
+                })
+              }}
+            </div>
+            <div class="step-description" v-if="sus.updateProgressInfo.phase === 'unpack-failed'">
+              {{ t('AppSettings.selfUpdate.updateProgress.unpackFailed') }}
+            </div>
+          </NStep>
+          <NStep>
+            <template #title>
+              <span class="step-title">{{
+                t('AppSettings.selfUpdate.updateProgress.waitingForRestart')
+              }}</span>
+            </template>
+            <div class="step-description">
+              {{ t('AppSettings.selfUpdate.updateProgress.waitingForRestartDescription') }}
+            </div>
+          </NStep>
+        </NSteps>
+      </ControlItem>
+      <ControlItem
+        class="control-item-margin"
+        :label="t('AppSettings.selfUpdate.updateDir.label')"
+        :label-description="t('AppSettings.selfUpdate.updateDir.description')"
+        :label-width="400"
+        v-if="
+          processStatus.current >= 2 ||
+          (processStatus.current === 1 && processStatus.status !== 'error')
+        "
+      >
+        <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">{{
+          t('AppSettings.selfUpdate.updateDir.open')
+        }}</NButton>
+      </ControlItem>
     </NCard>
     <NCard size="small" style="margin-top: 8px">
       <template #header>
@@ -266,6 +401,9 @@ import {
   useMainWindowStore,
   useWindowManagerStore
 } from '@renderer-shared/shards/window-manager/store'
+import { formatSeconds } from '@shared/utils/format'
+import { useMediaQuery } from '@vueuse/core'
+import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
 import {
   NButton,
@@ -276,11 +414,14 @@ import {
   NInputNumber,
   NScrollbar,
   NSelect,
+  NStep,
+  NSteps,
   NSwitch,
   NTooltip,
-  useDialog
+  useDialog,
+  useMessage
 } from 'naive-ui'
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 
 import { useMicaAvailability } from '@main-window/compositions/useMicaAvailability'
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
@@ -373,6 +514,78 @@ const httpProxyStrategies = computed(() => {
 const updateHttpProxySettings = (obj: Partial<HttpProxySetting>) => {
   app.setHttpProxy({ ...as.settings.httpProxy, ...obj })
 }
+
+const message = useMessage()
+
+const UPDATE_SOURCE_MAP = {
+  github: 'GitHub',
+  gitee: 'Gitee'
+}
+
+const handleCheckUpdates = async () => {
+  const { result, reason } = await su.checkUpdates()
+  switch (result) {
+    case 'no-updates':
+      message.success(() => t('AppSettings.selfUpdate.checkUpdatesResult.no-updates'))
+      break
+    case 'new-updates':
+      message.success(() => t('AppSettings.selfUpdate.checkUpdatesResult.new-updates'))
+      break
+    case 'failed':
+      message.warning(() => t('AppSettings.selfUpdate.checkUpdatesResult.failed', { reason }))
+      break
+  }
+}
+
+const appInject = inject('app') as any
+
+const handleShowUpdateModal = async () => {
+  appInject.openUpdateModal()
+}
+
+const processStatus = computed(() => {
+  if (!sus.updateProgressInfo) {
+    return {
+      current: 0,
+      status: 'wait' as any // utilize 'any' to suppress type error
+    }
+  }
+
+  switch (sus.updateProgressInfo.phase) {
+    case 'downloading':
+      return {
+        current: 1,
+        status: 'process'
+      }
+    case 'download-failed':
+      return {
+        current: 1,
+        status: 'error'
+      }
+    case 'unpacking':
+      return {
+        current: 2,
+        status: 'process'
+      }
+    case 'unpack-failed':
+      return {
+        current: 2,
+        status: 'error'
+      }
+    case 'waiting-for-restart':
+      return {
+        current: 3,
+        status: 'process'
+      }
+    default:
+      return {
+        current: 0,
+        status: 'wait'
+      }
+  }
+})
+
+const lessThan1024px = useMediaQuery('(max-width: 1024px)')
 </script>
 
 <style lang="less" scoped>
@@ -385,5 +598,13 @@ const updateHttpProxySettings = (obj: Partial<HttpProxySetting>) => {
   &:hover {
     color: #fff;
   }
+}
+
+.step-title {
+  font-size: 12px;
+}
+
+.step-description {
+  font-size: 11px;
 }
 </style>

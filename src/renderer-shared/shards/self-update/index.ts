@@ -82,8 +82,7 @@ export class SelfUpdateRenderer implements IAkariShardInitDispose {
               progress: info.unpackingProgress,
               description: () =>
                 t('self-update-renderer.self-update-task.unpacking', {
-                  progress: (info.downloadingProgress * 100).toFixed(2),
-                  eta: formatSeconds(info.downloadTimeLeft)
+                  progress: (info.unpackingProgress * 100).toFixed(2)
                 })
             })
             break

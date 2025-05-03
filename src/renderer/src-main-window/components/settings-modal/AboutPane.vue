@@ -42,140 +42,6 @@
             src="https://img.shields.io/github/stars/Hanxven/LeagueAkari"
         /></a>
       </div>
-      <NCard size="small" style="margin-top: 16px">
-        <ControlItem
-          class="control-item-margin"
-          :label="t('AboutPane.checkUpdates')"
-          :label-description="
-            t('AboutPane.checkFrom', { source: UPDATE_SOURCE_MAP[sus.settings.downloadSource] })
-          "
-          :label-width="180"
-        >
-          <NFlex align="center">
-            <NButton
-              size="small"
-              :loading="sus.isCheckingUpdates"
-              secondary
-              type="primary"
-              @click="() => handleCheckUpdates()"
-              >{{ t('AboutPane.checkUpdates') }}</NButton
-            >
-            <NButton
-              size="small"
-              v-if="sus.currentRelease"
-              secondary
-              @click="() => handleShowUpdateModal()"
-            >
-              <template v-if="sus.currentRelease.isNew">
-                {{ t('AboutPane.newRelease') }}
-              </template>
-              <template v-else>
-                {{ t('AboutPane.currentRelease') }}
-              </template>
-            </NButton>
-            <NButton
-              size="small"
-              v-if="sus.currentRelease && sus.currentRelease.isNew"
-              :disabled="sus.updateProgressInfo !== null"
-              secondary
-              @click="() => su.startUpdate()"
-            >
-              {{ t('AboutPane.downloadRelease') }}
-            </NButton>
-            <NButton
-              size="small"
-              v-if="sus.updateProgressInfo"
-              secondary
-              type="warning"
-              @click="() => su.cancelUpdate()"
-              >{{ t('AboutPane.cancelUpdate') }}</NButton
-            >
-            <span v-if="sus.lastCheckAt" style="font-size: 12px"
-              >{{ t('AboutPane.lastCheckAt') }}
-              {{ dayjs(sus.lastCheckAt).locale(as.settings.locale.toLowerCase()).fromNow() }}</span
-            >
-          </NFlex>
-        </ControlItem>
-        <ControlItem
-          v-if="sus.updateProgressInfo"
-          class="control-item-margin"
-          :label="t('AboutPane.updateProgress.label')"
-          :label-description="t('AboutPane.updateProgress.description')"
-          :label-width="180"
-        >
-          <NSteps
-            size="small"
-            horizontal
-            :current="processStatus.current"
-            :status="processStatus.status"
-          >
-            <NStep>
-              <template #title>
-                <span class="step-title">{{ t('AboutPane.updateProgress.downloading') }}</span>
-              </template>
-              <div class="step-description">
-                {{
-                  t('AboutPane.updateProgress.finished', {
-                    progress: (sus.updateProgressInfo.downloadingProgress * 100).toFixed()
-                  })
-                }}
-              </div>
-              <div class="step-description" v-if="sus.updateProgressInfo.phase === 'downloading'">
-                {{
-                  t('AboutPane.updateProgress.remain', {
-                    time: formatSeconds(sus.updateProgressInfo.downloadTimeLeft, 1)
-                  })
-                }}
-              </div>
-              <div
-                class="step-description"
-                v-if="sus.updateProgressInfo.phase === 'download-failed'"
-              >
-                {{ t('AboutPane.updateProgress.downloadFailed') }}
-              </div>
-            </NStep>
-            <NStep>
-              <template #title>
-                <span class="step-title">{{ t('AboutPane.updateProgress.unpacking') }}</span>
-              </template>
-              <div class="step-description">
-                {{
-                  t('AboutPane.updateProgress.finished', {
-                    progress: (sus.updateProgressInfo.unpackingProgress * 100).toFixed()
-                  })
-                }}
-              </div>
-              <div class="step-description" v-if="sus.updateProgressInfo.phase === 'unpack-failed'">
-                {{ t('AboutPane.updateProgress.unpackFailed') }}
-              </div>
-            </NStep>
-            <NStep>
-              <template #title>
-                <span class="step-title">{{
-                  t('AboutPane.updateProgress.waitingForRestart')
-                }}</span>
-              </template>
-              <div class="step-description">
-                {{ t('AboutPane.updateProgress.waitingForRestartDescription') }}
-              </div>
-            </NStep>
-          </NSteps>
-        </ControlItem>
-        <ControlItem
-          class="control-item-margin"
-          :label="t('AboutPane.updateDir.label')"
-          :label-description="t('AboutPane.updateDir.description')"
-          :label-width="180"
-          v-if="
-            processStatus.current >= 2 ||
-            (processStatus.current === 1 && processStatus.status !== 'error')
-          "
-        >
-          <NButton size="small" secondary @click="() => su.openNewUpdatesDir()">{{
-            t('AboutPane.updateDir.open')
-          }}</NButton>
-        </ControlItem>
-      </NCard>
     </NScrollbar>
     <div class="about-para copyright">
       {{ t('AboutPane.copyright') }}
@@ -184,29 +50,16 @@
 </template>
 
 <script setup lang="ts">
-import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
-import { useInstance } from '@renderer-shared/shards'
 import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
-import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
-import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { LEAGUE_AKARI_GITHUB } from '@shared/constants/common'
-import { formatSeconds } from '@shared/utils/format'
-import dayjs from 'dayjs'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NCard, NFlex, NScrollbar, NStep, NSteps, useMessage } from 'naive-ui'
-import { computed, h, inject } from 'vue'
-
-const UPDATE_SOURCE_MAP = {
-  github: 'GitHub',
-  gitee: 'Gitee'
-}
+import { NScrollbar, useMessage } from 'naive-ui'
+import { h } from 'vue'
 
 const { t } = useTranslation()
 
 const as = useAppCommonStore()
-const sus = useSelfUpdateStore()
-const su = useInstance(SelfUpdateRenderer)
 
 const message = useMessage()
 
@@ -216,69 +69,6 @@ const handleClickEasterEgg = () => {
     keepAliveOnHover: true
   })
 }
-
-const handleCheckUpdates = async () => {
-  const { result, reason } = await su.checkUpdates()
-  switch (result) {
-    case 'no-updates':
-      message.success(() => t('AboutPane.checkUpdatesResult.no-updates'))
-      break
-    case 'new-updates':
-      message.success(() => t('AboutPane.checkUpdatesResult.new-updates'))
-      break
-    case 'failed':
-      message.warning(() => t('AboutPane.checkUpdatesResult.failed', { reason }))
-      break
-  }
-}
-
-const appInject = inject('app') as any
-
-const handleShowUpdateModal = async () => {
-  appInject.openUpdateModal()
-}
-
-const processStatus = computed(() => {
-  if (!sus.updateProgressInfo) {
-    return {
-      current: 0,
-      status: 'wait' as any // utilize 'any' to suppress type error
-    }
-  }
-
-  switch (sus.updateProgressInfo.phase) {
-    case 'downloading':
-      return {
-        current: 1,
-        status: 'process'
-      }
-    case 'download-failed':
-      return {
-        current: 1,
-        status: 'error'
-      }
-    case 'unpacking':
-      return {
-        current: 2,
-        status: 'process'
-      }
-    case 'unpack-failed':
-      return {
-        current: 2,
-        status: 'error'
-      }
-    case 'waiting-for-restart':
-      return {
-        current: 3,
-        status: 'process'
-      }
-    default:
-      return {
-        current: 0,
-        status: 'wait'
-      }
-  }
-})
 </script>
 
 <style lang="less" scoped>
@@ -319,13 +109,5 @@ const processStatus = computed(() => {
   .divider {
     background-color: rgba(0, 0, 0, 0.1);
   }
-}
-
-.step-title {
-  font-size: 12px;
-}
-
-.step-description {
-  font-size: 11px;
 }
 </style>
