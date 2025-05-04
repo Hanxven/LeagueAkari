@@ -1,6 +1,7 @@
 <template>
   <div
     class="sidebar-menu"
+    :class="{ 'test-page': currentActiveItem === 'test' }"
     ref="sidebar-menu"
     :style="{
       '--indicator-top': `${indicatorPosition.top}px`,
@@ -109,19 +110,31 @@ watch(
       height: var(--indicator-rail-height);
       top: var(--indicator-top);
       border-radius: 2px;
+
+      // now for dark only
       background-color: #26dd0e;
     }
 
     &::before {
       transition:
+        background-color 0.2s,
         top 0.2s cubic-bezier(0.65, 0, 0.35, 1),
         height 0.2s cubic-bezier(0.65, 0, 0.35, 1);
     }
 
     &::after {
       transition:
+        background-color 0.2s,
         top 0.16s cubic-bezier(0.65, 0, 0.35, 1),
         height 0.16s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+  }
+
+  // dedicated for test page
+  &.test-page .indicator-rail {
+    &::before,
+    &::after {
+      background-color: #f94395;
     }
   }
 }

@@ -19,8 +19,8 @@ import { useOngoingGameStore } from '@renderer-shared/shards/ongoing-game/store'
 import { AiStatus as AiStatusIcon } from '@vicons/carbon'
 import { Tools as ToolsIcon } from '@vicons/fa'
 import {
-  Games24Filled as Games24FilledIcon,
-  Warning20Filled as Warning20FilledIcon
+  AnimalRabbit28Filled as AnimalRabbit28FilledIcon,
+  Games24Filled as Games24FilledIcon
 } from '@vicons/fluent'
 import { InsertChartFilled as InsertChartFilledIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
@@ -85,7 +85,7 @@ const menu = computed(() => {
     },
     {
       key: 'test',
-      icon: renderIcon(Warning20FilledIcon),
+      icon: renderIcon(AnimalRabbit28FilledIcon),
       name: t('SideBarMenu.test'),
       show: import.meta.env.DEV || as.version.includes('rabi')
     }
