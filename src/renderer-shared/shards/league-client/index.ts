@@ -100,6 +100,9 @@ export class LeagueClientRenderer {
     this._handleSubscribedLcuEventDispatch()
 
     this._setup.addSetupFn(() => this._handleInitializationProgressShow())
+
+    // @ts-ignore
+    window.lcuApi = this.api
   }
 
   constructor(

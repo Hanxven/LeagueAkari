@@ -6,18 +6,6 @@
         This page is reserved for testing scenarios, can only be seen in dev or .rabi mode.
       </div>
       <div style="width: 100%; height: 1px; background: #fff4"></div>
-      <div
-        style="height: 600px; width: 200px; border: 1px solid #fff; border-radius: 4px; margin: 8px"
-      >
-        <MenuList v-model:current="value" :list="listData">
-          <template #header>
-            <div class="section-icon-container">
-              <NIcon class="section-icon"><ToolkitIcon /></NIcon>
-              <span class="session-label">{{ t('Toolkit.title') }}</span>
-            </div>
-          </template>
-        </MenuList>
-      </div>
       <HorizontalExpand :show>
         <div>should show me?</div>
       </HorizontalExpand>
@@ -50,12 +38,10 @@
 <script setup lang="ts">
 import SpinningIcon from '@renderer-shared/assets/icon/SpinningIcon.vue'
 import HorizontalExpand from '@renderer-shared/components/HorizontalExpand.vue'
-import MenuList from '@renderer-shared/components/menu-list/MenuList.vue'
 import { PREMADE_TEAM_COLORS } from '@renderer-shared/components/ongoing-game-panel/ongoing-game-utils'
 import { useInstance } from '@renderer-shared/shards'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { markdownIt } from '@renderer-shared/utils/markdown'
-import { ToolKit as ToolkitIcon } from '@vicons/carbon'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NScrollbar, useMessage } from 'naive-ui'
 import { Component as ComponentC, computed, h, reactive, ref } from 'vue'
@@ -71,35 +57,6 @@ const value = ref('1')
 const renderIcon = (icon: ComponentC) => {
   return () => h(NIcon, null, () => h(icon))
 }
-
-const listData = reactive([
-  {
-    id: '1',
-    label: 'Test 1',
-    icon: renderIcon(SpinningIcon)
-  },
-  {
-    id: '2',
-    label: 'Test 2'
-  },
-  {
-    id: '3',
-    label: '工具及测试'
-  },
-  {
-    id: '4',
-    label: 'Test 4',
-    icon: renderIcon(SpinningIcon)
-  },
-  {
-    id: '5',
-    label: 'Test 5'
-  },
-  {
-    id: '6',
-    label: 'Test 6'
-  }
-])
 
 const textT = useMarkdownTest()
 

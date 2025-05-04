@@ -14,7 +14,7 @@
       >
         <img
           style="height: 160px; width: 160px"
-          src="@renderer-shared/assets/logo.png"
+          src="@renderer-shared/assets/logo-hollow.svg"
           alt="Logo of League Akari"
         />
       </div>
