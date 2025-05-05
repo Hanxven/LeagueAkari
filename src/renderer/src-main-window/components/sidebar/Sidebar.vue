@@ -22,7 +22,7 @@ import {
   AnimalRabbit28Filled as AnimalRabbit28FilledIcon,
   Games24Filled as Games24FilledIcon
 } from '@vicons/fluent'
-import { InsertChartFilled as InsertChartFilledIcon } from '@vicons/material'
+import { AnalyticsRound as AnalyticsRoundIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NIcon } from 'naive-ui'
 import { Component as ComponentC, computed, h, ref, watch, watchEffect } from 'vue'
@@ -64,7 +64,7 @@ const menu = computed(() => {
   return [
     {
       key: 'match-history',
-      icon: renderIcon(InsertChartFilledIcon),
+      icon: renderIcon(AnalyticsRoundIcon),
       name: t('SideBarMenu.match-history')
     },
     {

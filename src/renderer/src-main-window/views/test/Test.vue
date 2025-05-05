@@ -6,10 +6,15 @@
         This page is reserved for testing scenarios, can only be seen in dev or .rabi mode.
       </div>
       <div style="width: 100%; height: 1px; background: #fff4"></div>
+      <!-- Horizontal Collapse Transition -->
       <HorizontalExpand :show>
         <div>should show me?</div>
       </HorizontalExpand>
       <NButton @click="show = !show">Toggle</NButton>
+      <NIcon style="font-size: 32px">
+        <SpinningIcon />
+      </NIcon>
+      <!-- Premade Teams Color Presets -->
       <div class="colors-container">
         <div
           class="card"
@@ -27,10 +32,8 @@
           <div class="info">borderColor: {{ team.borderColor }}</div>
         </div>
       </div>
+      <!-- Markdown Rendering Test -->
       <div class="markdown-text markdown-body" v-html="markdownHtmlText"></div>
-      <NIcon style="font-size: 32px">
-        <SpinningIcon />
-      </NIcon>
     </NScrollbar>
   </div>
 </template>
