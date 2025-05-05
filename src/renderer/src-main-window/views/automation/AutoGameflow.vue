@@ -25,7 +25,7 @@
             :label-width="260"
           >
             <NInputNumber
-              style="width: 80px"
+              style="width: 100px"
               :value="store.settings.autoAcceptDelaySeconds"
               @update:value="(value) => shard.setAutoAcceptDelaySeconds(value || 0)"
               :min="0"
@@ -97,7 +97,7 @@
               :min="1"
               :max="99"
               size="small"
-              style="width: 80px"
+              style="width: 100px"
             />
           </ControlItem>
           <ControlItem
@@ -107,7 +107,7 @@
             :label-width="260"
           >
             <NInputNumber
-              style="width: 80px"
+              style="width: 100px"
               :value="store.settings.autoMatchmakingDelaySeconds"
               @update:value="(value) => shard.setAutoMatchmakingDelaySeconds(value || 0)"
               placeholder="秒"
@@ -166,7 +166,7 @@
           >
             <NInputNumber
               :disabled="store.settings.autoMatchmakingRematchStrategy !== 'fixed-duration'"
-              style="width: 80px"
+              style="width: 100px"
               :value="store.settings.autoMatchmakingRematchFixedDuration"
               @update:value="(value) => shard.setAutoMatchmakingRematchFixedDuration(value || 2)"
               :min="1"

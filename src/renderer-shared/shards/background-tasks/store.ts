@@ -44,6 +44,12 @@ export interface BackgroundTask {
   actions: BackgroundTaskAction[]
 }
 
+export interface BackgroundTaskRef {
+  isRemoved: () => boolean
+  update: (task: Partial<Omit<BackgroundTask, 'id'>>) => void
+  remove: () => void
+}
+
 /**
  * store only
  */
@@ -57,7 +63,17 @@ export const useBackgroundTasksStore = defineStore('shard:background-tasks-rende
     }
   }
 
-  const createTask = (id: string, task?: Partial<Omit<BackgroundTask, 'id'>>) => {
+  const removeTask = (id: string) => {
+    const index = tasks.value.findIndex((t) => t.id === id)
+    if (index !== -1) {
+      tasks.value.splice(index, 1)
+    }
+  }
+
+  const createTask = (
+    id: string,
+    task?: Partial<Omit<BackgroundTask, 'id'>>
+  ): BackgroundTaskRef => {
     const newTask: BackgroundTask = {
       id,
       createAt: Date.now(),
@@ -69,12 +85,11 @@ export const useBackgroundTasksStore = defineStore('shard:background-tasks-rende
       ...task
     }
     tasks.value.push(newTask)
-  }
 
-  const removeTask = (id: string) => {
-    const index = tasks.value.findIndex((t) => t.id === id)
-    if (index !== -1) {
-      tasks.value.splice(index, 1)
+    return {
+      isRemoved: () => tasks.value.findIndex((t) => t.id === id) === -1,
+      update: (task: Partial<Omit<BackgroundTask, 'id'>>) => updateTask(id, task),
+      remove: () => removeTask(id)
     }
   }
 
