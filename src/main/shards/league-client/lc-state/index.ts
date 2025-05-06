@@ -207,9 +207,7 @@ export class LeagueClientData {
       }
     }
 
-    this._stateInitializer.register('login-login-queue-state', loadLoginQueueState, {
-      priority: 100
-    })
+    this._stateInitializer.register('login-login-queue-state', loadLoginQueueState)
 
     this._onLcuNotConnected(() => {
       this.login.setLoginQueueState(null)
@@ -238,25 +236,23 @@ export class LeagueClientData {
 
     const loadCurrentSummoner = async () => {
       try {
-        // 正在排队, 意味着无法拉取召唤师信息
-        // 通过设置加载优先级, 保证拉取排队信息一定在获取召唤师信息之前
-        if (this.login.loginQueueState) {
-          return
-        }
-
         const data = (await this._context.lc.api.summoner.getCurrentSummoner()).data
         this.summoner.setMe(data)
         this.summoner.setNewIdSystemEnabled(Boolean(data.tagLine))
       } catch (error) {
+        // sometimes it's not loaded yet but will receive the lcu event update soon
+        if (isAxiosError(error) && error.response?.status === 404) {
+          this.summoner.setMe(null)
+          return
+        }
+
         this._context.ipc.sendEvent(this._context.namespace, 'error-sync-data', 'get-summoner')
         this._context.log.warn(`获取召唤师信息失败`, error)
       }
     }
 
     // 由于优先级设置, 一定会在 login-queue 之后加载
-    this._stateInitializer.register('summoner-current-summoner', loadCurrentSummoner, {
-      priority: 50
-    })
+    this._stateInitializer.register('summoner-current-summoner', loadCurrentSummoner)
 
     this._onLcuNotConnected(() => {
       this.summoner.setMe(null)
