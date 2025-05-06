@@ -14,6 +14,7 @@
       <NIcon style="font-size: 32px">
         <SpinningIcon />
       </NIcon>
+      <TemplateEdit />
       <!-- Premade Teams Color Presets -->
       <div class="colors-container">
         <div
@@ -49,6 +50,7 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NScrollbar, useMessage } from 'naive-ui'
 import { Component as ComponentC, computed, h, reactive, ref } from 'vue'
 
+import TemplateEdit from './TemplateEdit.vue'
 import { useMarkdownTest } from './markdown-test'
 
 const lc = useInstance(LeagueClientRenderer)

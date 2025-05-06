@@ -2,8 +2,7 @@ on:
   push:
     branches:
       - main
-      - dev
-      - refactor
+      - deft-rabi
   workflow_dispatch:
 
 jobs:
