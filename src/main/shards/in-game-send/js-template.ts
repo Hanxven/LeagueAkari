@@ -1,3 +1,4 @@
+import { i18next } from '@main/i18n'
 import { AkariManager } from '@shared/akari-shard'
 
 const JS_TEMPLATE_VERSION_SUPPORT = 10
@@ -8,7 +9,7 @@ export const enum JS_TEMPLATE_CHECK_RESULT {
   NO_GET_METADATA = 'no-getMetadata',
   NO_METADATA = 'no-metadata',
   UNSUPPORTED_VERSION = 'unsupported-version',
-  NO_GET_LINES = 'no-getLines'
+  NO_GET_MESSAGES = 'no-getMessages'
 }
 
 export interface JSContextV1 {
@@ -38,9 +39,30 @@ export function checkContextV1(ctx: any): JS_TEMPLATE_CHECK_RESULT {
     return JS_TEMPLATE_CHECK_RESULT.UNSUPPORTED_VERSION
   }
 
-  if (typeof ctx.getLines !== 'function') {
-    return JS_TEMPLATE_CHECK_RESULT.NO_GET_LINES
+  if (typeof ctx.getMessages !== 'function') {
+    return JS_TEMPLATE_CHECK_RESULT.NO_GET_MESSAGES
   }
 
   return JS_TEMPLATE_CHECK_RESULT.VALID
+}
+
+export function getExampleTemplate() {
+  return `${i18next.t('in-game-send-main.exampleTemplate.getMetadataComment')}
+function getMetadata() {
+  return {
+    version: ${JS_TEMPLATE_VERSION_SUPPORT}
+  }
+}
+
+${i18next.t('in-game-send-main.exampleTemplate.getMessagesComment')}
+function getMessages(env) {
+  return [
+    '${i18next.t('in-game-send-main.exampleTemplate.toSend')} 1',
+    '${i18next.t('in-game-send-main.exampleTemplate.toSend')} 2',
+    '${i18next.t('in-game-send-main.exampleTemplate.toSend')} 3',
+    '${i18next.t('in-game-send-main.exampleTemplate.toSend')} 4',
+    '${i18next.t('in-game-send-main.exampleTemplate.toSend')} 5',
+  ]
+}
+`
 }

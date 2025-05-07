@@ -10,6 +10,13 @@ export interface CustomSend {
   shortcut: string | null
 }
 
+export interface TemplateDef {
+  id: string
+  name: string
+  code: string
+  isValid: boolean
+}
+
 export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () => {
   const settings = shallowReactive({
     customSend: [] as CustomSend[],
@@ -27,7 +34,9 @@ export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () 
 
     cancelShortcut: null as string | null,
 
-    sendInterval: 65
+    sendInterval: 65,
+
+    templates: [] as TemplateDef[]
   })
 
   return {

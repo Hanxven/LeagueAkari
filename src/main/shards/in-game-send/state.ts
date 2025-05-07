@@ -11,13 +11,7 @@ export interface CustomSend {
 export interface TemplateDef {
   id: string
   name: string
-  sendShortcut: string | null
-  sendAllyShortcut: string | null
-  sendEnemyShortcut: string | null
-  sendAllyWithAllPrefix: string | null // '/all' or something else
-  sendEnemyWithAllPrefix: string | null
-  content: string
-  isJsTemplate: boolean
+  code: string
   isValid: boolean
 }
 

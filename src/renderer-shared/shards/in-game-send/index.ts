@@ -3,9 +3,11 @@ import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { CustomSend, useInGameSendStore } from './store'
+import { CustomSend, TemplateDef, useInGameSendStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'in-game-send-main'
+
+// copied from main
 
 @Shard(InGameSendRenderer.id)
 export class InGameSendRenderer implements IAkariShardInitDispose {
@@ -101,5 +103,17 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
 
   onSendCustomTemplateSuccess(cb: () => void) {
     this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'success-send-stats-use-custom-template', cb)
+  }
+
+  createTemplate(data?: Partial<Omit<TemplateDef, 'id'>>): Promise<TemplateDef> {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'createTemplate', data)
+  }
+
+  updateTemplate(id: string, data: Omit<Partial<TemplateDef>, 'id'>) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateTemplate', id, data)
+  }
+
+  removeTemplate(id: string) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'removeTemplate', id)
   }
 }

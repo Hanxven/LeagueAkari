@@ -2192,6 +2192,13 @@ window-manager-main:
 ongoing-game-main:
   taggedPlayer: Tagged Player
 
+in-game-send-main:
+  newTemplate: New Template {{index}}
+  exampleTemplate:
+    toSend: Message to send
+    getMetadataComment: // Define the metadata of the template
+    getMessagesComment: // Define the messages of the template
+
 app:
   singleton: Because Akari is unique, there can only be ONE Akari at a time
 

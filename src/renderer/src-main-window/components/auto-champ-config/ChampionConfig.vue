@@ -11,7 +11,7 @@
         <div class="header">
           <template v-if="selectedId">
             <LcuImage class="header-icon" :src="championIconUri(selectedId)" />
-            <span>{{ currentSelected?.label }}</span>
+            <span>{{ lcs.gameData.champions[selectedId]?.name }}</span>
           </template>
           <template v-else>{{ t('ChampionConfig.configure') }}</template>
         </div>
@@ -379,7 +379,7 @@
         </div>
       </div>
     </NModal>
-    <NButton size="tiny" type="primary" @click="show = true" :disabled="!lcs.isConnected">{{
+    <NButton size="tiny" type="primary" @click="show = true">{{
       t('ChampionConfig.configure')
     }}</NButton>
   </div>
@@ -415,6 +415,7 @@ import {
   NRadioButton,
   NRadioGroup,
   NVirtualList,
+  selectDark,
   useMessage
 } from 'naive-ui'
 import { computed, ref, toRaw, watch } from 'vue'
@@ -699,10 +700,6 @@ const handleRestoreRunes = () => {
 
   message.success(() => t('ChampionConfig.runesRestored'))
 }
-
-const currentSelected = computed(() => {
-  return championOptions.value.find((b) => b.value === selectedId.value)
-})
 
 // 在可用时始终选择一个英雄
 watch(

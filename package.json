@@ -23,7 +23,6 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@hanxven/league-akari-addons": "^1.0.0",
     "@types/luaparse": "^0.2.12",
-    "@vueuse/router": "^13.1.0",
     "ajv": "^8.17.1",
     "axios": "^1.9.0",
     "axios-retry": "^4.5.0",
@@ -42,6 +41,8 @@
     "ws": "^8.18.1"
   },
   "devDependencies": {
+    "@codemirror/lang-javascript": "^6.2.3",
+    "@codemirror/theme-one-dark": "^6.1.2",
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@electron/notarize": "^3.0.1",
     "@modyfi/vite-plugin-yaml": "^1.1.1",
@@ -64,6 +65,8 @@
     "@vueuse/components": "^13.1.0",
     "@vueuse/core": "^13.1.0",
     "@vueuse/motion": "^3.0.3",
+    "@vueuse/router": "^13.1.0",
+    "codemirror": "^6.0.1",
     "electron": "^36.1.0",
     "electron-builder": "26.0.14",
     "electron-vite": "^3.1.0",
@@ -85,8 +88,9 @@
     "vite": "^6.3.4",
     "vite-plugin-vue-devtools": "^7.7.6",
     "vue": "^3.5.13",
+    "vue-codemirror": "^6.1.1",
     "vue-router": "^4.5.1",
     "vue-tsc": "^2.2.10"
   },
-  "packageManager": "yarn@4.6.0"
+  "packageManager": "yarn@4.9.1"
 }

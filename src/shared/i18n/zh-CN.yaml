@@ -2195,6 +2195,13 @@ window-manager-main:
 ongoing-game-main:
   taggedPlayer: 已标记的玩家
 
+in-game-send-main:
+  newTemplate: 新模板 {{index}}
+  exampleTemplate:
+    toSend: 要发送的内容
+    getMetadataComment: // 定义模板元数据
+    getMessagesComment: // 定义模板消息
+
 app:
   singleton: 因为 Akari 是独一无二的，所以同一时间只能有一个 Akari
 
