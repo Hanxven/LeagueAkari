@@ -33,6 +33,7 @@ function getMessages(env) {
 
 function getMetadata() {
   return {
-    version: 10
+    version: 10,
+    type: 'ongoing-game'
   }
 }

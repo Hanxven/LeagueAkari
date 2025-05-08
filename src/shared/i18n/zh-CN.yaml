@@ -1958,10 +1958,6 @@ InGameSend:
       label: 发送间隔 (ms)
       description: 模拟发送时的间隔时间
 
-  templates:
-    title: 模板
-    hint: '使用符合 JavaScript 语法的模板，组合要发送的文本。这些 JavaScript 脚本拥有较高的权限，可访问到任何本机文件，请<span style="font-weight: bold">始终</span>确认其安全性'
-
   compiled: 已编译
   saved: 已保存
   invalidTemplate: 所提供的模板无效，请检查语法
@@ -2100,6 +2096,8 @@ TemplateEdit:
   deletePopconfirm: 这将执行删除操作，且不可恢复
   noTemplateSelected: 未选中模板
   filterPlaceholder: 查找模板
+  title: 模板定义
+  hint: '使用符合 JavaScript 语法的模板，组合要发送的文本。这些 JavaScript 脚本拥有较高的权限，可访问到任何本机文件，请<span style="font-weight: bold">始终</span>确认其安全性'
 
 simple-notifications-renderer:
   liveStreamingHints:
@@ -2237,6 +2235,10 @@ in-game-send-main:
   templateTypes:
     ongoing-game: 对局模板
     unknown: 未知类型
+
+  templatePresets:
+    empty: 空白模板
+    ongoing-game: 默认对局模板
 
 app:
   singleton: 因为 Akari 是独一无二的，所以同一时间只能有一个 Akari

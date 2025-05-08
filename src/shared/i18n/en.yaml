@@ -1951,10 +1951,6 @@ InGameSend:
       label: Send Interval (ms)
       description: Set the interval between each simulated sending action
 
-  templates:
-    title: Templates
-    hint: 'Use a JavaScript template to combine the text to send. These JavaScript scripts have high privileges and can access any local file. Please <span style="font-weight: bold">ALWAYS</span> confirm their safety'
-
   compiled: Compiled
   saved: Saved
   invalidTemplate: The provided template is invalid. Please check the syntax
@@ -2097,6 +2093,8 @@ TemplateEdit:
   deletePopconfirm: This will perform a deletion operation and cannot be undone
   noTemplateSelected: No template selected
   filterPlaceholder: Search templates
+  hint: 'Use a JavaScript template to combine the text to send. These JavaScript scripts have high privileges and can access any local file. Please <span style="font-weight: bold">ALWAYS</span> confirm their safety'
+  title: Template Definitions
 
 simple-notifications-renderer:
   liveStreamingHints:
@@ -2230,9 +2228,14 @@ in-game-send-main:
         'Message 5'
       ]
     }
+
   templateTypes:
     ongoing-game: Ongoing Game Template
     unknown: Unknown Type
+
+  templatePresets:
+    empty: Empty Template
+    ongoing-game: Default Ongoing Game Template
 
 app:
   singleton: Because Akari is unique, there can only be ONE Akari at a time

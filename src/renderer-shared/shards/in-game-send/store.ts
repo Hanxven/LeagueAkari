@@ -22,22 +22,8 @@ export interface TemplateDef {
 export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () => {
   const settings = shallowReactive({
     customSend: [] as CustomSend[],
-
-    sendStatsEnabled: false,
-    sendStatsTemplate: {
-      template: '',
-      isValid: false
-    },
-    sendStatsUseDefaultTemplate: true,
-    sendAllyShortcut: null as string | null,
-    sendEnemyShortcut: null as string | null,
-    sendAllAlliesShortcut: null as string | null,
-    sendAllEnemiesShortcut: null as string | null,
-
     cancelShortcut: null as string | null,
-
     sendInterval: 65,
-
     templates: [] as TemplateDef[]
   })
 

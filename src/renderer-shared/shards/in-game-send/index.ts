@@ -109,6 +109,10 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'createTemplate', data)
   }
 
+  createPresetTemplate(key: string) {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'createPresetTemplate', key)
+  }
+
   updateTemplate(id: string, data: Omit<Partial<TemplateDef>, 'id'>) {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateTemplate', id, data)
   }
