@@ -15,6 +15,7 @@ export interface TemplateDef {
   name: string
   code: string
   isValid: boolean
+  type: string | null
   error: string | null
 }
 

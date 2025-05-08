@@ -311,6 +311,13 @@
         </NCard>
         <NCard size="small" style="margin-top: 8px">
           <template #header>
+            <span class="card-header-title">{{ t('InGameSend.templates.title') }}</span>
+          </template>
+          <div class="template-hint" v-html="t('InGameSend.templates.hint')" />
+          <TemplateEdit />
+        </NCard>
+        <NCard size="small" style="margin-top: 8px">
+          <template #header>
             <span class="card-header-title">{{ t('InGameSend.settings.title') }}</span>
           </template>
           <ControlItem
@@ -377,6 +384,7 @@ import {
 import { h, reactive, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
+import TemplateEdit from '@main-window/components/TemplateEdit.vue'
 
 const { t } = useTranslation()
 
@@ -531,6 +539,13 @@ watch(
   font-size: 14px;
   padding: 16px;
   border-radius: 4px;
+}
+
+.template-hint {
+  color: #fff8;
+  font-style: italic;
+  font-size: 13px;
+  margin-bottom: 12px;
 }
 
 [data-theme='dark'] {

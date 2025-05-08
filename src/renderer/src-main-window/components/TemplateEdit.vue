@@ -12,6 +12,7 @@
       <NInput
         v-if="igs2.settings.templates.length > 0"
         v-model:value="filterText"
+        :placeholder="t('TemplateEdit.filterPlaceholder')"
         class="filter-input"
         size="small"
         clearable
@@ -64,6 +65,9 @@
     <div class="right-content">
       <template v-if="currentItem">
         <div class="header">
+          <NTag size="small" :type="currentItem.type ? 'success' : 'error'">
+            {{ t(`in-game-send-main.templateTypes.${currentItem.type || 'unknown'}`) }}
+          </NTag>
           <NInput
             size="small"
             @blur="handleSaveName"
@@ -133,7 +137,16 @@ import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import { Add as AddIcon, Edit as EditIcon, Search as SearchIcon } from '@vicons/carbon'
 import { Warning20Filled as Warning20FilledIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NIcon, NInput, NPopconfirm, NPopover, NVirtualList, useMessage } from 'naive-ui'
+import {
+  NButton,
+  NIcon,
+  NInput,
+  NPopconfirm,
+  NPopover,
+  NTag,
+  NVirtualList,
+  useMessage
+} from 'naive-ui'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
@@ -327,6 +340,7 @@ watch(
   .header {
     display: flex;
     gap: 8px;
+    align-items: center;
 
     .title {
       font-size: 16px;

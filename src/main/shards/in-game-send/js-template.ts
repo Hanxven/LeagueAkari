@@ -9,6 +9,7 @@ export const enum JS_TEMPLATE_CHECK_RESULT {
   NO_GET_METADATA = 'no-getMetadata',
   NO_METADATA = 'no-metadata',
   UNSUPPORTED_VERSION = 'unsupported-version',
+  WRONG_TEMPLATE_TYPE = 'wrong-template-type',
   NO_GET_MESSAGES = 'no-getMessages'
 }
 
@@ -19,6 +20,11 @@ export interface JSContextV1 {
   getMetadata: () => { version: number }
   getLines: (env: any) => string[]
 }
+
+const SUPPORTED_TEMPLATE_TYPES = [
+  // 战绩类, 读取 ongoing-game 阶段的数据
+  'ongoing-game'
+]
 
 export function checkContextV1(ctx: any): JS_TEMPLATE_CHECK_RESULT {
   if (typeof ctx !== 'object') {
@@ -31,16 +37,27 @@ export function checkContextV1(ctx: any): JS_TEMPLATE_CHECK_RESULT {
 
   const metadata = ctx.getMetadata()
 
-  if (typeof metadata !== 'object' || typeof metadata.version !== 'number') {
+  if (typeof metadata !== 'object') {
     return JS_TEMPLATE_CHECK_RESULT.NO_METADATA
   }
 
-  if (metadata.version > JS_TEMPLATE_VERSION_SUPPORT) {
+  if (typeof metadata.version !== 'number' || metadata.version > JS_TEMPLATE_VERSION_SUPPORT) {
     return JS_TEMPLATE_CHECK_RESULT.UNSUPPORTED_VERSION
   }
 
-  if (typeof ctx.getMessages !== 'function') {
-    return JS_TEMPLATE_CHECK_RESULT.NO_GET_MESSAGES
+  if (typeof metadata.type !== 'string' || !SUPPORTED_TEMPLATE_TYPES.includes(metadata.type)) {
+    return JS_TEMPLATE_CHECK_RESULT.WRONG_TEMPLATE_TYPE
+  }
+
+  switch (metadata.type) {
+    case 'ongoing-game':
+      if (typeof ctx.getMessages !== 'function') {
+        return JS_TEMPLATE_CHECK_RESULT.NO_GET_MESSAGES
+      }
+      break
+
+    default:
+      return JS_TEMPLATE_CHECK_RESULT.WRONG_TEMPLATE_TYPE
   }
 
   return JS_TEMPLATE_CHECK_RESULT.VALID

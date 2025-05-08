@@ -50,7 +50,8 @@ import { useTranslation } from 'i18next-vue'
 import { NButton, NIcon, NScrollbar, useMessage } from 'naive-ui'
 import { Component as ComponentC, computed, h, reactive, ref } from 'vue'
 
-import TemplateEdit from './TemplateEdit.vue'
+import TemplateEdit from '@main-window/components/TemplateEdit.vue'
+
 import { useMarkdownTest } from './markdown-test'
 
 const lc = useInstance(LeagueClientRenderer)

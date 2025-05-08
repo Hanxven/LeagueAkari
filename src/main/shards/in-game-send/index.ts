@@ -813,8 +813,9 @@ export class InGameSendMain implements IAkariShardInitDispose {
   private _checkAllTemplates() {
     let somethingWrong = false
     for (const t of this.settings.templates) {
-      const [isValid, error] = this._checkAndUpdateContext(t.id, t.code)
+      const [isValid, metadata, error] = this._checkAndCreateContext(t.id, t.code)
       t.isValid = isValid
+      t.type = metadata?.type ?? null
       t.error = error ? formatError(error) : null
 
       if (!isValid) {
@@ -838,8 +839,9 @@ export class InGameSendMain implements IAkariShardInitDispose {
     if (data.code !== undefined) {
       that.code = data.code
 
-      const [isValid, error] = this._checkAndUpdateContext(id, data.code)
+      const [isValid, metadata, error] = this._checkAndCreateContext(id, data.code)
       that.isValid = isValid
+      that.type = metadata?.type ?? null
       that.error = error ? formatError(error) : null
 
       if (!isValid) {
@@ -870,10 +872,11 @@ export class InGameSendMain implements IAkariShardInitDispose {
     )
   }
 
-  private _checkAndUpdateContext(
+  // [isValid, metadata, error]
+  private _checkAndCreateContext(
     id: string,
     code: string
-  ): [boolean, JS_TEMPLATE_CHECK_RESULT | Error | null] {
+  ): [boolean, any | null, JS_TEMPLATE_CHECK_RESULT | Error | null] {
     this._vmContexts[id] = vm.createContext({
       ...this._getAkariContext(),
       template: this.settings.templates.find((item) => item.id === id)
@@ -884,13 +887,13 @@ export class InGameSendMain implements IAkariShardInitDispose {
       script.runInContext(this._vmContexts[id])
       const checkResult = checkContextV1(this._vmContexts[id])
       if (checkResult !== JS_TEMPLATE_CHECK_RESULT.VALID) {
-        return [false, checkResult]
+        return [false, null, checkResult]
       }
     } catch (error: any) {
-      return [false, error]
+      return [false, null, error]
     }
 
-    return [true, null]
+    return [true, this._vmContexts[id].getMetadata(), null]
   }
 
   private _createTemplate(data?: Partial<Omit<TemplateDef, 'id'>>) {
@@ -906,13 +909,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
         data?.name ||
         i18next.t('in-game-send-main.newTemplate', { index: this.settings.templates.length + 1 }),
       code: data?.code || getExampleTemplate(),
-      isValid: true
+      isValid: true,
+      type: null as string | null,
+      error: null as string | null
     }
 
-    const [isValid, error] = this._checkAndUpdateContext(id, that.code)
+    const [isValid, metadata, error] = this._checkAndCreateContext(id, that.code)
     that.isValid = isValid
-
-    // @ts-ignore
+    that.type = metadata?.type ?? null
     that.error = error ? formatError(error) : null
 
     if (!isValid) {
