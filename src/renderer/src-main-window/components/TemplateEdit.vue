@@ -65,8 +65,8 @@
     <div class="right-content">
       <template v-if="currentItem">
         <div class="header">
-          <NTag size="small" :type="currentItem.type ? 'success' : 'error'">
-            {{ t(`in-game-send-main.templateTypes.${currentItem.type || 'unknown'}`) }}
+          <NTag size="small" :type="currentItem.type !== 'unknown' ? 'success' : 'error'">
+            {{ t(`in-game-send-main.templateTypes.${currentItem.type}`) }}
           </NTag>
           <NInput
             size="small"

@@ -13,7 +13,7 @@ export interface TemplateDef {
   name: string
   code: string
   isValid: boolean
-  type: string | null
+  type: string
   error: string | null
 }
 

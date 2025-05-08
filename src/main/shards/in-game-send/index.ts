@@ -815,11 +815,10 @@ export class InGameSendMain implements IAkariShardInitDispose {
     for (const t of this.settings.templates) {
       const [isValid, metadata, error] = this._checkAndCreateContext(t.id, t.code)
       t.isValid = isValid
-      t.type = metadata?.type ?? null
+      t.type = metadata?.type ?? 'unknown'
       t.error = error ? formatError(error) : null
 
       if (!isValid) {
-        this._log.warn('脚本验证失败', t.id, t.name, error)
         somethingWrong = true
       }
     }
@@ -841,12 +840,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
       const [isValid, metadata, error] = this._checkAndCreateContext(id, data.code)
       that.isValid = isValid
-      that.type = metadata?.type ?? null
+      that.type = metadata?.type ?? 'unknown'
       that.error = error ? formatError(error) : null
-
-      if (!isValid) {
-        this._log.warn('脚本验证失败', that.id, that.name, error)
-      }
     }
 
     if (data.name !== undefined) {
@@ -890,6 +885,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
         return [false, null, checkResult]
       }
     } catch (error: any) {
+      this._log.warn('脚本验证失败', id, error)
       return [false, null, error]
     }
 
@@ -916,12 +912,8 @@ export class InGameSendMain implements IAkariShardInitDispose {
 
     const [isValid, metadata, error] = this._checkAndCreateContext(id, that.code)
     that.isValid = isValid
-    that.type = metadata?.type ?? null
+    that.type = metadata?.type ?? 'unknown'
     that.error = error ? formatError(error) : null
-
-    if (!isValid) {
-      this._log.warn('脚本验证失败', that.id, that.name, error)
-    }
 
     this._setting.set('templates', [...this.settings.templates, that])
 
