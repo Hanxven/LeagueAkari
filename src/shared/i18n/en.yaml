@@ -478,7 +478,7 @@ DebugSettings:
     TerminatedInError: 'Terminated in Error'
 
   inAdministrator:
-    description: League Akari is running with administrator privileges, required for certain client-specific functionalities.
+    description: League Akari is currently running with administrator privileges. Now, it is League Akari X.
 
   kyokoMode:
     label: Kyoko Mode
@@ -2081,6 +2081,18 @@ SummonerSpellsCdTimer:
 BackgroundTasks:
   taskTitle: Ongoing Tasks ({{countV}})
 
+TemplateEdit:
+  newButton: New Template
+  errorTitle: This template is invalid. Please check its validity
+  noTemplate: No Template
+  revertButton: Revert
+  saveButton: Save
+  deleteButton: Delete
+  saveSuccess: Saved {{name}}
+  deleteSuccess: Deleted {{name}}
+  deletePopconfirm: This will perform a deletion operation and cannot be undone
+  noTemplateSelected: No template selected
+
 simple-notifications-renderer:
   liveStreamingHints:
     dismiss: Dismiss
@@ -2194,10 +2206,24 @@ ongoing-game-main:
 
 in-game-send-main:
   newTemplate: New Template {{index}}
-  exampleTemplate:
-    toSend: Message to send
-    getMetadataComment: // Define the metadata of the template
-    getMessagesComment: // Define the messages of the template
+  exampleTemplate: |
+    // Define the metadata of the template
+    function getMetadata() {
+      return {
+        version: 10
+      }
+    }
+
+    // Define the messages of the template
+    function getMessages(env) {
+      return [
+        'Message 1',
+        'Message 2',
+        'Message 3',
+        'Message 4',
+        'Message 5',
+      ]
+    }
 
 app:
   singleton: Because Akari is unique, there can only be ONE Akari at a time

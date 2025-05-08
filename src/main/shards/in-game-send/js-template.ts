@@ -47,22 +47,5 @@ export function checkContextV1(ctx: any): JS_TEMPLATE_CHECK_RESULT {
 }
 
 export function getExampleTemplate() {
-  return `${i18next.t('in-game-send-main.exampleTemplate.getMetadataComment')}
-function getMetadata() {
-  return {
-    version: ${JS_TEMPLATE_VERSION_SUPPORT}
-  }
-}
-
-${i18next.t('in-game-send-main.exampleTemplate.getMessagesComment')}
-function getMessages(env) {
-  return [
-    '${i18next.t('in-game-send-main.exampleTemplate.toSend')} 1',
-    '${i18next.t('in-game-send-main.exampleTemplate.toSend')} 2',
-    '${i18next.t('in-game-send-main.exampleTemplate.toSend')} 3',
-    '${i18next.t('in-game-send-main.exampleTemplate.toSend')} 4',
-    '${i18next.t('in-game-send-main.exampleTemplate.toSend')} 5',
-  ]
-}
-`
+  return i18next.t('in-game-send-main.exampleTemplate')
 }

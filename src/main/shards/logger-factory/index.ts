@@ -53,7 +53,7 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
   private _objectsToString(...args: any[]) {
     return args
       .map((arg) => {
-        if (arg instanceof Error) {
+        if (arg instanceof Error || this._isLikelyErrorObject(arg)) {
           return formatError(arg)
         }
 
@@ -76,6 +76,23 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
         return arg
       })
       .join(' ')
+  }
+
+  private _isLikelyErrorObject(obj: any) {
+    if (!obj || typeof obj !== 'object') {
+      return false
+    }
+
+    const props = Object.getOwnPropertyNames(obj)
+
+    const hasStack = props.includes('stack') && typeof obj.stack === 'string'
+    const hasMessage = props.includes('message') && typeof obj.message === 'string'
+
+    if (hasStack || hasMessage) {
+      return true
+    }
+
+    return false
   }
 
   openLogsDir() {

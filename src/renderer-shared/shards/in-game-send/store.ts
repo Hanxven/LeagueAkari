@@ -15,6 +15,7 @@ export interface TemplateDef {
   name: string
   code: string
   isValid: boolean
+  error: string | null
 }
 
 export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () => {

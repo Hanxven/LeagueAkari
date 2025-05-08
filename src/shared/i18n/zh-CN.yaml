@@ -481,7 +481,7 @@ DebugSettings:
     TerminatedInError: '错误终止'
 
   inAdministrator:
-    description: League Akari 运行在管理员权限，仅用于实现特定的客户端功能
+    description: League Akari 目前以管理员权限运行。现在，它是 League Akari X。
 
   kyokoMode:
     label: Kyoko 模式
@@ -2084,6 +2084,18 @@ SummonerSpellsCdTimer:
 BackgroundTasks:
   taskTitle: 正在进行 ({{countV}})
 
+TemplateEdit:
+  newButton: 新模板
+  errorTitle: 这个模板存在问题，请检查其是否符合模板定义
+  noTemplate: 无模板
+  revertButton: 还原
+  saveButton: 保存
+  deleteButton: 删除
+  saveSuccess: 已保存 {{name}}
+  deleteSuccess: 已删除 {{name}}
+  deletePopconfirm: 这将执行删除操作，且不可恢复
+  noTemplateSelected: 未选中模板
+
 simple-notifications-renderer:
   liveStreamingHints:
     dismiss: 关闭
@@ -2197,10 +2209,24 @@ ongoing-game-main:
 
 in-game-send-main:
   newTemplate: 新模板 {{index}}
-  exampleTemplate:
-    toSend: 要发送的内容
-    getMetadataComment: // 定义模板元数据
-    getMessagesComment: // 定义模板消息
+  exampleTemplate: |
+    // 定义模板元数据
+    function getMetadata() {
+      return {
+        version: 10
+      }
+    }
+
+    // 定义模板消息
+    function getMessages(env) {
+      return [
+        '消息 1',
+        '消息 2',
+        '消息 3',
+        '消息 4',
+        '消息 5',
+      ]
+    }
 
 app:
   singleton: 因为 Akari 是独一无二的，所以同一时间只能有一个 Akari

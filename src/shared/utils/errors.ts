@@ -9,6 +9,10 @@ export function formatError(e: any) {
     return `${e.message} ${e.stack}`
   }
 
+  if (typeof e === 'object' && e !== null) {
+    return `${e.message} ${e.stack}`
+  }
+
   return e
 }
 

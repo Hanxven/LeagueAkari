@@ -3,6 +3,7 @@ import { i18next } from '@main/i18n'
 import { IAkariShardInitDispose, Shard, SharedGlobalShard } from '@shared/akari-shard'
 import { isBotQueue } from '@shared/types/league-client/game-data'
 import { isPveQueue } from '@shared/types/league-client/match-history'
+import { formatError } from '@shared/utils/errors'
 import { sleep } from '@shared/utils/sleep'
 import { Eta } from 'eta'
 import { TemplateFunction } from 'eta/dist/types/compile'
@@ -21,12 +22,7 @@ import { OngoingGameMain } from '../ongoing-game'
 import { SettingFactoryMain } from '../setting-factory'
 import { SetterSettingService } from '../setting-factory/setter-setting-service'
 import defaultTemplate from './default-template.ejs?asset'
-import {
-  JSContextV1,
-  JS_TEMPLATE_CHECK_RESULT,
-  checkContextV1,
-  getExampleTemplate
-} from './js-template'
+import { JS_TEMPLATE_CHECK_RESULT, checkContextV1, getExampleTemplate } from './js-template'
 import { CustomSend, InGameSendSettings, InGameSendState, TemplateDef } from './state'
 
 /**
@@ -794,7 +790,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       InGameSendMain.id,
       'createTemplate',
       (_, data?: Partial<Omit<TemplateDef, 'id'>>) => {
-        return this._createEmptyTemplate(data)
+        return this._createTemplate(data)
       }
     )
 
@@ -809,6 +805,28 @@ export class InGameSendMain implements IAkariShardInitDispose {
     this._ipc.onCall(InGameSendMain.id, 'removeTemplate', (_, id: string) => {
       this._removeTemplate(id)
     })
+
+    this._checkAllTemplates()
+  }
+
+  // 初始化时检查模板
+  private _checkAllTemplates() {
+    let somethingWrong = false
+    for (const t of this.settings.templates) {
+      const [isValid, error] = this._checkAndUpdateContext(t.id, t.code)
+      t.isValid = isValid
+      t.error = error ? formatError(error) : null
+
+      if (!isValid) {
+        this._log.warn('脚本验证失败', t.id, t.name, error)
+        somethingWrong = true
+      }
+    }
+
+    // 触发一次更新
+    if (somethingWrong) {
+      this._setting.set('templates', [...this.settings.templates])
+    }
   }
 
   private _updateTemplate(id: string, data: Partial<Omit<TemplateDef, 'id' | 'isValid'>>) {
@@ -817,10 +835,18 @@ export class InGameSendMain implements IAkariShardInitDispose {
       return
     }
 
-    // 更新普通属性
     if (data.code !== undefined) {
       that.code = data.code
+
+      const [isValid, error] = this._checkAndUpdateContext(id, data.code)
+      that.isValid = isValid
+      that.error = error ? formatError(error) : null
+
+      if (!isValid) {
+        this._log.warn('脚本验证失败', that.id, that.name, error)
+      }
     }
+
     if (data.name !== undefined) {
       that.name = data.name
     }
@@ -844,32 +870,75 @@ export class InGameSendMain implements IAkariShardInitDispose {
     )
   }
 
-  private _createEmptyTemplate(data?: Partial<Omit<TemplateDef, 'id'>>) {
+  private _checkAndUpdateContext(
+    id: string,
+    code: string
+  ): [boolean, JS_TEMPLATE_CHECK_RESULT | Error | null] {
+    this._vmContexts[id] = vm.createContext({
+      ...this._getAkariContext(),
+      template: this.settings.templates.find((item) => item.id === id)
+    })
+
+    try {
+      const script = new vm.Script(code)
+      script.runInContext(this._vmContexts[id])
+      const checkResult = checkContextV1(this._vmContexts[id])
+      if (checkResult !== JS_TEMPLATE_CHECK_RESULT.VALID) {
+        return [false, checkResult]
+      }
+    } catch (error: any) {
+      return [false, error]
+    }
+
+    return [true, null]
+  }
+
+  private _createTemplate(data?: Partial<Omit<TemplateDef, 'id'>>) {
     if (this.settings.templates.length >= InGameSendMain.MAX_CUSTOM_SEND) {
       return
     }
 
     const id = crypto.randomUUID()
 
-    const obj = {
+    const that = {
       id,
       name:
         data?.name ||
         i18next.t('in-game-send-main.newTemplate', { index: this.settings.templates.length + 1 }),
-      code: getExampleTemplate(),
-      isValid: true // 默认模板一定是正确的
+      code: data?.code || getExampleTemplate(),
+      isValid: true
     }
 
-    this._setting.set('templates', [...this.settings.templates, obj])
+    const [isValid, error] = this._checkAndUpdateContext(id, that.code)
+    that.isValid = isValid
 
-    return obj
+    // @ts-ignore
+    that.error = error ? formatError(error) : null
+
+    if (!isValid) {
+      this._log.warn('脚本验证失败', that.id, that.name, error)
+    }
+
+    this._setting.set('templates', [...this.settings.templates, that])
+
+    return that
   }
 
   private _getAkariContext() {
     return {
-      // at the discretion of the user. We believe that the user will can well handle it
-      require: require,
-      akariManager: this._shared.manager
+      // at the discretion of the user. We believe that the user can well handle it
+      require,
+      process,
+      akariManager: this._shared.manager,
+      console,
+      module,
+      __filename,
+      __dirname,
+      mainGlobal: global,
+      Buffer,
+      setTimeout,
+      setInterval,
+      setImmediate
     }
   }
 }

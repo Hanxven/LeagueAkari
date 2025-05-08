@@ -13,6 +13,7 @@ export interface TemplateDef {
   name: string
   code: string
   isValid: boolean
+  error: string | null
 }
 
 export class InGameSendSettings {

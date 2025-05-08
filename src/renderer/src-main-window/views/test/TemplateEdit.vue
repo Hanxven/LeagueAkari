@@ -1,76 +1,127 @@
 <template>
-  <NCard size="small">
-    <div class="template-edit">
-      <div class="left-list">
-        <NButton type="primary" secondary class="button-new" size="small" @click="handleNew">
-          <template #icon>
-            <NIcon>
-              <AddIcon />
-            </NIcon>
-          </template>
-          New
-        </NButton>
-        <NInput v-model:value="filterText" class="filter-input" size="small" clearable>
-          <template #prefix>
-            <NIcon>
-              <SearchIcon />
-            </NIcon>
-          </template>
-        </NInput>
-        <NVirtualList
-          class="list"
-          :padding-top="4"
-          :item-size="30"
-          key-field="id"
-          :padding-bottom="4"
-          :items="filteredItems"
-        >
-          <template #default="{ item }">
-            <div
-              @click="updateActiveItem(item.id)"
-              class="list-item"
-              :class="{ active: item.id === activeItemId }"
-            >
-              {{ item.name }}
-            </div>
-          </template>
-        </NVirtualList>
-      </div>
-      <div class="right-content">
-        <template v-if="currentItem">
-          <div class="header">
-            <div class="title">{{ currentItem?.name }}</div>
-            <div class="actions">
-              <NButton size="small" secondary @click="handleRevert" :disabled="!changed">
-                Revert
-              </NButton>
-              <NButton size="small" secondary @click="handleSave" :disabled="!changed">
-                Save
-              </NButton>
-              <NButton size="small" secondary type="warning" @click="handleDelete">
-                Delete
-              </NButton>
-            </div>
-          </div>
-          <Codemirror
-            class="editor"
-            v-model="tempCode"
-            :style="{ flex: 1, height: 0, borderRadius: '2px', overflow: 'hidden' }"
-            :autofocus="true"
-            :indent-with-tab="true"
-            :tab-size="2"
-            :extensions="[javascript(), oneDark]"
-            @change="handleChange"
-          />
+  <div class="template-edit">
+    <div class="left-list">
+      <NButton type="primary" secondary class="button-new" size="small" @click="handleNew">
+        <template #icon>
+          <NIcon>
+            <AddIcon />
+          </NIcon>
         </template>
-        <template v-else>
-          <div class="empty">
-            <div class="empty-text">No template selected</div>
+        {{ t('TemplateEdit.newButton') }}
+      </NButton>
+      <NInput
+        v-if="igs2.settings.templates.length > 0"
+        v-model:value="filterText"
+        class="filter-input"
+        size="small"
+        clearable
+      >
+        <template #prefix>
+          <NIcon>
+            <SearchIcon />
+          </NIcon>
+        </template>
+      </NInput>
+      <NVirtualList
+        v-if="igs2.settings.templates.length > 0"
+        class="list"
+        :padding-top="4"
+        :item-size="30"
+        key-field="id"
+        :padding-bottom="4"
+        :items="filteredItems"
+      >
+        <template #default="{ item }">
+          <div
+            @click="updateActiveItem(item.id)"
+            class="list-item"
+            :class="{ active: item.id === activeItemId }"
+          >
+            <span class="name">{{ item.name }}</span>
+            <NPopover v-if="!item.isValid" placement="right">
+              <template #trigger>
+                <NIcon class="invalid-icon">
+                  <Warning20FilledIcon />
+                </NIcon>
+              </template>
+              <div :class="$style['error-message']">
+                <div :class="$style['error-title']">
+                  {{ t('TemplateEdit.errorTitle') }}
+                </div>
+                <div :class="$style['error-divider']"></div>
+                <div :class="$style['error-content']">{{ item.error }}</div>
+              </div>
+            </NPopover>
           </div>
         </template>
+      </NVirtualList>
+      <div v-else class="empty">
+        <div class="empty-text">
+          {{ t('TemplateEdit.noTemplate') }}
+        </div>
       </div>
     </div>
-  </NCard>
+    <div class="right-content">
+      <template v-if="currentItem">
+        <div class="header">
+          <NInput
+            size="small"
+            @blur="handleSaveName"
+            @keydown.enter="handleSaveName"
+            v-if="isEditingName"
+            v-model:value="tempName"
+            ref="nameInputEl"
+          />
+          <div v-else class="title" @click="handleShowEditNameInput">
+            <span class="name">{{ currentItem.name }}</span>
+            <NIcon>
+              <EditIcon />
+            </NIcon>
+          </div>
+          <div class="actions">
+            <NButton size="small" secondary @click="handleRevert" :disabled="!changed">
+              {{ t('TemplateEdit.revertButton') }}
+            </NButton>
+            <NButton size="small" secondary @click="handleSave" :disabled="!changed">
+              {{ t('TemplateEdit.saveButton') }}
+            </NButton>
+            <NPopconfirm
+              @positive-click="handleDelete"
+              :positive-button-props="{
+                size: 'tiny',
+                type: 'error'
+              }"
+              :negative-button-props="{
+                size: 'tiny'
+              }"
+            >
+              <template #trigger>
+                <NButton size="small" secondary type="error">
+                  {{ t('TemplateEdit.deleteButton') }}
+                </NButton>
+              </template>
+              <div>{{ t('TemplateEdit.deletePopconfirm') }}</div>
+            </NPopconfirm>
+          </div>
+        </div>
+        <Codemirror
+          class="editor"
+          v-model="tempCode"
+          :style="{ flex: 1, height: 0, borderRadius: '2px', overflow: 'hidden' }"
+          :autofocus="true"
+          :indent-with-tab="true"
+          :tab-size="2"
+          :extensions="[javascript(), oneDark]"
+          @change="handleChange"
+        />
+      </template>
+      <template v-else>
+        <div class="empty">
+          <div class="empty-text">{{ t('TemplateEdit.noTemplateSelected') }}</div>
+        </div>
+      </template>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -78,17 +129,24 @@ import { javascript } from '@codemirror/lang-javascript'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { useInstance } from '@renderer-shared/shards'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
-import { TemplateDef, useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
-import { Add as AddIcon, Search as SearchIcon } from '@vicons/carbon'
-import { NButton, NCard, NIcon, NInput, NVirtualList, useMessage } from 'naive-ui'
-import { computed, onMounted, ref, watch } from 'vue'
+import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
+import { Add as AddIcon, Edit as EditIcon, Search as SearchIcon } from '@vicons/carbon'
+import { Warning20Filled as Warning20FilledIcon } from '@vicons/fluent'
+import { useTranslation } from 'i18next-vue'
+import { NButton, NIcon, NInput, NPopconfirm, NPopover, NVirtualList, useMessage } from 'naive-ui'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
+
+const { t } = useTranslation()
 
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)
 
 const message = useMessage()
 const activeItemId = ref<string | null>(null)
+
+const isEditingName = ref(false)
+const tempName = ref('')
 const tempCode = ref('') // for temporarily use
 
 const currentItem = computed(() => {
@@ -98,7 +156,9 @@ const currentItem = computed(() => {
 const changed = ref(false)
 const filterText = ref('')
 const filteredItems = computed(() => {
-  return igs2.settings.templates.filter((item) => item.name.includes(filterText.value))
+  return igs2.settings.templates.filter(
+    (item) => item.name.includes(filterText.value) || item.id.includes(filterText.value)
+  )
 })
 
 const updateActiveItem = (id: string) => {
@@ -111,24 +171,42 @@ watch(
     if (item) {
       activeItemId.value = item.id
       tempCode.value = item.code
+      isEditingName.value = false
       changed.value = false
     }
   },
   { immediate: true }
 )
 
+const nameInputEl = useTemplateRef('nameInputEl')
+const handleShowEditNameInput = () => {
+  if (currentItem.value) {
+    isEditingName.value = true
+    tempName.value = currentItem.value.name
+    nextTick(() => {
+      nameInputEl.value?.focus()
+    })
+  }
+}
+
+const handleSaveName = async () => {
+  if (currentItem.value) {
+    igs.updateTemplate(currentItem.value.id, { name: tempName.value })
+    isEditingName.value = false
+  }
+}
+
 const handleRevert = () => {
   if (currentItem.value) {
-    tempCode.value = currentItem.value.code // shallow copy it
+    tempCode.value = currentItem.value.code
     changed.value = false
-    message.success(`Reverted ${currentItem.value.name}`)
   }
 }
 
 const handleSave = () => {
   if (currentItem.value) {
-    igs.updateTemplate(currentItem.value.id, { ...currentItem.value, code: tempCode.value })
-    message.success(`Saved ${currentItem.value.name}`)
+    igs.updateTemplate(currentItem.value.id, { code: tempCode.value })
+    message.success(() => t('TemplateEdit.saveSuccess', { name: currentItem.value!.name }))
   }
 }
 
@@ -138,8 +216,9 @@ const handleChange = (_: string, __: any) => {
 
 const handleDelete = () => {
   if (currentItem.value) {
+    let name = currentItem.value.name
     igs.removeTemplate(currentItem.value.id)
-    message.success(`Deleted ${currentItem.value.name}`)
+    message.success(() => t('TemplateEdit.deleteSuccess', { name }))
   }
 }
 
@@ -150,12 +229,12 @@ const handleNew = async () => {
 
 watch(
   () => igs2.settings.templates,
-  (_) => {
-    console.log('changed', _)
-
-    if (!currentItem.value && igs2.settings.templates.length > 0) {
-      updateActiveItem(igs2.settings.templates[0].id)
-    }
+  (templates) => {
+    nextTick(() => {
+      if (!currentItem.value && templates.length > 0) {
+        updateActiveItem(igs2.settings.templates[0].id)
+      }
+    })
   },
   { immediate: true }
 )
@@ -164,7 +243,6 @@ watch(
 <style lang="less" scoped>
 .template-edit {
   display: flex;
-  width: 798px;
   height: 600px;
   border: 1px solid #fff1;
 }
@@ -201,9 +279,6 @@ watch(
       cursor: pointer;
       transition: background-color 0.2s;
       margin: 0 4px 2px 4px;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
       font-size: 12px;
 
       &:hover {
@@ -213,6 +288,31 @@ watch(
       &.active {
         background-color: #fff2;
       }
+
+      .name {
+        flex-grow: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .invalid-icon {
+        font-size: 14px;
+        color: #ffd900e0;
+        margin-left: auto;
+      }
+    }
+  }
+
+  .empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .empty-text {
+      font-size: 16px;
+      color: #fff1;
     }
   }
 }
@@ -226,15 +326,29 @@ watch(
 
   .header {
     display: flex;
+    gap: 8px;
 
     .title {
       font-size: 16px;
       font-weight: bold;
       flex-grow: 1;
       width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: color 0.2s;
+
+      .name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &:hover {
+        color: #fff;
+      }
     }
 
     .actions {
@@ -269,5 +383,24 @@ watch(
 .right-content {
   padding: 8px;
   box-sizing: border-box;
+}
+</style>
+
+<style lang="less" module>
+.error-message {
+  .error-title {
+    font-size: 12px;
+  }
+
+  .error-divider {
+    height: 1px;
+    background-color: #fff2;
+    margin: 8px 0;
+  }
+
+  .error-content {
+    font-size: 12px;
+    white-space: pre-wrap;
+  }
 }
 </style>

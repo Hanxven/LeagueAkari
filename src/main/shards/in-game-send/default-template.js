@@ -2,7 +2,7 @@
  * 默认模板
  * @returns {string[]}
  */
-function getLines(env) {
+function getMessages(env) {
   if (!env.playerStats) return []
 
   const puuids = env.targetMembers
@@ -29,4 +29,10 @@ function getLines(env) {
     )
 
   return items
+}
+
+function getMetadata() {
+  return {
+    version: 10
+  }
 }
