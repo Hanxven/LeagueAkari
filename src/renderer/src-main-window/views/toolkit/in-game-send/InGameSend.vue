@@ -2,7 +2,8 @@
   <div class="single-root">
     <NScrollbar class="outer-wrapper">
       <div class="inner-wrapper">
-        <TemplateEdit />
+        <SendableItemEdit />
+        <TemplateEdit style="margin-top: 8px" />
         <NCard size="small" style="margin-top: 8px">
           <template #header>
             <span class="card-header-title">{{ t('InGameSend.settings.title') }}</span>
@@ -53,57 +54,18 @@ import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import { useTranslation } from 'i18next-vue'
-import { NCard, NInputNumber, NScrollbar, useDialog } from 'naive-ui'
-import { reactive, ref, watch, watchEffect } from 'vue'
+import { NCard, NInputNumber, NScrollbar } from 'naive-ui'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
 
+import SendableItemEdit from './SendableItemEdit.vue'
 import TemplateEdit from './TemplateEdit.vue'
 
 const { t } = useTranslation()
 
 const as = useAppCommonStore()
 const igs = useInGameSendStore()
-
 const ig = useInstance(InGameSendRenderer)
-
-const currentCustomSendTab = ref('')
-
-const tempMessageInput: Record<string, string> = reactive({})
-const tempNameInput: Record<string, string> = reactive({})
-
-watchEffect(() => {
-  // 永远保证有一个 tab 是打开的
-  const currentTab = igs.settings.customSend.findIndex((s) => s.id === currentCustomSendTab.value)
-  if (currentTab === -1 && igs.settings.customSend.length) {
-    currentCustomSendTab.value = igs.settings.customSend[0].id
-  }
-})
-
-watch(
-  () => igs.settings.customSend,
-  (list) => {
-    for (const item of list) {
-      tempNameInput[item.id] = item.name
-      tempMessageInput[item.id] = item.message
-    }
-  },
-  { immediate: true }
-)
-
-const lastSendCustomTemplateError = ref<{
-  reason: string
-} | null>()
-
-ig.onSendCustomTemplateError((message) => {
-  lastSendCustomTemplateError.value = {
-    reason: message
-  }
-})
-
-ig.onSendCustomTemplateSuccess(() => {
-  lastSendCustomTemplateError.value = null
-})
 </script>
 
 <style lang="less" scoped>

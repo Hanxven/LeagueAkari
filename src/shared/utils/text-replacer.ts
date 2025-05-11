@@ -19,5 +19,5 @@ class TextReplacer {
 }
 
 export const defaultReplacer = new TextReplacer({
-  萝莉: '咯力'
+  暴走萝莉: '金克斯'
 })

@@ -1890,58 +1890,6 @@ EasyToLaunch:
   failedMessage: 'Failed to launch {{name}}: {{reason}}'
 
 InGameSend:
-  sendStats:
-    title: Player Stats Sending
-    titleRequireAdmin: Player Stats Sending (Admin Required)
-    enabled:
-      label: Enable
-      description: Send statistical analysis of teammates or enemies during champion selection or in-game
-    sendAllyShortcut:
-      label: Send Ally Shortcut
-      description: Set a shortcut key to send ally statistical analysis
-    sendEnemyShortcut:
-      label: Send Enemy Shortcut
-      description: Set a shortcut key to send enemy statistical analysis
-    sendAllAlliesShortcut:
-      label: Send /all Ally Shortcut
-      description: Set a shortcut key to send global ally statistical analysis. The content sent will include the `/all` prefix on each line
-    sendAllEnemiesShortcut:
-      label: Send /all Enemy Shortcut
-      description: Set a shortcut key to send global enemy statistical analysis. The content sent will include the `/all` prefix on each line
-    sendStatsUseDefaultTemplate:
-      label: Use Default Template
-      description: Use the default sending template to send basic KDA information
-    sendStatsTemplate:
-      label: Custom Template
-      inputPlaceholder: Provide a sending template
-      submitButton: Update Template
-      cancelButton: Cancel Changes
-      description: The entries sent will use a custom template following EJS-style (ETA) format syntax. The final output should be text divided by lines, and blank lines will be ignored
-      descriptionDanger: The content of this template will be executed by the application and has high privileges. Please always confirm its safety
-      descriptionReferTo: Refer to the <a href="{{url}}" target="_blank">Templates</a>
-    dryRun:
-      label: Dry Run
-      description: Preview the output at the current point in time
-      button: Dry Run
-      buttonAllies: Dry Run (Allies)
-      buttonEnemies: Dry Run (Enemies)
-
-  customSend:
-    title: Custom Sending
-    titleRequireAdmin: Custom Sending (Admin Required)
-    newItem: New Item
-    unnamed: (Unnamed)
-    enabled: Enable
-    name: Name
-    shortcut: Set Shortcut
-    message: Set Text to Send
-    emptyPlaceholder: No custom sending items
-    buttonAdd: Add
-    delete:
-      label: Delete
-      button: Delete
-      popconfirm: Confirm deletion of this custom sending item?
-
   settings:
     title: Settings
     cancelShortcut:
@@ -1950,18 +1898,6 @@ InGameSend:
     sendInterval:
       label: Send Interval (ms)
       description: Set the interval between each simulated sending action
-
-  compiled: Compiled
-  saved: Saved
-  invalidTemplate: The provided template is invalid. Please check the syntax
-
-  # message dry-run
-  not-compiled: Template not compiled. Please check the syntax
-  stage-unavailable: Not in a match query stage
-  execution-error: Error occurred while executing the template. Please check the template logic for correctness
-  error: Unknown error
-  errorSendStatsUseCustomTemplateTitle: Custom Template Error
-  confirm: Confirm
 
 ChampionConfig:
   targetMode: Target Mode
@@ -2095,6 +2031,53 @@ TemplateEdit:
   filterPlaceholder: Search templates
   hint: 'Use a JavaScript template to combine the text to send. These JavaScript scripts have high privileges and can access any local file. Please <span style="font-weight: bold">ALWAYS</span> confirm their safety'
   title: Template Definitions
+
+SendableItemEdit:
+  title: Sendable Item
+  newButton: New Sendable Item
+  errorTitle: This sendable item is invalid. Please check its validity
+  noSendableItem: No Sendable Item
+  noSendableItemSelected: No sendable item selected
+  filterPlaceholder: Search sendable items
+  revertButton: Revert
+  saveButton: Save
+  deleteButton: Delete
+  errorTemplateInvalid: Invalid template used
+  plaintextPlaceholder: |
+    Provide the text split by lines here, like:
+    First line
+    Second line
+    Third line
+  itemEnabled: Enabled
+  deleteSuccess: Deleted {{name}}
+  deletePopconfirm: This will perform a deletion operation and cannot be undone
+  saveSuccess: Saved {{name}}
+
+  contentType:
+    label: Content Type
+    description:
+      plaintext: Plain text type will send the content split by lines
+      template: Dynamic template will use JavaScript script to generate sending content
+  enabled:
+    label: Enable This Sendable Item
+  template:
+    label: Use Template
+    description: Use this template to generate sending content
+  sendAllShortcut:
+    label: Send All Shortcut
+    description: Send content to all players in the game
+  sendAllyShortcut:
+    label: Send All Allies Shortcut
+    description: Send content to all allies in the game
+  sendEnemyShortcut:
+    label: Send All Enemies Shortcut
+    description: Send content to all enemies in the game
+  dryRun:
+    label: Dry Run
+    description: Dry run the sending content, will not actually send
+    all: All
+    ally: Allies
+    enemy: Enemies
 
 simple-notifications-renderer:
   liveStreamingHints:
@@ -2236,6 +2219,12 @@ in-game-send-main:
   templatePresets:
     empty: Empty Template
     ongoing-game: Default Ongoing Game Template
+
+  sendableItemPresets:
+    plaintext: Plain Text
+    template: Template
+
+  newSendableItem: New Sendable Item {{index}}
 
 app:
   singleton: Because Akari is unique, there can only be ONE Akari at a time

@@ -74,7 +74,7 @@ const renderText = (node: string | (() => VNodeChild)) => {
 }
 
 .task-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
 }
 

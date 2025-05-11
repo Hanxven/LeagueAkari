@@ -3697,13 +3697,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eta@npm:^3.5.0":
-  version: 3.5.0
-  resolution: "eta@npm:3.5.0"
-  checksum: 10c0/28ffc23658e3d77c1ab2660d0158b979688457659fc190d0edca26c186ab34039bec9d6745d975e5f0543981e285cd757bff85b47ea2374ab11444e2b7271dd0
-  languageName: node
-  linkType: hard
-
 "eventemitter3@npm:^5.0.1":
   version: 5.0.1
   resolution: "eventemitter3@npm:5.0.1"
@@ -4922,7 +4915,6 @@ __metadata:
     electron: "npm:^36.1.0"
     electron-builder: "npm:26.0.14"
     electron-vite: "npm:^3.1.0"
-    eta: "npm:^3.5.0"
     fast-csv: "npm:^5.0.2"
     html-to-image: "npm:^1.11.13"
     i18next: "npm:^25.0.2"

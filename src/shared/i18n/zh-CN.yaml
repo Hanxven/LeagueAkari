@@ -1896,59 +1896,6 @@ EasyToLaunch:
   failedMessage: 无法启动进程 {{name}}：{{reason}}
 
 InGameSend:
-  sendStats:
-    title: 对局玩家信息发送
-    titleRequireAdmin: 对局玩家信息发送 (需要管理员权限)
-    enabled:
-      label: 启用
-      description: 在英雄选择或对局中，发送队友或敌方的数据统计分析
-    sendAllyShortcut:
-      label: 发送己方快捷键
-      description: 设置快捷键，以发送己方数据统计分析
-    sendEnemyShortcut:
-      label: 发送敌方快捷键
-      description: 设置快捷键，以发送敌方数据统计分析
-    sendAllAlliesShortcut:
-      label: 发送全局己方快捷键
-      description: 设置快捷键，以发送全局己方数据统计分析。发送的内容每行会添加 /all 前缀
-    sendAllEnemiesShortcut:
-      label: 发送全局敌方快捷键
-      description: 设置快捷键，以发送全局敌方数据统计分析。发送的内容每行会添加 /all 前缀
-    sendStatsUseDefaultTemplate:
-      label: 使用默认模板
-      description: 使用默认的发送模板，发送基础的 KDA 信息
-    sendStatsTemplate:
-      label: 自定义模板
-      inputPlaceholder: 提供发送模板
-      submitButton: 更新模板
-      cancelButton: 取消更改
-      description: 发送条目将使用自定义模板，要求遵循 EJS 式 (ETA) 格式语法。最终的输出内容应该为按行分割的文本，空行将被忽略
-      descriptionDanger: 该模板的内容指令会被应用执行，拥有较高的权限。请始终确认其安全性
-      descriptionReferTo: 可参考 <a href="{{url}}" target="_blank">模板</a>
-
-    dryRun:
-      label: 试运行
-      description: 当前时间节点的即将输出内容
-      button: 试运行
-      buttonAllies: 试运行 (友方)
-      buttonEnemies: 试运行 (敌方)
-
-  customSend:
-    title: 自定义发送
-    titleRequireAdmin: 自定义发送 (需要管理员权限)
-    newItem: 新项
-    unnamed: (未命名)
-    enabled: 启用
-    name: 名称
-    shortcut: 设置快捷键
-    message: 设置发送文本行
-    emptyPlaceholder: 当前无自定义发送项目
-    buttonAdd: 添加
-    delete:
-      label: 删除
-      button: 删除
-      popconfirm: 确认删除该自定义发送项目？
-
   settings:
     title: 发送设置
     cancelShortcut:
@@ -1957,18 +1904,6 @@ InGameSend:
     sendInterval:
       label: 发送间隔 (ms)
       description: 模拟发送时的间隔时间
-
-  compiled: 已编译
-  saved: 已保存
-  invalidTemplate: 所提供的模板无效，请检查语法
-
-  # message dry-run
-  not-compiled: 模板未编译，请检查模板语法
-  stage-unavailable: 未处于对局查询阶段中
-  execution-error: 执行模板时出错，请检查模板逻辑正确性
-  error: 未知错误
-  errorSendStatsUseCustomTemplateTitle: 发送自定义模板时出错
-  confirm: 确认
 
 ChampionConfig:
   targetMode: 目标模式
@@ -2097,7 +2032,54 @@ TemplateEdit:
   noTemplateSelected: 未选中模板
   filterPlaceholder: 查找模板
   title: 模板定义
-  hint: '使用符合 JavaScript 语法的模板，组合要发送的文本。这些 JavaScript 脚本拥有较高的权限，可访问到任何本机文件，请<span style="font-weight: bold">始终</span>确认其安全性'
+  hint: '使用符合 JavaScript 语法的模板，组合要发送的文本。这些 JavaScript 脚本拥有完全的系统权限，请<span style="font-weight: bold">始终</span>确认其安全性'
+
+SendableItemEdit:
+  title: 发送项
+  newButton: 新发送项
+  errorTitle: 这个发送项存在问题，请检查其是否符合发送项定义
+  noSendableItem: 无发送项
+  noSendableItemSelected: 未选中发送项
+  filterPlaceholder: 查找发送项
+  revertButton: 还原
+  saveButton: 保存
+  deleteButton: 删除
+  errorTemplateInvalid: 使用了无效的模板
+  plaintextPlaceholder: |
+    在这里提供按行分割的文本，比如：
+    第一行
+    第二行
+    第三行
+  itemEnabled: 已启用
+  deleteSuccess: 已删除 {{name}}
+  deletePopconfirm: 这将执行删除操作，且不可恢复
+  saveSuccess: 已保存 {{name}}
+
+  enabled:
+    label: 启用此发送项
+  contentType:
+    label: 发送项类型
+    description:
+      plaintext: 纯文本类型会发送按行分割的内容
+      template: 动态模板将使用 JavaScript 脚本生成发送内容
+  template:
+    label: 使用此模板
+    description: 使用此模板生成发送内容
+  sendAllShortcut:
+    label: 发送所有玩家快捷键
+    description: 发送内容是本局中所有的玩家信息
+  sendEnemyShortcut:
+    label: 发送所有敌人快捷键
+    description: 发送内容是本局中所有的敌人信息
+  sendAllyShortcut:
+    label: 发送所有队友快捷键
+    description: 发送内容是本局中所有的队友信息
+  dryRun:
+    label: 试运行
+    description: 试运行发送内容，不会实际发送
+    all: 全部
+    ally: 友方
+    enemy: 敌方
 
 simple-notifications-renderer:
   liveStreamingHints:
@@ -2239,6 +2221,12 @@ in-game-send-main:
   templatePresets:
     empty: 空白模板
     ongoing-game: 默认对局模板
+
+  sendableItemPresets:
+    plaintext: 纯文本
+    template: 基于模板
+
+  newSendableItem: 新发送项 {{index}}
 
 app:
   singleton: 因为 Akari 是独一无二的，所以同一时间只能有一个 Akari

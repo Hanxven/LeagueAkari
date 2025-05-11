@@ -3,7 +3,7 @@ import { Dep, IAkariShardInitDispose, Shard } from '@shared/akari-shard'
 import { AkariIpcRenderer } from '../ipc'
 import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
 import { SettingUtilsRenderer } from '../setting-utils'
-import { CustomSend, TemplateDef, useInGameSendStore } from './store'
+import { SendableItem, TemplateDef, useInGameSendStore } from './store'
 
 const MAIN_SHARD_NAMESPACE = 'in-game-send-main'
 
@@ -31,55 +31,32 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     this._pm.sync(MAIN_SHARD_NAMESPACE, 'settings', store.settings)
   }
 
-  setSendStatsEnabled(enabled: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'sendStatsEnabled', enabled)
-  }
-
-  setSendStatsUseDefaultTemplate(useDefault: boolean) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'sendStatsUseDefaultTemplate', useDefault)
-  }
-
-  setSendAllyShortcut(shortcut: string | null) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'sendAllyShortcut', shortcut)
-  }
-
-  setSendEnemyShortcut(shortcut: string | null) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'sendEnemyShortcut', shortcut)
-  }
-
-  setSendAllAlliesShortcut(shortcut: string | null) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'sendAllAlliesShortcut', shortcut)
-  }
-
-  setSendAllEnemiesShortcut(shortcut: string | null) {
-    return this._setting.set(MAIN_SHARD_NAMESPACE, 'sendAllEnemiesShortcut', shortcut)
+  getSendableItemShortcutTargetId(id: string) {
+    return {
+      ally: `${MAIN_SHARD_NAMESPACE}/sendable-item/${id}/send-ally`,
+      enemy: `${MAIN_SHARD_NAMESPACE}/sendable-item/${id}/send-enemy`,
+      all: `${MAIN_SHARD_NAMESPACE}/sendable-item/${id}/send-all`
+    }
   }
 
   setCancelShortcut(shortcut: string | null) {
     return this._setting.set(MAIN_SHARD_NAMESPACE, 'cancelShortcut', shortcut)
   }
 
-  createCustomSend(name: string): Promise<CustomSend> {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'createCustomSend', name)
+  createSendableItem(data?: Partial<SendableItem>): Promise<SendableItem | undefined> {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'createSendableItem', data)
   }
 
-  updateCustomSend(id: string, data: Omit<Partial<CustomSend>, 'id'>) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateCustomSend', id, data)
+  updateSendableItem(id: string, data: Partial<SendableItem>): Promise<SendableItem | undefined> {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateSendableItem', id, data)
   }
 
-  deleteCustomSend(id: string) {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'deleteCustomSend', id)
+  removeSendableItem(id: string): Promise<boolean> {
+    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'removeSendableItem', id)
   }
 
   shortcutTargetId(id: string) {
     return `${MAIN_SHARD_NAMESPACE}/custom-send/${id}`
-  }
-
-  updateSendStatsTemplate(template: string): Promise<{
-    template: string
-    isValid: boolean
-  }> {
-    return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateSendStatsTemplate', template)
   }
 
   setSendInterval(interval: number) {
@@ -97,15 +74,7 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'dryRunStatsSend', target)
   }
 
-  onSendCustomTemplateError(cb: (message: string) => void) {
-    this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'error-send-stats-use-custom-template', cb)
-  }
-
-  onSendCustomTemplateSuccess(cb: () => void) {
-    this._ipc.onEventVue(MAIN_SHARD_NAMESPACE, 'success-send-stats-use-custom-template', cb)
-  }
-
-  createTemplate(data?: Partial<Omit<TemplateDef, 'id'>>): Promise<TemplateDef> {
+  createTemplate(data?: Partial<TemplateDef>): Promise<TemplateDef | undefined> {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'createTemplate', data)
   }
 
@@ -113,11 +82,11 @@ export class InGameSendRenderer implements IAkariShardInitDispose {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'createPresetTemplate', key)
   }
 
-  updateTemplate(id: string, data: Omit<Partial<TemplateDef>, 'id'>) {
+  updateTemplate(id: string, data: Partial<TemplateDef>): Promise<TemplateDef | undefined> {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'updateTemplate', id, data)
   }
 
-  removeTemplate(id: string) {
+  removeTemplate(id: string): Promise<boolean> {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'removeTemplate', id)
   }
 }

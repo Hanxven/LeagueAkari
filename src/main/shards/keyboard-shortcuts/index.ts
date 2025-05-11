@@ -15,7 +15,7 @@ interface ShortcutDetails {
 }
 
 /**
- * 管理员权限下, 处理全局范围的键盘快捷键的模块
+ * 管理员权限下, 处理全局范围的键盘快捷键的模块, 基于全局事件钩子
  * 提供订阅和事件分发服务
  */
 @Shard(KeyboardShortcutsMain.id)
@@ -297,7 +297,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
 
     this._registrationMap.set(shortcutId, { type, targetId, cb })
     this._targetIdMap.set(targetId, shortcutId)
-    this._log.info(`注册快捷键 ${shortcutId} (${type})`)
+    this._log.info(`注册快捷键 ${shortcutId} ${targetId} (${type})`)
   }
 
   unregister(shortcutId: string) {
@@ -305,7 +305,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     if (options) {
       this._registrationMap.delete(shortcutId)
       this._targetIdMap.delete(options.targetId)
-      this._log.info(`注销快捷键 ${shortcutId}`)
+      this._log.info(`注销快捷键 ${shortcutId} ${options.targetId}`)
       return true
     }
     return false
@@ -316,6 +316,7 @@ export class KeyboardShortcutsMain implements IAkariShardInitDispose {
     if (shortcutId) {
       this._registrationMap.delete(shortcutId)
       this._targetIdMap.delete(targetId)
+      this._log.info(`注销快捷键 ${shortcutId} ${targetId}`)
       return true
     }
     return false

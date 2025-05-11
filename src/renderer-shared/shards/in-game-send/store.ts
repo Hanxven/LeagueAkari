@@ -1,15 +1,44 @@
 import { defineStore } from 'pinia'
-import { shallowReactive } from 'vue'
+import { shallowReactive, shallowRef } from 'vue'
 
 // copied from main shard
-export interface CustomSend {
+export interface SendableItemContentPlaintext {
+  type: 'plaintext'
+  content: string
+}
+
+export interface SendableItemContentTemplate {
+  type: 'template'
+  templateId: string | null
+}
+
+export type SendableItemContent = SendableItemContentPlaintext | SendableItemContentTemplate
+
+export interface SendableItem {
   id: string
   name: string
   enabled: boolean
-  message: string
-  shortcut: string | null
-}
 
+  /**
+   * 通用快捷键, 或发送到全局
+   */
+  sendAllShortcut: string | null
+
+  /**
+   * 发送到己方
+   */
+  sendAllyShortcut: string | null
+
+  /**
+   * 发送到敌方
+   */
+  sendEnemyShortcut: string | null
+
+  /**
+   * 内容
+   */
+  content: SendableItemContent
+}
 export interface TemplateDef {
   id: string
   name: string
@@ -21,10 +50,10 @@ export interface TemplateDef {
 
 export const useInGameSendStore = defineStore('shard:in-game-send-renderer', () => {
   const settings = shallowReactive({
-    customSend: [] as CustomSend[],
+    sendableItems: [] as SendableItem[],
+    templates: [] as TemplateDef[],
     cancelShortcut: null as string | null,
-    sendInterval: 65,
-    templates: [] as TemplateDef[]
+    sendInterval: 65
   })
 
   return {

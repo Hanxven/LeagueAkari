@@ -1,3 +1,8 @@
+const CONFIG = {
+  // 发送组队信息
+  sendPremadeInfo: false
+}
+
 /**
  * 默认模板
  * @returns {string[]}

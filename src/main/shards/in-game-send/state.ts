@@ -1,13 +1,42 @@
 import { makeAutoObservable, observable } from 'mobx'
 
-export interface CustomSend {
+// TODO -> migration needed
+export interface SendableItemContentPlaintext {
+  type: 'plaintext'
+  content: string
+}
+
+export interface SendableItemContentTemplate {
+  type: 'template'
+  templateId: string | null // sometimes it may refer to an invalid template
+}
+
+export type SendableItemContent = SendableItemContentPlaintext | SendableItemContentTemplate
+
+export interface SendableItem {
   id: string
   name: string
   enabled: boolean
-  message: string
-  shortcut: string | null
-  textSource: 'plaintext' | 'template'
-  templateId: string | null
+
+  /**
+   * 通用快捷键, 或发送到全局
+   */
+  sendAllShortcut: string | null
+
+  /**
+   * 发送到己方
+   */
+  sendAllyShortcut: string | null
+
+  /**
+   * 发送到敌方
+   */
+  sendEnemyShortcut: string | null
+
+  /**
+   * 内容
+   */
+  content: SendableItemContent
 }
 
 export interface TemplateDef {
@@ -20,32 +49,18 @@ export interface TemplateDef {
 }
 
 export class InGameSendSettings {
-  customSend: CustomSend[] = []
-  sendStatsEnabled: boolean = false
-  sendStatsTemplate = {
-    template: '',
-    isValid: false
-  }
+  sendableItems: SendableItem[] = []
+  templates: TemplateDef[] = []
 
   cancelShortcut: string | null = null
   sendInterval: number = 65
 
-  // experimental feature
-  templates: TemplateDef[] = []
-
-  setSendStatsEnabled(enabled: boolean) {
-    this.sendStatsEnabled = enabled
+  setCancelShortcut(shortcut: string | null) {
+    this.cancelShortcut = shortcut
   }
 
-  setSendStatsTemplate(template: string, valid: boolean) {
-    this.sendStatsTemplate = {
-      template,
-      isValid: valid
-    }
-  }
-
-  setCustomSend(customSend: CustomSend[]) {
-    this.customSend = customSend
+  setSendableItems(customSend: SendableItem[]) {
+    this.sendableItems = customSend
   }
 
   setSendInterval(interval: number) {
@@ -54,8 +69,7 @@ export class InGameSendSettings {
 
   constructor() {
     makeAutoObservable(this, {
-      customSend: observable.ref,
-      sendStatsTemplate: observable.ref,
+      sendableItems: observable.ref,
       templates: observable.ref
     })
   }
@@ -63,6 +77,6 @@ export class InGameSendSettings {
 
 export class InGameSendState {
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {})
   }
 }

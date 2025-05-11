@@ -1,5 +1,4 @@
 import { i18next } from '@main/i18n'
-import { AkariManager } from '@shared/akari-shard'
 
 const JS_TEMPLATE_VERSION_SUPPORT = 10
 
@@ -14,11 +13,8 @@ export const enum JS_TEMPLATE_CHECK_RESULT {
 }
 
 export interface JSContextV1 {
-  require: NodeJS.Require
-  akariManager: AkariManager
-
-  getMetadata: () => { version: number }
-  getLines: (env: any) => string[]
+  getMetadata: () => { version: number; type: string }
+  getMessages: (env: any) => string[]
 }
 
 const SUPPORTED_TEMPLATE_TYPES = [

@@ -58,5 +58,6 @@
   },
   "[properties]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
-  }
+  },
+  "compile-hero.disable-compile-files-on-did-save-code": true
 }

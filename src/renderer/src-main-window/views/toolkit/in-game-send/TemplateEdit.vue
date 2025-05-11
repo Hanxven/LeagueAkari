@@ -11,7 +11,7 @@
           placement="bottom-start"
           :options="dropdownOptions"
           size="small"
-          :theme-overrides="{ color: '#222e', fontSizeSmall: '13px', optionHeightSmall: '26px' }"
+          :theme-overrides="DROPDOWN_OVERRIDES"
           @select="handleDropdownSelect"
         >
           <NButton type="primary" secondary class="button-new" size="small">
@@ -203,6 +203,8 @@ import {
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
+import { DROPDOWN_OVERRIDES } from './style-overrides'
+
 const { t } = useTranslation()
 
 const igs2 = useInGameSendStore()
@@ -265,7 +267,6 @@ watch(
   () => currentItem.value,
   (item) => {
     if (item) {
-      activeItemId.value = item.id
       tempCode.value = item.code
       isEditingName.value = false
       changed.value = false
@@ -315,13 +316,6 @@ const handleDelete = () => {
     let name = currentItem.value.name
     igs.removeTemplate(currentItem.value.id)
     message.success(() => t('TemplateEdit.deleteSuccess', { name }))
-  }
-}
-
-const handleNew = async () => {
-  const newItem = await igs.createTemplate()
-  if (newItem) {
-    updateActiveItem(newItem.id)
   }
 }
 
