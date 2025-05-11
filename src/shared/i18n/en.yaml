@@ -2052,6 +2052,8 @@ SendableItemEdit:
   deleteSuccess: Deleted {{name}}
   deletePopconfirm: This will perform a deletion operation and cannot be undone
   saveSuccess: Saved {{name}}
+  dryRunEmpty: Dry run result is empty
+  dryRunError: 'Dry run failed: {{reason}}'
 
   contentType:
     label: Content Type
@@ -2063,14 +2065,16 @@ SendableItemEdit:
   template:
     label: Use Template
     description: Use this template to generate sending content
+  sendShortcut:
+    label: Send Shortcut
   sendAllShortcut:
     label: Send All Shortcut
     description: Send content to all players in the game
   sendAllyShortcut:
-    label: Send All Allies Shortcut
+    label: Send Allies Shortcut
     description: Send content to all allies in the game
   sendEnemyShortcut:
-    label: Send All Enemies Shortcut
+    label: Send Enemies Shortcut
     description: Send content to all enemies in the game
   dryRun:
     label: Dry Run

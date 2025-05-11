@@ -2054,6 +2054,8 @@ SendableItemEdit:
   deleteSuccess: 已删除 {{name}}
   deletePopconfirm: 这将执行删除操作，且不可恢复
   saveSuccess: 已保存 {{name}}
+  dryRunError: 试运行失败：{{reason}}
+  dryRunEmpty: 试运行结果为空
 
   enabled:
     label: 启用此发送项
@@ -2065,14 +2067,16 @@ SendableItemEdit:
   template:
     label: 使用此模板
     description: 使用此模板生成发送内容
+  sendShortcut:
+    label: 发送快捷键
   sendAllShortcut:
     label: 发送所有玩家快捷键
     description: 发送内容是本局中所有的玩家信息
   sendEnemyShortcut:
-    label: 发送所有敌人快捷键
+    label: 发送敌人快捷键
     description: 发送内容是本局中所有的敌人信息
   sendAllyShortcut:
-    label: 发送所有队友快捷键
+    label: 发送队友快捷键
     description: 发送内容是本局中所有的队友信息
   dryRun:
     label: 试运行

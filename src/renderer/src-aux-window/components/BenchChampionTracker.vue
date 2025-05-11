@@ -329,8 +329,6 @@ const sendToChat = async () => {
     })
   })
 
-  messages.unshift(t('BenchChampionTracker.diceUsageTitle'))
-
   try {
     await lc.api.chat.chatSend(chatRoomId, defaultReplacer.replace(messages.join('\n')))
   } catch (error: any) {

@@ -171,9 +171,24 @@
               />
             </ControlItem>
             <ControlItem
+              :label="t('SendableItemEdit.sendShortcut.label')"
+              :label-width="200"
+              v-if="currentItem.content.type === 'plaintext'"
+            >
+              <ShortcutSelector
+                :disabled="!as.isAdministrator"
+                :shortcut-id="currentItem.sendAllShortcut"
+                :target-id="igs.getSendableItemShortcutTargetId(currentItem.id).all"
+                @update:shortcut-id="
+                  (id) => igs.updateSendableItem(currentItem!.id, { sendAllShortcut: id })
+                "
+              />
+            </ControlItem>
+            <ControlItem
               :label="t('SendableItemEdit.sendAllShortcut.label')"
               :label-width="200"
               :label-description="t('SendableItemEdit.sendAllShortcut.description')"
+              v-if="currentItem.content.type === 'template'"
             >
               <ShortcutSelector
                 :disabled="!as.isAdministrator"
@@ -188,6 +203,7 @@
               :label="t('SendableItemEdit.sendAllyShortcut.label')"
               :label-width="200"
               :label-description="t('SendableItemEdit.sendAllyShortcut.description')"
+              v-if="currentItem.content.type === 'template'"
             >
               <ShortcutSelector
                 :disabled="!as.isAdministrator"
@@ -202,6 +218,7 @@
               :label="t('SendableItemEdit.sendEnemyShortcut.label')"
               :label-width="200"
               :label-description="t('SendableItemEdit.sendEnemyShortcut.description')"
+              v-if="currentItem.content.type === 'template'"
             >
               <ShortcutSelector
                 :disabled="!as.isAdministrator"
@@ -216,11 +233,33 @@
               :label="t('SendableItemEdit.dryRun.label')"
               :label-width="200"
               :label-description="t('SendableItemEdit.dryRun.description')"
+              v-if="currentItem.content.type === 'template'"
             >
               <div class="button-group">
-                <NButton secondary size="tiny">{{ t('SendableItemEdit.dryRun.all') }}</NButton>
-                <NButton secondary size="tiny">{{ t('SendableItemEdit.dryRun.ally') }}</NButton>
-                <NButton secondary size="tiny">{{ t('SendableItemEdit.dryRun.enemy') }}</NButton>
+                <NButton
+                  :disabled="!currentItem.content.templateId"
+                  secondary
+                  size="tiny"
+                  @click="handleDryRun(currentItem.content.templateId!, 'all')"
+                >
+                  {{ t('SendableItemEdit.dryRun.all') }}
+                </NButton>
+                <NButton
+                  :disabled="!currentItem.content.templateId"
+                  secondary
+                  size="tiny"
+                  @click="handleDryRun(currentItem.content.templateId!, 'ally')"
+                >
+                  {{ t('SendableItemEdit.dryRun.ally') }}
+                </NButton>
+                <NButton
+                  :disabled="!currentItem.content.templateId"
+                  secondary
+                  size="tiny"
+                  @click="handleDryRun(currentItem.content.templateId!, 'enemy')"
+                >
+                  {{ t('SendableItemEdit.dryRun.enemy') }}
+                </NButton>
               </div>
             </ControlItem>
           </div>
@@ -293,21 +332,23 @@ import {
 import { Warning20Filled as Warning20FilledIcon } from '@vicons/fluent'
 import { useTranslation } from 'i18next-vue'
 import {
+  DialogReactive,
   NButton,
   NCard,
-  NCheckbox,
   NDropdown,
   NEllipsis,
   NIcon,
   NInput,
   NPopconfirm,
   NPopover,
+  NScrollbar,
   NSelect,
   NSwitch,
   NVirtualList,
+  useDialog,
   useMessage
 } from 'naive-ui'
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { computed, h, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'
@@ -504,6 +545,49 @@ watch(
   },
   { immediate: true }
 )
+
+const dialog = useDialog()
+const dialogRef = shallowRef<DialogReactive>()
+
+const handleDryRun = async (templateId: string, target: 'ally' | 'enemy' | 'all') => {
+  try {
+    const result = await igs.getDryRunResult(templateId, target)
+
+    dialogRef.value?.destroy()
+    dialogRef.value = dialog.create({
+      type: 'info',
+      title: 'Dry Run',
+      content: () =>
+        h(
+          NScrollbar,
+          {
+            style: { maxHeight: '80vh' }
+          },
+          () =>
+            result.length > 0
+              ? h(
+                  'div',
+                  result.map((line) => h('div', line))
+                )
+              : h(
+                  'div',
+                  {
+                    style: {
+                      color: '#fff8'
+                    }
+                  },
+                  '(' + t('SendableItemEdit.dryRunEmpty') + ')'
+                )
+        )
+    })
+  } catch (error: any) {
+    message.error(() =>
+      t('SendableItemEdit.dryRunError', {
+        reason: error.message
+      })
+    )
+  }
+}
 </script>
 
 <style lang="less" scoped>

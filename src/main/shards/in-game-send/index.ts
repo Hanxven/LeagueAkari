@@ -177,6 +177,16 @@ export class InGameSendMain implements IAkariShardInitDispose {
     }
   }
 
+  private _getDryRunResult(templateId: string, target: 'ally' | 'enemy' | 'all') {
+    const ctx = this._vmContexts[templateId] as JSContextV1
+    if (!ctx) {
+      this._log.warn('未找到模板上下文', templateId)
+      return null
+    }
+
+    return ctx.getMessages(this._createTemplateEnv({ target }))
+  }
+
   /**
    * 在英雄选择阶段和在游戏中, 会采用不同的策略
    * @param strs
@@ -296,16 +306,21 @@ export class InGameSendMain implements IAkariShardInitDispose {
       item.sendAllShortcut = data.sendAllShortcut
     }
 
-    if (data.sendAllyShortcut !== undefined) {
+    if (item.content.type === 'template' && data.sendAllyShortcut !== undefined) {
       item.sendAllyShortcut = data.sendAllyShortcut
     }
 
-    if (data.sendEnemyShortcut !== undefined) {
+    if (item.content.type === 'template' && data.sendEnemyShortcut !== undefined) {
       item.sendEnemyShortcut = data.sendEnemyShortcut
     }
 
     if (data.content !== undefined) {
       item.content = data.content
+
+      if (data.content.type === 'plaintext') {
+        item.sendAllyShortcut = null
+        item.sendEnemyShortcut = null
+      }
     }
 
     this._tryApplyingSendableItemShortcuts(item)
@@ -369,6 +384,14 @@ export class InGameSendMain implements IAkariShardInitDispose {
     this._ipc.onCall(InGameSendMain.id, 'removeTemplate', (_, id: string) => {
       this._removeTemplate(id)
     })
+
+    this._ipc.onCall(
+      InGameSendMain.id,
+      'getDryRunResult',
+      (_, templateId: string, target: 'ally' | 'enemy' | 'all') => {
+        return this._getDryRunResult(templateId, target)
+      }
+    )
   }
 
   private _handleTemplateAutoDeprecation() {
