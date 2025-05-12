@@ -567,6 +567,7 @@ const handleDryRun = async (templateId: string, target: 'ally' | 'enemy' | 'all'
             result.length > 0
               ? h(
                   'div',
+                  { style: { userSelect: 'text' } },
                   result.map((line) => h('div', line))
                 )
               : h(

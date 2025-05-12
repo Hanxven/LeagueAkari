@@ -645,6 +645,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
    */
   private _getAkariContext() {
     return {
+      MAX_VERSION_SUPPORTED: 10,
       require,
       process,
       akariManager: this._shared.manager,
@@ -736,9 +737,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
     const { all, ally, enemy } = this._getShortcutTargetId(item.id)
 
     this._kbd.unregisterByTargetId(all)
-
     this._kbd.unregisterByTargetId(ally)
-
     this._kbd.unregisterByTargetId(enemy)
   }
 }
