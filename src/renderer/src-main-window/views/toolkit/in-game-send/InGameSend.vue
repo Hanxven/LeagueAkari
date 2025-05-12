@@ -16,7 +16,6 @@
             :label-description="t('InGameSend.settings.cancelShortcut.description')"
           >
             <ShortcutSelector
-              :disabled="!as.isAdministrator"
               :target-id="InGameSendRenderer.SHORTCUT_ID_SEND_ALLY"
               :shortcut-id="igs.settings.cancelShortcut"
               @update:shortcut-id="(id) => ig.setCancelShortcut(id)"

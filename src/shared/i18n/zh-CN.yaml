@@ -866,6 +866,7 @@ ShortcutSelector:
   beingOccupied: 此快捷键被占用
   unchanged: (未变化)
   tooComplicated: 该快捷键组合具有较高复杂度，请确认
+  notRunAsAdministrator: 当前未以管理员权限运行，无法使用快捷键功能
   ok: 确认
   cancel: 取消
   select: 选择

@@ -123,7 +123,6 @@
         :label-description="t('MultiWindowSettings.opggWindow.showShortcut.description')"
       >
         <ShortcutSelector
-          :disabled="!as.isAdministrator"
           :target-id="AkariOpggWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
           :shortcut-id="ows.settings.showShortcut"
           @update:shortcut-id="(id) => wm.opggWindow.setShowShortcut(id)"
@@ -189,7 +188,6 @@
         :label-description="t('MultiWindowSettings.ongoingGameWindow.showShortcut.description')"
       >
         <ShortcutSelector
-          :disabled="!as.isAdministrator"
           :target-id="AkariOngoingGameWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
           :shortcut-id="ogws.settings.showShortcut"
           @update:shortcut-id="(id) => wm.ongoingGameWindow.setShowShortcut(id)"
@@ -245,7 +243,6 @@
         :label-description="t('MultiWindowSettings.cdTimerWindow.showShortcut.description')"
       >
         <ShortcutSelector
-          :disabled="!as.isAdministrator"
           :target-id="AkariCdTimerWindow.SHOW_WINDOW_SHORTCUT_TARGET_ID"
           :shortcut-id="ctws.settings.showShortcut"
           @update:shortcut-id="(id) => wm.cdTimerWindow.setShowShortcut(id)"

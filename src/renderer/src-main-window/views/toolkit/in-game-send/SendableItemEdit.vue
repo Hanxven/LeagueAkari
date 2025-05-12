@@ -176,7 +176,6 @@
               v-if="currentItem.content.type === 'plaintext'"
             >
               <ShortcutSelector
-                :disabled="!as.isAdministrator"
                 :shortcut-id="currentItem.sendAllShortcut"
                 :target-id="igs.getSendableItemShortcutTargetId(currentItem.id).all"
                 @update:shortcut-id="
@@ -191,7 +190,6 @@
               v-if="currentItem.content.type === 'template'"
             >
               <ShortcutSelector
-                :disabled="!as.isAdministrator"
                 :shortcut-id="currentItem.sendAllShortcut"
                 :target-id="igs.getSendableItemShortcutTargetId(currentItem.id).all"
                 @update:shortcut-id="
@@ -206,7 +204,6 @@
               v-if="currentItem.content.type === 'template'"
             >
               <ShortcutSelector
-                :disabled="!as.isAdministrator"
                 :shortcut-id="currentItem.sendAllyShortcut"
                 :target-id="igs.getSendableItemShortcutTargetId(currentItem.id).ally"
                 @update:shortcut-id="
@@ -221,7 +218,6 @@
               v-if="currentItem.content.type === 'template'"
             >
               <ShortcutSelector
-                :disabled="!as.isAdministrator"
                 :shortcut-id="currentItem.sendEnemyShortcut"
                 :target-id="igs.getSendableItemShortcutTargetId(currentItem.id).enemy"
                 @update:shortcut-id="
@@ -323,7 +319,6 @@
 import { oneDark } from '@codemirror/theme-one-dark'
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import { useInstance } from '@renderer-shared/shards'
-import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { InGameSendRenderer } from '@renderer-shared/shards/in-game-send'
 import { useInGameSendStore } from '@renderer-shared/shards/in-game-send/store'
 import {
@@ -363,8 +358,6 @@ import { DROPDOWN_OVERRIDES } from './style-overrides'
 
 // 还是直接复制一份组件好用
 const { t } = useTranslation()
-
-const as = useAppCommonStore()
 
 const igs2 = useInGameSendStore()
 const igs = useInstance(InGameSendRenderer)

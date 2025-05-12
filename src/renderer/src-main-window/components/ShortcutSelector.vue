@@ -49,9 +49,14 @@
         {{ t('ShortcutSelector.tooComplicated') }}
       </div>
     </NModal>
-    <NButton size="tiny" :disabled type="primary" @click="show = true">{{
-      t('ShortcutSelector.select')
-    }}</NButton>
+    <NPopover :disabled="as.isAdministrator">
+      <template #trigger>
+        <NButton size="tiny" :disabled="!as.isAdministrator" type="primary" @click="show = true">
+          {{ t('ShortcutSelector.select') }}
+        </NButton>
+      </template>
+      {{ t('ShortcutSelector.notRunAsAdministrator') }}
+    </NPopover>
     <div class="keys-preview">
       <template v-for="(key, index) of keys" :key="key">
         <div class="key">
@@ -66,17 +71,19 @@
 
 <script setup lang="ts">
 import { useInstance } from '@renderer-shared/shards'
+import { useAppCommonStore } from '@renderer-shared/shards/app-common/store'
 import { KeyboardShortcutsRenderer } from '@renderer-shared/shards/keyboard-shortcut'
 import { useTranslation } from 'i18next-vue'
-import { NButton, NModal } from 'naive-ui'
+import { NButton, NModal, NPopover } from 'naive-ui'
 import { computed, onDeactivated, onUnmounted, ref, shallowRef, watch } from 'vue'
 
 defineProps<{
-  disabled?: boolean
   targetId?: string
 }>()
 
 const { t } = useTranslation()
+
+const as = useAppCommonStore()
 
 const kbd = useInstance(KeyboardShortcutsRenderer)
 

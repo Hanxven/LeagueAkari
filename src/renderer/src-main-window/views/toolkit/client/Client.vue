@@ -75,7 +75,6 @@
               :target-id="GameClientRenderer.SHORTCUT_ID_TERMINATE_GAME_CLIENT"
               :shortcut-id="gcs.settings.terminateShortcut"
               @update:shortcut-id="(v) => gc.setTerminateShortcut(v)"
-              :disabled="!as.isAdministrator"
             />
           </ControlItem>
           <ControlItem
@@ -215,16 +214,7 @@ import { useGameClientStore } from '@renderer-shared/shards/game-client/store'
 import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
 import { useTranslation } from 'i18next-vue'
-import {
-  NButton,
-  NCard,
-  NFlex,
-  NInputNumber,
-  NScrollbar,
-  NSwitch,
-  useDialog,
-  useMessage
-} from 'naive-ui'
+import { NButton, NCard, NInputNumber, NScrollbar, NSwitch, useDialog, useMessage } from 'naive-ui'
 import { reactive, ref, toRaw, useTemplateRef, watch } from 'vue'
 
 import ShortcutSelector from '@main-window/components/ShortcutSelector.vue'

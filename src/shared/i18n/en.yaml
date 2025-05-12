@@ -860,6 +860,7 @@ ShortcutSelector:
   clear: Clear
   unset: Unset
   tooComplicated: This shortcut combination is highly complex, please confirm
+  notRunAsAdministrator: Not running as administrator, cannot use shortcut key
   reservedShortcut: This shortcut combination is reserved
   beingOccupied: This shortcut combination is already in use
   unchanged: (Unchanged)
