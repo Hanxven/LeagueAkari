@@ -117,7 +117,13 @@
               </NPopover>
               <NPopover>
                 <template #trigger>
-                  <NButton size="small" secondary @click="handleSave" :disabled="!changed">
+                  <NButton
+                    type="primary"
+                    size="small"
+                    secondary
+                    @click="handleSave"
+                    :disabled="!changed"
+                  >
                     <template #icon>
                       <NIcon>
                         <SaveIcon />

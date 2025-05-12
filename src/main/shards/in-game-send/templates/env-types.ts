@@ -102,6 +102,21 @@ export interface TemplateEnv {
   summoner: OngoingGameState['summoner']
 
   /**
+   * 一个 map，key 为 puuid。记录了每名玩家的排位信息
+   */
+  rankedStats: OngoingGameState['rankedStats']
+
+  /**
+   * 一个 map，key 为 puuid。记录了每名玩家数据库保存的召唤师信息
+   */
+  savedInfo: OngoingGameState['savedInfo']
+
+  /**
+   * 一个 map，key 为 puuid。记录了每名玩家的位置分配信息
+   */
+  positionAssignments: OngoingGameState['positionAssignments']
+
+  /**
    * 当前位于的查询阶段。包含一些游戏的基础信息
    */
   queryStage: OngoingGameState['queryStage']

@@ -27,6 +27,7 @@ import {
 } from './js-template'
 import { InGameSendSettings, InGameSendState, SendableItem, TemplateDef } from './state'
 import defaultTemplate from './templates/default-template.js?asset'
+import { TemplateEnv } from './templates/env-types'
 
 /**
  * 用于在游戏中模拟发送的相关功能
@@ -569,7 +570,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
     }
   }
 
-  private _createTemplateEnv(options: { target: 'ally' | 'enemy' | 'all' }) {
+  private _createTemplateEnv(options: { target: 'ally' | 'enemy' | 'all' }): TemplateEnv {
     const selfPuuid = this._lc.data.summoner.me?.puuid
     const teams = this._og.state.teams || {}
     const teamEntries = Object.entries(teams)
@@ -606,10 +607,10 @@ export class InGameSendMain implements IAkariShardInitDispose {
         this._lc.state.auth?.region || 'UNKNOWN',
         this._lc.state.auth?.rsoPlatformId
       ),
-      region: this._lc.state.auth?.region,
-      rsoPlatformId: this._lc.state.auth?.rsoPlatformId,
-      selfPuuid: this._lc.data.summoner.me?.puuid,
-      selfTeamId,
+      region: this._lc.state.auth?.region || 'UNKNOWN',
+      rsoPlatformId: this._lc.state.auth?.rsoPlatformId || 'UNKNOWN',
+      selfPuuid: this._lc.data.summoner.me?.puuid || 'UNKNOWN',
+      selfTeamId: selfTeamId || 'UNKNOWN',
       allyMembers,
       enemyMembers,
       allMembers,
@@ -632,7 +633,7 @@ export class InGameSendMain implements IAkariShardInitDispose {
       championSelections: this._og.state.championSelections,
       positionAssignments: this._og.state.positionAssignments,
       playerStats: this._og.state.playerStats,
-      gameTimeline: this._og.state.additionalGame,
+      gameTimeline: this._og.state.gameTimeline,
       inferredPremadeTeams: this._og.state.inferredPremadeTeams,
       teamParticipantGroups: this._og.state.teamParticipantGroups,
       additionalGame: this._og.state.additionalGame
