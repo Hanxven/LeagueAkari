@@ -1680,7 +1680,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^22.7.7":
+"@types/node@npm:*":
   version: 22.15.3
   resolution: "@types/node@npm:22.15.3"
   dependencies:
@@ -1689,7 +1689,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.15.17":
+"@types/node@npm:^22.15.17, @types/node@npm:^22.7.7":
   version: 22.15.17
   resolution: "@types/node@npm:22.15.17"
   dependencies:

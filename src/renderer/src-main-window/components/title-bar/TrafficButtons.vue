@@ -40,6 +40,8 @@
         </NFlex>
       </NFlex>
     </NModal>
+    <!-- 目前仍存在的绝赞 bug，最小化的时候无法清除 hover 状态 -->
+    <!-- 其他 electron 应用中多少也发现了类似的情况 -->
     <div
       :title="t('TrafficButtons.minimize')"
       class="traffic-button minimize"
@@ -52,10 +54,9 @@
       class="traffic-button maximize"
       @click="handleMaximize"
     >
-      <NIcon
-        ><Maximize20RegularIcon v-if="mws.status === 'normal'" /><WindowMultiple16FilledIcon
-          v-else
-        />
+      <NIcon>
+        <Maximize24FilledIcon v-if="mws.status === 'normal'" />
+        <WindowMultiple16FilledIcon v-else />
       </NIcon>
     </div>
     <div :title="t('TrafficButtons.close')" class="traffic-button close" @click="handleClose">
@@ -72,10 +73,8 @@ import {
   useMainWindowStore
 } from '@renderer-shared/shards/window-manager/store'
 import { WindowMultiple16Filled as WindowMultiple16FilledIcon } from '@vicons/fluent'
-import {
-  DividerShort20Regular as DividerShort20RegularIcon,
-  Maximize20Regular as Maximize20RegularIcon
-} from '@vicons/fluent'
+import { DividerShort20Regular as DividerShort20RegularIcon } from '@vicons/fluent'
+import { Maximize24Filled as Maximize24FilledIcon } from '@vicons/fluent'
 import { CloseOutlined as CloseOutlinedIcon } from '@vicons/material'
 import { useTranslation } from 'i18next-vue'
 import { NButton, NCheckbox, NFlex, NIcon, NModal, NRadio, NRadioGroup } from 'naive-ui'
@@ -138,6 +137,7 @@ watch(
   height: 100%;
   display: flex;
   z-index: 10000000;
+  -webkit-app-region: no-drag;
 
   &.blurred {
     filter: brightness(0.8);
@@ -151,7 +151,11 @@ watch(
     width: 48px;
     font-size: 14px;
     transition: all 0.3s;
-    -webkit-app-region: no-drag;
+
+    // special case for close button
+    &.close {
+      font-size: 16px;
+    }
 
     &:active {
       filter: brightness(0.85);
@@ -163,21 +167,21 @@ watch(
   .traffic-buttons {
     .traffic-button.minimize {
       &:hover {
-        background-color: rgba(255, 255, 255, 0.162);
+        background-color: #fff3;
         color: #fff;
       }
     }
 
     .traffic-button.maximize {
       &:hover {
-        background-color: rgba(255, 255, 255, 0.162);
+        background-color: #fff3;
         color: #fff;
       }
     }
 
     .traffic-button.close {
       &:hover {
-        background-color: rgb(194, 0, 0);
+        background-color: #e81123;
         color: #fff;
       }
     }
