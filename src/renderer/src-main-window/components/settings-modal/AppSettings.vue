@@ -48,7 +48,7 @@
         />
       </ControlItem>
       <ControlItem
-        v-if="false && as.settings.isInKyokoMode"
+        v-if="isDev && as.settings.isInKyokoMode"
         class="control-item-margin"
         :label="t('AppSettings.basic.backgroundMaterial.label')"
         :label-description="t('AppSettings.basic.backgroundMaterial.description')"
@@ -427,6 +427,8 @@ import { useMicaAvailability } from '@main-window/compositions/useMicaAvailabili
 import { useMainWindowUiStore } from '@main-window/shards/main-window-ui/store'
 
 const { t } = useTranslation()
+
+const isDev = import.meta.env.DEV
 
 const lcus = useLeagueClientUxStore()
 const lcs = useLeagueClientStore()

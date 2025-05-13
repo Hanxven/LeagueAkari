@@ -161,7 +161,7 @@ export function bootstrap() {
   AkariProtocolMain.register()
 
   logger.info({
-    message: `League Akari ${app.getVersion()}`,
+    message: `League Akari ${app.getVersion()}, ${os.platform()} ${os.release()}`,
     namespace: 'app'
   })
 

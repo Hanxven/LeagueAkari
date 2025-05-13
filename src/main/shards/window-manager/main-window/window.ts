@@ -63,11 +63,6 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         frame: false,
         fullscreenable: false,
         maximizable: true,
-        titleBarOverlay: {
-          height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
-          color: '#00000000',
-          symbolColor: '#ffffff'
-        },
         titleBarStyle: 'hidden'
       }
     })
@@ -93,30 +88,6 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
         }
       },
       { fireImmediately: true, equals: comparer.shallow }
-    )
-
-    this._mobx.reaction(
-      () => [this._app.state.shouldUseDarkColors, this.state.focus, this.state.ready],
-      ([should, focus, ready]) => {
-        if (!ready) {
-          return
-        }
-
-        if (should) {
-          if (focus === 'blurred') {
-            this._window?.setTitleBarOverlay(AkariMainWindow.TITLE_BAR_OVERLAY_PRESET.darkBlur)
-          } else {
-            this._window?.setTitleBarOverlay(AkariMainWindow.TITLE_BAR_OVERLAY_PRESET.dark)
-          }
-        } else {
-          if (focus === 'blurred') {
-            this._window?.setTitleBarOverlay(AkariMainWindow.TITLE_BAR_OVERLAY_PRESET.lightBlur)
-          } else {
-            this._window?.setTitleBarOverlay(AkariMainWindow.TITLE_BAR_OVERLAY_PRESET.light)
-          }
-        }
-      },
-      { fireImmediately: true }
     )
 
     this._mobx.reaction(
