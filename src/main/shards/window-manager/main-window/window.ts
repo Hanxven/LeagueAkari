@@ -14,30 +14,6 @@ export class AkariMainWindow extends BaseAkariWindow<MainWindowState, MainWindow
   static readonly BASE_HEIGHT = 860
   static readonly MIN_WIDTH = 840
   static readonly MIN_HEIGHT = 600
-  static readonly PRESET_TITLE_BAR_HEIGHT = 36 // 应该和渲染进程中定义的高度一致
-
-  static readonly TITLE_BAR_OVERLAY_PRESET = {
-    dark: {
-      height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
-      color: '#00000000',
-      symbolColor: '#ffffff'
-    },
-    light: {
-      height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
-      color: '#00000000',
-      symbolColor: '#000000'
-    },
-    darkBlur: {
-      height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
-      color: '#00000000',
-      symbolColor: '#c2c2c2'
-    },
-    lightBlur: {
-      height: AkariMainWindow.PRESET_TITLE_BAR_HEIGHT,
-      color: '#00000000',
-      symbolColor: '#6b6b6b'
-    }
-  } as const
 
   private _nextCloseAction: string | null = null
 

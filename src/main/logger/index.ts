@@ -80,40 +80,48 @@ export function initAppLogger(level: string = 'info') {
 
   const filename = `LA_${dayjs().format('YYYYMMDD_HHmmssSSS')}.log`
 
-  const logger = createLogger({
-    transports: [
-      new transports.File({
-        filename,
-        dirname: logsDir,
-        level,
-        maxsize: 1024 * 1024 * 128, // 128MB
-        format: format.combine(
-          format.timestamp(),
-          format.printf(({ level, message, namespace, timestamp }) => {
-            return `[${dayjs(timestamp as number).format('YYYY-MM-DD HH:mm:ss:SSS')}] [${namespace}] [${level}] ${message}`
-          })
-        )
-      }),
-      new transports.Console({
-        level: import.meta.env.DEV ? 'debug' : 'warn',
-        format: format.combine(
-          format.timestamp(),
-          format.printf(({ level, message, namespace, timestamp }) => {
-            const timestampColored = `${STYLES.white}[${dayjs(timestamp as any).format('YYYY-MM-DD HH:mm:ss:SSS')}]${STYLES.reset}`
-            const namespaceColored = `${STYLES.brightBlue}${STYLES.bold}[${namespace}]${STYLES.reset}`
-            const levelColor = LEVEL_COLORS[level] || STYLES.reset
-            const levelColored = `${levelColor}[${level}]${STYLES.reset}`
-
-            return `${timestampColored} ${namespaceColored} ${levelColored} ${message}`
-          })
-        )
+  const fileTransport = new transports.File({
+    filename,
+    dirname: logsDir,
+    level,
+    maxsize: 1024 * 1024 * 128, // 128MB
+    format: format.combine(
+      format.timestamp(),
+      format.printf(({ level, message, namespace, timestamp }) => {
+        return `[${dayjs(timestamp as number).format('YYYY-MM-DD HH:mm:ss:SSS')}] [${namespace}] [${level}] ${message}`
       })
-    ]
+    )
+  })
+
+  const consoleTransport = new transports.Console({
+    level: import.meta.env.DEV ? 'debug' : level,
+    format: format.combine(
+      format.timestamp(),
+      format.printf(({ level, message, namespace, timestamp }) => {
+        const timestampColored = `${STYLES.white}[${dayjs(timestamp as any).format('YYYY-MM-DD HH:mm:ss:SSS')}]${STYLES.reset}`
+        const namespaceColored = `${STYLES.brightBlue}${STYLES.bold}[${namespace}]${STYLES.reset}`
+        const levelColor = LEVEL_COLORS[level] || STYLES.reset
+        const levelColored = `${levelColor}[${level}]${STYLES.reset}`
+
+        return `${timestampColored} ${namespaceColored} ${levelColored} ${message}`
+      })
+    )
+  })
+
+  const setLevel = (level: string) => {
+    fileTransport.level = level
+    consoleTransport.level = import.meta.env.DEV ? 'debug' : level
+  }
+
+  const logger = createLogger({
+    transports: [fileTransport, consoleTransport]
   })
 
   return {
     logger,
     logsDir,
-    filename
+    filename,
+    setLevel,
+    getLevel: () => fileTransport.level || level
   }
 }

@@ -5,6 +5,8 @@ import path from 'node:path'
 import { Logger } from 'winston'
 
 import { AkariIpcMain } from '../ipc'
+import { MobxUtilsMain } from '../mobx-utils'
+import { LoggerFactoryState } from './state'
 
 export class AkariLogger {
   constructor(
@@ -36,6 +38,8 @@ export class AkariLogger {
 export class LoggerFactoryMain implements IAkariShardInitDispose {
   static id = 'logger-factory-main'
 
+  public readonly state = new LoggerFactoryState()
+
   // 从全局注入的 logger 实例
   private readonly _logger: Logger
   private readonly _logsDir: string
@@ -43,11 +47,18 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
 
   constructor(
     private readonly _shared: SharedGlobalShard,
-    private readonly _ipc: AkariIpcMain
+    private readonly _ipc: AkariIpcMain,
+    private readonly _mobx: MobxUtilsMain
   ) {
     this._appDir = path.join(app.getPath('exe'), '..')
     this._logsDir = path.join(this._appDir, 'logs')
     this._logger = this._shared.global.logger
+
+    this.state.setLogLevel(this._shared.global.getLogLevel())
+
+    this._shared.global.events.on('log-level-changed', (level) => {
+      this.state.setLogLevel(level)
+    })
   }
 
   private _objectsToString(...args: any[]) {
@@ -137,6 +148,8 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
   }
 
   async onInit() {
+    this._mobx.propSync(LoggerFactoryMain.id, 'state', this.state, 'logLevel')
+
     this._ipc.onCall(
       LoggerFactoryMain.id,
       'log',
@@ -159,6 +172,11 @@ export class LoggerFactoryMain implements IAkariShardInitDispose {
         }
       }
     )
+
+    this._ipc.onCall(LoggerFactoryMain.id, 'setLogLevel', (_, level: string) => {
+      this.info(LoggerFactoryMain.id, `Setting log level to ${level}`)
+      this._shared.global.setLogLevel(level)
+    })
 
     this._ipc.onCall(LoggerFactoryMain.id, 'openLogsDir', () => {
       this.openLogsDir()

@@ -3,6 +3,8 @@ import { formatError } from '@shared/utils/errors'
 import dayjs from 'dayjs'
 
 import { AkariIpcRenderer } from '../ipc'
+import { PiniaMobxUtilsRenderer } from '../pinia-mobx-utils'
+import { useLoggerStore } from './store'
 
 export const MAIN_SHARD_NAMESPACE = 'logger-factory-main'
 
@@ -10,7 +12,10 @@ export const MAIN_SHARD_NAMESPACE = 'logger-factory-main'
 export class LoggerRenderer {
   static id = 'logger-renderer'
 
-  constructor(@Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer) {}
+  constructor(
+    @Dep(AkariIpcRenderer) private readonly _ipc: AkariIpcRenderer,
+    @Dep(PiniaMobxUtilsRenderer) private readonly _pm: PiniaMobxUtilsRenderer
+  ) {}
 
   // same as main shard
   private _objectsToString(...args: any[]) {
@@ -189,5 +194,15 @@ export class LoggerRenderer {
 
   openLogsDir() {
     return this._ipc.call(MAIN_SHARD_NAMESPACE, 'openLogsDir')
+  }
+
+  setLogLevel(level: string) {
+    this._ipc.call(MAIN_SHARD_NAMESPACE, 'setLogLevel', level)
+  }
+
+  async onInit() {
+    const store = useLoggerStore()
+
+    await this._pm.sync(MAIN_SHARD_NAMESPACE, 'state', store)
   }
 }

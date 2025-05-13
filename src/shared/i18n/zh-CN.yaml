@@ -71,6 +71,10 @@ AppSettings:
         none: 默认
         mica: Mica
 
+    logLevel:
+      label: 日志级别
+      description: 设置应用的日志级别
+
   selfUpdate:
     title: 应用更新
     tip:

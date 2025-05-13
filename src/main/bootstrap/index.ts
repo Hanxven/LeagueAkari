@@ -46,6 +46,7 @@ import { BaseConfig, readBaseConfig, writeBaseConfig } from './base-config'
 
 interface AkariAppEventMap {
   'second-instance': [commandLine: string[], workingDirectory: string]
+  'log-level-changed': [level: string]
 }
 
 declare module '@shared/akari-shard' {
@@ -95,6 +96,18 @@ declare module '@shared/akari-shard' {
      * @returns
      */
     restart: () => void
+
+    /**
+     * 获取日志级别, 文件 transport 层面的
+     * @returns 日志级别
+     */
+    getLogLevel: () => string
+
+    /**
+     * 设置日志级别, 会触发 'log-level-changed' 事件
+     * @param level 日志级别
+     */
+    setLogLevel: (level: string) => void
   }
 }
 
@@ -144,7 +157,7 @@ export function bootstrap() {
 
   // 创建全局唯一的日志器
   const logLevel = baseConfig && baseConfig.logLevel ? baseConfig.logLevel : 'info'
-  const { logger, filename: logFilename } = initAppLogger(logLevel)
+  const { logger, filename: logFilename, setLevel, getLevel } = initAppLogger(logLevel)
 
   // 应用级别的事件总线
   const events = new EventEmitter<AkariAppEventMap>()
@@ -161,7 +174,17 @@ export function bootstrap() {
   AkariProtocolMain.register()
 
   logger.info({
-    message: `League Akari ${app.getVersion()}, ${os.platform()} ${os.release()}`,
+    message: `League Akari ${app.getVersion()}`,
+    namespace: 'app'
+  })
+
+  logger.info({
+    message: `Platform: ${os.platform()}, Release: ${os.release()}`,
+    namespace: 'app'
+  })
+
+  logger.info({
+    message: `Log Level: ${logLevel}`,
     namespace: 'app'
   })
 
@@ -193,6 +216,12 @@ export function bootstrap() {
     manager.global.restart = () => {
       app.relaunch()
       app.quit()
+    }
+    manager.global.getLogLevel = getLevel
+    manager.global.setLogLevel = (level: string) => {
+      setLevel(level)
+      writeBaseConfig({ logLevel: level })
+      events.emit('log-level-changed', level)
     }
 
     if (isAdministrator) {

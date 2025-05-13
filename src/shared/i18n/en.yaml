@@ -69,6 +69,10 @@ AppSettings:
         none: Default
         mica: Mica
 
+    logLevel:
+      label: Log Level
+      description: Set the log level of the application
+
   selfUpdate:
     title: Application Update
     tip:

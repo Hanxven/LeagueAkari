@@ -33,6 +33,21 @@
         />
       </ControlItem>
       <ControlItem
+        v-if="isDev && as.settings.isInKyokoMode"
+        class="control-item-margin"
+        :label="t('AppSettings.basic.logLevel.label')"
+        :label-description="t('AppSettings.basic.logLevel.description')"
+        :label-width="400"
+      >
+        <NSelect
+          style="width: 160px"
+          size="small"
+          :value="ls.logLevel"
+          @update:value="(val) => lg.setLogLevel(val)"
+          :options="logLevels"
+        />
+      </ControlItem>
+      <ControlItem
         v-if="as.settings.isInKyokoMode"
         class="control-item-margin"
         label="Theme Color (experimental)"
@@ -394,6 +409,8 @@ import { LeagueClientRenderer } from '@renderer-shared/shards/league-client'
 import { LeagueClientUxRenderer } from '@renderer-shared/shards/league-client-ux'
 import { useLeagueClientUxStore } from '@renderer-shared/shards/league-client-ux/store'
 import { useLeagueClientStore } from '@renderer-shared/shards/league-client/store'
+import { LoggerRenderer } from '@renderer-shared/shards/logger'
+import { useLoggerStore } from '@renderer-shared/shards/logger/store'
 import { SelfUpdateRenderer } from '@renderer-shared/shards/self-update'
 import { useSelfUpdateStore } from '@renderer-shared/shards/self-update/store'
 import { WindowManagerRenderer } from '@renderer-shared/shards/window-manager'
@@ -437,12 +454,14 @@ const wms = useWindowManagerStore()
 const as = useAppCommonStore()
 const muis = useMainWindowUiStore()
 const mws = useMainWindowStore()
+const ls = useLoggerStore()
 
 const su = useInstance(SelfUpdateRenderer)
 const wm = useInstance(WindowManagerRenderer)
 const app = useInstance(AppCommonRenderer)
 const lcu = useInstance(LeagueClientUxRenderer)
 const lc = useInstance(LeagueClientRenderer)
+const lg = useInstance(LoggerRenderer)
 
 const preferMica = useMicaAvailability()
 
@@ -471,6 +490,13 @@ const themes = [
   { label: '跟随系统', value: 'default' },
   { label: '亮色', value: 'light' },
   { label: '暗色', value: 'dark' }
+]
+
+const logLevels = [
+  { label: 'Info', value: 'info' },
+  { label: 'Warn', value: 'warn' },
+  { label: 'Error', value: 'error' },
+  { label: 'Debug', value: 'debug' }
 ]
 
 const backgroundMaterials = computed(() => {
