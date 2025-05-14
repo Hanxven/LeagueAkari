@@ -41,9 +41,6 @@
     "writability",
     "Yuriyuri"
   ],
-  "files.associations": {
-    "*.ejs": "html"
-  },
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
@@ -58,6 +55,5 @@
   },
   "[properties]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
-  },
-  "compile-hero.disable-compile-files-on-did-save-code": true
+  }
 }
