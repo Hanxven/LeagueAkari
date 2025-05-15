@@ -100,7 +100,7 @@ const overallProgress = computed(() => {
     }
   }
 
-  return total / bts.tasks.length
+  return Math.min(total / bts.tasks.length, 0.9)
 })
 
 const { openAnnouncementModal } = inject('app') as any

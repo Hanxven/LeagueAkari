@@ -190,22 +190,26 @@ export interface ChampionSimple {
   roles: string[]
 }
 
+// for reference
 export type GameMode =
-  | 'NEXUSBLITZ'
-  | 'URF'
-  | 'PRACTICETOOL'
-  | 'SNOWURF'
-  | 'TUTORIAL'
-  | 'CLASSIC'
-  | 'ARAM'
-  | 'DOOMBOTSTEEMO'
-  | 'ULTBOOK'
-  | 'ONEFORALL'
-  | 'ARSR'
-  | 'ASSASSINATE'
-  | 'FIRSTBLOOD'
-  | 'PROJECT'
-  | 'STARGUARDIAN'
+  | 'NEXUSBLITZ' // 极限闪击
+  | 'URF' // 无限火力 / 无限乱斗
+  | 'PRACTICETOOL' // 训练模式
+  | 'SNOWURF' // 冰雪无限火力
+  | 'TUTORIAL' // 新手教程
+  | 'CLASSIC' // 经典
+  | 'ARAM' // 极地大乱斗
+  | 'DOOMBOTSTEEMO' // 末日人机 - 提莫
+  | 'ULTBOOK' // 终极魔典
+  | 'ONEFORALL' // 克隆大作战
+  | 'ARSR' // ?
+  | 'ASSASSINATE' // 血月杀
+  | 'FIRSTBLOOD' // 超载
+  | 'PROJECT' // ?
+  | 'STARGUARDIAN' // 星之守护者
+  | 'BRAWL' // 神木之门
+  | 'CHERRY' // 斗魂竞技场 (Arena)
+  | 'STRAWBERRY' // 无尽狂潮 (Swarm)
 
 export interface GameMap {
   id: number

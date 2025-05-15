@@ -584,6 +584,7 @@ import LeagueAkariSpan from '@renderer-shared/components/LeagueAkariSpan.vue'
 import RankedTable from '@renderer-shared/components/RankedTable.vue'
 import StreamerModeMaskedText from '@renderer-shared/components/StreamerModeMaskedText.vue'
 import MatchHistoryCard from '@renderer-shared/components/match-history-card/MatchHistoryCard.vue'
+import { useSgpTagOptions } from '@renderer-shared/compositions/useSgpTagOptions'
 import { useStreamerModeMaskedText } from '@renderer-shared/compositions/useStreamerModeMaskedText'
 import { useInstance } from '@renderer-shared/shards'
 import { AppCommonRenderer } from '@renderer-shared/shards/app-common'
@@ -604,11 +605,7 @@ import {
 } from '@shared/utils/analysis'
 import { summonerName } from '@shared/utils/name'
 import { Delete as DeleteIcon } from '@vicons/carbon'
-import {
-  Edit20Filled as EditIcon,
-  Star24Filled as Star24FilledIcon,
-  Star24Regular as Star24RegularIcon
-} from '@vicons/fluent'
+import { Edit20Filled as EditIcon } from '@vicons/fluent'
 import { RefreshSharp as RefreshIcon } from '@vicons/ionicons5'
 import {
   MoreHorizFilled as MoreHorizFilledIcon,
@@ -1110,50 +1107,7 @@ watch(
   }
 )
 
-const sgpTagOptions = computed(() => {
-  return [
-    {
-      label: t('common.sgpMatchHistoryTags.all'),
-      value: 'all'
-    },
-    {
-      label: lcs.gameData.queues[420]?.name || t('common.sgpMatchHistoryTags.q_420', 'q_420'),
-      value: `q_420`
-    },
-    {
-      label: lcs.gameData.queues[430]?.name || t('common.sgpMatchHistoryTags.q_430', 'q_430'),
-      value: `q_430`
-    },
-    {
-      label: lcs.gameData.queues[440]?.name || t('common.sgpMatchHistoryTags.q_440', 'q_440'),
-      value: `q_440`
-    },
-    {
-      label: lcs.gameData.queues[450]?.name || t('common.sgpMatchHistoryTags.q_450', 'q_450'),
-      value: `q_450`
-    },
-    {
-      label: lcs.gameData.queues[480]?.name || t('common.sgpMatchHistoryTags.q_480', 'q_480'),
-      value: `q_480`
-    },
-    {
-      label: lcs.gameData.queues[1700]?.name || t('common.sgpMatchHistoryTags.q_1700', 'q_1700'),
-      value: 'q_1700'
-    },
-    {
-      label: lcs.gameData.queues[490]?.name || t('common.sgpMatchHistoryTags.q_490', 'q_490'),
-      value: `q_490`
-    },
-    {
-      label: lcs.gameData.queues[1900]?.name || t('common.sgpMatchHistoryTags.q_1900', 'q_1900'),
-      value: `q_1900`
-    },
-    {
-      label: lcs.gameData.queues[900]?.name || t('common.sgpMatchHistoryTags.q_900', 'q_900'),
-      value: `q_900`
-    }
-  ]
-})
+const sgpTagOptions = useSgpTagOptions()
 
 const handleChangeSgpTag = async (tag: string) => {
   await loadMatchHistory(tab.matchHistoryPage?.page, tab.matchHistoryPage?.pageSize, tag)

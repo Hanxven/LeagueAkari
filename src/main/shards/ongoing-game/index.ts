@@ -55,7 +55,8 @@ export class OngoingGameMain implements IAkariShardInitDispose {
     `q_900`, // URF
     `q_1400`, // ULTBOOK
     `q_1700`,
-    `q_1900`
+    `q_1900`,
+    'q_2300' // BRAWL
   ])
 
   private readonly _log: AkariLogger
