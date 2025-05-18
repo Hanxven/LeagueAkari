@@ -18,6 +18,16 @@
       <NButton
         secondary
         class="square-button"
+        :title="t('MatchHistoryTab.prevPage')"
+        @click="goToPreviousChampion"
+      >
+        <template #icon>
+          <NIcon><ArrowBackIcon /></NIcon>
+        </template>
+      </NButton>
+      <NButton
+        secondary
+        class="square-button"
         :title="t('Opgg.settings.button')"
         @click="isSettingsLayerShow = true"
       >
@@ -211,6 +221,7 @@
 <script lang="ts" setup>
 import { useOpggStore } from '@opgg-window/shards/opgg/store'
 import OpggIcon from '@renderer-shared/assets/icon/OpggIcon.vue'
+import { ArrowBack as ArrowBackIcon } from '@vicons/ionicons5';
 import ControlItem from '@renderer-shared/components/ControlItem.vue'
 import ChampionIcon from '@renderer-shared/components/widgets/ChampionIcon.vue'
 import { useStableComputed } from '@renderer-shared/compositions/useStableComputed'
@@ -541,12 +552,28 @@ const handlePositionChange = async (p: PositionType) => {
   await loadChampionData(false)
 }
 
+const previousChampionId = ref<number | null>(null); // 保存上一个英雄 ID
+const currentChampionId = ref<number | null>(null); // 当前英雄 ID
+
+// 原有方法 handleToChampion
 const handleToChampion = async (id: number, shouldAutoApply: boolean) => {
-  currentTab.value = 'champion'
-  championId.value = id
-  champion.value = null
-  await loadChampionData(shouldAutoApply)
-}
+  if (currentChampionId.value !== null) {
+    previousChampionId.value = currentChampionId.value; // 保存当前 ID 为上一个 ID
+  }
+  currentChampionId.value = id; // 更新当前 ID
+
+  currentTab.value = 'champion';
+  championId.value = id;
+  champion.value = null;
+  await loadChampionData(shouldAutoApply);
+};
+
+// 返回上一个英雄的方法
+const goToPreviousChampion = async () => {
+  if (previousChampionId.value !== null) {
+    await handleToChampion(previousChampionId.value, false);
+  }
+};
 
 onMounted(() => {
   loadAll()
