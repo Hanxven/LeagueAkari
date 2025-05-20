@@ -205,7 +205,7 @@ export type GameMode =
   | 'ARSR' // ?
   | 'ASSASSINATE' // 血月杀
   | 'FIRSTBLOOD' // 超载
-  | 'PROJECT' // ?
+  | 'PROJECT' // LOL衍生2D格斗游戏《Project L》
   | 'STARGUARDIAN' // 星之守护者
   | 'BRAWL' // 神木之门
   | 'CHERRY' // 斗魂竞技场 (Arena)
